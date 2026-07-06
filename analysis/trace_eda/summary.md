@@ -190,3 +190,16 @@ almost entirely from the vision-borne component — the frequency-domain
 counterpart of the 72.5% volume share (§G) and the r≈0.89 images~ctx
 coupling (§E). Diurnal lines present in all three; text-only prefill hits
 its noise floor sooner (less forecastable structure).
+
+### Spectral-line significance check (bin-exact, SNR vs local median)
+
+Tested whether any sub-diurnal line (e.g. ~18 h) is real. Verdict: **no** —
+the 18.67 h bin (k=9 of the 168 h record) has SNR 2.6 in requests and is
+absent from the top lines of images/ctx; apparent sub-diurnal peaks are
+fluctuations on the steep 1/f background. Credible lines are the diurnal
+family only, with a notable shape detail: in the request signal the **12 h
+(SNR 5.6) and 8 h (SNR 4.7) harmonics exceed the 24 h fundamental (2.9)** —
+a multi-peaked daily profile rather than a single smooth cycle. ctx's
+strongest line is 24 h (SNR 6.5). Very-low-frequency "peaks" (84 h, 33.6 h,
+28 h = record/k for k=2,5,6) have 2–6 cycles of support and sit where LRD
+power concentrates — record-length artifacts, not periodicities.
