@@ -3,7 +3,7 @@
 Persists what every script so far recomputed on the fly:
   series/rates_1min.parquet : per-minute requests, images, ctx, gen
                               (+ per-class image counts) — zero-filled clock
-  series/rates_1s.parquet   : per-second requests, images, ctx, gen — zero-filled
+  series/rates_1s.parquet   : per-second, same 8 columns — zero-filled
   series/rates_{15s,30s,45s}.parquet : block-sums of the per-second series,
                               same 8 columns as 1min (incl. per-class images)
 Consumers: predictors/ (forecasting input), trace_to_two_pool.py (scenarios).
@@ -52,7 +52,7 @@ wcs = wcs.sort_index().to_pandas().unstack(fill_value=0).reindex(w1s.index, fill
 for c in ["single", "tiled_small", "tiled_large", "frames"]:
     w1s[f"images_{c}"] = wcs[c] if c in wcs.columns else 0
 w1s.index.name = "window_start"
-w1s[["requests", "images", "ctx", "gen"]].to_parquet(os.path.join(OUT, "rates_1s.parquet"))
+w1s.to_parquet(os.path.join(OUT, "rates_1s.parquet"))
 
 import numpy as np
 
@@ -65,4 +65,4 @@ for secs in (15, 30, 45):
     print(f"rates_{secs}s.parquet:  {wb.shape}")
 
 print(f"rates_1min.parquet: {w1m.shape} cols={list(w1m.columns)}")
-print(f"rates_1s.parquet:   {w1s[['requests','images','ctx','gen']].shape}")
+print(f"rates_1s.parquet:   {w1s.shape}")
