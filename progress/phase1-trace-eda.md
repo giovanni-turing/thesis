@@ -1,5 +1,9 @@
 # Phase 1 — Azure Trace EDA + Two-Pool Workload Converter
 
+> **EDA COMPLETE (2026-07-06)** — scripts+figures+stats in `analysis/trace_eda/`,
+> findings and converter decisions in `analysis/trace_eda/summary.md`.
+> Remaining in Phase 1: `trace_to_two_pool.py` implementing those decisions.
+
 Plan agreed 2026-07-06. Companion to [`thesis-roadmap.md`](thesis-roadmap.md) Phase 1.
 
 ## Input
