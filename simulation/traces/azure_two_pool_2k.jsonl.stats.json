@@ -1,0 +1,35 @@
+{
+ "requests": 2000,
+ "requests_with_images": 1263,
+ "text_only_fraction": 0.3685,
+ "total_images": 5758,
+ "image_px": 448,
+ "encoder_workers": 2,
+ "sim_horizon_s": 721.072,
+ "mean_images_per_s": 7.985,
+ "mean_requests_per_s": 2.774,
+ "encoder_service_ms": {
+  "p50": 7.822,
+  "p90": 49.797,
+  "p99": 244.255
+ },
+ "encoder_delay_ms": {
+  "p50": 7.822,
+  "p90": 49.797,
+  "p99": 181.51,
+  "max": 591.035
+ },
+ "requests_batch_extrapolated": 1,
+ "input_length": {
+  "p50": 1215,
+  "p90": 4356,
+  "p99": 11197,
+  "max": 115657
+ },
+ "context_minus_aic_vision_tokens": {
+  "p50": 1191,
+  "p90": 2606,
+  "p99": 5912
+ },
+ "distinct_image_counts_costed": 9
+}
