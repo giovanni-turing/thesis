@@ -2,7 +2,7 @@
 
 **EDA report — Phase 1 of the thesis pipeline.** All analyses GPU-computed
 (cuDF/cuML/CuPy 26.06, RTX 5090). Every number below is reproducible from a
-committed script; every figure and stats file is inventoried in §8.
+committed script; every figure and stats file is inventoried in §9.
 
 ---
 
@@ -80,7 +80,7 @@ daily profile) over a strong 1/f^β long-range-dependent background. A
 bin-exact significance check rejects any sub-diurnal line (e.g. ~18 h) and
 marks the ≥84 h "peaks" as record-length artifacts.
 
-**The persistence gradient** — the EDA's single most consequential table:
+**The persistence gradient** — the central summary of the temporal analysis:
 
 | signal | CV² (1 min) | ACF half-life | spectral slope | Hurst |
 | --- | --- | --- | --- | --- |
@@ -123,9 +123,9 @@ forecastable one.
 - **Onset speed sets the design constraint** (§I, `i_burst_onsets.png`):
   baseline→peak in **p50 = 6 min, p10 = 2 min, fastest = 1 min**, with a
   median steepest single-minute jump of **208 img/s** (max 355). Against
-  cold starts of tens of seconds to minutes, the fast half of bursts is
-  structurally unwinnable for a reactive scaler — the forecast-horizon
-  budget (onset − cold-start) is the binding constraint.
+  cold starts of tens of seconds to minutes, the fast half of bursts cannot be
+  tracked reactively — the forecast-horizon budget (onset − cold-start)
+  is the binding constraint.
 
 ## 5. Forecastability (the proposal's feasibility, quantified)
 
@@ -144,7 +144,7 @@ forecastable one.
   (chronos, timesfm, toto), to be tested against naive baselines.
 - The sub-minute band is a white shot-noise floor (§F): the *signals* carry
   no exploitable structure below ~1 minute. What decision/forecast frequency
-  the system actually needs is NOT inferable from the trace — it depends on
+  the system actually needs is not inferable from the trace — it depends on
   pool cold-start (warmup) times, per-replica capacity, and cost, which are
   measured in Phases 2–3; the floor only says finer-than-minute inputs add
   noise, not information.

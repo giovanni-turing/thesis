@@ -2,8 +2,9 @@
 
 Trace: `data/AzureLMMInferenceTrace_multimodal.csv.gz` · 1,000,000 requests ·
 exactly 7 days (2024-10-15T12:00Z → 2024-10-22T12:00Z) · computed on GPU
-(cuDF 26.06, RTX 5090). Scripts: `a_quality.py` … `d_signals.py`; figures in
-`figures/`; per-script stats in `*_stats.json`.
+(cuDF 26.06, RTX 5090). Scripts: `a_quality.py` … `m_gen_and_global.py` (sections A–M below,
+in analysis order); figures in `figures/`; per-script stats in `*_stats.json`.
+Narrative synthesis: `REPORT.md`. Converter decisions: final section.
 
 ## A — Quality & semantics
 
@@ -56,26 +57,6 @@ exactly 7 days (2024-10-15T12:00Z → 2024-10-22T12:00Z) · computed on GPU
   signal a rate-based autoscaler cannot see and the more forecastable one at
   cold-start-relevant horizons (ACF@5min: 0.64 vs 0.52). This is the
   feasibility premise for the predictive-scaling phase.
-
-## Converter decisions (feed `trace_to_two_pool.py`)
-
-1. **LLM-pool `input_length` = `ContextTokens` as-is.** It is the traced
-   LLM-side load (already carrying the traced model's vision share); no
-   subtraction is defensible given the non-constant per-image increment.
-   `output_length = GeneratedTokens`.
-2. **Encoder-pool work = `NumImages` × (448² image)** — fixed-size baseline
-   per the phase decision; each image = one ViT forward (AIC-costed on
-   rtx_5090 silicon). The k² tile structure means "images" arrive in bulk
-   per request — encoder batching matters and the pool simulator must
-   process a request's tiles as one arriving batch.
-3. **hash_ids disjoint per request** (no cross-request prefix reuse assumed).
-4. **Timestamps preserved** (open-loop replay); encoder-pool delay folded in
-   per the established timestamp-shift composition.
-5. **Scenario windows**: full 7 days for baselines; the top burst episodes
-   (from `c_temporal_stats.json` top6) as headline autoscaling scenarios.
-6. Drop the 151 duplicate rows; keep zero-token rows (they are real
-   requests; give output_length max(1, GeneratedTokens) if the simulator
-   requires ≥1).
 
 ## E — Comprehensive: arrival process, modality splits, correlations
 
@@ -174,13 +155,6 @@ off request rate alone underestimates burst pressure ~2.7×; (ii) ctx/s is
 itself forecastable (H≈0.86, 15-min memory) and should be forecast as its
 own signal alongside images/s, per the per-pool-signals design.
 
-## H — Pairwise density maps
-
-`h_pairwise_density.png`: three log-log 2D densities, one sequential hue per
-panel. imgs×ctx shows the tight ~66-tok/img ridge at high counts over wide
-text-driven spread at low counts; imgs×gen shows discrete k² stripes with no
-trend (independence); ctx×gen a diffuse weak-coupled cloud (ρ=0.17).
-
 ## F2 — Fourier analysis of the ctx signal (with modality decomposition)
 
 `f2_fourier_ctx.png`: ctx_total 1/f^0.72 (**H ≈ 0.86**); decomposed,
@@ -203,6 +177,13 @@ a multi-peaked daily profile rather than a single smooth cycle. ctx's
 strongest line is 24 h (SNR 6.5). Very-low-frequency "peaks" (84 h, 33.6 h,
 28 h = record/k for k=2,5,6) have 2–6 cycles of support and sit where LRD
 power concentrates — record-length artifacts, not periodicities.
+
+## H — Pairwise density maps
+
+`h_pairwise_density.png`: three log-log 2D densities, one sequential hue per
+panel. imgs×ctx shows the tight ~66-tok/img ridge at high counts over wide
+text-driven spread at low counts; imgs×gen shows discrete k² stripes with no
+trend (independence); ctx×gen a diffuse weak-coupled cloud (ρ=0.17).
 
 ## I — Burst anatomy (onset dynamics)
 
@@ -277,3 +258,23 @@ times, per-replica capacity, and cost, which the trace does not contain
 (Phases 2–3 measure them). Consolidated global percentile tables
 (p1→p99.9, request-level + 1-min rates, all four signals):
 `m_global_percentiles.md` / `m_gen_and_global_stats.json`.
+
+## Converter decisions (feed `trace_to_two_pool.py`)
+
+1. **LLM-pool `input_length` = `ContextTokens` as-is.** It is the traced
+   LLM-side load (already carrying the traced model's vision share); no
+   subtraction is defensible given the non-constant per-image increment.
+   `output_length = GeneratedTokens`.
+2. **Encoder-pool work = `NumImages` × (448² image)** — fixed-size baseline
+   per the phase decision; each image = one ViT forward (AIC-costed on
+   rtx_5090 silicon). The k² tile structure means "images" arrive in bulk
+   per request — encoder batching matters and the pool simulator must
+   process a request's tiles as one arriving batch.
+3. **hash_ids disjoint per request** (no cross-request prefix reuse assumed).
+4. **Timestamps preserved** (open-loop replay); encoder-pool delay folded in
+   per the established timestamp-shift composition.
+5. **Scenario windows**: full 7 days for baselines; the top burst episodes
+   (from `c_temporal_stats.json` top6) as headline autoscaling scenarios.
+6. Drop the 151 duplicate rows; keep zero-token rows (they are real
+   requests; give output_length max(1, GeneratedTokens) if the simulator
+   requires ≥1).
