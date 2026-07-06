@@ -1,0 +1,37 @@
+{
+ "numimages": {
+  "share_text_only": 0.5,
+  "distinct_values": 94,
+  "all_perfect_squares": false,
+  "quantiles_imagebearing": {
+   "0.5": 1.0,
+   "0.9": 25.0,
+   "0.99": 529.0,
+   "0.999": 1089.0
+  },
+  "max": 9409,
+  "mean_images_per_request_overall": 14.33217
+ },
+ "ContextTokens": {
+  "mean": 2910.954494,
+  "quantiles": {
+   "0.5": 1124.0,
+   "0.9": 5828.0,
+   "0.99": 35932.0,
+   "0.999": 65623.00800000038
+  },
+  "max": 148569,
+  "top1pct_share_of_total": 0.15180661597796863
+ },
+ "GeneratedTokens": {
+  "mean": 186.631667,
+  "quantiles": {
+   "0.5": 98.0,
+   "0.9": 433.0,
+   "0.99": 1066.0,
+   "0.999": 3943.0010000000475
+  },
+  "max": 16384,
+  "top1pct_share_of_total": 0.13428063630809234
+ }
+}

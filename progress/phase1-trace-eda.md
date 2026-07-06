@@ -1,0 +1,46 @@
+# Phase 1 — Azure Trace EDA + Two-Pool Workload Converter
+
+Plan agreed 2026-07-06. Companion to [`thesis-roadmap.md`](thesis-roadmap.md) Phase 1.
+
+## Input
+
+`data/AzureLMMInferenceTrace_multimodal.csv.gz` — 1,000,000 requests,
+columns `TIMESTAMP` (ISO, ms precision, starts 2024-10-15T12:00Z),
+`NumImages`, `ContextTokens`, `GeneratedTokens`.
+
+Schema facts that shape the phase:
+
+- **No image resolutions** — only counts. Decision: **fixed 448² baseline**
+  for the encoder pool (matches the validated AIC/bench point: 7.82 ms
+  predicted, 11.36 ms measured HF); sensitivity via one alternate size later.
+- **`ContextTokens` semantics unknown** (text-only vs incl. vision tokens) —
+  resolved empirically in script A before the converter fixes its
+  `input_length` formula.
+
+## Decisions (locked)
+
+1. Deliverable: **committed scripts + figures** (audit discipline), not notebooks.
+2. Image size: **fixed 448²** (196 post-merge vision tokens/image).
+3. Fresh EDA — no cross-assertions against the mestrado trace chapter.
+4. **Compute on GPU (CUDA)** per user request: `cudf` / `cudf.pandas` in
+   `eda/.venv` on the RTX 5090 (this is what the eda project's RAPIDS stack
+   was installed for).
+
+## EDA structure (one script per block, figures + stats emitted per script)
+
+- **A — quality & semantics**: monotonicity, gaps, duration, dupes/zeros,
+  field ranges; ContextTokens | NumImages conditional analysis →
+  text-vs-vision token accounting decision for the converter.
+- **B — marginals**: NumImages (incl. text-only share), ContextTokens,
+  GeneratedTokens distributions and tails; per-pool load implications.
+- **C — temporal**: request-rate and image-rate series at multiple windows;
+  seasonality; burstiness (CV², peak/mean); burst-episode extraction.
+- **D — per-pool signals**: images/s vs context-tokens/s vs generated-tokens/s;
+  cross-correlation and lag; autocorrelation horizons vs cold-start times
+  (predictor feasibility input for roadmap Phase 4).
+
+## Outputs
+
+- `analysis/trace_eda/{a_quality,b_marginals,c_temporal,d_signals}.py`
+- `analysis/trace_eda/figures/*.png`, `analysis/trace_eda/summary.md` (+ stats JSON)
+- Converter-decisions section appended to summary → feeds `trace_to_two_pool.py`
