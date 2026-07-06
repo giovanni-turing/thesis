@@ -1,5 +1,5 @@
-% Root document for the thesis draft chapters.
-% Self-contained under /home/gio/tese (figures in ./figuras/eda/).
+% Root document for the thesis draft chapters (lives in tex/).
+% Self-contained under /home/gio/tese; figures in ../figuras/eda/.
 % Build:  latexmk -pdf tese.tex     (or: pdflatex tese.tex  x2)
 \documentclass[12pt,a4paper]{book}
 
@@ -13,6 +13,7 @@
 \DeclareSIUnit{\flop}{FLOP}  % used by the aiconfigurator chapter (TFLOP/s)
 \usepackage{booktabs}
 \usepackage{graphicx}
+\graphicspath{{../}}  % figures live at repo root: ../figuras/eda/
 \usepackage{microtype}
 
 \title{Thesis Draft Chapters --- Workspace Preview Build}
@@ -23,8 +24,9 @@
 \maketitle
 \tableofcontents
 
-\include{tex/aiconfigurator}
-\include{tex/trace-eda}
+
+\include{trace-eda}
+\include{aiconfigurator}
 
 % Minimal bibliography so the build resolves \cite without biber.
 \begin{thebibliography}{9}
