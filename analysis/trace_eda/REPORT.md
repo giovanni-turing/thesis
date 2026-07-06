@@ -88,6 +88,7 @@ marks the ≥84 h "peaks" as record-length artifacts.
 | ctx tokens/s | 0.85 | 15 min | 1/f^0.72 | ≈0.86 |
 | — vision-borne part | — | — | 1/f^0.74 | ≈0.87 |
 | — text-borne part | — | — | 1/f^0.51 | ≈0.76 |
+| gen tokens/s (decode) | 0.40 | 5 min | 1/f^0.82 | ≈0.91 |
 | images/s | 3.83 | 69 min | 1/f^0.86 | **≈0.93** |
 
 The more vision-driven a signal, the burstier **and** the more persistent
@@ -139,8 +140,20 @@ forecastable one.
   structurally underfit the vision signal — the a-priori case for the
   long-context/foundation-model forecasters staged in `models/`
   (chronos, timesfm, toto), to be tested against naive baselines.
-- The sub-minute band is a white shot-noise floor (§F): nothing of value is
-  lost by forecasting at minute granularity.
+- The sub-minute band is a white shot-noise floor (§F): the *signals* carry
+  no exploitable structure below ~1 minute. What decision/forecast frequency
+  the system actually needs is NOT inferable from the trace — it depends on
+  pool cold-start (warmup) times, per-replica capacity, and cost, which are
+  measured in Phases 2–3; the floor only says finer-than-minute inputs add
+  noise, not information.
+- **Decode-signal properties** (§M): gen/s is the signal best explained by
+  request rate among the three (R² = 0.654, α = 182 tok/req), the least
+  bursty (CV² 0.40), fastest-mixing (ACF half-life 5 min), and nearly
+  burst-neutral (rate ratio 1.78× during image bursts; per-request
+  generation *shortens*, p50 84 vs 99). Whether this makes reactive scaling
+  sufficient for the decode pool is a system question (cold-start, capacity,
+  cost) answered by the Phase-3 baselines — the trace only says decode's
+  demand signal is the most benign of the three.
 
 ## 6. Design decisions this EDA fixes for the proposal
 
@@ -163,7 +176,23 @@ forecastable one.
    static-optimal and reactive baselines, scored specifically inside burst
    episodes — where §4 shows reactive scaling loses by construction.
 
-## 7. Limitations (of the trace, to state in the thesis)
+## 7. Global reference tables (percentiles)
+
+Request-level marginals and 1-minute rate signals, all four signals
+(`m_gen_and_global_stats.json`; generator: `m_gen_and_global.py`):
+
+| signal | mean | p1 | p10 | p50 | p90 | p95 | p99 | p99.9 | max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| request-level: NumImages | 14.3 | 0.00 | 0.00 | 0.50 | 9.00 | 25 | 484 | 625 | 9,409 |
+| request-level: NumImages_imagebearing | 28.7 | 1.00 | 1.00 | 1.00 | 25 | 196 | 529 | 1,089 | 9,409 |
+| request-level: ContextTokens | 2,911.0 | 113 | 283 | 1,124 | 5,828 | 9,755 | 35,932 | 65,623 | 148,569 |
+| request-level: GeneratedTokens | 186.6 | 1.00 | 10 | 98 | 433 | 603 | 1,066 | 3,943 | 16,384 |
+| rate (1-min): requests_per_s | 1.7 | 0.23 | 0.53 | 1.55 | 2.88 | 3.33 | 4.35 | 5.73 | 8 |
+| rate (1-min): images_per_s | 23.7 | 0.00 | 0.00 | 5.63 | 77 | 132 | 224 | 322 | 370 |
+| rate (1-min): ctx_tokens_per_s | 4,813.1 | 281 | 940 | 3,537 | 10,326 | 14,157 | 21,610 | 30,647 | 39,108 |
+| rate (1-min): gen_tokens_per_s | 308.6 | 42 | 103 | 281 | 531 | 629 | 1,010 | 1,599 | 2,164 |
+
+## 8. Limitations (of the trace, to state in the thesis)
 
 No image resolutions (counts only → fixed-448² scenario parameter); no
 session/user identifiers; no latency or SLA ground truth (arrival-side
@@ -172,7 +201,7 @@ modality split by construction; `ContextTokens` embeds the *traced*
 model's vision tokenization, not Qwen3-VL's (workload self-consistent, not
 model-transferable).
 
-## 8. Asset inventory
+## 9. Asset inventory
 
 | script | figures | stats | one-line finding |
 | --- | --- | --- | --- |
@@ -188,6 +217,7 @@ model-transferable).
 | `j_classes.py` | `j_class_signals.png`, `j_burst_attribution.png` | `j_classes_stats.json` | frames class = 81.2% of volume; bursts 93–96% frames |
 | `k_episode_clusters.py` | `k_episode_clusters.png` | `k_episode_clusters_stats.json` | one burst type (honest negative) |
 | `l_request_clusters.py` | `l_request_clusters.png` | `l_request_clusters_stats.json` | 4 semantic archetypes ↔ serving stages |
+| `m_gen_and_global.py` | `m_gen_signal.png` | `m_gen_and_global_stats.json`, `m_global_percentiles.md` | decode-signal symmetry; global percentile tables |
 
 Narrative summary with all numbers: `summary.md` (per-section detail).
 Dataset provenance: `../../data/source/README.md`.

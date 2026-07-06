@@ -261,3 +261,19 @@ third of all prefill tokens, converging with §J's frames-class attribution
 pressure lives in the text-chat group (gen p50 201); vision groups are
 short-decode. Per-group demand signals map cleanly onto pool stages:
 video group → encoder + prefill; text-chat → decode.
+
+## M — Decode-signal symmetry + global percentile tables
+
+gen tokens/s (1-min): mean 309, CV² 0.40, max 2,164. Constant-fraction fit
+vs request rate: R² = 0.654 (α = 182 tok/req) — the best rate-explained of
+the three pool signals. ACF half-life 5 min (fastest-mixing); spectral
+slope 1/f^0.82 (H ≈ 0.91 in the LRD band — variance concentrates at high
+frequency, so short practical memory despite LRD scaling). Nearly
+burst-neutral: during image-burst minutes decode rate rises 1.78× and
+per-request generation *shortens* (p50 84 vs 99). NOTE: these are signal
+properties only — whether reactive scaling suffices for decode, and what
+forecast/decision frequency any pool needs, depends on cold-start (warmup)
+times, per-replica capacity, and cost, which the trace does not contain
+(Phases 2–3 measure them). Consolidated global percentile tables
+(p1→p99.9, request-level + 1-min rates, all four signals):
+`m_global_percentiles.md` / `m_gen_and_global_stats.json`.
