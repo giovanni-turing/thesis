@@ -1,0 +1,21 @@
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.prefix, expected /home/gio/tese/eda/.venv, got /home/gio/tese/predictors/../eda/.venv
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.exec_prefix, expected /home/gio/tese/eda/.venv, got /home/gio/tese/predictors/../eda/.venv
+Loading weights:   0%|          | 0/170 [00:00<?, ?it/s]Loading weights: 100%|██████████| 170/170 [00:00<00:00, 3906.57it/s]
+[chronos uni 1min] part 1/1: 167 origins, 8016 rows in 2.3s (72 orig/s)
+[chronos cov 1min] part 1/1: 167 origins, 8016 rows in 8.4s (20 orig/s)
+[chronos uni 45s] part 1/1: 447 origins, 21456 rows in 5.8s (77 orig/s)
+[chronos cov 45s] part 1/1: 447 origins, 21456 rows in 22.9s (19 orig/s)
+[chronos uni 30s] part 1/1: 1007 origins, 48336 rows in 13.0s (77 orig/s)
+[chronos cov 30s] part 1/1: 1007 origins, 48336 rows in 51.4s (20 orig/s)
+[chronos uni 15s] part 1/1: 2687 origins, 128976 rows in 34.6s (78 orig/s)
+[chronos cov 15s] part 1/1: 2687 origins, 128976 rows in 136.7s (20 orig/s)
+[chronos uni 1s] part 1/13: 4096 origins, 196608 rows in 52.8s (78 orig/s)
+[chronos uni 1s] part 2/13: 4096 origins, 196608 rows in 52.9s (77 orig/s)
+[chronos uni 1s] part 3/13: 4096 origins, 196608 rows in 52.9s (77 orig/s)
+[chronos uni 1s] part 4/13: 4096 origins, 196608 rows in 52.8s (78 orig/s)
+[chronos uni 1s] part 5/13: 4096 origins, 196608 rows in 52.9s (77 orig/s)
+[chronos uni 1s] part 6/13: 4096 origins, 196608 rows in 52.9s (77 orig/s)
+[chronos uni 1s] part 7/13: 4096 origins, 196608 rows in 52.9s (77 orig/s)
+[chronos uni 1s] part 8/13: 4096 origins, 196608 rows in 52.9s (77 orig/s)
+[chronos uni 1s] part 9/13: 4096 origins, 196608 rows in 52.9s (77 orig/s)
+[chronos uni 1s] part 10/13: 4096 origins, 196608 rows in 53.0s (77 orig/s)

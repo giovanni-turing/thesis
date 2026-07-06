@@ -1,0 +1,20 @@
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.prefix, expected /home/gio/tese/eda/.venv, got /home/gio/tese/predictors/../eda/.venv
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.exec_prefix, expected /home/gio/tese/eda/.venv, got /home/gio/tese/predictors/../eda/.venv
+[naive uni 1min] part 1/1: 679 origins, 32592 rows in 0.5s (1400 orig/s)
+[naive uni 45s] part 1/1: 959 origins, 46032 rows in 0.7s (1408 orig/s)
+[naive uni 30s] part 1/1: 1519 origins, 72912 rows in 1.2s (1309 orig/s)
+[naive uni 15s] part 1/1: 3199 origins, 153552 rows in 2.5s (1257 orig/s)
+[naive uni 1s] part 1/13: 4096 origins, 196608 rows in 3.4s (1202 orig/s)
+[naive uni 1s] part 2/13: 4096 origins, 196608 rows in 3.4s (1217 orig/s)
+[naive uni 1s] part 3/13: 4096 origins, 196608 rows in 3.4s (1191 orig/s)
+[naive uni 1s] part 4/13: 4096 origins, 196608 rows in 3.4s (1206 orig/s)
+[naive uni 1s] part 5/13: 4096 origins, 196608 rows in 3.3s (1234 orig/s)
+[naive uni 1s] part 6/13: 4096 origins, 196608 rows in 3.5s (1186 orig/s)
+[naive uni 1s] part 7/13: 4096 origins, 196608 rows in 3.4s (1207 orig/s)
+[naive uni 1s] part 8/13: 4096 origins, 196608 rows in 3.2s (1269 orig/s)
+[naive uni 1s] part 9/13: 4096 origins, 196608 rows in 3.4s (1210 orig/s)
+[naive uni 1s] part 10/13: 4096 origins, 196608 rows in 3.3s (1229 orig/s)
+[naive uni 1s] part 11/13: 4096 origins, 196608 rows in 3.3s (1235 orig/s)
+[naive uni 1s] part 12/13: 4096 origins, 196608 rows in 3.4s (1213 orig/s)
+[naive uni 1s] part 13/13: 1087 origins, 52176 rows in 0.9s (1189 orig/s)
+[naive] done

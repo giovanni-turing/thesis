@@ -1,0 +1,23 @@
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.prefix, expected /home/gio/tese/eda/.venv, got /home/gio/tese/predictors/../eda/.venv
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.exec_prefix, expected /home/gio/tese/eda/.venv, got /home/gio/tese/predictors/../eda/.venv
+Loading weights:   0%|          | 0/813 [00:00<?, ?it/s]Loading weights: 100%|██████████| 813/813 [00:00<00:00, 18742.27it/s]
+/home/gio/tese/eda/.venv/lib/python3.14/site-packages/transformers/models/timesfm/modeling_timesfm.py:626: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  result = result + (torch.tensor(freq[: len(inputs)], dtype=torch.int32).reshape(-1, 1),)
+[timesfm uni 1min] part 1/1: 679 origins, 32592 rows in 3.1s (221 orig/s)
+[timesfm uni 45s] part 1/1: 959 origins, 46032 rows in 4.0s (241 orig/s)
+[timesfm uni 30s] part 1/1: 1519 origins, 72912 rows in 6.4s (236 orig/s)
+[timesfm uni 15s] part 1/1: 3199 origins, 153552 rows in 13.4s (239 orig/s)
+[timesfm uni 1s] part 1/13: 4096 origins, 196608 rows in 17.1s (239 orig/s)
+[timesfm uni 1s] part 2/13: 4096 origins, 196608 rows in 17.2s (239 orig/s)
+[timesfm uni 1s] part 3/13: 4096 origins, 196608 rows in 17.1s (240 orig/s)
+[timesfm uni 1s] part 4/13: 4096 origins, 196608 rows in 17.1s (239 orig/s)
+[timesfm uni 1s] part 5/13: 4096 origins, 196608 rows in 17.1s (239 orig/s)
+[timesfm uni 1s] part 6/13: 4096 origins, 196608 rows in 17.1s (240 orig/s)
+[timesfm uni 1s] part 7/13: 4096 origins, 196608 rows in 17.1s (239 orig/s)
+[timesfm uni 1s] part 8/13: 4096 origins, 196608 rows in 17.1s (240 orig/s)
+[timesfm uni 1s] part 9/13: 4096 origins, 196608 rows in 17.1s (239 orig/s)
+[timesfm uni 1s] part 10/13: 4096 origins, 196608 rows in 17.1s (240 orig/s)
+[timesfm uni 1s] part 11/13: 4096 origins, 196608 rows in 17.1s (239 orig/s)
+[timesfm uni 1s] part 12/13: 4096 origins, 196608 rows in 17.1s (240 orig/s)
+[timesfm uni 1s] part 13/13: 1087 origins, 52176 rows in 4.6s (239 orig/s)
+[timesfm] done

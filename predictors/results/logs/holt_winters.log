@@ -1,0 +1,20 @@
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.prefix, expected /home/gio/tese/eda/.venv, got /home/gio/tese/predictors/../eda/.venv
+<frozen site>:101: RuntimeWarning: Unexpected value in sys.exec_prefix, expected /home/gio/tese/eda/.venv, got /home/gio/tese/predictors/../eda/.venv
+[holt_winters uni 1min] part 1/1: 679 origins, 32592 rows in 0.9s (735 orig/s)
+[holt_winters uni 45s] part 1/1: 959 origins, 46032 rows in 1.3s (740 orig/s)
+[holt_winters uni 30s] part 1/1: 1519 origins, 72912 rows in 2.1s (724 orig/s)
+[holt_winters uni 15s] part 1/1: 3199 origins, 153552 rows in 4.4s (732 orig/s)
+[holt_winters uni 1s] part 1/13: 4096 origins, 196608 rows in 4.5s (903 orig/s)
+[holt_winters uni 1s] part 2/13: 4096 origins, 196608 rows in 4.5s (909 orig/s)
+[holt_winters uni 1s] part 3/13: 4096 origins, 196608 rows in 4.6s (898 orig/s)
+[holt_winters uni 1s] part 4/13: 4096 origins, 196608 rows in 4.6s (897 orig/s)
+[holt_winters uni 1s] part 5/13: 4096 origins, 196608 rows in 4.5s (906 orig/s)
+[holt_winters uni 1s] part 6/13: 4096 origins, 196608 rows in 4.6s (886 orig/s)
+[holt_winters uni 1s] part 7/13: 4096 origins, 196608 rows in 4.6s (900 orig/s)
+[holt_winters uni 1s] part 8/13: 4096 origins, 196608 rows in 4.5s (915 orig/s)
+[holt_winters uni 1s] part 9/13: 4096 origins, 196608 rows in 4.5s (901 orig/s)
+[holt_winters uni 1s] part 10/13: 4096 origins, 196608 rows in 4.5s (904 orig/s)
+[holt_winters uni 1s] part 11/13: 4096 origins, 196608 rows in 4.4s (924 orig/s)
+[holt_winters uni 1s] part 12/13: 4096 origins, 196608 rows in 4.5s (905 orig/s)
+[holt_winters uni 1s] part 13/13: 1087 origins, 52176 rows in 1.2s (876 orig/s)
+[holt_winters] done
