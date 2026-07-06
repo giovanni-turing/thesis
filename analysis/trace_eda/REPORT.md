@@ -148,6 +148,12 @@ forecastable one.
   pool cold-start (warmup) times, per-replica capacity, and cost, which are
   measured in Phases 2–3; the floor only says finer-than-minute inputs add
   noise, not information.
+- **Series semantics caveat**: all rate signals attribute a request's whole
+  token volume to its *arrival* minute (the trace has no durations). This is
+  faithful for images and prefill (executed near arrival) but makes gen/s an
+  *offered-work arrival* series, not achieved decode throughput — real decode
+  load is a smoothed, lagged version, so gen/s burstiness is an upper bound
+  on what the decode pool feels.
 - **Decode-signal properties** (§M): gen/s is the signal best explained by
   request rate among the three (R² = 0.654, α = 182 tok/req), the least
   bursty (CV² 0.40), fastest-mixing (ACF half-life 5 min), and nearly
