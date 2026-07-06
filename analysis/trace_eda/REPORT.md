@@ -101,8 +101,10 @@ forecastable one.
   `d_img_vs_req_scatter.png`): constant-fraction fit R² = **0.123**
   (α = 15.1 img/req) — independently consistent with the thesis trace
   chapter's ≈0.12. By contrast, decode load tracks request rate well
-  (gen~req r = 0.81): rate-based scaling is adequate for decode, blind for
-  vision.
+  (gen~req r = 0.81, R² = 0.654 §M): the request-rate signal carries most of
+  the decode demand's information but almost none of the vision demand's —
+  whether that translates into adequate scaling for either pool depends on
+  cold-start/capacity/cost (Phases 2–3).
 - **Bursts are invisible in the request signal** (§C,
   `c_seven_day_signals.png`): 87 p99-exceedances forming 18 merged
   episodes; the top episode peaks at **370 img/s while requests peak at
