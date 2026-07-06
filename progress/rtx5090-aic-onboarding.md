@@ -1,6 +1,6 @@
-# RTX 5090 AIC Onboarding — Progress — ✅ PHASE DONE
+# RTX 5090 AIC Onboarding — Progress — ✅ COMPLETED
 
-> **Status: COMPLETE.** All phases below are done; upstream draft PR
+> **Status: COMPLETED.** All phases below are done; upstream draft PR
 > [ai-dynamo/aiconfigurator#1312](https://github.com/ai-dynamo/aiconfigurator/pull/1312)
 > is open, the chapter draft is at `tex/aiconfigurator.tex`, and next steps
 > live in [`thesis-roadmap.md`](thesis-roadmap.md).
