@@ -23,3 +23,5 @@ tese.fls
 tese.fdb_latexmk
 tese.synctex.gz
 tex/*.aux
+# benchmark checkpoint parts: reproducible intermediates of the assembled results/*.parquet
+predictors/results/parts/
