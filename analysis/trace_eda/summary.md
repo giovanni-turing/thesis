@@ -123,3 +123,23 @@ does not forecast decode load and vice versa.
    regime where forecast-driven scaling can beat reactive scaling.
 4. GeneratedTokens' heavy tail (Hill ≈ 1.9) makes decode-side capacity
    planning quantile-driven, not mean-driven.
+
+## F — Fourier analysis of the arrival process
+
+Per-second counts (604,800 samples), CuPy FFT, log-binned periodograms
+(`f_fourier_spectra.png`, `f_fourier_stats.json`).
+
+- **Diurnal harmonics** (24 h line + 12/8/6 h overtones) are present in both
+  signals — real periodicity with ~7 cycles of support. Apparent periods
+  ≥ 84 h are record-length artifacts of the 7-day window, not weekly cycles.
+- **Long-range dependence, quantified in the frequency domain**: mid-band
+  (10 min–12 h) spectral slopes 1/f^0.66 (requests, H ≈ 0.83) and
+  **1/f^0.86 (images, H ≈ 0.93)**. Agrees with the Fano growth (§E) and the
+  ACF half-lives (§D) — three independent estimators, one conclusion: strong
+  persistence, strongest in the vision signal.
+- **White shot-noise floor** above ~0.02 Hz in both signals: sub-minute
+  fluctuations are irreducible arrival granularity; forecastable structure
+  lives at provisioning timescales (minutes and up).
+- Phase-4 implication: H ≈ 0.93 means short-memory models (Poisson/ARMA
+  class) structurally underfit the vision signal — an a-priori case for
+  long-context forecasters, to be tested against naive/seasonal baselines.
