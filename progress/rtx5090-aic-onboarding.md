@@ -1,4 +1,9 @@
-# RTX 5090 AIC Onboarding — Progress
+# RTX 5090 AIC Onboarding — Progress — ✅ PHASE DONE
+
+> **Status: COMPLETE.** All phases below are done; upstream draft PR
+> [ai-dynamo/aiconfigurator#1312](https://github.com/ai-dynamo/aiconfigurator/pull/1312)
+> is open, the chapter draft is at `tex/aiconfigurator.tex`, and next steps
+> live in [`thesis-roadmap.md`](thesis-roadmap.md).
 
 Goal: onboard `rtx_5090` as an aiconfigurator system and collect `encoder_attention`
 (ViT) perf data, feeding the thesis's heterogeneous disaggregated VLM simulation:
@@ -74,7 +79,7 @@ Workflow: `aic-auto-collect` skill phases. Audit artifacts per phase under
    1.736 ms, unmodeled ops 0.71 ms, kernel variants ~12%; attention within 3%).
    A vLLM wall-clock number remains a nice-to-have narrative datapoint only;
    serving behavior itself is the Mocker/DynoSim phase's subject.
-6. Two-pool composition — **minimal test PASSED** (2026-07-06):
+6. ~~Two-pool composition~~ ✅ DONE — **minimal test PASSED** (2026-07-06):
    `collector_artifacts/phase9_two_pool/{encoder_pool_sim.py,run.sh,two_pool_report.json}`.
    Stage 1: FIFO encoder-pool sim (service = AIC ViT 7.82 ms on rtx_5090 silicon)
    → mooncake trace with timestamp-shifted handoff (PyPI dynamo wheel lacks
