@@ -240,3 +240,24 @@ frames) against a homogeneous majority (median 95% frames). **Honest
 negative: there is one burst type in this trace**, varying in magnitude
 and duration, not kind. No episode taxonomy is needed downstream; scenario
 selection can sample by peak/duration alone. (`k_episode_clusters.png`)
+
+## L — Request-level semantic groups (cuML KMeans, GPU, k=4 by silhouette)
+
+Clustering all 1M requests on log(imgs, ctx, gen) recovers four archetypes
+(`l_request_clusters.png`, silhouette 0.39):
+
+| group | req share | image share | ctx share | profile (p50: img/ctx/gen) |
+| --- | --- | --- | --- | --- |
+| text: conversational generation | 51.4% | 1.3% | 23.9% | 0 / 1,063 / 201 |
+| text: short-answer / extraction | 31.0% | 1.1% | 9.6% | 0 / 738 / 22 |
+| vision: doc/tiled understanding | 14.1% | 11.9% | 33.5% | 9 / 4,879 / 124 |
+| vision: video/frame analysis | 3.4% | **85.7%** | 32.9% | 400 / 31,512 / 56 |
+
+Reading: the text half splits on generation length (chat vs extraction);
+the vision half splits into document understanding vs video/frame jobs.
+The video group — 3.4% of requests — carries 85.7% of image volume and a
+third of all prefill tokens, converging with §J's frames-class attribution
+(the unsupervised grouping rediscovers the k² class structure). Decode
+pressure lives in the text-chat group (gen p50 201); vision groups are
+short-decode. Per-group demand signals map cleanly onto pool stages:
+video group → encoder + prefill; text-chat → decode.

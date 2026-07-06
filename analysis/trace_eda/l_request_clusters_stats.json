@@ -1,0 +1,62 @@
+{
+ "silhouette_by_k": {
+  "3": 0.3776755453340179,
+  "4": 0.3880019499975558,
+  "5": 0.3184889840187853,
+  "6": 0.357935008232958,
+  "7": 0.3729989107840236,
+  "8": 0.3871160015670961,
+  "9": 0.360554498452985
+ },
+ "chosen_k": 4,
+ "clusters": {
+  "0": {
+   "n": 310382,
+   "img_p50": 0.0,
+   "ctx_p50": 738.0,
+   "gen_p50": 22.0,
+   "img_sum": 154993,
+   "ctx_sum": 280846855,
+   "req_share": 0.31,
+   "img_share": 0.011,
+   "ctx_share": 0.096,
+   "semantic_name": "text: short-answer / extraction"
+  },
+  "1": {
+   "n": 33961,
+   "img_p50": 400.0,
+   "ctx_p50": 31512.0,
+   "gen_p50": 56.0,
+   "img_sum": 12283562,
+   "ctx_sum": 958737676,
+   "req_share": 0.034,
+   "img_share": 0.857,
+   "ctx_share": 0.329,
+   "semantic_name": "vision: video/frame analysis"
+  },
+  "2": {
+   "n": 514455,
+   "img_p50": 0.0,
+   "ctx_p50": 1063.0,
+   "gen_p50": 201.0,
+   "img_sum": 188250,
+   "ctx_sum": 696628104,
+   "req_share": 0.514,
+   "img_share": 0.013,
+   "ctx_share": 0.239,
+   "semantic_name": "text: conversational generation"
+  },
+  "3": {
+   "n": 141202,
+   "img_p50": 9.0,
+   "ctx_p50": 4879.0,
+   "gen_p50": 124.0,
+   "img_sum": 1705365,
+   "ctx_sum": 974741859,
+   "req_share": 0.141,
+   "img_share": 0.119,
+   "ctx_share": 0.335,
+   "semantic_name": "vision: doc/tiled understanding"
+  }
+ }
+}

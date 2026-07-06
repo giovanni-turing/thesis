@@ -70,3 +70,15 @@
  06-07-2026 04:57:59:151 [pid=1163544 tid=1163544] NOTICE  cufio-drv:1063 running in compatible mode
  06-07-2026 04:57:59:447 [pid=1163544 tid=1163544] ERROR  cufio-fs:79 mount option not found in mount table data device: /dev/nvme0n1p7
  06-07-2026 04:57:59:447 [pid=1163544 tid=1163544] NOTICE  cufio:289 cuFileHandleRegister GDS not supported or disabled by config, using cuFile posix read/write with compat mode enabled
+ 06-07-2026 04:59:35:838 [pid=1165158 tid=1165158] NOTICE  cufio-drv:1063 running in compatible mode
+ 06-07-2026 04:59:36:137 [pid=1165158 tid=1165158] ERROR  cufio-fs:79 mount option not found in mount table data device: /dev/nvme0n1p7
+ 06-07-2026 04:59:36:137 [pid=1165158 tid=1165158] NOTICE  cufio:289 cuFileHandleRegister GDS not supported or disabled by config, using cuFile posix read/write with compat mode enabled
+ 06-07-2026 04:59:54:163 [pid=1165521 tid=1165521] NOTICE  cufio-drv:1063 running in compatible mode
+ 06-07-2026 04:59:54:458 [pid=1165521 tid=1165521] ERROR  cufio-fs:79 mount option not found in mount table data device: /dev/nvme0n1p7
+ 06-07-2026 04:59:54:458 [pid=1165521 tid=1165521] NOTICE  cufio:289 cuFileHandleRegister GDS not supported or disabled by config, using cuFile posix read/write with compat mode enabled
+ 06-07-2026 05:00:08:889 [pid=1165824 tid=1165824] NOTICE  cufio-drv:1063 running in compatible mode
+ 06-07-2026 05:00:09:287 [pid=1165824 tid=1165824] ERROR  cufio-fs:79 mount option not found in mount table data device: /dev/nvme0n1p7
+ 06-07-2026 05:00:09:287 [pid=1165824 tid=1165824] NOTICE  cufio:289 cuFileHandleRegister GDS not supported or disabled by config, using cuFile posix read/write with compat mode enabled
+ 06-07-2026 05:01:09:962 [pid=1167165 tid=1167165] NOTICE  cufio-drv:1063 running in compatible mode
+ 06-07-2026 05:01:10:363 [pid=1167165 tid=1167165] ERROR  cufio-fs:79 mount option not found in mount table data device: /dev/nvme0n1p7
+ 06-07-2026 05:01:10:363 [pid=1167165 tid=1167165] NOTICE  cufio:289 cuFileHandleRegister GDS not supported or disabled by config, using cuFile posix read/write with compat mode enabled
