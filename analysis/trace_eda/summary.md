@@ -258,3 +258,29 @@ times, per-replica capacity, and cost, which the trace does not contain
 (Phases 2–3 measure them). Consolidated global percentile tables
 (p1→p99.9, request-level + 1-min rates, all four signals):
 `m_global_percentiles.md` / `m_gen_and_global_stats.json`.
+
+## Q — Multi-resolution analysis + tail-regime marginals
+
+**Multi-resolution** (`q_multires.png`): aggregation attenuates observed
+peaks unevenly — at 60 s windows the visible peak is only **3.9%** of the
+1 s peak for images/s (gen 6.5%, ctx 11.2%, requests 37.1%). A
+minute-resolution monitor underestimates the vision signal's instantaneous
+peak by ~25×; the encoder pool's true arrival surges live below the
+monitoring floor of coarse windows. CV² decays with window size most
+slowly for images (25.7 → 3.83; shallow log-log slope, consistent with
+H ≈ 0.93) and fastest for gen (4.7 → 0.40, fast-mixing).
+
+**Tail regimes** (`q_tail_regime_kdes.png`; global vs conditioned KDEs of
+each marginal, log scale):
+- **large_ctx** (top 1% ContextTokens): 82% multimodal, NumImages p50 = 529,
+  gen p50 = 59 — large-context traffic *is* the frames class; the imgs
+  marginal collapses onto ~23² tiles.
+- **large_img** (top 1% image-bearing): ctx p50 = 35,932 (deterministic
+  ctx–img coupling at the tail), gen p50 = 53.
+- **high_req_rate** (top 1% req/s minutes): per-request marginals barely
+  move (ctx p50 1,210 vs 1,124; gen 105 vs 98; img p50 = 1) — request-rate
+  spikes carry *ordinary-composition* traffic.
+- **Regime overlap**: hot-request minutes ∩ hot-image minutes = **5 of 106**
+  (Jaccard 0.02) — the extreme events of the two signals are essentially
+  disjoint. This sharpens the decoupling finding: not merely uncorrelated
+  on average, the two demand signals spike at *different times*.

@@ -2,7 +2,7 @@
 
 **EDA report — dataset analysis only.** All analyses GPU-computed
 (cuDF/cuML/CuPy 26.06, RTX 5090). Every number below is reproducible from a
-committed script; every figure and stats file is inventoried in §9.
+committed script; every figure and stats file is inventoried in §10.
 
 ---
 
@@ -179,7 +179,26 @@ forecastable one.
 6. Demands are mutually non-derivable (img↔gen independent at request and
    window level); each demand signal carries information the others do not.
 
-## 7. Global reference tables (percentiles)
+## 7. Multi-resolution and tail-regime views
+
+**Aggregation hides the vision signal's peaks** (§Q, `q_multires.png`): at
+60 s windows the observed peak is 37% of the 1 s peak for requests/s but
+only **3.9% for images/s** (ctx 11.2%, gen 6.5%) — a minute-resolution
+monitor understates the encoder pool's instantaneous surges by ~25×.
+Burstiness decays with window size most slowly for images (CV² 25.7 → 3.83),
+consistent with its long-range dependence.
+
+**Tail regimes** (§Q, `q_tail_regime_kdes.png`): conditioning the marginals
+on extreme values shows (i) top-1%-context traffic is 82% multimodal with
+NumImages p50 = 529 — the large-context tail *is* the frames class;
+(ii) top-1%-image requests have ctx p50 ≈ 36k (tail-deterministic ctx–img
+coupling) and short decode (gen p50 53); (iii) top-1% request-rate minutes
+carry ordinary-composition traffic (all per-request medians ≈ global); and
+(iv) hot-request and hot-image minutes intersect in only **5 of 106**
+minutes (Jaccard 0.02) — the two signals' extreme events are essentially
+disjoint in time, sharpening the decoupling result from §4.
+
+## 8. Global reference tables (percentiles)
 
 Request-level marginals and 1-minute rate signals, all four signals
 (`m_gen_and_global_stats.json`; generator: `m_gen_and_global.py`):
@@ -195,7 +214,7 @@ Request-level marginals and 1-minute rate signals, all four signals
 | rate (1-min): ctx_tokens_per_s | 4,813.1 | 281 | 940 | 3,537 | 10,326 | 14,157 | 21,610 | 30,647 | 39,108 |
 | rate (1-min): gen_tokens_per_s | 308.6 | 42 | 103 | 281 | 531 | 629 | 1,010 | 1,599 | 2,164 |
 
-## 8. Limitations (of the trace, to state in the thesis)
+## 9. Limitations (of the trace, to state in the thesis)
 
 No image resolutions (counts only → fixed-448² scenario parameter); no
 session/user identifiers; no latency or SLA ground truth (arrival-side
@@ -204,7 +223,7 @@ modality split by construction; `ContextTokens` embeds the *traced*
 model's vision tokenization, not Qwen3-VL's (workload self-consistent, not
 model-transferable).
 
-## 9. Asset inventory
+## 10. Asset inventory
 
 | script | figures | stats | one-line finding |
 | --- | --- | --- | --- |
@@ -221,6 +240,8 @@ model-transferable).
 | `k_episode_clusters.py` | `k_episode_clusters.png` | `k_episode_clusters_stats.json` | one burst type (honest negative) |
 | `l_request_clusters.py` | `l_request_clusters.png` | `l_request_clusters_stats.json` | 4 semantic archetypes ↔ serving stages |
 | `m_gen_and_global.py` | `m_gen_signal.png` | `m_gen_and_global_stats.json`, `m_global_percentiles.md` | decode-signal symmetry; global percentile tables |
+| `o_interactive_3d.py` / `p_surface_tokens.py` | `o_demand_space_3d.html`, `p_demand_space_tokens.html` | — | interactive KDE density surfaces of the (ctx/s, gen/s) plane |
+| `q_multires_tails.py` | `q_multires.png`, `q_tail_regime_kdes.png` | `q_multires_tails_stats.json` | peak attenuation (images 3.9% @60s); tail regimes; disjoint extremes |
 
 Narrative summary with all numbers: `summary.md` (per-section detail).
 Dataset provenance: `../../data/source/README.md`.
