@@ -1,0 +1,37 @@
+% Root document for the thesis draft chapters.
+% Self-contained under /home/gio/tese (figures in ./figuras/eda/).
+% Build:  latexmk -pdf tese.tex     (or: pdflatex tese.tex  x2)
+\documentclass[12pt,a4paper]{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\sisetup{round-mode=none}
+\DeclareSIUnit{\flop}{FLOP}  % used by the aiconfigurator chapter (TFLOP/s)
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{microtype}
+
+\title{Thesis Draft Chapters --- Workspace Preview Build}
+\author{Giovanni Oliveira}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\include{tex/aiconfigurator}
+\include{tex/trace-eda}
+
+% Minimal bibliography so the build resolves \cite without biber.
+\begin{thebibliography}{9}
+\bibitem{Qiu2025ModServe}
+S.~Qiu, X.~Liu, et al.
+\emph{ModServe: Modality-Disaggregated Serving for Multimodal LLM Inference}.
+ACM SoCC, 2025. arXiv:2502.00937.
+\end{thebibliography}
+
+\end{document}

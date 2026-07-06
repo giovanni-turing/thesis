@@ -1,9 +1,9 @@
 # thesis-artifacts repo: track only research artifacts, progress notes, and top-level docs.
 # Each subproject below is its own independent git checkout — never track them here.
-ai-dynamo/
-rapids/
-eda/
-models/
+/ai-dynamo/
+/rapids/
+/eda/
+/models/
 *.whl
 # scratch/venvs
 collector_artifacts/phase9_two_pool/dynamo-venv/
@@ -13,3 +13,13 @@ __pycache__/
 .agents
 # KvikIO/GPUDirect-Storage cuFile logs
 cufile.log
+# LaTeX preview-build artifacts (tese.tex root); keep sources + figures, drop aux
+tese.pdf
+tese.aux
+tese.log
+tese.toc
+tese.out
+tese.fls
+tese.fdb_latexmk
+tese.synctex.gz
+tex/*.aux
