@@ -27,11 +27,11 @@ OUT = os.path.join(HERE, "figures", "o_demand_space_3d.html")
 # (button label, seconds, parquet name)
 RESOLUTIONS = [("1s", 1, "1s"), ("15s", 15, "15s"), ("30s", 30, "30s"),
                ("45s", 45, "45s"), ("60s", 60, "1min")]
-GRID = 90
-SUPPORT_FRAC = 1e-3  # mask grid nodes with density below this fraction of max
+GRID = 240           # dense sampling of the smooth KDE
+SUPPORT_FRAC = 3e-4  # keep more of the low-density shoulder
 
 
-def kde_surface_gpu(xy_host, n_host, grid=GRID, chunk=100_000):
+def kde_surface_gpu(xy_host, n_host, grid=GRID, chunk=12_000):
     """2D Gaussian KDE density + Nadaraya-Watson E[n|x] on a grid (GPU)."""
     P = cp.asarray(xy_host, dtype=cp.float32)          # (N, 2)
     nval = cp.asarray(n_host, dtype=cp.float32)        # (N,)
@@ -67,29 +67,26 @@ def kde_surface_gpu(xy_host, n_host, grid=GRID, chunk=100_000):
 
 
 surfaces, labels = [], []
-cmax_log = 0.0
 for name, secs, fname in RESOLUTIONS:
     w = pd.read_parquet(os.path.join(SERIES, f"rates_{fname}.parquet"))
     ctx = np.log10(1.0 + w["ctx"].to_numpy(float) / secs)
     gen = np.log10(1.0 + w["gen"].to_numpy(float) / secs)
     img = w["images"].to_numpy(float) / secs
     gx, gy, dens, cond = kde_surface_gpu(np.column_stack([ctx, gen]), img)
-    cond_log = np.log10(1.0 + cond)
-    cmax_log = max(cmax_log, float(np.nanmax(cond_log)))
-    surfaces.append((name, gx, gy, dens, cond, cond_log))
+    surfaces.append((name, gx, gy, dens, cond, cond))
     labels.append(name)
 
 traces = []
-ctick_vals = [0, 1, 2]
-ctick_txt = ["0", "9", "99"]
 for name, gx, gy, dens, cond, cond_log in surfaces:
+    # per-resolution color scale, capped at this surface's own p10/p99
+    sup = cond[~np.isnan(cond)]
     traces.append(go.Surface(
         x=gx, y=gy, z=dens,
-        surfacecolor=cond_log,
-        cmin=0.0, cmax=cmax_log,
-        colorscale=[[0, "#f7f9fc"], [0.5, "#2a78d6"], [1, "#123c74"]],
-        colorbar=dict(title="E[img/s | ctx,gen]", thickness=14,
-                      tickvals=ctick_vals, ticktext=ctick_txt),
+        surfacecolor=cond,
+        cmin=float(np.percentile(sup, 10)), cmax=float(np.percentile(sup, 99)),
+        colorscale=[[0.0, "#008300"], [0.35, "#a8d24a"], [0.6, "#eda100"],
+                    [0.8, "#eb6834"], [1.0, "#c40000"]],  # green -> red, red at max
+        colorbar=dict(title="log2(1 + E[img/s | ctx,gen])", thickness=14),
         customdata=np.stack([cond], axis=-1),
         hovertemplate=("log ctx/s %{x:.2f} · log gen/s %{y:.2f}<br>"
                        "density %{z:.3g}<br>E[img/s] %{customdata[0]:,.1f}"
