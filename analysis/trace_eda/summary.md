@@ -258,23 +258,3 @@ times, per-replica capacity, and cost, which the trace does not contain
 (Phases 2–3 measure them). Consolidated global percentile tables
 (p1→p99.9, request-level + 1-min rates, all four signals):
 `m_global_percentiles.md` / `m_gen_and_global_stats.json`.
-
-## Converter decisions (feed `trace_to_two_pool.py`)
-
-1. **LLM-pool `input_length` = `ContextTokens` as-is.** It is the traced
-   LLM-side load (already carrying the traced model's vision share); no
-   subtraction is defensible given the non-constant per-image increment.
-   `output_length = GeneratedTokens`.
-2. **Encoder-pool work = `NumImages` × (448² image)** — fixed-size baseline
-   per the phase decision; each image = one ViT forward (AIC-costed on
-   rtx_5090 silicon). The k² tile structure means "images" arrive in bulk
-   per request — encoder batching matters and the pool simulator must
-   process a request's tiles as one arriving batch.
-3. **hash_ids disjoint per request** (no cross-request prefix reuse assumed).
-4. **Timestamps preserved** (open-loop replay); encoder-pool delay folded in
-   per the established timestamp-shift composition.
-5. **Scenario windows**: full 7 days for baselines; the top burst episodes
-   (from `c_temporal_stats.json` top6) as headline autoscaling scenarios.
-6. Drop the 151 duplicate rows; keep zero-token rows (they are real
-   requests; give output_length max(1, GeneratedTokens) if the simulator
-   requires ≥1).

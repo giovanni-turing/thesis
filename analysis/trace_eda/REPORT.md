@@ -1,6 +1,6 @@
-# The Azure Multimodal Inference Trace: Characterization and Implications for Disaggregated, Forecast-Driven Serving
+# The Azure Multimodal Inference Trace: An Exploratory Characterization
 
-**EDA report — Phase 1 of the thesis pipeline.** All analyses GPU-computed
+**EDA report — dataset analysis only.** All analyses GPU-computed
 (cuDF/cuML/CuPy 26.06, RTX 5090). Every number below is reproducible from a
 committed script; every figure and stats file is inventoried in §9.
 
@@ -95,7 +95,7 @@ The more vision-driven a signal, the burstier **and** the more persistent
 it is: the signal most dangerous to reactive scaling is precisely the most
 forecastable one.
 
-## 4. The vision-signal problem (the proposal's motivation, quantified)
+## 4. The vision signal: decoupled, bursty, single-class
 
 - **Request rate does not explain vision work** (§D,
   `d_img_vs_req_scatter.png`): constant-fraction fit R² = **0.123**
@@ -103,8 +103,8 @@ forecastable one.
   chapter's ≈0.12. By contrast, decode load tracks request rate well
   (gen~req r = 0.81, R² = 0.654 §M): the request-rate signal carries most of
   the decode demand's information but almost none of the vision demand's —
-  whether that translates into adequate scaling for either pool depends on
-  cold-start/capacity/cost (Phases 2–3).
+  what any scaling policy can do with this depends on system
+  parameters (cold-start, per-replica capacity, cost) outside this dataset.
 - **Bursts are invisible in the request signal** (§C,
   `c_seven_day_signals.png`): 87 p99-exceedances forming 18 merged
   episodes; the top episode peaks at **370 img/s while requests peak at
@@ -127,7 +127,7 @@ forecastable one.
   tracked reactively — the forecast-horizon budget (onset − cold-start)
   is the binding constraint.
 
-## 5. Forecastability (the proposal's feasibility, quantified)
+## 5. Signal predictability
 
 - The vision signal has **69 minutes of autocorrelation half-life** (vs 9
   for requests) and **H ≈ 0.93** — strong long-range dependence, i.e.
@@ -139,14 +139,13 @@ forecastable one.
   the vision signal → **each pool must be forecast on its own signal**
   (vision ← images/s; language prefill ← ctx/s; language decode ← gen/s).
 - H ≈ 0.93 also means short-memory models (Poisson/ARMA class)
-  structurally underfit the vision signal — the a-priori case for the
-  long-context/foundation-model forecasters staged in `models/`
-  (chronos, timesfm, toto), to be tested against naive baselines.
+  structurally underfit the vision signal — an a-priori indication that short-memory forecasters
+  will underfit this signal class.
 - The sub-minute band is a white shot-noise floor (§F): the *signals* carry
   no exploitable structure below ~1 minute. What decision/forecast frequency
   the system actually needs is not inferable from the trace — it depends on
-  pool cold-start (warmup) times, per-replica capacity, and cost, which are
-  measured in Phases 2–3; the floor only says finer-than-minute inputs add
+  pool cold-start (warmup) times, per-replica capacity, and cost — system
+  parameters outside this dataset; the floor only says finer-than-minute inputs add
   noise, not information.
 - **Series semantics caveat**: all rate signals attribute a request's whole
   token volume to its *arrival* minute (the trace has no durations). This is
@@ -160,29 +159,25 @@ forecastable one.
   burst-neutral (rate ratio 1.78× during image bursts; per-request
   generation *shortens*, p50 84 vs 99). Whether this makes reactive scaling
   sufficient for the decode pool is a system question (cold-start, capacity,
-  cost) answered by the Phase-3 baselines — the trace only says decode's
+  cost) that this dataset cannot answer — it only establishes that decode's
   demand signal is the most benign of the three.
 
-## 6. Design decisions this EDA fixes for the proposal
+## 6. Key findings (summary)
 
-1. **Converter** (`trace_to_two_pool.py`, next): `input_length =
-   ContextTokens` as-is; `output_length = GeneratedTokens` (≥1); encoder
-   work = NumImages × 448² ViT forwards (AIC-costed on rtx_5090 silicon);
-   per-request tile batches preserved; disjoint hash_ids; timestamps
-   preserved; class/group labels carried; 151 duplicates dropped.
-2. **Scenario selection**: full 7 days for baselines; burst episodes
-   sampled by peak/duration (no taxonomy needed — §K); the six largest
-   frames-floods as headline autoscaling scenarios.
-3. **Predictor interface** (`predictors/predictor.py`): three per-pool
-   signals at 1-min granularity; horizon ≥ cold-start + onset budget
-   (§I: minutes matter); frames-class signal is the highest-leverage
-   target — burst detection on 2.7% of requests covers 81% of image work.
-4. **Simulator fidelity**: encoder pool must batch per-request tile
-   groups; prefill pressure super-linear during bursts (2.69× length ×
-   higher rate) must emerge in the composed workload, not be assumed.
-5. **Evaluation framing**: SLA compliance × GPU-hours against
-   static-optimal and reactive baselines, scored specifically inside burst
-   episodes — where §4 shows reactive scaling loses by construction.
+1. Half the requests are text-only; images arrive as k×k tile/frame grids;
+   `ContextTokens` embeds a non-constant vision-token contribution.
+2. Four request archetypes exist; the video/frame archetype (3.4% of
+   requests) carries 85.7% of image volume and a third of prefill tokens.
+3. The arrival process is non-Poisson at every scale (Fano 1.8→938), with
+   a diurnal harmonic family over a long-range-dependent background.
+4. The image signal is the burstiest (CV² 3.83) and most persistent
+   (H ≈ 0.93) of the four demand signals; it is poorly explained by request
+   rate (R² = 0.123) while decode load is largely rate-carried (R² = 0.654).
+5. Bursts are homogeneous frames-class floods (93–96% of episode volume),
+   ramping baseline→peak in a median of 6 minutes with single-minute jumps
+   of ~208 img/s, and compounding with 2.69× longer prefills.
+6. Demands are mutually non-derivable (img↔gen independent at request and
+   window level); each demand signal carries information the others do not.
 
 ## 7. Global reference tables (percentiles)
 
