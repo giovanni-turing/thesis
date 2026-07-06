@@ -1,0 +1,38 @@
+{
+ "ctx_signal": {
+  "tokens_per_s": {
+   "mean": 4813.08613425926,
+   "p99": 21610.16166666665,
+   "max": 39108.25,
+   "cv2": 0.8528279398833853
+  },
+  "constant_fraction_vs_req": {
+   "alpha_tokens_per_req": 2967.892056777588,
+   "r2": 0.4377740829132857
+  },
+  "acf_halflife_minutes": 15,
+  "spectral_slope_beta": 0.7183548515834868,
+  "hurst_from_beta": 0.8591774257917434
+ },
+ "prefill_volume": {
+  "share_from_multimodal": 0.7249510380013519,
+  "share_of_requests_multimodal": 0.5,
+  "minute_share_mm_p10_p90": [
+   0.0,
+   0.8967453868788096
+  ]
+ },
+ "ctx_burst_vs_calm": {
+  "burst": {
+   "0.5": 1428.0,
+   "0.9": 33722.0,
+   "0.99": 36198.0
+  },
+  "calm": {
+   "0.5": 1117.0,
+   "0.9": 5682.0,
+   "0.99": 34827.0
+  },
+  "mean_ratio_burst_over_calm": 2.6864582732527778
+ }
+}

@@ -143,3 +143,33 @@ Per-second counts (604,800 samples), CuPy FFT, log-binned periodograms
 - Phase-4 implication: H ≈ 0.93 means short-memory models (Poisson/ARMA
   class) structurally underfit the vision signal — an a-priori case for
   long-context forecasters, to be tested against naive/seasonal baselines.
+
+## G — ContextTokens as a demand signal (prefill load)
+
+Signal (`ctx tokens/s`, 1-min): mean 4,813, max 39,108, **CV² 0.85** —
+between the request signal (0.32) and the image signal (3.83).
+Constant-fraction fit vs request rate: **R² = 0.438** — better than vision
+(0.12) but still far from sufficient for rate-based sizing. ACF half-life
+**15 min** (requests 9, images 69); spectral slope 1/f^0.72, **H ≈ 0.86**.
+
+**Volume decomposition**: multimodal requests carry **72.5% of all prefill
+tokens** while being 50% of requests; the minute-level multimodal share
+swings 0.1–0.95 with clear regime structure (`g_ctx_decomposition.png`) —
+prefill capacity is mostly a vision-driven concern.
+
+**Mixture structure** (`g_ctx_mixture_burst.png`): multimodal prefill has a
+hard lower edge (~200 tokens — minimum context of an image-bearing request)
+and a secondary mass at 10⁴–10⁵ tokens (the tile-heavy k² classes);
+text-only spans the low end more broadly.
+
+**Burst composition shift**: during p99-image-rate burst minutes, requests
+have **2.69× the mean prefill length** of calm minutes (p50 1,428 vs 1,117;
+the burst CCDF shows a fat shelf near 3×10⁴ tokens). Bursts compound: more
+images AND longer prefills per request — prefill pressure during bursts is
+super-linear in arrival rate, which any SLA/scaling policy must price.
+
+Pipeline implications: (i) the language pool's prefill stage inherits
+vision-borne burstiness (r≈0.89 with images/s, 72% of volume) — sizing it
+off request rate alone underestimates burst pressure ~2.7×; (ii) ctx/s is
+itself forecastable (H≈0.86, 15-min memory) and should be forecast as its
+own signal alongside images/s, per the per-pool-signals design.
