@@ -203,3 +203,40 @@ a multi-peaked daily profile rather than a single smooth cycle. ctx's
 strongest line is 24 h (SNR 6.5). Very-low-frequency "peaks" (84 h, 33.6 h,
 28 h = record/k for k=2,5,6) have 2–6 cycles of support and sit where LRD
 power concentrates — record-length artifacts, not periodicities.
+
+## I — Burst anatomy (onset dynamics)
+
+18 merged episodes (from 87 raw p99-exceedances; boundaries extended to p50
+crossings). **Onset baseline→peak: p50 = 6 min, p10 = 2 min, fastest = 1 min**;
+median ramp 42 img/s per minute; **median steepest single-minute jump =
+208 img/s** (max 355). Design consequence: with cold starts of tens of
+seconds to minutes, the fast half of bursts cannot be caught reactively —
+the forecast-horizon budget (onset minus cold-start) is the autoscaler's
+binding constraint. (`i_burst_onsets.png`, `i_burst_aligned.png`)
+
+## J — Workload classes on the k² structure
+
+| class | k | req share | image share | ctx p50 | CV² (img rate) |
+| --- | --- | --- | --- | --- | --- |
+| text | 0 | 50.0% | — | 792 | — |
+| single | 1 | 33.0% | 2.3% | 1,069 | 1.1 |
+| tiled_small | 2–5 | 13.1% | 10.6% | 4,558 | 1.1 |
+| tiled_large | 6–10 | 1.1% | 5.9% | 13,747 | 15.6 |
+| frames | >10 | 2.7% | **81.2%** | 33,722 | 5.4 |
+
+**Every top-6 burst episode is 93–96% frames-class image volume.** The
+vision pool's demand — and its bursts — are effectively one workload class
+(video-like frame jobs, 2.7% of requests). Per-class signals
+(`j_class_signals.png`) show frames switching between off and full-on
+regimes while single/tiled_small stay quasi-stationary. Implication:
+monitoring/forecasting the frames-class signal specifically is the leverage
+point; the converter should carry class labels.
+
+## K — Episode clustering (cuML KMeans, GPU)
+
+Features: log peak/onset/duration/ctx + class shares; silhouette selects
+k=2 but the split is 17-vs-1 — a single mixed-composition outlier (66%
+frames) against a homogeneous majority (median 95% frames). **Honest
+negative: there is one burst type in this trace**, varying in magnitude
+and duration, not kind. No episode taxonomy is needed downstream; scenario
+selection can sample by peak/duration alone. (`k_episode_clusters.png`)

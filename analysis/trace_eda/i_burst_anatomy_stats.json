@@ -1,0 +1,86 @@
+{
+ "thresholds": {
+  "p50_img_per_s": 5.633333333333334,
+  "p99_img_per_s": 223.98499999999984
+ },
+ "n_raw_episodes": 87,
+ "n_merged_episodes": 18,
+ "onset_minutes": {
+  "p10": 1.7000000000000002,
+  "p50": 6.0,
+  "p90": 51.60000000000001,
+  "min": 1.0
+ },
+ "ramp_img_per_s_per_min": {
+  "p50": 41.962500000000006,
+  "p90": 202.8166666666668,
+  "max": 355.33333333333337
+ },
+ "steepest_1min_jump_img_per_s": {
+  "p50": 208.10833333333335,
+  "p90": 306.685,
+  "max": 355.33333333333337
+ },
+ "top6_by_peak": [
+  {
+   "start_baseline": "2024-10-21 13:09:00",
+   "peak": "2024-10-21 19:53:00",
+   "end_baseline": "2024-10-21 21:08:00",
+   "peak_img_per_s": 370.18333333333334,
+   "onset_minutes": 220,
+   "decay_minutes": null,
+   "ramp_img_per_s_per_min": 1.6717424242424244,
+   "steepest_1min_jump_img_per_s": 293.7
+  },
+  {
+   "start_baseline": "2024-10-15 21:26:00",
+   "peak": "2024-10-15 22:14:00",
+   "end_baseline": "2024-10-15 23:00:00",
+   "peak_img_per_s": 363.7,
+   "onset_minutes": 48,
+   "decay_minutes": null,
+   "ramp_img_per_s_per_min": 7.460416666666666,
+   "steepest_1min_jump_img_per_s": 201.9
+  },
+  {
+   "start_baseline": "2024-10-18 10:28:00",
+   "peak": "2024-10-18 10:29:00",
+   "end_baseline": "2024-10-18 10:35:00",
+   "peak_img_per_s": 355.48333333333335,
+   "onset_minutes": 1,
+   "decay_minutes": 6,
+   "ramp_img_per_s_per_min": 355.33333333333337,
+   "steepest_1min_jump_img_per_s": 355.33333333333337
+  },
+  {
+   "start_baseline": "2024-10-18 15:47:00",
+   "peak": "2024-10-18 16:47:00",
+   "end_baseline": "2024-10-18 18:36:00",
+   "peak_img_per_s": 350.3833333333333,
+   "onset_minutes": 60,
+   "decay_minutes": null,
+   "ramp_img_per_s_per_min": 5.839722222222222,
+   "steepest_1min_jump_img_per_s": 209.68333333333334
+  },
+  {
+   "start_baseline": "2024-10-18 14:42:00",
+   "peak": "2024-10-18 15:17:00",
+   "end_baseline": "2024-10-18 15:43:00",
+   "peak_img_per_s": 343.4166666666667,
+   "onset_minutes": 35,
+   "decay_minutes": null,
+   "ramp_img_per_s_per_min": 9.768095238095238,
+   "steepest_1min_jump_img_per_s": 252.20000000000002
+  },
+  {
+   "start_baseline": "2024-10-15 23:36:00",
+   "peak": "2024-10-16 00:29:00",
+   "end_baseline": "2024-10-16 00:38:00",
+   "peak_img_per_s": 337.18333333333334,
+   "onset_minutes": 1,
+   "decay_minutes": null,
+   "ramp_img_per_s_per_min": 336.98333333333335,
+   "steepest_1min_jump_img_per_s": 336.98333333333335
+  }
+ ]
+}
