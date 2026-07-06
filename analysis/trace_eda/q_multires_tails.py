@@ -26,29 +26,35 @@ SERIES = os.path.join(HERE, "series")
 C_VIOLET = "#4a3aa7"  # categorical slot 5
 
 # ============================ Part 1: multi-resolution ============================
-RES = [("1s", 1, "1s"), ("15s", 15, "15s"), ("30s", 30, "30s"),
-       ("45s", 45, "45s"), ("60s", 60, "1min")]
+# Dense window sweep via block-sums of the 1s series (log-spaced, 1s..1h).
+WINDOWS = [1, 2, 3, 5, 8, 12, 15, 20, 30, 45, 60, 90, 120, 180, 300, 600,
+           900, 1800, 3600]
 SIGNALS = [("requests", C_AQUA), ("images", C_BLUE), ("ctx", C_YELLOW), ("gen", C_VIOLET)]
 
+w1s = pd.read_parquet(os.path.join(SERIES, "rates_1s.parquet"))
 mr = {}
-for name, secs, fname in RES:
-    w = pd.read_parquet(os.path.join(SERIES, f"rates_{fname}.parquet"))
+for secs in WINDOWS:
+    name = f"{secs}s"
+    blocks = np.arange(len(w1s)) // secs
+    wb = w1s.groupby(blocks).sum()
     mr[name] = {}
     for col, _ in SIGNALS:
-        r = w[col].to_numpy(float) / secs
+        r = wb[col].to_numpy(float) / secs
         mr[name][col] = {
             "mean": float(r.mean()), "cv2": float((r.std() / r.mean()) ** 2),
             "p99": float(np.quantile(r, 0.99)), "max": float(r.max()),
         }
 
-atten = {col: {name: mr[name][col]["max"] / mr["1s"][col]["max"] for name, _, _ in RES}
+atten = {col: {f"{s}s": mr[f"{s}s"][col]["max"] / mr["1s"][col]["max"] for s in WINDOWS}
          for col, _ in SIGNALS}
 
 fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.4), constrained_layout=True)
-xs = [secs for _, secs, _ in RES]
+xs = WINDOWS
 for col, color in SIGNALS:
-    axes[0].plot(xs, [mr[n][col]["cv2"] for n, _, _ in RES], "o-", color=color, label=col)
-    axes[1].plot(xs, [atten[col][n] for n, _, _ in RES], "o-", color=color, label=col)
+    axes[0].plot(xs, [mr[f"{s}s"][col]["cv2"] for s in WINDOWS], "o-",
+                 color=color, label=col, markersize=3.5, linewidth=1.3)
+    axes[1].plot(xs, [atten[col][f"{s}s"] for s in WINDOWS], "o-",
+                 color=color, label=col, markersize=3.5, linewidth=1.3)
 axes[0].set_xscale("log"); axes[0].set_yscale("log")
 axes[0].set_xlabel("window (s)"); axes[0].set_ylabel("CV² of rate")
 axes[0].set_title("Burstiness vs binning window")
@@ -143,6 +149,8 @@ save_stats("q_multires_tails_stats.json", stats)
 print("\nKey readout:")
 print("peak attenuation 1s->60s:",
       {c: round(atten[c]["60s"], 3) for c, _ in SIGNALS})
+print("peak attenuation 1s->1h:",
+      {c: round(atten[c]["3600s"], 3) for c, _ in SIGNALS})
 for rname, row in stats["regimes"].items():
     print(f"{rname}: share={row['share']:.2%} mm_share={row['multimodal_share']:.0%} "
           + " ".join(f"{v} p50={row[v]['p50']:.0f} (global {row[v]['p50_global']:.0f})"
