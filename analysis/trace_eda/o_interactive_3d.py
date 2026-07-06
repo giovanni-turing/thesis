@@ -1,11 +1,17 @@
-"""EDA O — interactive 3D view of the demand space (plotly + GPU KDE smoothing).
+"""EDA O — KDE density surface of the (ctx, gen) demand plane (plotly, GPU).
 
-Each point is one time window at coordinates (ctx tokens/s, gen tokens/s,
-images/s) in log10(1+x) space. Point color is the request rate smoothed by a
-Gaussian-KDE (Nadaraya–Watson) regression over the 3D neighborhood — the KDE
-runs on GPU (CuPy, chunked pairwise kernels, Scott's-rule bandwidth).
-A button group switches the window resolution (1s / 15s / 30s / 45s / 60s;
-large series are subsampled to 15k points). Output: self-contained HTML.
+Construction (per resolution):
+  1. Points: one per time window, coordinates (log10(1+ctx/s), log10(1+gen/s)).
+  2. Gaussian KDE on the plane (Scott's-rule bandwidth, CuPy, chunked)
+     evaluated on a grid  ->  z = P(ctx, gen)   (the density surface).
+  3. Surface color = E[img/s | ctx, gen], the Nadaraya-Watson ratio of the
+     image-weighted KDE to the marginal KDE:
+         E[n | x] = sum_i K(x, x_i) n_i / sum_i K(x, x_i)
+     (equivalently: marginalizing the joint KDE of (ctx, gen, n_img) over n).
+  4. Grid nodes with negligible density support are masked (holes, not
+     extrapolation).
+A button group switches the window resolution (1s / 15s / 30s / 45s / 60s).
+Output: self-contained HTML.
 """
 import os
 
@@ -21,78 +27,95 @@ OUT = os.path.join(HERE, "figures", "o_demand_space_3d.html")
 # (button label, seconds, parquet name)
 RESOLUTIONS = [("1s", 1, "1s"), ("15s", 15, "15s"), ("30s", 30, "30s"),
                ("45s", 45, "45s"), ("60s", 60, "1min")]
-MAX_POINTS = 15_000
-SEED = 0
+GRID = 90
+SUPPORT_FRAC = 1e-3  # mask grid nodes with density below this fraction of max
 
 
-def kde_smooth_gpu(X_host, y_host, chunk=2048):
-    """Nadaraya–Watson regression of y on X with a Gaussian kernel (GPU).
-
-    Bandwidth: Scott's rule per dimension on standardized coordinates.
-    """
-    X = cp.asarray(X_host, dtype=cp.float32)
-    y = cp.asarray(y_host, dtype=cp.float32)
-    n, d = X.shape
-    mu, sd = X.mean(0), X.std(0) + 1e-9
-    Z = (X - mu) / sd
-    h = float(n ** (-1.0 / (d + 4)))  # Scott's rule on standardized coords
+def kde_surface_gpu(xy_host, n_host, grid=GRID, chunk=100_000):
+    """2D Gaussian KDE density + Nadaraya-Watson E[n|x] on a grid (GPU)."""
+    P = cp.asarray(xy_host, dtype=cp.float32)          # (N, 2)
+    nval = cp.asarray(n_host, dtype=cp.float32)        # (N,)
+    N = len(P)
+    mu, sd = P.mean(0), P.std(0) + 1e-9
+    Z = (P - mu) / sd
+    h = float(N ** (-1.0 / 6.0))                       # Scott's rule, d=2
     inv2h2 = 1.0 / (2.0 * h * h)
-    out = cp.empty(n, dtype=cp.float32)
-    for i in range(0, n, chunk):
-        zi = Z[i:i + chunk]                       # (c, d)
-        d2 = ((zi[:, None, :] - Z[None, :, :]) ** 2).sum(-1)  # (c, n)
-        w = cp.exp(-d2 * inv2h2)
-        out[i:i + chunk] = (w @ y) / w.sum(1)
-    return cp.asnumpy(out)
+
+    gx = cp.linspace(P[:, 0].min(), P[:, 0].max(), grid)
+    gy = cp.linspace(P[:, 1].min(), P[:, 1].max(), grid)
+    GX, GY = cp.meshgrid(gx, gy)                       # (g, g)
+    G = cp.stack([GX.ravel(), GY.ravel()], 1)          # (g*g, 2)
+    Gz = (G - mu) / sd
+
+    dens = cp.zeros(len(G), dtype=cp.float32)
+    wsum_n = cp.zeros(len(G), dtype=cp.float32)
+    for i in range(0, N, chunk):
+        Zi = Z[i:i + chunk]                            # (c, 2)
+        d2 = ((Gz[:, None, :] - Zi[None, :, :]) ** 2).sum(-1)   # (g*g, c)
+        K = cp.exp(-d2 * inv2h2)
+        dens += K.sum(1)
+        wsum_n += K @ nval[i:i + chunk]
+
+    cond = wsum_n / cp.maximum(dens, 1e-12)            # E[n | x]
+    dens = dens / (N * 2 * np.pi * h * h * float(sd[0] * sd[1]))  # pdf normalize
+    mask = dens < SUPPORT_FRAC * dens.max()
+    dens[mask] = cp.nan
+    cond[mask] = cp.nan
+    g = grid
+    return (cp.asnumpy(gx), cp.asnumpy(gy),
+            cp.asnumpy(dens.reshape(g, g)), cp.asnumpy(cond.reshape(g, g)))
 
 
-rng = np.random.default_rng(SEED)
-traces, labels = [], []
+surfaces, labels = [], []
+cmax_log = 0.0
 for name, secs, fname in RESOLUTIONS:
     w = pd.read_parquet(os.path.join(SERIES, f"rates_{fname}.parquet"))
-    if len(w) > MAX_POINTS:
-        w = w.iloc[np.sort(rng.choice(len(w), MAX_POINTS, replace=False))]
-    rates = w[["ctx", "gen", "images", "requests"]].to_numpy(dtype=float) / secs
-    L = np.log10(1.0 + rates[:, :3])              # ctx/s, gen/s, img/s in log space
-    color = kde_smooth_gpu(L, rates[:, 3])        # KDE-smoothed requests/s
-    labels.append(f"{name}" + (" (15k sample)" if len(w) == MAX_POINTS else ""))
-    traces.append(go.Scatter3d(
-        x=L[:, 0], y=L[:, 1], z=L[:, 2],
-        mode="markers",
-        marker=dict(
-            size=2.5,
-            color=color,
-            colorscale=[[0, "#f7f9fc"], [0.5, "#2a78d6"], [1, "#123c74"]],
-            colorbar=dict(title="req/s<br>(KDE-smoothed)", thickness=14),
-            opacity=0.75,
-        ),
-        customdata=np.column_stack([rates[:, :3], color]),
-        hovertemplate=("ctx/s %{customdata[0]:,.0f} · gen/s %{customdata[1]:,.0f}"
-                       " · img/s %{customdata[2]:,.1f}<br>req/s (smoothed)"
-                       " %{customdata[3]:.2f}<extra></extra>"),
+    ctx = np.log10(1.0 + w["ctx"].to_numpy(float) / secs)
+    gen = np.log10(1.0 + w["gen"].to_numpy(float) / secs)
+    img = w["images"].to_numpy(float) / secs
+    gx, gy, dens, cond = kde_surface_gpu(np.column_stack([ctx, gen]), img)
+    cond_log = np.log10(1.0 + cond)
+    cmax_log = max(cmax_log, float(np.nanmax(cond_log)))
+    surfaces.append((name, gx, gy, dens, cond, cond_log))
+    labels.append(name)
+
+traces = []
+ctick_vals = [0, 1, 2]
+ctick_txt = ["0", "9", "99"]
+for name, gx, gy, dens, cond, cond_log in surfaces:
+    traces.append(go.Surface(
+        x=gx, y=gy, z=dens,
+        surfacecolor=cond_log,
+        cmin=0.0, cmax=cmax_log,
+        colorscale=[[0, "#f7f9fc"], [0.5, "#2a78d6"], [1, "#123c74"]],
+        colorbar=dict(title="E[img/s | ctx,gen]", thickness=14,
+                      tickvals=ctick_vals, ticktext=ctick_txt),
+        customdata=np.stack([cond], axis=-1),
+        hovertemplate=("log ctx/s %{x:.2f} · log gen/s %{y:.2f}<br>"
+                       "density %{z:.3g}<br>E[img/s] %{customdata[0]:,.1f}"
+                       "<extra></extra>"),
         visible=False,
         name=name,
+        showscale=True,
     ))
 traces[-1].visible = True  # default: 60s
 
-def axis(title):
-    ticks = [0, 1, 2, 3, 4, 5]
-    return dict(title=title, tickvals=ticks,
-                ticktext=[f"{10**t - 1:,.0f}" for t in ticks])
-
-buttons = [dict(label=lbl,
-                method="update",
+xt = [0, 1, 2, 3, 4, 5]
+xl = ["0", "9", "99", "999", "9,999", "99,999"]
+buttons = [dict(label=lbl, method="update",
                 args=[{"visible": [j == i for j in range(len(traces))]}])
            for i, lbl in enumerate(labels)]
-buttons_default = len(labels) - 1
 
 fig = go.Figure(data=traces)
 fig.update_layout(
-    title="Demand space: (ctx/s, gen/s, img/s), color = KDE-smoothed request rate",
-    scene=dict(xaxis=axis("ctx tokens/s"), yaxis=axis("gen tokens/s"),
-               zaxis=axis("images/s")),
+    title="KDE density surface of (ctx/s, gen/s) — height P(ctx,gen), color E[img/s | ctx,gen]",
+    scene=dict(
+        xaxis=dict(title="ctx tokens/s", tickvals=xt, ticktext=xl),
+        yaxis=dict(title="gen tokens/s", tickvals=xt, ticktext=xl),
+        zaxis=dict(title="density"),
+    ),
     updatemenus=[dict(type="buttons", direction="right", x=0.5, xanchor="center",
-                      y=1.08, active=buttons_default, buttons=buttons)],
+                      y=1.08, active=len(labels) - 1, buttons=buttons)],
     margin=dict(l=0, r=0, t=80, b=0),
     template="plotly_white",
 )
