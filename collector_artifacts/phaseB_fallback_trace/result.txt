@@ -1,0 +1,28 @@
+# Encoder-timing fallback trace (2026-07-06)
+# Question: what does AIC use for ViT encoder timing on systems WITHOUT
+# encoder_attention_perf.parquet (e.g. rtx_pro_6000_server)?
+
+## _build_op_sources semantics (perf_database.py:1592)
+Priority-ordered sources: (1) active backend/version, (2) other versions of same
+framework (newest first), (3) other frameworks. Cross-SYSTEM borrowing does NOT
+exist — sources are all within the same system's data dir.
+
+## Runtime behavior on rtx_pro_6000_server (vllm 0.22.0), b=1 s=784 n=16 d=72 bf16
+SILICON  -> PerfDataNotAvailableError (hard error, no fallback)
+HYBRID   -> EmpiricalNotImplementedError (no empirical utilisation data for op)
+EMPIRICAL-> EmpiricalNotImplementedError
+SOL      -> 0.00605 ms  (speed-of-light bound)
+rtx_5090 measured silicon, same shape: 0.03580 ms
+=> SOL underestimates encoder attention ~5.9x at this shape.
+
+## Why Qwen3-VL support-matrix rows PASS on systems without encoder data
+Support-matrix commands pass no image dimensions -> num_images_per_request=0 ->
+_run_encoder_phase returns early: the ViT is not costed at all. "PASS" = text-only
+costing. Any image-aware costing on such systems either hard-fails (SILICON/HYBRID)
+or silently uses a ~6x-optimistic SOL bound.
+
+## Consequence for thesis / upstream
+Collected encoder_attention silicon data is REQUIRED for meaningful VLM encoder
+costing; there is no usable fallback. The rtx_5090 collection closes this gap for
+consumer Blackwell, and the same collection should be run on rtx_pro_6000_server
+upstream.

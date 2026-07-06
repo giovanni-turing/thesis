@@ -1,0 +1,5 @@
+framework,version,device,op_name,kernel_source,batch_size,isl,num_heads,head_dim,attn_dtype,latency
+VLLM,0.22.0,NVIDIA GeForce RTX 5090,encoder_attention,vllm_vit_flash_attn,4,32768,8,64,bfloat16,37.75593566894531
+VLLM,0.22.0,NVIDIA GeForce RTX 5090,encoder_attention,vllm_vit_flash_attn,32,576,2,64,bfloat16,0.03643733263015747
+VLLM,0.22.0,NVIDIA GeForce RTX 5090,encoder_attention,vllm_vit_flash_attn,4,3072,20,72,bfloat16,1.3168799877166748
+VLLM,0.22.0,NVIDIA GeForce RTX 5090,encoder_attention,vllm_vit_flash_attn,32,1024,4,72,bfloat16,0.2637813289960225

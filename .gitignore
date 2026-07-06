@@ -1,0 +1,10 @@
+# thesis-artifacts repo: track only research artifacts, progress notes, and top-level docs.
+# Each subproject below is its own independent git checkout — never track them here.
+ai-dynamo/
+rapids/
+eda/
+models/
+*.whl
+# scratch/venvs
+collector_artifacts/phase9_two_pool/dynamo-venv/
+__pycache__/

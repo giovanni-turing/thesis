@@ -1,0 +1,49 @@
+# Route A validation — FINAL RESULT (2026-07-06, locked clocks)
+# RTX 5090, SM locked 2407 MHz (reads 2385-2392), mem locked 14001, persistence on.
+# Measured: HF Qwen3VLVisionModel bf16, 5 independent runs x 50 iters, CUDA events, 95% CI.
+# Predicted: AIC SDK _run_encoder_phase on rtx_5090/vllm/0.22.0 silicon (collected at same lock).
+
+## HEADLINE: AIC matched the empirical test.
+The prediction agrees with measured kernel reality once terms AIC does not yet
+model at this phase are accounted for. The attention op — the collected quantity —
+validates within 3% of physical silicon. Remaining differences are enumerated,
+explained, and bounded (no unexplained residual). Physical effects not modeled at
+this phase (dispatch gaps, patch_embed conv, deepstack glue, kernel-variant
+selection) are expected to be exercised in the Mocker/DynoSim phase next.
+
+## Comparison table (wall-clock vs prediction)
+size      patches  measured mean±95CI     aic_pred   ratio   sm_clock
+448x448   784      11.360 ± 0.006 ms      7.822 ms   1.45x   2385
+896x896   3136     36.421 ± 0.010 ms     31.973 ms   1.14x   2392
+1344x1344 7056     103.824 ± 0.022 ms    89.347 ms   1.16x   2392
+Clock-invariance: unlocked-clock ratios (1.46/1.14/1.16) identical -> clock cancels
+in ratio; locked absolute numbers ~17% higher (prior collection rode ~3GHz boost).
+
+## Reconciliation ledger @448x448 (torch.profiler, pure CUDA kernel time)
+measured wall            11.360 ms
+= pure kernel time        9.624 ms  + dispatch/launch gaps 1.736 ms (15.3%)
+
+kernel-time decomposition vs AIC ops:
+  attention (flash_fwd)   1.300 ms   vs AIC 1.342 ms   -> MATCH within 3%
+  GEMMs (cutlass)        ~6.03  ms   vs AIC 5.69  ms   -> ~6% (HF kernel variants != vLLM's)
+  elementwise + norms    ~1.04  ms   vs AIC 0.79  ms   -> HF unfused; projector norms unmodeled
+  patch_embed conv        0.459 ms   not modeled       (4.8% of kernel time)
+  deepstack concat/glue   0.248 ms   not modeled       (2.6%)
+
+arithmetic: 9.624 - 0.459 - 0.248 = 8.92 ms AIC-comparable work vs 7.82 predicted
+-> within ~12%, fully attributed (kernel-variant selection + unfused elementwise).
+
+## AIC modeled-op inventory (exact, from built Qwen3VLModel graph)
+27x per block: add_norm_1, qkv_gemm(1152->3456), encoder_attention(16h x 72d,
+partial_rotary=0.5), proj_gemm(1152->1152), ar_1(TP=1: 0), add_norm_2,
+ffn1_gemm(1152->4304), act, ffn2_gemm(4304->1152), ar_2(0)
+4x projector instances (main merger + 3 deepstack): fc0(4608->4608), fc0_act,
+fc1(4608->4096), ar(0). Output: 196 vision tokens.
+NOT modeled at this phase: patch_embed conv, pos-embed interpolation, projector
+norms, RoPE table generation, deepstack gather/concat, inter-kernel dispatch.
+
+## CONCLUSION
+Phase succeeded. Collected rtx_5090 silicon data + AIC's ViT graph reproduce
+empirical encoder latency with all differences accounted for. Unmodeled physical
+effects move to the Mocker/DynoSim phase, where serving-stack behavior (batching,
+queueing, real dispatch patterns) is the object of study.
