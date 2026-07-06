@@ -102,9 +102,21 @@ traces[-1].visible = True  # default: 60s
 
 xt = [0, 1, 2, 3, 4, 5]
 xl = ["0", "9", "99", "999", "9,999", "99,999"]
-buttons = [dict(label=lbl, method="update",
-                args=[{"visible": [j == i for j in range(len(traces))]}])
-           for i, lbl in enumerate(labels)]
+# per-resolution axis renormalization: each button also updates scene ranges
+def rng(a, pad=0.03):
+    lo, hi = float(np.nanmin(a)), float(np.nanmax(a))
+    span = hi - lo
+    return [lo - pad * span, hi + pad * span]
+
+buttons = []
+for i, (name, gx, gy, dens, cond, cond_log) in enumerate(surfaces):
+    buttons.append(dict(
+        label=name, method="update",
+        args=[{"visible": [j == i for j in range(len(traces))]},
+              {"scene.xaxis.range": rng(gx),
+               "scene.yaxis.range": rng(gy),
+               "scene.zaxis.range": [0, float(np.nanmax(dens)) * 1.05]}],
+    ))
 
 fig = go.Figure(data=traces)
 fig.update_layout(
