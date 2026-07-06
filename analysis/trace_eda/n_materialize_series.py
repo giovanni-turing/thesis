@@ -1,17 +1,18 @@
-"""EDA N — materialize the binned time series as reusable artifacts (GPU/cuDF).
+"""EDA N — materialize binned time series (GPU/cuDF).
 
-Persists what every script so far recomputed on the fly:
-  series/rates_1min.parquet : per-minute requests, images, ctx, gen
-                              (+ per-class image counts) — zero-filled clock
-  series/rates_1s.parquet   : per-second, same 8 columns — zero-filled
-  series/rates_{15s,30s,45s}.parquet : block-sums of the per-second series,
-                              same 8 columns as 1min (incl. per-class images)
-Consumers: predictors/ (forecasting input), trace_to_two_pool.py (scenarios).
-Convention: counts per window (NOT divided by window seconds); rate = value/60
-or /1 as appropriate.
+Plain binning of the trace into zero-filled windows. One schema, five
+resolutions: index window_start; columns requests, images, ctx, gen
+(counts per window — divide by window seconds for rates).
+
+  series/rates_1s.parquet    604,800 rows
+  series/rates_15s.parquet    40,320 rows
+  series/rates_30s.parquet    20,160 rows
+  series/rates_45s.parquet    13,440 rows
+  series/rates_1min.parquet   10,080 rows
 """
 import os
 
+import numpy as np
 import pandas as pd
 
 from _common import load_trace
@@ -20,49 +21,20 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "series")
 os.makedirs(OUT, exist_ok=True)
 
 df = load_trace()
-k = df["NumImages"].pow(0.5).round().astype("int32")
-df = df.assign(k=k, cls="text")
-for name, cond in [("single", (df["k"] == 1) & (df["NumImages"] > 0)),  # k=1 incl. NumImages=2 rounding down
-                   ("tiled_small", (df["k"] >= 2) & (df["k"] <= 5) & (df["NumImages"] > 1)),
-                   ("tiled_large", (df["k"] >= 6) & (df["k"] <= 10)),
-                   ("frames", df["k"] > 10)]:
-    df["cls"] = df["cls"].where(~cond, name)
 
-def base_agg(freq):
-    w = df.assign(win=df["ts"].dt.floor(freq)).groupby("win").agg(
-        requests=("NumImages", "count"), images=("NumImages", "sum"),
-        ctx=("ContextTokens", "sum"), gen=("GeneratedTokens", "sum"),
-    ).sort_index().to_pandas()
-    full = pd.date_range(w.index.min(), w.index.max(), freq=freq)
-    return w.reindex(full, fill_value=0)
-
-# 1-min: base + per-class image counts
-w1m = base_agg("min")
-wc = df.assign(win=df["ts"].dt.floor("min")).groupby(["win", "cls"])["NumImages"].sum()
-wc = wc.sort_index().to_pandas().unstack(fill_value=0).reindex(w1m.index, fill_value=0)
-for c in ["single", "tiled_small", "tiled_large", "frames"]:
-    w1m[f"images_{c}"] = wc[c] if c in wc.columns else 0
-w1m.index.name = "window_start"
-w1m.to_parquet(os.path.join(OUT, "rates_1min.parquet"))
-
-w1s = base_agg("s")
-# per-class image counts at 1 s, for block-sums to intermediate windows
-wcs = df.assign(win=df["ts"].dt.floor("s")).groupby(["win", "cls"])["NumImages"].sum()
-wcs = wcs.sort_index().to_pandas().unstack(fill_value=0).reindex(w1s.index, fill_value=0)
-for c in ["single", "tiled_small", "tiled_large", "frames"]:
-    w1s[f"images_{c}"] = wcs[c] if c in wcs.columns else 0
+w1s = df.assign(win=df["ts"].dt.floor("s")).groupby("win").agg(
+    requests=("NumImages", "count"), images=("NumImages", "sum"),
+    ctx=("ContextTokens", "sum"), gen=("GeneratedTokens", "sum"),
+).sort_index().to_pandas()
+w1s = w1s.reindex(pd.date_range(w1s.index.min(), w1s.index.max(), freq="s"), fill_value=0)
 w1s.index.name = "window_start"
 w1s.to_parquet(os.path.join(OUT, "rates_1s.parquet"))
+print(f"rates_1s.parquet:   {w1s.shape}")
 
-import numpy as np
-
-for secs in (15, 30, 45):
+for secs, name in [(15, "15s"), (30, "30s"), (45, "45s"), (60, "1min")]:
     blocks = np.arange(len(w1s)) // secs
     wb = w1s.groupby(blocks).sum()
     wb.index = w1s.index[::secs][: len(wb)]
     wb.index.name = "window_start"
-    wb.to_parquet(os.path.join(OUT, f"rates_{secs}s.parquet"))
-    print(f"rates_{secs}s.parquet:  {wb.shape}")
-
-print(f"rates_1min.parquet: {w1m.shape} cols={list(w1m.columns)}")
-print(f"rates_1s.parquet:   {w1s.shape}")
+    wb.to_parquet(os.path.join(OUT, f"rates_{name}.parquet"))
+    print(f"rates_{name}.parquet: {wb.shape}")
