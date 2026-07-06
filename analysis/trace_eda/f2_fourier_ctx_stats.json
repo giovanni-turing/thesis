@@ -1,0 +1,14 @@
+{
+ "ctx_total": {
+  "spectral_slope_beta": 0.7183548515834868,
+  "hurst_from_beta": 0.8591774257917434
+ },
+ "ctx_multimodal": {
+  "spectral_slope_beta": 0.735087143648596,
+  "hurst_from_beta": 0.867543571824298
+ },
+ "ctx_text_only": {
+  "spectral_slope_beta": 0.5138886595279991,
+  "hurst_from_beta": 0.7569443297639995
+ }
+}

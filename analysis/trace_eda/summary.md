@@ -180,3 +180,13 @@ own signal alongside images/s, per the per-pool-signals design.
 panel. imgs×ctx shows the tight ~66-tok/img ridge at high counts over wide
 text-driven spread at low counts; imgs×gen shows discrete k² stripes with no
 trend (independence); ctx×gen a diffuse weak-coupled cloud (ρ=0.17).
+
+## F2 — Fourier analysis of the ctx signal (with modality decomposition)
+
+`f2_fourier_ctx.png`: ctx_total 1/f^0.72 (**H ≈ 0.86**); decomposed,
+ctx_multimodal 1/f^0.74 (H ≈ 0.87) vs ctx_text_only 1/f^0.51 (H ≈ 0.76).
+The total prefill signal's spectral shape and persistence are inherited
+almost entirely from the vision-borne component — the frequency-domain
+counterpart of the 72.5% volume share (§G) and the r≈0.89 images~ctx
+coupling (§E). Diurnal lines present in all three; text-only prefill hits
+its noise floor sooner (less forecastable structure).
