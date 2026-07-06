@@ -8,3 +8,8 @@ models/
 # scratch/venvs
 collector_artifacts/phase9_two_pool/dynamo-venv/
 __pycache__/
+.claude
+.codex
+.agents
+# KvikIO/GPUDirect-Storage cuFile logs
+cufile.log
