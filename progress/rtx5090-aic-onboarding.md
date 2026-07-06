@@ -22,7 +22,7 @@ Workflow: `aic-auto-collect` skill phases. Audit artifacts per phase under
 | 7 — Validate consumption | ✅ core done | `get_database('rtx_5090','vllm','0.22.0')` loads; `query_encoder_attention(b=8, n=16, head_size=72, bf16)`: seq 784→0.173ms, 1764→0.746ms, 3136→2.137ms, 6400→8.761ms (clean quadratic). Pending: sanity charts, full-model query (needs gemm) |
 | 6b — ViT gemm collection (bf16) | ✅ done | 35,742/35,742 cases → 33,516 unique rows. Gaps recorded: 2,228 giant-shape OOM (32GB limit) + 105 pre-skipped (>4GB footprint cutoff). Incident: CUDA-graph state corruption after OOM churn segfaulted two runs → fixed by pre-skip cutoff + `empty_cache` + chunked container restarts; 106 small-shape false-OOMs requeued, all clean (0 errors) |
 | 7b — Full ViT costing | ✅ done | SDK `_run_encoder_phase` for Qwen3-VL-8B @448×448: **6.66 ms total**, GEMMs dominate (ffn1 1.50 / ffn2 1.24 / qkv 1.14 / attn 1.13 ms), sources silicon/mixed/empirical as designed |
-| 8 — Handoff | 🔄 partial | Two DCO commits on `data/rtx_5090-vllm-0.22.0`: system+encoder parquet, gemm parquet. Pending: DoD summary, upstream PR decision, fallback trace |
+| 8 — Handoff | ✅ done | 3 DCO commits pushed to fork `gio-turing/aiconfigurator`; **draft PR opened upstream: [ai-dynamo/aiconfigurator#1312](https://github.com/ai-dynamo/aiconfigurator/pull/1312)** (Summary/Validation body incl. locked-clock methodology, documented gaps, 3% empirical cross-check, no-fallback motivation) |
 | A — Route A validation | ✅ **SUCCEEDED** (final) | **AIC matched the empirical test.** Locked clocks (SM 2407/mem 14001), 5×50 iters, 95% CI. Wall: 11.360±0.006 / 36.421±0.010 / 103.824±0.022 ms vs predicted 7.822 / 31.973 / 89.347 ms. Profiler reconciliation @448²: attention matches within 3%; kernel time minus unmodeled ops (patch_embed 0.459, deepstack glue 0.248) = 8.92 vs 7.82 ms (~12%, attributed to HF-vs-vLLM kernel variants + unfused elementwise); dispatch gaps 1.736 ms (15.3%). No unexplained residual — AIC simply does not model all physical effects at this phase (dispatch, conv, glue); those move to the Mocker/DynoSim phase. Full ledger: `collector_artifacts/phaseA_validation/result.txt` |
 
 ## Key findings / decisions
@@ -54,8 +54,8 @@ Workflow: `aic-auto-collect` skill phases. Audit artifacts per phase under
 
 ## Next actions
 
-1. Phase 8: Definition-of-Done handoff summary; decide upstream PR
-   (encoder parquet is a genuine gap-fill; yaml + gemm make it complete)
+1. ~~Phase 8 handoff~~ ✅ done — draft PR #1312 opened from fork; PR body serves
+   as the Definition-of-Done summary
 2. ~~Fallback trace~~ ✅ done — **no fallback exists**: SILICON/HYBRID/EMPIRICAL
    all hard-error without encoder parquet; only SOL answers and it underestimates
    ~5.9× (0.0061 vs 0.0358 ms measured). Qwen3-VL support-matrix "PASS" on such
