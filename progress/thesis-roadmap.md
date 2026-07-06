@@ -80,13 +80,17 @@ the two theses' artifacts).
 ## Phase 2 — Fidelity upgrades to the two-pool simulation
 
 **Goal**: make both pools' timing defensible, not just plumbed.
+Progress + results: `phase2-simulation.md`. Runner: `simulation/run_replay.sh`.
 
-1. **Language-pool AIC timing**: wire h100_sxm AIC engine timing into
-   `dynamo.replay`. Decision point (blocker for 2 and 3b): the PyPI `ai-dynamo`
-   wheel used in the minimal test predates `agentic_mooncake`/`tool_wait_ms`
-   and may lack engine-timing AIC and `--planner-config` maturity — evaluate
-   building dynamo from source (maturin, per its CLAUDE.md) vs. a newer wheel.
-   Resolve this FIRST; it determines the runtime for everything after.
+1. **Language-pool AIC timing** — ✅ DONE. h100_sxm/vLLM 0.22.0 AIC engine
+   timing is live in `dynamo.replay`. The feared blocker was wrong: the pinned
+   `ai-dynamo==1.2.1` wheel ALREADY exposes engine-timing AIC (`aic_backend`/
+   `aic_system`/... in `replay/main.py` + `mocker/config.py`); it only needed
+   `aiconfigurator` co-resident in the replay env (the wheel is cp310-abi3, so
+   `uv pip install ai-dynamo==1.2.1` into the aiconfigurator .venv suffices — no
+   source build). Poly-vs-AIC delta quantified (AIC: slower decode, 3–5× heavier
+   latency tails). `agentic_mooncake`/`--planner-config` maturity is a SEPARATE
+   axis that only gates Phase 3.2 (SLA Planner) — decide source-build THEN.
 2. **Encoder-pool realism**: per-request image counts and sizes from the trace
    (AIC latency queried per size — the collected sweep covers the shapes),
    batching effects on the encoder (AIC batch dimension), and a documented
@@ -151,7 +155,9 @@ baselines during bursts, at equal or lower GPU-hours.
   14001,14001`, persistence on) before any GPU measurement session.
 - GPU is shared with the RAG stack: `docker compose -p mmrag stop qwen-embed
   qwen-rerank` (dir `/home/gio/claude`) before GPU work; `start` to restore.
-- The dynamo runtime decision (source build vs wheel) gates Phases 2–4; make
-  it at the start of Phase 2, not mid-experiment.
+- The dynamo runtime decision (source build vs wheel) does NOT gate engine-
+  timing AIC (the 1.2.1 wheel + co-resident aiconfigurator already do it, see
+  Phase 2.1). It only gates the SLA-Planner baseline + agentic_mooncake —
+  decide at the start of Phase 3.2.
 - Every phase keeps the audit discipline: scripts + captured results under
   `collector_artifacts/<phase>/`, committed to this repo.

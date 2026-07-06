@@ -220,10 +220,23 @@ image and 256 text tokens per request, \SI{20}{\milli\second} arrival
 interval) produces a complete AIPerf-style report (mean time-to-first-token
 \SI{32.4}{\milli\second}; 27.6 requests per second), confirming that
 measured silicon, analytical encoder costing, queueing composition, and
-the LLM-pool simulator interoperate end to end. Raising this pipeline's
-fidelity --- AIC engine timing for the language pool on the datacenter
-system, realistic image-size distributions, load sweeps, and planner-in-
-the-loop simulation --- is the subject of the next phase.
+the LLM-pool simulator interoperate end to end.
+
+The first of the fidelity upgrades this pipeline invites --- AIC engine
+timing for the language pool on the datacenter \texttt{h100\_sxm} system,
+replacing the simulator's default polynomial timing --- has since been
+carried out, driven by the real Azure multimodal trace rather than the
+synthetic smoke workload. It required no engine rebuild: the shipped
+inference runtime already exposes the engine-timing AIC surface, and
+enabling it only meant co-locating the AIC performance model with the
+replay runtime in one interpreter. On an identical trace window and
+topology, the calibrated timing exposes markedly heavier tail latency than
+the polynomial default (99th-percentile time-to-first-token
+${\approx}1.2\times$, tail maxima $3$--$5\times$, per-user decode throughput
+${\approx}12\%$ lower) --- precisely the burst-time behaviour a cost-blind
+timing model flattens. Realistic image-size distributions, load sweeps to
+each pool's saturation knee, and planner-in-the-loop simulation remain for
+the phase that follows.
 
 \section{Summary}
 
