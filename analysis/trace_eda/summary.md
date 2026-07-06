@@ -76,3 +76,50 @@ exactly 7 days (2024-10-15T12:00Z → 2024-10-22T12:00Z) · computed on GPU
 6. Drop the 151 duplicate rows; keep zero-token rows (they are real
    requests; give output_length max(1, GeneratedTokens) if the simulator
    requires ≥1).
+
+## E — Comprehensive: arrival process, modality splits, correlations
+
+### Arrival process is bursty at every operational scale (not Poisson)
+
+- Inter-arrival CV = 1.55 (Poisson would be 1); the survival curve is
+  heavy-tailed against the exponential reference.
+- Per-second counts are overdispersed vs Poisson(1.65).
+- **Fano factor grows without bound with window size**: 1.8 (1 s) → 8.0
+  (10 s) → 31.9 (1 min) → 186 (10 min) → 938 (1 h). Burstiness is
+  scale-free / long-range dependent — no aggregation window "smooths it
+  away", so reactive smoothing alone cannot absorb it.
+
+### Distributions by modality
+
+- Multimodal requests have **longer inputs but shorter outputs**:
+  ContextTokens p50 1,422 vs 792 (text-only); GeneratedTokens p50 80 vs
+  147 — a VQA/captioning profile vs longer-form text chat.
+- Hill tail indices (top 1%): GeneratedTokens ≈ 1.9 (genuinely heavy tail),
+  ContextTokens ≈ 6.6, NumImages ≈ 7.2 (bounded-ish power-law tails).
+
+### Correlations
+
+Request level (Spearman, all): imgs~ctx **0.50**, imgs~gen **−0.06**,
+ctx~gen 0.17. Within multimodal only: imgs~ctx **0.83** (image tiles drive
+context length), imgs~gen **0.08** (decode length is independent of image
+count — median gen tokens stays ≈50–140 across 1…529 images, with one
+distinct 435-token class at 225 images worth noting as a workload cluster).
+
+Window level (1 min, Pearson): images~ctx **0.89** (vision load ≈ prefill
+load — the two are the same pressure), images~gen 0.28 with the lagged
+cross-correlation peaking sharply **at lag 0** (no lead/lag): image load
+does not forecast decode load and vice versa.
+
+### Implications for the thesis pipeline
+
+1. **Independent per-pool forecasting is justified**: vision and decode
+   demands are weakly coupled and contemporaneous — neither is derivable
+   from the other (nor from request rate; §D).
+2. **Prefill and vision pressure travel together** (r≈0.89): the encoder
+   pool and the LLM prefill stage stress simultaneously — relevant for
+   disaggregated prefill/decode splits on the language side.
+3. **Scale-free burstiness** means SLA compliance under bursts is a
+   provisioning-lead-time problem, not a smoothing problem — exactly the
+   regime where forecast-driven scaling can beat reactive scaling.
+4. GeneratedTokens' heavy tail (Hill ≈ 1.9) makes decode-side capacity
+   planning quantile-driven, not mean-driven.

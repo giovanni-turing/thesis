@@ -1,0 +1,146 @@
+{
+ "arrivals": {
+  "mean_rate_req_per_s": 1.653438333827202,
+  "interarrival_cv": 1.549343736354385
+ },
+ "fano_factor_by_window": {
+  "s": 1.7638877630419363,
+  "10s": 7.990738587608923,
+  "min": 31.86402190693521,
+  "10min": 186.43410640714995,
+  "h": 938.1234256287424
+ },
+ "ContextTokens": {
+  "text_only": {
+   "p50": 792.0,
+   "p99": 12737.040000000037,
+   "mean": 1601.310024
+  },
+  "multimodal": {
+   "p50": 1422.0,
+   "p99": 35932.0,
+   "mean": 4220.598964
+  },
+  "hill_tail_index_top1pct": 6.61218241022759
+ },
+ "GeneratedTokens": {
+  "text_only": {
+   "p50": 147.0,
+   "p99": 1278.0,
+   "mean": 206.445698
+  },
+  "multimodal": {
+   "p50": 80.0,
+   "p99": 785.0,
+   "mean": 166.817636
+  },
+  "hill_tail_index_top1pct": 1.9380202330218295
+ },
+ "NumImages_multimodal": {
+  "p50": 1.0,
+  "p90": 25.0,
+  "p99": 529.0,
+  "hill_tail_index_top1pct": 7.206221191809591
+ },
+ "request_level_corr": {
+  "pearson_all": {
+   "NumImages": {
+    "NumImages": 1.0,
+    "ContextTokens": 0.757,
+    "GeneratedTokens": -0.02
+   },
+   "ContextTokens": {
+    "NumImages": 0.757,
+    "ContextTokens": 1.0,
+    "GeneratedTokens": 0.013
+   },
+   "GeneratedTokens": {
+    "NumImages": -0.02,
+    "ContextTokens": 0.013,
+    "GeneratedTokens": 1.0
+   }
+  },
+  "spearman_all": {
+   "NumImages": {
+    "NumImages": 1.0,
+    "ContextTokens": 0.503,
+    "GeneratedTokens": -0.061
+   },
+   "ContextTokens": {
+    "NumImages": 0.503,
+    "ContextTokens": 1.0,
+    "GeneratedTokens": 0.166
+   },
+   "GeneratedTokens": {
+    "NumImages": -0.061,
+    "ContextTokens": 0.166,
+    "GeneratedTokens": 1.0
+   }
+  },
+  "spearman_multimodal_only": {
+   "NumImages": {
+    "NumImages": 1.0,
+    "ContextTokens": 0.827,
+    "GeneratedTokens": 0.08
+   },
+   "ContextTokens": {
+    "NumImages": 0.827,
+    "ContextTokens": 1.0,
+    "GeneratedTokens": 0.069
+   },
+   "GeneratedTokens": {
+    "NumImages": 0.08,
+    "ContextTokens": 0.069,
+    "GeneratedTokens": 1.0
+   }
+  }
+ },
+ "gen_median_by_numimages": {
+  "1": 71.0,
+  "4": 140.0,
+  "9": 140.0,
+  "16": 109.0,
+  "25": 37.0,
+  "36": 131.0,
+  "49": 86.0,
+  "100": 118.0,
+  "196": 86.0,
+  "225": 435.0,
+  "361": 49.0,
+  "400": 50.0,
+  "441": 48.0,
+  "484": 48.0,
+  "529": 52.0
+ },
+ "window_level_pearson_1min": {
+  "requests": {
+   "requests": 1.0,
+   "images": 0.355,
+   "ctx": 0.663,
+   "gen": 0.812
+  },
+  "images": {
+   "requests": 0.355,
+   "images": 1.0,
+   "ctx": 0.894,
+   "gen": 0.277
+  },
+  "ctx": {
+   "requests": 0.663,
+   "images": 0.894,
+   "ctx": 1.0,
+   "gen": 0.545
+  },
+  "gen": {
+   "requests": 0.812,
+   "images": 0.277,
+   "ctx": 0.545,
+   "gen": 1.0
+  }
+ },
+ "img_gen_xcorr_1min": {
+  "best_lag_minutes": 0,
+  "best_corr": 0.27695157069754844,
+  "at_lag_0": 0.27695157069754844
+ }
+}
