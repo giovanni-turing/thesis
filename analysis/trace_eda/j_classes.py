@@ -19,7 +19,7 @@ k = df["NumImages"].pow(0.5).round().astype("int32")
 df = df.assign(k=k)
 conds = [
     ("text", df["NumImages"] == 0),
-    ("single", df["NumImages"] == 1),
+    ("single", (df["k"] == 1) & (df["NumImages"] > 0)),  # k=1 incl. NumImages=2 rounding down
     ("tiled_small", (df["k"] >= 2) & (df["k"] <= 5) & (df["NumImages"] > 1)),
     ("tiled_large", (df["k"] >= 6) & (df["k"] <= 10)),
     ("frames", df["k"] > 10),

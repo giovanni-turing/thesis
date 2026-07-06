@@ -20,7 +20,7 @@ from _common import C_AQUA, C_BLUE, C_YELLOW, MUTED, load_trace, plt, save_fig, 
 df = load_trace()
 k_side = df["NumImages"].pow(0.5).round().astype("int32")
 df = df.assign(k=k_side, cls="text")
-for name, cond in [("single", df["NumImages"] == 1),
+for name, cond in [("single", (df["k"] == 1) & (df["NumImages"] > 0)),  # k=1 incl. NumImages=2 rounding down
                    ("tiled_small", (df["k"] >= 2) & (df["k"] <= 5) & (df["NumImages"] > 1)),
                    ("tiled_large", (df["k"] >= 6) & (df["k"] <= 10)),
                    ("frames", df["k"] > 10)]:
