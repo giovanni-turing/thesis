@@ -173,3 +173,10 @@ vision-borne burstiness (r≈0.89 with images/s, 72% of volume) — sizing it
 off request rate alone underestimates burst pressure ~2.7×; (ii) ctx/s is
 itself forecastable (H≈0.86, 15-min memory) and should be forecast as its
 own signal alongside images/s, per the per-pool-signals design.
+
+## H — Pairwise density maps
+
+`h_pairwise_density.png`: three log-log 2D densities, one sequential hue per
+panel. imgs×ctx shows the tight ~66-tok/img ridge at high counts over wide
+text-driven spread at low counts; imgs×gen shows discrete k² stripes with no
+trend (independence); ctx×gen a diffuse weak-coupled cloud (ρ=0.17).
