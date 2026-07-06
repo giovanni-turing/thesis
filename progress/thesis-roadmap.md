@@ -51,7 +51,13 @@ written up. Summary of what exists and can be relied on:
 
 ---
 
-## Phase 1 — Azure trace → two-pool workload — NEXT
+## Phase 1 — Azure trace → two-pool workload — ✅ DONE
+
+Delivered as `workload/trace_to_two_pool.py` (commit `6b9bbc1`): per request,
+an AIC-costed vision-pool arrival (rtx_5090 silicon, 448 px/image) + an
+LLM-pool mooncake row with disjoint `hash_ids`; encoder FIFO delay folded
+into the LLM arrival timestamp (`--no-encoder-shift` for the ablation).
+Original scope below for reference.
 
 **Goal**: replace the synthetic smoke workload with the real bursty signal the
 thesis's motivation is built on, so every downstream experiment runs on the
@@ -77,7 +83,7 @@ LLM inference trace — the same trace analyzed in the thesis's trace chapter).
 workload statistics matching the trace chapter's numbers (sanity link between
 the two theses' artifacts).
 
-## Phase 2 — Fidelity upgrades to the two-pool simulation
+## Phase 2 — Fidelity upgrades to the two-pool simulation — IN PROGRESS (2.1 ✅)
 
 **Goal**: make both pools' timing defensible, not just plumbed.
 Progress + results: `phase2-simulation.md`. Runner: `simulation/run_replay.sh`.
@@ -113,26 +119,33 @@ Progress + results: `phase2-simulation.md`. Runner: `simulation/run_replay.sh`.
    established reactive baseline. Record SLA compliance, scaling actions, and
    GPU-hours over time, especially through the burst episodes.
 
-## Phase 4 — Predictive scaling (the contribution) — `predictors/`
+## Phase 4 — Predictive scaling (the contribution) — `predictors/` — IN PROGRESS (4.1–4.2 ✅)
 
 **Goal**: show that forecasting each pool's OWN demand signal beats both
 baselines during bursts, at equal or lower GPU-hours.
+Progress + results: `phase4-predictors.md`. Chapter draft: `tex/predictors.tex`.
 
-1. **`predictors/predictor.py` = the interface** (file created, currently
-   empty): sliding window of per-pool demand in → per-pool forecast out
-   (vision pool: image-load series, the signal rate-based scaling cannot see;
-   language pool: token-load series). Horizon must exceed replica cold-start
-   (tens of seconds to minutes on the thesis's platform).
-2. **Backends**: time-series foundation models already staged in `models/`
-   (chronos, timesfm, toto) plus cheap baselines (naive last-value, seasonal,
-   EWMA) — foundation-model-vs-naive is itself a reportable comparison.
-3. **Closed loop**: forecast → provisioning decision (with cold-start lead
-   time) → apply to the two-pool simulation → measure SLA compliance ×
+1. **Interface** — ✅ DONE. `predictor.py`: Bucket (targets + covariates at one
+   cadence) → Forecast (point + 9 quantiles); batch executor; clip-at-zero.
+2. **Backends + benchmark** — ✅ DONE. Six backends (naive/EWMA/Holt–Winters +
+   TimesFM-2.0-500M / Chronos-2 120M / Toto-2.0-2.5B zero-shot) benchmarked
+   rolling-origin (H=12, shared origin grid, per-model max context − headroom)
+   over all 5 resolutions × 4 signals, uni + native-covariate modes: **FMs beat
+   every baseline in all 20 cells** (~⅓ lower WAPE at 1 s); Toto-2 wins fine
+   resolutions, Chronos-2 coarse; horizon degradation mild (12 min lead ≈ free,
+   covers median 6-min burst onset); covariates ±0.4 % (help only ≤15 s);
+   median-point FMs are not improved by any fixed percentile (band = headroom).
+   19.2 M forecasts + metrics archived (`predictors/results/`).
+3. **Closed loop — NEXT**: forecast → provisioning decision (with cold-start
+   lead time) → apply to the two-pool simulation → measure SLA compliance ×
    GPU-hours vs Phase 3 baselines, with the six burst episodes as the
    headline scenarios and the ~10× missizing case made quantitative.
+   Note: needs Phase 2.2–2.3 (encoder realism, saturation knees) and Phase 3
+   baselines in place first.
 4. **Ablations**: forecast horizon vs cold-start time; per-pool signals vs
-   request-rate-only (the strawman the thesis argues against); forecast error
-   sensitivity.
+   request-rate-only (the strawman — forecast image load FROM request rate,
+   using the covariate machinery); forecast error sensitivity; quantile
+   calibration/coverage if p90-headroom provisioning is used.
 
 ## Phase 5 — Validation anchor + writing
 
