@@ -60,6 +60,20 @@ $4.7\times$. Burst behavior --- precisely what autoscaling experiments
 measure --- is visible only under calibrated timing, so all headline runs
 use AIC timing and the polynomial is retained for cheap coverage sweeps.
 
+\paragraph{Family transfer.} The language-pool numbers in this chapter are
+for Qwen3-VL-8B at TP1. A spot-check prices the family flagship,
+Qwen3-VL-235B-A22B at TP8 (MoE-TP~8), on the same shipped H100 data, window,
+and topology: TTFT p99 of 398 / 1{,}402~ms at $1\times$/$4\times$ the trace
+rate against the 8B's 307 / 882 --- the saturation knee lands in the same
+swept octave under the placeholder target --- with $2\times$ the decode
+latency throughout (TPOT 14.9 vs.\ 7.9~ms; 87 vs.\ 142 output tok/s per
+user), so a TPOT-based SLA would bind earlier for the flagship. The vision
+side needs no such caveat: the ViT \emph{and} its 4096-dimensional projector
+output are identical between the 8B and the 235B
+(Chapter~\ref{cap:aiconfigurator}), so the encoder cost model, the batching
+law, the burst-saturation result, and the handoff bound all transfer to the
+flagship unchanged.
+
 \begin{table}[htb]
 \centering
 \caption{Language pool under identical load and topology, polynomial vs.\
@@ -223,7 +237,9 @@ The latency targets used for knee detection are placeholders; the baseline
 chapter fixes the SLAs and re-derives operating points from these same
 curves. The topology is locked at 2$\times$2 workers here --- the
 worker-count grid is the static-optimal baseline's search space, not this
-chapter's. The vision pool inherits the uniform-448\textsuperscript{2}
+chapter's --- and language-pool results are reported for the 8B at TP1 with
+a 235B-TP8 spot-check (Section~\ref{sec:sim-timing}); intermediate family
+members (32B) were not priced. The vision pool inherits the uniform-448\textsuperscript{2}
 image assumption and AIC's ${\sim}1.14\times$ conservative encoder bias;
 the handoff term is an analytic bound, not a measured NIXL curve. Encoder
 delays fold into language-pool arrivals through the trace seam, which

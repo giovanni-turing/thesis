@@ -144,6 +144,27 @@ FIFO head-of-line blocking at low mean utilization: invisible to request-rate
 (2.2 req/s mean) or mean-utilization monitoring, exactly the provisioning gap
 the predictive-scaling contribution targets.
 
+## Result E — 235B-A22B at TP8: the model-size spot-check
+
+The family flagship, priced on the same shipped h100_sxm/vLLM 0.22.0 data
+(`Qwen3VLMoEModel`, tp=8 + moe_tp=8), on the same head2k isolation window and
+topology — via `run_replay.sh` env overrides (`AIC_MODEL`, `AIC_TP`,
+`AIC_MOE_TP`; defaults unchanged = 8B/TP1). Results: `simulation/results/235b/`.
+
+| s (offered) | 8B-TP1 TTFT mean/p99 (ms) | 235B-TP8 TTFT mean/p99 (ms) | 235B TPOT / tok/s/user |
+|---|---|---|---|
+| 1 (2.8 req/s) | 73 / 307 | 124 / 398 | 14.9 ms / 86.9 |
+| 4 (11.1 req/s) | 140 / 882 | 329 / 1,402 | 87.9 ms / 25.8 |
+| 16 (44.3 req/s) | 17,336 / 40,163 | 27,354 / 61,438 | 158 ms / 15.6 |
+
+Reading: under the placeholder TTFT p99 < 2 s target the 235B-TP8 knee sits in
+the same swept octave as the 8B (s=4), with ~1.6× higher p99 at the knee and
+2× the decode latency everywhere (a TPOT/ITL-based SLA would bind earlier for
+the 235B). The steady-window decoupling gap vs the vision pool (knee ≥ s=32)
+is therefore ≥8× for the flagship too, and the burst-window direction is
+untouched — the vision pool (ViT + projector→4096 shared between 8B and 235B,
+Phase 0) saturates below the trace's own rate regardless of decoder size.
+
 ## State
 
 - Phase 1 ✅ real trace → two-pool converter, validated end-to-end.
@@ -153,6 +174,9 @@ the predictive-scaling contribution targets.
 - Phase 2.3 ✅ per-pool arrival-speedup sweeps + knees on head2k and burst1
   (Result D). Remaining sweep axes (worker grids, six-episode battery, long
   steady window) belong to Phase 3's baseline runs.
+- 235B-A22B TP8 spot-check ✅ (Result E): same knee octave under the
+  placeholder SLA, 2× decode latency; model-size axis available in
+  `run_replay.sh` via env overrides.
 
 Open items: run the six burst episodes + full-trace window (not just the 2k
 head); decide encoder resolution/size distribution (currently uniform 448²);

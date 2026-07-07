@@ -20,10 +20,16 @@ WORKERS=${4:-2}
 shift $(( $# < 4 ? $# : 4 ))
 
 # Language-pool model config (locked decoder pool: h100_sxm + vLLM 0.22.0, Qwen3-VL).
-AIC_MODEL=Qwen/Qwen3-VL-8B-Instruct
+# Env overrides (defaults = the 8B/TP1 baseline): AIC_MODEL, AIC_TP, and for MoE
+# family members AIC_MOE_TP / AIC_MOE_EP (e.g. 235B-A22B at TP8: AIC_TP=8 AIC_MOE_TP=8).
+AIC_MODEL=${AIC_MODEL:-Qwen/Qwen3-VL-8B-Instruct}
+AIC_TP=${AIC_TP:-1}
+AIC_MOE_JSON=""
+[ -n "${AIC_MOE_TP:-}" ] && AIC_MOE_JSON=',"aic_moe_tp_size":'"$AIC_MOE_TP"
+[ -n "${AIC_MOE_EP:-}" ] && AIC_MOE_JSON="$AIC_MOE_JSON"',"aic_moe_ep_size":'"$AIC_MOE_EP"
 case "$MODEL" in
   poly) ENGINE_ARGS='{"block_size":64}' ;;                              # mocker default polynomial timing
-  aic)  ENGINE_ARGS='{"aic_backend":"vllm","aic_system":"h100_sxm","aic_model_path":"'"$AIC_MODEL"'","aic_tp_size":1,"aic_backend_version":"0.22.0","block_size":64}' ;;
+  aic)  ENGINE_ARGS='{"aic_backend":"vllm","aic_system":"h100_sxm","aic_model_path":"'"$AIC_MODEL"'","aic_tp_size":'"$AIC_TP$AIC_MOE_JSON"',"aic_backend_version":"0.22.0","block_size":64}' ;;
   *) echo "model must be poly|aic" >&2; exit 2 ;;
 esac
 
