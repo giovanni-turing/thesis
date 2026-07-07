@@ -23,10 +23,10 @@
  "horizon_s": 22.534,
  "vision_sim_end_s": 22.534,
  "encoder_delay_ms": {
-  "p50": 27.561,
-  "p90": 503.371,
-  "p99": 810.509,
-  "max": 913.291
+  "p50": 27.729,
+  "p90": 501.055,
+  "p99": 794.14,
+  "max": 960.031
  },
  "encoder_service_ms": {
   "p50": 7.822,
@@ -35,9 +35,9 @@
  },
  "encoder_batch_service_ms": {
   "p50": 12.675,
-  "p90": 225.042,
-  "p99": 311.075,
-  "max": 596.974
+  "p90": 244.255,
+  "p99": 314.498,
+  "max": 314.498
  },
  "handoff_ms": {
   "p50": 0.714,
@@ -45,8 +45,8 @@
   "p99": 25.376,
   "max": 62.37
  },
- "encoder_utilization": 0.6649,
+ "encoder_utilization": 0.6646,
  "queue_divergent": false,
- "batches": 460,
+ "batches": 458,
  "exit_code": 0
 }

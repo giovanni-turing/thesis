@@ -62,9 +62,44 @@ the record); source-built runtime (`REPLAY_PY=.../dynamo/.venv/bin/python
 AIC_VER=0.19.0`). Adjustment-interval and scaling bounds to be fixed when
 3.2 runs.
 
+## Encoder chunk dispatch: parallel (decided 2026-07-07, user-approved)
+
+The 3.1 smoke test exposed a structural infeasibility: under the Phase-2
+dispatch policy (an oversized request's ≤64-image chunks run sequentially
+on ONE worker) large frames-class requests carry an intrinsic multi-second
+service floor — burst3's delay p99 plateaus at 2,877 ms from C=4 through
+C=32 (utilization ≤11%) — so no static OR dynamic worker count can meet
+the evaluation SLA on frames-heavy windows. Resolution: **parallel chunk
+dispatch** — chunks enter the FIFO as independent units and fan out across
+free workers. Physically grounded (images are independent in the encoder;
+the batching law prices any forward at its image total). Implemented in
+`workload/trace_to_two_pool.py` (new default; `--sequential-chunks`
+restores the Phase-2 policy, regression-verified to the millisecond).
+
+Re-derived Phase-2 results under the new policy: burst1 s=1 C=2 delay
+p99 5,368→4,957 ms at 29% util (headline burst reversal UNCHANGED);
+head2k knee still censored at s=32 (794 ms); LLM curves untouched
+(isolation trace). Chapter 6 + intro updated; burst3 becomes feasible at
+C=8 (p99 714 ms) — static-optimal is now well-defined everywhere.
+Mechanism shift worth quoting: every forward is now ≤315 ms, and the
+burst pathology is queue depth (789 s above 1,000 queued images, peak
+4,637), not multi-second forwards.
+
+## 3.1 static-optimal — tooling ready, grid running
+
+- `simulation/derive_windows.py` → `simulation/windows.json`: six burst
+  episodes ±10 min (burst1 reproduces the Phase-2 window EXACTLY —
+  anchor-asserted) + `steady24h` (calmest full UTC day, 2024-10-20:
+  1.02 req/s, 5.4 img/s mean, 88,260 requests).
+- `simulation/sweep_grid.py`: per window, two monotone 1-D first-feasible
+  searches (`C*` for vision via converter runs, `N*` for LLM via replay on
+  the `C*`-shifted trace, AIC timing) + integer bisection + corner
+  cross-check (`N*` must stay feasible at the next C rung). GPU-hours per hardware
+  class, never summed. Results → `simulation/results/grid/`.
+
 ## Open (rest of Phase 3)
 
-- 3.1 static-optimal: encoder×LLM worker grid under the evaluation SLA on
-  the six burst episodes + a diurnal steady window → Pareto → GPU-hours.
+- 3.1: grid completing on all 7 windows → Pareto/GPU-hours table + the
+  all-windows static config and its steady24h overprovisioning factor.
 - 3.2 reactive planner through the same windows; record scaling actions,
   compliance (evaluation SLA), GPU-hours.

@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-07-07T08:36:00+00:00",
+ "generated_utc": "2026-07-07T14:36:42+00:00",
  "thresholds": {
   "vision_encoder_delay_p99_ms": 1000.0,
   "llm_ttft_p99_ms": 1000.0,
@@ -917,9 +917,9 @@
    "vision_sim_end_s": 29939.321,
    "encoder_delay_ms": {
     "p50": 8.536,
-    "p90": 2427.777,
-    "p99": 5368.088,
-    "max": 13279.248
+    "p90": 1837.931,
+    "p99": 4957.27,
+    "max": 12402.341
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -927,10 +927,10 @@
     "p99": 2605.136
    },
    "encoder_batch_service_ms": {
-    "p50": 7.822,
-    "p90": 2382.995,
-    "p99": 2605.136,
-    "max": 6025.257
+    "p50": 314.498,
+    "p90": 314.498,
+    "p99": 314.498,
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -938,9 +938,9 @@
     "p99": 272.001,
     "max": 629.608
    },
-   "encoder_utilization": 0.2877,
+   "encoder_utilization": 0.2876,
    "queue_divergent": false,
-   "batches": 37040,
+   "batches": 83432,
    "exit_code": 0
   },
   {
@@ -966,12 +966,12 @@
    "requests": 64804,
    "total_images": 3478128,
    "horizon_s": 1871.207,
-   "vision_sim_end_s": 8580.857,
+   "vision_sim_end_s": 8580.569,
    "encoder_delay_ms": {
-    "p50": 1721295.784,
-    "p90": 5890583.095,
-    "p99": 6719689.658,
-    "max": 6735042.763
+    "p50": 1721787.122,
+    "p90": 5890807.802,
+    "p99": 6719530.149,
+    "max": 6734492.013
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -979,10 +979,10 @@
     "p99": 2605.136
    },
    "encoder_batch_service_ms": {
-    "p50": 967.167,
-    "p90": 2605.136,
-    "p99": 3074.737,
-    "max": 6025.257
+    "p50": 314.498,
+    "p90": 314.498,
+    "p99": 314.498,
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -990,9 +990,9 @@
     "p99": 272.001,
     "max": 629.608
    },
-   "encoder_utilization": 0.9994,
+   "encoder_utilization": 0.9995,
    "queue_divergent": false,
-   "batches": 14419,
+   "batches": 63208,
    "exit_code": 0
   },
   {
@@ -1020,10 +1020,10 @@
    "horizon_s": 14969.656,
    "vision_sim_end_s": 14969.664,
    "encoder_delay_ms": {
-    "p50": 54.621,
-    "p90": 8124.524,
-    "p99": 25479.431,
-    "max": 36164.756
+    "p50": 207.607,
+    "p90": 8106.389,
+    "p99": 25436.491,
+    "max": 35209.949
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -1031,10 +1031,10 @@
     "p99": 2605.136
    },
    "encoder_batch_service_ms": {
-    "p50": 28.679,
-    "p90": 2382.995,
-    "p99": 3074.737,
-    "max": 6025.257
+    "p50": 314.498,
+    "p90": 314.498,
+    "p99": 314.498,
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -1042,9 +1042,9 @@
     "p99": 272.001,
     "max": 629.608
    },
-   "encoder_utilization": 0.5742,
+   "encoder_utilization": 0.574,
    "queue_divergent": false,
-   "batches": 26369,
+   "batches": 73197,
    "exit_code": 0
   },
   {
@@ -1070,12 +1070,12 @@
    "requests": 64804,
    "total_images": 3478128,
    "horizon_s": 935.604,
-   "vision_sim_end_s": 8576.387,
+   "vision_sim_end_s": 8576.076,
    "encoder_delay_ms": {
-    "p50": 2034278.145,
-    "p90": 6700762.216,
-    "p99": 7637529.907,
-    "max": 7643122.674
+    "p50": 2034753.633,
+    "p90": 6701306.088,
+    "p99": 7637749.083,
+    "max": 7641615.425
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -1083,10 +1083,10 @@
     "p99": 2605.136
    },
    "encoder_batch_service_ms": {
-    "p50": 967.167,
-    "p90": 2605.136,
-    "p99": 3074.737,
-    "max": 6025.257
+    "p50": 314.498,
+    "p90": 314.498,
+    "p99": 314.498,
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -1096,7 +1096,7 @@
    },
    "encoder_utilization": 1.0,
    "queue_divergent": false,
-   "batches": 14412,
+   "batches": 63199,
    "exit_code": 0
   },
   {
@@ -1122,12 +1122,12 @@
    "requests": 64804,
    "total_images": 3478128,
    "horizon_s": 7484.828,
-   "vision_sim_end_s": 8814.61,
+   "vision_sim_end_s": 8814.126,
    "encoder_delay_ms": {
-    "p50": 108161.611,
-    "p90": 1237191.996,
-    "p99": 1500497.489,
-    "max": 1516879.307
+    "p50": 108366.425,
+    "p90": 1237159.914,
+    "p99": 1500148.532,
+    "max": 1516052.592
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -1135,10 +1135,10 @@
     "p99": 2605.136
    },
    "encoder_batch_service_ms": {
-    "p50": 967.167,
-    "p90": 2605.136,
-    "p99": 3074.737,
-    "max": 6025.257
+    "p50": 314.498,
+    "p90": 314.498,
+    "p99": 314.498,
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -1146,9 +1146,9 @@
     "p99": 272.001,
     "max": 629.608
    },
-   "encoder_utilization": 0.973,
+   "encoder_utilization": 0.9731,
    "queue_divergent": false,
-   "batches": 14957,
+   "batches": 63635,
    "exit_code": 0
   },
   {
@@ -1174,12 +1174,12 @@
    "requests": 64804,
    "total_images": 3478128,
    "horizon_s": 3742.414,
-   "vision_sim_end_s": 8590.575,
+   "vision_sim_end_s": 8590.139,
    "encoder_delay_ms": {
-    "p50": 1096106.564,
-    "p90": 4271352.858,
-    "p99": 4898558.972,
-    "max": 4926649.279
+    "p50": 1096463.479,
+    "p90": 4271382.587,
+    "p99": 4898340.546,
+    "max": 4925448.865
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -1187,10 +1187,10 @@
     "p99": 2605.136
    },
    "encoder_batch_service_ms": {
-    "p50": 967.167,
-    "p90": 2605.136,
-    "p99": 3074.737,
-    "max": 6025.257
+    "p50": 314.498,
+    "p90": 314.498,
+    "p99": 314.498,
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -1198,9 +1198,9 @@
     "p99": 272.001,
     "max": 629.608
    },
-   "encoder_utilization": 0.9983,
+   "encoder_utilization": 0.9984,
    "queue_divergent": false,
-   "batches": 14427,
+   "batches": 63220,
    "exit_code": 0
   },
   {
@@ -1231,7 +1231,7 @@
     "p50": 8.536,
     "p90": 54.621,
     "p99": 200.207,
-    "max": 659.344
+    "max": 376.868
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -1242,7 +1242,7 @@
     "p50": 7.822,
     "p90": 49.797,
     "p99": 244.255,
-    "max": 596.974
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -1252,7 +1252,7 @@
    },
    "encoder_utilization": 0.0226,
    "queue_divergent": false,
-   "batches": 1231,
+   "batches": 1232,
    "exit_code": 0
   },
   {
@@ -1283,7 +1283,7 @@
     "p50": 8.536,
     "p90": 140.862,
     "p99": 371.76,
-    "max": 659.344
+    "max": 464.01
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -1294,7 +1294,7 @@
     "p50": 7.822,
     "p90": 83.783,
     "p99": 244.255,
-    "max": 596.974
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -1302,9 +1302,9 @@
     "p99": 25.376,
     "max": 62.37
    },
-   "encoder_utilization": 0.3536,
+   "encoder_utilization": 0.3534,
    "queue_divergent": false,
-   "batches": 983,
+   "batches": 981,
    "exit_code": 0
   },
   {
@@ -1335,7 +1335,7 @@
     "p50": 8.536,
     "p90": 54.621,
     "p99": 200.207,
-    "max": 659.344
+    "max": 376.868
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -1346,7 +1346,7 @@
     "p50": 7.822,
     "p90": 49.797,
     "p99": 244.255,
-    "max": 596.974
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -1356,7 +1356,7 @@
    },
    "encoder_utilization": 0.0453,
    "queue_divergent": false,
-   "batches": 1229,
+   "batches": 1230,
    "exit_code": 0
   },
   {
@@ -1384,10 +1384,10 @@
    "horizon_s": 22.534,
    "vision_sim_end_s": 22.534,
    "encoder_delay_ms": {
-    "p50": 27.561,
-    "p90": 503.371,
-    "p99": 810.509,
-    "max": 913.291
+    "p50": 27.729,
+    "p90": 501.055,
+    "p99": 794.14,
+    "max": 960.031
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -1396,9 +1396,9 @@
    },
    "encoder_batch_service_ms": {
     "p50": 12.675,
-    "p90": 225.042,
-    "p99": 311.075,
-    "max": 596.974
+    "p90": 244.255,
+    "p99": 314.498,
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -1406,9 +1406,9 @@
     "p99": 25.376,
     "max": 62.37
    },
-   "encoder_utilization": 0.6649,
+   "encoder_utilization": 0.6646,
    "queue_divergent": false,
-   "batches": 460,
+   "batches": 458,
    "exit_code": 0
   },
   {
@@ -1439,7 +1439,7 @@
     "p50": 8.536,
     "p90": 54.621,
     "p99": 200.207,
-    "max": 659.344
+    "max": 376.868
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -1450,7 +1450,7 @@
     "p50": 7.822,
     "p90": 49.797,
     "p99": 244.255,
-    "max": 596.974
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -1460,7 +1460,7 @@
    },
    "encoder_utilization": 0.0904,
    "queue_divergent": false,
-   "batches": 1218,
+   "batches": 1219,
    "exit_code": 0
   },
   {
@@ -1491,7 +1491,7 @@
     "p50": 8.536,
     "p90": 54.621,
     "p99": 200.207,
-    "max": 659.344
+    "max": 376.868
    },
    "encoder_service_ms": {
     "p50": 7.822,
@@ -1502,7 +1502,7 @@
     "p50": 7.822,
     "p90": 49.797,
     "p99": 244.255,
-    "max": 596.974
+    "max": 314.498
    },
    "handoff_ms": {
     "p50": 0.714,
@@ -1512,7 +1512,7 @@
    },
    "encoder_utilization": 0.1802,
    "queue_divergent": false,
-   "batches": 1177,
+   "batches": 1178,
    "exit_code": 0
   }
  ],
@@ -1614,12 +1614,12 @@
     32.0
    ],
    "metric": [
-    5368.088,
-    25479.431,
-    1500497.489,
-    4898558.972,
-    6719689.658,
-    7637529.907
+    4957.27,
+    25436.491,
+    1500148.532,
+    4898340.546,
+    6719530.149,
+    7637749.083
    ],
    "offered": [
     116.173,
@@ -1659,7 +1659,7 @@
     200.207,
     200.207,
     371.76,
-    810.509
+    794.14
    ],
    "offered": [
     7.985,
@@ -1686,6 +1686,12 @@
   }
  },
  "decoupling": {
+  "burst1|llm-poly": {
+   "vision_knee_speedup": null,
+   "llm_knee_speedup": 1.0,
+   "knees_differ": true,
+   "llm_over_vision_knee_ratio": null
+  },
   "head2k|llm-poly": {
    "vision_knee_speedup": 32.0,
    "llm_knee_speedup": 2.0,
@@ -1697,12 +1703,6 @@
    "llm_knee_speedup": 2.0,
    "knees_differ": true,
    "llm_over_vision_knee_ratio": 0.062
-  },
-  "burst1|llm-poly": {
-   "vision_knee_speedup": null,
-   "llm_knee_speedup": 1.0,
-   "knees_differ": true,
-   "llm_over_vision_knee_ratio": null
   }
  },
  "sanity": {

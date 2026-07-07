@@ -1,0 +1,79 @@
+{
+ "burst1": {
+  "offset": 843072,
+  "max_requests": 64804,
+  "note": "episode 1 of top6_by_peak +/-10min pad: [2024-10-21 12:59:00 .. 2024-10-21 21:18:00) UTC, peak 370.2 img/s @ 2024-10-21 19:53:00, onset 220 min",
+  "requests": 64804,
+  "span_s": 29939.3,
+  "mean_req_per_s": 2.165,
+  "mean_img_per_s": 116.173,
+  "peak_1min_img_per_s": 370.18,
+  "text_only_fraction": 0.325
+ },
+ "burst2": {
+  "offset": 78376,
+  "max_requests": 13870,
+  "note": "episode 2 of top6_by_peak +/-10min pad: [2024-10-15 21:16:00 .. 2024-10-15 23:10:00) UTC, peak 363.7 img/s @ 2024-10-15 22:14:00, onset 48 min",
+  "requests": 13870,
+  "span_s": 6836.8,
+  "mean_req_per_s": 2.029,
+  "mean_img_per_s": 124.063,
+  "peak_1min_img_per_s": 363.7,
+  "text_only_fraction": 0.348
+ },
+ "burst3": {
+  "offset": 531966,
+  "max_requests": 3093,
+  "note": "episode 3 of top6_by_peak +/-10min pad: [2024-10-18 10:18:00 .. 2024-10-18 10:45:00) UTC, peak 355.5 img/s @ 2024-10-18 10:29:00, onset 1 min",
+  "requests": 3093,
+  "span_s": 1619.7,
+  "mean_req_per_s": 1.91,
+  "mean_img_per_s": 88.437,
+  "peak_1min_img_per_s": 355.48,
+  "text_only_fraction": 0.599
+ },
+ "burst4": {
+  "offset": 565664,
+  "max_requests": 25639,
+  "note": "episode 4 of top6_by_peak +/-10min pad: [2024-10-18 15:37:00 .. 2024-10-18 18:46:00) UTC, peak 350.4 img/s @ 2024-10-18 16:47:00, onset 60 min",
+  "requests": 25639,
+  "span_s": 11339.2,
+  "mean_req_per_s": 2.261,
+  "mean_img_per_s": 135.028,
+  "peak_1min_img_per_s": 350.38,
+  "text_only_fraction": 0.43
+ },
+ "burst5": {
+  "offset": 558386,
+  "max_requests": 8983,
+  "note": "episode 5 of top6_by_peak +/-10min pad: [2024-10-18 14:32:00 .. 2024-10-18 15:53:00) UTC, peak 343.4 img/s @ 2024-10-18 15:17:00, onset 35 min",
+  "requests": 8983,
+  "span_s": 4857.9,
+  "mean_req_per_s": 1.849,
+  "mean_img_per_s": 114.205,
+  "peak_1min_img_per_s": 343.42,
+  "text_only_fraction": 0.503
+ },
+ "burst6": {
+  "offset": 93867,
+  "max_requests": 9821,
+  "note": "episode 6 of top6_by_peak +/-10min pad: [2024-10-15 23:26:00 .. 2024-10-16 00:48:00) UTC, peak 337.2 img/s @ 2024-10-16 00:29:00, onset 1 min",
+  "requests": 9821,
+  "span_s": 4919.3,
+  "mean_req_per_s": 1.996,
+  "mean_img_per_s": 88.858,
+  "peak_1min_img_per_s": 337.18,
+  "text_only_fraction": 0.465
+ },
+ "steady24h": {
+  "offset": 627019,
+  "max_requests": 88260,
+  "note": "calmest full UTC day (lowest peak 1-min img rate among [datetime.date(2024, 10, 16), datetime.date(2024, 10, 17), datetime.date(2024, 10, 18), datetime.date(2024, 10, 19), datetime.date(2024, 10, 20), datetime.date(2024, 10, 21)]): 2024-10-19",
+  "requests": 88260,
+  "span_s": 86396.7,
+  "mean_req_per_s": 1.022,
+  "mean_img_per_s": 5.443,
+  "peak_1min_img_per_s": 57.05,
+  "text_only_fraction": 0.573
+ }
+}

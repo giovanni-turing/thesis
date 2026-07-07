@@ -200,49 +200,78 @@ def simulate_vision_pool(
     n_workers: int,
     cap: int,
     encoder: EncoderCostModel,
+    parallel_chunks: bool = True,
 ) -> tuple[dict[int, float], list[tuple[float, float, int, int]], int]:
     """Event-driven FIFO pool with greedy whole-request batching.
+
+    Oversized requests (> cap images) are chunked into <=cap-image forwards.
+    With parallel_chunks=True (default, Phase-3 policy) each chunk is an
+    independent FIFO dispatch unit, so multiple free workers drain one
+    oversized request concurrently — physically valid because images are
+    independent in the encoder and cost is exactly f(total images); chunks
+    are never batched with other requests. With parallel_chunks=False the
+    request's chunks run sequentially on ONE worker (the Phase-2 policy,
+    kept for reproducibility of the earlier knee results): that policy
+    gives large requests an intrinsic multi-second service floor that no
+    worker count removes. A request finishes when its LAST unit finishes.
 
     Returns (finish_ms by request index,
              batches as (start_ms, finish_ms, total_images, n_forwards),
              requests_chunked).
     """
+    # Decompose requests into dispatch units: (arrival, idx, n_img, is_chunk).
+    units: list[tuple[float, int, int, bool]] = []
+    requests_chunked = 0
+    for arr, idx, n in reqs:
+        if n > cap and parallel_chunks:
+            requests_chunked += 1
+            full, rem = divmod(n, cap)
+            units.extend((arr, idx, cap, True) for _ in range(full))
+            if rem:
+                units.append((arr, idx, rem, True))
+        else:
+            if n > cap:
+                requests_chunked += 1
+            units.append((arr, idx, n, False))
+
     finish: dict[int, float] = {}
     batches: list[tuple[float, float, int, int]] = []
     worker_free = [0.0] * n_workers
-    queue: deque[tuple[float, int, int]] = deque()
+    queue: deque[tuple[float, int, int, bool]] = deque()
     i = 0
-    requests_chunked = 0
 
-    while i < len(reqs) or queue:
+    while i < len(units) or queue:
         w = min(range(n_workers), key=worker_free.__getitem__)
         if not queue:  # idle pool: wait for the next arrival
-            queue.append(reqs[i])
+            queue.append(units[i])
             i += 1
         start = max(worker_free[w], queue[0][0])
         # Everything that has arrived by the batch start is eligible, FIFO.
-        while i < len(reqs) and reqs[i][0] <= start:
-            queue.append(reqs[i])
+        while i < len(units) and units[i][0] <= start:
+            queue.append(units[i])
             i += 1
-        batch = [queue.popleft()]
-        total = batch[0][2]
-        if total > cap:  # oversized request: own batch, sequential chunks
-            requests_chunked += 1
+        head = queue.popleft()
+        members = [head]
+        total = head[2]
+        if head[3]:  # chunk of an oversized request: one forward, never batched
+            n_forwards = 1
+            service = encoder.latency_ms(total)[0]
+        elif total > cap:  # oversized, sequential policy: own batch, chained chunks
             n_forwards = math.ceil(total / cap)
             service = encoder.chunked_service_ms(total, cap)
         else:
-            while queue and total + queue[0][2] <= cap:
-                r = queue.popleft()
-                batch.append(r)
-                total += r[2]
+            while queue and not queue[0][3] and total + queue[0][2] <= cap:
+                u = queue.popleft()
+                members.append(u)
+                total += u[2]
             n_forwards = 1
             service = encoder.latency_ms(total)[0]
         fin = start + service
         worker_free[w] = fin
         batches.append((start, fin, total, n_forwards))
-        for arr, idx, _n in batch:
+        for arr, idx, _n, _c in members:
             assert fin >= arr, "request finished before it arrived"
-            finish[idx] = fin
+            finish[idx] = max(finish.get(idx, 0.0), fin)
     return finish, batches, requests_chunked
 
 
@@ -335,6 +364,10 @@ def main() -> None:
     ap.add_argument("--trace-block-size", type=int, default=512, help="tokens per hash_id (mooncake)")
     ap.add_argument("--max-requests", type=int, default=None, help="cap request count (window head)")
     ap.add_argument("--offset", type=int, default=0, help="skip this many requests before the window")
+    ap.add_argument("--sequential-chunks", action="store_true",
+                    help="restore the Phase-2 dispatch policy (an oversized request's "
+                         "chunks run sequentially on one worker) instead of the default "
+                         "parallel chunk dispatch across free workers")
     ap.add_argument("--no-encoder-shift", action="store_true",
                     help="LLM-pool isolation: emit raw (speedup-compressed) arrivals — encoder "
                          "delay is NOT folded in; the vision pool is still simulated so stats/"
@@ -360,7 +393,8 @@ def main() -> None:
     img_reqs = [(float(arrivals_ms[i]), i, int(num_images[i]))
                 for i in range(len(df)) if int(num_images[i]) > 0]
     finish, batches, requests_chunked = simulate_vision_pool(
-        img_reqs, args.encoder_workers, cap, encoder)
+        img_reqs, args.encoder_workers, cap, encoder,
+        parallel_chunks=not args.sequential_chunks)
 
     # Handoff bound: post-merge embeddings cross pools (async; not worker time).
     def handoff_ms(n_img: int) -> float:
@@ -432,6 +466,7 @@ def main() -> None:
         "image_px": args.image_px,
         "encoder_workers": args.encoder_workers,
         "encoder_batch_images": cap,
+        "chunk_dispatch": "sequential" if args.sequential_chunks else "parallel",
         "arrival_speedup": args.arrival_speedup,
         "handoff_rtt_ms": args.handoff_rtt_ms,
         "handoff_gbps": args.handoff_gbps,

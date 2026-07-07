@@ -21,12 +21,12 @@
  "requests": 64804,
  "total_images": 3478128,
  "horizon_s": 1871.207,
- "vision_sim_end_s": 8580.857,
+ "vision_sim_end_s": 8580.569,
  "encoder_delay_ms": {
-  "p50": 1721295.784,
-  "p90": 5890583.095,
-  "p99": 6719689.658,
-  "max": 6735042.763
+  "p50": 1721787.122,
+  "p90": 5890807.802,
+  "p99": 6719530.149,
+  "max": 6734492.013
  },
  "encoder_service_ms": {
   "p50": 7.822,
@@ -34,10 +34,10 @@
   "p99": 2605.136
  },
  "encoder_batch_service_ms": {
-  "p50": 967.167,
-  "p90": 2605.136,
-  "p99": 3074.737,
-  "max": 6025.257
+  "p50": 314.498,
+  "p90": 314.498,
+  "p99": 314.498,
+  "max": 314.498
  },
  "handoff_ms": {
   "p50": 0.714,
@@ -45,8 +45,8 @@
   "p99": 272.001,
   "max": 629.608
  },
- "encoder_utilization": 0.9994,
+ "encoder_utilization": 0.9995,
  "queue_divergent": false,
- "batches": 14419,
+ "batches": 63208,
  "exit_code": 0
 }

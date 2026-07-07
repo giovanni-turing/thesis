@@ -26,7 +26,7 @@
   "p50": 8.536,
   "p90": 140.862,
   "p99": 371.76,
-  "max": 659.344
+  "max": 464.01
  },
  "encoder_service_ms": {
   "p50": 7.822,
@@ -37,7 +37,7 @@
   "p50": 7.822,
   "p90": 83.783,
   "p99": 244.255,
-  "max": 596.974
+  "max": 314.498
  },
  "handoff_ms": {
   "p50": 0.714,
@@ -45,8 +45,8 @@
   "p99": 25.376,
   "max": 62.37
  },
- "encoder_utilization": 0.3536,
+ "encoder_utilization": 0.3534,
  "queue_divergent": false,
- "batches": 983,
+ "batches": 981,
  "exit_code": 0
 }

@@ -126,13 +126,24 @@ that amounts to a ${\sim}\SI{2.9}{\milli\second}$ fixed per-forward
 overhead. The pool's dispatch policy is greedy FIFO: a freed worker takes
 whole queued requests, in order, up to a 64-image cap (the collected batch
 range, so no extrapolation); a request exceeding the cap alone --- the
-trace reaches $97^2 = \num{9409}$ images --- is chunked into sequential
-$\leq 64$-image forwards on one worker (${\approx}\SI{46}{\second}$ for the
-largest), which also eliminates the batch-axis extrapolation the Phase-1
-converter had to flag. Under low load a lone request dispatches
-immediately, reproducing per-request behavior; the policy changes nothing
-at the steady head (delay percentiles identical to three decimals) and
-matters exactly where batching should --- inside bursts.
+trace reaches $97^2 = \num{9409}$ images --- is chunked into $\leq
+64$-image forwards that enter the FIFO as independent dispatch units, so
+several free workers drain one oversized request concurrently. This
+chunk-parallel policy is physically grounded --- images are independent in
+the encoder, and the batching law prices any forward at its image total
+--- and it is what makes encoder tail latency \emph{capacity-controllable}:
+under the sequential alternative (one request's chunks chained on one
+worker, retained behind a converter flag), the largest requests carry an
+intrinsic multi-second service floor that no worker count removes ---
+measured on the fastest-onset episode, delay p99 plateaus at
+\SI{2.9}{\second} from 4 through 32 workers --- which would make every
+frames-heavy window statically infeasible under the evaluation SLA by
+construction. The largest request still costs ${\approx}\SI{46}{\second}$
+of kernel time (147 forwards), but spread across whatever workers are
+free. Under low load a lone request dispatches immediately, reproducing
+per-request behavior; the policy changes nothing at the steady head
+(delay percentiles identical to three decimals) and matters exactly where
+batching should --- inside bursts.
 
 \paragraph{Handoff.} The encoder's output must cross pools: post-merge
 vision embeddings of $196 \times 4096$ bf16 values per image ---
@@ -197,8 +208,8 @@ Pool / timing & Window & Knee & Offered & TTFT p99 (ms), $1{\to}$knee \\
 LLM / poly & steady & $s{=}2$ (ITL-bound) & 5.5 req/s & $249 \to 277$ \\
 LLM / AIC  & steady & $s{=}2$ (ITL-bound) & 5.5 req/s & $307 \to 418$ \\
 LLM / poly & burst & $s{=}1$ & 2.2 req/s & $910$ at $s{=}1$ \\
-Vision / AIC & steady & $\geq s{=}32$ (cens.) & $\geq$ 256 img/s & $200 \to 811$ \\
-Vision / AIC & burst & \textbf{none: over at $s{=}1$} & 116 img/s & $5{,}368$ at $s{=}1$ \\
+Vision / AIC & steady & $\geq s{=}32$ (cens.) & $\geq$ 256 img/s & $200 \to 794$ \\
+Vision / AIC & burst & \textbf{none: over at $s{=}1$} & 116 img/s & $4{,}957$ at $s{=}1$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -233,19 +244,19 @@ interactive SLA is set by sustained token throughput per user, exactly the
 axis the 235B spot-check of Section~\ref{sec:sim-timing} stresses further.
 On the burst episode the asymmetry flips: the vision pool violates its
 bound \emph{at the trace's own recorded rate}, with a p99 encoder delay of
-\SI{5.4}{\second} --- while its mean utilization is only 29\%, and while
+\SI{5.0}{\second} --- while its mean utilization is only 29\%, and while
 the language pool, fed the very same requests, still meets the full SLA at
 that rate (its knee: $s{=}1$; at $2\times$ both bounds fail).
 
 Figure~\ref{fig:sim-burst-queue} exposes the mechanism. The episode's
-7{,}716 frames-class requests (${>}64$ images each) dispatch as chunked
-multi-second forwards (batch service p90 \SI{2.4}{\second}, max
-\SI{6.0}{\second}), and arrivals clump --- the worst second lands 975
-images at once. Behind a FIFO, that combination produces recurring
-head-of-line blocking: the backlog spikes past 1{,}000 images 417 times
---- seconds apart for eight hours --- and peaks at 4{,}452 queued images,
-each spike a multi-second p99 excursion, yet the pool drains fully between
-spikes and ends the window with an empty queue. This is the provisioning
+7{,}716 frames-class requests (${>}64$ images each) decompose into
+83{,}432 chunk forwards --- every forward at most \SI{315}{\milli\second}
+--- and arrivals clump: the worst second lands 975 images at once. Behind
+a strict FIFO, a frames flood therefore monopolizes \emph{every} worker at
+once: the backlog exceeds 1{,}000 queued images for 789 seconds spread
+across the eight-hour episode, peaking at 4{,}637, each excursion a
+multi-second p99 event, yet the pool drains fully between excursions and
+ends the window with an empty queue. This is the provisioning
 gap in its sharpest form: a monitor watching request rate
 (\SI{2.2}{req/s}, unremarkable), mean utilization (29\%), or any
 minute-averaged signal sees a healthy pool, while the tail SLA is being
@@ -259,11 +270,10 @@ Chapter~\ref{cap:predictors} showed to be forecastable.
 \caption{Inside the burst episode at the trace's own rate: offered image
 load (top, 1-minute mean of the per-second series) and the encoder pool's
 queued-image depth (bottom, per second). The queue repeatedly spikes past
-1{,}000 images --- peaking at 4{,}452 --- and fully drains between spikes,
+1{,}000 images --- peaking at 4{,}637 --- and fully drains between spikes,
 so the episode's \emph{mean} utilization stays at 29\% while p99 encoder
-delay reaches \SI{5.4}{\second}: episodic FIFO head-of-line blocking by
-chunked frames-class requests, invisible to rate- or mean-utilization
-monitoring.}
+delay reaches \SI{5.0}{\second}: episodic FIFO head-of-line blocking by
+frames-class floods, invisible to rate- or mean-utilization monitoring.}
 \label{fig:sim-burst-queue}
 \end{figure}
 

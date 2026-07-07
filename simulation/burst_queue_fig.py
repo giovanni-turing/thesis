@@ -34,6 +34,9 @@ plt.rcParams.update({
 })
 
 series = json.load(open(SERIES))["series"]
+point = json.load(open(HERE / "results" / "sweeps" / "vision_burst1_aic_s1.json"))
+util_pct = round(point["encoder_utilization"] * 100)
+n_workers = point["encoder_workers"]
 t_h = np.array([s["t"] for s in series]) / 3600.0
 arrived = np.array([s["img_arrived"] for s in series], dtype=float)
 queue = np.array([s["queue_imgs_end"] for s in series], dtype=float)
@@ -49,7 +52,8 @@ ax1.plot(t_h, arr_1min, color=C_AQUA, linewidth=1.0)
 ax1.set_ylabel("offered images/s\n(1-min mean)")
 ax1.set_ylim(bottom=0)
 ax1.set_title("Vision pool over the largest burst episode at the trace's own rate "
-              "(2 workers, mean utilization 29%)", loc="left", color=INK)
+              f"({n_workers} workers, mean utilization {util_pct}%)",
+              loc="left", color=INK)
 
 ax2.plot(t_h, queue, color=C_BLUE, linewidth=1.0)
 ax2.set_ylabel("queued images")
