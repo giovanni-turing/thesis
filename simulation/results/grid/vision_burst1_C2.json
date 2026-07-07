@@ -7,12 +7,12 @@
  "offered_img_per_s": 116.173,
  "horizon_s": 29939.313,
  "encoder_delay_ms": {
-  "p50": 8.536,
-  "p90": 1837.931,
-  "p99": 4957.27,
-  "max": 12402.341
+  "p50": 8.876,
+  "p90": 1859.178,
+  "p99": 5013.37,
+  "max": 12587.387
  },
- "encoder_utilization": 0.2876,
+ "encoder_utilization": 0.2889,
  "queue_divergent": false,
  "feasible": false
 }

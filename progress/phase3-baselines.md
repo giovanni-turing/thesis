@@ -165,7 +165,7 @@ feasibility verdicts don't flip).
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | burst1 | 6 | 2 | 2 | 4 | 8.32 | 49.9 | 33.3 |
 | burst2 | 8 | 2 | 2 | 4 | 1.90 | 15.2 | 7.6 |
-| burst3 | 6 | 2 | 2 | 4 | 0.45 | 2.7 | 1.8 |
+| burst3 | 7 | 2 | 2 | 4 | 0.45 | 3.15 | 1.8 |
 | burst4 | 7 | 2 | 2 | 4 | 3.15 | 22.1 | 12.6 |
 | burst5 | 16 | 2 | 2 | 4 | 1.35 | 21.6 | 5.4 |
 | burst6 | 6 | 2 | 2 | 4 | 1.37 | 8.2 | 5.5 |
@@ -177,7 +177,12 @@ the all-windows static config is **16 encoders + TP2×2 LLM** vs the calm
 day's 2 + TP1×2 — **8× vision-fleet and 2× LLM-fleet overprovisioning on
 steady traffic**, and the fleets differ in SHAPE (TP2 vs TP1), which a
 reactive replica-scaler cannot morph. All corner cross-checks passed.
-Results: `simulation/results/grid/grid_summary.json` (94 points).
+Results: `simulation/results/grid/grid_summary.json` (101 points).
+**Provenance note (2026-07-08):** vision phase re-derived after the
+Phase C ViT-shape infill corrected small-N encoder costs (±6% at
+N≤8); exactly one boundary verdict flipped — burst3 C* 6→7 (old
+corner read 1,003 ms under corrected data). All other windows and
+the headline unchanged; LLM side (h100 data) untouched.
 Remaining before chapter-quoting: router-knob sensitivity at corners;
 verify the binding LLM config on the other windows (headline note).
 

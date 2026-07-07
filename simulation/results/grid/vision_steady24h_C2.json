@@ -8,9 +8,9 @@
  "horizon_s": 86396.723,
  "encoder_delay_ms": {
   "p50": 0.0,
-  "p90": 54.621,
-  "p99": 729.901,
-  "max": 3009.947
+  "p90": 52.255,
+  "p99": 733.643,
+  "max": 3024.915
  },
  "encoder_utilization": 0.0142,
  "queue_divergent": false,

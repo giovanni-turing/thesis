@@ -12,26 +12,26 @@
  "handoff_gbps": 25.0,
  "encoder_shift_applied": true,
  "sim_horizon_s": 1619.691,
- "vision_sim_end_s": 1631.194,
+ "vision_sim_end_s": 1632.11,
  "mean_images_per_s": 88.437,
  "offered_img_per_s": 88.437,
  "mean_requests_per_s": 1.91,
  "encoder_service_ms": {
-  "p50": 49.797,
-  "p90": 2382.995,
-  "p99": 2605.136
+  "p50": 47.431,
+  "p90": 2394.995,
+  "p99": 2620.041
  },
  "encoder_batch_service_ms": {
-  "p50": 314.498,
-  "p90": 314.498,
-  "p99": 314.498,
-  "max": 314.498
+  "p50": 316.369,
+  "p90": 316.369,
+  "p99": 316.369,
+  "max": 316.369
  },
  "encoder_delay_ms": {
   "p50": 0.0,
-  "p90": 21461.951,
-  "p99": 53787.112,
-  "max": 62948.767
+  "p90": 21961.621,
+  "p99": 54169.533,
+  "max": 63447.488
  },
  "handoff_ms": {
   "p50": 4.824,
@@ -39,18 +39,18 @@
   "p99": 272.001,
   "max": 272.001
  },
- "encoder_utilization": 0.4334,
- "queue_imgs_at_arrival_end": 2234,
+ "encoder_utilization": 0.4351,
+ "queue_imgs_at_arrival_end": 2419,
  "queue_divergent": true,
- "batches": 2713,
- "encoder_forwards": 2713,
+ "batches": 2710,
+ "encoder_forwards": 2710,
  "images_per_batch": {
   "p50": 64,
   "p90": 64,
   "p99": 64
  },
  "requests_chunked": 303,
- "service_memo_hits": 4196,
+ "service_memo_hits": 4193,
  "distinct_service_sizes_costed": 57,
  "input_length": {
   "p50": 1080,
