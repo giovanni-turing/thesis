@@ -18,7 +18,10 @@ step maturin-develop
 cd "$DYN/lib/bindings/python"
 # aic-forward-pass: the engine-timing AIC callback (dynamo._internal.aic) is
 # feature-gated; the PyPI wheel ships it, default features do not.
-maturin develop --uv --features aic-forward-pass || { echo "STEP_FAILED maturin"; exit 1; }
+# --release: debug-profile sims are correct but slow; the archived runtime
+# wheel (../wheels/dynamo-1.3.0-release-aic-forward-pass/) was built release
+# and verified regression-identical to debug (p99/max bitwise).
+maturin develop --uv --release --features aic-forward-pass || { echo "STEP_FAILED maturin"; exit 1; }
 
 step gpu-memory-service
 cd "$DYN"

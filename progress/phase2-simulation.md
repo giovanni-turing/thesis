@@ -186,6 +186,13 @@ Feature surface verified on `dynamo.replay --help`: `--planner-config`
 (advisory agg/disagg), `agentic_mooncake` trace format,
 `--arrival-speedup-ratio`, full `aic_*` engine args incl. MoE.
 
+Runtime artifact: `wheels/dynamo-1.3.0-release-aic-forward-pass/
+ai_dynamo_runtime-1.3.0-cp310-abi3-manylinux_2_39_x86_64.whl` (43 MB,
+release profile, on disk only — `*.whl` is gitignored), installed into the
+dynamo `.venv` and regression-identical to the debug develop build (p99/max
+bitwise). Build caches were reclaimed afterwards (uv cache 92.6 GiB +
+cargo target 18 GB); rebuilds start from `build_dynamo_src.sh`.
+
 One data-path difference: the source build's AIC runs in **Rust**
 (aiconfigurator-core) and reads perf parquet directly — it does not resolve
 the `SHARED_LAYER_REUSE` marker, so h100_sxm/vllm **0.22.0 must be requested
