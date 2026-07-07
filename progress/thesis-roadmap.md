@@ -116,6 +116,12 @@ Progress + results: `phase2-simulation.md`. Runner: `simulation/run_replay.sh`.
    vision saturates at the trace's own rate (p99 5.4 s at 29% mean util;
    frames-class HOL blocking) while the LLM keeps 2× headroom. The decoupling
    argument, now in simulation. Worker-grid sweeps move to Phase 3.1.
+4. **Extras banked for Phase 3**: 235B-A22B TP8 spot-check (Result E — same
+   knee octave as 8B under the TTFT placeholder, 2× decode; vision side
+   family-invariant) · dynamo 1.3.0 source build with release wheel archived
+   (`wheels/`, regression-verified; wheel's callback tail artifact corrected
+   in chapter + docs) · model-size and runtime axes wired into
+   `run_replay.sh` (`AIC_MODEL/AIC_TP/AIC_MOE_TP`, `REPLAY_PY`, `AIC_VER`).
 
 ## Phase 3 — Baselines
 
@@ -151,8 +157,8 @@ Progress + results: `phase4-predictors.md`. Chapter draft: `tex/predictors.tex`.
    lead time) → apply to the two-pool simulation → measure SLA compliance ×
    GPU-hours vs Phase 3 baselines, with the six burst episodes as the
    headline scenarios and the ~10× missizing case made quantitative.
-   Note: needs Phase 2.2–2.3 (encoder realism, saturation knees) and Phase 3
-   baselines in place first.
+   Note: Phase 2 prerequisites are done; blocked only on the Phase 3
+   baselines (the comparison targets).
 4. **Ablations**: forecast horizon vs cold-start time; per-pool signals vs
    request-rate-only (the strawman — forecast image load FROM request rate,
    using the covariate machinery); forecast error sensitivity; quantile
