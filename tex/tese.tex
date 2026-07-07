@@ -25,16 +25,20 @@
 \tableofcontents
 
 
+\include{intro}
+\include{related}
 \include{trace-eda}
 \include{predictors}
 \include{aiconfigurator}
 \include{twopool}
 
 % Minimal bibliography so the build resolves \cite without biber.
-\begin{thebibliography}{9}
+\begin{thebibliography}{99}
 \bibitem{Qiu2025ModServe}
-S.~Qiu, X.~Liu, et al.
-\emph{ModServe: Modality-Disaggregated Serving for Multimodal LLM Inference}.
+H.~Qiu, A.~Biswas, Z.~Zhao, J.~Mohan, A.~Khare, E.~Choukse, {\'I}.~Goiri,
+et al.
+\emph{ModServe: Modality- and Stage-Aware Resource Disaggregation for
+Scalable Multimodal Model Serving}.
 ACM SoCC, 2025. arXiv:2502.00937.
 \bibitem{Das2024TimesFM}
 A.~Das, W.~Kong, R.~Sen, Y.~Zhou.
@@ -52,6 +56,263 @@ E.~Khwaja, C.~Lettieri, G.~Woo, et al.
 R.~J. Hyndman, G.~Athanasopoulos.
 \emph{Forecasting: Principles and Practice}, 3rd~ed.
 OTexts, Melbourne, 2021.
+\bibitem{Kwon2023vLLM}
+W.~Kwon, Z.~Li, S.~Zhuang, Y.~Sheng, L.~Zheng, C.~H. Yu, J.~E. Gonzalez,
+H.~Zhang, I.~Stoica.
+\emph{Efficient Memory Management for Large Language Model Serving with
+PagedAttention}.
+ACM SOSP, 2023. arXiv:2309.06180.
+\bibitem{Zhong2024DistServe}
+Y.~Zhong, S.~Liu, J.~Chen, J.~Hu, Y.~Zhu, X.~Liu, X.~Jin, H.~Zhang.
+\emph{DistServe: Disaggregating Prefill and Decoding for Goodput-Optimized
+Large Language Model Serving}.
+USENIX OSDI, 2024. arXiv:2401.09670.
+\bibitem{Patel2024Splitwise}
+P.~Patel, E.~Choukse, C.~Zhang, A.~Shah, {\'I}.~Goiri, S.~Maleki,
+R.~Bianchini.
+\emph{Splitwise: Efficient Generative LLM Inference Using Phase Splitting}.
+ACM/IEEE ISCA, 2024. arXiv:2311.18677.
+\bibitem{Agrawal2024SarathiServe}
+A.~Agrawal, N.~Kedia, A.~Panwar, J.~Mohan, N.~Kwatra, B.~S. Gulavani,
+A.~Tumanov, R.~Ramjee.
+\emph{Taming Throughput-Latency Tradeoff in LLM Inference with
+Sarathi-Serve}.
+USENIX OSDI, 2024. arXiv:2403.02310.
+\bibitem{Qin2025Mooncake}
+R.~Qin, Z.~Li, W.~He, M.~Zhang, Y.~Wu, W.~Zheng, X.~Xu.
+\emph{Mooncake: Trading More Storage for Less Computation --- A
+KVCache-Centric Architecture for Serving LLM Chatbot}.
+USENIX FAST (Best Paper), 2025. arXiv:2407.00079.
+\bibitem{Dosovitskiy2021ViT}
+A.~Dosovitskiy, L.~Beyer, A.~Kolesnikov, et al.
+\emph{An Image is Worth $16\times16$ Words: Transformers for Image
+Recognition at Scale}.
+ICLR, 2021. arXiv:2010.11929.
+\bibitem{Dynamo2025}
+NVIDIA.
+\emph{NVIDIA Dynamo: A Datacenter-Scale Distributed Inference Serving
+Framework}. 2025.
+\texttt{https://github.com/ai-dynamo/dynamo}.
+\bibitem{Leland1994}
+W.~E. Leland, M.~S. Taqqu, W.~Willinger, D.~V. Wilson.
+\emph{On the Self-Similar Nature of Ethernet Traffic (Extended Version)}.
+IEEE/ACM Transactions on Networking, 2(1):1--15, 1994.
+\bibitem{Crovella1997}
+M.~E. Crovella, A.~Bestavros.
+\emph{Self-Similarity in World Wide Web Traffic: Evidence and Possible
+Causes}.
+IEEE/ACM Transactions on Networking, 5(6):835--846, 1997.
+\bibitem{Fu2024ServerlessLLM}
+Y.~Fu, L.~Xue, Y.~Huang, A.-O. Brabete, D.~Ustiugov, Y.~Patel, L.~Mai.
+\emph{ServerlessLLM: Low-Latency Serverless Inference for Large Language
+Models}.
+USENIX OSDI, 2024. arXiv:2401.14351.
+\bibitem{Agrawal2024Vidur}
+A.~Agrawal, N.~Kedia, J.~Mohan, A.~Panwar, N.~Kwatra, B.~S. Gulavani,
+R.~Ramjee, A.~Tumanov.
+\emph{Vidur: A Large-Scale Simulation Framework for LLM Inference}.
+MLSys, 2024. arXiv:2405.05465.
+\bibitem{vLLMOmni2026}
+P.~Yin, J.~Zhu, H.~Gao, C.~Zheng, Y.~Huang, et al.
+\emph{vLLM-Omni: Fully Disaggregated Serving for Any-to-Any Multimodal
+Models}. 2026. arXiv:2602.02204.
+\bibitem{WarmServe2025}
+C.~Lou, S.~Qi, R.~Kang, Y.~Zhang, C.~Sun, P.~Wang, X.~Liu, X.~Jin.
+\emph{WarmServe: Enabling One-for-Many GPU Prewarming for Multi-LLM
+Serving}. ICML, 2026. arXiv:2512.09472.
+\bibitem{Yu2022Orca}
+G.-I. Yu, J.~S. Jeong, G.-W. Kim, S.~Kim, B.-G. Chun.
+\emph{Orca: A Distributed Serving System for Transformer-Based Generative
+Models}.
+USENIX OSDI, 2022.
+\bibitem{Zheng2024SGLang}
+L.~Zheng, L.~Yin, Z.~Xie, et al.
+\emph{SGLang: Efficient Execution of Structured Language Model Programs}.
+NeurIPS, 2024. arXiv:2312.07104.
+\bibitem{Wu2023FastServe}
+B.~Wu, Y.~Zhong, Z.~Zhang, G.~Huang, X.~Liu, X.~Jin.
+\emph{Fast Distributed Inference Serving for Large Language Models}.
+2023. arXiv:2305.05920.
+\bibitem{Ruan2025DynaServe}
+C.~Ruan, Y.~Chen, D.~Tian, Y.~Shi, Y.~Wu, J.~Li, C.~Li.
+\emph{DynaServe: Unified and Elastic Execution for Dynamic Disaggregated
+LLM Serving}.
+2025. arXiv:2504.09285.
+\bibitem{Singh2025EPD}
+G.~Singh, X.~Wang, Y.~Hu, T.~Yu, L.~Xing, W.~Jiang, Z.~Wang, X.~Bai,
+Y.~Li, Y.~Xiong, Y.~Zhang, Z.~Fan.
+\emph{Efficiently Serving Large Multimodal Models Using EPD
+Disaggregation}.
+ICML, 2025. arXiv:2501.05460.
+\bibitem{Dong2025HydraInfer}
+X.~Dong, T.~Liu, Y.~Zeng, X.~Zhao, W.~Huang, L.~Liu, Y.~Liu, S.~Wu,
+Y.~Wu, H.~Yang, K.~Zhang, J.~Li.
+\emph{HydraInfer: Hybrid Disaggregated Scheduling for Multimodal Large
+Language Model Serving}.
+2025. arXiv:2505.12658.
+\bibitem{Gujarati2017Swayam}
+A.~Gujarati, S.~Elnikety, Y.~He, K.~S. McKinley, B.~B. Brandenburg.
+\emph{Swayam: Distributed Autoscaling to Meet SLAs of Machine Learning
+Inference Services with Resource Efficiency}.
+ACM/IFIP/USENIX Middleware, 2017.
+\bibitem{Zhang2019MArk}
+C.~Zhang, M.~Yu, W.~Wang, F.~Yan.
+\emph{MArk: Exploiting Cloud Services for Cost-Effective, SLO-Aware
+Machine Learning Inference Serving}.
+USENIX ATC, 2019.
+\bibitem{Gujarati2020Clockwork}
+A.~Gujarati, R.~Karimi, S.~Alzayat, W.~Hao, A.~Kaufmann, Y.~Vigfusson,
+J.~Mace.
+\emph{Serving DNNs like Clockwork: Performance Predictability from the
+Bottom Up}.
+USENIX OSDI, 2020.
+\bibitem{Romero2021INFaaS}
+F.~Romero, Q.~Li, N.~J. Yadwadkar, C.~Kozyrakis.
+\emph{INFaaS: Automated Model-less Inference Serving}.
+USENIX ATC, 2021.
+\bibitem{Li2023AlpaServe}
+Z.~Li, L.~Zheng, Y.~Zhong, et al.
+\emph{AlpaServe: Statistical Multiplexing with Model Parallelism for Deep
+Learning Serving}.
+USENIX OSDI, 2023. arXiv:2302.11665.
+\bibitem{Rzadca2020Autopilot}
+K.~Rzadca, P.~Findeisen, J.~Swiderski, et al.
+\emph{Autopilot: Workload Autoscaling at Google}.
+ACM EuroSys, 2020.
+\bibitem{Llumnix2024}
+B.~Sun, Z.~Huang, H.~Zhao, W.~Xiao, X.~Zhang, Y.~Li, W.~Lin.
+\emph{Llumnix: Dynamic Scheduling for Large Language Model Serving}.
+USENIX OSDI, 2024. arXiv:2406.03243.
+\bibitem{Jaiswal2025SageServe}
+S.~Jaiswal, K.~Jain, Y.~Simmhan, A.~Parayil, A.~Mallick, R.~Wang,
+R.~St.~Amant, C.~Bansal, V.~R\"uhle, A.~Kulkarni, S.~Kofsky,
+S.~Rajmohan.
+\emph{SageServe: Optimizing LLM Serving on Cloud Data Centers with
+Forecast Aware Auto-Scaling}.
+Proc.\ ACM Meas.\ Anal.\ Comput.\ Syst.\ (SIGMETRICS), 9(3):61, 2025.
+arXiv:2502.14617.
+\bibitem{Zhang2025SynergySched}
+Y.~Zhang, Y.~Chen, X.~Mo, et al.
+\emph{A Predictive and Synergistic Two-Layer Scheduling Framework for LLM
+Serving}.
+2025. arXiv:2509.23384.
+\bibitem{Wang2024BurstGPT}
+Y.~Wang, et al.
+\emph{BurstGPT: A Real-World Workload Dataset to Optimize LLM Serving
+Systems}.
+ACM KDD, 2025. arXiv:2401.17644.
+\bibitem{Xiang2025ServeGen}
+Y.~Xiang, X.~Li, K.~Qian, Y.~Zhang, W.~Yu, E.~Zhai, X.~Jin, J.~Zhou.
+\emph{ServeGen: Workload Characterization and Generation of Large
+Language Model Serving in Production}.
+USENIX NSDI, 2026. arXiv:2505.09999.
+\bibitem{Ansari2024Chronos}
+A.~F. Ansari, L.~Stella, C.~Turkmen, et al.
+\emph{Chronos: Learning the Language of Time Series}.
+TMLR, 2024. arXiv:2403.07815.
+\bibitem{Woo2024Moirai}
+G.~Woo, C.~Liu, A.~Kumar, C.~Xiong, S.~Savarese, D.~Sahoo.
+\emph{Unified Training of Universal Time Series Forecasting Transformers}.
+ICML, 2024. arXiv:2402.02592.
+\bibitem{Rasul2023LagLlama}
+K.~Rasul, A.~Ashok, A.~R. Williams, et al.
+\emph{Lag-Llama: Towards Foundation Models for Probabilistic Time Series
+Forecasting}.
+2023. arXiv:2310.08278.
+\bibitem{Aksu2024GIFTEval}
+T.~Aksu, G.~Woo, J.~Liu, et al.
+\emph{GIFT-Eval: A Benchmark for General Time Series Forecasting Model
+Evaluation}.
+2024. arXiv:2410.10393.
+\bibitem{AIConfigurator2025}
+NVIDIA.
+\emph{aiconfigurator: Offline Deployment Configuration Search for
+Disaggregated LLM Serving}. 2025.
+\texttt{https://github.com/ai-dynamo/aiconfigurator}.
+\bibitem{AzureLMM2025}
+Microsoft Azure.
+\emph{AzureLMMInferenceDataset2025}. AzurePublicDataset repository, 2025.
+\texttt{https://github.com/Azure/AzurePublicDataset}.
+\bibitem{Liu2025ElasticMM}
+Z.~Liu, S.~Cheng, G.~Tan, Y.~You, D.~Tao.
+\emph{ElasticMM: Efficient Multimodal LLMs Serving with Elastic
+Multimodal Parallelism}.
+NeurIPS, 2025. arXiv:2507.10069.
+\bibitem{Guo2025RServe}
+T.~Guo, T.~Xu, X.~Chen, J.~Chen, N.~Xiao, X.~Zhang.
+\emph{RServe: Overlapping Encoding and Prefill for Efficient LMM
+Inference}.
+2025. arXiv:2509.24381.
+\bibitem{Yu2026HeteroServe}
+D.~Yu.
+\emph{Cost-Efficient Multimodal LLM Inference via Cross-Tier GPU
+Heterogeneity}.
+2026. arXiv:2603.12707.
+\bibitem{Crankshaw2020InferLine}
+D.~Crankshaw, G.-E. Sela, X.~Mo, C.~Zumar, I.~Stoica, J.~Gonzalez,
+A.~Tumanov.
+\emph{InferLine: Latency-Aware Provisioning and Scaling for Prediction
+Serving Pipelines}.
+ACM SoCC, 2020.
+\bibitem{Patke2025Chiron}
+A.~Patke, D.~Reddy, S.~Jha, C.~Narayanaswami, Z.~Kalbarczyk, R.~Iyer.
+\emph{Hierarchical Autoscaling for Large Language Model Serving with
+Chiron}.
+2025. arXiv:2501.08090.
+\bibitem{Xiang2025Aegaeon}
+Y.~Xiang, et al.
+\emph{Aegaeon: Effective GPU Pooling for Concurrent LLM Serving on the
+Market}.
+ACM SOSP, 2025.
+\bibitem{Zhang2025BlitzScale}
+D.~Zhang, et al.
+\emph{BlitzScale: Fast and Live Large Model Autoscaling with O(1) Host
+Caching}.
+USENIX OSDI, 2025. arXiv:2412.17246.
+\bibitem{Li2025TamingChaos}
+R.~Li, R.~Du, Z.~Chu, et al.
+\emph{Taming the Chaos: Coordinated Autoscaling for Heterogeneous and
+Disaggregated LLM Inference}.
+2025. arXiv:2508.19559.
+\bibitem{Lai2025TokenScale}
+R.~Lai, H.~Liu, C.~Lu, Z.~Liu, S.~Cao, S.~Shao, et al.
+\emph{TokenScale: Timely and Accurate Autoscaling for Disaggregated LLM
+Serving with Token Velocity}.
+2025. arXiv:2512.03416.
+\bibitem{Paxson1995}
+V.~Paxson, S.~Floyd.
+\emph{Wide-Area Traffic: The Failure of Poisson Modeling}.
+IEEE/ACM Transactions on Networking, 3(3):226--244, 1995.
+\bibitem{Stojkovic2025DynamoLLM}
+J.~Stojkovic, C.~Zhang, {\'I}.~Goiri, J.~Torrellas, E.~Choukse.
+\emph{DynamoLLM: Designing LLM Inference Clusters for Performance and
+Energy Efficiency}.
+IEEE HPCA, 2025. arXiv:2408.00741.
+\bibitem{Shi2025TimeMoE}
+X.~Shi, S.~Wang, Y.~Nie, D.~Li, Z.~Ye, Q.~Wen, M.~Jin.
+\emph{Time-MoE: Billion-Scale Time Series Foundation Models with Mixture
+of Experts}.
+ICLR, 2025. arXiv:2409.16040.
+\bibitem{Cohen2024Toto}
+B.~Cohen, E.~Khwaja, K.~Wang, C.~Masson, E.~Ram\'e, Y.~Doubli,
+O.~Abou-Amal.
+\emph{Toto: Time Series Optimized Transformer for Observability}.
+Datadog technical report, 2024. arXiv:2407.07874.
+\bibitem{Cohen2025BOOM}
+B.~Cohen, E.~Khwaja, Y.~Doubli, et al.
+\emph{This Time is Different: An Observability Perspective on Time Series
+Foundation Models}.
+2025. arXiv:2505.14766.
+\bibitem{Cho2024LLMServingSim}
+J.~Cho, M.~Kim, H.~Choi, G.~Heo, J.~Park.
+\emph{LLMServingSim: A HW/SW Co-Simulation Infrastructure for LLM
+Inference Serving at Scale}.
+IEEE IISWC, 2024. arXiv:2408.05499.
+\bibitem{Cho2026LLMServingSim2}
+J.~Cho, H.~Choi, G.~Heo, J.~Park.
+\emph{LLMServingSim 2.0: A Unified Simulator for Heterogeneous and
+Disaggregated LLM Serving Infrastructure}.
+2026. arXiv:2602.23036.
 \end{thebibliography}
 
 \end{document}

@@ -124,7 +124,8 @@ def main() -> None:
     ax_l.axhline(t, color=MUTED, lw=1, ls=(0, (4, 3)), zorder=2)
     ax_l.text(0.985, t * 1.12,
               f"SLA: TTFT p99 < {t:g} ms (knee also requires ITL p99 < {thr.get('llm_itl_p99_ms', 100):g} ms)",
-              ha="right", va="bottom", fontsize=7.5, color=MUTED,
+              ha="right", va="bottom", fontsize=7.5, color=MUTED, zorder=6,
+              bbox=dict(facecolor="white", edgecolor="none", alpha=0.85, pad=1.5),
               transform=ax_l.get_yaxis_transform())
     ax_l.set_xscale("log")
     ax_l.set_yscale("log")
@@ -146,7 +147,9 @@ def main() -> None:
     t = thr["vision_encoder_delay_p99_ms"]
     ax_v.axhline(t, color=MUTED, lw=1, ls=(0, (4, 3)), zorder=2)
     ax_v.text(0.02, t * 1.12, f"SLA: encoder delay p99 < {t:g} ms", ha="left",
-              va="bottom", fontsize=7.5, color=MUTED, transform=ax_v.get_yaxis_transform())
+              va="bottom", fontsize=7.5, color=MUTED, zorder=6,
+              bbox=dict(facecolor="white", edgecolor="none", alpha=0.85, pad=1.5),
+              transform=ax_v.get_yaxis_transform())
     ax_v.set_xscale("log")
     ax_v.set_yscale("log")
     ax_v.set_xlabel("offered load (img/s, log)")

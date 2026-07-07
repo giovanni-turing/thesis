@@ -78,7 +78,9 @@ axes[0].set_title("Language-pool arrival signal (1-min windows, 7 days)")
 axes[1].plot(w1m.index, img_1m, color=C_BLUE, linewidth=0.7)
 axes[1].axhline(float(thr), color="#9ca3af", linewidth=0.8, linestyle="--")
 axes[1].annotate(f"p99 = {thr:.1f} img/s", xy=(w1m.index[100], float(thr)),
-                 xytext=(0, 4), textcoords="offset points", fontsize=8, color="#6b7280")
+                 xytext=(0, 5), textcoords="offset points", fontsize=8, color="#6b7280",
+                 zorder=5,
+                 bbox=dict(facecolor="white", edgecolor="none", alpha=0.85, pad=1.5))
 axes[1].set_ylabel("images/s")
 axes[1].set_title("Vision-pool arrival signal — same clock, its own bursts")
 fig.autofmt_xdate()

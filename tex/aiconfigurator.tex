@@ -1,6 +1,7 @@
 %!TeX root=./tese.tex
 \chapter{Calibrating an Analytical Cost Model for the Vision Pool}
 \label{cap:aiconfigurator}
+\chaptermark{Calibrating the Vision-Pool Cost Model}
 
 This chapter reports the construction and empirical validation of a
 silicon-calibrated cost model for the vision stage of the disaggregated
@@ -49,7 +50,7 @@ hardware --- the work of this chapter.
 \subsection{Target system}
 
 The vision pool's hardware class is represented by an NVIDIA GeForce
-RTX~5090 (GB202 die, consumer Blackwell, compute capability~12.0,
+RTX~5090 (GB202 die, consumer Blackwell, compute capability 12.0, with
 \SI{32607}{\mebi\byte} GDDR7, observed board power limit \SI{600}{\watt},
 driver 595.71.05, CUDA~13.2). The system was registered in AIC as
 \texttt{rtx\_5090}: memory bandwidth and capacity follow the observed node
@@ -232,7 +233,7 @@ enabling it only meant co-locating the AIC performance model with the
 replay runtime in one interpreter. On an identical trace window and
 topology, the calibrated timing exposes markedly heavier tail latency than
 the polynomial default (99th-percentile time-to-first-token
-${\approx}1.2\times$, tail maxima $3$--$5\times$, per-user decode throughput
+${\approx}1.2\times$, tail maxima roughly doubled, per-user decode throughput
 ${\approx}12\%$ lower) --- precisely the burst-time behaviour a cost-blind
 timing model flattens. Realistic image-size distributions, load sweeps to
 each pool's saturation knee, and planner-in-the-loop simulation remain for

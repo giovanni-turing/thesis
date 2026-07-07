@@ -3,6 +3,7 @@
 % workspace and copied into figuras/eda/ (prefixed eda_) for the thesis build.
 \chapter{The Azure Multimodal Inference Trace: An Exploratory Characterization}
 \label{cap:trace-eda}
+\chaptermark{The Azure Multimodal Inference Trace}
 
 This chapter characterizes the workload dataset used throughout the thesis:
 Microsoft's \textit{AzureLMMInferenceDataset2025}, a production trace of a
@@ -69,9 +70,9 @@ text-only requests (context median 1{,}422 vs.\ 792 tokens; generation
 median 80 vs.\ 147) --- a question-answering profile against longer-form
 text chat.
 
-Unsupervised clustering of all requests on $\log(1{+}\text{images},
-1{+}\text{context}, 1{+}\text{generated})$ (cuML $k$-means, $k{=}4$ by
-silhouette) recovers four interpretable archetypes
+Unsupervised clustering of all requests on $\log(1{+}\text{images})$,
+$\log(1{+}\text{context})$, and $\log(1{+}\text{generated})$ (cuML
+$k$-means, $k{=}4$ by silhouette) recovers four interpretable archetypes
 (Table~\ref{tab:eda-archetypes}, Figure~\ref{fig:eda-clusters}). The
 video/frame-analysis archetype ---
 3.4\% of requests --- carries 85.7\% of all image volume and a third of
@@ -84,6 +85,8 @@ decode; extraction-style requests stress almost nothing.
 \centering
 \caption{Request archetypes recovered by unsupervised clustering.}
 \label{tab:eda-archetypes}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lrrrl}
 \toprule
 Archetype & Requests & Image vol. & Prefill vol. & p50 (img/ctx/gen) \\
@@ -245,7 +248,7 @@ tracked reactively (Figure~\ref{fig:eda-onsets}).
 \includegraphics[width=\linewidth]{figuras/eda/eda_i_burst_onsets.png}
 \caption{Burst onset speed across the 18 episodes. Left: the baseline-to-peak
 ramp time is a median of \SI{6}{\minute}, with the fastest episodes reaching
-peak in \SI{1}{\second}--\SI{2}{\minute}. Right: fast onset does not mean small
+peak in one to two minutes. Right: fast onset does not mean small
 burst --- some of the steepest ramps reach the highest peaks. The onset time is
 the entire budget a scaling policy has; the fast half of these episodes ramps
 faster than a replica can cold-start, which is what makes reactive scaling
@@ -362,7 +365,8 @@ vision pool from the request signal misses precisely the moments that matter.
 \centering
 \caption{Global percentiles: request-level marginals and 1-minute rates.}
 \label{tab:eda-percentiles}
-\small
+\footnotesize
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lrrrrrrr}
 \toprule
 Signal & mean & p50 & p90 & p95 & p99 & p99.9 & max \\

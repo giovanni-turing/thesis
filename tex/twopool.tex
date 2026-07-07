@@ -5,6 +5,7 @@
 % (Results A-D) and simulation/results/sweeps/summary.json.
 \chapter{The Two-Pool Simulation: Composition, Fidelity, and Saturation}
 \label{cap:twopool}
+\chaptermark{The Two-Pool Simulation}
 
 The preceding chapters produced the three ingredients of the thesis's
 experimental platform: a characterized workload
@@ -91,6 +92,7 @@ flagship unchanged.
 calibrated (AIC \texttt{h100\_sxm}, vLLM 0.22.0) timing; 2{,}000-request
 steady window, 2 workers, offline KV router.}
 \label{tab:sim-poly-aic}
+\small
 \begin{tabular}{lrr}
 \toprule
 Metric & Polynomial & AIC h100 \\
@@ -103,8 +105,10 @@ Output tok/s per user (avg) & 160.6 & 142.0 \\
 \end{tabular}
 \end{table}
 
-\section{Encoder-pool realism: an exact batching law and a handoff bound}
-\label{sec:sim-encoder}
+{\renewcommand{\sectionmark}[1]{}%
+\section{Encoder-pool realism: an exact batching law and a handoff bound}%
+\label{sec:sim-encoder}}
+\sectionmark{Encoder-pool realism}
 
 Two fidelity upgrades make the vision pool defensible rather than merely
 plumbed.
@@ -145,8 +149,10 @@ uniform 448\textsuperscript{2} assumption of
 Chapter~\ref{cap:aiconfigurator} stands, with its known, bounded
 ${\sim}1.14\times$ conservative bias on comparable ViT work.
 
-\section{Saturation knees: the decoupling, now in simulation}
-\label{sec:sim-knees}
+{\renewcommand{\sectionmark}[1]{}%
+\section{Saturation knees: the decoupling, now in simulation}%
+\label{sec:sim-knees}}
+\sectionmark{Saturation knees}
 
 With both pools defensibly timed, the load question becomes answerable:
 \emph{at what offered load does each pool violate its latency target?}
@@ -183,15 +189,16 @@ censored (never crossed within the swept range); on the burst window it is
 saturated at the trace's own recorded rate.}
 \label{tab:sim-knees}
 \footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{llrrr}
 \toprule
-Pool / timing & Window & Knee & Offered at knee & TTFT p99 (ms), $s{=}1 \to$ knee \\
+Pool / timing & Window & Knee & Offered & TTFT p99 (ms), $1{\to}$knee \\
 \midrule
-LLM / poly & steady head & $s{=}2$ (ITL-bound) & 5.5 req/s & $249 \to 277$ \\
-LLM / AIC  & steady head & $s{=}2$ (ITL-bound) & 5.5 req/s & $307 \to 418$ \\
-LLM / poly & burst episode & $s{=}1$ & 2.2 req/s & $910$ at $s{=}1$ \\
-Vision / AIC & steady head & $\geq s{=}32$ (cens.) & $\geq$ 256 img/s & $200 \to 811$ \\
-Vision / AIC & burst episode & \textbf{none: over at $s{=}1$} & 116 img/s & $5{,}368$ at $s{=}1$ \\
+LLM / poly & steady & $s{=}2$ (ITL-bound) & 5.5 req/s & $249 \to 277$ \\
+LLM / AIC  & steady & $s{=}2$ (ITL-bound) & 5.5 req/s & $307 \to 418$ \\
+LLM / poly & burst & $s{=}1$ & 2.2 req/s & $910$ at $s{=}1$ \\
+Vision / AIC & steady & $\geq s{=}32$ (cens.) & $\geq$ 256 img/s & $200 \to 811$ \\
+Vision / AIC & burst & \textbf{none: over at $s{=}1$} & 116 img/s & $5{,}368$ at $s{=}1$ \\
 \bottomrule
 \end{tabular}
 \end{table}

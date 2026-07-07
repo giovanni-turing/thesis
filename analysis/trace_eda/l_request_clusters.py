@@ -87,7 +87,9 @@ for cl in sorted(s["cluster"].unique()):
 axes[0].set_xscale("log"); axes[0].set_yscale("log")
 axes[0].set_xlabel("ContextTokens"); axes[0].set_ylabel("GeneratedTokens")
 axes[0].set_title(f"Semantic request groups (k={best_k}, silhouette={sil[best_k]:.2f})")
-leg = axes[0].legend(frameon=False, fontsize=7, markerscale=4, loc="lower right")
+leg = axes[0].legend(frameon=True, framealpha=0.9, facecolor="white",
+                     edgecolor="none", fontsize=7, markerscale=4,
+                     loc="lower right")
 for lh in leg.legend_handles:
     lh.set_alpha(1.0)
 axes[1].set_xscale("log"); axes[1].set_yscale("log")

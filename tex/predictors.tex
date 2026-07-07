@@ -5,6 +5,7 @@
 % benchmark parquets produced by predictors/benchmark.py).
 \chapter{Forecasting the Demand Signals with Time-Series Foundation Models}
 \label{cap:predictors}
+\chaptermark{Forecasting the Demand Signals}
 
 Chapter~\ref{cap:trace-eda} closed on a feasibility premise: the demand
 signal most dangerous to reactive scaling --- the vision pool's image rate
@@ -152,9 +153,11 @@ and 156.9\% for naive --- a one-third reduction exactly where reactive
 signals are noisiest.
 
 Second, \textbf{which model wins is resolution-dependent}. Toto-2
-(usually with covariates) takes 15 of the 20 cells, all of them at
-\SI{30}{\second} and finer; Chronos-2 leads the coarse-bin request and
-image columns and TimesFM the \SI{1}{\minute} context column. The spreads
+(usually with covariates) takes 15 of the 20 cells, including all twelve
+at \SI{30}{\second} and finer; Chronos-2 takes the remaining coarse-bin
+cells --- requests at \SI{1}{\minute} and \SI{45}{\second}, images at
+\SI{1}{\minute}, context at \SI{45}{\second} --- and TimesFM the
+\SI{1}{\minute} context column. The spreads
 among the three are small (typically under 2 WAPE points), so model choice
 matters far less than the choice to use a foundation model at all.
 
