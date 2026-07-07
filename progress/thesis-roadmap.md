@@ -116,9 +116,14 @@ Progress + results: `phase2-simulation.md`. Runner: `simulation/run_replay.sh`.
    vision saturates at the trace's own rate (p99 5.4 s at 29% mean util;
    frames-class HOL blocking) while the LLM keeps 2× headroom. The decoupling
    argument, now in simulation. Worker-grid sweeps move to Phase 3.1.
+   **⚠ Numbers above are under the old placeholder SLA — superseded by
+   Phase 3.0 (adopted SLA): LLM knee s=2 both timings, steady gap ≥16×,
+   burst LLM knee s=1 (no 2× headroom). Cite Phase 3.0's numbers, not
+   these.**
 4. **Extras banked for Phase 3**: 235B-A22B TP8 spot-check (Result E — same
-   knee octave as 8B under the TTFT placeholder, 2× decode; vision side
-   family-invariant) · dynamo 1.3.0 source build with release wheel archived
+   knee octave as 8B under the TTFT placeholder; under the adopted SLA the
+   flagship knee is s=1, one octave below the 8B — see Phase 3.0; 2× decode;
+   vision side family-invariant) · dynamo 1.3.0 source build with release wheel archived
    (`wheels/`, regression-verified; wheel's callback tail artifact corrected
    in chapter + docs) · model-size and runtime axes wired into
    `run_replay.sh` (`AIC_MODEL/AIC_TP/AIC_MOE_TP`, `REPLAY_PY`, `AIC_VER`).
@@ -138,14 +143,46 @@ Progress + SLA definitions: `phase3-baselines.md`.
    violates). 235B-TP8 knee: s=1 (decoder scale halves the LLM envelope).
    Chapter 4 updated to the adopted SLA.
 
-1. **Static-optimal**: sweep encoder-workers × LLM-workers (and TP shape if
-   in scope) under the TTFT/TPOT SLA on the trace → Pareto frontier →
-   best-achievable static configuration and its GPU-hours. Tooling: DynoSim
-   sweep / `replay_optimize`, or scripted grid over the two-pool pipeline.
-2. **Reactive autoscaler**: Dynamo's SLA Planner in simulation
-   (`--planner-config` on DynoSim runs) driven by the same trace — the
-   established reactive baseline. Record SLA compliance, scaling actions, and
-   GPU-hours over time, especially through the burst episodes.
+1. **Static-optimal — NEXT**: sweep encoder-workers × LLM-workers under the
+   evaluation SLA → Pareto frontier → best static config + GPU-hours.
+   Work items:
+   (a) grid driver `simulation/sweep_grid.py` extending `sweep_load.py`:
+   C_enc ∈ {1,2,3,4,6,8} × N_llm ∈ {1,2,3,4,6,8}, coarse pass then refine
+   around the frontier; encoder count is a converter param, LLM count a
+   replay param.
+   (b) windows: the six burst episodes + one diurnal steady window (same
+   episode definitions as the EDA chapter — sanity-link the ids).
+   (c) GPU-hours accounting: report **per hardware class** (5090-hours,
+   H100-hours) — never summed; add one cost-weighted scalar only as a
+   sensitivity note.
+   (d) headline: the static config that meets the SLA on *all* windows is
+   burst-sized — quantify its calm-traffic overprovisioning (the ≈10×/≥16×
+   missizing made concrete).
+2. **Reactive autoscaler — NEXT (after 3.1)**: Dynamo SLA Planner
+   (`--planner-config`, mode agg, native 500/50 ms window-mean control law;
+   source-built runtime per Standing decisions) through the same windows.
+   Work items:
+   (a) fix adjustment interval + min/max workers in the planner config
+   (record in `phase3-baselines.md`);
+   (b) **design decision — encoder-pool reactive policy**: the Dynamo
+   planner does not see the vision pool, so define the fair reactive
+   strawman for it (threshold scaler on window-mean utilization / queue
+   depth, same actuation + cold-start lead as 4.3 will use);
+   (c) fix the cold-start lead-time parameter set (e.g. 30/60/120 s,
+   shared by 3.2 and 4.3 so baselines and contribution are comparable);
+   (d) record scaling-action timeline, evaluation-SLA compliance, and
+   GPU-hours integrated over the worker-count schedule. The expected
+   finding — window-mean control satisfied while tail SLA is violated —
+   is a result, not a bug (see `phase3-baselines.md`).
+   (e) **Version note (verified in git, 2026-07-07)**: the planner's
+   two-loop design (forecast-driven throughput loop with ARIMA/Kalman/
+   Prophet + reactive load loop) landed 2026-04 (#8046, first in v1.1.0)
+   and IS in the pinned 1.2.1/1.3.0; the pre-v1.1 planner (from v0.3.2,
+   2025-06, #1420) was the observed-metrics SLA loop only. Baseline 3.2 =
+   the reactive load/SLA loop (what the offline replay adapter feeds).
+   **Optional extra comparison** if time allows: enable the throughput
+   loop as "Dynamo's own single-signal classical-predictor scaling" —
+   a middle rung between reactive and the thesis's per-pool TSFM policy.
 
 ## Phase 4 — Predictive scaling (the contribution) — `predictors/` — IN PROGRESS (4.1–4.2 ✅)
 
@@ -164,12 +201,33 @@ Progress + results: `phase4-predictors.md`. Chapter draft: `tex/predictors.tex`.
    covers median 6-min burst onset); covariates ±0.4 % (help only ≤15 s);
    median-point FMs are not improved by any fixed percentile (band = headroom).
    19.2 M forecasts + metrics archived (`predictors/results/`).
-3. **Closed loop — NEXT**: forecast → provisioning decision (with cold-start
-   lead time) → apply to the two-pool simulation → measure SLA compliance ×
-   GPU-hours vs Phase 3 baselines, with the six burst episodes as the
-   headline scenarios and the ~10× missizing case made quantitative.
-   Note: Phase 2 prerequisites are done; blocked only on the Phase 3
-   baselines (the comparison targets).
+3. **Closed loop — blocked on Phase 3 only**: forecast → provisioning
+   decision (with cold-start lead time) → two-pool simulation → SLA
+   compliance × GPU-hours vs both baselines on the six burst episodes.
+   Planning notes (from the 2026-07-07 review):
+   (a) **reuse the archived forecasts** — the 19.2 M-value parquet set
+   already contains the stitched per-pool paths + quantiles at every
+   cadence; the controller consumes them offline, no re-inference;
+   (b) controller: per decision tick (1 min), map forecast demand →
+   worker count via each pool's capacity model (encoder: batching-law
+   img/s per worker at the SLA point; LLM: knee-derived req/s per
+   worker), headroom policy = point vs p90 (the quantile-band finding);
+   (c) **engineering risk — time-varying worker counts**: the encoder
+   FIFO needs a worker schedule C(t) with cold-start delay (new workers
+   usable after the lead time); the LLM pool should actuate through the
+   same planner hook as 3.2 so all policies share actuation mechanics;
+   (d) score exactly as 3.1/3.2 (evaluation SLA × per-class GPU-hours);
+   (e) **controller architecture (decided 2026-07-07)**: two-tier.
+   Headline runs = **offline controller** (standalone script: forecast
+   parquet → capacity model + cold-start lag → C(t)/N(t) schedule
+   consumed by the two-pool pipeline; identical actuation for all
+   policies). Validation (Phase 5.1) = the winning policy **once** as a
+   planner PREDICT/PROPOSE plugin behind Dynamo's plugin API, actuated
+   via `VirtualConnector` (planner writes decision → sim polls
+   `client.wait()` → acks `client.complete()`) against mocked workers.
+   The encoder-pool controller mirrors the VirtualConnector decision/ack
+   semantics inside the FIFO sim (no native interface exists for a
+   vision pool) so both pools share actuation mechanics.
 4. **Ablations**: forecast horizon vs cold-start time; per-pool signals vs
    request-rate-only (the strawman — forecast image load FROM request rate,
    using the covariate machinery); forecast error sensitivity; quantile
@@ -183,10 +241,28 @@ Progress + results: `phase4-predictors.md`. Chapter draft: `tex/predictors.tex`.
 2. **Optional physical anchor**: the extracted ViT served as one real encoder
    worker on the 5090 under a burst replay — one physical data point tying the
    whole simulation chain to silicon.
-3. **Writing**: results chapter(s) mirroring `tex/aiconfigurator.tex` —
-   trace-to-workload methodology, baselines, predictive-scaling results,
-   validation. Fold the Phase 0 chapter's cross-references and citations when
-   integrating into the mestrado build.
+3. **Writing** — IN PROGRESS (front matter + all four result chapters
+   drafted; closing chapters pending their phases).
+   - ✅ Drafted: `tex/intro.tex`, `tex/related.tex`, `tex/trace-eda.tex`,
+     `tex/predictors.tex`, `tex/aiconfigurator.tex`, `tex/twopool.tex`;
+     workspace build `tex/tese.tex` (61 pp).
+   - ✅ Review pass (2026-07-07): bibliography fully web-verified and
+     extended to 55 entries (venue upgrades: WarmServe→ICML'26, EPD→ICML'25,
+     SageServe→SIGMETRICS'25, BurstGPT→KDD'25, ServeGen→NSDI'26; ModServe
+     authors/title corrected; added ElasticMM, TokenScale, HeteroScale,
+     Chiron, Aegaeon, BlitzScale, InferLine, Paxson–Floyd, DynamoLLM,
+     Time-MoE, Toto/BOOM, LLMServingSim 1/2.0, RServe, HeteroServe, dataset
+     cite). Cross-chapter numbers reconciled to the adopted SLA (≥16×
+     steady gap; burst reversal; AIC tail ≈2×; intro SLA-placeholder
+     resolved). Layout: overfull 29→1 (0.4 pt residual); three figures
+     regenerated for label legibility (`c_seven_day_signals`,
+     `l_request_clusters`, `sim_knees`).
+   - ⬜ Remaining placeholders (all gated on Phases 3–5): closed-loop
+     headline in intro ¶2 / thesis statement / RQ4 / contribution 5;
+     baselines cross-ref in related §2.3; positioning-table last column;
+     organization ¶ closing chapters; validation-anchor sentence in scope.
+   - ⬜ Baselines chapter, closed-loop chapter, conclusion; fold into the
+     mestrado build with Phase 0 cross-references.
 
 ---
 
