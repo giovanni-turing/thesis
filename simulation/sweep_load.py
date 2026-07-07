@@ -32,11 +32,14 @@ Windows
   custom — pass --offset/--max-requests yourself.
 
 Knee definition (per (pool, window, timing) curve)
-  knee = largest swept speedup whose latency metric stays under threshold:
+  knee = largest swept speedup whose latency metrics stay under the SLA:
     vision: encoder_delay_ms.p99 < --vision-p99-threshold-ms (default 1000)
             AND not queue_divergent;
-    llm:    p99_ttft_ms < --llm-ttft-p99-threshold-ms (default 2000).
-  Thresholds are PLACEHOLDERS pending the Phase 3 SLA definitions.
+    llm:    ttft.p99 < --llm-ttft-p99-threshold-ms (default 1000)
+            AND itl.p99 < --llm-itl-p99-threshold-ms (default 100).
+  These defaults ARE the thesis SLA (progress/phase3-baselines.md): tail-based
+  evaluation targets, 2x the SLA Planner's native window-mean targets
+  (ttft_ms=500, itl_ms=50), which the reactive baseline runs unmodified.
 
 Idempotent: a (pool, window, timing, speedup) point whose result JSON already
 exists under --out-dir is skipped (--force reruns). Every invocation rebuilds
@@ -250,14 +253,22 @@ def run_vision_point(out_dir: Path, window: str, speedup: float, offset: int,
 # --------------------------------------------------------------------------
 
 def knee_metric(point: dict) -> tuple[float, bool]:
-    """(metric value, under_threshold_extra_ok) — extra gate for vision divergence."""
+    """(primary metric, secondary_criteria_ok).
+
+    vision: (delay p99, not queue-divergent); llm: (TTFT p99, ITL p99 under
+    its own SLA bound — stored on the point dict by detect_knee)."""
     if point["pool"] == "vision":
         return float(point["encoder_delay_ms"]["p99"]), not bool(point.get("queue_divergent"))
-    return float(point["ttft_ms"]["p99"]), True
+    itl_ok = bool(point.get("_itl_ok", True))
+    return float(point["ttft_ms"]["p99"]), itl_ok
 
 
-def detect_knee(points: list[dict], threshold: float) -> dict:
+def detect_knee(points: list[dict], threshold: float, itl_threshold: float | None = None) -> dict:
     pts = sorted(points, key=lambda p: p["speedup"])
+    if itl_threshold is not None:
+        for p in pts:
+            if p["pool"] == "llm":
+                p["_itl_ok"] = float(p["itl_ms"]["p99"]) < itl_threshold
     under = [p for p in pts if knee_metric(p)[0] < threshold and knee_metric(p)[1]]
     over = [p for p in pts if not (knee_metric(p)[0] < threshold and knee_metric(p)[1])]
     knee = max((p["speedup"] for p in under), default=None)
@@ -302,7 +313,7 @@ def sanity_offered_scaling(points: list[dict]) -> list[dict]:
     return issues
 
 
-def rebuild_summary(out_dir: Path, vision_thr: float, llm_thr: float) -> dict:
+def rebuild_summary(out_dir: Path, vision_thr: float, llm_thr: float, llm_itl_thr: float) -> dict:
     points = []
     for f in sorted(out_dir.glob("*_s*.json")):
         if f.name == "summary.json":
@@ -319,7 +330,8 @@ def rebuild_summary(out_dir: Path, vision_thr: float, llm_thr: float) -> dict:
         groups.setdefault((p["pool"], p["window"], p["timing"]), []).append(p)
     for (pool, window, timing), pts in sorted(groups.items()):
         thr = vision_thr if pool == "vision" else llm_thr
-        curves[f"{pool}|{window}|{timing}"] = detect_knee(pts, thr)
+        itl = None if pool == "vision" else llm_itl_thr
+        curves[f"{pool}|{window}|{timing}"] = detect_knee(pts, thr, itl)
         sanity_scaling += sanity_offered_scaling(pts)
 
     # Decoupling: compare vision vs llm knees on the same window.
@@ -343,7 +355,10 @@ def rebuild_summary(out_dir: Path, vision_thr: float, llm_thr: float) -> dict:
         "thresholds": {
             "vision_encoder_delay_p99_ms": vision_thr,
             "llm_ttft_p99_ms": llm_thr,
-            "note": "placeholders pending Phase 3 SLA definitions",
+            "llm_itl_p99_ms": llm_itl_thr,
+            "note": "thesis SLA (progress/phase3-baselines.md): tail-based evaluation "
+                    "targets; the SLA Planner baseline runs its native window-mean "
+                    "targets (ttft_ms=500, itl_ms=50) as policy config",
         },
         "windows": {w: {"offset": o, "max_requests": n, "note": note}
                     for w, (o, n, note) in WINDOWS.items()},
@@ -380,9 +395,11 @@ def main() -> None:
     ap.add_argument("--offset", type=int, default=None, help="custom window row offset")
     ap.add_argument("--max-requests", type=int, default=None, help="custom window row count")
     ap.add_argument("--vision-p99-threshold-ms", type=float, default=1000.0,
-                    help="vision knee threshold on encoder_delay p99 (placeholder SLA)")
-    ap.add_argument("--llm-ttft-p99-threshold-ms", type=float, default=2000.0,
-                    help="llm knee threshold on TTFT p99 (placeholder SLA)")
+                    help="vision SLA: encoder_delay p99 bound (thesis SLA)")
+    ap.add_argument("--llm-ttft-p99-threshold-ms", type=float, default=1000.0,
+                    help="llm SLA: TTFT p99 bound (thesis SLA)")
+    ap.add_argument("--llm-itl-p99-threshold-ms", type=float, default=100.0,
+                    help="llm SLA: ITL p99 bound (thesis SLA; knee requires both)")
     ap.add_argument("--force", action="store_true", help="rerun existing points")
     ap.add_argument("--summary-only", action="store_true",
                     help="skip runs; just rebuild summary.json from existing points")
@@ -431,7 +448,8 @@ def main() -> None:
                     log(f"  FAILED: {exc}")
 
     summary = rebuild_summary(out_dir, args.vision_p99_threshold_ms,
-                              args.llm_ttft_p99_threshold_ms)
+                              args.llm_ttft_p99_threshold_ms,
+                              args.llm_itl_p99_threshold_ms)
     log(f"summary.json rebuilt: {len(summary['points'])} points, "
         f"{len(summary['curves'])} curves")
     for name, c in summary["curves"].items():

@@ -123,9 +123,20 @@ Progress + results: `phase2-simulation.md`. Runner: `simulation/run_replay.sh`.
    in chapter + docs) · model-size and runtime axes wired into
    `run_replay.sh` (`AIC_MODEL/AIC_TP/AIC_MOE_TP`, `REPLAY_PY`, `AIC_VER`).
 
-## Phase 3 — Baselines
+## Phase 3 — Baselines — IN PROGRESS (SLA ✅)
 
 **Goal**: the two reference points every autoscaling claim needs.
+Progress + SLA definitions: `phase3-baselines.md`.
+
+0. **SLA — ✅ DECIDED (2026-07-07)**: evaluation SLA (all policies, per
+   pool): LLM TTFT p99 < 1 s AND ITL p99 < 100 ms; vision encoder-delay
+   p99 < 1 s. Reactive planner keeps its native window-mean 500/50 ms as
+   policy config. Knees re-derived from existing sweeps: **LLM is
+   ITL-(decode-)bound — knee s=2 both timings on the steady head
+   (5.5 req/s), s=1 on the burst; vision unchanged** → steady decoupling
+   gap ≥16×; burst reversal exact (LLM meets SLA at 1× where vision
+   violates). 235B-TP8 knee: s=1 (decoder scale halves the LLM envelope).
+   Chapter 4 updated to the adopted SLA.
 
 1. **Static-optimal**: sweep encoder-workers × LLM-workers (and TP shape if
    in scope) under the TTFT/TPOT SLA on the trace → Pareto frontier →

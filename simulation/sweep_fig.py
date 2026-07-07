@@ -61,7 +61,7 @@ def curve_points(summary: dict, pool: str, window: str, timing: str) -> list[dic
 
 def draw_curve(ax, pts: list[dict], curve: dict, *, color: str, ls: str, label: str,
                xkey: str, metric,
-               knee_label: tuple = (0, -15, "center", "top")) -> None:
+               knee_label: tuple = (0, -15, "center", "top"), knee_suffix: str = "") -> None:
     xs = [p["offered"][xkey] for p in pts]
     ys = [metric(p) for p in pts]
     ax.plot(xs, ys, ls, color=color, label=label, zorder=3)
@@ -79,7 +79,7 @@ def draw_curve(ax, pts: list[dict], curve: dict, *, color: str, ls: str, label: 
         ax.plot([kx], [ky], "o", ms=9, color=color, markerfacecolor=color,
                 markeredgecolor="white", markeredgewidth=2, zorder=5)
         censored = not curve.get("saturated_in_range", True)
-        txt = f"knee s={knee:g}" + (" (censored)" if censored else "")
+        txt = f"knee s={knee:g}" + (" (censored)" if censored else "") + knee_suffix
         dx, dy, ha, va = knee_label
         ax.annotate(txt, (kx, ky), textcoords="offset points", xytext=(dx, dy),
                     ha=ha, va=va, fontsize=8, color=INK, zorder=6)
@@ -97,24 +97,35 @@ def main() -> None:
     fig, (ax_l, ax_v) = plt.subplots(1, 2, figsize=(9.6, 3.9), layout="constrained")
 
     # ---- left: language pool ----
-    knee_labels = {("head2k", "poly"): (0, -15, "center", "top"),
-                   ("head2k", "aic"): (0, 9, "center", "bottom"),
-                   ("burst1", "poly"): (7, -3, "left", "top"),
-                   ("burst1", "aic"): (7, -3, "left", "top")}
+    knee_labels = {("head2k", "poly"): (8, -4, "left", "top"),
+                   ("head2k", "aic"): (8, 3, "left", "bottom"),
+                   ("burst1", "poly"): (6, 10, "left", "bottom"),
+                   ("burst1", "aic"): (6, 10, "left", "bottom")}
     for window, timing in (("head2k", "poly"), ("head2k", "aic"), ("burst1", "poly"),
                            ("burst1", "aic")):
         pts = curve_points(summary, "llm", window, timing)
         c = summary["curves"].get(f"llm|{window}|{timing}")
         if not pts or not c:
             continue
+        # If the first-over point still meets the TTFT bound, the ITL bound is
+        # what killed it — mark the knee so it reads right under the TTFT line.
+        suffix = ""
+        fo = c.get("first_over_speedup")
+        if fo is not None:
+            p_fo = next((p for p in pts if p["speedup"] == fo), None)
+            if p_fo and p_fo["ttft_ms"]["p99"] < thr["llm_ttft_p99_ms"] \
+               and p_fo["itl_ms"]["p99"] >= thr.get("llm_itl_p99_ms", float("inf")):
+                suffix = " (ITL-bound)"
         draw_curve(ax_l, pts, c, color=WINDOW_COLOR[window], ls=TIMING_STYLE[timing],
                    label=f"{window} · {timing}", xkey="req_per_s",
                    metric=lambda p: p["ttft_ms"]["p99"],
-                   knee_label=knee_labels[(window, timing)])
+                   knee_label=knee_labels[(window, timing)], knee_suffix=suffix)
     t = thr["llm_ttft_p99_ms"]
     ax_l.axhline(t, color=MUTED, lw=1, ls=(0, (4, 3)), zorder=2)
-    ax_l.text(0.985, t * 1.12, f"threshold {t:g} ms (placeholder SLA)", ha="right",
-              va="bottom", fontsize=7.5, color=MUTED, transform=ax_l.get_yaxis_transform())
+    ax_l.text(0.985, t * 1.12,
+              f"SLA: TTFT p99 < {t:g} ms (knee also requires ITL p99 < {thr.get('llm_itl_p99_ms', 100):g} ms)",
+              ha="right", va="bottom", fontsize=7.5, color=MUTED,
+              transform=ax_l.get_yaxis_transform())
     ax_l.set_xscale("log")
     ax_l.set_yscale("log")
     ax_l.set_xlabel("offered load (req/s, log)")
@@ -134,7 +145,7 @@ def main() -> None:
                    knee_label=(7, -11, "left", "top"))
     t = thr["vision_encoder_delay_p99_ms"]
     ax_v.axhline(t, color=MUTED, lw=1, ls=(0, (4, 3)), zorder=2)
-    ax_v.text(0.02, t * 1.12, f"threshold {t:g} ms (placeholder SLA)", ha="left",
+    ax_v.text(0.02, t * 1.12, f"SLA: encoder delay p99 < {t:g} ms", ha="left",
               va="bottom", fontsize=7.5, color=MUTED, transform=ax_v.get_yaxis_transform())
     ax_v.set_xscale("log")
     ax_v.set_yscale("log")

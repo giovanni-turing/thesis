@@ -72,10 +72,13 @@ prices.
 for Qwen3-VL-8B at TP1. A spot-check prices the family flagship,
 Qwen3-VL-235B-A22B at TP8 (MoE-TP~8), on the same shipped H100 data, window,
 and topology: TTFT p99 of 398 / 1{,}402~ms at $1\times$/$4\times$ the trace
-rate against the 8B's 307 / 882 --- the saturation knee lands in the same
-swept octave under the placeholder target --- with $2\times$ the decode
-latency throughout (TPOT 14.9 vs.\ 7.9~ms; 87 vs.\ 142 output tok/s per
-user), so a TPOT-based SLA would bind earlier for the flagship. The vision
+rate against the 8B's 307 / 882, with $2\times$ the decode latency
+throughout (TPOT 14.9 vs.\ 7.9~ms; 87 vs.\ 142 output tok/s per user).
+Under the evaluation SLA the decode bound is what moves: the flagship's ITL
+p99 is already \SI{87.7}{\milli\second} at the trace's own rate, so its
+knee sits at $s{=}1$ ($2.8$~req/s) against the 8B's $s{=}2$ --- decoder
+scale halves the language pool's operating envelope while leaving the
+vision pool untouched. The vision
 side needs no such caveat: the ViT \emph{and} its 4096-dimensional projector
 output are identical between the 8B and the 235B
 (Chapter~\ref{cap:aiconfigurator}), so the encoder cost model, the batching
@@ -150,10 +153,18 @@ With both pools defensibly timed, the load question becomes answerable:
 Arrival timestamps are compressed by a speedup factor $s$ --- natively in
 \texttt{dynamo.replay} for the language pool (on the isolation trace, so
 the knee is attributable to that pool alone), in the converter for the
-vision pool --- and each pool's tail latency is tracked against placeholder
-targets (TTFT p99 $<\SI{2}{\second}$; encoder delay p99
-$<\SI{1}{\second}$) pending the formal SLA definitions of the baseline
-chapter. Two windows are swept at the locked 2-encoder $\times$ 2-LLM
+vision pool --- and each pool is graded against the thesis's evaluation
+SLA, deliberately tail-based because burst-time tails are precisely the
+failure mode under study: the language pool must hold TTFT p99
+$<\SI{1}{\second}$ \emph{and} inter-token latency p99 $<\SI{100}{\milli\second}$
+(first token within a second and at least 10~tokens/s for the worst
+percentile user); the vision pool must hold encoder delay p99
+$<\SI{1}{\second}$, matching the language TTFT budget so a composed
+multimodal request stays within ${\approx}\SI{2}{\second}$ p99 to first
+token. (The reactive baseline of the next chapter regulates on Dynamo's
+native \emph{window-mean} targets, $500/\SI{50}{\milli\second}$ --- that is
+its control law, evaluated like every other policy against the bounds
+above.) Two windows are swept at the locked 2-encoder $\times$ 2-LLM
 topology: the steady 2{,}000-request head (\SI{2.77}{req/s},
 \SI{8.0}{img/s}) and the week's largest burst episode
 (Section~\ref{sec:eda-vision}: 64{,}804 requests over \SI{8.3}{\hour},
@@ -163,20 +174,22 @@ the knees.
 
 \begin{table}[htb]
 \centering
-\caption{Saturation knees per pool and window: the largest swept speedup
-$s$ whose tail metric stays under the placeholder target, and that knee's
-offered load. The vision pool's steady-window knee is censored (never
-crossed within the swept range); on the burst window it is saturated at
-the trace's own recorded rate.}
+\caption{Saturation knees per pool and window under the evaluation SLA:
+the largest swept speedup $s$ meeting every bound, and that knee's offered
+load. ``ITL-bound'' marks knees whose successor point still meets the TTFT
+budget but crosses the inter-token bound --- decode saturates the SLA
+before prefill queueing does. The vision pool's steady-window knee is
+censored (never crossed within the swept range); on the burst window it is
+saturated at the trace's own recorded rate.}
 \label{tab:sim-knees}
 \footnotesize
 \begin{tabular}{llrrr}
 \toprule
-Pool / timing & Window & Knee & Offered at knee & p99 (ms), $s{=}1 \to$ knee \\
+Pool / timing & Window & Knee & Offered at knee & TTFT p99 (ms), $s{=}1 \to$ knee \\
 \midrule
-LLM / poly & steady head & $s{=}8$ & 22.2 req/s & $249 \to 1{,}366$ \\
-LLM / AIC  & steady head & $s{=}4$ & 11.1 req/s & $307 \to 882$ \\
-LLM / poly & burst episode & $s{=}2$ & 4.3 req/s & $910 \to 1{,}458$ \\
+LLM / poly & steady head & $s{=}2$ (ITL-bound) & 5.5 req/s & $249 \to 277$ \\
+LLM / AIC  & steady head & $s{=}2$ (ITL-bound) & 5.5 req/s & $307 \to 418$ \\
+LLM / poly & burst episode & $s{=}1$ & 2.2 req/s & $910$ at $s{=}1$ \\
 Vision / AIC & steady head & $\geq s{=}32$ (cens.) & $\geq$ 256 img/s & $200 \to 811$ \\
 Vision / AIC & burst episode & \textbf{none: over at $s{=}1$} & 116 img/s & $5{,}368$ at $s{=}1$ \\
 \bottomrule
@@ -186,27 +199,36 @@ Vision / AIC & burst episode & \textbf{none: over at $s{=}1$} & 116 img/s & $5{,
 \begin{figure}[htb]
 \centering
 \includegraphics[width=\linewidth]{figuras/sim/sim_knees.png}
-\caption{Tail latency versus offered load per pool (log--log), swept by
-arrival speedup at the fixed 2$\times$2-worker topology. On the steady
-window (blue) the language pool crosses its target at $s{=}8$ (polynomial
-timing; $s{=}4$ calibrated) while the vision pool remains under target
-through $s{=}32$ --- at the language pool's knee the encoder still idles at
-18\% utilization. On the burst episode (green) the order reverses: the
-vision pool starts \emph{above} its target at the episode's own recorded
-rate while the language pool keeps a further $2\times$ of headroom. No
+\caption{TTFT and encoder-delay p99 versus offered load per pool
+(log--log), swept by arrival speedup at the fixed 2$\times$2-worker
+topology; knee markers apply the full evaluation SLA, so the language
+knees sit \emph{below} the TTFT line --- they are set by the inter-token
+bound (``ITL-bound''), which crosses first. On the steady window (blue)
+both timing models put the language knee at $s{=}2$ while the vision pool
+remains under its bound through $s{=}32$ --- at the language pool's knee
+the encoder idles at 4.5\% utilization. On the burst episode (green) the
+order reverses: the vision pool starts \emph{above} its bound at the
+episode's own recorded rate, which the language pool still meets. No
 single load axis serves both pools.}
 \label{fig:sim-knees}
 \end{figure}
 
 The two knees differ on both windows, in opposite directions. On the
-steady head the vision pool carries at least $4\times$ the language pool's
-load headroom ($8\times$ against calibrated timing) --- sizing both pools
-off one signal would overprovision the encoder fleet several-fold in calm
-traffic. On the burst episode the asymmetry flips: the vision pool
-violates its target \emph{at the trace's own recorded rate}, with a p99
-encoder delay of \SI{5.4}{\second} --- while its mean utilization is only
-29\%, and while the language pool, fed the very same requests, retains
-$2\times$ headroom.
+steady head the vision pool carries at least $16\times$ the language
+pool's load headroom (both timing models) --- sizing both pools off one
+signal would overprovision the encoder fleet by an order of magnitude in
+calm traffic. A second structural fact falls out of the dual-bound SLA:
+the language pool is \emph{decode-bound}, not TTFT-bound --- at the knee's
+successor point the TTFT budget still has $2\times$ slack while ITL p99
+has crossed ($154$ and \SI{211}{\milli\second} for polynomial and
+calibrated timing at $s{=}4$) --- so language-pool capacity under an
+interactive SLA is set by sustained token throughput per user, exactly the
+axis the 235B spot-check of Section~\ref{sec:sim-timing} stresses further.
+On the burst episode the asymmetry flips: the vision pool violates its
+bound \emph{at the trace's own recorded rate}, with a p99 encoder delay of
+\SI{5.4}{\second} --- while its mean utilization is only 29\%, and while
+the language pool, fed the very same requests, still meets the full SLA at
+that rate (its knee: $s{=}1$; at $2\times$ both bounds fail).
 
 Figure~\ref{fig:sim-burst-queue} exposes the mechanism. The episode's
 7{,}716 frames-class requests (${>}64$ images each) dispatch as chunked
@@ -241,9 +263,12 @@ monitoring.}
 \section{Limitations}
 \label{sec:sim-limitations}
 
-The latency targets used for knee detection are placeholders; the baseline
-chapter fixes the SLAs and re-derives operating points from these same
-curves. The topology is locked at 2$\times$2 workers here --- the
+The evaluation SLA's specific bounds (\SI{1}{\second}/\SI{100}{\milli\second}/%
+\SI{1}{\second}) are a design choice --- defensible for interactive
+multimodal serving, but the knee positions shift with them (under a lax
+TTFT-only \SI{2}{\second} bound the language knees sit one to two octaves
+higher); the sweep curves themselves are SLA-free and re-derivable under
+any bounds. The topology is locked at 2$\times$2 workers here --- the
 worker-count grid is the static-optimal baseline's search space, not this
 chapter's --- and language-pool results are reported for the 8B at TP1 with
 a 235B-TP8 spot-check (Section~\ref{sec:sim-timing}); intermediate family
@@ -263,12 +288,13 @@ The two-pool simulation now runs the real trace end to end on calibrated
 timing for both pools: an encoder pool whose batching follows an exact,
 probe-verified cost law with a bounded inter-pool handoff, and a language
 pool whose calibrated timing surfaces the latency tails the default
-polynomial hides. Stressed with arrival-speedup sweeps, the composed
-system reproduces the thesis's motivating claim as measured behavior: the
-pools saturate at loads $\geq 4\times$ apart on steady traffic --- in the
-\emph{opposite} order during the largest burst, where the vision pool
-violates its tail target at the trace's own rate and 29\% mean utilization
-while the language pool keeps $2\times$ headroom. A single scaling signal
+polynomial hides. Stressed with arrival-speedup sweeps under a tail-based interactive SLA,
+the composed system reproduces the thesis's motivating claim as measured
+behavior: the pools saturate at loads $\geq 16\times$ apart on steady
+traffic --- with the language pool decode-bound, not TTFT-bound --- and in
+the \emph{opposite} order during the largest burst, where the vision pool
+violates its tail bound at the trace's own rate and 29\% mean utilization
+while the language pool still meets the full SLA. A single scaling signal
 cannot serve both pools, and the signal that matters for the vision pool
 is invisible to rate- and utilization-based monitors. The next chapters
 build the baselines (static-optimal sizing and the reactive planner) on

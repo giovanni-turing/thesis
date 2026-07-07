@@ -1,9 +1,10 @@
 {
- "generated_utc": "2026-07-07T00:21:11+00:00",
+ "generated_utc": "2026-07-07T08:36:00+00:00",
  "thresholds": {
   "vision_encoder_delay_p99_ms": 1000.0,
-  "llm_ttft_p99_ms": 2000.0,
-  "note": "placeholders pending Phase 3 SLA definitions"
+  "llm_ttft_p99_ms": 1000.0,
+  "llm_itl_p99_ms": 100.0,
+  "note": "thesis SLA (progress/phase3-baselines.md): tail-based evaluation targets; the SLA Planner baseline runs its native window-mean targets (ttft_ms=500, itl_ms=50) as policy config"
  },
  "windows": {
   "head2k": {
@@ -81,7 +82,8 @@
     "p99": 8926.673900730908,
     "max": 153791.71692877635
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": true
   },
   {
    "pool": "llm",
@@ -142,7 +144,8 @@
     "p99": 14747.112044990994,
     "max": 217348.26743064635
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": false
   },
   {
    "pool": "llm",
@@ -203,7 +206,8 @@
     "p99": 58985.35343106743,
     "max": 590579.8117218018
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": false
   },
   {
    "pool": "llm",
@@ -264,7 +268,8 @@
     "p99": 1470414.2742014043,
     "max": 3129887.309971406
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": false
   },
   {
    "pool": "llm",
@@ -325,7 +330,8 @@
     "p99": 8849.65184199973,
     "max": 22507.475789000222
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": true
   },
   {
    "pool": "llm",
@@ -386,7 +392,70 @@
     "p99": 83259.24733699985,
     "max": 99775.64912599997
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": false
+  },
+  {
+   "pool": "llm",
+   "window": "head2k",
+   "timing": "aic",
+   "speedup": 2.0,
+   "llm_workers": 2,
+   "mechanism": "dynamo.replay --arrival-speedup-ratio (native; timestamps /= ratio)",
+   "trace": "/home/gio/tese/simulation/results/sweeps/traces/llm_head2k.jsonl",
+   "report": "/home/gio/tese/simulation/results/sweeps/reports/llm_head2k_aic_s2.report.json",
+   "base": {
+    "req_per_s": 2.774,
+    "horizon_s": 721.072,
+    "requests": 2000,
+    "input_tok_per_s": 6200.158,
+    "output_tok_per_s": 552.856
+   },
+   "offered": {
+    "req_per_s": 5.548,
+    "input_tok_per_s": 12400.32,
+    "output_tok_per_s": 1105.71,
+    "total_tok_per_s": 13506.03
+   },
+   "measured": {
+    "request_throughput_rps": 5.469431821904786,
+    "output_throughput_tok_s": 1090.1917631852605,
+    "total_throughput_tok_s": 13316.450269234781,
+    "duration_ms": 365668.6956020012,
+    "completed_requests": 2000,
+    "sim_wall_time_ms": 33476.650667,
+    "driver_wall_s": 34.1
+   },
+   "ttft_ms": {
+    "mean": 83.6951453797906,
+    "median": 43.626387999160215,
+    "p90": 161.36906799959252,
+    "p99": 418.2260329989949,
+    "max": 7608.498935999873
+   },
+   "tpot_ms": {
+    "mean": 10.092989449042316,
+    "median": 8.907283213740048,
+    "p90": 13.564994964913543,
+    "p99": 28.94687504545304,
+    "max": 108.75565776666674
+   },
+   "itl_ms": {
+    "mean": 9.743023241757632,
+    "median": 7.513466000003973,
+    "p90": 9.117556999990484,
+    "p99": 67.33404299998074,
+    "max": 846.298827999999
+   },
+   "e2e_ms": {
+    "mean": 2015.9753582897956,
+    "median": 1175.660749999981,
+    "p90": 4448.1778549999,
+    "p99": 12159.632064999896,
+    "max": 23230.365590000118
+   },
+   "exit_code": 0,
+   "_itl_ok": true
   },
   {
    "pool": "llm",
@@ -447,7 +516,8 @@
     "p99": 22477.67150300005,
     "max": 43119.014076000036
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": false
   },
   {
    "pool": "llm",
@@ -508,7 +578,8 @@
     "p99": 6878.767564000387,
     "max": 16408.726900000765
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": true
   },
   {
    "pool": "llm",
@@ -569,7 +640,8 @@
     "p99": 62137.59877399994,
     "max": 82252.74718900003
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": false
   },
   {
    "pool": "llm",
@@ -630,7 +702,8 @@
     "p99": 8451.571100002795,
     "max": 16571.177458997496
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": true
   },
   {
    "pool": "llm",
@@ -691,7 +764,8 @@
     "p99": 69686.89790499995,
     "max": 83401.91434299982
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": false
   },
   {
    "pool": "llm",
@@ -752,7 +826,8 @@
     "p99": 17191.57037999951,
     "max": 34567.20108699941
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": false
   },
   {
    "pool": "llm",
@@ -813,7 +888,8 @@
     "p99": 49067.33862500002,
     "max": 82912.08070199932
    },
-   "exit_code": 0
+   "exit_code": 0,
+   "_itl_ok": false
   },
   {
    "pool": "vision",
@@ -1461,9 +1537,9 @@
     17.32
    ],
    "queue_divergent": null,
-   "threshold": 2000.0,
-   "knee_speedup": 2.0,
-   "first_over_speedup": 4.0,
+   "threshold": 1000.0,
+   "knee_speedup": 1.0,
+   "first_over_speedup": 2.0,
    "saturated_in_range": true,
    "monotonic_ok": true,
    "monotonicity_violations": []
@@ -1471,23 +1547,26 @@
   "llm|head2k|aic": {
    "speedups": [
     1.0,
+    2.0,
     4.0,
     16.0
    ],
    "metric": [
     306.729,
+    418.226,
     882.077,
     40163.453
    ],
    "offered": [
     2.774,
+    5.548,
     11.096,
     44.384
    ],
    "queue_divergent": null,
-   "threshold": 2000.0,
-   "knee_speedup": 4.0,
-   "first_over_speedup": 16.0,
+   "threshold": 1000.0,
+   "knee_speedup": 2.0,
+   "first_over_speedup": 4.0,
    "saturated_in_range": true,
    "monotonic_ok": true,
    "monotonicity_violations": []
@@ -1518,9 +1597,9 @@
     88.768
    ],
    "queue_divergent": null,
-   "threshold": 2000.0,
-   "knee_speedup": 8.0,
-   "first_over_speedup": 16.0,
+   "threshold": 1000.0,
+   "knee_speedup": 2.0,
+   "first_over_speedup": 4.0,
    "saturated_in_range": true,
    "monotonic_ok": true,
    "monotonicity_violations": []
@@ -1609,19 +1688,19 @@
  "decoupling": {
   "head2k|llm-poly": {
    "vision_knee_speedup": 32.0,
-   "llm_knee_speedup": 8.0,
+   "llm_knee_speedup": 2.0,
    "knees_differ": true,
-   "llm_over_vision_knee_ratio": 0.25
+   "llm_over_vision_knee_ratio": 0.062
   },
   "head2k|llm-aic": {
    "vision_knee_speedup": 32.0,
-   "llm_knee_speedup": 4.0,
+   "llm_knee_speedup": 2.0,
    "knees_differ": true,
-   "llm_over_vision_knee_ratio": 0.125
+   "llm_over_vision_knee_ratio": 0.062
   },
   "burst1|llm-poly": {
    "vision_knee_speedup": null,
-   "llm_knee_speedup": 2.0,
+   "llm_knee_speedup": 1.0,
    "knees_differ": true,
    "llm_over_vision_knee_ratio": null
   }
