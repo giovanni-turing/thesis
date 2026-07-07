@@ -97,8 +97,9 @@ Progress + results: `phase2-simulation.md`. Runner: `simulation/run_replay.sh`.
    `aic_system`/... in `replay/main.py` + `mocker/config.py`); it only needed
    `aiconfigurator` co-resident in the replay env (the wheel is cp310-abi3, so
    `uv pip install ai-dynamo==1.2.1` into the aiconfigurator .venv suffices — no
-   source build). Poly-vs-AIC delta quantified (AIC: slower decode, 3–5× heavier
-   latency tails). `agentic_mooncake`/`--planner-config` maturity is a SEPARATE
+   source build). Poly-vs-AIC delta quantified (AIC: slower decode, ~1.8–1.9×
+   heavier max tails, p99 +24% — artifact-corrected by the source build; see
+   phase2-simulation.md "Source build"). `agentic_mooncake`/`--planner-config` maturity is a SEPARATE
    axis that only gates Phase 3.2 (SLA Planner) — decide source-build THEN.
 2. **Encoder-pool realism** — ✅ DONE (Result C, `phase2-simulation.md`).
    Cross-request batching on AIC's batch dimension (probe: encoder cost is

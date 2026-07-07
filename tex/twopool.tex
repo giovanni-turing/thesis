@@ -54,11 +54,19 @@ deterministic given a trace window.
 
 Table~\ref{tab:sim-poly-aic} compares the two timing models on the same
 2{,}000-request steady window (raw arrivals, identical topology). The
-calibrated model is moderately slower on averages but dramatically heavier
-in the tails: maximum TTFT grows $3\times$ and maximum inter-token latency
-$4.7\times$. Burst behavior --- precisely what autoscaling experiments
-measure --- is visible only under calibrated timing, so all headline runs
-use AIC timing and the polynomial is retained for cheap coverage sweeps.
+calibrated model is moderately slower on averages and markedly heavier in
+the tails: TTFT p99 grows $1.24\times$ and the maximum TTFT and inter-token
+latency roughly double ($1.8\times$ and $1.9\times$). Burst behavior ---
+precisely what autoscaling experiments measure --- is visible only under
+calibrated timing, so all headline runs use AIC timing and the polynomial
+is retained for cheap coverage sweeps. One measurement note: these AIC
+numbers come from the source-built runtime, whose calibrated predictions
+run in-core (Rust) in microseconds; an earlier wheel-based runtime ran them
+as per-request Python callbacks whose wall-time leaked into the simulated
+clock, inflating the \emph{extreme} tail only (identical p99, maximum TTFT
+7.6 vs.\ 4.5~s on identical perf data) --- an instrumentation artifact to
+guard against when a simulator's timing hook is slower than the events it
+prices.
 
 \paragraph{Family transfer.} The language-pool numbers in this chapter are
 for Qwen3-VL-8B at TP1. A spot-check prices the family flagship,
@@ -84,10 +92,10 @@ steady window, 2 workers, offline KV router.}
 \toprule
 Metric & Polynomial & AIC h100 \\
 \midrule
-TTFT avg / p99 / max (ms) & 67.3 / 248 / 2{,}540 & 72.7 / 307 / 7{,}598 \\
-Request latency avg / p99 (ms) & 1{,}413 / 6{,}879 & 1{,}609 / 8{,}850 \\
-Inter-token latency avg / max (ms) & 6.79 / 181 & 7.75 / 847 \\
-Output tok/s per user (avg) & 160.6 & 141.7 \\
+TTFT avg / p99 / max (ms) & 67.3 / 248 / 2{,}540 & 68.2 / 307 / 4{,}518 \\
+Request latency avg / p99 (ms) & 1{,}413 / 6{,}879 & 1{,}590 / 8{,}163 \\
+Inter-token latency avg / max (ms) & 6.79 / 181 & 7.67 / 348 \\
+Output tok/s per user (avg) & 160.6 & 142.0 \\
 \bottomrule
 \end{tabular}
 \end{table}

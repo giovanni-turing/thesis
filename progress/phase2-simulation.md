@@ -50,7 +50,10 @@ trace, same topology — only the mocker's timing model changes.
 
 AIC gives **slower per-user decode (142 vs 161 tok/s) and much heavier tails**
 (TTFT max 3×, ITL max 4.7×) — the calibrated model exposes burst behavior the
-polynomial default flattens. `Wall Time` jumps 0.33 s → 32 s because AIC
+polynomial default flattens. **[Superseded on tail magnitudes]**: the wheel's
+per-request python callback inflated the *extreme* tail (see "Source build"
+below) — the artifact-free multipliers are TTFT max **1.8×** and ITL max
+**1.9×** (p99 +24% unchanged); the qualitative conclusion stands. `Wall Time` jumps 0.33 s → 32 s because AIC
 predicts every request instead of evaluating a polynomial (proof the session is
 live, not silently falling back).
 
