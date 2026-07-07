@@ -1,0 +1,132 @@
+# cmd: env AIC_TP=2 bash /home/gio/tese/simulation/run_replay.sh /home/gio/tese/simulation/results/grid/traces/grid_burst4_C7.jsonl aic /home/gio/tese/simulation/results/grid/reports/grid_llm_burst4_C7_N1_TP2_aic.report.json 1
+# cwd: /home/gio/tese/simulation
+[2m2026-07-07T21:20:21.821371Z[0m [32m INFO[0m [2mkvbm_logical::manager::builder[0m[2m:[0m Using Lineage inactive backend
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=32
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=64
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=128
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=256
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=512
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=768
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=1024
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=1536
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=2048
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=2560
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=3072
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=3584
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=4096
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=5120
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=6144
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=7168
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=8192
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=10240
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=12288
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=14336
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=16384
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=20480
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=24576
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=28672
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=32768
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=40960
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=49152
+Skipping interpolation for y=51200 as it does not exist in both x_left=257 and x_right=384
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=57344
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=65536
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=131072
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=262144
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=32
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=64
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=128
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=256
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=512
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=768
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=1024
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=1536
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=2048
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=2560
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=3072
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=3584
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=4096
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=5120
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=6144
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=7168
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=8192
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=10240
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=12288
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=14336
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=16384
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=20480
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=24576
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=28672
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=32768
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=40960
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=49152
+Skipping interpolation for y=51200 as it does not exist in both x_left=257 and x_right=384
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=57344
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=65536
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=131072
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=262144
+Skipping interpolation for z=51200 as it does not exist in both y_left=51200 and y_right=65536
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=32
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=64
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=128
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=256
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=512
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=768
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=1024
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=1536
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=2048
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=2560
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=3072
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=3584
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=4096
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=5120
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=6144
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=7168
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=8192
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=10240
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=12288
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=14336
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=16384
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=20480
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=24576
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=28672
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=32768
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=40960
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=49152
+Skipping interpolation for y=51200 as it does not exist in both x_left=257 and x_right=384
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=57344
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=65536
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=131072
+Skipping interpolation for z=51200 as it does not exist in both x_left=257 and x_right=384 for y=262144
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=57344
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=65536
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=131072
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=262144
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=57344
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=65536
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=131072
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=262144
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=57344
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=65536
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=131072
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=262144
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=57344
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=65536
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=131072
+Skipping interpolation for z=51200 as it does not exist in both x_left=16384 and x_right=32768 for y=262144
+NVIDIA AIPerf | LLM Metrics
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┓
+┃ Metric                                             ┃       avg ┃   min ┃        max ┃       p99 ┃      p90 ┃      p75 ┃      std ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━┩
+┃ Time to First Token (ms)                           ┃    351.78 ┃  8.81 ┃   6,727.91 ┃  3,087.95 ┃   922.99 ┃   527.21 ┃   609.81 ┃
+┃ Time to Second Token (ms)                          ┃     30.65 ┃  4.17 ┃     155.96 ┃    144.23 ┃   124.49 ┃    20.57 ┃    47.59 ┃
+┃ Request Latency (ms)                               ┃  1,991.89 ┃ 10.55 ┃ 146,478.62 ┃ 13,522.05 ┃ 4,443.30 ┃ 2,214.77 ┃ 3,699.06 ┃
+┃ Inter Token Latency (ms)                           ┃      9.23 ┃  4.17 ┃     454.48 ┃    156.22 ┃     6.99 ┃     5.34 ┃    23.96 ┃
+┃ Output Token Throughput Per User (tokens/sec/user) ┃    198.62 ┃  2.20 ┃     240.00 ┃    237.35 ┃   231.40 ┃   227.37 ┃    48.28 ┃
+┃ Output Token Throughput (tokens/sec)               ┃    404.06 ┃   N/A ┃        N/A ┃       N/A ┃      N/A ┃      N/A ┃      N/A ┃
+┃ Request Throughput (requests/sec)                  ┃      2.26 ┃   N/A ┃        N/A ┃       N/A ┃      N/A ┃      N/A ┃      N/A ┃
+┃ Request Count (requests)                           ┃ 25,639.00 ┃   N/A ┃        N/A ┃       N/A ┃      N/A ┃      N/A ┃      N/A ┃
+└━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┴━━━━━━━━━━━┴━━━━━━━┴━━━━━━━━━━━━┴━━━━━━━━━━━┴━━━━━━━━━━┴━━━━━━━━━━┴━━━━━━━━━━┘
+Wall Time (ms): 460,930.54
+Prefix Cache Reused Ratio: 0.00
+Saved full report to: /home/gio/tese/simulation/results/grid/reports/grid_llm_burst4_C7_N1_TP2_aic.report.json

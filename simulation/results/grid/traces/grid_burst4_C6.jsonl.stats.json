@@ -1,0 +1,66 @@
+{
+ "requests": 25639,
+ "requests_with_images": 14617,
+ "text_only_fraction": 0.4299,
+ "total_images": 1531105,
+ "image_px": 448,
+ "encoder_workers": 6,
+ "encoder_batch_images": 64,
+ "chunk_dispatch": "parallel",
+ "arrival_speedup": 1.0,
+ "handoff_rtt_ms": 0.2,
+ "handoff_gbps": 25.0,
+ "encoder_shift_applied": true,
+ "sim_horizon_s": 11339.204,
+ "vision_sim_end_s": 11339.204,
+ "mean_images_per_s": 135.028,
+ "offered_img_per_s": 135.028,
+ "mean_requests_per_s": 2.261,
+ "encoder_service_ms": {
+  "p50": 49.797,
+  "p90": 2382.995,
+  "p99": 2605.136
+ },
+ "encoder_batch_service_ms": {
+  "p50": 314.498,
+  "p90": 314.498,
+  "p99": 314.498,
+  "max": 314.498
+ },
+ "encoder_delay_ms": {
+  "p50": 8.536,
+  "p90": 625.082,
+  "p99": 1052.21,
+  "max": 2397.354
+ },
+ "handoff_ms": {
+  "p50": 4.824,
+  "p90": 248.88,
+  "p99": 272.001,
+  "max": 567.438
+ },
+ "encoder_utilization": 0.1114,
+ "queue_imgs_at_arrival_end": 0,
+ "queue_divergent": false,
+ "batches": 34855,
+ "encoder_forwards": 34855,
+ "images_per_batch": {
+  "p50": 64,
+  "p90": 64,
+  "p99": 64
+ },
+ "requests_chunked": 3621,
+ "service_memo_hits": 52976,
+ "distinct_service_sizes_costed": 51,
+ "input_length": {
+  "p50": 1354,
+  "p90": 30407,
+  "p99": 35932,
+  "max": 124292
+ },
+ "context_minus_aic_vision_tokens": {
+  "p50": 943,
+  "p90": 4632,
+  "p99": 4934
+ }
+}

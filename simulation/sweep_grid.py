@@ -93,26 +93,29 @@ def vision_point(out_dir: Path, window: str, win: dict, c: int, force: bool) -> 
 
 
 def llm_point(out_dir: Path, window: str, c: int, n: int, timing: str,
-              trace: Path, force: bool) -> dict:
-    pp = out_dir / f"llm_{window}_C{c}_N{n}_{timing}.json"
+              trace: Path, force: bool, tp: int = 1) -> dict:
+    tp_tag = "" if tp == 1 else f"_TP{tp}"          # TP1 keeps legacy names
+    pp = out_dir / f"llm_{window}_C{c}_N{n}{tp_tag}_{timing}.json"
     if pp.exists() and not force:
         return json.loads(pp.read_text())
-    tag = f"grid_llm_{window}_C{c}_N{n}_{timing}"
+    tag = f"grid_llm_{window}_C{c}_N{n}{tp_tag}_{timing}"
     report = out_dir / "reports" / f"{tag}.report.json"
     report.parent.mkdir(parents=True, exist_ok=True)
-    log(f"  replay: {window} C={c} N={n} ({timing})")
+    log(f"  replay: {window} C={c} N={n} TP={tp} ({timing})")
     t0 = time.time()
-    rc = sl.run_logged(["bash", str(sl.RUN_REPLAY), str(trace), timing, str(report), str(n)],
+    rc = sl.run_logged(["env", f"AIC_TP={tp}", "bash", str(sl.RUN_REPLAY),
+                        str(trace), timing, str(report), str(n)],
                        out_dir / "logs" / f"{tag}.log", cwd=HERE,
                        timeout=sl.REPLAY_TIMEOUT_S * 2)
     if rc != 0 or not report.exists():
-        raise RuntimeError(f"replay failed (exit {rc}) for {window}/C{c}/N{n}")
+        raise RuntimeError(f"replay failed (exit {rc}) for {window}/C{c}/N{n}/TP{tp}")
     rep = json.loads(report.read_text())
     pick = lambda pfx: {k: rep.get(f"{k}_{pfx}") for k in
                         ("mean", "median", "p90", "p99", "max")}
     ttft, itl = pick("ttft_ms"), pick("itl_ms")
     rec = {
         "pool": "llm", "window": window, "encoder_workers": c, "llm_workers": n,
+        "tp": tp, "gpus": tp * n,
         "timing": timing, "trace": str(trace), "report": str(report),
         "ttft_ms": ttft, "itl_ms": itl, "tpot_ms": pick("tpot_ms"),
         "completed_requests": rep.get("completed_requests"),
@@ -168,6 +171,10 @@ def main() -> None:
                     help="LLM timing model (headline runs: aic)")
     ap.add_argument("--c-ladder", type=int, nargs="+", default=[1, 2, 4, 8, 16, 32])
     ap.add_argument("--n-ladder", type=int, nargs="+", default=[1, 2, 4, 8, 16])
+    ap.add_argument("--tp-ladder", type=int, nargs="+", default=[1, 2, 4],
+                    help="LLM tensor-parallel sizes to consider; cost = TP x N GPUs. "
+                         "TP is the lever against the per-request prefill floor of "
+                         "giant multimodal contexts (TTFT p99 plateaus in N at TP1)")
     ap.add_argument("--out-dir", type=Path, default=HERE / "results" / "grid")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--summary-only", action="store_true")
@@ -198,34 +205,50 @@ def main() -> None:
                 failures.append(f"{window}: vision infeasible up to "
                                 f"C={max(args.c_ladder)}")
                 continue
-            # Phase L — minimum LLM workers on the C* (encoder-shifted) trace.
+            # Phase L — cheapest (TP, N) on the C* (encoder-shifted) trace.
+            # Cost = TP x N GPUs; TP parallelizes a single request's prefill,
+            # so it (not N) is the lever when TTFT p99 hits the per-request
+            # prefill floor of giant multimodal contexts. A TP rung is only
+            # tried while it could still beat the best cost found (min N = 1).
             c_trace = Path(vpoints[c_star]["trace"])
-            n_star, lpoints = min_feasible(
-                sorted(args.n_ladder),
-                lambda n: llm_point(out_dir, window, c_star, n, args.timing,
-                                    c_trace, args.force))
-            if n_star is None:
+            best = None  # (cost_gpus, tp, n_star, lpoints)
+            for tp in args.tp_ladder:
+                if best is not None and tp >= best[0]:
+                    break
+                n_star_tp, lp = min_feasible(
+                    sorted(args.n_ladder),
+                    lambda n, _tp=tp: llm_point(out_dir, window, c_star, n,
+                                                args.timing, c_trace,
+                                                args.force, tp=_tp))
+                if n_star_tp is not None:
+                    cost = tp * n_star_tp
+                    if best is None or cost < best[0]:
+                        best = (cost, tp, n_star_tp, lp)
+            if best is None:
                 failures.append(f"{window}: llm infeasible up to "
-                                f"N={max(args.n_ladder)} at C={c_star}")
+                                f"N={max(args.n_ladder)} x TP={max(args.tp_ladder)} "
+                                f"at C={c_star}")
                 continue
+            llm_gpus, tp_star, n_star, lpoints = best
             # Cross-check — corner-point independence: at the next C rung the
-            # same N* must stay feasible (shift only smooths as C grows).
+            # same (TP*, N*) must stay feasible (shift only smooths as C grows).
             c_next = next((c for c in sorted(args.c_ladder) if c > c_star), None)
             cross = None
             if c_next is not None:
                 vnext = vision_point(out_dir, window, win, c_next, args.force)
                 cross = llm_point(out_dir, window, c_next, n_star, args.timing,
-                                  Path(vnext["trace"]), args.force)
+                                  Path(vnext["trace"]), args.force, tp=tp_star)
                 if not cross["feasible"]:
-                    failures.append(f"{window}: cross-check FAILED — N*={n_star} "
-                                    f"infeasible at C={c_next}; corner point is "
-                                    f"not independent, needs a full grid here")
+                    failures.append(f"{window}: cross-check FAILED — TP{tp_star}/"
+                                    f"N{n_star} infeasible at C={c_next}; corner "
+                                    f"point is not independent, needs a full grid")
             span_h = win["span_s"] / 3600.0
             results[window] = {
-                "c_star": c_star, "n_star": n_star,
+                "c_star": c_star, "tp_star": tp_star, "n_star": n_star,
+                "llm_gpus": llm_gpus,
                 "span_h": round(span_h, 3),
                 "gpu_hours": {"rtx5090": round(c_star * span_h, 2),
-                              "h100": round(n_star * span_h, 2)},
+                              "h100": round(llm_gpus * span_h, 2)},
                 "vision_delay_p99_ms_at_cstar":
                     vpoints[c_star]["encoder_delay_ms"]["p99"],
                 "llm_ttft_p99_ms_at_star": lpoints[n_star]["ttft_ms"]["p99"],
@@ -234,7 +257,7 @@ def main() -> None:
                 "vision_points_run": sorted(vpoints),
                 "llm_points_run": sorted(lpoints),
             }
-            log(f"  {window}: C*={c_star} N*={n_star} "
+            log(f"  {window}: C*={c_star} TP*={tp_star} N*={n_star} "
                 f"({results[window]['gpu_hours']['rtx5090']} 5090-h, "
                 f"{results[window]['gpu_hours']['h100']} h100-h)")
         except (RuntimeError, KeyError, OSError) as exc:
@@ -249,37 +272,49 @@ def main() -> None:
     for w in {p["window"] for p in all_points}:
         vp = {p["encoder_workers"]: p for p in all_points
               if p["pool"] == "vision" and p["window"] == w}
-        lp = {(p["encoder_workers"], p["llm_workers"]): p for p in all_points
-              if p["pool"] == "llm" and p["window"] == w}
+        lp = {(p["encoder_workers"], p.get("tp", 1), p["llm_workers"]): p
+              for p in all_points if p["pool"] == "llm" and p["window"] == w}
         c_feas = sorted(c for c, p in vp.items() if p["feasible"])
         c_star = c_feas[0] if c_feas else None
-        n_feas = sorted(n for (c, n), p in lp.items()
-                        if c == c_star and p["feasible"]) if c_star else []
-        n_star = n_feas[0] if n_feas else None
+        feas = [(tp * n, tp, n) for (c, tp, n), p in lp.items()
+                if c == c_star and p["feasible"]] if c_star else []
+        cost_star, tp_star, n_star = min(feas) if feas else (None, None, None)
         span_h = registry[w]["span_s"] / 3600.0 if w in registry else None
         per_window[w] = {
-            "c_star": c_star, "n_star": n_star, "span_h": round(span_h, 3),
+            "c_star": c_star, "tp_star": tp_star, "n_star": n_star,
+            "llm_gpus": cost_star, "span_h": round(span_h, 3),
             "gpu_hours": ({"rtx5090": round(c_star * span_h, 2),
-                           "h100": round(n_star * span_h, 2)}
-                          if c_star and n_star else None),
+                           "h100": round(cost_star * span_h, 2)}
+                          if c_star and cost_star else None),
             "vision_curve": {c: {"p99": vp[c]["encoder_delay_ms"]["p99"],
                                  "feasible": vp[c]["feasible"]} for c in sorted(vp)},
-            "llm_curve": {f"C{c}_N{n}": {"ttft_p99": lp[(c, n)]["ttft_ms"]["p99"],
-                                         "itl_p99": lp[(c, n)]["itl_ms"]["p99"],
-                                         "feasible": lp[(c, n)]["feasible"]}
-                          for (c, n) in sorted(lp)},
+            "llm_curve": {f"C{c}_TP{tp}_N{n}":
+                          {"ttft_p99": lp[(c, tp, n)]["ttft_ms"]["p99"],
+                           "itl_p99": lp[(c, tp, n)]["itl_ms"]["p99"],
+                           "feasible": lp[(c, tp, n)]["feasible"]}
+                          for (c, tp, n) in sorted(lp)},
         }
     complete = {w: r for w, r in per_window.items()
-                if r["c_star"] is not None and r["n_star"] is not None}
+                if r["c_star"] is not None and r["llm_gpus"] is not None}
     headline = None
     if complete:
         c_all = max(r["c_star"] for r in complete.values())
-        n_all = max(r["n_star"] for r in complete.values())
+        binding = max(complete, key=lambda w: complete[w]["llm_gpus"])
         headline = {
-            "static_all_windows": {"encoder_workers": c_all, "llm_workers": n_all},
+            "static_all_windows": {
+                "encoder_workers": c_all,
+                "llm_config_binding_window": binding,
+                "llm_tp": complete[binding]["tp_star"],
+                "llm_workers": complete[binding]["n_star"],
+                "llm_gpus": complete[binding]["llm_gpus"],
+                "note": "LLM all-windows config = the binding (most expensive) "
+                        "window's optimum; verify feasibility on the remaining "
+                        "windows before quoting (feasibility is monotone in N "
+                        "at fixed TP but not across TP)",
+            },
             "overprovision_vs_per_window": {
                 w: {"vision_x": round(c_all / r["c_star"], 2),
-                    "llm_x": round(n_all / r["n_star"], 2)}
+                    "llm_x": round(complete[binding]["llm_gpus"] / r["llm_gpus"], 2)}
                 for w, r in complete.items()},
             "note": "static config sized to pass ALL windows vs each window's "
                     "own optimum — the calm-traffic overprovisioning headline "

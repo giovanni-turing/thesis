@@ -41,10 +41,15 @@ case "$MODEL" in
   *) echo "model must be poly|aic" >&2; exit 2 ;;
 esac
 
+# Offline replay only supports kv_router with >1 workers; with a single
+# worker routing is trivial, so round_robin is behavior-identical there.
+ROUTER=kv_router
+[ "$WORKERS" -le 1 ] && ROUTER=round_robin
+
 cd "$AIC"
 exec "$PY" -m dynamo.replay "$TRACE" \
   --trace-format mooncake --trace-block-size 512 \
-  --replay-mode offline --router-mode kv_router \
+  --replay-mode offline --router-mode "$ROUTER" \
   --num-workers "$WORKERS" \
   --extra-engine-args "$ENGINE_ARGS" \
   --report-json "$REPORT" "$@"

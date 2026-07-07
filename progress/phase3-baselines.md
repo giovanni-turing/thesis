@@ -13,7 +13,7 @@ Two levels, deliberately distinct:
 **Evaluation SLA (all policies are graded on this, per pool, per window):**
 
 | Pool | Bound | Rationale |
-|---|---|---|
+| --- | --- | --- |
 | Language | TTFT p99 < 1,000 ms AND ITL p99 < 100 ms | interactive grade: first token within 1 s and ≥10 tok/s at the 99th percentile; tail-based because the thesis's failure mode IS burst-time tails |
 | Vision | encoder delay (queue+service+handoff) p99 < 1,000 ms | matches the language TTFT budget so composed multimodal p99 TTFT stays ≲2 s |
 
@@ -34,7 +34,7 @@ meeting BOTH language bounds; one new point, llm/head2k/aic/s2, tightens the
 calibrated bracket). Figure regenerated (`results/sweeps/knees.png`).
 
 | Curve | knee (was, at placeholder 2 s TTFT-only) | offered at knee | binding bound |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | llm · head2k · poly | **s=2** (was s=8) | 5.5 req/s | **ITL** (s=4: TTFT 473 ✓, ITL 154 ✗) |
 | llm · head2k · aic | **s=2** (was s=4) | 5.5 req/s | **ITL** (s=4: TTFT 882 ✓, ITL 211 ✗) |
 | llm · burst1 · poly | **s=1** (was s=2) | 2.2 req/s | both at s=2 (TTFT 1,458, ITL 178) |
@@ -62,6 +62,21 @@ the record); source-built runtime (`REPLAY_PY=.../dynamo/.venv/bin/python
 AIC_VER=0.19.0`). Adjustment-interval and scaling bounds to be fixed when
 3.2 runs.
 
+**Perf-model bootstrap (decided 2026-07-08): AIC interpolation.** DynoSim
+has two "tuning" surfaces. (1) Engine timing — already solved: AIC-backed
+mocker timing replaces the profile-an-engine tuning phase (Phase 2.1,
+poly-vs-AIC quantified). (2) The planner's own capacity model — it
+bootstraps from self-benchmark → AIC interpolation → profile NPZ → live
+FPM regression; we feed it **AIC interpolation from the same h100_sxm
+database that times the sim**. Self-consistent and deliberately generous:
+the reactive baseline gets a perfect capacity model, so its SLA misses are
+attributable purely to reacting late — the effect the thesis isolates. Do
+NOT let it fall back to live FPM regression (warm-up holds early decisions
+— contaminates short burst windows); warm-start the traffic predictors via
+`--load-predictor-warmup-trace` (or document constant-predictor fallback).
+The predictive policy's capacity model uses the same AIC source, for
+parity across all policies.
+
 ## Encoder chunk dispatch: parallel (decided 2026-07-07, user-approved)
 
 The 3.1 smoke test exposed a structural infeasibility: under the Phase-2
@@ -85,6 +100,24 @@ Mechanism shift worth quoting: every forward is now ≤315 ms, and the
 burst pathology is queue depth (789 s above 1,000 queued images, peak
 4,637), not multi-second forwards.
 
+## LLM prefill floor on burst windows: TP is the lever (found 2026-07-07)
+
+The first grid pass found every burst window LLM-infeasible at TP1 for ANY
+worker count: TTFT p99 plateaus at ~1,285–1,330 ms from N=4 through N=16
+(ITL fine at ~8 ms). Same structural shape as the encoder chunk floor —
+a PER-REQUEST service floor, here the prefill latency of giant
+frames-class contexts (p99 ≈36k tokens ≈1.3 s of prefill compute on one
+H100 at TP1). Replica count cannot shorten one request's prefill; tensor
+parallelism can. Confirmed directly: burst6 C=6 N=8 at TP2 → TTFT p99
+708 ms (feasible). Consequence for the chapter: **during frames floods the
+language pool's binding constraint flips from decode throughput (steady
+traffic, ITL-bound, knee s=2) to single-request prefill latency —
+requiring a TP change, not replica scaling**. `sweep_grid.py` now searches
+(TP, N) with cost = TP×N GPUs (TP rungs pruned by best-cost); the same
+plateau evidence is in `results/grid/` TP1 point files. Note
+`run_replay.sh` fix: single-worker replays need `--router-mode
+round_robin` (kv_router requires >1 workers); behavior-identical at N=1.
+
 ## 3.1 static-optimal — tooling ready, grid running
 
 - `simulation/derive_windows.py` → `simulation/windows.json`: six burst
@@ -97,9 +130,73 @@ burst pathology is queue depth (789 s above 1,000 queued images, peak
   cross-check (`N*` must stay feasible at the next C rung). GPU-hours per hardware
   class, never summed. Results → `simulation/results/grid/`.
 
+**AIC coverage at giant contexts (probed 2026-07-08).** The shipped
+h100_sxm context-attention grid tops out at ISL 16,384; frames-class
+requests reach 36k (trace p99) and 148k (max), so ~3% of requests — the
+burst-TTFT-critical ones — are priced by extrapolation. Probe
+(`query_context_attention`, b=1, 32/8 heads, bf16): beyond-grid latency
+tracks the theoretical quadratic to within a few % per octave out to
+147k (×2.18 vs 2.2, ×1.75 vs 1.8, ×3.90 vs 4.0, ×5.05 vs 5.1) —
+physics-consistent, compute-bound regime; the dominant prefill GEMM term
+is collected to m=32,768 and linear beyond. Residual risk: real
+long-context kernels degrade slightly super-quadratically → the 1.3 s
+prefill floor is if anything underestimated (the TP finding is
+conservative), but feasibility MARGINS at boundary configs (e.g. 708 ms
+at TP2) carry the extrapolation uncertainty. Document as a limitation in
+the baselines chapter; encoder-side queries have no extrapolation by
+construction (64-image cap inside the collected envelope).
+
+**Relation to DynoSim Sweep (`replay_optimize`), noted 2026-07-08.** The
+official sweep loop is TP search → worker search → **router search**
+(overlap-score credit, prefill-load scale) — router tuning is a stage of
+the sweep, not a separate offline phase. `sweep_grid.py` deliberately does
+NOT reuse it: (1) objective inversion — replay_optimize's descent is
+budget-consuming, we minimize GPUs subject to SLA; (2) it has no vision
+pool / converter-seam dimension; (3) its SLASpec is mean/p95-oriented, our
+SLA is dual-bound p99. Consequence: our "static-optimal" is scoped to
+**fixed default routing**. Mitigation before quoting the chapter numbers:
+a router-knob sensitivity check at each window's (C*, TP*, N*) corner
+(small 1-D sweep over overlap-score credit / prefill-load scale; verify
+feasibility verdicts don't flip).
+
+## 3.1 static-optimal — GRID COMPLETE (2026-07-08)
+
+| window | C* | TP* | N* | LLM GPUs | span h | 5090-h | h100-h |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| burst1 | 6 | 2 | 2 | 4 | 8.32 | 49.9 | 33.3 |
+| burst2 | 8 | 2 | 2 | 4 | 1.90 | 15.2 | 7.6 |
+| burst3 | 6 | 2 | 2 | 4 | 0.45 | 2.7 | 1.8 |
+| burst4 | 7 | 2 | 2 | 4 | 3.15 | 22.1 | 12.6 |
+| burst5 | 16 | 2 | 2 | 4 | 1.35 | 21.6 | 5.4 |
+| burst6 | 6 | 2 | 2 | 4 | 1.37 | 8.2 | 5.5 |
+| steady24h | 2 | 1 | 2 | 2 | 24.0 | 48.0 | 48.0 |
+
+Every burst window converges on the same LLM shape (TP2×N2 = 4 H100s,
+prefill-floor-driven); only the encoder count varies (6–16). Headline:
+the all-windows static config is **16 encoders + TP2×2 LLM** vs the calm
+day's 2 + TP1×2 — **8× vision-fleet and 2× LLM-fleet overprovisioning on
+steady traffic**, and the fleets differ in SHAPE (TP2 vs TP1), which a
+reactive replica-scaler cannot morph. All corner cross-checks passed.
+Results: `simulation/results/grid/grid_summary.json` (94 points).
+Remaining before chapter-quoting: router-knob sensitivity at corners;
+verify the binding LLM config on the other windows (headline note).
+
+## Encoder f(N) batch validation (Phase B, 2026-07-08)
+
+Real-ViT measurement of f(N) for every N in 1..128 (no OOM), vs the exact
+AIC query path: N=1 reproduces the chapter's attributed 1.43×; the ratio
+GROWS to 1.62 at N=64 / 1.66 at 128 — per-image unmodeled terms
+(patch-embed conv, DeepStack glue, kernel variants) that the N=1 ledger
+covered but whose growth is unattributed. Decoupling/reversal findings are
+scale-robust; absolute C* carries an AIC-optimistic vs HF-eager-pessimistic
+band. Artifacts + follow-ups (N=64 kernel profile, `--encoder-cost-scale`
+sensitivity, upstream note): `collector_artifacts/phaseB_batch_validation/`.
+
 ## Open (rest of Phase 3)
 
-- 3.1: grid completing on all 7 windows → Pareto/GPU-hours table + the
-  all-windows static config and its steady24h overprovisioning factor.
+- 3.1 close-out: router-knob sensitivity at corner configs; binding-config
+  verification on all windows; encoder-cost-scale sensitivity re-derivation.
+- 3.2 reactive planner through the same windows (AIC-bootstrapped perf
+  model; predictor warm-start; see decisions above).
 - 3.2 reactive planner through the same windows; record scaling actions,
   compliance (evaluation SLA), GPU-hours.

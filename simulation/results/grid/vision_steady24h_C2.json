@@ -1,0 +1,18 @@
+{
+ "pool": "vision",
+ "window": "steady24h",
+ "encoder_workers": 2,
+ "trace": "/home/gio/tese/simulation/results/grid/traces/grid_steady24h_C2.jsonl",
+ "stats": "/home/gio/tese/simulation/results/grid/traces/grid_steady24h_C2.jsonl.stats.json",
+ "offered_img_per_s": 5.443,
+ "horizon_s": 86396.723,
+ "encoder_delay_ms": {
+  "p50": 0.0,
+  "p90": 54.621,
+  "p99": 729.901,
+  "max": 3009.947
+ },
+ "encoder_utilization": 0.0142,
+ "queue_divergent": false,
+ "feasible": true
+}

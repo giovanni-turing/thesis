@@ -1,0 +1,35 @@
+{
+ "pool": "llm",
+ "window": "burst1",
+ "encoder_workers": 8,
+ "llm_workers": 2,
+ "tp": 2,
+ "gpus": 4,
+ "timing": "aic",
+ "trace": "/home/gio/tese/simulation/results/grid/traces/grid_burst1_C8.jsonl",
+ "report": "/home/gio/tese/simulation/results/grid/reports/grid_llm_burst1_C8_N2_TP2_aic.report.json",
+ "ttft_ms": {
+  "mean": 117.20985746727783,
+  "median": 25.728521835058928,
+  "p90": 548.2878339998424,
+  "p99": 771.7072869986296,
+  "max": 4220.006708987057
+ },
+ "itl_ms": {
+  "mean": 5.191444929562384,
+  "median": 4.441140000009909,
+  "p90": 5.046206999570131,
+  "p99": 6.882516000419855,
+  "max": 429.867566999048
+ },
+ "tpot_ms": {
+  "mean": 5.57084218191725,
+  "median": 4.533135936341503,
+  "p90": 6.649509200174362,
+  "p99": 22.201104956557568,
+  "max": 194.37121685727365
+ },
+ "completed_requests": 64804,
+ "driver_wall_s": 1303.9,
+ "feasible": true
+}
