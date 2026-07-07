@@ -61,6 +61,18 @@ produces the growing ratio. Real batching gain is ~1.4× (exhausted by
 N≈6), not the AIC-side 1.6×-at-64 quoted in the twopool batching
 paragraph.
 
+## Statistical protocol note
+
+8 timed iterations per point in ONE block (not the chapter's 5×50
+replicated protocol; no t-CIs). Dispersion recorded: median
+(mean−min)/mean 0.04% across all 128 points, worst 0.72% at N=2 — three
+orders of magnitude below the 28–66% effects concluded from. Drift
+check: per-point SM clock flat (2385–2400 MHz, no trend; N=1 and N=128
+both at 2400), and the ratio's dip-then-rise shape is inconsistent with
+monotone thermal drift. Sufficient for the ratio analysis; RE-MEASURE at
+the chapter protocol (5×50, locked-clock confirmation) before any value
+is quoted verbatim in the thesis or shipped as the converter cost table.
+
 ## Follow-ups
 
 1. Kernel-level profile at N=64 (torch.profiler, as the chapter did at
