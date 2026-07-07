@@ -31,6 +31,18 @@ completed). SM clock steady at 2385–2400 MHz throughout (lock reference
   is smooth and near-linear (4.91→4.86 ms/img); the measured curve also
   stays smooth through 128 — no cliff at the cap.
 
+## Query-grid anatomy (probed 2026-07-08)
+
+f(N) at 448² issues ONE encoder-attention query at (b=N, s=784, 16h×72):
+s=784 is NOT a collected point — every attention cost interpolates
+s=576↔1024 (anchored physically by the chapter's 3% N=1 validation);
+b interpolates between pow-2 rungs for non-pow-2 N. The MLP/projector
+GEMMs are queried at m=784·N, so for N≳42 m exceeds 32,768 and lands in
+the documented giant-tail OOM-gap region of the GEMM collection —
+interpolator warnings confirm sparse anchors there ("only one data point
+for a given xy", x=32/y=65536). Degraded large-m GEMM anchors are a
+concrete additional contributor to the ratio growth at high N.
+
 ## Interpretation
 
 The growing component means per-image costs that the AIC encoder graph
