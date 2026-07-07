@@ -28,3 +28,4 @@ predictors/results/parts/
 # load-sweep intermediates: point JSONs/summary/figure/series are tracked; raw traces+logs are reproducible
 simulation/results/sweeps/traces/
 simulation/results/sweeps/logs/
+simulation/results/srcbuild/*.log

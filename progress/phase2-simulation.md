@@ -165,6 +165,48 @@ is therefore ≥8× for the flagship too, and the burst-window direction is
 untouched — the vision pool (ViT + projector→4096 shared between 8B and 235B,
 Phase 0) saturates below the trace's own rate regardless of decoder size.
 
+## Source build — Phase 3.2 unblocked (decision resolved: build from source)
+
+dynamo **1.3.0** built from the local checkout into its repo `.venv`
+(`simulation/build_dynamo_src.sh` = the reproducible recipe; aiconfigurator
+installed editable alongside — the reverse co-residence of Phase 2.1). The
+pinned wheel env is untouched, so all Phase-2 results stay reproducible;
+`run_replay.sh` switches runtimes via `REPLAY_PY` (default = wheel).
+Environment fixes baked into the recipe: user-level `protoc` 29.3
+(`~/.local/protoc`, etcd-client build script), `BINDGEN_EXTRA_CLANG_ARGS`
+pointing at GCC-13's freestanding headers (libclang-18 ships without its
+resource headers; nixl-sys bindgen needs `stdbool.h`), and
+`maturin develop --features aic-forward-pass` (the engine-timing AIC callback
+is feature-gated; the PyPI wheel ships it, default features do not).
+
+Feature surface verified on `dynamo.replay --help`: `--planner-config`
+(advisory agg/disagg), `agentic_mooncake` trace format,
+`--arrival-speedup-ratio`, full `aic_*` engine args incl. MoE.
+
+One data-path difference: the source build's AIC runs in **Rust**
+(aiconfigurator-core) and reads perf parquet directly — it does not resolve
+the `SHARED_LAYER_REUSE` marker, so h100_sxm/vllm **0.22.0 must be requested
+as 0.19.0** (`AIC_VER=0.19.0`; verified: SDK predictions at 0.22.0 == 0.19.0
+exactly, and wheel replay at 0.19.0 == 0.22.0 to <0.1%, max TTFT identical).
+
+Regression, head2k isolation, 2 workers (wheel 1.2.1 vs source 1.3.0):
+
+| Timing | Metric | wheel | source |
+|---|---|---|---|
+| poly | everything | — | **bit-identical** (TTFT 67.3/248/2,540; TPOT 6.90) |
+| aic | TTFT p99 | 307.4 | **307.4 (identical)** |
+| aic | TPOT mean | 7.851 | 7.767 (−1.1%) |
+| aic | TTFT mean / max | 72.7 / 7,598 | 68.2 / 4,518 |
+
+The bulk of the distribution is identical; the extreme tail is LIGHTER on the
+source build. Attribution: the wheel's AIC callback runs per-request Python
+SDK predictions in-process (the known 0.33 s → 32 s wall-time inflation of
+Result A) and that wall-time bleeds into the simulated tail; the Rust path
+predicts in-core in microseconds. Data is ruled out (wheel@0.19.0 ==
+wheel@0.22.0, max bit-identical). The source build is the cleaner simulator —
+Phase 3+ runs use it (`REPLAY_PY=.../dynamo/.venv/bin/python AIC_VER=0.19.0`);
+wheel numbers remain the Phase-2 record.
+
 ## State
 
 - Phase 1 ✅ real trace → two-pool converter, validated end-to-end.

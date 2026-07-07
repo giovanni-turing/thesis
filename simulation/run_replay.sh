@@ -11,7 +11,11 @@
 #   run_replay.sh <trace.jsonl> <poly|aic> <report.json> [num_workers] [extra replay args...]
 set -euo pipefail
 AIC=/home/gio/tese/ai-dynamo/aiconfigurator
-PY="$AIC/.venv/bin/python"
+# REPLAY_PY selects the interpreter/runtime: default = pinned ai-dynamo==1.2.1
+# wheel in the aiconfigurator venv (Phase 2 reproducibility); the dynamo 1.3.0
+# source build lives in /home/gio/tese/ai-dynamo/dynamo/.venv/bin/python
+# (aiconfigurator co-installed editable — see progress docs, source-build note).
+PY="${REPLAY_PY:-$AIC/.venv/bin/python}"
 
 TRACE=${1:?trace jsonl}
 MODEL=${2:?poly|aic}
@@ -24,12 +28,16 @@ shift $(( $# < 4 ? $# : 4 ))
 # family members AIC_MOE_TP / AIC_MOE_EP (e.g. 235B-A22B at TP8: AIC_TP=8 AIC_MOE_TP=8).
 AIC_MODEL=${AIC_MODEL:-Qwen/Qwen3-VL-8B-Instruct}
 AIC_TP=${AIC_TP:-1}
+# AIC_VER: perf-DB version. 0.22.0 is a shared-layer-reuse marker the PYTHON
+# SDK resolves to 0.19.0 (verified identical predictions); the source build's
+# Rust AIC path reads parquet directly and needs the resolved version.
+AIC_VER=${AIC_VER:-0.22.0}
 AIC_MOE_JSON=""
 [ -n "${AIC_MOE_TP:-}" ] && AIC_MOE_JSON=',"aic_moe_tp_size":'"$AIC_MOE_TP"
 [ -n "${AIC_MOE_EP:-}" ] && AIC_MOE_JSON="$AIC_MOE_JSON"',"aic_moe_ep_size":'"$AIC_MOE_EP"
 case "$MODEL" in
   poly) ENGINE_ARGS='{"block_size":64}' ;;                              # mocker default polynomial timing
-  aic)  ENGINE_ARGS='{"aic_backend":"vllm","aic_system":"h100_sxm","aic_model_path":"'"$AIC_MODEL"'","aic_tp_size":'"$AIC_TP$AIC_MOE_JSON"',"aic_backend_version":"0.22.0","block_size":64}' ;;
+  aic)  ENGINE_ARGS='{"aic_backend":"vllm","aic_system":"h100_sxm","aic_model_path":"'"$AIC_MODEL"'","aic_tp_size":'"$AIC_TP$AIC_MOE_JSON"',"aic_backend_version":"'"$AIC_VER"'","block_size":64}' ;;
   *) echo "model must be poly|aic" >&2; exit 2 ;;
 esac
 

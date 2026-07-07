@@ -178,9 +178,12 @@ Progress + results: `phase4-predictors.md`. Chapter draft: `tex/predictors.tex`.
   14001,14001`, persistence on) before any GPU measurement session.
 - GPU is shared with the RAG stack: `docker compose -p mmrag stop qwen-embed
   qwen-rerank` (dir `/home/gio/claude`) before GPU work; `start` to restore.
-- The dynamo runtime decision (source build vs wheel) does NOT gate engine-
-  timing AIC (the 1.2.1 wheel + co-resident aiconfigurator already do it, see
-  Phase 2.1). It only gates the SLA-Planner baseline + agentic_mooncake —
-  decide at the start of Phase 3.2.
+- ~~The dynamo runtime decision (source build vs wheel)~~ **RESOLVED: built
+  from source** (dynamo 1.3.0, repo `.venv`; recipe
+  `simulation/build_dynamo_src.sh`, regression + gotchas in
+  `phase2-simulation.md` "Source build"). Phase 3.2 SLA-Planner +
+  agentic_mooncake unblocked. Source runs: `REPLAY_PY=.../dynamo/.venv/bin/
+  python AIC_VER=0.19.0` (rust AIC path needs the reuse-resolved version);
+  wheel env untouched for Phase-2 reproducibility.
 - Every phase keeps the audit discipline: scripts + captured results under
   `collector_artifacts/<phase>/`, committed to this repo.
