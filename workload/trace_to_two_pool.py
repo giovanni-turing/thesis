@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Phase 1 — Azure LMM inference trace -> two-pool workload converter.
+"""Phase 1+2.2 — Azure LMM inference trace -> two-pool workload converter.
 
 Turns the real bursty Azure multimodal trace
 (`data/AzureLMMInferenceTrace_multimodal.csv.gz`, one row per request:
@@ -16,7 +16,11 @@ a FIFO pool of C encoder workers, and the language stage is left to
 request that spends `encoder_delay` in the vision pool is equivalent to the same
 request arriving at the LLM pool `encoder_delay` later, so we shift its
 `timestamp` forward instead of carrying a separate `tool_wait_ms` field (which
-the pinned PyPI `ai-dynamo` wheel predates).
+the pinned PyPI `ai-dynamo` wheel predates). With `--no-encoder-shift` the
+emitted timestamps are the raw (speedup-compressed) arrivals — LLM-pool
+isolation — but the vision pool is STILL simulated so the stats/series describe
+the same hypothetical encoder pool in both modes; only the emission differs
+(`encoder_shift_applied` in the stats records which one you got).
 
 Field semantics (from the dataset card, `data/source/*.md`)
 -----------------------------------------------------------
@@ -25,25 +29,79 @@ Field semantics (from the dataset card, `data/source/*.md`)
 - GeneratedTokens -> `output_length`.
 - NumImages -> drives the vision pool only.
 
-Encoder cost model
-------------------
-Per request, one ViT forward over `NumImages` images at a FIXED per-image
-resolution (`--image-px`, default 448 -> 784 pre-merge patches / 196 post-merge
-tokens per image, matching the phase-9 minimal test and landing on collected
-rtx_5090 silicon). Latency comes from AIC's `_run_encoder_phase` and therefore
-scales monotonically with `NumImages` (attention batches over the image axis,
-GEMMs scale with total patch count). The trace records no per-image size, so a
-uniform assumed resolution is the honest choice; it is a single knob to sweep
-for sensitivity. Service time is memoized per distinct `NumImages` value (~100
-of them), so AIC is queried ~100 times, not once per request.
+Encoder cost model (probe-backed)
+---------------------------------
+Latency comes from AIC's `_run_encoder_phase` (rtx_5090 / vLLM 0.22.0,
+Qwen3-VL-8B) at a FIXED per-image resolution (`--image-px`, default 448 -> 784
+pre-merge patches / 196 post-merge tokens per image). Probe (this file's
+authoring, deltas printed by `_run_encoder_phase` directly): the predicted
+latency is EXACTLY a function of total images — (batch_size=1, num_images=N)
+== (batch_size=k, num_images=N/k) for every split tried, e.g. all of
+(1,64)/(2,32)/(4,16)/(8,8)/(64,1) = 314.498 ms; N=8 -> 44.105 ms and N=32 ->
+160.701 ms at every factoring (delta +0.000000 ms). Source-level reason: ViT
+attention is queried with eff_batch = batch_size*num_images (varlen over the
+image axis) and every other op with x = total patch/token count, so each term
+depends only on the product. Service time is therefore memoized by TOTAL image
+count per forward. Anchors: f(1)=7.822 ms, f(64)=314.498 ms -> 4.91 ms/img
+amortized at full batch vs 7.82 solo (~1.6x throughput), i.e. ~2.9 ms fixed
+per-forward overhead that batching amortizes.
 
-Caveat: for requests with very many images (NumImages > 64) the ViT attention
-batch dimension exceeds the collected batch range (<=64) and AIC extrapolates;
-those requests are rare (1-2 rows each) but flagged in the stats.
+Fixed 448² rationale: the trace records no per-image sizes, so a uniform
+assumed resolution is the honest choice (a documented knob to sweep), not an
+invented size distribution. Per Result B (progress/phase2-simulation.md) AIC
+under-predicts comparable measured ViT work by ~1.14x at 448² — a bounded,
+conservative bias for the decoupling argument.
+
+Cross-request encoder batching
+------------------------------
+The pool is event-driven: when a worker frees, it greedily takes WHOLE queued
+requests from the FIFO head while their summed image count stays within
+`--encoder-batch-images` (default 64 = the collected batch range, so no AIC
+batch-axis extrapolation), and runs them as ONE ViT forward costed at the batch
+total. A request larger than the remaining room waits for the next batch —
+FIFO admission order is exact, so no starvation: the head request always enters
+first. An oversized single request (> cap; the trace maxes at 9409 images) gets
+a batch of its own, chunked into sequential <=cap forwards on that ONE worker
+(e.g. 9409 -> 147 x f(64) + f(1) ≈ 46.2 s); `requests_chunked` counts these.
+A request's encoder finish = its batch's finish. No coalescing wait is added:
+under low load a lone request dispatches immediately (batch of 1), reproducing
+the old per-request-forward behavior.
+
+Handoff-transfer bound
+----------------------
+After encoder service, the post-merge vision embeddings cross to the LLM pool:
+bytes = post_merge_tokens x 4096 (Qwen3-VL projector/LLM hidden) x 2 (bf16);
+transfer_ms = --handoff-rtt-ms (default 0.2) + bytes / (--handoff-gbps line
+rate, default 25 -> bytes/s = gbps*1e9/8). Per image at 448²: 196 x 4096 x 2 B
+≈ 1.6 MB -> ~0.51 ms at 25 Gbps, ~0.71 ms with RTT. The transfer is added to
+the request's `encoder_delay` but does NOT occupy the worker (async DMA/NIC
+behind the compute stream): optimistic for encoder throughput, conservative
+for request latency. `--handoff-gbps 0` disables the term (old behavior).
+Sizing uses AIC's post-merge token count for the request's own image count
+(n_img_post is exactly tokens_per_image x n in the SDK, so it is derived from
+the memoized 1-image query).
+
+Arrival speedup
+---------------
+`--arrival-speedup S` divides every inter-arrival gap by S BEFORE the encoder
+sim (arrivals_ms /= S), compressing the offered load; the emitted mooncake
+timestamps are the compressed ones and the stats record S. This is the load
+knob the Phase-2.3 sweep driver turns to find each pool's saturation knee.
+
+Per-second series (`--series-out`)
+----------------------------------
+Optional vision-pool time series JSON, one entry per second of the compressed
+clock relative to the first arrival: images arrived / completed in that second
+and queue depth (images) / busy workers at the second's end. The stats also
+gain `encoder_utilization` (busy worker-ms over workers x horizon incl. drain
+tail), `offered_img_per_s`, and `queue_divergent` (queue at the END OF
+ARRIVALS > 10x max(1, median-to-that-point) — backlog outgrew steady state:
+past the saturation knee; the drain tail is excluded because a finite window
+always drains to 0 eventually).
 
 Run inside the aiconfigurator env (needs the SDK + collected rtx_5090 data):
     cd /home/gio/tese/ai-dynamo/aiconfigurator
-    uv run --frozen python /home/gio/tese/workload/trace_to_two_pool.py \
+    .venv/bin/python /home/gio/tese/workload/trace_to_two_pool.py \
         --out /tmp/azure_two_pool.jsonl --max-requests 2000
 """
 from __future__ import annotations
@@ -51,6 +109,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+from collections import deque
 
 import pandas as pd
 
@@ -60,16 +119,18 @@ from aiconfigurator.sdk.models import get_model
 from aiconfigurator.sdk.perf_database import get_database
 
 TRACE = "/home/gio/tese/data/AzureLMMInferenceTrace_multimodal.csv.gz"
+LLM_HIDDEN = 4096  # Qwen3-VL-8B projector output / LLM hidden size
+BYTES_PER_ELEM = 2  # bf16 embeddings on the wire
 
 
 class EncoderCostModel:
-    """AIC-costed ViT forward latency per request, at one fixed image resolution.
+    """AIC-costed ViT forward latency, at one fixed image resolution.
 
-    `latency_ms(n)` returns (service_ms, post_merge_vision_tokens) for a request
-    carrying `n` images, memoized by `n`. `post_merge_vision_tokens` is AIC's
-    view of how many tokens those images inject into the LLM context — logged
-    only as a cross-check against the trace's own ContextTokens, never used to
-    alter `input_length` (the trace already includes image tokens).
+    `latency_ms(total_images)` returns (service_ms, post_merge_vision_tokens)
+    for ONE forward over `total_images` images, memoized by that total — valid
+    because the probe showed AIC's prediction depends only on the product
+    batch_size x num_images (see module docstring), so a cross-request batch of
+    T images is costed as (batch_size=1, num_images=T).
     """
 
     def __init__(
@@ -86,24 +147,148 @@ class EncoderCostModel:
         self._model = get_model(model_name, sdk_config.ModelConfig(), backend)
         self._backend = get_backend(backend)
         self._cache: dict[int, tuple[float, int]] = {0: (0.0, 0)}
+        self.memo_hits = 0
+        self._tokens_per_image: int | None = None
 
-    def latency_ms(self, num_images: int) -> tuple[float, int]:
-        num_images = int(num_images)
-        if num_images <= 0:
+    def latency_ms(self, total_images: int) -> tuple[float, int]:
+        total_images = int(total_images)
+        if total_images <= 0:
             return 0.0, 0
-        hit = self._cache.get(num_images)
+        hit = self._cache.get(total_images)
         if hit is not None:
+            self.memo_hits += 1
             return hit
         rc = sdk_config.RuntimeConfig(batch_size=1, isl=1024, osl=128)
-        rc.num_images_per_request = num_images
+        rc.num_images_per_request = total_images
         rc.image_height = self.image_px
         rc.image_width = self.image_px
         lat, _energy, _source, n_img_post = self._backend._run_encoder_phase(
             self._model, self._db, rc, batch_size=1
         )
         out = (float(sum(lat.values())), int(n_img_post))
-        self._cache[num_images] = out
+        self._cache[total_images] = out
         return out
+
+    @property
+    def tokens_per_image(self) -> int:
+        """Post-merge vision tokens per image (196 at 448²); n_img_post is
+        exactly tokens_per_image x num_images in the SDK, so one 1-image query
+        sizes every request without extrapolated large-count queries."""
+        if self._tokens_per_image is None:
+            _, post_1 = self.latency_ms(1)
+            self._tokens_per_image = int(post_1)
+        return self._tokens_per_image
+
+    def post_merge_tokens(self, num_images: int) -> int:
+        return self.tokens_per_image * max(0, int(num_images))
+
+    def chunked_service_ms(self, num_images: int, cap: int) -> float:
+        """Service for one request run alone: sequential <=cap forwards."""
+        full, rem = divmod(int(num_images), cap)
+        total = full * self.latency_ms(cap)[0] if full else 0.0
+        if rem:
+            total += self.latency_ms(rem)[0]
+        return total
+
+    @property
+    def distinct_sizes_costed(self) -> int:
+        return len(self._cache) - 1  # minus the 0-image sentinel
+
+
+def simulate_vision_pool(
+    reqs: list[tuple[float, int, int]],  # (arrival_ms, request_index, num_images), FIFO order
+    n_workers: int,
+    cap: int,
+    encoder: EncoderCostModel,
+) -> tuple[dict[int, float], list[tuple[float, float, int, int]], int]:
+    """Event-driven FIFO pool with greedy whole-request batching.
+
+    Returns (finish_ms by request index,
+             batches as (start_ms, finish_ms, total_images, n_forwards),
+             requests_chunked).
+    """
+    finish: dict[int, float] = {}
+    batches: list[tuple[float, float, int, int]] = []
+    worker_free = [0.0] * n_workers
+    queue: deque[tuple[float, int, int]] = deque()
+    i = 0
+    requests_chunked = 0
+
+    while i < len(reqs) or queue:
+        w = min(range(n_workers), key=worker_free.__getitem__)
+        if not queue:  # idle pool: wait for the next arrival
+            queue.append(reqs[i])
+            i += 1
+        start = max(worker_free[w], queue[0][0])
+        # Everything that has arrived by the batch start is eligible, FIFO.
+        while i < len(reqs) and reqs[i][0] <= start:
+            queue.append(reqs[i])
+            i += 1
+        batch = [queue.popleft()]
+        total = batch[0][2]
+        if total > cap:  # oversized request: own batch, sequential chunks
+            requests_chunked += 1
+            n_forwards = math.ceil(total / cap)
+            service = encoder.chunked_service_ms(total, cap)
+        else:
+            while queue and total + queue[0][2] <= cap:
+                r = queue.popleft()
+                batch.append(r)
+                total += r[2]
+            n_forwards = 1
+            service = encoder.latency_ms(total)[0]
+        fin = start + service
+        worker_free[w] = fin
+        batches.append((start, fin, total, n_forwards))
+        for arr, idx, _n in batch:
+            assert fin >= arr, "request finished before it arrived"
+            finish[idx] = fin
+    return finish, batches, requests_chunked
+
+
+def build_series(
+    reqs: list[tuple[float, int, int]],
+    batches: list[tuple[float, float, int, int]],
+    t_end_ms: float,
+) -> list[dict]:
+    """Per-second vision-pool series on the compressed clock (t=0 at first arrival)."""
+    ARR, FIN, START = 0, 1, 2  # tie order keeps queue >= 0 and busy <= workers
+    events: list[tuple[float, int, int]] = []
+    for arr, _idx, n in reqs:
+        events.append((arr, ARR, n))
+    for start, fin, total, _nf in batches:
+        events.append((start, START, total))
+        events.append((fin, FIN, total))
+    events.sort(key=lambda e: (e[0], e[1]))
+
+    n_sec = int(t_end_ms // 1000) + 1 if t_end_ms > 0 else 1
+    series: list[dict] = []
+    queue_imgs = busy = 0
+    e = 0
+    for t in range(n_sec):
+        boundary = (t + 1) * 1000.0
+        arrived = completed = 0
+        while e < len(events) and events[e][0] < boundary:
+            _tm, kind, qty = events[e]
+            if kind == ARR:
+                queue_imgs += qty
+                arrived += qty
+            elif kind == START:
+                queue_imgs -= qty
+                busy += 1
+            else:  # FIN
+                busy -= 1
+                completed += qty
+            e += 1
+        assert queue_imgs >= 0 and busy >= 0
+        series.append({
+            "t": t,
+            "img_arrived": arrived,
+            "img_completed": completed,
+            "queue_imgs_end": queue_imgs,
+            "busy_workers_end": busy,
+        })
+    return series
 
 
 def load_window(max_requests: int | None, offset: int) -> pd.DataFrame:
@@ -133,57 +318,78 @@ def main() -> None:
     ap.add_argument("--stats", default=None, help="optional stats JSON (default: <out>.stats.json)")
     ap.add_argument("--image-px", type=int, default=448, help="assumed per-image square resolution")
     ap.add_argument("--encoder-workers", type=int, default=2, help="FIFO vision-pool worker count")
+    ap.add_argument("--encoder-batch-images", type=int, default=64,
+                    help="max images per ViT forward (cross-request batch cap; 64 = collected "
+                         "batch range). Oversized single requests are chunked to <=cap forwards")
+    ap.add_argument("--handoff-rtt-ms", type=float, default=0.2,
+                    help="fixed per-request encoder->LLM handoff latency (ms)")
+    ap.add_argument("--handoff-gbps", type=float, default=25.0,
+                    help="encoder->LLM link rate for post-merge embeddings (Gbps line rate); "
+                         "0 disables the handoff term entirely")
+    ap.add_argument("--arrival-speedup", type=float, default=1.0,
+                    help="divide all inter-arrival gaps by this factor before the encoder sim "
+                         "(compresses offered load; emitted timestamps are the compressed ones)")
+    ap.add_argument("--series-out", default=None,
+                    help="optional per-second vision-pool series JSON (arrivals/completions/"
+                         "queue depth/busy workers on the compressed clock)")
     ap.add_argument("--trace-block-size", type=int, default=512, help="tokens per hash_id (mooncake)")
     ap.add_argument("--max-requests", type=int, default=None, help="cap request count (window head)")
     ap.add_argument("--offset", type=int, default=0, help="skip this many requests before the window")
     ap.add_argument("--no-encoder-shift", action="store_true",
-                    help="LLM-pool isolation: emit raw arrivals (encoder delay forced to 0); "
-                         "image/service stats are still reported for reference")
+                    help="LLM-pool isolation: emit raw (speedup-compressed) arrivals — encoder "
+                         "delay is NOT folded in; the vision pool is still simulated so stats/"
+                         "series stay comparable across modes")
     args = ap.parse_args()
+    if args.arrival_speedup <= 0:
+        ap.error("--arrival-speedup must be > 0")
+    if args.encoder_workers < 1 or args.encoder_batch_images < 1:
+        ap.error("--encoder-workers and --encoder-batch-images must be >= 1")
 
     df = load_window(args.max_requests, args.offset)
     encoder = EncoderCostModel(args.image_px)
+    cap = args.encoder_batch_images
 
     t0 = df["ts"].iloc[0]
     arrivals_ms = (df["ts"] - t0).dt.total_seconds().to_numpy() * 1000.0
+    arrivals_ms /= args.arrival_speedup  # compress offered load BEFORE the encoder sim
     num_images = df["NumImages"].to_numpy()
     context_tokens = df["ContextTokens"].to_numpy()
     generated_tokens = df["GeneratedTokens"].to_numpy()
 
-    workers = [0.0] * args.encoder_workers  # earliest-free time per encoder worker
-    rows: list[dict] = []
-    enc_delays, enc_service, token_deltas = [], [], []
-    n_with_images = n_batch_extrapolated = 0
+    # ---- vision pool: event-driven FIFO with cross-request batching ----
+    img_reqs = [(float(arrivals_ms[i]), i, int(num_images[i]))
+                for i in range(len(df)) if int(num_images[i]) > 0]
+    finish, batches, requests_chunked = simulate_vision_pool(
+        img_reqs, args.encoder_workers, cap, encoder)
 
+    # Handoff bound: post-merge embeddings cross pools (async; not worker time).
+    def handoff_ms(n_img: int) -> float:
+        if args.handoff_gbps <= 0 or n_img <= 0:
+            return 0.0
+        n_bytes = encoder.post_merge_tokens(n_img) * LLM_HIDDEN * BYTES_PER_ELEM
+        return args.handoff_rtt_ms + n_bytes / (args.handoff_gbps * 1e9 / 8) * 1e3
+
+    rows: list[dict] = []
+    enc_delays, enc_service, handoffs, token_deltas = [], [], [], []
     for i in range(len(df)):
         arrival = float(arrivals_ms[i])
         n_img = int(num_images[i])
-        service_ms, n_img_post = encoder.latency_ms(n_img)
-
         if n_img > 0:
-            n_with_images += 1
-            enc_service.append(service_ms)
-            if n_img > 64:  # ViT attention batch axis beyond collected range
-                n_batch_extrapolated += 1
-            # AIC's post-merge vision tokens vs the trace's total context tokens
-            token_deltas.append(int(context_tokens[i]) - n_img_post)
-            if args.no_encoder_shift:  # LLM-pool isolation: raw arrival
-                encoder_delay = 0.0
-            else:  # FIFO vision pool: queue wait + service folded into arrival
-                w = min(range(len(workers)), key=lambda j: workers[j])
-                start = max(arrival, workers[w])
-                finish = start + service_ms
-                workers[w] = finish
-                encoder_delay = finish - arrival
+            enc_service.append(encoder.chunked_service_ms(n_img, cap))  # standalone reference
+            token_deltas.append(int(context_tokens[i]) - encoder.post_merge_tokens(n_img))
+            h = handoff_ms(n_img)
+            handoffs.append(h)
+            encoder_delay = (finish[i] - arrival) + h
         else:
             encoder_delay = 0.0
         enc_delays.append(encoder_delay)
+        emitted_delay = 0.0 if args.no_encoder_shift else encoder_delay
 
         input_len = max(1, int(context_tokens[i]))
         output_len = max(1, int(generated_tokens[i]))
         n_blocks = max(1, math.ceil(input_len / args.trace_block_size))
         rows.append({
-            "timestamp": round(arrival + encoder_delay, 3),
+            "timestamp": round(arrival + emitted_delay, 3),
             "input_length": input_len,
             "output_length": output_len,
             # Disjoint per request: no spurious cross-request prefix reuse.
@@ -196,36 +402,85 @@ def main() -> None:
         for r in rows:
             f.write(json.dumps(r) + "\n")
 
+    # ---- series + pool-level stats (always computed; file only on request) ----
     horizon_s = (arrivals_ms[-1] - arrivals_ms[0]) / 1000.0 if len(arrivals_ms) > 1 else 0.0
+    last_finish = max((b[1] for b in batches), default=0.0)
+    t_end_ms = max(float(arrivals_ms[-1]) if len(arrivals_ms) else 0.0, last_finish)
+    series = build_series(img_reqs, batches, t_end_ms)
+    busy_ms = sum(fin - start for start, fin, _t, _nf in batches)
+    utilization = busy_ms / (args.encoder_workers * t_end_ms) if t_end_ms > 0 else 0.0
+    # Divergence is judged at the END OF ARRIVALS (the series itself runs through
+    # the drain tail, where a finite window's queue always returns to 0).
+    arr_end_sec = min(len(series) - 1, int(arrivals_ms[-1] // 1000)) if len(series) else 0
+    q_to_arr_end = [s["queue_imgs_end"] for s in series[: arr_end_sec + 1]]
+    q_median = sorted(q_to_arr_end)[len(q_to_arr_end) // 2] if q_to_arr_end else 0
+    q_at_arrival_end = q_to_arr_end[-1] if q_to_arr_end else 0
+    queue_divergent = bool(q_at_arrival_end > 10 * max(1, q_median))
+    total_images = int(num_images.sum())
+    n_with_images = len(img_reqs)
+
+    if args.series_out:
+        with open(args.series_out, "w") as f:
+            json.dump({"freq_s": 1, "arrival_speedup": args.arrival_speedup,
+                       "series": series}, f)
+
     stats = {
         "requests": len(df),
         "requests_with_images": n_with_images,
         "text_only_fraction": round(1 - n_with_images / len(df), 4),
-        "total_images": int(num_images.sum()),
+        "total_images": total_images,
         "image_px": args.image_px,
         "encoder_workers": args.encoder_workers,
+        "encoder_batch_images": cap,
+        "arrival_speedup": args.arrival_speedup,
+        "handoff_rtt_ms": args.handoff_rtt_ms,
+        "handoff_gbps": args.handoff_gbps,
+        "encoder_shift_applied": not args.no_encoder_shift,
         "sim_horizon_s": round(horizon_s, 3),
-        "mean_images_per_s": round(int(num_images.sum()) / horizon_s, 3) if horizon_s else 0.0,
+        "vision_sim_end_s": round(t_end_ms / 1000.0, 3),  # incl. drain tail
+        "mean_images_per_s": round(total_images / horizon_s, 3) if horizon_s else 0.0,
+        "offered_img_per_s": round(total_images / horizon_s, 3) if horizon_s else 0.0,
         "mean_requests_per_s": round(len(df) / horizon_s, 3) if horizon_s else 0.0,
-        "encoder_service_ms": percentiles(enc_service),
+        "encoder_service_ms": percentiles(enc_service),  # per-request standalone (chunk-aware)
+        "encoder_batch_service_ms": {  # per dispatched batch (the actual forwards)
+            **percentiles([fin - start for start, fin, _t, _nf in batches]),
+            "max": round(max((fin - start for start, fin, _t, _nf in batches), default=0.0), 3),
+        },
         "encoder_delay_ms": {**percentiles(enc_delays), "max": round(max(enc_delays), 3)},
-        "requests_batch_extrapolated": n_batch_extrapolated,
+        "handoff_ms": {**percentiles(handoffs),
+                       "max": round(max(handoffs), 3) if handoffs else 0.0},
+        "encoder_utilization": round(utilization, 4),
+        "queue_imgs_at_arrival_end": q_at_arrival_end,
+        "queue_divergent": queue_divergent,
+        "batches": len(batches),
+        "encoder_forwards": sum(nf for _s, _f, _t, nf in batches),
+        "images_per_batch": percentiles([t for _s, _f, t, _nf in batches]),
+        "requests_chunked": requests_chunked,
+        "service_memo_hits": encoder.memo_hits,
+        "distinct_service_sizes_costed": encoder.distinct_sizes_costed,
         "input_length": {**percentiles([r["input_length"] for r in rows]),
                          "max": max(r["input_length"] for r in rows)},
         "context_minus_aic_vision_tokens": percentiles(token_deltas) if token_deltas else {},
-        "distinct_image_counts_costed": len(encoder._cache) - 1,
     }
     stats_path = args.stats or f"{args.out}.stats.json"
     with open(stats_path, "w") as f:
         json.dump(stats, f, indent=1)
 
-    print(f"trace: {args.out} ({len(rows)} requests, horizon {horizon_s:.1f}s)")
+    print(f"trace: {args.out} ({len(rows)} requests, horizon {horizon_s:.1f}s, "
+          f"speedup x{args.arrival_speedup:g}"
+          f"{', ISOLATION (no encoder shift)' if args.no_encoder_shift else ''})")
     print(f"  {n_with_images} with images ({stats['text_only_fraction']:.0%} text-only), "
-          f"{stats['total_images']} images total, {stats['mean_images_per_s']:.1f} img/s mean")
-    print(f"  encoder service ms: {stats['encoder_service_ms']}")
-    print(f"  encoder delay ms:   {stats['encoder_delay_ms']}")
-    if n_batch_extrapolated:
-        print(f"  ! {n_batch_extrapolated} requests with >64 images (AIC batch extrapolation)")
+          f"{total_images} images total, {stats['offered_img_per_s']:.1f} img/s offered")
+    print(f"  vision pool: {len(batches)} batches / {stats['encoder_forwards']} forwards "
+          f"(cap {cap} img), {requests_chunked} chunked oversized, "
+          f"memo {encoder.memo_hits} hits / {encoder.distinct_sizes_costed} AIC sizes")
+    print(f"  encoder service ms (standalone): {stats['encoder_service_ms']}")
+    print(f"  encoder delay ms (queue+service+handoff): {stats['encoder_delay_ms']}")
+    print(f"  handoff ms: {stats['handoff_ms']}")
+    print(f"  utilization {utilization:.1%} over {stats['vision_sim_end_s']:.1f}s"
+          f"{'  !! QUEUE DIVERGENT' if queue_divergent else ''}")
+    if args.series_out:
+        print(f"  series: {args.series_out} ({len(series)} x 1s)")
     print(f"  stats: {stats_path}")
 
 

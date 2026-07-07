@@ -9,6 +9,9 @@ lives in `../workload/trace_to_two_pool.py`; results and analysis land here.
   timing; `aic` = h100_sxm/vLLM 0.22.0 calibrated engine timing.
 - `traces/` — generated mooncake JSONL (+ `.stats.json` cross-linking to the EDA).
 - `results/` — AIPerf report JSONs.
+- `sweep_load.py` + `sweep_fig.py` — Phase 2.3 arrival-speedup saturation-knee
+  sweeps (per-pool load-vs-latency curves + knees); results and rollup in
+  `results/sweeps/` (see its README.md).
 
 ## Environment
 Runs from the aiconfigurator uv `.venv`, which now also carries

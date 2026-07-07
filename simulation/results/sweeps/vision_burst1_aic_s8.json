@@ -1,0 +1,52 @@
+{
+ "pool": "vision",
+ "window": "burst1",
+ "timing": "aic",
+ "speedup": 8.0,
+ "encoder_workers": 2,
+ "image_px": 448,
+ "encoder_batch_images": 64,
+ "mechanism": "converter --arrival-speedup (inter-arrival gaps /= s before FIFO sim)",
+ "trace": "/home/gio/tese/simulation/results/sweeps/traces/vision_burst1_s8.jsonl",
+ "stats": "/home/gio/tese/simulation/results/sweeps/traces/vision_burst1_s8.jsonl.stats.json",
+ "series": "/home/gio/tese/simulation/results/sweeps/series/vision_burst1_s8.series.json",
+ "base": {
+  "img_per_s": 116.173,
+  "req_per_s": 2.164
+ },
+ "offered": {
+  "img_per_s": 929.381,
+  "req_per_s": 17.316
+ },
+ "requests": 64804,
+ "total_images": 3478128,
+ "horizon_s": 3742.414,
+ "vision_sim_end_s": 8590.575,
+ "encoder_delay_ms": {
+  "p50": 1096106.564,
+  "p90": 4271352.858,
+  "p99": 4898558.972,
+  "max": 4926649.279
+ },
+ "encoder_service_ms": {
+  "p50": 7.822,
+  "p90": 2169.463,
+  "p99": 2605.136
+ },
+ "encoder_batch_service_ms": {
+  "p50": 967.167,
+  "p90": 2605.136,
+  "p99": 3074.737,
+  "max": 6025.257
+ },
+ "handoff_ms": {
+  "p50": 0.714,
+  "p90": 226.787,
+  "p99": 272.001,
+  "max": 629.608
+ },
+ "encoder_utilization": 0.9983,
+ "queue_divergent": false,
+ "batches": 14427,
+ "exit_code": 0
+}

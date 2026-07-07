@@ -96,12 +96,63 @@ argument, and a knob to sweep.
 
 ---
 
+## Result C — Phase 2.2: encoder batching + handoff realism (converter)
+
+The converter's vision pool is now an event-driven FIFO with cross-request
+batching on AIC's batch dimension, a handoff-transfer bound, an
+`--arrival-speedup` load knob, and a per-second `--series-out` series.
+Probe-backed simplification: AIC's encoder prediction is EXACTLY a function of
+total images per forward — (batch_size=1, n=64) ≡ (64, 1) ≡ every factoring,
+delta 0.000000 ms — so batches are costed by their image total. f(1)=7.822 ms
+vs f(64)=314.498 ms ⇒ 4.91 ms/img amortized (~1.6× throughput at full batch,
+~2.9 ms fixed per-forward overhead). Oversized requests (>64 images, up to
+9409) are chunked into sequential ≤64-image forwards on one worker —
+eliminating the old AIC batch-axis extrapolation. Handoff bound: post-merge
+embeddings (196 tok/img × 4096 × bf16 ≈ 1.6 MB/img) at `--handoff-gbps` 25 +
+0.2 ms RTT ≈ 0.71 ms/img-request at p50; 62 ms for a 121-image request; async
+(not worker-occupying). Validation: isolation JSONL byte-identical to Phase 1;
+delay percentiles unchanged at the idle 2k head (p50/p90/p99 exactly equal;
+max +5.9 ms from chunking the one 121-image request); replay smoke TTFT avg
+67.13 ms vs Result A's 67.2.
+
+## Result D — Phase 2.3: saturation knees — the decoupling, in simulation
+
+`simulation/sweep_load.py` sweeps arrival speedup per pool (LLM: native
+`dynamo.replay --arrival-speedup-ratio` on the isolation trace; vision:
+converter `--arrival-speedup`), 2 encoder × 2 LLM workers, placeholder SLA
+thresholds (TTFT p99 < 2 s, encoder delay p99 < 1 s). 25 points, all sane
+(offered scaling exact, curves monotone). Figure:
+`simulation/results/sweeps/knees.png`; data: `summary.json`.
+
+| Curve | knee | first-over | metric at s=1 → knee |
+|---|---|---|---|
+| llm · head2k · poly | s=8 (22.2 req/s) | s=16 | TTFT p99 249 → 1,366 ms |
+| llm · head2k · aic  | s=4 (11.1 req/s) | s=16 | 307 → 882 ms |
+| llm · burst1 · poly | s=2 (4.3 req/s)  | s=4  | 910 → 1,458 ms |
+| vision · head2k     | s=32 (256 img/s, censored — never crossed) | — | 200 → 811 ms |
+| vision · burst1     | **none — saturated at s=1** (116 img/s mean) | s=1 | p99 5,368 ms |
+
+**The pools' knees differ on both windows, in opposite directions.** On the
+steady head the vision pool has ≥4× (vs poly; ≥8× vs aic) the LLM pool's load
+headroom. On the burst episode the vision pool violates its SLA at the trace's
+own recorded rate — p99 encoder delay 5.4 s at only **29% mean utilization** —
+while the LLM pool still has 2× headroom. Mechanism (from the per-second
+series): 7,716 frames-class requests are chunked (>64 images; batch service
+p90 2.4 s, max 6.0 s) and the peak second lands 975 images at once — the queue
+reaches 4,452 images and stays >1,000 for 417 s of the 8.3 h window. Episodic
+FIFO head-of-line blocking at low mean utilization: invisible to request-rate
+(2.2 req/s mean) or mean-utilization monitoring, exactly the provisioning gap
+the predictive-scaling contribution targets.
+
 ## State
 
 - Phase 1 ✅ real trace → two-pool converter, validated end-to-end.
 - Phase 2.1 ✅ h100 AIC language-pool timing live; poly-vs-AIC delta quantified.
-- Phase 2.2/2.3 next: encoder batching/handoff realism, then arrival-speedup
-  load sweeps to locate each pool's saturation knee (where decoupling shows).
+- Phase 2.2 ✅ encoder batching (probe-backed f(total-images) costing),
+  handoff bound, speedup + series hooks (Result C).
+- Phase 2.3 ✅ per-pool arrival-speedup sweeps + knees on head2k and burst1
+  (Result D). Remaining sweep axes (worker grids, six-episode battery, long
+  steady window) belong to Phase 3's baseline runs.
 
 Open items: run the six burst episodes + full-trace window (not just the 2k
 head); decide encoder resolution/size distribution (currently uniform 448²);

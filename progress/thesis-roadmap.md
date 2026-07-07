@@ -83,7 +83,7 @@ LLM inference trace — the same trace analyzed in the thesis's trace chapter).
 workload statistics matching the trace chapter's numbers (sanity link between
 the two theses' artifacts).
 
-## Phase 2 — Fidelity upgrades to the two-pool simulation — IN PROGRESS (2.1 ✅)
+## Phase 2 — Fidelity upgrades to the two-pool simulation — ✅ DONE
 
 **Goal**: make both pools' timing defensible, not just plumbed.
 Progress + results: `phase2-simulation.md`. Runner: `simulation/run_replay.sh`.
@@ -97,14 +97,21 @@ Progress + results: `phase2-simulation.md`. Runner: `simulation/run_replay.sh`.
    source build). Poly-vs-AIC delta quantified (AIC: slower decode, 3–5× heavier
    latency tails). `agentic_mooncake`/`--planner-config` maturity is a SEPARATE
    axis that only gates Phase 3.2 (SLA Planner) — decide source-build THEN.
-2. **Encoder-pool realism**: per-request image counts and sizes from the trace
-   (AIC latency queried per size — the collected sweep covers the shapes),
-   batching effects on the encoder (AIC batch dimension), and a documented
-   handoff-transfer term (embeddings cross pools; measure or bound it).
-3. **Load characterization**: arrival-speedup sweeps on the composed trace to
-   locate each pool's saturation knee — needed to place the SLA thresholds and
-   to show the pools saturate at different offered loads (the decoupling
-   argument, now in simulation).
+2. **Encoder-pool realism** — ✅ DONE (Result C, `phase2-simulation.md`).
+   Cross-request batching on AIC's batch dimension (probe: encoder cost is
+   exactly f(total images); 1.6× throughput at full batch), oversized-request
+   chunking (kills the >64-image extrapolation), analytic handoff bound
+   (≈1.6 MB/img bf16 embeddings over a parameterized link), and the
+   `--arrival-speedup` / per-second `--series-out` hooks for the sweeps.
+   The trace has no image sizes → fixed 448²
+   stays, documented (~1.14× conservative vs silicon).
+3. **Load characterization** — ✅ DONE (Result D, `phase2-simulation.md`;
+   `simulation/sweep_load.py`, `results/sweeps/knees.png`). Knees differ on
+   both windows, opposite order: steady head — vision ≥4× the LLM's headroom
+   (LLM knee s=8 poly / s=4 aic vs vision ≥s=32); largest burst episode —
+   vision saturates at the trace's own rate (p99 5.4 s at 29% mean util;
+   frames-class HOL blocking) while the LLM keeps 2× headroom. The decoupling
+   argument, now in simulation. Worker-grid sweeps move to Phase 3.1.
 
 ## Phase 3 — Baselines
 

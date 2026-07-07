@@ -1,0 +1,61 @@
+{
+ "pool": "llm",
+ "window": "head2k",
+ "timing": "poly",
+ "speedup": 4.0,
+ "llm_workers": 2,
+ "mechanism": "dynamo.replay --arrival-speedup-ratio (native; timestamps /= ratio)",
+ "trace": "/home/gio/tese/simulation/results/sweeps/traces/llm_head2k.jsonl",
+ "report": "/home/gio/tese/simulation/results/sweeps/reports/llm_head2k_poly_s4.report.json",
+ "base": {
+  "req_per_s": 2.774,
+  "horizon_s": 721.072,
+  "requests": 2000,
+  "input_tok_per_s": 6200.158,
+  "output_tok_per_s": 552.856
+ },
+ "offered": {
+  "req_per_s": 11.096,
+  "input_tok_per_s": 24800.63,
+  "output_tok_per_s": 2211.42,
+  "total_tok_per_s": 27012.05
+ },
+ "measured": {
+  "request_throughput_rps": 10.680756579133567,
+  "output_throughput_tok_s": 2128.9364647575085,
+  "total_throughput_tok_s": 26004.4861066211,
+  "duration_ms": 187252.65248599477,
+  "completed_requests": 2000,
+  "sim_wall_time_ms": 300.557744,
+  "driver_wall_s": 0.4
+ },
+ "ttft_ms": {
+  "mean": 98.44757872245833,
+  "median": 65.54371299948252,
+  "p90": 197.0405939995544,
+  "p99": 473.0828709995985,
+  "max": 2582.584090999553
+ },
+ "tpot_ms": {
+  "mean": 17.34672537338916,
+  "median": 14.416903081967293,
+  "p90": 30.4119752324331,
+  "p99": 56.51084099999571,
+  "max": 112.1258380000072
+ },
+ "itl_ms": {
+  "mean": 15.30712753374415,
+  "median": 8.69474800000171,
+  "p90": 16.268152999997255,
+  "p99": 154.2373260000022,
+  "max": 184.5636300000042
+ },
+ "e2e_ms": {
+  "mean": 3134.225993288456,
+  "median": 1969.3541079996721,
+  "p90": 7366.1365949994215,
+  "p99": 17191.57037999951,
+  "max": 34567.20108699941
+ },
+ "exit_code": 0
+}
