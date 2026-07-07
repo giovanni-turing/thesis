@@ -85,6 +85,9 @@ the two theses' artifacts).
 
 ## Phase 2 — Fidelity upgrades to the two-pool simulation — ✅ DONE
 
+Chapter draft: `tex/twopool.tex` (composition + poly-vs-AIC + encoder
+realism + saturation knees).
+
 **Goal**: make both pools' timing defensible, not just plumbed.
 Progress + results: `phase2-simulation.md`. Runner: `simulation/run_replay.sh`.
 
