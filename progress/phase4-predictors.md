@@ -94,3 +94,34 @@ forecast → worker schedule → two-pool simulation → SLA × worker-seconds.
 - LLM-side actuation decided: register a `forecast_file` predictor in the
   planner's LOAD_PREDICTORS registry (plain string-keyed dict) so the
   predictive policy shares the reactive baseline's exact actuation path.
+
+
+## 4.3 first policy matrix + LLM-side findings (2026-07-08)
+
+**Encoder C(t) matrix (5 covered windows × {p50,p90} × rho{15,25}),
+results `simulation/results/ct_matrix/`:** p90/rho15 passes the tail SLA
+on ALL windows (p99 588–905 ms) at **0.10× deployable-static cost on the
+calm day** and 0.87–1.18× inside bursts — the band-as-headroom finding
+(ch. 4) reproduced inside the closed loop; p50 underprovisions broadly
+(worst: 39 s p99 on the 1-min-onset burst3 — onset outruns forecast
+lead). Failure modes recorded (burst5 rho25 divergence = capacity
+calibration boundary; its grid-implied rho ≈ 7).
+
+**Forecast coverage rule:** span is resolution-dependent (8k-bin context
+⇒ 1min forecasts from Oct 20 14:36, 15s from Oct 16 09:36); burst2/6
+(Oct 15) structurally unforecastable under the protocol — evaluation
+windows must be in-span; both loaders now hard-fail otherwise.
+
+**LLM side through the planner (forecast_file live after the
+optimization_target='sla' fix):** at TP1, tail-infeasible at any replica
+count (prefill floor — replica scaling cannot fix fleet shape; 3.1's
+finding in the control plane). At TP2 with live accurate forecasts:
+TTFT p99 1,717 ms / ITL 126.8 at mean ~1.0 replica — the planner's
+**average-based capacity conversion** provisions to mean throughput while
+the SLA binds on tails. Even perfect predictions through a mean-based
+capacity model miss the tail: the design doc's own limitation, measured.
+Consequence for the contribution: the predictive policy needs the same
+tail-aware per-pool capacity mapping the encoder side uses (knee-derived
+per-replica rate), not the planner's throughput regression. Next: env
+knob to feed boosted quantiles / knee-mapped targets through
+forecast_file; encoder reactive twin; weekly aggregate (E2B).
