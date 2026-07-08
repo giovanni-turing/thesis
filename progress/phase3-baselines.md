@@ -240,3 +240,30 @@ converter (BUILD ONCE — 4.3's predictive controller needs the same hook).
   model; predictor warm-start; see decisions above).
 - 3.2 reactive planner through the same windows; record scaling actions,
   compliance (evaluation SLA), GPU-hours.
+
+
+## 3.2 reactive LLM baseline — COMPLETE (2026-07-08)
+
+14 planner-in-the-loop replays (7 windows x {A: as-shipped Easy-mode load
+loop; B: full two-loop with ARIMA, optimization_target=sla, 15s/60s
+intervals}), composed C*-shifted traces, bursts at TP2 / steady at TP1,
+RUST_LOG=warn (per-request router INFO had ballooned logs during the
+first wave — contributed to the disk-full). Results
+(`simulation/results/reactive32/`):
+
+- **All 14 runs FAIL the evaluation tail SLA** at mean ~1.0-1.05
+  replicas (TTFT p99 1.1-3.5 s; ITL p99 121-162 on bursts).
+- **All 14 satisfy the planner's own window-mean control law with huge
+  margin** (avg TTFT 126-322 ms vs 500; avg ITL 6.9-9.3 vs 50) — the
+  pre-registered "means met, p99 violated" finding, verbatim, on every
+  window: the reactive planner is healthy by its own eyes throughout.
+- **A ≈ B**: upgrading the predictor (constant->ARIMA, both loops) moves
+  tails only 10-30% and compliance not at all — the mean-based capacity
+  conversion, not the prediction source, is the binding defect under
+  tail SLAs. Same conclusion as the forecast_file x1/x2 runs: even
+  perfect predictions through mean-based sizing miss tails.
+
+LLM burst1 column now complete: oracle-static TP2xN2 59.9k ws PASS |
+reactive A 30.0k ws FAIL | reactive B 30.8k ws FAIL | forecast (knee-
+scaled) 64.1k ws PASS. Reactive is half the cost and non-compliant;
+forecast pays ~7% over oracle for compliance.

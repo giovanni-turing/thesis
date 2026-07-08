@@ -1,0 +1,3 @@
+{"mode":"agg","environment":"virtual","namespace":"r32a","backend":"vllm",
+ "advisory":true,"max_gpu_budget":8,"min_endpoint":1,
+ "load_adjustment_interval_seconds":60}
