@@ -334,3 +334,7 @@ Progress + results: `phase4-predictors.md`. Chapter draft: `tex/predictors.tex`.
   wheel env untouched for Phase-2 reproducibility.
 - Every phase keeps the audit discipline: scripts + captured results under
   `collector_artifacts/<phase>/`, committed to this repo.
+- **Results ledger (standing, 2026-07-08)**: every new result is entered in
+  `progress/results-ledger.md` (artifact path, command, date, which tex it
+  feeds/supersedes) at the moment it lands. Ledger-vs-tex sweep before any
+  submission build. Guard against the stale-number drift `report.md` found.
