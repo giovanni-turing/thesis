@@ -1,0 +1,12 @@
+# cmd: env AIC_TP=2 bash /home/gio/tese/simulation/run_replay.sh /home/gio/tese/simulation/results/grid/traces/grid_burst2_C8.jsonl aic /home/gio/tese/simulation/results/grid/closeout/reports/router_burst2_C8_TP2_N2_credit2.0.report.json 2 --router-config {"overlap_score_credit": 2.0}
+# cwd: /home/gio/tese/simulation
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/gio/tese/ai-dynamo/aiconfigurator/.venv/lib/python3.13/site-packages/dynamo/replay/__main__.py", line 7, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/home/gio/tese/ai-dynamo/aiconfigurator/.venv/lib/python3.13/site-packages/dynamo/replay/main.py", line 493, in main
+    KvRouterConfig.from_json(args.router_config)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+Exception: Failed to parse KvRouterConfig JSON: overlap_score_credit: overlap_score_credit must be between 0.0 and 1.0; values above 1.0 are probably not what you intended. If you want to weigh TTFT/prompt-side prefill load more heavily, keep overlap_score_credit <= 1.0 and use that larger value for prefill_load_scale instead; prefill_load_scale is applied after overlap credits.

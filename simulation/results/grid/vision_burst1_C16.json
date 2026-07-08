@@ -1,0 +1,18 @@
+{
+ "pool": "vision",
+ "window": "burst1",
+ "encoder_workers": 16,
+ "trace": "/home/gio/tese/simulation/results/grid/traces/grid_burst1_C16.jsonl",
+ "stats": "/home/gio/tese/simulation/results/grid/traces/grid_burst1_C16.jsonl.stats.json",
+ "offered_img_per_s": 116.173,
+ "horizon_s": 29939.313,
+ "encoder_delay_ms": {
+  "p50": 8.876,
+  "p90": 448.102,
+  "p99": 588.37,
+  "max": 1327.714
+ },
+ "encoder_utilization": 0.0362,
+ "queue_divergent": false,
+ "feasible": true
+}

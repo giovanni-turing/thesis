@@ -47,6 +47,16 @@ ROUTER=kv_router
 [ "$WORKERS" -le 1 ] && ROUTER=round_robin
 
 cd "$AIC"
+# REPLAY_ENTRY: optional script path replacing `-m dynamo.replay` (e.g. the
+# forecast_file predictor wrapper simulation/replay_with_forecast.py).
+if [ -n "${REPLAY_ENTRY:-}" ]; then
+  exec "$PY" "$REPLAY_ENTRY" "$TRACE" \
+  --trace-format mooncake --trace-block-size 512 \
+  --replay-mode offline --router-mode "$ROUTER" \
+  --num-workers "$WORKERS" \
+  --extra-engine-args "$ENGINE_ARGS" \
+  --report-json "$REPORT" "$@"
+fi
 exec "$PY" -m dynamo.replay "$TRACE" \
   --trace-format mooncake --trace-block-size 512 \
   --replay-mode offline --router-mode "$ROUTER" \

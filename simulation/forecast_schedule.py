@@ -80,6 +80,13 @@ def main() -> None:
         raise SystemExit(f"no forecast rows cover window {args.window} "
                          f"({t0} .. +{span_s:.0f}s) — outside the common span?")
     df = df.sort_values("ts").drop_duplicates("ts")  # stitched tiles: 1 row/bin
+    gap_s = (df.ts.iloc[0] - t0).total_seconds()
+    bin_chk = pd.Timedelta(args.resolution.replace("min", "m")).total_seconds()
+    if gap_s > 2 * bin_chk:
+        raise SystemExit(
+            f"window start {t0} is OUTSIDE the {args.resolution} forecast "
+            f"span (first bin {df.ts.iloc[0]}, {gap_s/3600:.1f} h later) — "
+            f"use a finer resolution or an in-span window")
 
     minutes = ((df.ts - t0).dt.total_seconds()).to_numpy()
     # Forecast series are PER-BIN TOTALS (predictors chapter: "per-bin

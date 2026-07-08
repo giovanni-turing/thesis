@@ -1,0 +1,7 @@
+{
+ "tag": "router_burst4_C7_TP2_N2_credit0.5",
+ "ttft_p99": 792.3926039999351,
+ "itl_p99": 15.513376999646425,
+ "feasible": true,
+ "wall_s": 595.9
+}

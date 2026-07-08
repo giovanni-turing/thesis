@@ -1,0 +1,7 @@
+{
+ "tag": "binding_steady24h_C16_TP2_N2",
+ "ttft_p99": 394.52779400348663,
+ "itl_p99": 5.141623000148684,
+ "feasible": true,
+ "wall_s": 704.3
+}

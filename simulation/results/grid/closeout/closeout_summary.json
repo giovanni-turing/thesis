@@ -1,0 +1,273 @@
+{
+ "generated_utc": "2026-07-08T03:05:53+00:00",
+ "router_variants": {
+  "credit0.25": {
+   "overlap_score_credit": 0.25
+  },
+  "credit0.5": {
+   "overlap_score_credit": 0.5
+  },
+  "pls0.5": {
+   "prefill_load_scale": 0.5
+  },
+  "pls2.0": {
+   "prefill_load_scale": 2.0
+  }
+ },
+ "binding_config": {
+  "c": 16,
+  "tp": 2,
+  "n": 2
+ },
+ "results": {
+  "router_burst1_C6_TP2_N2_credit0.25": {
+   "tag": "router_burst1_C6_TP2_N2_credit0.25",
+   "ttft_p99": 763.3902450166643,
+   "itl_p99": 6.887345999479294,
+   "feasible": true,
+   "wall_s": 1314.6
+  },
+  "router_burst1_C6_TP2_N2_credit0.5": {
+   "tag": "router_burst1_C6_TP2_N2_credit0.5",
+   "ttft_p99": 763.3791180029511,
+   "itl_p99": 6.921887000091374,
+   "feasible": true,
+   "wall_s": 1438.2
+  },
+  "router_burst1_C6_TP2_N2_pls0.5": {
+   "tag": "router_burst1_C6_TP2_N2_pls0.5",
+   "ttft_p99": 771.0078839808702,
+   "itl_p99": 6.915516998618841,
+   "feasible": true,
+   "wall_s": 1438.6
+  },
+  "router_burst1_C6_TP2_N2_pls2.0": {
+   "tag": "router_burst1_C6_TP2_N2_pls2.0",
+   "ttft_p99": 760.7107679955661,
+   "itl_p99": 6.8882090002298355,
+   "feasible": true,
+   "wall_s": 1440.7
+  },
+  "router_burst2_C8_TP2_N2_credit0.25": {
+   "tag": "router_burst2_C8_TP2_N2_credit0.25",
+   "ttft_p99": 766.2591829998419,
+   "itl_p99": 9.341451999964193,
+   "feasible": true,
+   "wall_s": 181.8
+  },
+  "router_burst2_C8_TP2_N2_credit0.5": {
+   "tag": "router_burst2_C8_TP2_N2_credit0.5",
+   "ttft_p99": 766.2591829998419,
+   "itl_p99": 9.340504999971017,
+   "feasible": true,
+   "wall_s": 241.8
+  },
+  "router_burst2_C8_TP2_N2_pls0.5": {
+   "tag": "router_burst2_C8_TP2_N2_pls0.5",
+   "ttft_p99": 782.2579289944842,
+   "itl_p99": 9.226448999950662,
+   "feasible": true,
+   "wall_s": 221.4
+  },
+  "router_burst2_C8_TP2_N2_pls2.0": {
+   "tag": "router_burst2_C8_TP2_N2_pls2.0",
+   "ttft_p99": 774.1329709999263,
+   "itl_p99": 9.125756999943405,
+   "feasible": true,
+   "wall_s": 236.2
+  },
+  "router_steady24h_C2_TP1_N2_credit0.25": {
+   "tag": "router_steady24h_C2_TP1_N2_credit0.25",
+   "ttft_p99": 727.362049009651,
+   "itl_p99": 9.237326003611088,
+   "feasible": true,
+   "wall_s": 634.1
+  },
+  "router_steady24h_C2_TP1_N2_credit0.5": {
+   "tag": "router_steady24h_C2_TP1_N2_credit0.5",
+   "ttft_p99": 727.362049009651,
+   "itl_p99": 9.240285001695156,
+   "feasible": true,
+   "wall_s": 701.4
+  },
+  "router_steady24h_C2_TP1_N2_pls0.5": {
+   "tag": "router_steady24h_C2_TP1_N2_pls0.5",
+   "ttft_p99": 727.2514999769628,
+   "itl_p99": 9.272936999797821,
+   "feasible": true,
+   "wall_s": 752.0
+  },
+  "router_steady24h_C2_TP1_N2_pls2.0": {
+   "tag": "router_steady24h_C2_TP1_N2_pls2.0",
+   "ttft_p99": 727.4419250078499,
+   "itl_p99": 9.294362999498844,
+   "feasible": true,
+   "wall_s": 740.4
+  },
+  "router_burst6_C6_TP2_N2_credit0.25": {
+   "tag": "router_burst6_C6_TP2_N2_credit0.25",
+   "ttft_p99": 733.777131000068,
+   "itl_p99": 7.727316999807954,
+   "feasible": true,
+   "wall_s": 113.8
+  },
+  "router_burst6_C6_TP2_N2_credit0.5": {
+   "tag": "router_burst6_C6_TP2_N2_credit0.5",
+   "ttft_p99": 733.777131000068,
+   "itl_p99": 7.727316999807954,
+   "feasible": true,
+   "wall_s": 147.5
+  },
+  "router_burst6_C6_TP2_N2_pls0.5": {
+   "tag": "router_burst6_C6_TP2_N2_pls0.5",
+   "ttft_p99": 734.9594499971718,
+   "itl_p99": 7.8143469998613,
+   "feasible": true,
+   "wall_s": 150.8
+  },
+  "router_burst6_C6_TP2_N2_pls2.0": {
+   "tag": "router_burst6_C6_TP2_N2_pls2.0",
+   "ttft_p99": 733.777131000068,
+   "itl_p99": 7.66154700005427,
+   "feasible": true,
+   "wall_s": 155.9
+  },
+  "router_burst3_C7_TP2_N2_credit0.25": {
+   "tag": "router_burst3_C7_TP2_N2_credit0.25",
+   "ttft_p99": 845.6918049999513,
+   "itl_p99": 8.743769000051543,
+   "feasible": true,
+   "wall_s": 43.9
+  },
+  "router_burst3_C7_TP2_N2_credit0.5": {
+   "tag": "router_burst3_C7_TP2_N2_credit0.5",
+   "ttft_p99": 845.6918049999513,
+   "itl_p99": 8.744136000052094,
+   "feasible": true,
+   "wall_s": 60.3
+  },
+  "router_burst3_C7_TP2_N2_pls0.5": {
+   "tag": "router_burst3_C7_TP2_N2_pls0.5",
+   "ttft_p99": 833.7951429999666,
+   "itl_p99": 8.390820999979042,
+   "feasible": true,
+   "wall_s": 61.3
+  },
+  "router_burst3_C7_TP2_N2_pls2.0": {
+   "tag": "router_burst3_C7_TP2_N2_pls2.0",
+   "ttft_p99": 815.8888030016096,
+   "itl_p99": 9.103645000024699,
+   "feasible": true,
+   "wall_s": 54.5
+  },
+  "router_burst4_C7_TP2_N2_credit0.25": {
+   "tag": "router_burst4_C7_TP2_N2_credit0.25",
+   "ttft_p99": 792.3926039999351,
+   "itl_p99": 15.447459999937564,
+   "feasible": true,
+   "wall_s": 455.9
+  },
+  "router_burst4_C7_TP2_N2_credit0.5": {
+   "tag": "router_burst4_C7_TP2_N2_credit0.5",
+   "ttft_p99": 792.3926039999351,
+   "itl_p99": 15.513376999646425,
+   "feasible": true,
+   "wall_s": 595.9
+  },
+  "router_burst4_C7_TP2_N2_pls0.5": {
+   "tag": "router_burst4_C7_TP2_N2_pls0.5",
+   "ttft_p99": 798.2791170012206,
+   "itl_p99": 15.325147000141442,
+   "feasible": true,
+   "wall_s": 556.9
+  },
+  "router_burst4_C7_TP2_N2_pls2.0": {
+   "tag": "router_burst4_C7_TP2_N2_pls2.0",
+   "ttft_p99": 781.4877260001376,
+   "itl_p99": 15.515084000304341,
+   "feasible": true,
+   "wall_s": 523.5
+  },
+  "router_burst5_C16_TP2_N2_credit0.25": {
+   "tag": "router_burst5_C16_TP2_N2_credit0.25",
+   "ttft_p99": 781.0795859997161,
+   "itl_p99": 7.407594999996945,
+   "feasible": true,
+   "wall_s": 150.8
+  },
+  "router_burst5_C16_TP2_N2_credit0.5": {
+   "tag": "router_burst5_C16_TP2_N2_credit0.5",
+   "ttft_p99": 781.0795859997161,
+   "itl_p99": 7.407514000078663,
+   "feasible": true,
+   "wall_s": 189.0
+  },
+  "router_burst5_C16_TP2_N2_pls0.5": {
+   "tag": "router_burst5_C16_TP2_N2_pls0.5",
+   "ttft_p99": 793.8870119994972,
+   "itl_p99": 7.405743000097573,
+   "feasible": true,
+   "wall_s": 211.9
+  },
+  "router_burst5_C16_TP2_N2_pls2.0": {
+   "tag": "router_burst5_C16_TP2_N2_pls2.0",
+   "ttft_p99": 777.8270370052196,
+   "itl_p99": 7.407134999986738,
+   "feasible": true,
+   "wall_s": 200.0
+  },
+  "binding_burst1": {
+   "tag": "binding_burst1_C16_TP2_N2",
+   "ttft_p99": 782.0767330080271,
+   "itl_p99": 6.8216309999115765,
+   "feasible": true,
+   "wall_s": 1448.9
+  },
+  "binding_burst2": {
+   "tag": "binding_burst2_C16_TP2_N2",
+   "ttft_p99": 826.1743240002543,
+   "itl_p99": 9.28529700008221,
+   "feasible": true,
+   "wall_s": 235.8
+  },
+  "binding_steady24h": {
+   "tag": "binding_steady24h_C16_TP2_N2",
+   "ttft_p99": 394.52779400348663,
+   "itl_p99": 5.141623000148684,
+   "feasible": true,
+   "wall_s": 704.3
+  },
+  "binding_burst6": {
+   "tag": "binding_burst6_C16_TP2_N2",
+   "ttft_p99": 737.9147719996981,
+   "itl_p99": 7.214627999812365,
+   "feasible": true,
+   "wall_s": 154.9
+  },
+  "binding_burst3": {
+   "tag": "binding_burst3_C16_TP2_N2",
+   "ttft_p99": 764.2668909998611,
+   "itl_p99": 8.908514000009745,
+   "feasible": true,
+   "wall_s": 63.3
+  },
+  "binding_burst4": {
+   "tag": "binding_burst4_C16_TP2_N2",
+   "ttft_p99": 823.589329989627,
+   "itl_p99": 15.502498999238014,
+   "feasible": true,
+   "wall_s": 510.9
+  },
+  "binding_burst5": {
+   "tag": "binding_burst5_C16_TP2_N2",
+   "ttft_p99": 781.0795859997161,
+   "itl_p99": 7.407514000078663,
+   "feasible": true,
+   "wall_s": 161.3
+  }
+ },
+ "router_verdict_flips": [],
+ "binding_infeasible": [],
+ "failures": [],
+ "conclusion": "PASS: no router-knob verdict flips; binding config feasible on all windows"
+}
