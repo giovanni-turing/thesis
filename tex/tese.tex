@@ -1,11 +1,13 @@
-% Root document for the thesis draft chapters (lives in tex/).
-% Self-contained under /home/gio/tese; figures in ../figuras/eda/.
-% Build:  latexmk -pdf tese.tex     (or: pdflatex tese.tex  x2)
+% Thesis root (lives in tex/). Self-contained under /home/gio/tese;
+% figures under ../figuras/. Build: latexmk -pdf tese.tex
+% NOTE (submission): the generic book class is a working substitute until
+% the institutional template (abnTeX2 / departmental class) is adopted;
+% committee page, catalog sheet, and the Portuguese title page come with it.
 \documentclass[12pt,a4paper]{book}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
+\usepackage[main=english,brazil]{babel}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{siunitx}
@@ -13,17 +15,133 @@
 \DeclareSIUnit{\flop}{FLOP}  % used by the aiconfigurator chapter (TFLOP/s)
 \usepackage{booktabs}
 \usepackage{graphicx}
-\graphicspath{{../}}  % figures live at repo root: ../figuras/eda/
+\graphicspath{{../}}  % figures live at repo root: ../figuras/
 \usepackage{microtype}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc}
+\usepackage[hidelinks]{hyperref}
 
-\title{Thesis Draft Chapters --- Workspace Preview Build}
+\title{Predictive Per-Pool Provisioning for\\
+Modality-Disaggregated Multimodal Model Serving}
 \author{Giovanni Oliveira}
 \date{\today}
 
 \begin{document}
+\frontmatter
 \maketitle
-\tableofcontents
 
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+Multimodal large-model serving systems increasingly disaggregate by
+modality: a vision-encoder pool converts images into embedding tokens, and
+a language pool runs prefill and decode. Each pool must then be
+provisioned separately --- and the prevailing reactive practice, scaling
+on request rate or utilization, silently assumes those signals carry
+every pool's demand. Analyzing the first public production trace of a
+multimodal inference cluster (Azure, one million requests over seven
+days), this thesis shows that the assumption fails for the vision pool:
+image arrivals are nearly decoupled from request rate ($R^2 = 0.12$), an
+order of magnitude burstier, ramp to peak within replica cold-start
+times, and their extreme minutes are essentially disjoint from the
+request signal's (Jaccard 0.02). The same signal is also the most
+persistent --- the most forecastable: zero-shot time-series foundation
+models beat fixed-parameter classical baselines on every demand signal
+at every resolution tested, with empirically calibrated p90 headroom at
+provisioning cadence. To convert forecasts into provisioning decisions,
+the thesis builds a calibrated two-pool simulation platform: encoder
+costs collected on RTX 5090 silicon for this work (contributed upstream
+to NVIDIA's aiconfigurator) and audited against physical measurement,
+composed with Dynamo's discrete-event language-pool simulator under
+calibrated H100 timing. The composed system reproduces the decoupling
+mechanically: the pools saturate an order of magnitude apart on steady
+traffic, and the largest burst breaks both --- the language pool through
+a prefill floor removed by one parallelism change, the vision pool
+through episodic queueing at 29\% mean utilization, invisible to rate-
+and utilization-based monitoring. Closing the loop, forecast-driven
+per-pool worker schedules hold the tail latency objective through burst
+onsets that defeat an identically informed reactive controller at every
+tested cold-start lead, at a fraction of the best static fleet's
+GPU-hours.
+
+\begin{otherlanguage}{brazil}
+\chapter*{Resumo}
+\addcontentsline{toc}{chapter}{Resumo}
+Sistemas de servi\c{c}o de modelos multimodais cada vez mais se
+desagregam por modalidade: um \emph{pool} codificador de vis\~ao converte
+imagens em \emph{tokens} de \emph{embedding}, e um \emph{pool} de
+linguagem executa \emph{prefill} e \emph{decode}. Cada \emph{pool} passa
+ent\~ao a ser provisionado separadamente --- e a pr\'atica reativa
+vigente, escalar pela taxa de requisi\c{c}\~oes ou pela utiliza\c{c}\~ao,
+assume silenciosamente que esses sinais carregam a demanda de todos os
+\emph{pools}. Analisando o primeiro \emph{trace} p\'ublico de
+produ\c{c}\~ao de um \emph{cluster} de infer\^encia multimodal (Azure, um
+milh\~ao de requisi\c{c}\~oes em sete dias), esta disserta\c{c}\~ao
+mostra que a hip\'otese falha para o \emph{pool} de vis\~ao: as chegadas
+de imagens s\~ao quase desacopladas da taxa de requisi\c{c}\~oes
+($R^2 = 0{,}12$), uma ordem de magnitude mais intermitentes, atingem o
+pico dentro do tempo de partida a frio de uma r\'eplica, e seus minutos
+extremos s\~ao essencialmente disjuntos dos do sinal de requisi\c{c}\~oes
+(Jaccard 0{,}02). O mesmo sinal \'e tamb\'em o mais persistente --- o
+mais previs\'ivel: modelos de funda\c{c}\~ao de s\'eries temporais,
+usados \emph{zero-shot}, superam as \emph{baselines} cl\'assicas em todos
+os sinais de demanda e resolu\c{c}\~oes testadas, com p90 empiricamente
+calibrado na cad\^encia de provisionamento. Para converter previs\~oes em
+decis\~oes de provisionamento, constr\'oi-se uma plataforma de
+simula\c{c}\~ao de dois \emph{pools} calibrada: custos do codificador
+coletados em sil\'icio RTX 5090 (contribu\'idos ao aiconfigurator da
+NVIDIA) e auditados contra medi\c{c}\~ao f\'isica, compostos com o
+simulador de eventos discretos do Dynamo sob tempos H100 calibrados. O
+sistema composto reproduz o desacoplamento mecanicamente: os \emph{pools}
+saturam separados por uma ordem de magnitude em tr\'afego
+estacion\'ario, e a
+maior rajada quebra ambos --- o de linguagem por um piso de
+\emph{prefill} remov\'ivel por uma mudan\c{c}a de paralelismo, o de
+vis\~ao por enfileiramento epis\'odico a 29\% de utiliza\c{c}\~ao
+m\'edia, invis\'ivel a monitores de taxa e utiliza\c{c}\~ao. Fechando o
+la\c{c}o, escalas de trabalhadores dirigidas por previs\~ao por
+\emph{pool} sustentam o objetivo de lat\^encia de cauda atrav\'es de
+in\'icios de rajada que derrotam um controlador reativo igualmente
+informado em todos os tempos de partida a frio testados, a uma
+fra\c{c}\~ao das GPU-horas da melhor frota est\'atica.
+\end{otherlanguage}
+
+\tableofcontents
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoffigures
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{\listtablename}
+\listoftables
+
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\begin{tabular}{@{}ll@{}}
+ACF & autocorrelation function \\
+AIC & \textit{aiconfigurator}, NVIDIA's offline deployment planner \\
+CV$^2$ & squared coefficient of variation (excess dispersion) \\
+EWMA & exponentially weighted moving average \\
+FIFO & first-in, first-out (queue discipline) \\
+GEMM & general matrix--matrix multiplication \\
+HPA & (Kubernetes) Horizontal Pod Autoscaler \\
+ISL / OSL & input / output sequence length \\
+ITL & inter-token latency (per-token decode gap) \\
+KV & key--value (attention cache) \\
+LRD & long-range dependence \\
+MAE & mean absolute error \\
+SLA / SLO & service-level agreement / objective (see Chapter~1) \\
+SOL & speed-of-light (analytic lower-bound timing) \\
+TP & tensor parallelism \\
+TPOT & time per output token \\
+TSFM & time-series foundation model \\
+TTFT & time to first token \\
+ViT & Vision Transformer \\
+WAPE & weighted absolute percentage error \\
+\end{tabular}
+
+\mainmatter
 
 \include{intro}
 \include{related}
@@ -31,6 +149,9 @@
 \include{predictors}
 \include{aiconfigurator}
 \include{twopool}
+
+\appendix
+\include{apendice}
 
 % Minimal bibliography so the build resolves \cite without biber.
 \begin{thebibliography}{99}
@@ -82,7 +203,7 @@ USENIX OSDI, 2024. arXiv:2403.02310.
 R.~Qin, Z.~Li, W.~He, M.~Zhang, Y.~Wu, W.~Zheng, X.~Xu.
 \emph{Mooncake: Trading More Storage for Less Computation --- A
 KVCache-Centric Architecture for Serving LLM Chatbot}.
-USENIX FAST (Best Paper), 2025. arXiv:2407.00079.
+USENIX FAST, 2025. arXiv:2407.00079.
 \bibitem{Dosovitskiy2021ViT}
 A.~Dosovitskiy, L.~Beyer, A.~Kolesnikov, et al.
 \emph{An Image is Worth $16\times16$ Words: Transformers for Image
@@ -92,7 +213,9 @@ ICLR, 2021. arXiv:2010.11929.
 NVIDIA.
 \emph{NVIDIA Dynamo: A Datacenter-Scale Distributed Inference Serving
 Framework}. 2025.
-\texttt{https://github.com/ai-dynamo/dynamo}.
+\url{https://github.com/ai-dynamo/dynamo}; planner design documentation
+at \url{https://docs.dynamo.nvidia.com}. Accessed 2026-07-07 (v1.x
+line; simulations use the v1.3.0 source build).
 \bibitem{Leland1994}
 W.~E. Leland, M.~S. Taqqu, W.~Willinger, D.~V. Wilson.
 \emph{On the Self-Similar Nature of Ethernet Traffic (Extended Version)}.
@@ -119,7 +242,7 @@ Models}. 2026. arXiv:2602.02204.
 \bibitem{WarmServe2025}
 C.~Lou, S.~Qi, R.~Kang, Y.~Zhang, C.~Sun, P.~Wang, X.~Liu, X.~Jin.
 \emph{WarmServe: Enabling One-for-Many GPU Prewarming for Multi-LLM
-Serving}. ICML, 2026. arXiv:2512.09472.
+Serving}. ICML, 2026 (to appear). arXiv:2512.09472.
 \bibitem{Yu2022Orca}
 G.-I. Yu, J.~S. Jeong, G.-W. Kim, S.~Kim, B.-G. Chun.
 \emph{Orca: A Distributed Serving System for Transformer-Based Generative
@@ -205,7 +328,7 @@ ACM KDD, 2025. arXiv:2401.17644.
 Y.~Xiang, X.~Li, K.~Qian, Y.~Zhang, W.~Yu, E.~Zhai, X.~Jin, J.~Zhou.
 \emph{ServeGen: Workload Characterization and Generation of Large
 Language Model Serving in Production}.
-USENIX NSDI, 2026. arXiv:2505.09999.
+USENIX NSDI, 2026 (to appear). arXiv:2505.09999.
 \bibitem{Ansari2024Chronos}
 A.~F. Ansari, L.~Stella, C.~Turkmen, et al.
 \emph{Chronos: Learning the Language of Time Series}.
@@ -228,11 +351,45 @@ Evaluation}.
 NVIDIA.
 \emph{aiconfigurator: Offline Deployment Configuration Search for
 Disaggregated LLM Serving}. 2025.
-\texttt{https://github.com/ai-dynamo/aiconfigurator}.
+\url{https://github.com/ai-dynamo/aiconfigurator}. Accessed 2026-07-07.
+
+\bibitem{Qwen3VL2025}
+Qwen Team (Alibaba).
+\emph{Qwen3-VL model family} (model cards and configuration files:
+Qwen3-VL-8B-Instruct, Qwen3-VL-32B-Instruct, Qwen3-VL-235B-A22B-Instruct).
+Hugging Face, 2025. \url{https://huggingface.co/Qwen}. Configuration
+fields verified 2026-07-08.
+
+\bibitem{NVIDIA5090Specs}
+NVIDIA.
+\emph{GeForce RTX 5090 --- product specifications}.
+\url{https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/}.
+Accessed 2026-07-08.
+
+\bibitem{K8sAutoscalers}
+The Kubernetes Authors.
+\emph{Horizontal Pod Autoscaling}, Kubernetes documentation,
+\url{https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/};
+KEDA Authors, \emph{Kubernetes Event-driven Autoscaling},
+\url{https://keda.sh}; Knative Authors, \emph{Knative Pod Autoscaler},
+\url{https://knative.dev/docs/serving/autoscaling/}. Accessed 2026-07-08.
+
+\bibitem{Arrow1951Newsvendor}
+K.~J. Arrow, T.~Harris, J.~Marschak.
+\emph{Optimal Inventory Policy}.
+Econometrica, 19(3):250--272, 1951.
+
+\bibitem{Dao2023FlashAttention2}
+T.~Dao.
+\emph{FlashAttention-2: Faster Attention with Better Parallelism and Work
+Partitioning}.
+ICLR, 2024. arXiv:2307.08691.
 \bibitem{AzureLMM2025}
 Microsoft Azure.
-\emph{AzureLMMInferenceDataset2025}. AzurePublicDataset repository, 2025.
-\texttt{https://github.com/Azure/AzurePublicDataset}.
+\emph{Azure LMM Inference Dataset 2025} (dataset). Released with
+ModServe~\cite{Qiu2025ModServe} in the AzurePublicDataset repository,
+2025. \url{https://github.com/Azure/AzurePublicDataset}; schema and
+terms of use as stated in the repository. Accessed 2026-07-05.
 \bibitem{Liu2025ElasticMM}
 Z.~Liu, S.~Cheng, G.~Tan, Y.~You, D.~Tao.
 \emph{ElasticMM: Efficient Multimodal LLMs Serving with Elastic

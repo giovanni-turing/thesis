@@ -107,6 +107,55 @@ feeds:      chapter in prep: closed loop (751 ms p99 PASS at mean 2.14 replicas;
 supersedes: new
 commit:     2532b53
 
+### LLM/AIC burst knee points — the review's missing row (H1)  (2026-07-08)
+artifact:   simulation/results/sweeps/llm_burst1_aic_s{1,2}.json; reports/llm_burst1_aic_tp2_s1.report.json
+command:    REPLAY_PY=<dynamo/.venv> AIC_VER=0.19.0 python3 simulation/sweep_load.py --pool llm --window burst1 --timing aic --speedups 1 2  (isolation trace, TP1×2); bespoke run_replay.sh AIC_TP=2 for the TP2×2 point
+feeds:      tex/twopool.tex Tab. sim-knees new "LLM/AIC burst" row (none: over at s=1, 1,868 ms; ITL 58.3 ok) + reframed inversion ¶ (TP2×2: 748.4 ms TTFT p99 / 6.6 ms ITL p99 PASS); intro ¶2/RQ1/contribution 4; knees figure curve "burst1·aic"
+supersedes: the poly-only burst verdict ("language still meets the full SLA" — false under calibrated timing at TP1)
+commit:     this pass
+
+### Steady knee refinement s=3 (H2)  (2026-07-08)
+artifact:   simulation/results/sweeps/llm_head2k_{poly,aic}_s3.json (+ summary.json rebuilt: poly knee→s=3, aic knee stays s=2 with first_over=s3)
+command:    python3 simulation/sweep_load.py --pool llm --window head2k --timing {poly,aic} --speedups 3  (aic under source build)
+feeds:      tex/twopool.tex Tab. sim-knees steady rows (poly s=3, 249→374; aic s=2 ITL-bound at s=3: TTFT 554/ITL 109.5); every "≥16×" claim replaced with "order of magnitude" (provable >10× calibrated: vision censored ≥32 vs llm first_over 3)
+supersedes: "≥16×" separation (intro ×2, twopool ×2, RQ1, contribution 4, summary) and "both timing models put the knee at s=2"
+commit:     this pass
+
+### Encoder cap sensitivity (S4.4)  (2026-07-08)
+artifact:   simulation/results/cap_sensitivity/vision_burst1_cap{32,128}.jsonl.stats.json
+command:    <aic/.venv> workload/trace_to_two_pool.py --offset 843072 --max-requests 64804 --encoder-workers 2 --encoder-batch-images {32,128}
+feeds:      tex/twopool.tex limitations (p99 5,163/5,013/6,743 ms at cap 32/64/128, util 29–33% — burst verdict cap-insensitive; cap-128 extrapolates past the collected batch range)
+supersedes: new (answers report.md S4.4)
+commit:     this pass
+
+### Empirical quantile coverage (E6/F3.5)  (2026-07-08)
+artifact:   predictors/results/metrics/quantile_coverage.json
+command:    pandas pass over predictors/results/*.parquet: frac(y_true<=q) for q∈{p10,p50,p90} + band, per model-mode × signal × resolution, common span (origin>=8076), pooled over horizon
+feeds:      tex/predictors.tex new "Is the band calibrated?" ¶ (p90 0.88–0.90 @1min all models/signals; band 69% vs nominal 80%; 29% @1s zero-ties), band-figure caption fix (measured 11% p90 exceedance), limitations update, intro contribution 2
+supersedes: the uncalibrated p90-headroom proposal and the caption's "spike ... inside the band" (contradicted by the figure)
+commit:     this pass
+
+### Clustering silhouette scan (E8)  (2026-07-08)
+artifact:   analysis/trace_eda/l_silhouette_scan.json
+command:    recompute mirroring analysis/trace_eda/l_request_clusters.py (deterministic: seed 0, n_init 10, 50k subsample)
+feeds:      tex/trace-eda.tex archetype ¶ ("k=4 maximizes silhouette over k∈{3..9} at 0.388, vs 0.378 @3, 0.319 @5")
+supersedes: unquantified "k=4 by silhouette"
+commit:     this pass
+
+### Forecast-archive recount + burst-window stat corrections  (2026-07-08)
+artifact:   (counts) predictors/results/*.parquet metadata; (burst) simulation/results/sweeps/traces/vision_burst1_s1.jsonl.stats.json + series/vision_burst1_s1.series.json; analysis/trace_eda/{a_quality,i_burst_anatomy}_stats.json
+command:    pyarrow metadata sum (21,404,640 rows / 26 files; 20,749,440 common-span); pandas over the trace (dup=151 retained; 101 minutes>p99 → 87 runs → 18 episodes; hot sets ≥p99: 106 req / 101 img; burst1 chunk units Σceil=56,510; worst second 2,726) — all cross-checked against the artifacts named
+feeds:      tex/predictors.tex (21.4M ×2); tex/trace-eda.tex (duplicates retained; 101/87/18; Jaccard set defs); tex/twopool.tex burst-mechanism ¶ (56,510 units / 83,376 forwards / ≤316.4 ms / 2,726 worst-second)
+supersedes: "19.2M values", "151 dropped", "87 windows", "83,432 chunk forwards", "≤315 ms", "975 images"
+commit:     this pass
+
+### New thesis figures (review pass)  (2026-07-08)
+artifact:   figuras/aic/aic_fn.png (src collector_artifacts/phaseB_batch_validation/fn_figure.png); figuras/pred/pred_models_burst.png (src predictors/results/figures/models_burst.png); figuras/sim/sim_knees.png (regenerated: +burst1·aic curve, s=3 points); intro TikZ architecture (in-source)
+command:    eda venv matplotlib scripts (this pass) + simulation/sweep_fig.py rerun
+feeds:      tex/aiconfigurator.tex Fig. aic-fn; tex/predictors.tex Fig. pred-models; tex/twopool.tex Fig. sim-knees (new caption); tex/intro.tex Fig. intro-arch
+supersedes: knees.png without the calibrated burst curve; no-figure state for f(N)/multi-model/architecture
+commit:     this pass
+
 ### Phase C shape infill  (2026-07-08)
 artifact:   collector_artifacts/phaseC_vit_shape_infill/{encoder_attention,gemm}_perf.txt + merged parquets in ai-dynamo/aiconfigurator (AIC commit 656ac8ca, LOCAL — push held)
 command:    docker run ... vllm/vllm-openai:v0.22.0 python3 /artifacts/run_infill.py  (465 cases, locked clocks); merge_parquet.py

@@ -13,7 +13,7 @@ __pycache__/
 .agents
 # KvikIO/GPUDirect-Storage cuFile logs
 cufile.log
-# LaTeX preview-build artifacts (tese.tex root); keep sources + figures, drop aux
+# LaTeX build artifacts (tese.tex root); keep sources + figures, drop aux
 tese.pdf
 tese.aux
 tese.log
@@ -23,9 +23,22 @@ tese.fls
 tese.fdb_latexmk
 tese.synctex.gz
 tex/*.aux
+tex/*.log
+tex/*.toc
+tex/*.lof
+tex/*.lot
+tex/*.out
+tex/*.fls
+tex/*.fdb_latexmk
+tex/*.synctex.gz
+tex/tese.pdf
 # benchmark checkpoint parts: reproducible intermediates of the assembled results/*.parquet
 predictors/results/parts/
 # load-sweep intermediates: point JSONs/summary/figure/series are tracked; raw traces+logs are reproducible
 simulation/results/sweeps/traces/
 simulation/results/sweeps/logs/
 simulation/results/srcbuild/*.log
+# cap-sensitivity: stats JSONs are the artifact; composed traces + converter logs are reproducible
+simulation/results/cap_sensitivity/*.jsonl
+simulation/results/cap_sensitivity/*.log
+.e2b_sandbox

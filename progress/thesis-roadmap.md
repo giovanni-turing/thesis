@@ -310,12 +310,35 @@ Progress + results: `phase4-predictors.md`. Chapter draft: `tex/predictors.tex`.
      resolved). Layout: overfull 29→1 (0.4 pt residual); three figures
      regenerated for label legibility (`c_seven_day_signals`,
      `l_request_clusters`, `sim_knees`).
-   - ⬜ Remaining placeholders (all gated on Phases 3–5): closed-loop
-     headline in intro ¶2 / thesis statement / RQ4 / contribution 5;
-     baselines cross-ref in related §2.3; positioning-table last column;
-     organization ¶ closing chapters; validation-anchor sentence in scope.
+   - ✅ **Review adjudication (2026-07-08)**: all items of the three
+     external review docs (IMPROVEMENTS.md, THESIS-FEEDBACK.md, report.md)
+     checked, fixed-or-adjudicated, and marked in place. Highlights that
+     CHANGED the thesis text: (a) **H1** — ran the missing LLM/AIC burst
+     knee: TP1×2 FAILS at s=1 (1,868 ms vs poly's 910), TP2×2 passes
+     (748 ms) → inversion reframed ("both fail at the naive topology,
+     differently; at the SLA-shaped TP2 config the original contrast holds
+     verbatim"); (b) **H2** — s=3 sweep → "≥16×" replaced by
+     "order of magnitude" (poly knee s=3; calibrated s=2, fails s=3);
+     (c) coverage computed: **p90 calibrated** (0.88–0.90 @1min, all
+     models/signals) — the p90 headroom rule is now evidence-backed;
+     (d) placeholders resolved 8/9 (statement, RQ4, contribution 5,
+     organization) from the archived 4.3/3.x results; (e) front matter
+     (title, abstract+resumo, LoF/LoT/abbreviations), architecture figure,
+     f(N)+ledger figure, multi-model burst figure, reproducibility
+     appendix, hyperref; (f) stale numbers purged (19.2M→21,404,640;
+     83,432→56,510 units/83,376 forwards; 315→316.4; 975→2,726;
+     147→148; duplicates retained not dropped; 87→101 windows/87 runs;
+     persistence-estimator claim repaired — Hurst=(1+β)/2 identity
+     disclosed, decode † quarantined). Build: 92 pp, 0 undefined refs.
+     New runs ledgered. Deferred by decision: biblatex migration +
+     et-al expansions + PNG→PDF (batched with institutional-template
+     switch); global sentence-length pass (final copy-edit).
+   - ⬜ Remaining placeholder (1, intentional): validation-anchor sentence
+     in intro scope — resolves with Phase 5.1.
    - ⬜ Baselines chapter, closed-loop chapter, conclusion; fold into the
-     mestrado build with Phase 0 cross-references.
+     mestrado build with Phase 0 cross-references. (The intro/related now
+     STATE the delivered results with numbers, so the document argues
+     end-to-end while these chapters are written.)
 
 ---
 

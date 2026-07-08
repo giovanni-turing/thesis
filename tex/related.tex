@@ -82,12 +82,14 @@ adopts --- have been costed explicitly~\cite{Yu2026HeteroServe}. Encoder
 disaggregation has
 also reached the mainstream engines: both vLLM and SGLang now ship
 encoder-separated serving modes with elastic encoder
-scaling.\footnote{vLLM, \emph{Encoder Disaggregation for Scalable
+scaling.\footnote{Grey-literature convention: engine blog posts are
+cited in footnotes with access dates; peer-reviewed and preprint works
+in the bibliography. vLLM, \emph{Encoder Disaggregation for Scalable
 Multimodal Model Serving},
-\texttt{https://vllm.ai/blog/2025-12-15-vllm-epd}; LMSYS, \emph{EPD
+\url{https://vllm.ai/blog/2025-12-15-vllm-epd}; LMSYS, \emph{EPD
 Disaggregation: Elastic Encoder Scaling for Vision-Language Models in
-SGLang}, \texttt{https://www.lmsys.org/blog/2026-01-12-epd/}. Both
-verified 2026-07-07.}
+SGLang}, \url{https://www.lmsys.org/blog/2026-01-12-epd/}. Both
+accessed 2026-07-07.}
 
 These systems settle the architecture question --- the encoder pool
 exists, separately deployed, separately scalable, and now shipping in
@@ -96,9 +98,11 @@ operational rather than hypothetical. Their scaling decisions are
 driven by currently observed load (queue depths, utilization, arrival
 rates), inheriting the reactive loop of Section~\ref{sec:rel-autoscale};
 none of them asks \emph{what demand signal} an encoder pool should be
-provisioned on, whether that signal is visible in the request stream a
-conventional autoscaler watches (Chapter~\ref{cap:trace-eda} shows it is
-not), or whether it is forecastable at the horizons replica cold starts
+provisioned on, whether that signal is visible in the request \emph{rate}
+a conventional autoscaler watches (Chapter~\ref{cap:trace-eda} shows it
+is not --- though it is computable from request \emph{content}, since
+every request declares its image count at admission), or whether it is
+forecastable at the horizons replica cold starts
 require (Chapter~\ref{cap:predictors} shows it is). ModServe's own trace
 analysis documents bursty, heterogeneous image traffic --- the motivating
 observation --- but its scaling remains reactive; the per-pool demand
@@ -108,7 +112,14 @@ characterized as forecasting targets before this thesis.
 \section{Autoscaling for model serving}
 \label{sec:rel-autoscale}
 
-SLO-aware autoscaling predates LLMs. Swayam derived provisioning rules
+SLO-aware autoscaling predates LLMs. In general-purpose orchestration
+the reactive loop is standardized infrastructure: Kubernetes' Horizontal
+Pod Autoscaler scales on aggregate utilization or custom metrics, KEDA
+generalizes the trigger to event sources, and Knative's KPA regulates on
+request concurrency~\cite{K8sAutoscalers} --- all watching signals of
+the one request stream, which is the inheritance this thesis
+interrogates. For ML serving specifically, Swayam derived provisioning
+rules
 from SLA models for ML inference services~\cite{Gujarati2017Swayam}; MArk
 combined proactive and reactive scaling over heterogeneous cloud
 instances~\cite{Zhang2019MArk}; Clockwork built latency predictability
@@ -158,13 +169,17 @@ mid-2025 as an SLA planner regulating prefill and decode pool sizes on
 observed TTFT/TPOT metrics, within a year it grew a second, slower
 \emph{forecast-driven} loop that predicts the aggregate request rate and
 mean sequence lengths with classical models (ARIMA, Kalman, Prophet) to
-set replica floors under the reactive loop~\cite{Dynamo2025}. Its
-reactive SLA loop is the baseline of this thesis's evaluation
-\emph{[Placeholder: cross-reference the baselines chapter when it
-lands]}; its predictive loop still watches a single averaged text-side
+set replica floors under the reactive loop~\cite{Dynamo2025}.\footnote{Planner
+behavior as described here is version-specific: it follows the planner
+design documentation of the Dynamo 1.x line and inspection of the source
+tree at the commit used for this thesis's simulations (v1.3.0 source
+build; accessed 2026-07-07). See Appendix~\ref{ap:artifacts}.} Its
+reactive SLA loop is the baseline of this thesis's evaluation (run
+unmodified, planner-in-the-loop, in the baselines chapter --- in
+preparation); its predictive loop still watches a single averaged text-side
 stream --- a limitation its own design notes state. Autoscalers purpose-built for
 \emph{disaggregated} LLM serving are the newest arrivals, and the closest
-neighbors of this thesis: ByteDance reports coordinated scaling of
+neighbors of this thesis: ByteDance's HeteroScale coordinates scaling of
 heterogeneous prefill and decode pools in
 production~\cite{Li2025TamingChaos}, and TokenScale sizes the two pools on
 per-stage token-velocity signals rather than the request
@@ -247,11 +262,20 @@ their benchmark domains (energy, retail, weather, cloud telemetry) do not
 include inference-serving demand, and the deployment-relevant questions
 --- accuracy at a specific provisioning cadence, degradation across the
 lead-time horizon, the value of cross-signal covariates --- are not posed
-in autoscaling terms. Chapter~\ref{cap:predictors} fills exactly that
+in autoscaling terms. The zero-shot property is what makes TSFMs
+interesting for this thesis specifically: a per-pool provisioning system
+multiplies the number of signals to forecast, and a pretrained model
+removes the per-signal fitting and tuning burden that classical
+pipelines impose. Chapter~\ref{cap:predictors} fills exactly that
 slot: a rolling-origin, provisioning-framed benchmark of three TSFMs
 against classical baselines on all four demand signals of a production
 multimodal trace, zero-shot, with the forecast consumed as a scaler
-would consume it.
+would consume it. One adjacent literature grounds the \emph{use} of the
+forecasts rather than their accuracy: sizing quantile headroom under a
+provisioning lead time is a critical-fractile (newsvendor)
+problem~\cite{Arrow1951Newsvendor}, long applied to staffing under
+uncertain demand; the closed-loop chapters draw the operating quantile
+from that framing.
 
 \section{Simulators and performance models}
 \label{sec:rel-sim}
@@ -263,7 +287,9 @@ motivated by the cost of sweeping deployment configurations on
 hardware~\cite{Agrawal2024Vidur}; LLMServingSim co-simulates the
 accelerator and the serving stack, and its 2.0 release explicitly targets
 heterogeneous and disaggregated serving
-infrastructure~\cite{Cho2024LLMServingSim,Cho2026LLMServingSim2}; Dynamo
+infrastructure~\cite{Cho2024LLMServingSim,Cho2026LLMServingSim2}
+(positioned with Vidur in Table~\ref{tab:rel-positioning}: simulation
+without modality disaggregation or scaling policy); Dynamo
 ships a discrete-event simulator
 of its own worker pools (the \emph{mocker}), which this thesis drives
 through \texttt{dynamo.replay}~\cite{Dynamo2025}; and aiconfigurator
@@ -285,7 +311,8 @@ each seam (Chapter~\ref{cap:twopool}) rather than assuming it.
 What separates this thesis from the landscape above is not an ingredient
 but a finding. The demand signal most dangerous to reactive scaling ---
 the vision pool's image rate: the burstiest of the four demand signals,
-nearly invisible in the request stream a conventional autoscaler watches,
+nearly invisible in the request \emph{rate} a conventional autoscaler
+watches,
 and ramping to peak within replica cold-start times in the fast half of
 its bursts --- is also the most persistent, and therefore the most
 forecastable, at exactly the horizons provisioning requires
@@ -308,11 +335,12 @@ zero-shot benchmark of time-series foundation models on serving demand
 signals; and the first silicon-calibrated encoder cost model for a
 consumer-class GPU in a deployment planner, contributed upstream.
 Table~\ref{tab:rel-positioning} summarizes the landscape against the four
-ingredients the claim requires. \emph{[Placeholder: extend the table's
-last column once the baseline and closed-loop chapters land, citing their
-headline SLA $\times$ GPU-hours result.]}
+ingredients the claim requires. (The closed-loop chapters, in
+preparation, add the quantitative payoff behind the last column's
+checkmark: SLA compliance against provisioned GPU-hours over the
+evaluated span, versus static-optimal and reactive baselines.)
 
-\begin{table}[htb]
+\begin{table}[htbp]
 \centering
 \caption{Positioning against the closest related work. \checkmark\ =
 addressed; $\sim$ = partially (see text); --- = not addressed.}
@@ -330,7 +358,7 @@ ElasticMM~\cite{Liu2025ElasticMM} & \checkmark & $\sim$ & --- & --- \\
 SageServe / WarmServe~\cite{Jaiswal2025SageServe,WarmServe2025} & --- & --- & \checkmark & --- \\
 TokenScale / HeteroScale~\cite{Lai2025TokenScale,Li2025TamingChaos} & --- & $\sim$ & --- & --- \\
 Dynamo (planner)~\cite{Dynamo2025} & $\sim$ & --- & $\sim$ & $\sim$ \\
-Vidur~\cite{Agrawal2024Vidur} & --- & --- & --- & $\sim$ \\
+Vidur / LLMServingSim~2.0~\cite{Agrawal2024Vidur,Cho2026LLMServingSim2} & --- & --- & --- & $\sim$ \\
 \textbf{This thesis} & \checkmark & \checkmark & \checkmark & \checkmark \\
 \bottomrule
 \end{tabular}

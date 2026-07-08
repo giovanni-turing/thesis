@@ -1,0 +1,13 @@
+{
+ "provenance": "Recomputed 2026-07-08 mirroring l_request_clusters.py exactly (cuML KMeans on StandardScaler(log1p(img,ctx,gen)), n_init=10, random_state=0; silhouette on 50k GPU subsample, cp.random.seed(0)). Quoted in tex/trace-eda.tex archetype paragraph.",
+ "silhouette_by_k": {
+  "3": 0.3777,
+  "4": 0.3880,
+  "5": 0.3185,
+  "6": 0.3579,
+  "7": 0.3730,
+  "8": 0.3871,
+  "9": 0.3606
+ },
+ "argmax_k": 4
+}
