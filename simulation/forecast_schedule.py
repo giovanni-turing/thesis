@@ -32,13 +32,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import pandas as pd
 
 HERE = Path(__file__).resolve().parent
-TRACE = "/home/gio/tese/data/AzureLMMInferenceTrace_multimodal.csv.gz"
-WINDOWS = HERE / "windows.json"
+TRACE = os.environ.get("TESE_TRACE",
+    "/home/gio/tese/data/AzureLMMInferenceTrace_multimodal.csv.gz")
+WINDOWS = Path(os.environ.get("TESE_WINDOWS", HERE / "windows.json"))
 
 
 def window_start_ts(offset: int) -> pd.Timestamp:
@@ -58,7 +60,8 @@ def main() -> None:
                          "cold-start, but driven by the OBSERVED image rate of the "
                          "trailing bin (what a threshold autoscaler watches); the "
                          "only difference vs forecast is signal lead time")
-    ap.add_argument("--parquet", default=str(HERE.parent / "predictors/results/chronos_images.parquet"))
+    ap.add_argument("--parquet", default=os.environ.get("FORECAST_PARQUET",
+                        str(HERE.parent / "predictors/results/chronos_images.parquet")))
     ap.add_argument("--resolution", default="1min")
     ap.add_argument("--quantile", default="p50",
                     help="forecast column consumed: point, p10..p90")

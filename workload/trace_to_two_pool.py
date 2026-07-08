@@ -108,6 +108,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import math
 from collections import deque
 
@@ -118,7 +119,8 @@ from aiconfigurator.sdk.backends.factory import get_backend
 from aiconfigurator.sdk.models import get_model
 from aiconfigurator.sdk.perf_database import get_database
 
-TRACE = "/home/gio/tese/data/AzureLMMInferenceTrace_multimodal.csv.gz"
+TRACE = os.environ.get("TESE_TRACE",
+    "/home/gio/tese/data/AzureLMMInferenceTrace_multimodal.csv.gz")
 LLM_HIDDEN = 4096  # Qwen3-VL-8B projector output / LLM hidden size
 BYTES_PER_ELEM = 2  # bf16 embeddings on the wire
 

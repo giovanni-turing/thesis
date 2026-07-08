@@ -1,0 +1,12 @@
+{"window": "burst3", "policy": "forecast", "quantile": "p50", "rho": 15, "cold_start_s": 60, "hysteresis_min": 3, "resolution": "15s"}
+{"window": "burst3", "policy": "forecast", "quantile": "p50", "rho": 25, "cold_start_s": 60, "hysteresis_min": 3, "resolution": "15s"}
+{"window": "burst3", "policy": "forecast", "quantile": "p90", "rho": 15, "cold_start_s": 60, "hysteresis_min": 3, "resolution": "15s"}
+{"window": "burst3", "policy": "forecast", "quantile": "p90", "rho": 25, "cold_start_s": 60, "hysteresis_min": 3, "resolution": "15s"}
+{"window": "burst3", "policy": "reactive", "quantile": "obs", "rho": 15, "cold_start_s": 60, "hysteresis_min": 3, "resolution": "15s"}
+{"window": "burst3", "policy": "reactive", "quantile": "obs", "rho": 25, "cold_start_s": 60, "hysteresis_min": 3, "resolution": "15s"}
+{"window": "burst3", "policy": "forecast", "quantile": "p90", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "resolution": "15s"}
+{"window": "burst3", "policy": "reactive", "quantile": "obs", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "resolution": "15s"}
+{"window": "burst3", "policy": "forecast", "quantile": "p90", "rho": 15, "cold_start_s": 120, "hysteresis_min": 3, "resolution": "15s"}
+{"window": "burst3", "policy": "reactive", "quantile": "obs", "rho": 15, "cold_start_s": 120, "hysteresis_min": 3, "resolution": "15s"}
+{"window": "burst3", "policy": "forecast", "quantile": "p90", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "resolution": "15s"}
+{"window": "burst3", "policy": "reactive", "quantile": "obs", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "resolution": "15s"}
