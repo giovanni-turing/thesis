@@ -3,7 +3,10 @@
 
 Input: CELL env var (JSON) or argv[1]:
   {"window": "burst3", "policy": "forecast", "quantile": "p90", "rho": 15,
-   "cold_start_s": 60, "hysteresis_min": 3, "resolution": "15s"}
+   "cold_start_s": 60, "hysteresis_min": 3, "resolution": "15s",
+   "model": "chronos"}
+"model" selects /opt/tese/forecasts/<model>_images.parquet (default chronos,
+pilot-compatible); ignored for policy=reactive (trailing observation).
 window offsets/counts come from the shipped windows.json. Prints exactly one
 JSON line (the cell result) to stdout as the LAST line — sbx_batch captures it.
 Paths are the template's: /opt/tese/* and PYTHONPATH=/opt/aic/src.
@@ -19,6 +22,7 @@ win = W[CELL["window"]]
 sched = "/tmp/cell.sched.json"
 out = "/tmp/cell.jsonl"
 
+parquet = "/opt/tese/forecasts/%s_images.parquet" % CELL.get("model", "chronos")
 ctl = [sys.executable, "/opt/tese/scripts/forecast_schedule.py",
        "--window", CELL["window"], "--policy", CELL.get("policy", "forecast"),
        "--resolution", CELL.get("resolution", "1min"),
@@ -26,6 +30,7 @@ ctl = [sys.executable, "/opt/tese/scripts/forecast_schedule.py",
        "--rho", str(CELL.get("rho", 15)),
        "--cold-start-s", str(CELL.get("cold_start_s", 60)),
        "--hysteresis-min", str(CELL.get("hysteresis_min", 3)),
+       "--parquet", parquet,
        "--out", sched]
 r = subprocess.run(ctl, capture_output=True, text=True)
 if r.returncode != 0:
