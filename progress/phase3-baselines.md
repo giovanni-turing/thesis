@@ -231,13 +231,14 @@ Remaining for full 3.2: parse the decision-log timeline; per-window runs
 encoder-pool reactive policy = the C(t) worker-schedule mechanism in the
 converter (BUILD ONCE — 4.3's predictive controller needs the same hook).
 
-## Open (rest of Phase 3)
+## Phase 3 status: ✅ COMPLETE (2026-07-08)
 
-- 3.1 close-out: router-knob sensitivity at corner configs; binding-config
-  verification on all windows; encoder-cost-scale (or measured-f(N)-table)
-  sensitivity re-derivation. Natural first cargo for the E2B pilot.
-- 3.2 reactive planner through the same windows (AIC-bootstrapped perf
-  model; predictor warm-start; see decisions above).
+- 3.0 SLA decided ✓ · 3.1 static-optimal grid + close-out (35 checks, no
+  flips, binding feasible) ✓ · 3.2 reactive planner, both pools ✓
+  (encoder reactive twin in the C(t) matrix; LLM planner A/B above).
+- Carried into Phase 4.4: encoder-cost-scale / measured-f(N)-table
+  sensitivity re-derivation (Phase B follow-up #2/#3) — an ablation
+  axis, not a baseline gap.
 - 3.2 reactive planner through the same windows; record scaling actions,
   compliance (evaluation SLA), GPU-hours.
 

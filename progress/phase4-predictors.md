@@ -164,3 +164,41 @@ DERIVABLE from AIC + the grid (scale = replica mean capacity / knee
 rate), replacing the scalar knob in 4.4. Both pools now pass the tail
 SLA under forecast-driven scaling on burst1; encoder-side
 forecast-vs-reactive table above completes the v1 evidence chain.
+
+
+## Fleet certified + 3.2 cross-reference + NEXT GOALS (2026-07-08)
+
+- **E2B fleet CERTIFIED**: template `tese-twopool` (30 MB code+silicon,
+  160 MB payload, torch-free) + `simulation/e2b_fleet.py` (commands API,
+  resumable JSONL, envs pinned in-driver). Pilot 12/12, EXACT parity with
+  local (588.37 / 38,339.05 / 54,169.533 reproduce to the decimal).
+  Integration ladder recorded in the driver (kernel port → env
+  propagation → dist-info → root user → per-sandbox pyarrow); template
+  rev 2 will bake these in (python3 -m pip install of the source tree,
+  windows.json path, ownership).
+- **Lead-sweep preview (burst3, 1-min onset)**: reactive FAILS at every
+  cold-start (16 s p99 @30 s lead → 54 s @120 s+, converging to the
+  never-scaled limit); forecast p90 flat at 588 ms through 300 s —
+  **forecasting buys regime anticipation, not merely lead time**.
+- **3.2 reactive LLM baseline complete** (see `phase3-baselines.md`):
+  14/14 runs satisfy the planner's own mean law with 2–4× margin while
+  failing the tail SLA; predictor upgrade (constant→ARIMA) moves tails
+  10–30%, compliance 0. Four-column LLM burst1: oracle 59.9k PASS |
+  reactive 30.0k FAIL | Dynamo-ARIMA 30.8k FAIL | forecast 64.1k PASS.
+
+**NEXT GOALS, in order:**
+1. 4.4 fleet matrix: in-span windows × {forecast p50/p90, reactive} ×
+   lead {30,60,120,300} × rho {10,15,20,25} × model {chronos,toto,
+   timesfm} (~400–600 cells; cells.jsonl → e2b_fleet.py).
+2. Weekly aggregate over the covered ~5.2-day span: per policy, summed
+   worker-seconds + violation time vs deployable static (C=16 + TP2×2)
+   → the headline SLA × GPU-hours number for the thesis statement.
+3. LLM principled tail mapping: derive scale = replica mean capacity /
+   knee rate from AIC + grid (replaces FORECAST_REQ_SCALE=8); extend
+   LLM policy runs to all in-span windows.
+4. Template rev 2 (drop driver shims).
+5. Writing: baselines chapter + closed-loop chapter from the phase docs;
+   resolve intro/thesis-statement/RQ4/contribution-5 placeholders and the
+   positioning table's last column with the aggregate headline.
+6. Phase 5.1 validation anchor (planner plugin + VirtualConnector run)
+   after the chapters draft.

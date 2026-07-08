@@ -148,7 +148,7 @@ Progress + results: `phase2-simulation.md`. Runner: `simulation/run_replay.sh`.
    in chapter + docs) · model-size and runtime axes wired into
    `run_replay.sh` (`AIC_MODEL/AIC_TP/AIC_MOE_TP`, `REPLAY_PY`, `AIC_VER`).
 
-## Phase 3 — Baselines — IN PROGRESS (SLA ✅)
+## Phase 3 — Baselines — ✅ DONE (2026-07-08: SLA ✅ · 3.1 ✅ · 3.2 ✅)
 
 **Goal**: the two reference points every autoscaling claim needs.
 Progress + SLA definitions: `phase3-baselines.md`.
@@ -212,7 +212,32 @@ Progress + SLA definitions: `phase3-baselines.md`.
    loop as "Dynamo's own single-signal classical-predictor scaling" —
    a middle rung between reactive and the thesis's per-pool TSFM policy.
 
-## Phase 4 — Predictive scaling (the contribution) — `predictors/` — IN PROGRESS (4.1–4.2 ✅)
+## Phase 4 — Predictive scaling (the contribution) — IN PROGRESS (4.1–4.3 ✅, 4.4 NEXT)
+
+**Status 2026-07-08 (details in `phase4-predictors.md`):** 4.3 is
+delivered as infrastructure + v1 results — C(t) encoder hook (validated
+bit-exact), forecast controller, `forecast_file` planner predictor, the
+forecast-vs-reactive head-to-head (reactive fails the 1-min-onset burst
+at EVERY cold-start lead, 16–54 s p99, converging to never-scaled;
+forecast flat at 588 ms through 300 s lead — regime anticipation), and
+the LLM pool SLA-green through the production planner path (knee-scaled
+targets). Reactive baselines complete on both pools; four-column
+comparison exists per pool. **Standing infrastructure: E2B fleet**
+(template `tese-twopool`, driver `simulation/e2b_fleet.py`, exact-parity
+certified 12/12; forecast-coverage rule: 1min from Oct 20 14:36, 15s
+from Oct 16 09:36, burst2/6 structurally unforecastable).
+
+**NEXT (4.4, fleet):** (a) full matrix — in-span windows × {forecast
+p50/p90, reactive} × lead {30,60,120,300 s} × rho {10,15,20,25} × model
+{chronos,toto,timesfm} ≈ 400–600 cells; (b) **weekly aggregate** over
+the covered span (~5.2 days) → THE headline SLA × GPU-hours number
+vs deployable static; (c) LLM principled mapping (mean-capacity/knee
+ratio from AIC, replacing the ×8 knob) + LLM runs beyond burst1;
+(d) template rev 2 (pip-install source, drop driver shims). Then the
+baselines + closed-loop chapters draft from the phase docs and the
+intro/thesis-statement placeholders resolve.
+
+(Original phase plan below.)
 
 **Goal**: show that forecasting each pool's OWN demand signal beats both
 baselines during bursts, at equal or lower GPU-hours.
