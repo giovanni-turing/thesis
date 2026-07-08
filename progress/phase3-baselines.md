@@ -203,6 +203,34 @@ replays were re-measured on the corrected traces (7 windows, parallel):
 **no verdict changed**, zero failures. The 3.1 table above is now
 end-to-end consistent with the grid-exact database.
 
+## 3.2 planner-in-the-loop: smoke PASSED (2026-07-08)
+
+First planner-in-the-loop replay on the source build (head2k, mode=agg,
+environment=virtual, advisory, load-scaling only, constant predictor,
+60 s interval): exit 0, **12 planner ticks** (720 s / 60 s ✓), diagnostics
+HTML + gzipped decision log emitted (`aiconfigurator/planner_reports/`),
+report saved. First finding, already thesis-shaped: TTFT p99 **1,872 ms**
+under the planner vs 307 ms at fixed N=2 — the replay starts the pool at
+min_endpoint and the ±1-per-interval reactive loop lags the load. The
+report natively integrates `decode_worker_seconds` (784.2 s over the
+720 s window = mean 1.09 workers) — GPU-hours accounting is built in.
+
+**Source-venv dependency gotcha (record for reruns):** the planner stack
+imports, none shipped in the source dev venv: `scikit-learn`,
+`prometheus-api-client`, `plotly`, `pmdarima`, `filterpy`, `prophet`
+(+ pulls `statsmodels`). All installed 2026-07-08. The pinned wheel
+bundles these; the source build does not.
+
+**AIC bootstrap spec (for the full runs):** `aic_interpolation` takes
+{hf_id, system, backend, isl, osl, sweep_max_context_length,
+prefill/decode_interpolation_granularity, prefill_pick, decode_pick} —
+all required; wire h100_sxm/vllm + trace-representative isl/osl.
+
+Remaining for full 3.2: parse the decision-log timeline; per-window runs
+(arima predictor + `--load-predictor-warmup-trace`, both loops on);
+encoder-pool reactive policy = the C(t) worker-schedule mechanism in the
+converter (BUILD ONCE — 4.3's predictive controller needs the same hook).
+
 ## Open (rest of Phase 3)
 
 - 3.1 close-out: router-knob sensitivity at corner configs; binding-config

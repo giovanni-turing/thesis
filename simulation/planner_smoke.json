@@ -1,0 +1,15 @@
+{
+  "mode": "agg",
+  "environment": "virtual",
+  "namespace": "smoke",
+  "backend": "vllm",
+  "ttft_ms": 500.0,
+  "itl_ms": 50.0,
+  "load_predictor": "constant",
+  "enable_throughput_scaling": false,
+  "enable_load_scaling": true,
+  "load_adjustment_interval_seconds": 60,
+  "max_gpu_budget": 8,
+  "min_endpoint": 1,
+  "advisory": true
+}
