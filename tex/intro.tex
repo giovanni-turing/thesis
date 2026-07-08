@@ -107,7 +107,18 @@ assumptions hide inside that loop: that the watched signal actually
 carries each pool's demand, and that new replicas arrive faster than the
 load changes --- optimistic for GPU serving, where bringing up a replica
 (scheduling, weight loading, warmup) is measured in tens of seconds to
-minutes~\cite{Fu2024ServerlessLLM}. Prediction-driven capacity management
+minutes~\cite{Fu2024ServerlessLLM}.\footnote{The lead time is
+pool-specific. Measured on this thesis's benchmark node, the 576M-parameter
+vision encoder reaches serving-ready in ${\approx}$3--5\,s of
+\emph{model-side} work --- dominated by interpreter and framework imports,
+with the 1.15\,GB checkpoint costing only 0.11\,s to read (O\_DIRECT NVMe)
+plus 0.13\,s of host-to-device transfer --- so encoder-pool lead times
+above ${\approx}5$\,s measure orchestration (pod scheduling, image pull,
+node acquisition), not the model. Language-pool workers, with an order of
+magnitude more weights plus engine initialization and KV-cache allocation,
+sit in the tens-of-seconds-and-up regime of the systems cited above. The
+closed-loop evaluation therefore sweeps per-pool lead-time ranges rather
+than one shared constant.} Prediction-driven capacity management
 has begun to appear for text-only LLM fleets --- forecast-aware fleet
 planning~\cite{Jaiswal2025SageServe}, prewarming GPUs against
 forecast peak load~\cite{WarmServe2025} --- but it watches aggregate,

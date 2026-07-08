@@ -107,6 +107,13 @@ feeds:      chapter in prep: closed loop (751 ms p99 PASS at mean 2.14 replicas;
 supersedes: new
 commit:     2532b53
 
+### Encoder model-side cold start (Phase D)  (2026-07-08)
+artifact:   collector_artifacts/phaseD_cold_start/{trials.jsonl,README.md}
+command:    eda/.venv/bin/python collector_artifacts/phaseD_cold_start/measure_cold_start.py --out trials.jsonl  (×3 fresh processes); dd if=<ckpt> of=/dev/null bs=16M iflag=direct
+feeds:      tex/intro.tex cold-start footnote (encoder ≈3–5 s model-side, imports-dominated; weights 0.11 s O_DIRECT + 0.13 s H2D warm); 4.4 lead-grid grounding ({10..300 s} = orchestration regimes above a measured floor); chapter in prep: closed loop (per-pool lead times)
+supersedes: assumed shared cold-start range for both pools
+commit:     0ac54bb
+
 ### LLM/AIC burst knee points — the review's missing row (H1)  (2026-07-08)
 artifact:   simulation/results/sweeps/llm_burst1_aic_s{1,2}.json; reports/llm_burst1_aic_tp2_s1.report.json
 command:    REPLAY_PY=<dynamo/.venv> AIC_VER=0.19.0 python3 simulation/sweep_load.py --pool llm --window burst1 --timing aic --speedups 1 2  (isolation trace, TP1×2); bespoke run_replay.sh AIC_TP=2 for the TP2×2 point
