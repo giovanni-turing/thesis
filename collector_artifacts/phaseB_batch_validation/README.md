@@ -88,10 +88,19 @@ chapter protocol (5×50, CIs ≤±0.3 ms, clocks 2377–2400 MHz):
 point. Thesis Table (aic chapter, model-vs-silicon) quotes the 5×50
 values against post-infill grid-exact predictions.
 
+## Kernel ledger at N=64 (follow-up #1 — DONE 2026-07-08)
+
+`profile_vit_kernels.py` → `kernel_ledger_N{1,64}.json`. Modeled ops
+behave as composed: attention exactly linear per image (1.300→1.306 ms —
+matches the collected b=64 row), GEMM per-image falls 6.03→3.69 ms;
+dispatch amortizes 15.3%→2.5%. The growth is the unmodeled categories:
+elementwise 1.18→1.89 ms/img, DeepStack gather/cat 0.26→0.58 ms/img;
+unmodeled total 168.6 ms at N=64 = 92% of the 182 ms model-vs-kernel
+gap. Ledger CLOSED; recorded in thesis §5.3.1.
+
 ## Follow-ups
 
-1. Kernel-level profile at N=64 (torch.profiler, as the chapter did at
-   N=1) to close the growth ledger term-by-term.
+1. ~~Kernel-level profile at N=64~~ DONE (above).
 2. `--encoder-cost-scale` sensitivity knob in the converter; re-derive C*
    at 1.6× to bound the static-optimal table (expected: C* roughly
    proportional; steady24h C*=2 likely → 3–4, burst5 16 → ~26).

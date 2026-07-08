@@ -235,14 +235,26 @@ $N$ & Measured (ms) & Composed (ms) & Ratio \\
 Two structural facts emerge. First, \textbf{the gap grows with $N$}: from
 ${\approx}1.37$ at small batches to $1.62$ at the 64-image dispatch cap.
 A constant ratio would indicate stack overhead; a growing one indicates
-\emph{per-image} costs missing from the operator graph --- exactly the
-modules the $N{=}1$ ledger of Section~\ref{sec:aic-validation} identifies
-as outside AIC's scope (the patch-embedding convolution and DeepStack
-gather scale linearly with $N$; kernel-variant deltas scale with GEMM
-volume), compounded at high $N$ by measurement's eager-stack pessimism.
-The honest reading brackets reality: the composition is an optimistic
+\emph{per-image} costs missing from the operator graph. A kernel-level
+profile at $N{=}64$, mirroring the $N{=}1$ ledger of
+Section~\ref{sec:aic-validation}, closes the attribution term by term.
+The operators AIC models behave exactly as composed: attention is
+precisely linear per image (\SI{1.300}{\milli\second} at $N{=}1$,
+\SI{1.306}{\milli\second} at $N{=}64$ --- the windowed-attention
+structure), and per-image GEMM time \emph{falls} from 6.03 to
+\SI{3.69}{\milli\second} as larger $m$ improves kernel efficiency.
+Dispatch gaps, 15.3\% of wall time at $N{=}1$, amortize to 2.5\%. What
+grows is everything the graph omits: unfused elementwise work rises from
+1.18 to \SI{1.89}{\milli\second} per image and the DeepStack
+gather/concatenation from 0.26 to \SI{0.58}{\milli\second}, and together
+with the patch-embedding convolution these unmodeled categories total
+\SI{168.6}{\milli\second} at $N{=}64$ --- \textbf{92\% of the
+\SI{182}{\milli\second} gap between the composition and measured kernel
+time}, with kernel-variant GEMM deltas covering the remainder. The
+honest reading brackets reality: the composition is an optimistic
 kernel-path bound, the eager measurement a pessimistic serving-stack
-bound, and a production vLLM encoder sits between.
+bound (production vLLM fuses much of the elementwise work), and a
+production encoder sits between.
 
 Second, \textbf{the model and the silicon disagree about where batching
 stops paying}. Measured per-image cost bottoms at $N{=}6$
