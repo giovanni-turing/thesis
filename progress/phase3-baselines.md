@@ -197,10 +197,17 @@ scale-robust; absolute C* carries an AIC-optimistic vs HF-eager-pessimistic
 band. Artifacts + follow-ups (N=64 kernel profile, `--encoder-cost-scale`
 sensitivity, upstream note): `collector_artifacts/phaseB_batch_validation/`.
 
+**Corner re-verification (2026-07-08, final):** after the Phase C infill
+regenerated the encoder-shifted traces, all 14 LLM corner/cross-check
+replays were re-measured on the corrected traces (7 windows, parallel):
+**no verdict changed**, zero failures. The 3.1 table above is now
+end-to-end consistent with the grid-exact database.
+
 ## Open (rest of Phase 3)
 
 - 3.1 close-out: router-knob sensitivity at corner configs; binding-config
-  verification on all windows; encoder-cost-scale sensitivity re-derivation.
+  verification on all windows; encoder-cost-scale (or measured-f(N)-table)
+  sensitivity re-derivation. Natural first cargo for the E2B pilot.
 - 3.2 reactive planner through the same windows (AIC-bootstrapped perf
   model; predictor warm-start; see decisions above).
 - 3.2 reactive planner through the same windows; record scaling actions,

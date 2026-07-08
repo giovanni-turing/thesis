@@ -21,6 +21,26 @@ Chapter draft for the completed phase: `tex/aiconfigurator.tex`.
 
 ## Phase 0 — Calibrated cost model for the vision pool — ✅ DONE
 
+**2026-07-08 additions — f(N) validation, shape infill, composition §.**
+Post-campaign hardening while Phase 3 ran (details:
+`collector_artifacts/phaseB_batch_validation/README.md` + `phaseC_vit_shape_infill/`):
+
+- **Phase B — batch-axis validation**: real-ViT f(N) measured for every
+  N∈[1,128] (no OOM; thesis-quoted points re-measured at 5×50, CIs
+  ≤±0.3 ms). Measured/model ratio grows 1.37→1.62 over N≤64 (per-image
+  unmodeled operators); measured batching gain saturates at N≈6 (1.56×,
+  drifting to 1.41×) vs the model's 1.65×-at-64. Conservative direction
+  for the thesis's saturation claims.
+- **Phase C — targeted shape infill**: the exact ViT query shapes were
+  never on the campaign grid (s=784 always interpolated; N≳42 GEMMs in
+  the OOM-gap zone). 465-case infill at identical protocol → 448px query
+  path now grid-exact (7,760/34,710 rows). Downstream: ch.6 numbers moved
+  ≤1%, burst3 C* 6→7 (had sat 3 ms inside the bound). AIC-side commit
+  656ac8ca on the PR branch is LOCAL — push awaiting user sign-off.
+- **Chapter additions**: §5.3 composition mechanics (model vs measured vs
+  lookup-table strata) + model-vs-silicon table; dated infill-correction
+  note; all simulation-derived numbers refreshed (build: 65 pp clean).
+
 Everything in this phase is complete, committed (this repo + fork), and
 written up. Summary of what exists and can be relied on:
 
@@ -143,9 +163,17 @@ Progress + SLA definitions: `phase3-baselines.md`.
    violates). 235B-TP8 knee: s=1 (decoder scale halves the LLM envelope).
    Chapter 4 updated to the adopted SLA.
 
-1. **Static-optimal — NEXT**: sweep encoder-workers × LLM-workers under the
-   evaluation SLA → Pareto frontier → best static config + GPU-hours.
-   Work items:
+1. **Static-optimal — ✅ DONE (2026-07-08)**: all 7 windows converged
+   (results table + provenance in `phase3-baselines.md`). Headline: every
+   burst window needs LLM TP2×N2 (4 H100s; TP1 is prefill-floor-infeasible
+   at ANY replica count) with encoder `C*` 6–16, vs the calm day's
+   2 encoders plus TP1×2 — **8× vision / 2× LLM overprovisioning AND a fleet-shape
+   difference (TP2 vs TP1) no replica-scaler can morph**. Derived under
+   grid-exact encoder data (Phase C infill; one marginal flip burst3
+   `C*` 6→7; LLM corners re-verified on corrected traces, no changes).
+   Remaining close-out checks (router-knob sensitivity at corners,
+   binding-config verification) fold into the E2B pilot. Original work
+   items below for reference:
    (a) grid driver `simulation/sweep_grid.py` extending `sweep_load.py`:
    C_enc ∈ {1,2,3,4,6,8} × N_llm ∈ {1,2,3,4,6,8}, coarse pass then refine
    around the frontier; encoder count is a converter param, LLM count a
