@@ -140,6 +140,125 @@ $+4.3\%$ input correction, is itself evidence of how close to the bounds
 the affected verdicts sat --- and why grid-exact silicon data at the
 query shapes is worth the 465-case infill.
 
+{\renewcommand{\sectionmark}[1]{}%
+\section{From tables to a prediction: how AIC composes encoder latency}%
+\label{sec:aic-composition}}
+\sectionmark{How AIC composes a prediction}
+
+The validation that follows is only interpretable if the prediction's
+anatomy is explicit. AIC's estimate for one encoder forward is an
+\emph{arithmetic composition over an operator graph}: the model
+configuration is expanded into the concrete operator sequence --- per
+block, fused add-norm, the QKV projection GEMM, non-causal encoder
+attention, the output projection, and the two MLP GEMMs; after the
+27~blocks, four projector instances (the main merger and three DeepStack
+mergers) --- and the predicted latency is the \emph{sum} of one query per
+operator against the system's collected performance tables.
+Tensor-parallel communication terms are analytic and zero at TP=1.
+Nothing else enters: no dispatch overhead, no kernel-fusion policy, no
+scheduler --- by design, the prediction is a pure kernel-time ledger,
+which is precisely why it can be audited term-by-term against a kernel
+profile (Section~\ref{sec:aic-validation}).
+
+Each per-operator query resolves through one of three strata, and naming
+them separates what is measured from what is modeled:
+
+\begin{enumerate}
+\item \textbf{Measured (exact-hit lookup).} If the queried shape is a
+collected grid point, the returned latency \emph{is} the silicon
+measurement --- for this system, the mean of six CUDA-graph replays of
+the production vLLM kernel at locked clocks. After the shape infill of
+Section~\ref{sec:aic-collection}, every 448-pixel encoder-attention query
+$(b{=}N,\, s{=}784)$ and every block-GEMM query $(m{=}784N)$ for
+$N \le 64$ is an exact hit: on its operational domain, the encoder cost
+model is a lookup table of measurements, not a fitted model.
+\item \textbf{Interpolated.} Off-grid shapes are priced by piecewise
+multilinear interpolation between the bracketing collected points on each
+axis (batch, sequence length, GEMM dimensions), with a clamp that refuses
+locally non-monotone segments. There is no tunable resolution at query
+time --- the collected grid \emph{is} the discretization. The infill
+quantified what this stratum had cost here: the pre-infill 448-pixel
+path, interpolated between the $s{=}576$ and $s{=}1024$ lines, sat
+$+4.3\%$ to $-5.8\%$ from the exact measurements.
+\item \textbf{Modeled (analytic bounds).} Beyond the grid edge the query
+extrapolates the outermost segment --- probed on the H100 tables out to
+147k-token contexts, this tracks the theoretical quadratic of attention
+within a few percent per octave --- and when a system has no collected
+data at all for an operator, only the speed-of-light mode answers, from
+FLOP and bandwidth ceilings alone. That analytic floor is
+${\approx}5.9\times$ optimistic for encoder attention
+(Section~\ref{sec:aic-motivation}): the gap between stratum three and
+stratum one is the entire reason this chapter's collection campaign
+exists.
+\end{enumerate}
+
+The strata also delimit what the composition \emph{cannot} see: operators
+absent from the graph (the patch-embedding convolution, the DeepStack
+gather, unfused elementwise work) and every serving-stack effect
+(dispatch, fusion, batching policy, queueing). The former appear as
+attributed residuals in the validation below; the latter are deliberately
+delegated to the discrete-event layer of Chapter~\ref{cap:twopool}.
+
+\subsection{Model versus silicon across the batch axis}
+\label{sec:aic-model-vs-silicon}
+
+Because the two-pool simulation dispatches the encoder in cross-request
+batches, the composed prediction $f(N)$ --- one forward over $N$ images
+--- is its single most load-bearing curve, and it deserves its own
+measurement. Table~\ref{tab:aic-fn} compares the composition against the
+extracted tower measured end-to-end at every quoted point (five
+replications of fifty CUDA-event iterations each, locked clocks; an
+every-integer sweep of $N \in [1,128]$ at lighter protocol agrees with
+these points within 1\%).
+
+\begin{table}[htb]
+\centering
+\caption{Composed prediction vs.\ end-to-end measurement of the encoder
+forward over $N$ images of $448^2$ (RTX~5090, bf16, locked clocks;
+measurement is the HF stack, 95\% CIs $\leq \pm 0.3$\,ms).}
+\label{tab:aic-fn}
+\small
+\begin{tabular}{rrrr}
+\toprule
+$N$ & Measured (ms) & Composed (ms) & Ratio \\
+\midrule
+1   & 11.30  & 8.16   & 1.38 \\
+6   & 43.58  & 31.79  & 1.37 \\
+8   & 58.65  & 43.13  & 1.36 \\
+16  & 123.39 & 82.22  & 1.50 \\
+32  & 253.33 & 160.20 & 1.58 \\
+64  & 511.23 & 316.37 & 1.62 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two structural facts emerge. First, \textbf{the gap grows with $N$}: from
+${\approx}1.37$ at small batches to $1.62$ at the 64-image dispatch cap.
+A constant ratio would indicate stack overhead; a growing one indicates
+\emph{per-image} costs missing from the operator graph --- exactly the
+modules the $N{=}1$ ledger of Section~\ref{sec:aic-validation} identifies
+as outside AIC's scope (the patch-embedding convolution and DeepStack
+gather scale linearly with $N$; kernel-variant deltas scale with GEMM
+volume), compounded at high $N$ by measurement's eager-stack pessimism.
+The honest reading brackets reality: the composition is an optimistic
+kernel-path bound, the eager measurement a pessimistic serving-stack
+bound, and a production vLLM encoder sits between.
+
+Second, \textbf{the model and the silicon disagree about where batching
+stops paying}. Measured per-image cost bottoms at $N{=}6$
+(\SI{7.26}{\milli\second}, $1.56\times$ below single-image) and drifts
+back to \SI{7.99}{\milli\second} by the cap --- amortization is exhausted
+by $N{\approx}6$--$8$, beyond which the encoder is purely compute-bound
+--- while the composition's fixed-overhead form keeps amortizing to its
+$1.65\times$ at $N{=}64$. The batching \emph{law} of
+Chapter~\ref{cap:twopool} (cost depends only on total images) survives
+measurement; the batching \emph{benefit} is real but saturates earlier
+and smaller than the model claims. Both discrepancies move in the
+conservative direction for this thesis's claims --- realized encoder
+capacity is, if anything, lower than simulated, making burst-time
+saturation earlier, not later --- and the band they define is carried as
+a documented sensitivity rather than absorbed.
+
 \section{Validation against physical measurement}
 \label{sec:aic-validation}
 

@@ -81,9 +81,12 @@ replicated protocol; no t-CIs). Dispersion recorded: median
 orders of magnitude below the 28–66% effects concluded from. Drift
 check: per-point SM clock flat (2385–2400 MHz, no trend; N=1 and N=128
 both at 2400), and the ratio's dip-then-rise shape is inconsistent with
-monotone thermal drift. Sufficient for the ratio analysis; RE-MEASURE at
-the chapter protocol (5×50, locked-clock confirmation) before any value
-is quoted verbatim in the thesis or shipped as the converter cost table.
+monotone thermal drift. Sufficient for the ratio analysis. UPDATE (2026-07-08): the eight
+thesis-quoted points (N=1,6,8,16,32,64,96,128) were re-measured at the
+chapter protocol (5×50, CIs ≤±0.3 ms, clocks 2377–2400 MHz):
+`measured_f_n_5x50.csv`; agreement with the n=8 sweep <1% at every
+point. Thesis Table (aic chapter, model-vs-silicon) quotes the 5×50
+values against post-infill grid-exact predictions.
 
 ## Follow-ups
 

@@ -123,7 +123,10 @@ each dispatched batch at its image total, and it pays: $f(1) = \SI{8.16}{\milli\
 per image alone versus $f(64) = \SI{316.4}{\milli\second}$ ---
 \SI{4.94}{\milli\second} per image amortized, a $1.65\times$ throughput gain
 that amounts to a ${\sim}\SI{3.2}{\milli\second}$ fixed per-forward
-overhead. The pool's dispatch policy is greedy FIFO: a freed worker takes
+overhead. (Measured end-to-end, the realized gain is smaller and
+saturates by $N{\approx}6$--$8$ --- the model-versus-silicon band of
+Section~\ref{sec:aic-model-vs-silicon}, conservative for the saturation
+results below.) The pool's dispatch policy is greedy FIFO: a freed worker takes
 whole queued requests, in order, up to a 64-image cap (the collected batch
 range, so no extrapolation); a request exceeding the cap alone --- the
 trace reaches $97^2 = \num{9409}$ images --- is chunked into $\leq
