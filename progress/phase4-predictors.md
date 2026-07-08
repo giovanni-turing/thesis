@@ -151,3 +151,16 @@ on burst1 — p90 overshoots the plateau). The onset-vs-cold-start ablation
 (longer leads grow the reactive-failing set; trace median onset 6 min)
 is the 4.4 experiment that generalizes this row. Full matrix:
 `simulation/results/ct_matrix/` (30 runs, policy_window_q_rho tags).
+
+
+## 4.3 LLM pool closes too (2026-07-08): both pools SLA-green under forecasts
+
+FORECAST_REQ_SCALE calibration on burst1 @ TP2: x1/x2 identical (planner
+holds 1 replica — mean-based capacity estimate far above offered), x8 →
+mean 2.14 replicas, **TTFT p99 751 ms / ITL 6.5 ms: full SLA PASS**.
+Threshold between x2 and x8 ≈ the mean-capacity/tail-knee ratio (~10 vs
+~1.1 req/s per TP2 replica) — so the principled tail-aware mapping is
+DERIVABLE from AIC + the grid (scale = replica mean capacity / knee
+rate), replacing the scalar knob in 4.4. Both pools now pass the tail
+SLA under forecast-driven scaling on burst1; encoder-side
+forecast-vs-reactive table above completes the v1 evidence chain.
