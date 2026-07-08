@@ -1,0 +1,1 @@
+burst1 [reactive]: 160 steps, workers 1..15, provisioned 215039 worker-s over the 29939s window (static C*x span for comparison; drain tail extra)

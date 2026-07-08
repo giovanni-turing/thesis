@@ -52,6 +52,12 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--window", required=True)
+    ap.add_argument("--policy", choices=["forecast", "reactive"], default="forecast",
+                    help="forecast: consume the archived TSFM path. reactive: the "
+                         "twin baseline — identical capacity rule, hysteresis and "
+                         "cold-start, but driven by the OBSERVED image rate of the "
+                         "trailing bin (what a threshold autoscaler watches); the "
+                         "only difference vs forecast is signal lead time")
     ap.add_argument("--parquet", default=str(HERE.parent / "predictors/results/chronos_images.parquet"))
     ap.add_argument("--resolution", default="1min")
     ap.add_argument("--quantile", default="p50",
@@ -69,6 +75,27 @@ def main() -> None:
     win = json.loads(WINDOWS.read_text())[args.window]
     t0 = window_start_ts(win["offset"])
     span_s = win["span_s"]
+
+    if args.policy == "reactive":
+        # Observed trailing-bin image rate from the trace itself (lagged one
+        # bin: at minute m the scaler knows minute m-1's rate — the reactive
+        # information set). Same units (img/s) as the forecast branch.
+        raw = pd.read_csv(TRACE)
+        ts = raw["TIMESTAMP"].str.replace("Z", "", regex=False).str.pad(23, "right", "0")
+        raw["ts"] = pd.to_datetime(ts, format="%Y-%m-%dT%H:%M:%S.%f")
+        raw = raw.sort_values("ts").reset_index(drop=True)
+        w = raw.iloc[win["offset"]:win["offset"] + win["max_requests"]]
+        bin_s = pd.Timedelta(args.resolution.replace("min", "m")).total_seconds()
+        rate = (w.set_index("ts")["NumImages"]
+                 .resample(f"{int(bin_s)}s").sum() / bin_s)
+        rate = rate.shift(1).fillna(0.0)          # trailing-bin observation
+        minutes = ((rate.index - t0).total_seconds()).to_numpy()
+        q = rate.to_numpy()
+        desired = [max(args.min_workers,
+                       min(args.max_workers, int(-(-v // args.rho))))
+                   for v in q]
+        _emit(args, minutes, desired, span_s, bin_s)
+        return
 
     df = pd.read_parquet(args.parquet)
     df = df[df.resolution == args.resolution]
@@ -96,15 +123,22 @@ def main() -> None:
     q = (df[args.quantile].clip(lower=0.0) / bin_s).to_numpy()
     desired = [max(args.min_workers, min(args.max_workers, int(-(-v // args.rho))))
                for v in q]
+    _emit(args, minutes, desired, span_s, bin_s)
 
-    if args.hysteresis_min > 0:  # rolling max over trailing H entries
+
+def _emit(args, minutes, desired, span_s, bin_s) -> None:
+    """Shared policy tail: hysteresis, cold-start, step emission.
+    Both windows are TIME-based and converted to bins at the actual
+    resolution (a 60 s lead is 1 bin at 1min but 4 bins at 15 s)."""
+    hyst_bins = max(0, int(round(args.hysteresis_min * 60.0 / bin_s)))
+    if hyst_bins > 0:  # rolling max over trailing H entries
         held = []
         for i in range(len(desired)):
-            held.append(max(desired[max(0, i - args.hysteresis_min):i + 1]))
+            held.append(max(desired[max(0, i - hyst_bins):i + 1]))
         desired = held
 
     # cold start: available = min desired over the trailing lead window
-    lead_bins = max(0, int(round(args.cold_start_s / 60.0)))
+    lead_bins = max(0, int(round(args.cold_start_s / bin_s)))
     avail = []
     for i in range(len(desired)):
         avail.append(min(desired[max(0, i - lead_bins):i + 1]))
@@ -112,16 +146,16 @@ def main() -> None:
     steps: list[list[float]] = [[0.0, avail[0]]]
     for t, c in zip(minutes, avail):
         if c != steps[-1][1]:
-            steps.append([max(0.0, t), c])
+            steps.append([max(0.0, float(t)), int(c)])
     if steps[0][0] != 0.0:
-        steps.insert(0, [0.0, avail[0]])
+        steps.insert(0, [0.0, int(avail[0])])
 
     Path(args.out).write_text(json.dumps(steps))
     prov = 0.0
     for (a, ca), (b, _cb) in zip(steps, steps[1:]):
         prov += ca * (min(b, span_s) - min(a, span_s))
     prov += steps[-1][1] * max(0.0, span_s - steps[-1][0])
-    print(f"{args.window}: {len(steps)} steps, workers "
+    print(f"{args.window} [{args.policy}]: {len(steps)} steps, workers "
           f"{min(s[1] for s in steps)}..{max(s[1] for s in steps)}, "
           f"provisioned {prov:.0f} worker-s over the {span_s:.0f}s window "
           f"(static C*x span for comparison; drain tail extra)")

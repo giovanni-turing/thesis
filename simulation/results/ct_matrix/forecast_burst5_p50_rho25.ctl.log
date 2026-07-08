@@ -1,0 +1,1 @@
+burst5 [forecast]: 32 steps, workers 1..9, provisioned 19555 worker-s over the 4858s window (static C*x span for comparison; drain tail extra)

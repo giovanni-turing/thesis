@@ -98,7 +98,11 @@ class _ForecastFilePredictor(P.BasePredictor):
     def predict_next(self) -> float:
         r, c, g = self._bin(self.ticks)  # next bin = one past the observed ones
         if self.kind == "req":
-            return max(r, 0.0)
+            # FORECAST_REQ_SCALE: tail-aware capacity mapping through the
+            # planner's mean-based conversion — scale the predicted request
+            # rate so mean-throughput sizing lands on tail-adequate replicas
+            # (knee-derived; e.g. 2.0 for the TP2 burst shape).
+            return max(r, 0.0) * float(os.environ.get("FORECAST_REQ_SCALE", "1.0"))
         if r <= 0.0:
             return 0.0
         return max((c if self.kind == "isl" else g) / r, 1.0)

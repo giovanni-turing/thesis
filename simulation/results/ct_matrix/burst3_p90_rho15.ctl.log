@@ -1,1 +1,0 @@
-burst3: 34 steps, workers 10..24, provisioned 28255 worker-s over the 1620s window (static C*x span for comparison; drain tail extra)

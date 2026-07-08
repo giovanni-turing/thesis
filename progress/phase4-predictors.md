@@ -125,3 +125,29 @@ tail-aware per-pool capacity mapping the encoder side uses (knee-derived
 per-replica rate), not the planner's throughput regression. Next: env
 knob to feed boosted quantiles / knee-mapped targets through
 forecast_file; encoder reactive twin; weekly aggregate (E2B).
+
+
+## 4.3 forecast-vs-reactive head-to-head (2026-07-08) — the central result, v1
+
+Twin policies: identical capacity rule (ceil(q/rho)), hysteresis (3 min),
+cold-start (60 s, trailing-min), actuation (C(t) hook); the ONLY delta is
+the information set — archived Chronos p90 tile vs trailing-bin observed
+image rate. Corrected time-based bin conversion (60 s lead = 4 bins at
+15 s; earlier 15 s runs were 4x lead-favorable and were wiped/rerun).
+
+| window (onset) | forecast p90/rho15 | reactive obs/rho15 |
+| --- | --- | --- |
+| burst3 (1 min) | **588 ms PASS**, 31.3k ws | **38,339 ms FAIL**, 25.8k ws |
+| burst1 (220 min) | 599 ms PASS, 417k ws | 825 ms PASS, 348k ws |
+| burst4 (60 min) | 588 ms PASS, 232k ws | 588 ms PASS, 234k ws |
+| burst5 (35 min) | 588 ms PASS, 86.8k ws | 592 ms PASS, 94.5k ws |
+| steady24h | 734 ms PASS, 157k ws | 734 ms PASS, 174k ws |
+
+Reading: **forecasting matters precisely where the trace chapter said it
+would** — fast-onset bursts, where onset < observation lag + cold start;
+the reactive twin spends worker-seconds AND violates (workers arrive
+post-spike). On slow ramps reactive ≈ forecast (reactive slightly cheaper
+on burst1 — p90 overshoots the plateau). The onset-vs-cold-start ablation
+(longer leads grow the reactive-failing set; trace median onset 6 min)
+is the 4.4 experiment that generalizes this row. Full matrix:
+`simulation/results/ct_matrix/` (30 runs, policy_window_q_rho tags).
