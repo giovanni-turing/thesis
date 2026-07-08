@@ -117,6 +117,11 @@ above ${\approx}5$\,s measure orchestration (pod scheduling, image pull,
 node acquisition), not the model. Language-pool workers, with an order of
 magnitude more weights plus engine initialization and KV-cache allocation,
 sit in the tens-of-seconds-and-up regime of the systems cited above. The
+asymmetry is structural, not model-specific: across current VLM families
+the vision tower stays at hundreds of millions to a few billion
+parameters while decoders scale to hundreds of billions, so the encoder
+pool's lead is orchestration-bound in general --- and the gap widens with
+every decoder generation. The
 closed-loop evaluation therefore sweeps per-pool lead-time ranges rather
 than one shared constant.} Prediction-driven capacity management
 has begun to appear for text-only LLM fleets --- forecast-aware fleet
