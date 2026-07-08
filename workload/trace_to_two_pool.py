@@ -195,12 +195,42 @@ class EncoderCostModel:
         return len(self._cache) - 1  # minus the 0-image sentinel
 
 
+def build_slot_windows(
+    schedule: list[tuple[float, int]],  # (step_ms, capacity), step 0 first, sorted
+) -> list[list[tuple[float, float]]]:
+    """Piecewise-constant capacity schedule -> per-slot active windows.
+
+    Slots activate lowest-index-first on scale-up and retire LIFO
+    (highest-index-first) on scale-down, so a scale-down followed by a
+    scale-up reuses the highest slot indices. Returns, per slot, a sorted
+    list of [activate_ms, deactivate_ms) windows (last window open-ended
+    at +inf)."""
+    max_cap = max(c for _, c in schedule)
+    windows: list[list[tuple[float, float]]] = [[] for _ in range(max_cap)]
+    open_since: list[float | None] = [None] * max_cap
+    active = 0
+    for t, cap_now in schedule:
+        if cap_now > active:
+            for w in range(active, cap_now):
+                open_since[w] = t
+        elif cap_now < active:
+            for w in range(cap_now, active):
+                windows[w].append((open_since[w], t))
+                open_since[w] = None
+        active = cap_now
+    for w in range(max_cap):
+        if open_since[w] is not None:
+            windows[w].append((open_since[w], float("inf")))
+    return windows
+
+
 def simulate_vision_pool(
     reqs: list[tuple[float, int, int]],  # (arrival_ms, request_index, num_images), FIFO order
     n_workers: int,
     cap: int,
     encoder: EncoderCostModel,
     parallel_chunks: bool = True,
+    worker_schedule: list[tuple[float, int]] | None = None,
 ) -> tuple[dict[int, float], list[tuple[float, float, int, int]], int]:
     """Event-driven FIFO pool with greedy whole-request batching.
 
@@ -214,6 +244,15 @@ def simulate_vision_pool(
     kept for reproducibility of the earlier knee results): that policy
     gives large requests an intrinsic multi-second service floor that no
     worker count removes. A request finishes when its LAST unit finishes.
+
+    worker_schedule (Phase 4.3/3.2 autoscaling hook): piecewise-constant
+    capacity steps [(t_ms, workers), ...] relative to the window start,
+    first step at t=0. Semantics: a forward may START on a slot only
+    inside one of that slot's active windows; in-flight forwards run to
+    completion past a deactivation (drain, no preemption). Cold-start
+    lead belongs to the CONTROLLER: a scale-up decided at t must appear
+    in the schedule at t + lead. When None, capacity is n_workers
+    throughout (the static behavior, bit-identical to before).
 
     Returns (finish_ms by request index,
              batches as (start_ms, finish_ms, total_images, n_forwards),
@@ -236,16 +275,36 @@ def simulate_vision_pool(
 
     finish: dict[int, float] = {}
     batches: list[tuple[float, float, int, int]] = []
-    worker_free = [0.0] * n_workers
+    if worker_schedule is None:
+        slot_windows = [[(0.0, float("inf"))] for _ in range(n_workers)]
+    else:
+        slot_windows = build_slot_windows(worker_schedule)
+    n_slots = len(slot_windows)
+    worker_free = [0.0] * n_slots
+
+    def earliest_start(w: int, lower: float) -> float:
+        """Earliest time slot w may START a forward at/after `lower`."""
+        s = max(worker_free[w], lower)
+        for a, d in slot_windows[w]:
+            if s < a:
+                s = a
+            if s < d:
+                return s
+        return float("inf")
+
     queue: deque[tuple[float, int, int, bool]] = deque()
     i = 0
 
     while i < len(units) or queue:
-        w = min(range(n_workers), key=worker_free.__getitem__)
         if not queue:  # idle pool: wait for the next arrival
             queue.append(units[i])
             i += 1
-        start = max(worker_free[w], queue[0][0])
+        head_arrival = queue[0][0]
+        w = min(range(n_slots), key=lambda k: (earliest_start(k, head_arrival), k))
+        start = earliest_start(w, head_arrival)
+        assert start != float("inf"), (
+            "worker schedule leaves the pool at zero capacity forever with "
+            "work still queued — schedules must keep at least one eventual slot")
         # Everything that has arrived by the batch start is eligible, FIFO.
         while i < len(units) and units[i][0] <= start:
             queue.append(units[i])
@@ -364,6 +423,13 @@ def main() -> None:
     ap.add_argument("--trace-block-size", type=int, default=512, help="tokens per hash_id (mooncake)")
     ap.add_argument("--max-requests", type=int, default=None, help="cap request count (window head)")
     ap.add_argument("--offset", type=int, default=0, help="skip this many requests before the window")
+    ap.add_argument("--worker-schedule", default=None,
+                    help="JSON file: [[t_seconds, workers], ...] piecewise-constant "
+                         "encoder capacity relative to window start (first step at "
+                         "t=0). Overrides --encoder-workers as the capacity over "
+                         "time; cold-start lead must already be applied by the "
+                         "schedule's author. Slots retire LIFO and drain in-flight "
+                         "forwards (no preemption)")
     ap.add_argument("--sequential-chunks", action="store_true",
                     help="restore the Phase-2 dispatch policy (an oversized request's "
                          "chunks run sequentially on one worker) instead of the default "
@@ -392,9 +458,16 @@ def main() -> None:
     # ---- vision pool: event-driven FIFO with cross-request batching ----
     img_reqs = [(float(arrivals_ms[i]), i, int(num_images[i]))
                 for i in range(len(df)) if int(num_images[i]) > 0]
+    schedule = None
+    if args.worker_schedule:
+        raw = json.load(open(args.worker_schedule))
+        schedule = sorted((float(t) * 1000.0, int(c)) for t, c in raw)
+        if not schedule or schedule[0][0] != 0.0:
+            ap.error("--worker-schedule must start with a step at t=0")
     finish, batches, requests_chunked = simulate_vision_pool(
         img_reqs, args.encoder_workers, cap, encoder,
-        parallel_chunks=not args.sequential_chunks)
+        parallel_chunks=not args.sequential_chunks,
+        worker_schedule=schedule)
 
     # Handoff bound: post-merge embeddings cross pools (async; not worker time).
     def handoff_ms(n_img: int) -> float:
@@ -442,7 +515,14 @@ def main() -> None:
     t_end_ms = max(float(arrivals_ms[-1]) if len(arrivals_ms) else 0.0, last_finish)
     series = build_series(img_reqs, batches, t_end_ms)
     busy_ms = sum(fin - start for start, fin, _t, _nf in batches)
-    utilization = busy_ms / (args.encoder_workers * t_end_ms) if t_end_ms > 0 else 0.0
+    if schedule is None:
+        provisioned_ms = args.encoder_workers * t_end_ms
+    else:  # integrate the piecewise-constant capacity up to the sim end
+        provisioned_ms = 0.0
+        for (t0, c0), (t1, _c1) in zip(schedule, schedule[1:]):
+            provisioned_ms += c0 * max(0.0, min(t1, t_end_ms) - min(t0, t_end_ms))
+        provisioned_ms += schedule[-1][1] * max(0.0, t_end_ms - schedule[-1][0])
+    utilization = busy_ms / provisioned_ms if provisioned_ms > 0 else 0.0
     # Divergence is judged at the END OF ARRIVALS (the series itself runs through
     # the drain tail, where a finite window's queue always returns to 0).
     arr_end_sec = min(len(series) - 1, int(arrivals_ms[-1] // 1000)) if len(series) else 0
@@ -467,6 +547,14 @@ def main() -> None:
         "encoder_workers": args.encoder_workers,
         "encoder_batch_images": cap,
         "chunk_dispatch": "sequential" if args.sequential_chunks else "parallel",
+        "worker_schedule": (None if schedule is None else {
+            "steps": len(schedule),
+            "min_workers": min(c for _, c in schedule),
+            "max_workers": max(c for _, c in schedule),
+            "provisioned_worker_seconds": round(provisioned_ms / 1000.0, 1),
+        }),
+        "provisioned_worker_seconds": round(provisioned_ms / 1000.0, 1),
+        "busy_worker_seconds": round(busy_ms / 1000.0, 1),
         "arrival_speedup": args.arrival_speedup,
         "handoff_rtt_ms": args.handoff_rtt_ms,
         "handoff_gbps": args.handoff_gbps,

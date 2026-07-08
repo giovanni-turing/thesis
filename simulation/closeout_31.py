@@ -33,8 +33,11 @@ OUT = HERE / "results" / "grid" / "closeout"
 GRID = HERE / "results" / "grid"
 SLA = sg.SLA
 ROUTER_VARIANTS = {
+    # overlap_score_credit is hard-bounded to [0,1], 1.0 = default/max —
+    # the upper direction doesn't exist; prefill weighting beyond default
+    # is prefill_load_scale's job (per the KvRouterConfig validation).
+    "credit0.25": {"overlap_score_credit": 0.25},
     "credit0.5": {"overlap_score_credit": 0.5},
-    "credit2.0": {"overlap_score_credit": 2.0},
     "pls0.5": {"prefill_load_scale": 0.5},
     "pls2.0": {"prefill_load_scale": 2.0},
 }

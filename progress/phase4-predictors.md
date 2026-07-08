@@ -67,3 +67,30 @@ build). Code: `predictors/`. Commits: `8519553` (scaffold), `5a3131a`
    forecasts (the strawman — forecast image load FROM request rate via the
    covariate machinery); forecast-error sensitivity. Quantile calibration
    (coverage) if the band drives headroom sizing.
+
+
+## 4.3 closed loop — INFRASTRUCTURE LIVE (2026-07-08)
+
+First end-to-end forecast-driven run executed: trace → archived Chronos
+forecast → worker schedule → two-pool simulation → SLA × worker-seconds.
+
+- **Converter C(t) hook** (`--worker-schedule`): piecewise-constant
+  capacity, slot-based active windows, LIFO retirement, drain semantics
+  (no preemption), provisioned-worker-seconds integral in stats.
+  Validated: no-schedule path bit-identical (grid p99 reproduced exactly);
+  constant schedule ≡ static; dynamic provisioned integral exact.
+- **Controller v1** (`simulation/forecast_schedule.py`): stitched-tile
+  forecasts consumed as a scaler would; desired = ceil(q(t)/rho);
+  hysteresis = trailing-max; cold start = trailing-min over the lead
+  (up-lead/down-now semantics). Ablation axes are flags: quantile, rho,
+  lead, hysteresis. Units gotcha fixed + documented: forecast series are
+  PER-BIN TOTALS, divide by bin seconds.
+- **First result (burst1, p90, rho=20, lead 60 s, hyst 3 min):** delay
+  p99 677 ms (SLA met), 316k worker-s, schedule 4..13 workers, 35 steps.
+  Framing that the evaluation chapter must use: per-window static C* is
+  an ORACLE (window-specific hindsight optimum, 180k) — the deployable
+  comparisons are static-all-windows (C=16 → 479k on this window:
+  **forecast saves 34%**) and the 3.2 reactive baseline (pending).
+- LLM-side actuation decided: register a `forecast_file` predictor in the
+  planner's LOAD_PREDICTORS registry (plain string-keyed dict) so the
+  predictive policy shares the reactive baseline's exact actuation path.
