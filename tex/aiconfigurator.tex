@@ -107,13 +107,38 @@ any collection campaign on memory-constrained cards.
 
 \subsection{Collected dataset}
 
-The final dataset comprises \num{7679} encoder-attention cases (batch
+The campaign dataset comprises \num{7679} encoder-attention cases (batch
 $\in\{1,\dots,64\}$, sequence length $\in[1, 65536]$, 35 head
 configurations including the $16\times 72$ geometry of the Qwen3-VL vision
 tower; zero errors) and \num{34326} unique bf16 GEMM rows, both under
 \texttt{systems/data/rtx\_5090/vllm/0.22.0/}. The dataset, system file,
 and registration were contributed upstream as a draft pull request
 (ai-dynamo/aiconfigurator \#1312).
+
+\paragraph{Targeted shape infill (correction, recorded).} A later audit of
+the exact shapes the two-pool cost model queries found that the campaign's
+log-spaced sweep grid did not include them: the 448-pixel image is 784
+patches, so every encoder-attention query interpolated between the
+collected $s{=}576$ and $s{=}1024$ lines, and the companion GEMMs at
+$m = 784N$ crossed into the sparsely-anchored giant-shape region for
+$N \gtrsim 42$. A 465-case infill --- the $s \in \{784, 3136, 12544\}$
+attention lines and the encoder graph's exact GEMM shapes for
+$N \in [1,64]$ --- was collected under the identical protocol (same
+container, collector code, locked clocks; zero errors) and merged,
+bringing the dataset to \num{7760} attention and \num{34710} GEMM rows and
+making the 448-pixel query path grid-exact. The correction shifted
+predicted encoder costs by $+4.3\%$ at one image, $-5.8\%$ at six, and
+under $1\%$ at 32 and above; the validation numbers reported below
+document the pre-infill state they were measured against. Every
+simulation result in Chapter~\ref{cap:twopool} was re-derived under the
+corrected data --- encoder-delay percentiles moved by at most
+${\approx}1\%$ and no finding changed --- and in the worker-sizing
+experiments of the baseline chapter one marginal optimum shifted by a
+single worker (an episode whose configuration had sat \SI{3}{\milli\second}
+inside the tail bound). The magnitude of these shifts, against the
+$+4.3\%$ input correction, is itself evidence of how close to the bounds
+the affected verdicts sat --- and why grid-exact silicon data at the
+query shapes is worth the 465-case infill.
 
 \section{Validation against physical measurement}
 \label{sec:aic-validation}

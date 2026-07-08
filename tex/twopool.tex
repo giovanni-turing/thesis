@@ -119,10 +119,10 @@ every factoring of $N$ images into (batch, images-per-request) --- $(1,64)$,
 $(2,32)$, $(64,1)$ --- returns the same latency to the microsecond, because
 attention is evaluated at the product batch$\times$images and every other
 operator at the total token count. Batching is therefore modeled by costing
-each dispatched batch at its image total, and it pays: $f(1) = \SI{7.822}{\milli\second}$
-per image alone versus $f(64) = \SI{314.5}{\milli\second}$ ---
-\SI{4.91}{\milli\second} per image amortized, a $1.6\times$ throughput gain
-that amounts to a ${\sim}\SI{2.9}{\milli\second}$ fixed per-forward
+each dispatched batch at its image total, and it pays: $f(1) = \SI{8.16}{\milli\second}$
+per image alone versus $f(64) = \SI{316.4}{\milli\second}$ ---
+\SI{4.94}{\milli\second} per image amortized, a $1.65\times$ throughput gain
+that amounts to a ${\sim}\SI{3.2}{\milli\second}$ fixed per-forward
 overhead. The pool's dispatch policy is greedy FIFO: a freed worker takes
 whole queued requests, in order, up to a 64-image cap (the collected batch
 range, so no extrapolation); a request exceeding the cap alone --- the
@@ -208,8 +208,8 @@ Pool / timing & Window & Knee & Offered & TTFT p99 (ms), $1{\to}$knee \\
 LLM / poly & steady & $s{=}2$ (ITL-bound) & 5.5 req/s & $249 \to 277$ \\
 LLM / AIC  & steady & $s{=}2$ (ITL-bound) & 5.5 req/s & $307 \to 418$ \\
 LLM / poly & burst & $s{=}1$ & 2.2 req/s & $910$ at $s{=}1$ \\
-Vision / AIC & steady & $\geq s{=}32$ (cens.) & $\geq$ 256 img/s & $200 \to 794$ \\
-Vision / AIC & burst & \textbf{none: over at $s{=}1$} & 116 img/s & $4{,}957$ at $s{=}1$ \\
+Vision / AIC & steady & $\geq s{=}32$ (cens.) & $\geq$ 256 img/s & $199 \to 787$ \\
+Vision / AIC & burst & \textbf{none: over at $s{=}1$} & 116 img/s & $5{,}013$ at $s{=}1$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -253,8 +253,8 @@ Figure~\ref{fig:sim-burst-queue} exposes the mechanism. The episode's
 83{,}432 chunk forwards --- every forward at most \SI{315}{\milli\second}
 --- and arrivals clump: the worst second lands 975 images at once. Behind
 a strict FIFO, a frames flood therefore monopolizes \emph{every} worker at
-once: the backlog exceeds 1{,}000 queued images for 789 seconds spread
-across the eight-hour episode, peaking at 4{,}637, each excursion a
+once: the backlog exceeds 1{,}000 queued images for 805 seconds spread
+across the eight-hour episode, peaking at 4{,}701, each excursion a
 multi-second p99 event, yet the pool drains fully between excursions and
 ends the window with an empty queue. This is the provisioning
 gap in its sharpest form: a monitor watching request rate
@@ -270,7 +270,7 @@ Chapter~\ref{cap:predictors} showed to be forecastable.
 \caption{Inside the burst episode at the trace's own rate: offered image
 load (top, 1-minute mean of the per-second series) and the encoder pool's
 queued-image depth (bottom, per second). The queue repeatedly spikes past
-1{,}000 images --- peaking at 4{,}637 --- and fully drains between spikes,
+1{,}000 images --- peaking at 4{,}701 --- and fully drains between spikes,
 so the episode's \emph{mean} utilization stays at 29\% while p99 encoder
 delay reaches \SI{5.0}{\second}: episodic FIFO head-of-line blocking by
 frames-class floods, invisible to rate- or mean-utilization monitoring.}
