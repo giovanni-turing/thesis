@@ -130,8 +130,8 @@ commit:     acfbdee
 
 ### 4.4 LLM forecast closed loop under realistic leads  (2026-07-08)
 artifact:   simulation/results/riders44/fc_lead{60,90,120,300}.report.json (+fc_lead60_s1 scale-1 twin)
-command:    run_44_riders.sh fc block  (fc_burst1_tp2_s8 config + STARTUP_TIME ∈ {60,90,120,300})
-feeds:      chapter in prep: closed loop — forecast PASSES at every LLM lead (TTFT p99 736–757 ms vs 751 at L=0; ITL ~6.5) — lead-invariance proven on BOTH pools; closes the "instant workers flattered our own result" gap
+command:    run_44_riders.sh fc block  (fc_burst1_tp2_s8 config + STARTUP_TIME ∈ {60,90,120,300}); twin = same at FORECAST_REQ_SCALE=1
+feeds:      chapter in prep: closed loop — forecast PASSES at every LLM lead (TTFT p99 736–757 ms vs 751 at L=0; ITL ~6.5) — lead-invariance proven on BOTH pools; closes the "instant workers flattered our own result" gap. The scale-1 twin FAILS (1,716.6 ms / ITL 126.8, ≈ the reactive ladder's 1,616): forecast fed through the planner's mean-based capacity conversion fails like reactive — signal quality cannot compensate a mean→tail conversion; the ×8 (to become the principled mean-capacity/knee mapping) IS the tail-aware conversion. Triad on burst1@L60: reactive 1,616 FAIL | forecast+mean-conv 1,717 FAIL | forecast+tail-conv 736 PASS
 supersedes: fc_burst1_tp2_s8 as sole LLM closed-loop evidence (L=0)
 commit:     acfbdee
 
