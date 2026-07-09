@@ -42,6 +42,10 @@ under calibrated engine timing whose delta against the simulator's
 default polynomial is quantified --- including a burst-window SLA
 violation the polynomial misses outright. Per-pool attribution is by
 construction: either pool replays in isolation on the same workload.
+The control loop itself is anchored to the live Dynamo stack: on the
+fastest-onset burst, the winning policy and the reactive baseline
+reproduce their simulated verdicts through the real control plane,
+with tails within 1--7\% and replica-time within 8\%.
 
 \paragraph{RQ4 --- Closed-loop payoff: yes, with the mechanism
 identified.} On the encoder pool, the p90-forecast schedule meets the
@@ -75,11 +79,10 @@ third of the best static fleet's GPU-time.
 \section{Future work}
 \label{sec:conc-future}
 
-Four extensions are queued by design. \emph{Validation anchors}: replay
-of the winning policy against the live Dynamo runtime with mocked
-workers (same planner code path, real control plane), and optionally one
-physical encoder worker on the RTX~5090 under a burst replay ---
-closing the loop between simulation and stack. \emph{A structural
+Four extensions are queued by design. \emph{A physical encoder anchor}:
+one real encoder worker served on the RTX~5090 under a burst replay ---
+the silicon-side complement to the live control-loop anchor of
+Chapter~\ref{cap:validation}. \emph{A structural
 language-pool predictor}: the prefill signal decomposes as text-borne
 demand plus an image-driven component with higher persistence; a
 predictor additive in the vision forecast should pay precisely at

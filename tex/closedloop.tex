@@ -157,6 +157,19 @@ burst-sized; the language-side saving is cross-window (TP1$\times$2 on
 calm traffic, half the burst fleet's GPUs), while the decisive per-pool
 savings are on the encoder side, priced next.
 
+\paragraph{The quantile dial, on the language pool too.} On burst1's
+slow onset the p50 forecast sufficed; on the fastest onset it does not.
+Replaying burst3 end-to-end (60-second replica lead, tail-aware
+conversion throughout) yields the language-pool mirror of the encoder
+matrix's quantile result: reactive fails at TTFT p99
+3{,}495\,\si{\milli\second}, the p50 forecast fails at
+2{,}164\,\si{\milli\second} --- better-informed, still late, exactly as
+p50 detection lagged fast onsets in Section~\ref{sec:cl-matrix} ---
+and the p90 forecast passes at \SI{651}{\milli\second}. Headroom
+quantile, not signal access, separates pass from fail on fast onsets on
+\emph{both} pools. (This burst3 configuration is also the policy pair
+carried to the live-stack validation of Chapter~\ref{cap:validation}.)
+
 \section{The week-scale aggregate}
 \label{sec:cl-aggregate}
 

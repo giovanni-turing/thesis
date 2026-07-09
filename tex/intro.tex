@@ -523,10 +523,13 @@ whose sensitivity is quantified there; and language-pool results are reported fo
 TP1 with a 235B-TP8 spot-check, leaving intermediate family members
 unpriced. Forecasts are zero-shot --- no fine-tuning on the trace ---
 which is the conservative reading of the foundation models' capability.
-\emph{[Placeholder: the planned validation anchors --- the winning policy
-replayed against the live Dynamo runtime with mocked workers, and
-optionally one physical encoder worker on the RTX~5090 under a burst
-replay --- and what they did or did not confirm.]}
+Finally, the control loop itself is anchored to the real stack: the
+winning policy and the reactive baseline, replayed against the live
+Dynamo runtime (real control plane, mocked engines) on the
+fastest-onset burst, reproduce the simulated verdicts in both
+directions with tail latencies within 1--7\% and provisioned
+replica-time within 8\% (Chapter~\ref{cap:validation}); the physical
+encoder-worker anchor remains future work.
 
 \section{Organization}
 \label{sec:intro-org}
@@ -554,6 +557,8 @@ forecast-driven per-pool schedules against those baselines as SLA
 compliance $\times$ provisioned worker-time, with ablations over
 cold-start lead, headroom quantile, forecasting model, and capacity
 rating, and prices the policy over the covered week.
-Chapter~\ref{cap:conclusion} concludes. A \emph{validation} chapter ---
-the winning policy replayed against the live Dynamo runtime with mocked
-workers --- is in preparation from the running platform.
+Chapter~\ref{cap:validation} anchors the closed loop to the live Dynamo
+runtime --- the winning policy and the reactive baseline through the
+real control plane, compared against their offline twins --- and
+reports the simulation-versus-stack divergences the exercise surfaced.
+Chapter~\ref{cap:conclusion} concludes.

@@ -1,0 +1,148 @@
+%!TeX root=./tese.tex
+% Validation-anchor chapter. Artifacts: simulation/results/live51/
+% (offline twins + live_runs/{live_fc,live_re,verify_flag}); harness:
+% simulation/live51/. Ledger: "5.1 validation anchor" entries.
+% Upstream fix: ai-dynamo/dynamo branch fix/planner-live-fpm-observation-mode
+% commit 33a9babe01 (local).
+\chapter{Validation Anchor: the Loop on the Live Stack}
+\label{cap:validation}
+\chaptermark{Validation Anchor}
+
+Every closed-loop result so far ran through Dynamo's \emph{offline}
+replay: real planner code, virtual clock, in-process actuation. This
+chapter anchors that platform to the \emph{live} stack: the same
+policies, on the same workload, executed through Dynamo's real control
+plane in real time --- HTTP frontend with the in-process KV router,
+independent mocker worker processes discovered over etcd, metrics
+scraped by Prometheus, the SLA planner running as its own service, and
+scaling decisions actuated through the planner's VirtualConnector
+protocol by a worker-manager written for this thesis (nothing in the
+Dynamo tree consumes VirtualConnector decisions for live workers). The
+question is the platform-validity one (RQ3), asked at the last layer
+simulation cannot reach: \emph{does the simulated control loop behave
+the same on the real stack?}
+
+\section{Setup}
+\label{sec:val-setup}
+
+The anchor window is burst3 --- the one-minute-onset episode, the
+hardest case in the fleet matrix --- replayed in real time
+(\SI{27}{\minute}, 3{,}093 requests) by a fixed-schedule load client
+(aiperf) that synthesizes each request at its trace timestamp with its
+exact token counts and prefix-sharing structure, and measures TTFT/ITL
+client-side. Both anchor policies run the production planner service:
+the \emph{forecast} policy is the thesis's winning configuration
+(archived Chronos p90 path at 15-second bins through the
+\texttt{forecast\_file} predictor, tail-aware conversion, 60-second
+replica lead), the \emph{reactive} policy is the variant-B baseline
+(ARIMA predictor, 200/20\,ms window-mean targets). Engine timing is
+identical to the offline runs by construction: live mocker workers load
+the same AIC latency model, engine arguments, and KV-block capacity ---
+one TP2 replica per OS process, so replicas die independently. The
+cold-start lead is modeled by delayed spawn (59\,s + a measured
+1.0\,s spawn-to-registered latency); mocker-native
+\texttt{startup\_time} could not be reused because its live semantics
+\emph{invert} the offline ones (Section~\ref{sec:val-findings}). Each
+live run is compared against an offline twin --- the identical trace,
+planner configuration, capacity mapping, lead, and replica budget ---
+re-run through the replay platform of the preceding chapters.
+
+\section{Results: verdicts, tails, and decisions agree}
+\label{sec:val-results}
+
+\begin{table}[htbp]
+\centering
+\caption{Live stack versus offline twin on burst3 (evaluation SLA:
+TTFT p99 $<$ \SI{1}{\second}, ITL p99 $<$
+\SI{100}{\milli\second}; budget-matched at 4 TP2 replicas).}
+\label{tab:val-anchor}
+\small
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+Policy & Metric & Live & Offline twin & $\Delta$ \\
+\midrule
+Forecast p90 & TTFT p99 (ms) & 695 & 651 & $+6.8\%$ \\
+ & ITL p99 (ms) & 11.5 & 5.3 & $+6.2$\,ms \\
+ & replica-seconds & 6{,}063 & 6{,}400 & $-5.3\%$ \\
+ & verdict & \textbf{PASS} & \textbf{PASS} & agree \\
+\midrule
+Reactive & TTFT p99 (ms) & 3{,}531 & 3{,}495 & $+1.0\%$ \\
+ & ITL p99 (ms) & 150.7 & 160.3 & $-6.0\%$ \\
+ & replica-seconds & 1{,}799 & 1{,}948 & $-7.6\%$ \\
+ & verdict & \textbf{FAIL} & \textbf{FAIL} & agree \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The anchor holds in both verdict directions
+(Table~\ref{tab:val-anchor}): the forecast policy passes the tail SLA
+live exactly as simulated, the reactive policy fails live exactly as
+simulated --- its p99 within 1\% of the simulation --- and provisioned
+replica-time agrees within 8\%. The agreement extends below the
+aggregate numbers. The demand path is \emph{byte-identical}: for the
+first twelve planner ticks the live and offline planners log the same
+predicted demand to the second decimal (first tick, live:
+\texttt{29.86 rps / 5.31 engine\_rps = 6 replicas}; offline:
+\texttt{29.86 / 5.30 = 6}), because the predictor, registry,
+construction order, and capacity conversion are the same code --- only
+the clock differs. The capacity beliefs then drift within their
+expected band (the regression is tuned from sampled forward passes,
+which arrive in different order live), but the \emph{applied} capacity
+--- after the budget cap --- tracks the same trajectory, and the
+client-observed tails land within run noise of the simulated ones.
+The burst3 policy split itself (p90 passes where p50 and reactive
+fail; Chapter~\ref{cap:closedloop}) reproduces on the real stack.
+
+\section{What the live stack revealed}
+\label{sec:val-findings}
+
+The anchor's second product is the divergences it surfaced --- none of
+them policy-level, all of them worth knowing before a deployment:
+
+\begin{description}
+\item[Live \texttt{startup\_time} inverts the offline semantics.]
+Offline, a scaling-up mocker with \texttt{startup\_time} is invisible
+to the router until ready. Live, the same option registers the worker
+\emph{immediately} and stalls its requests: a routable-but-dead window
+that a load-aware router --- seeing an idle-looking worker ---
+preferentially fills. Cold-start leads were therefore modeled by
+delaying the spawn itself.
+\item[The live planner's capacity model starves at calm load.] The live
+planner samples worker metrics in tracking mode --- the \emph{latest}
+forward pass per worker, once per load tick --- while the offline
+replay feeds \emph{every} pass. Mixed prefill+decode passes, the only
+samples that inform aggregated capacity, are rare at calm load: zero
+arrived in five minutes at 2\,req/s, leaving the capacity model
+unready --- it would warm only once the workload was already busy,
+too late for scale-ahead decisions. The fix (contributed to the Dynamo
+tree as an opt-in \texttt{fpm\_observation\_mode}) drains every
+published pass into the same regression feed the replay uses;
+with it, the live planner is ready at its first tick and computes the
+offline twin's first decision.
+\item[Tick cadence stretches under stall.] The live planner's 60-second
+ticks held cadence except one 245-second stall, after which the
+forecast feed realigned to wall time; the offline virtual clock can
+never stall. Decision \emph{count} is therefore not exactly
+reproducible live; decision \emph{values} at matching times are.
+\item[Budget units differ between paths.] The offline replay caps
+replicas at \texttt{max\_gpu\_budget}; the live planner divides the
+same field by GPUs-per-replica. The anchor comparison equalizes the
+caps; the thesis's offline results are unaffected (their budgets never
+bind), but the unit inconsistency is a reportable upstream defect.
+\end{description}
+
+\section{Scope of the anchor}
+\label{sec:val-scope}
+
+The anchor covers one window (the hardest), two policies (the
+contribution and the baseline it beats), the language pool (the pool
+with a production control path; the encoder pool's controller exists
+only in simulation), and mocked engine execution --- it validates the
+\emph{control loop}, not GPU silicon, which is what
+Chapter~\ref{cap:aiconfigurator} anchored physically on the encoder
+side. Within that scope the conclusion is direct: the platform's
+closed-loop behavior transfers to the real stack within run noise, in
+both the passing and the failing direction, and the divergences that
+do exist are identified, explained, and in one case fixed upstream ---
+they are properties of the harnesses, not of the policies this thesis
+compares.

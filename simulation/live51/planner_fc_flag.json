@@ -1,0 +1,37 @@
+{
+  "mode": "agg",
+  "environment": "virtual",
+  "namespace": "a51fc",
+  "backend": "vllm",
+  "model_name": "Qwen/Qwen3-VL-8B-Instruct",
+  "ttft_ms": 500.0,
+  "itl_ms": 50.0,
+  "load_predictor": "forecast_file",
+  "enable_throughput_scaling": true,
+  "enable_load_scaling": false,
+  "throughput_adjustment_interval_seconds": 60,
+  "max_gpu_budget": 8,
+  "decode_engine_num_gpu": 2,
+  "min_endpoint": 1,
+  "advisory": false,
+  "optimization_target": "sla",
+  "metric_pulling_prometheus_endpoint": "http://localhost:9090",
+  "aic_interpolation": {
+    "hf_id": "Qwen/Qwen3-VL-8B-Instruct",
+    "system": "h100_sxm",
+    "backend": "vllm",
+    "isl": 4000,
+    "osl": 150,
+    "sweep_max_context_length": 16384,
+    "prefill_interpolation_granularity": 8,
+    "decode_interpolation_granularity": 8,
+    "prefill_pick": {
+      "tp": 2
+    },
+    "decode_pick": {
+      "tp": 2
+    }
+  },
+  "load_min_observations": 1,
+  "fpm_observation_mode": "all"
+}

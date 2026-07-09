@@ -1,0 +1,21 @@
+{"event": "spawn", "pid": 713196, "seq": 1, "reason": "initial", "n_live": 1, "n_pending": 0, "t_wall": 1783621900.4864848}
+{"event": "spawn", "pid": 713197, "seq": 2, "reason": "initial", "n_live": 2, "n_pending": 0, "t_wall": 1783621900.4869602}
+{"event": "start", "initial": 2, "spawn_delay": 59.0, "t_wall": 1783621900.4869955}
+{"event": "decision", "decision_id": 0, "num_prefill": -1, "num_decode": 1, "n_live": 2, "n_pending": 0, "t_wall": 1783621962.846445}
+{"event": "sigterm", "pid": 713197, "n_live": 1, "t_wall": 1783621962.8466396}
+{"event": "ack", "decision_id": 0, "n_live": 1, "n_pending": 0, "t_wall": 1783621962.857089}
+{"event": "decision", "decision_id": 1, "num_prefill": -1, "num_decode": 2, "n_live": 1, "n_pending": 0, "t_wall": 1783622637.778961}
+{"event": "spawn_scheduled", "delay_s": 59.0, "n_live": 1, "n_pending": 1, "t_wall": 1783622637.7790973}
+{"event": "ack", "decision_id": 1, "n_live": 1, "n_pending": 1, "t_wall": 1783622637.7901602}
+{"event": "spawn", "pid": 735601, "seq": 3, "reason": "lead+59s", "n_live": 2, "n_pending": 1, "t_wall": 1783622696.8093796}
+{"event": "decision", "decision_id": 2, "num_prefill": -1, "num_decode": 1, "n_live": 2, "n_pending": 0, "t_wall": 1783622742.8227062}
+{"event": "sigterm", "pid": 735601, "n_live": 1, "t_wall": 1783622742.8228478}
+{"event": "ack", "decision_id": 2, "n_live": 1, "n_pending": 0, "t_wall": 1783622742.8336556}
+{"event": "decision", "decision_id": 3, "num_prefill": -1, "num_decode": 2, "n_live": 1, "n_pending": 0, "t_wall": 1783623387.8739908}
+{"event": "spawn_scheduled", "delay_s": 59.0, "n_live": 1, "n_pending": 1, "t_wall": 1783623387.8741372}
+{"event": "ack", "decision_id": 3, "n_live": 1, "n_pending": 1, "t_wall": 1783623387.8854733}
+{"event": "spawn", "pid": 755600, "seq": 4, "reason": "lead+59s", "n_live": 2, "n_pending": 1, "t_wall": 1783623446.8952627}
+{"event": "decision", "decision_id": 4, "num_prefill": -1, "num_decode": 1, "n_live": 2, "n_pending": 0, "t_wall": 1783623492.8795075}
+{"event": "sigterm", "pid": 755600, "n_live": 1, "t_wall": 1783623492.8796504}
+{"event": "ack", "decision_id": 4, "n_live": 1, "n_pending": 0, "t_wall": 1783623492.8901086}
+{"event": "shutdown", "n_live": 1, "n_pending": 0, "t_wall": 1783623544.9817352}

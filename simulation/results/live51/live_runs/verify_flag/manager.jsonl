@@ -1,0 +1,10 @@
+{"event": "spawn", "pid": 690915, "seq": 1, "reason": "initial", "n_live": 1, "n_pending": 0, "t_wall": 1783621125.115601}
+{"event": "spawn", "pid": 690916, "seq": 2, "reason": "initial", "n_live": 2, "n_pending": 0, "t_wall": 1783621125.1161933}
+{"event": "start", "initial": 2, "spawn_delay": 3.0, "t_wall": 1783621125.1162505}
+{"event": "decision", "decision_id": 0, "num_prefill": -1, "num_decode": 4, "n_live": 2, "n_pending": 0, "t_wall": 1783621232.205667}
+{"event": "spawn_scheduled", "delay_s": 3.0, "n_live": 2, "n_pending": 1, "t_wall": 1783621232.2057686}
+{"event": "spawn_scheduled", "delay_s": 3.0, "n_live": 2, "n_pending": 2, "t_wall": 1783621232.2057955}
+{"event": "ack", "decision_id": 0, "n_live": 2, "n_pending": 2, "t_wall": 1783621232.2130878}
+{"event": "spawn", "pid": 694978, "seq": 3, "reason": "lead+3s", "n_live": 3, "n_pending": 2, "t_wall": 1783621235.2093484}
+{"event": "spawn", "pid": 694979, "seq": 4, "reason": "lead+3s", "n_live": 4, "n_pending": 2, "t_wall": 1783621235.2098124}
+{"event": "shutdown", "n_live": 4, "n_pending": 0, "t_wall": 1783621497.2645888}

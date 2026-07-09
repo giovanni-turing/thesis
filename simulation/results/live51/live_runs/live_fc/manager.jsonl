@@ -1,0 +1,17 @@
+{"event": "spawn", "pid": 613611, "seq": 1, "reason": "initial", "n_live": 1, "n_pending": 0, "t_wall": 1783618283.67927}
+{"event": "spawn", "pid": 613612, "seq": 2, "reason": "initial", "n_live": 2, "n_pending": 0, "t_wall": 1783618283.6797385}
+{"event": "start", "initial": 2, "spawn_delay": 59.0, "t_wall": 1783618283.6797776}
+{"event": "decision", "decision_id": 0, "num_prefill": -1, "num_decode": 4, "n_live": 2, "n_pending": 0, "t_wall": 1783618390.7691476}
+{"event": "spawn_scheduled", "delay_s": 59.0, "n_live": 2, "n_pending": 1, "t_wall": 1783618390.7693563}
+{"event": "spawn_scheduled", "delay_s": 59.0, "n_live": 2, "n_pending": 2, "t_wall": 1783618390.7694356}
+{"event": "ack", "decision_id": 0, "n_live": 2, "n_pending": 2, "t_wall": 1783618390.7803464}
+{"event": "spawn", "pid": 618997, "seq": 3, "reason": "lead+59s", "n_live": 3, "n_pending": 2, "t_wall": 1783618449.8014297}
+{"event": "spawn", "pid": 618998, "seq": 4, "reason": "lead+59s", "n_live": 4, "n_pending": 2, "t_wall": 1783618449.80252}
+{"event": "decision", "decision_id": 1, "num_prefill": -1, "num_decode": 3, "n_live": 4, "n_pending": 0, "t_wall": 1783619361.000913}
+{"event": "sigterm", "pid": 618998, "n_live": 3, "t_wall": 1783619361.0010386}
+{"event": "ack", "decision_id": 1, "n_live": 3, "n_pending": 0, "t_wall": 1783619361.012667}
+{"event": "decision", "decision_id": 2, "num_prefill": -1, "num_decode": 4, "n_live": 3, "n_pending": 0, "t_wall": 1783619481.0502443}
+{"event": "spawn_scheduled", "delay_s": 59.0, "n_live": 3, "n_pending": 1, "t_wall": 1783619481.0504246}
+{"event": "ack", "decision_id": 2, "n_live": 3, "n_pending": 1, "t_wall": 1783619481.0530312}
+{"event": "spawn", "pid": 647892, "seq": 5, "reason": "lead+59s", "n_live": 4, "n_pending": 1, "t_wall": 1783619540.0804358}
+{"event": "shutdown", "n_live": 4, "n_pending": 0, "t_wall": 1783619927.2492309}

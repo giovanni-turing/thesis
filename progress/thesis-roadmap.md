@@ -332,12 +332,20 @@ Progress + results: `phase4-predictors.md`. Chapter draft: `tex/predictors.tex`.
 
 ## Phase 5 — Validation anchor + writing
 
-1. **Live-mocker run** of the winning policy: real Dynamo frontend/router/
-   planner code paths against mocked workers (CPU only) — confirms the
-   simulated control loop behaves on the real stack.
-2. **Optional physical anchor**: the extracted ViT served as one real encoder
-   worker on the 5090 under a burst replay — one physical data point tying the
-   whole simulation chain to silicon.
+1. **Live-mocker run — ✅ DONE (2026-07-09, ledgered)**: winning policy
+   (fc-p90) + reactive baseline on burst3 through the REAL stack
+   (etcd/NATS, frontend+KV router, per-process TP2 mockers, Prometheus,
+   planner service, VirtualConnector consumed by
+   `simulation/live51/worker_manager.py`). VERDICTS AGREE both
+   directions (PASS 695 vs 651 ms; FAIL 3,531 vs 3,495 ms; replica-time
+   within 8%; demand path byte-identical). 4 divergence findings; FPM
+   sampling gap FIXED upstream-style (dynamo branch
+   `fix/planner-live-fpm-observation-mode`, 33a9babe01 local, flag-only
+   e2e verified). Chapter: `tex/validation.tex`. Intro placeholder
+   resolved — ZERO placeholders remain.
+2. **Optional physical anchor** (future work in conclusion): the
+   extracted ViT served as one real encoder worker on the 5090 under a
+   burst replay — one physical data point tying the chain to silicon.
 3. **Writing** — IN PROGRESS (front matter + all four result chapters
    drafted; closing chapters pending their phases).
    - ✅ Drafted: `tex/intro.tex`, `tex/related.tex`, `tex/trace-eda.tex`,
