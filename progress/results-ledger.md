@@ -245,4 +245,4 @@ artifact:   simulation/results/aggregate44/fc_p90_L{30,300}_{toto,timesfm}.jsonl
 command:    bash simulation/run_44_aggregate_models.sh  (p90/rho15/15s/hyst3, leads {30,300}, schedules from toto/timesfm parquets, same aggregate span + converter as the chronos rows)
 feeds:      tex/closedloop.tex §cl-aggregate model-robustness ¶ — all three TSFMs PASS: chronos 0.273–0.307× (588 ms), toto 0.275–0.305× (588 ms), timesfm 0.263–0.297× (664.5 ms at L300, mild queueing, passing); ≤4% cost spread; Chronos quoted as the SMALLEST model (120M vs Toto 2.5B) — headline rests on the cheapest forecaster, not the best
 supersedes: chronos-only evidence for the aggregate row (matrix already showed per-window model insensitivity)
-commit:     (this commit)
+commit:     e40ae20
