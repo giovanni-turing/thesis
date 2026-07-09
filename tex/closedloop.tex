@@ -241,7 +241,7 @@ burst3} \\
 
 The headline: \textbf{the p90-forecast schedule meets the tail SLA over
 the aggregate \emph{and} inside every in-span episode at 0.27--0.31
-times the deployable static fleet's provisioned worker-time} (2.12--2.38M
+times the deployable static encoder fleet's provisioned worker-time} (2.12--2.38M
 versus 7.74M worker-seconds, at p99 \SI{588}{\milli\second} versus the
 static fleet's 565). The forecaster does not carry the result:
 regenerating the p90 schedules from the other two model archives leaves
@@ -276,14 +276,31 @@ respect to information (no value is used before its issue time) but
 offline: a deployed controller would re-forecast on drift, and its
 inference cost (${\sim}$seconds per tick on CPU-class hardware for the
 models used) is not charged to the fleet. The per-worker capacity rating
-$\rho$ is a swept control knob (four settings, graded above) rather than
-derived from first principles; its feasible settings sit far
+$\rho$ is a swept control knob (four settings, graded above), not a
+first-principles derivation; its feasible settings sit far
 below the encoder's raw throughput because the binding constraint is
 the tail bound under bursty within-bin arrivals, not mean throughput ---
-the encoder-side analogue of the language pool's belief-to-knee gap. Language-pool closed-loop evidence
-covers the largest burst (all leads, both conversions) and the binding
-mix (mapping validation); the remaining windows are priced by the grid
-and the knee formula rather than replayed end-to-end. Per-pool leads
+the encoder-side analogue of the language pool's belief-to-knee gap.
+Language-pool closed-loop evidence covers the largest burst (all leads,
+both conversions), the fastest onset (the triad above; carried live in
+Chapter~\ref{cap:validation}), the binding mix (mapping validation),
+and the full evaluation span (the week-scale run above); the remaining
+windows are priced by the grid and the knee formula rather than
+replayed end-to-end. The replay is open-loop: arrivals follow the trace
+regardless of experienced latency, so overload cannot shed or defer
+demand as clients would --- policies are compared under identical
+offered load, and the decode signal is the offered-work upper bound of
+Chapter~\ref{cap:trace-eda}, conservative in the same direction for
+every policy. The inter-pool handoff is priced single-stream
+(${\approx}1.6$\,MB per image); Qwen3-VL's DeepStack projections
+quadruple that payload, and a sensitivity replay of the aggregate at
+the $4\times$ payload on the modeled 25\,Gbps link raises p99 handoff
+from 272 to 1{,}087\,\si{\milli\second} (encoder-delay p99
+1{,}404\,\si{\milli\second} --- an SLA violation from transfer
+alone). The \SI{588}{\milli\second} floor therefore assumes an
+embedding-only handoff or a ${\geq}100$\,Gbps inter-pool fabric, which
+restores the quoted numbers exactly (transfer scales linearly with
+payload over bandwidth). Per-pool leads
 are swept as constants per run, not stochastic; and the two
 out-of-span episodes (burst2/6, inside the trace's first 1.4 days,
 which the zero-shot forecasters consume as context before their first
@@ -310,5 +327,5 @@ through a tail-aware capacity conversion, derived here as a measured
 belief-to-knee ratio, that repairs the mean-based sizing defect shared
 by every reactive configuration tested. Priced over the covered week,
 the policy meets the SLA in aggregate and per-episode at 0.27--0.31
-times the deployable static fleet's worker-time --- the thesis
+times the deployable static encoder fleet's worker-time --- the thesis
 statement's economic clause, now number-backed.

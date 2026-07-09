@@ -173,8 +173,8 @@ ${\approx}\SI{6.4}{\mega\byte}$ per image (${\approx}\SI{250}{\milli\second}$
 at the 121-image maximum on the default link): still second-order against
 the multi-second queueing tails this chapter measures, but the
 single-stream figure used in the runs is a known undercount for this
-family, and the link payload is a converter parameter scheduled for
-correction in the closed-loop runs. Second, the bound is
+family; Chapter~\ref{cap:closedloop}'s limitations quantify the
+$4\times$-payload sensitivity on the week-scale aggregate. Second, the bound is
 \emph{bandwidth-only}: contention, serialization points, NIC/PCIe
 placement, and cross-node topology are not modeled, so it is a lower
 bound on transfer latency, not a tail estimate. The transfer is charged
@@ -405,10 +405,12 @@ would strain even TP2, and the honest reading is that the burst-window
 language verdict is convention-dependent while the vision verdict is
 not. The choice made here --- \texttt{ContextTokens} verbatim --- keeps
 the workload self-consistent with the trace at the cost of
-target-model consistency; a both-conventions sensitivity run is
-scheduled with the closed-loop experiments.
+target-model consistency; a both-conventions sensitivity run was not
+performed and remains future work.
 
-The vision pool inherits the uniform-448\textsuperscript{2}
+All encoder timing derives from a single RTX~5090 node (locked clocks);
+cross-unit silicon variance is unquantified. The vision pool inherits
+the uniform-448\textsuperscript{2}
 image assumption and AIC's ${\sim}1.14\times$ conservative encoder bias
 (per-image cost scales roughly with patch count, so a $224^2$-dominated
 workload would run ${\approx}4\times$ cheaper per image and a

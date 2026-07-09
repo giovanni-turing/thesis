@@ -61,9 +61,15 @@ through episodic queueing at 29\% mean utilization, invisible to rate-
 and utilization-based monitoring. Closing the loop, forecast-driven
 per-pool worker schedules hold the tail latency objective through burst
 onsets that defeat an identically informed reactive controller at every
-tested cold-start lead, at 0.27--0.31 times the best static fleet's
-provisioned GPU-time over the covered week --- behavior the thesis
-reproduces end-to-end on the live serving runtime.
+tested cold-start lead, at 0.27--0.31 times the deployable static
+encoder fleet's provisioned GPU-time over the covered week (with the
+language fleet at 0.96 times its burst-sized static shape)
+
+\medskip
+\noindent\textbf{Keywords:} multimodal model serving; modality
+disaggregation; autoscaling; time-series forecasting; GPU provisioning;
+tail latency --- behavior reproduced on the live serving runtime on the
+fastest-onset burst.
 
 \begin{otherlanguage}{brazil}
 \chapter*{Resumo}
@@ -85,7 +91,8 @@ pico dentro do tempo de partida a frio de uma r\'eplica, e seus minutos
 extremos s\~ao essencialmente disjuntos dos do sinal de requisi\c{c}\~oes
 (Jaccard 0{,}02). O mesmo sinal \'e tamb\'em o mais persistente --- o
 mais previs\'ivel: modelos de funda\c{c}\~ao de s\'eries temporais,
-usados \emph{zero-shot}, superam as \emph{baselines} cl\'assicas em todos
+usados \emph{zero-shot}, superam as \emph{baselines} cl\'assicas de
+par\^ametros fixos em todos
 os sinais de demanda e resolu\c{c}\~oes testadas, com p90 empiricamente
 calibrado na cad\^encia de provisionamento. Para converter previs\~oes em
 decis\~oes de provisionamento, constr\'oi-se uma plataforma de
@@ -104,9 +111,15 @@ la\c{c}o, escalas de trabalhadores dirigidas por previs\~ao por
 \emph{pool} sustentam o objetivo de lat\^encia de cauda atrav\'es de
 in\'icios de rajada que derrotam um controlador reativo igualmente
 informado em todos os tempos de partida a frio testados, a 0,27--0,31
-do tempo de GPU provisionado da melhor frota est\'atica na semana
-coberta --- comportamento reproduzido de ponta a ponta no
-\emph{runtime} de servi\c{c}o real.
+do tempo de GPU provisionado da frota est\'atica implant\'avel de
+codificadores na semana coberta (com a frota de linguagem a 0,96 de
+sua forma est\'atica dimensionada para rajadas)
+
+\medskip
+\noindent\textbf{Palavras-chave:} servi\c{c}o de modelos multimodais;
+desagrega\c{c}\~ao por modalidade; autoescalonamento; previs\~ao de
+s\'eries temporais; provisionamento de GPU; lat\^encia de cauda --- comportamento reproduzido no \emph{runtime} de servi\c{c}o real
+na rajada de in\'icio mais r\'apido.
 \end{otherlanguage}
 
 % ---- Draft-status note (REMOVE for the defense/submission version) ----
@@ -117,7 +130,8 @@ live-runtime validation anchor (Chapter~\ref{cap:validation}) --- and
 every quantitative claim traces to a versioned artifact through the
 workspace's results ledger. Pending for the defense version:
 institutional formatting (departmental template, ABNT front matter,
-biblatex bibliography) and a final copy-edit. Chapter numbering may
+biblatex bibliography), figure regeneration to vector formats, and a
+final copy-edit. Chapter numbering may
 shift when the institutional template is adopted.
 
 \tableofcontents

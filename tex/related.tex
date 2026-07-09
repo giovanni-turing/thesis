@@ -2,8 +2,7 @@
 % Related work. Sources verified against the local paper library
 % (/home/gio/mestrado/openclaw/data/papers*), the rag corpus, and the Neo4j
 % citation graph (in-library citation counts guided selection); recent
-% works additionally verified by web search. \emph{[Placeholder: ...]}
-% items to resolve before the final build.
+% works additionally verified by web search. No placeholders remain.
 \chapter{Related Work}
 \label{cap:related}
 
@@ -170,8 +169,8 @@ design documentation of the Dynamo 1.x line and inspection of the source
 tree at the commit used for this thesis's simulations (v1.3.0 source
 build; accessed 2026-07-07). See Appendix~\ref{ap:artifacts}.} Its
 reactive SLA loop is the baseline of this thesis's evaluation (run
-unmodified, planner-in-the-loop, in the baselines chapter --- in
-preparation); its predictive loop still watches a single averaged
+unmodified, planner-in-the-loop, Chapter~\ref{cap:baselines}); its
+predictive loop still watches a single averaged
 text-side stream --- a limitation its own design notes state.
 Autoscalers purpose-built for \emph{disaggregated} LLM serving are the
 newest arrivals and the closest neighbors of this thesis: ByteDance's
@@ -265,8 +264,8 @@ a scaler would consume it. One adjacent literature grounds the
 \emph{use} of the forecasts rather than their accuracy: sizing quantile
 headroom under a provisioning lead time is a critical-fractile
 (newsvendor) problem~\cite{Arrow1951Newsvendor}, long applied to
-staffing under uncertain demand; the closed-loop chapters draw the
-operating quantile from that framing.
+staffing under uncertain demand; the closed-loop chapters select the
+operating quantile empirically under that framing.
 
 \section{Simulators and performance models}
 \label{sec:rel-sim}
@@ -325,10 +324,11 @@ time-series foundation models on serving demand signals; and the first
 silicon-calibrated encoder cost model for a consumer-class GPU in a
 deployment planner, contributed upstream.
 Table~\ref{tab:rel-positioning} summarizes the landscape against the four
-ingredients the claim requires. (The closed-loop chapters, in
-preparation, add the quantitative payoff behind the last column's
-checkmark: SLA compliance against provisioned GPU-hours over the
-evaluated span, versus static-optimal and reactive baselines.)
+ingredients the claim requires. (Chapters~\ref{cap:baselines}
+and~\ref{cap:closedloop} supply the quantitative payoff behind the last
+column's checkmark: the tail SLA held in aggregate and per-episode at
+0.27--0.31 times the deployable static encoder fleet's provisioned
+worker-time, versus static-optimal and reactive baselines.)
 
 \begin{table}[htbp]
 \centering

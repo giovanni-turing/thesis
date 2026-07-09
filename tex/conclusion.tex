@@ -62,8 +62,9 @@ fails like the reactive baseline --- mean-based capacity conversion, not
 loop tuning, is the reactive planner's defect, and no spend level
 repairs it under lead. Over the 5.60-day covered span the policy holds
 the SLA in aggregate and inside every episode at
-\textbf{0.27--0.31$\times$ the deployable static fleet's provisioned
-worker-time}; the reactive controller's apparent aggregate pass
+\textbf{0.27--0.31$\times$ the deployable static encoder fleet's
+provisioned worker-time} (the language fleet passes the same span at
+0.96$\times$ its burst-sized static shape); the reactive controller's apparent aggregate pass
 dissolves under per-episode grading --- the trace chapter's
 dashboard-masking, recurring in the evaluation metric.
 
@@ -74,7 +75,7 @@ least visible signal is the most persistent and is forecastable
 zero-shot at provisioning horizons (twenty of twenty cells), and scaling
 on those forecasts holds the tail objective through the onsets that
 defeat reactive control at every tested lead, at roughly a quarter to a
-third of the best static fleet's GPU-time.
+third of the best static encoder fleet's GPU-time.
 
 \section{Future work}
 \label{sec:conc-future}

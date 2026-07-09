@@ -308,9 +308,9 @@ operationalizes. Choosing \emph{which} quantile to hold is economic,
 not aesthetic --- a critical-fractile (newsvendor) choice: the
 optimal level follows from the ratio of under-provisioning cost (SLO
 damage during a cold-start lead) to over-provisioning cost (idle
-GPU-seconds)~\cite{Arrow1951Newsvendor}, and the closed-loop chapter
-derives its operating quantile from that trade-off rather than fixing
-p90 by convention. At the burst's collapse
+GPU-seconds)~\cite{Arrow1951Newsvendor}; the closed-loop chapter
+selects its operating quantile empirically in that spirit, sweeping
+p50 against p90 under the SLA rather than fixing p90 by convention. At the burst's collapse
 the stitched path lags by up to one horizon (12 minutes), the price of
 forecasting in $H$-step tiles; a scaler holding capacity 12 minutes too
 long is a far cheaper failure than one arriving 6 minutes late to a
@@ -384,8 +384,9 @@ per-series tuning would narrow the margins of
 Table~\ref{tab:pred-wape}, which should be read accordingly. ARIMA --- the
 incumbent predictor in production autoscalers, including Dynamo's ---
 is absent from this accuracy benchmark but present where it matters
-more: the closed-loop chapters run Dynamo's own ARIMA predictor as a
-baseline policy. Quantile calibration is
+more: the reactive baseline policy of Chapters~\ref{cap:baselines}
+and~\ref{cap:closedloop} runs Dynamo's planner with its ARIMA
+predictor unmodified. Quantile calibration is
 partially assessed (Section~\ref{sec:pred-quantiles}: upper edge
 calibrated at 1-minute cadence, lower edge distorted by zero ties);
 horizon- and burst-conditional coverage remain open.

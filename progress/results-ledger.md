@@ -110,7 +110,7 @@ commit:     2532b53
 ### 4.4 fleet matrix — 560 cells, per-pool leads  (2026-07-08)
 artifact:   simulation/results/results_44.jsonl (560 records, 0 errors) + cells_44.jsonl (+_wave1); template czhmc6picw1w86popfdk rebuilt (payload +toto/timesfm parquets, run_cell model selector)
 command:    python3 simulation/gen_cells_44.py; .venv/bin/python simulation/e2b_fleet.py --cells-file cells_44.jsonl --out results_44.jsonl (wave1: 60@60, wave2: 500@500, per user's ramp); parity gate vs pilot bit-exact (588.37/31838)
-feeds:      chapter in prep: closed loop — L* table (forecast/p90/ρ15: L*=300 on EVERY window; reactive: burst3 L*=none — fails even at 15 s, burst4/5 L*=45, burst1/steady L*=300; p50 non-viable 16/60); operating-point p99=588.4 everywhere = f(64)+handoff floor (zero queueing)
+feeds:      chapter in prep: closed loop — L* table (forecast/p90/ρ15: L*=300 on EVERY window; reactive: burst3 L*=none — fails even at 15 s, burst4/5 L*=45, burst1/steady L*=300; p50 passes only 23/60 at rho15 — corrected 2026-07-09, prior "16/60" was a tally error); operating-point p99=588.4 everywhere = f(64)+handoff floor (zero queueing)
 supersedes: pilot lead sweep (subset; retained) and first ct_matrix (lead 60 only)
 commit:     acfbdee
 
@@ -253,3 +253,10 @@ command:    bash simulation/results/llm_week/launch.sh  (run_replay.sh on result
 feeds:      tex/closedloop.tex §cl-llm "language pool at week scale" ¶ — fc-p90 PASSES the 5.60-day span (TTFT p99 651.1 ms, ITL 6.4) at 518.6 H100 GPU-h = 0.96× burst-sized static TP2×2 (537.4 GPU-h/span); reactive FAILS the week (1,196.6 ms) at 281.8 GPU-h — half the spend, wrong tail. Closes the last coverage asymmetry (LLM pool now week-graded like the encoder pool)
 supersedes: window-level-only LLM closed-loop evidence (burst1/3/4 retained)
 commit:     5c04ffa
+
+### DeepStack ×4 handoff-payload sensitivity — closes report.md S4.6  (2026-07-09)
+artifact:   simulation/results/aggregate44/fc_p90_L30_ds4.jsonl.stats.json
+command:    trace_to_two_pool.py --offset 250399 --max-requests 749601 --encoder-workers 2 --worker-schedule fc_p90_L30.sched.json --handoff-gbps 6.25  (×4 payload at 25 Gbps ≡ ×1 at 6.25 Gbps by linearity)
+feeds:      tex/closedloop.tex limitations — 4× payload on the modeled 25 Gbps link: handoff p99 272→1,087 ms, encoder-delay p99 1,404 ms (SLA violation from transfer alone); the 588 ms floor assumes embedding-only handoff or a ≥100 Gbps fabric (restores quoted numbers exactly); tex/twopool.tex handoff ¶ now points here instead of promising a "scheduled correction"
+supersedes: the unfulfilled "payload correction scheduled for the closed-loop runs" promise
+commit:     (this commit)

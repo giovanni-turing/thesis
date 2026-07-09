@@ -58,7 +58,7 @@ REJECTED.
 | T6.1 SLO/SLA | **DONE** | Defined once (Ch.1); "evaluation SLA" fixed as term of art |
 | T6.2 TPOT/ITL | **DONE** | Mapping defined at first use (Ch.1) and at the SLA ¶ (Ch.6); abbreviations list entry |
 | T6.3 units | **PARTIAL/DEFERRED** | Headline tables carry units; full `\num{}`-normalization pass deferred to final copy-edit |
-| T6.4 colloquialisms | **DONE** | All flagged phrases replaced (see feedback W2) |
+| T6.4 colloquialisms | **DONE (rev. 2026-07-09)** | "caught" reworded; "prices" retained deliberately — consistent domain diction, 14 uses across review-hardened chapters |
 | T6.5 sentence length | **PARTIAL** | Worst offenders split; global pass deferred per this review's own rewrite order (step 6) |
 
 

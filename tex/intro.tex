@@ -2,9 +2,8 @@
 % Introduction. Quantitative claims quoted here are established in the body
 % chapters and reproducible from the workspace's versioned scripts
 % (analysis/trace_eda, predictors, collector_artifacts, simulation).
-% One \emph{[Placeholder: ...]} remains (validation anchors, resolved by
-% the validation chapter); all others were resolved 2026-07-08 from the
-% completed baseline/closed-loop experiments (see progress/results-ledger.md).
+% No placeholders remain (last one resolved by the validation chapter,
+% 2026-07-09); provenance for every number is in progress/results-ledger.md.
 \chapter{Introduction}
 \label{cap:intro}
 
@@ -27,8 +26,8 @@ one per pool, continuously, under load that moves by the minute.
 
 This thesis studies how the pools of a modality-disaggregated multimodal
 serving system should be scaled, and defends a specific answer: each pool
-must be provisioned on a forecast of \emph{its own} demand signal. Four
-results carry the argument, one per chapter. In a production multimodal
+must be provisioned on a forecast of \emph{its own} demand signal. The
+argument builds across the document. In a production multimodal
 trace, vision demand is nearly decoupled from the request rate a
 conventional autoscaler watches, and the burstiest demand signal is also
 the most persistent --- the most forecastable
@@ -46,8 +45,8 @@ trace's largest burst breaks them in structurally different ways
 (Chapter~\ref{cap:twopool}). Closing the loop, per-pool forecasts hold
 the tail latency objective through burst onsets that defeat an
 identically informed reactive controller at every tested cold-start lead
-time, at a fraction of the deployable static fleet's provisioned
-GPU-time over the covered week
+time, at a fraction of the deployable static encoder fleet's
+provisioned GPU-time over the covered week
 (Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}).
 
 \section{Context: serving multimodal models by disaggregation}
@@ -168,7 +167,7 @@ fast and the burstiness does not average away. Onsets ramp from baseline
 to peak in a median of six minutes --- the fastest in one --- with a
 median steepest single-minute jump of \SI{208}{img/s}; against replica
 cold starts of tens of seconds to minutes, the fast half of the bursts
-cannot be caught by a policy that waits to observe them. Aggregation
+arrive too fast for a policy that waits to observe them. Aggregation
 does not rescue the reactive loop: the arrival process is overdispersed
 at every operational scale --- the Fano factor of the counting process
 grows from 1.8 at one second to 938 at one hour --- so no averaging
@@ -267,7 +266,7 @@ image signal loses the fastest-onset burst at every lead (p99
 9.5--54\,\si{\second}) --- regime anticipation, not signal choice, is
 the operative advantage; over the 5.60-day covered span the policy
 meets the SLA in aggregate and inside every episode at 0.27--0.31 times
-the deployable static fleet's provisioned worker-time; and the reactive
+the deployable static encoder fleet's provisioned worker-time; and the reactive
 planner's failure mode on the language pool is diagnostic --- all
 fourteen configurations satisfy their own window-mean control law while
 violating the tail SLA, tightening targets under lead raises spend
@@ -465,13 +464,14 @@ cannot buy the tail back under lead; and the contribution proper:
 per-pool forecasts driving worker schedules under cold-start lead,
 scored as SLA compliance $\times$ provisioned worker-time in a 560-cell
 factorial (windows, forecasting models, quantiles, leads, capacity
-ratings). The p90-forecast policy meets the SLA in every cell at every
+ratings). At the operating rating ($\rho{=}15$) the p90-forecast policy
+meets the SLA in every cell at every
 lead from 15 to \SI{300}{\second} (p99 \SI{588}{\milli\second}, the
 zero-queueing service floor); the reactive controller, watching the
 \emph{same} per-pool signal, loses the fastest-onset burst at every lead
 (p99 9.5--54\,\si{\second}); over the 5.60-day covered span the policy
 passes in aggregate and per-episode at 0.27--0.31 times the deployable
-static fleet's worker-time, while the reactive controller's apparent
+static encoder fleet's worker-time, while the reactive controller's apparent
 aggregate pass dissolves under per-episode grading. Mechanisms: regime
 anticipation on the encoder pool (the p90 forecast crosses onset
 thresholds at or before the signal itself, zero calm-day false alarms);

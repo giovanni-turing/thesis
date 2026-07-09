@@ -25,14 +25,14 @@ separates the policies is information, not plumbing.
 \section{Protocol}
 \label{sec:base-protocol}
 
-The workload windows are the six burst episodes of
+The workload windows are the six largest burst episodes of
 Chapter~\ref{cap:trace-eda} (peak 1-minute image rates 337--370
 \si{img/s}, onsets 1--220 minutes) plus the calmest full day of the trace
 (2024-10-19; peak \SI{57}{img/s}) as the steady reference. Two episodes
 (burst2/6) fall in the trace's first 1.4 days, reserved as forecast
 context (the temporal split is stated in
-Chapter~\ref{cap:closedloop}); they are graded here by forecast-free
-policies only. Each policy
+Chapter~\ref{cap:closedloop}); they are graded here by the static grid
+and the language-pool reactive baseline only. Each policy
 produces, per window, a worker schedule for the encoder pool ($C(t)$
 workers) and a configuration or replica schedule for the language pool
 ($\mathrm{TP}\times N$ H100 workers), and is graded on the resulting
@@ -83,7 +83,9 @@ the burst's long-prompt prefills pin TTFT p99 at
 ${\approx}$\SI{1285}{\milli\second} even at $N{=}16$ --- a
 \emph{prefill floor} that replica scaling cannot buy down and one
 parallelism change removes (TP2$\times$2:
-\SI{763}{\milli\second} on burst1). Second, the encoder requirement
+\SI{763}{\milli\second} on burst1's composed trace here;
+Chapter~\ref{cap:twopool} quotes \SI{748.4}{\milli\second} for the
+same shape on its isolation trace). Second, the encoder requirement
 swings from 2 workers on the calm day to 16 on burst5 --- the
 order-of-magnitude missizing of Chapter~\ref{cap:trace-eda}, now as a
 fleet-sizing fact. Third, the single static fleet that survives
@@ -101,7 +103,7 @@ no frontier movement).
 The reactive baseline is Dynamo's SLA planner --- the production
 controller of the platform this thesis targets --- run through the same
 replay path, in both its shipped load-based variant (A) and its
-SLA-target variant (B), across the seven windows (14 configurations
+SLA-target variant (B, ARIMA-driven throughput loop plus load loop), across the seven windows (14 configurations
 total, each at its window's optimal TP shape). The result is uniform:
 \textbf{all fourteen configurations satisfy the planner's own control
 law --- window-mean TTFT/ITL under its 500/50\,ms targets, with
