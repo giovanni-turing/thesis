@@ -147,14 +147,14 @@ artifact:   simulation/results/riders44/tp2knee_s{1.25,1.5,2}.report.json; fc_sc
 command:    (knee) run_replay.sh llm_burst1 aic TP2 N2 --arrival-speedup-ratio {1.25,1.5,2}; (belief) median engine_rps from planner "Agg: X rps / Y engine_rps" ticks, degenerate ticks (>100) dropped → 10.07; (validation) fc runs FORECAST_REQ_SCALE ∈ {4.64,6.22,7.0,8.0}, STARTUP_TIME=60
 feeds:      chapter in prep: closed loop — FORMULA: scale = engine_rps(believed)/r_tail(measured tail knee). Measured: belief median 10.07 rps/TP2-replica (p10–p90: 8.5–12.8; mix-varying); r_tail burst1 = 1.62 (s=1.5 PASS 906 ms, s=2 FAIL), burst4 ∈ [1.26,1.44] (scale 7.0 PASS 792 ms, 6.22 FAIL 1,104) → burst4 is the BINDING mix. Validation flips exactly at the formula's boundary: burst1 — 4.64 FAIL/6.22 PASS 932 (−16% GPU-h vs ×8)/8 PASS 736; burst4 — 6.22 FAIL/7.0 PASS/8.0 PASS 754. ⇒ ×8 = belief/1.26 = binding-window knee + ~14% capacity margin: the empirical knob is the principled value with margin, not arbitrary. Margin is MANDATORY: planner-in-loop runs show ~4% p99 run noise (932→968 same config) and r_tail is mix-dependent
 supersedes: FORECAST_REQ_SCALE=8 as an unexplained knob ("threshold between 2–8×")
-commit:     pending-45
+commit:     a3cd122
 
 ### forecast_file predictor: sub-minute feed fixes  (2026-07-09)
 artifact:   simulation/replay_with_forecast.py (units + tick-clock fixes)
 command:    (bug found via burst4 fc runs: scaled demand ~2.4 rps vs actual ~2.2 req/s raw)
 feeds:      all future LLM closed-loop runs at 15 s resolution. Two compounding sub-minute bugs: (1) parquet quantiles are per-BIN totals, planner reads per-60s counts → values ×(60/bin_s) (×4 understated at 15 s); (2) predictor advanced 1 bin/tick but ticks are 60 s → path read 4× slow, stuck at window start. Both ×1 no-ops at 1 min (burst1 regression: 968 vs 932 ms = run noise, not the fix). Pre-fix burst4 fc results (fc_scale{6.22,8}_burst4.report.json) are INVALID — superseded by _v2
 supersedes: fc_scale6.22_burst4/fc_scale8_burst4 (buggy feed; retained as the bug record)
-commit:     pending-45
+commit:     a3cd122
 
 ### Encoder model-side cold start (Phase D)  (2026-07-08)
 artifact:   collector_artifacts/phaseD_cold_start/{trials.jsonl,README.md}
