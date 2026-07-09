@@ -112,35 +112,35 @@ artifact:   simulation/results/results_44.jsonl (560 records, 0 errors) + cells_
 command:    python3 simulation/gen_cells_44.py; .venv/bin/python simulation/e2b_fleet.py --cells-file cells_44.jsonl --out results_44.jsonl (wave1: 60@60, wave2: 500@500, per user's ramp); parity gate vs pilot bit-exact (588.37/31838)
 feeds:      chapter in prep: closed loop — L* table (forecast/p90/ρ15: L*=300 on EVERY window; reactive: burst3 L*=none — fails even at 15 s, burst4/5 L*=45, burst1/steady L*=300; p50 non-viable 16/60); operating-point p99=588.4 everywhere = f(64)+handoff floor (zero queueing)
 supersedes: pilot lead sweep (subset; retained) and first ct_matrix (lead 60 only)
-commit:     this pass (44)
+commit:     acfbdee
 
 ### 4.4 rider (d) — burst-onset detection from archived forecasts  (2026-07-08)
 artifact:   simulation/results/riders44/detection_delay.json
 command:    eda/.venv/bin/python simulation/detect_onsets_44.py  (θ=224 img/s·15 s; stitched 15-s paths; issue-time = tile origin)
 feeds:      chapter in prep: closed loop (p90 detects every in-span onset at −105..+210 s incl. BEFORE-signal crossings on the two fastest onsets; point/p50 detect hours late or never; calm-day false alarms = 0 for all models/paths) — the mechanism behind the p90 headroom rule; answers review E5
 supersedes: new
-commit:     this pass (44)
+commit:     acfbdee
 
 ### 4.4 rider (c) — reactive target ladder under realistic LLM lead  (2026-07-08)
 artifact:   simulation/results/riders44/ladder_t{400_40,300_30,250_25,200_20}.report.json (+planner_*.json)
 command:    bash simulation/run_44_riders.sh  (variant-B planner, grid_burst1_C6 TP2, STARTUP_TIME=60 via new run_replay.sh knob → mocker-native startup_time)
 feeds:      chapter in prep: baselines/closed loop — tightening window-mean targets 400/40→200/20 raises spend 18.6→20.4 GPU-h but tail is pinned (TTFT p99 1,616–1,620 ms FAIL at every level; budget not saturated): under a 60-s lead reactive cannot buy tail compliance — the defect is information timing, not thrift
 supersedes: refines the "conversion is the defect" 3.2 finding under realistic lead (3.2 ran L=0, maximally charitable)
-commit:     this pass (44)
+commit:     acfbdee
 
 ### 4.4 LLM forecast closed loop under realistic leads  (2026-07-08)
 artifact:   simulation/results/riders44/fc_lead{60,90,120,300}.report.json (+fc_lead60_s1 scale-1 twin)
 command:    run_44_riders.sh fc block  (fc_burst1_tp2_s8 config + STARTUP_TIME ∈ {60,90,120,300})
 feeds:      chapter in prep: closed loop — forecast PASSES at every LLM lead (TTFT p99 736–757 ms vs 751 at L=0; ITL ~6.5) — lead-invariance proven on BOTH pools; closes the "instant workers flattered our own result" gap
 supersedes: fc_burst1_tp2_s8 as sole LLM closed-loop evidence (L=0)
-commit:     this pass (44)
+commit:     acfbdee
 
 ### 4.4 weekly aggregate — THE headline  (2026-07-08)
 artifact:   simulation/results/aggregate44/*.jsonl.stats.json + *.sched.json (8 configs); windows.json +aggregate (offset 250399, n 749601, span 483,660 s = 5.60 days, 2024-10-16 21:39 → trace end = full 15-s-forecast-covered span)
 command:    bash simulation/run_44_aggregate.sh  (chronos schedules, ρ15/15s/hyst3; statics = converter fixed C)
 feeds:      chapter in prep: closed loop headline — forecast-p90 PASSES the span (588 ms p99) at 2.38M/2.12M worker-s (L30/L300) = 0.31×/0.27× static-C16 (7.74M, 565 ms); reactive "passes" aggregate (588 @0.34×; 905 marginal @0.22×) ONLY via aggregation masking — matrix shows it failing burst3 at every lead (mirror of Ch.3's dashboard-masking, now in the metric); p50 FAILS (3.0–4.7 s); static C2 FAILS (2.95 s). Headline: forecast-p90 meets the tail SLO in aggregate AND per-episode at 0.27–0.31× the deployable static fleet
 supersedes: single-window C(t) results as the cost story; thesis-statement clause now number-backed
-commit:     this pass (44)
+commit:     acfbdee
 
 ### Encoder model-side cold start (Phase D)  (2026-07-08)
 artifact:   collector_artifacts/phaseD_cold_start/{trials.jsonl,README.md}
