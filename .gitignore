@@ -46,3 +46,6 @@ simulation/results/cap_sensitivity/*.log
 simulation/results/aggregate44/*.jsonl
 simulation/results/aggregate44/*.log
 simulation/results/riders44/*.log
+# burst26 reactive-encoder baseline: stats+schedules tracked; raw mooncake jsonl + logs reproducible
+simulation/results/burst26_reactive/*.jsonl
+simulation/results/burst26_reactive/*.log
