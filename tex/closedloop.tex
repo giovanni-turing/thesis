@@ -211,7 +211,16 @@ The headline: \textbf{the p90-forecast schedule meets the tail SLA over
 the aggregate \emph{and} inside every in-span episode at 0.27--0.31
 times the deployable static fleet's provisioned worker-time} (2.12--2.38M
 versus 7.74M worker-seconds, at p99 \SI{588}{\milli\second} versus the
-static fleet's 565).
+static fleet's 565). The forecaster does not carry the result:
+regenerating the p90 schedules from the other two model archives leaves
+the verdict unchanged --- Toto at the same service floor for
+0.27--0.31$\times$, TimesFM at 0.26--0.30$\times$ (its 300-second-lead
+schedule admits mild queueing, p99 \SI{664}{\milli\second}, still
+passing) --- a $\leq$4\% cost spread across models. The table quotes
+Chronos-2 deliberately: at 120M parameters it is the \emph{smallest} of
+the three (Toto-2.0 is $20\times$ larger), so the headline rests on the
+cheapest forecaster, not the most accurate one (at this resolution the
+accuracy winner is Toto, Chapter~\ref{cap:predictors}).
 
 Two rows demand care. The reactive rows \emph{appear} to pass ---
 their aggregate p99 clears the bound --- but the per-episode column

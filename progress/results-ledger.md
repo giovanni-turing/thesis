@@ -239,3 +239,10 @@ command:    (fix) PlannerConfig.fpm_observation_mode 'all': recv-mode drain → 
 feeds:      tex/validation.tex §val-findings — 4 findings: (1) live startup_time INVERTS offline semantics (registers immediately, stalls requests → routable-but-dead window; leads modeled by delayed spawn); (2) tracking-mode FPM sampling starves agg capacity model at calm load (0 mixed samples in 5 min @2 rps; offline ready tick 1) → fixed via flag; (3) live tick cadence can stall (one 245 s gap; forecast feed realigns to wall time); (4) budget-unit inconsistency (offline replay caps replicas at max_gpu_budget; live divides by decode_engine_num_gpu) — anchor twins budget-matched via max_gpu_budget=4, thesis offline results unaffected (budgets never bind)
 supersedes: new
 commit:     0eb7323 (dynamo-side 33a9babe01 local)
+
+### Aggregate model-sensitivity rider — table 8.2 is forecaster-robust  (2026-07-09)
+artifact:   simulation/results/aggregate44/fc_p90_L{30,300}_{toto,timesfm}.jsonl.stats.json (+.sched.json)
+command:    bash simulation/run_44_aggregate_models.sh  (p90/rho15/15s/hyst3, leads {30,300}, schedules from toto/timesfm parquets, same aggregate span + converter as the chronos rows)
+feeds:      tex/closedloop.tex §cl-aggregate model-robustness ¶ — all three TSFMs PASS: chronos 0.273–0.307× (588 ms), toto 0.275–0.305× (588 ms), timesfm 0.263–0.297× (664.5 ms at L300, mild queueing, passing); ≤4% cost spread; Chronos quoted as the SMALLEST model (120M vs Toto 2.5B) — headline rests on the cheapest forecaster, not the best
+supersedes: chronos-only evidence for the aggregate row (matrix already showed per-window model insensitivity)
+commit:     (this commit)
