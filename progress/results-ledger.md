@@ -252,4 +252,4 @@ artifact:   simulation/results/llm_week/week_{fc_p90,re}.report.json (+.log, lau
 command:    bash simulation/results/llm_week/launch.sh  (run_replay.sh on results/aggregate44/fc_p90_L30.jsonl [composed trace, winning encoder schedule], aic TP2 N=2, STARTUP_TIME=60; fc: replay_with_forecast FORECAST_{MODEL=chronos,QUANTILE=p90,RESOLUTION=15s,T0="2024-10-16 21:39:00"} SCALE=8, planner_forecast_smoke; re: planner_ladder_t200_20)
 feeds:      tex/closedloop.tex §cl-llm "language pool at week scale" ¶ — fc-p90 PASSES the 5.60-day span (TTFT p99 651.1 ms, ITL 6.4) at 518.6 H100 GPU-h = 0.96× burst-sized static TP2×2 (537.4 GPU-h/span); reactive FAILS the week (1,196.6 ms) at 281.8 GPU-h — half the spend, wrong tail. Closes the last coverage asymmetry (LLM pool now week-graded like the encoder pool)
 supersedes: window-level-only LLM closed-loop evidence (burst1/3/4 retained)
-commit:     (this commit)
+commit:     5c04ffa
