@@ -57,6 +57,13 @@ def _load_series() -> dict[str, "pd.Series"]:
         df = df[df.ts >= t0 - pd.Timedelta(minutes=1)]
         df = df.sort_values("ts").drop_duplicates("ts")
         s = df.set_index("ts")[q].clip(lower=0.0)
+        # Units: parquet quantiles are PER-BIN totals, and the planner reads a
+        # predicted value as a per-60s count (its adjustment interval).
+        # Normalize per-bin -> per-60s so demand is resolution-independent
+        # (x1 at 1min: burst1 runs byte-identical; x4 at 15s: demand was
+        # silently understated 4x). ISL/OSL are ratios c/r, g/r — unaffected.
+        bin_s = pd.Timedelta(res.replace("min", "m")).total_seconds()
+        s = s * (60.0 / bin_s)
         if s.empty:
             raise SystemExit(f"forecast_file: no rows for {variate} at/after {t0}")
         # Alignment guard: the forecast span must actually COVER the window
@@ -87,6 +94,13 @@ class _ForecastFilePredictor(P.BasePredictor):
         self.ticks += 1
 
     def _bin(self, idx: int) -> tuple[float, float, float]:
+        # Clock: one planner tick = 60 s of sim time, but the series is at
+        # FORECAST_RESOLUTION bins — advance round(60/bin_s) bins per tick
+        # (1 at 1min, unchanged; 4 at 15s, else the path is read 4x too
+        # slowly and sticks near the window start).
+        res = os.environ.get("FORECAST_RESOLUTION", "1min")
+        bin_s = pd.Timedelta(res.replace("min", "m")).total_seconds()
+        idx = int(idx * max(1, round(60.0 / bin_s)))
         req = self.series["requests"]
         i = min(idx, len(req) - 1)
         ts = req.index[i]
