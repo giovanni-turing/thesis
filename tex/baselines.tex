@@ -28,7 +28,11 @@ separates the policies is information, not plumbing.
 The workload windows are the six burst episodes of
 Chapter~\ref{cap:trace-eda} (peak 1-minute image rates 337--370
 \si{img/s}, onsets 1--220 minutes) plus the calmest full day of the trace
-(2024-10-19; peak \SI{57}{img/s}) as the steady reference. Each policy
+(2024-10-19; peak \SI{57}{img/s}) as the steady reference. Two episodes
+(burst2/6) fall in the trace's first 1.4 days, which the forecasting
+protocol reserves as model context (the temporal split is stated in
+Chapter~\ref{cap:closedloop}); they are graded here by the forecast-free
+policies only. Each policy
 produces, per window, a worker schedule for the encoder pool ($C(t)$
 workers) and a configuration or replica schedule for the language pool
 ($\mathrm{TP}\times N$ H100 workers), and is graded on the resulting

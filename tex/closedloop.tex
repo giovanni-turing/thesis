@@ -43,6 +43,24 @@ predictive and reactive language-pool policies share the production
 actuation path end to end; replica lead is enforced by the simulator's
 native worker-startup delay.
 
+\paragraph{Temporal split, stated as such.} The evaluation follows a
+train/test-style temporal discipline against contamination. The trace's
+first 1.4 days are consumed as forecast \emph{context} --- the
+zero-shot models' rolling history before their first usable
+15-second forecast --- and are never graded; the remaining 5.60 days
+form the evaluation span, on which every closed-loop verdict in this
+chapter is scored (episodes burst1/3/4/5 and the calm day; the two
+pre-coverage episodes are graded only by forecast-free policies,
+Chapter~\ref{cap:baselines}). No information flows backward across the
+split or within it: every forecast value is issued strictly before the
+bins it predicts (rolling origin, Chapter~\ref{cap:predictors}), and no
+policy constant is selected by outcomes on the evaluation span --- each
+is either derived from capacity measurement (the encoder cost model,
+the belief-to-knee conversion) or swept with all values reported
+(headroom quantile, capacity rating, cold-start leads). A deployed
+system would enter the week with prior history as context; the warm-up
+hole is the price of zero-shot honesty, not a property of the method.
+
 \section{Encoder pool: the lead-time result}
 \label{sec:cl-matrix}
 
