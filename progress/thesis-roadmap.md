@@ -236,8 +236,23 @@ Cold-start grounding: Phase D measurement (encoder 3–5 s model-side).
 
 **REMAINING in phase 4:** (c-orig) LLM principled mapping
 (mean-capacity/knee, replacing ×8) + LLM windows beyond burst1;
-(d-orig) template rev 2 (cleanup, non-gating). Then WRITING: baselines +
-closed-loop chapters now have every number.
+(d-orig) template rev 2 (cleanup, non-gating).
+**QUEUED (user, 2026-07-08) — structural-additive LLM predictor
+ablation, AFTER the principled mapping:** decompose the LLM prefill
+forecast as text-borne + g(image forecast) (g = Ch.3's per-image token
+conditional, ~277→66); rationale: vision-borne component has the higher
+persistence (H≈.87 vs .76) and prefill regime shifts are vision-driven,
+so expect gains at ONSETS, not averages (Ch.4 covariate null covers
+averages; detection-delay analysis showed the averages/onsets split).
+Step 1 archive-only: reconstruct ctx path from archived image forecasts
+via g, score vs direct ctx forecast pooled + onset-conditioned; graduate
+to a planner run only if the onset edge is real. Related design note for
+the chapters: the seam gives the LLM an exact in-flight preview (admitted
+vision work + known ContextTokens at now+sojourn) — horizon ≈ encoder
+sojourn (~0.6 s healthy) → scheduling-timescale value (chunked-prefill/
+KV pre-alloc), not replica-lead value; one ¶ in closed-loop chapter +
+Dynamo-planner extension candidate for Phase 5.
+Then WRITING: baselines + closed-loop chapters now have every number.
 
 (Superseded status below for history.)
 
