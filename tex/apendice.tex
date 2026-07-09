@@ -101,11 +101,30 @@ Fig.~\ref{fig:sim-burst-queue} &
 Cap sensitivity (\S\ref{sec:sim-limitations}) &
   \texttt{workload/trace\_to\_two\_pool.py} &
   \texttt{results/cap\_sensitivity/} \\
-Static grid; reactive planner; closed loop (cited forward) &
-  \texttt{simulation/ \{sweep\_grid.py, run\_32\_reactive.sh,
-  run\_ct\_matrix.sh, e2b\_fleet.py\}} &
-  \texttt{results/\{grid, reactive32, ct\_matrix, planner\}};
-  \texttt{results/pilot\_results.jsonl} \\
+Tab.~\ref{tab:base-grid} &
+  \texttt{simulation/sweep\_grid.py} (+35 close-out corner runs) &
+  \texttt{results/grid/ grid\_summary.json} \\
+Reactive planner (\S\ref{sec:base-reactive-llm}) &
+  \texttt{simulation/ run\_32\_reactive.sh} &
+  \texttt{results/reactive32/ r32\{A,B\}\_*.report.json} \\
+Tab.~\ref{tab:base-ladder}; Tab.~\ref{tab:cl-triad};
+LLM lead sweep + capacity mapping (\S\ref{sec:cl-llm}) &
+  \texttt{simulation/ run\_44\_riders.sh};
+  \texttt{replay\_with\_forecast.py} &
+  \texttt{results/riders44/ \{ladder\_*, fc\_lead*, fc\_scale*,
+  tp2knee\_*\}.report.json} \\
+Tab.~\ref{tab:base-react-enc}; 560-cell matrix (\S\ref{sec:cl-matrix}) &
+  \texttt{simulation/ \{gen\_cells\_44.py, e2b\_fleet.py\}} &
+  \texttt{results/results\_44.jsonl} \\
+Onset detection (\S\ref{sec:cl-matrix}) &
+  \texttt{simulation/ detect\_onsets\_44.py} &
+  \texttt{results/riders44/ detection\_delay.json} \\
+Tab.~\ref{tab:cl-aggregate} &
+  \texttt{simulation/ run\_44\_aggregate.sh} &
+  \texttt{results/aggregate44/ *.stats.json} \\
+Encoder cold start (Ch.~\ref{cap:intro} n., \S\ref{sec:base-protocol}) &
+  \texttt{collector\_artifacts/ phaseD\_cold\_start/} &
+  \texttt{trials.jsonl} \\
 \bottomrule
 \end{tabular}
 \end{table}

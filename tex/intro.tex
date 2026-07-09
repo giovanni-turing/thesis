@@ -55,9 +55,9 @@ capacity removes and no rate- or utilization-based monitor sees
 (Chapter~\ref{cap:twopool}). Closing the loop, per-pool forecasts driving
 worker schedules hold the tail latency objective through burst onsets
 that defeat an identically informed reactive controller at every tested
-cold-start lead time, at a fraction of the statically provisioned
-fleet's GPU-hours (baselines and closed-loop chapters, in preparation;
-results summarized in Section~\ref{sec:intro-contrib}).
+cold-start lead time, at 0.27--0.31 times the deployable static fleet's
+provisioned GPU-time over the covered week
+(Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}).
 
 \section{Context: serving multimodal models by disaggregation}
 \label{sec:intro-context}
@@ -273,18 +273,24 @@ polynomial misses a $1.9\times$ SLA violation outright).
 \item[RQ4 --- Closed-loop payoff.] Does provisioning each pool on a
 forecast of its own signal improve SLA compliance and GPU-hours over the
 two reference policies --- the best static configuration and a reactive
-planner --- during the trace's burst episodes? The completed experiments
-(chapters in preparation) answer yes, and locate \emph{why}: on the
-fastest-onset burst the forecast-driven encoder schedule holds the tail
-bound (p99 \SI{588}{\milli\second}) where a reactive controller watching
-the \emph{same} image signal fails at every tested cold-start lead from
-30 to \SI{300}{\second} (p99 $\geq$\SI{38}{\second}) --- regime
-anticipation, not signal choice, is the operative advantage; on the calm
-day the same policy runs at a tenth of the deployable static fleet's
-provisioned worker-seconds; and the reactive planner's failure mode on
-the language pool is diagnostic --- all fourteen configurations satisfy
-their own window-mean control law while violating the tail SLA, so
-mean-based capacity conversion, not loop tuning, is what fails.
+planner --- during the trace's burst episodes?
+Chapters~\ref{cap:baselines} and~\ref{cap:closedloop} answer yes, and
+locate \emph{why}: the forecast-driven encoder schedule holds the tail
+bound on every window at every cold-start lead from 15 to
+\SI{300}{\second} (p99 \SI{588}{\milli\second}, the zero-queueing
+service floor), where a reactive controller watching the \emph{same}
+image signal loses the fastest-onset burst at every lead (p99
+9.5--54\,\si{\second}) --- regime anticipation, not signal choice, is
+the operative advantage; over the 5.60-day covered span the policy
+meets the SLA in aggregate and inside every episode at 0.27--0.31 times
+the deployable static fleet's provisioned worker-time; and the reactive
+planner's failure mode on the language pool is diagnostic --- all
+fourteen configurations satisfy their own window-mean control law while
+violating the tail SLA, tightening targets under lead raises spend
+without moving the tail, and the same forecast fed through the mean
+conversion fails identically --- so mean-based capacity conversion, not
+loop tuning or signal quality, is what fails, and a measured tail-aware
+conversion repairs it.
 \end{description}
 
 {\renewcommand{\sectionmark}[1]{}%
@@ -470,25 +476,31 @@ and utilization-based monitors and fixable only by capacity. The
 decoupling of Chapter~\ref{cap:trace-eda}, reproduced as system behavior.
 
 \item \textbf{Baselines and the closed predictive-scaling loop}
-(chapters in preparation; experiments complete, archived, and
-summarized here). The static-optimal worker-grid frontier per window
-(the burst windows need 6--16 encoder workers at trace rate against 2
-on a calm day, and TP2 language shapes throughout); a reactive
-SLA-planner baseline whose fourteen language-pool configurations all
-satisfy their own window-mean control law while violating the tail SLA
---- isolating mean-based capacity conversion as the defect; and the
-contribution proper: per-pool forecasts driving worker schedules under
-cold-start lead times, scored as SLA compliance $\times$
-provisioned worker-seconds. On the fastest-onset burst the forecast
-schedule holds the tail bound (p99 \SI{588}{\milli\second}) where the
+(Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}). The
+static-optimal worker-grid frontier per window (the burst windows need
+6--16 encoder workers at trace rate against 2 on a calm day, and TP2
+language shapes throughout); a reactive SLA-planner baseline whose
+fourteen language-pool configurations all satisfy their own window-mean
+control law while violating the tail SLA --- isolating mean-based
+capacity conversion as the defect, with a target-tightening ladder
+showing spend cannot buy the tail back under lead; and the contribution
+proper: per-pool forecasts driving worker schedules under cold-start
+lead times, scored as SLA compliance $\times$ provisioned worker-time,
+in a 560-cell factorial over windows, forecasting models, quantiles,
+leads, and capacity ratings. The p90-forecast policy meets the SLA in
+every cell at every lead from 15 to \SI{300}{\second} (p99
+\SI{588}{\milli\second}, the zero-queueing service floor) where the
 reactive controller --- watching the \emph{same} per-pool signal ---
-fails at every lead time from 30 to \SI{300}{\second}, degrading
-monotonically toward its never-scaled limit (p99 $\geq$\SI{38}{\second});
-on the calm day the forecast schedule spends a tenth of the deployable
-static fleet's provisioned worker-seconds. Regime anticipation ---
-raising capacity before an onset a trailing window cannot see --- is
-identified as the operative mechanism, with quantile choice (p90) as
-the headroom dial.
+loses the fastest-onset burst at every lead (p99 9.5--54\,\si{\second});
+over the 5.60-day covered span the policy passes in aggregate and
+per-episode at 0.27--0.31 times the deployable static fleet's
+worker-time, while the reactive controller's apparent aggregate pass
+dissolves under per-episode grading. Regime anticipation --- the p90
+forecast crosses onset thresholds at or before the signal itself, with
+zero calm-day false alarms --- is identified as the operative mechanism
+on the encoder pool; a derived tail-aware capacity conversion
+(a measured belief-to-knee ratio) is the second necessary ingredient on
+the language pool.
 \end{enumerate}
 
 \section{Scope and limitations}
@@ -534,12 +546,14 @@ and exercises the system. Chapter~\ref{cap:aiconfigurator} constructs and
 physically validates the vision pool's cost model on collected RTX~5090
 silicon. Chapter~\ref{cap:twopool} composes the two-pool simulation,
 quantifies both pools' timing fidelity, and locates their saturation knees
---- the decoupling as measured system behavior. Four chapters are in
-preparation from completed and archived experiments: a \emph{baselines}
-chapter establishing the static-optimal worker grid and the reactive
-SLA-planner baseline on both pools; a \emph{closed-loop} chapter scoring
+--- the decoupling as measured system behavior.
+Chapter~\ref{cap:baselines} establishes the two reference policies:
+the static-optimal worker grid and the reactive baselines on both
+pools. Chapter~\ref{cap:closedloop} closes the loop, scoring
 forecast-driven per-pool schedules against those baselines as SLA
-compliance $\times$ provisioned worker-seconds, with ablations over
-cold-start lead, headroom quantile, and forecasting model; a
-\emph{validation} chapter replaying the winning policy against the live
-Dynamo runtime with mocked workers; and \emph{conclusions}.
+compliance $\times$ provisioned worker-time, with ablations over
+cold-start lead, headroom quantile, forecasting model, and capacity
+rating, and prices the policy over the covered week.
+Chapter~\ref{cap:conclusion} concludes. A \emph{validation} chapter ---
+the winning policy replayed against the live Dynamo runtime with mocked
+workers --- is in preparation from the running platform.

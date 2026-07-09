@@ -1,0 +1,97 @@
+%!TeX root=./tese.tex
+% Conclusions. Numbers quoted here are established in the body chapters
+% and ledgered in progress/results-ledger.md.
+\chapter{Conclusions}
+\label{cap:conclusion}
+
+This thesis set out to answer how the pools of a modality-disaggregated
+multimodal serving system should be scaled, and defended a specific
+answer: each pool on a forecast of its own demand signal. The four
+research questions of Chapter~\ref{cap:intro} can now be answered from
+evidence.
+
+\paragraph{RQ1 --- Signal sufficiency: no.} The request-rate signal a
+conventional autoscaler watches does not carry the vision pool's demand:
+statistically (a constant-fraction model explains $R^2 = 0.12$ of the
+image-rate series, against $0.65$ for decode; extreme minutes essentially
+disjoint, Jaccard $0.02$), and mechanically (the composed system's pools
+saturate an order of magnitude apart on steady traffic, and the encoder
+pool fails its tail bound at the trace's own recorded rate, at 29\% mean
+utilization, invisibly to rate- and utilization-based monitors). The
+missizing is priced by the static grid: burst-feasible fleets need
+6--16 encoder workers and a TP2 language shape against 2 workers and TP1
+on the calm day --- an $8\times$/$2\times$ overprovisioning plus a fleet-shape
+change no replica scaler can perform.
+
+\paragraph{RQ2 --- Forecastability: yes, zero-shot.} Three pretrained
+time-series foundation models beat every classical baseline in all
+twenty (resolution, signal) cells under one rolling-origin protocol;
+accuracy degrades only marginally across a twelve-step horizon (covering
+the median burst onset); covariates are nearly irrelevant at
+provisioning cadence --- the forecasting-side echo of the decoupling ---
+and the p90 band edge is empirically calibrated (coverage 0.88--0.90)
+at provisioning cadence, which is what later converts forecasts into
+provisionable headroom.
+
+\paragraph{RQ3 --- Platform validity: yes, with measured fidelity.} The
+encoder cost model was collected on silicon for this thesis
+(and contributed upstream), validated to ${\approx}3\%$ on its dominant
+operator with a fully attributed residual ledger and a
+conservative-direction composed-forward band; the language pool runs
+under calibrated engine timing whose delta against the simulator's
+default polynomial is quantified --- including a burst-window SLA
+violation the polynomial misses outright. Per-pool attribution is by
+construction: either pool replays in isolation on the same workload.
+
+\paragraph{RQ4 --- Closed-loop payoff: yes, with the mechanism
+identified.} On the encoder pool, the p90-forecast schedule meets the
+tail SLA on every window at every cold-start lead from 15 to 300 seconds
+--- including the one-minute-onset burst that defeats an identically
+informed reactive controller at every lead --- because the forecast
+detects onsets at or before the signal itself; anticipated capacity
+removes queueing, leaving the service floor
+(\SI{588}{\milli\second} p99). On the language pool, forecasts pass
+bursts under realistic replica leads only when combined with a
+tail-aware capacity conversion (a measured belief-to-knee ratio); fed
+through the planner's native mean-based conversion, the same forecast
+fails like the reactive baseline --- mean-based capacity conversion, not
+loop tuning, is the reactive planner's defect, and no spend level
+repairs it under lead. Over the 5.60-day covered span the policy holds
+the SLA in aggregate and inside every episode at
+\textbf{0.27--0.31$\times$ the deployable static fleet's provisioned
+worker-time}; the reactive controller's apparent aggregate pass
+dissolves under per-episode grading --- the trace chapter's
+dashboard-masking, recurring in the evaluation metric.
+
+\paragraph{The thesis statement, revisited.} Every clause is now
+number-backed: the pools' demands decouple ($R^2=0.12$, Jaccard
+$0.02$), saturate far apart (order of magnitude on steady traffic), the
+least visible signal is the most persistent and is forecastable
+zero-shot at provisioning horizons (twenty of twenty cells), and scaling
+on those forecasts holds the tail objective through the onsets that
+defeat reactive control at every tested lead, at roughly a quarter to a
+third of the best static fleet's GPU-time.
+
+\section{Future work}
+\label{sec:conc-future}
+
+Four extensions are queued by design. \emph{Validation anchors}: replay
+of the winning policy against the live Dynamo runtime with mocked
+workers (same planner code path, real control plane), and optionally one
+physical encoder worker on the RTX~5090 under a burst replay ---
+closing the loop between simulation and stack. \emph{A structural
+language-pool predictor}: the prefill signal decomposes as text-borne
+demand plus an image-driven component with higher persistence; a
+predictor additive in the vision forecast should pay precisely at
+onsets, where regime shifts are vision-driven --- the pooled-average
+null of Chapter~\ref{cap:predictors} does not cover that
+onset-conditioned case. \emph{The seam as a preview channel}: in a
+modality-disaggregated system the vision pool's admitted work is an
+exact, short-horizon preview of language-pool arrivals
+(horizon $\approx$ encoder sojourn); useless for replica lead, but free
+information at scheduling timescales (chunked-prefill planning, KV
+pre-allocation) --- a natural planner extension. \emph{Workload
+breadth}: image-size-aware encoder costing when a trace with size
+information becomes available, the intermediate model family members,
+and fine-tuned (rather than zero-shot) forecasters as the upper bound on
+the forecasting side.

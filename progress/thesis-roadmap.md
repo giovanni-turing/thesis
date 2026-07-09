@@ -379,10 +379,17 @@ Progress + results: `phase4-predictors.md`. Chapter draft: `tex/predictors.tex`.
      switch); global sentence-length pass (final copy-edit).
    - ⬜ Remaining placeholder (1, intentional): validation-anchor sentence
      in intro scope — resolves with Phase 5.1.
-   - ⬜ Baselines chapter, closed-loop chapter, conclusion; fold into the
-     mestrado build with Phase 0 cross-references. (The intro/related now
-     STATE the delivered results with numbers, so the document argues
-     end-to-end while these chapters are written.)
+   - ✅ **Baselines + closed-loop + conclusions chapters DRAFTED
+     (2026-07-09, advisor preliminary-review version)**: `tex/baselines.tex`
+     (static grid Tab. base-grid, reactive 3.2, target ladder, reactive
+     encoder L* table), `tex/closedloop.tex` (controller, 560-cell matrix
+     ablations, detection mechanism, LLM triad + belief/knee mapping,
+     aggregate headline Tab. cl-aggregate), `tex/conclusion.tex` (RQ1–4
+     verdicts + future work). Intro RQ4/contrib-5/organization updated to
+     real chapter refs; abstract/resumo carry the 0.27–0.31× headline;
+     repro appendix extended with the new artifacts; removable
+     "Note on this draft" page added. Build 112 pp, 0 undefined refs.
+     Every number cross-checked against the artifacts at write time.
 
 ---
 

@@ -61,8 +61,8 @@ through episodic queueing at 29\% mean utilization, invisible to rate-
 and utilization-based monitoring. Closing the loop, forecast-driven
 per-pool worker schedules hold the tail latency objective through burst
 onsets that defeat an identically informed reactive controller at every
-tested cold-start lead, at a fraction of the best static fleet's
-GPU-hours.
+tested cold-start lead, at 0.27--0.31 times the best static fleet's
+provisioned GPU-time over the covered week.
 
 \begin{otherlanguage}{brazil}
 \chapter*{Resumo}
@@ -102,9 +102,22 @@ m\'edia, invis\'ivel a monitores de taxa e utiliza\c{c}\~ao. Fechando o
 la\c{c}o, escalas de trabalhadores dirigidas por previs\~ao por
 \emph{pool} sustentam o objetivo de lat\^encia de cauda atrav\'es de
 in\'icios de rajada que derrotam um controlador reativo igualmente
-informado em todos os tempos de partida a frio testados, a uma
-fra\c{c}\~ao das GPU-horas da melhor frota est\'atica.
+informado em todos os tempos de partida a frio testados, a 0,27--0,31
+do tempo de GPU provisionado da melhor frota est\'atica na semana
+coberta.
 \end{otherlanguage}
+
+% ---- Draft-status note (REMOVE for the defense/submission version) ----
+\chapter*{Note on this draft}
+This is a preliminary version (2026-07-09) prepared for advisor review.
+All experimental phases are complete and archived; every quantitative
+claim in the document traces to a versioned artifact through the
+workspace's results ledger. Pending for the defense version:
+the validation-anchor experiment (the winning policy replayed against
+the live Dynamo runtime with mocked workers) and its short chapter;
+institutional formatting (departmental template, ABNT front matter,
+biblatex bibliography); and a final copy-edit. Chapter numbering may
+shift when the institutional template is adopted.
 
 \tableofcontents
 \cleardoublepage
@@ -149,6 +162,9 @@ WAPE & weighted absolute percentage error \\
 \include{predictors}
 \include{aiconfigurator}
 \include{twopool}
+\include{baselines}
+\include{closedloop}
+\include{conclusion}
 
 \appendix
 \include{apendice}
