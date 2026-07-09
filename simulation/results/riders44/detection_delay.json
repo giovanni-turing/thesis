@@ -1,0 +1,220 @@
+{
+ "threshold_img_per_bin": 3360,
+ "bin_s": 15,
+ "episodes": {
+  "ep1/burst1": {
+   "onset_minutes": 220,
+   "t_actual": "2024-10-21 12:47:30",
+   "chronos": {
+    "point": {
+     "detected": true,
+     "delay_s": 14430.0,
+     "usable_lead_s": -14430.0
+    },
+    "p50": {
+     "detected": true,
+     "delay_s": 14430.0,
+     "usable_lead_s": -14430.0
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": 210.0,
+     "usable_lead_s": -210.0
+    }
+   },
+   "toto": {
+    "point": {
+     "detected": true,
+     "delay_s": 14430.0,
+     "usable_lead_s": -14430.0
+    },
+    "p50": {
+     "detected": true,
+     "delay_s": 14430.0,
+     "usable_lead_s": -14430.0
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": 30.0,
+     "usable_lead_s": -30.0
+    }
+   },
+   "timesfm": {
+    "point": {
+     "detected": true,
+     "delay_s": 14430.0,
+     "usable_lead_s": -14430.0
+    },
+    "p50": {
+     "detected": false
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": 60.0,
+     "usable_lead_s": -30.0
+    }
+   }
+  },
+  "ep3/burst3": {
+   "onset_minutes": 1,
+   "t_actual": "2024-10-18 09:59:45",
+   "chronos": {
+    "point": {
+     "detected": false
+    },
+    "p50": {
+     "detected": false
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": -105.0,
+     "usable_lead_s": 165.0
+    }
+   },
+   "toto": {
+    "point": {
+     "detected": false
+    },
+    "p50": {
+     "detected": false
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": 15.0,
+     "usable_lead_s": -15.0
+    }
+   },
+   "timesfm": {
+    "point": {
+     "detected": false
+    },
+    "p50": {
+     "detected": false
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": 15.0,
+     "usable_lead_s": -15.0
+    }
+   }
+  },
+  "ep4/burst4": {
+   "onset_minutes": 60,
+   "t_actual": "2024-10-18 15:17:00",
+   "chronos": {
+    "point": {
+     "detected": true,
+     "delay_s": 3300.0,
+     "usable_lead_s": -3300.0
+    },
+    "p50": {
+     "detected": true,
+     "delay_s": 3300.0,
+     "usable_lead_s": -3300.0
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": 0.0,
+     "usable_lead_s": 120.0
+    }
+   },
+   "toto": {
+    "point": {
+     "detected": true,
+     "delay_s": 5460.0,
+     "usable_lead_s": -5460.0
+    },
+    "p50": {
+     "detected": true,
+     "delay_s": 5460.0,
+     "usable_lead_s": -5460.0
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": 0.0,
+     "usable_lead_s": 120.0
+    }
+   },
+   "timesfm": {
+    "point": {
+     "detected": true,
+     "delay_s": 5460.0,
+     "usable_lead_s": -5460.0
+    },
+    "p50": {
+     "detected": true,
+     "delay_s": 6180.0,
+     "usable_lead_s": -6180.0
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": 0.0,
+     "usable_lead_s": 120.0
+    }
+   }
+  },
+  "ep5/burst5": {
+   "onset_minutes": 35,
+   "t_actual": "2024-10-18 14:12:30",
+   "chronos": {
+    "point": {
+     "detected": false
+    },
+    "p50": {
+     "detected": false
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": -15.0,
+     "usable_lead_s": 30.0
+    }
+   },
+   "toto": {
+    "point": {
+     "detected": false
+    },
+    "p50": {
+     "detected": false
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": -30.0,
+     "usable_lead_s": 30.0
+    }
+   },
+   "timesfm": {
+    "point": {
+     "detected": false
+    },
+    "p50": {
+     "detected": false
+    },
+    "p90": {
+     "detected": true,
+     "delay_s": 150.0,
+     "usable_lead_s": -150.0
+    }
+   }
+  }
+ },
+ "false_alarms_calm_day": {
+  "chronos": {
+   "actual_crossings": 0,
+   "point": 0,
+   "p50": 0,
+   "p90": 0
+  },
+  "toto": {
+   "actual_crossings": 0,
+   "point": 0,
+   "p50": 0,
+   "p90": 0
+  },
+  "timesfm": {
+   "actual_crossings": 0,
+   "point": 0,
+   "p50": 0,
+   "p90": 0
+  }
+ }
+}

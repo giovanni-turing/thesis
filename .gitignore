@@ -42,3 +42,7 @@ simulation/results/srcbuild/*.log
 simulation/results/cap_sensitivity/*.jsonl
 simulation/results/cap_sensitivity/*.log
 .e2b_sandbox
+# 4.4 aggregate/rider intermediates: stats+schedules+reports tracked; composed traces reproducible
+simulation/results/aggregate44/*.jsonl
+simulation/results/aggregate44/*.log
+simulation/results/riders44/*.log

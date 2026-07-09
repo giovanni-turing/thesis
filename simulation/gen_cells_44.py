@@ -15,10 +15,13 @@ Grid (user-reviewed 2026-07-08):
   rho         {10,15,20,25} img/s per worker (shared by both policies)
   hysteresis  3 min (fixed; scale-down trailing-max)
 
-480 forecast + 80 reactive = 560 cells.
+480 forecast + 80 reactive = 560 cells, shuffled with a fixed seed so any
+prefix is a representative sample (the launch ramps: first 60 cells as a
+canary wave at concurrency 60, then the remaining 500 at concurrency 500).
 """
 import itertools
 import json
+import random
 
 WINDOWS = ["burst1", "burst3", "burst4", "burst5", "steady24h"]
 LEADS = [15, 30, 45, 300]
@@ -34,8 +37,10 @@ for w, lead, rho in itertools.product(WINDOWS, LEADS, RHOS):
         cells.append({**base, "policy": "forecast", "quantile": q, "model": m})
     cells.append({**base, "policy": "reactive"})
 
+random.Random(0).shuffle(cells)
+
 out = "/home/gio/tese/simulation/results/cells_44.jsonl"
 with open(out, "w") as f:
     for c in cells:
         f.write(json.dumps(c) + "\n")
-print(f"{len(cells)} cells -> {out}")
+print(f"{len(cells)} cells (seed-0 shuffle) -> {out}")

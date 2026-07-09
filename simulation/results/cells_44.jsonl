@@ -1,560 +1,560 @@
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
 {"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
 {"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
 {"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
-{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
 {"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
 {"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst4", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst4", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 15, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst1", "resolution": "15s", "rho": 20, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "toto"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "burst3", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst3", "resolution": "15s", "rho": 25, "cold_start_s": 300, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "steady24h", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 10, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}
+{"window": "burst5", "resolution": "15s", "rho": 25, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "toto"}
+{"window": "steady24h", "resolution": "15s", "rho": 25, "cold_start_s": 30, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "chronos"}
+{"window": "steady24h", "resolution": "15s", "rho": 20, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "timesfm"}
+{"window": "burst4", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst1", "resolution": "15s", "rho": 15, "cold_start_s": 30, "hysteresis_min": 3, "policy": "reactive"}
+{"window": "burst5", "resolution": "15s", "rho": 15, "cold_start_s": 300, "hysteresis_min": 3, "policy": "forecast", "quantile": "p90", "model": "chronos"}
+{"window": "burst5", "resolution": "15s", "rho": 10, "cold_start_s": 45, "hysteresis_min": 3, "policy": "forecast", "quantile": "p50", "model": "timesfm"}

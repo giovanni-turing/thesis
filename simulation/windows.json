@@ -75,5 +75,12 @@
   "mean_img_per_s": 5.443,
   "peak_1min_img_per_s": 57.05,
   "text_only_fraction": 0.573
+ },
+ "aggregate": {
+  "offset": 250399,
+  "max_requests": 749601,
+  "note": "4.4 weekly aggregate: full 15-s-forecast-covered span [2024-10-16 21:39:00 .. trace end], 749601 requests [2024-10-16 21:39:00.118000 .. 2024-10-22 11:59:59.964000]",
+  "requests": 749601,
+  "span_s": 483659.8
  }
 }

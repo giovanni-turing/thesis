@@ -212,7 +212,36 @@ Progress + SLA definitions: `phase3-baselines.md`.
    loop as "Dynamo's own single-signal classical-predictor scaling" —
    a middle rung between reactive and the thesis's per-pool TSFM policy.
 
-## Phase 4 — Predictive scaling (the contribution) — IN PROGRESS (4.1–4.3 ✅, 4.4 NEXT)
+## Phase 4 — Predictive scaling (the contribution) — 4.1–4.4 ✅ (headline in hand)
+
+**4.4 DELIVERED (2026-07-08, all ledgered):** (a) **fleet matrix** — 560
+cells (5 in-span windows × {fc p50/p90 × 3 models, reactive} × leads
+{15,30,45,300 s} × ρ {10,15,20,25}, 15-s res everywhere), 60→500-parallel
+ramp, 0 errors, parity bit-exact. **L\*** result: forecast/p90/ρ15 passes
+EVERY window at EVERY lead (p99 = 588 ms = f(64)+handoff service floor);
+reactive: burst3 L\*=none (fails even at 15 s — below any orchestration),
+burst4/5 L\*=45 s, slow ramps L\*=300. (b) **weekly aggregate** (5.60-day
+covered span, 749,601 reqs): **forecast-p90 PASSES at 0.27–0.31× the
+deployable static fleet's worker-seconds** (2.12–2.38M vs C16's 7.74M,
+588 vs 565 ms) — THE headline; reactive "passes" the aggregate only via
+aggregation masking (fails burst3 inside it — the Ch.3 dashboard-masking
+phenomenon recurring in the metric); p50 and static-C2 FAIL. (c) riders:
+detection-delay (p90 detects every onset −105..+210 s, 2 pre-signal
+crossings, ZERO calm-day false alarms; point/p50 hours-late/never);
+reactive target-ladder at LLM lead 60 s (spend ↑ 18.6→20.4 GPU-h, tail
+pinned ~1,616 ms FAIL at every target — reactive cannot buy tail
+compliance under lead); LLM forecast closed loop under leads
+{60,90,120,300}: PASS flat 736–757 ms (lead-invariance on both pools).
+Cold-start grounding: Phase D measurement (encoder 3–5 s model-side).
+
+**REMAINING in phase 4:** (c-orig) LLM principled mapping
+(mean-capacity/knee, replacing ×8) + LLM windows beyond burst1;
+(d-orig) template rev 2 (cleanup, non-gating). Then WRITING: baselines +
+closed-loop chapters now have every number.
+
+(Superseded status below for history.)
+
+## Phase 4 (pre-4.4 status, superseded)
 
 **Status 2026-07-08 (details in `phase4-predictors.md`):** 4.3 is
 delivered as infrastructure + v1 results — C(t) encoder hook (validated

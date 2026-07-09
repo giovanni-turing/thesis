@@ -35,9 +35,13 @@ AIC_VER=${AIC_VER:-0.22.0}
 AIC_MOE_JSON=""
 [ -n "${AIC_MOE_TP:-}" ] && AIC_MOE_JSON=',"aic_moe_tp_size":'"$AIC_MOE_TP"
 [ -n "${AIC_MOE_EP:-}" ] && AIC_MOE_JSON="$AIC_MOE_JSON"',"aic_moe_ep_size":'"$AIC_MOE_EP"
+# STARTUP_TIME (seconds): mocker-native worker cold-start lead — scale-ups
+# schedule a WorkerReady at now+startup_time; unset = instant workers.
+STARTUP_JSON=""
+[ -n "${STARTUP_TIME:-}" ] && STARTUP_JSON=',"startup_time":'"$STARTUP_TIME"
 case "$MODEL" in
-  poly) ENGINE_ARGS='{"block_size":64}' ;;                              # mocker default polynomial timing
-  aic)  ENGINE_ARGS='{"aic_backend":"vllm","aic_system":"h100_sxm","aic_model_path":"'"$AIC_MODEL"'","aic_tp_size":'"$AIC_TP$AIC_MOE_JSON"',"aic_backend_version":"'"$AIC_VER"'","block_size":64}' ;;
+  poly) ENGINE_ARGS='{"block_size":64'"$STARTUP_JSON"'}' ;;             # mocker default polynomial timing
+  aic)  ENGINE_ARGS='{"aic_backend":"vllm","aic_system":"h100_sxm","aic_model_path":"'"$AIC_MODEL"'","aic_tp_size":'"$AIC_TP$AIC_MOE_JSON"',"aic_backend_version":"'"$AIC_VER"'","block_size":64'"$STARTUP_JSON"'}' ;;
   *) echo "model must be poly|aic" >&2; exit 2 ;;
 esac
 
