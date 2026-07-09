@@ -259,4 +259,4 @@ artifact:   simulation/results/aggregate44/fc_p90_L30_ds4.jsonl.stats.json
 command:    trace_to_two_pool.py --offset 250399 --max-requests 749601 --encoder-workers 2 --worker-schedule fc_p90_L30.sched.json --handoff-gbps 6.25  (×4 payload at 25 Gbps ≡ ×1 at 6.25 Gbps by linearity)
 feeds:      tex/closedloop.tex limitations — 4× payload on the modeled 25 Gbps link: handoff p99 272→1,087 ms, encoder-delay p99 1,404 ms (SLA violation from transfer alone); the 588 ms floor assumes embedding-only handoff or a ≥100 Gbps fabric (restores quoted numbers exactly); tex/twopool.tex handoff ¶ now points here instead of promising a "scheduled correction"
 supersedes: the unfulfilled "payload correction scheduled for the closed-loop runs" promise
-commit:     (this commit)
+commit:     337211e
