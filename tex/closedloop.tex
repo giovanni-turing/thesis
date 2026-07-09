@@ -188,6 +188,20 @@ quantile, not signal access, separates pass from fail on fast onsets on
 \emph{both} pools. (This burst3 configuration is also the policy pair
 carried to the live-stack validation of Chapter~\ref{cap:validation}.)
 
+\paragraph{The language pool at week scale.} A continuous replay of the
+full 5.60-day evaluation span through the planner (the composed trace
+under the winning encoder schedule, 60-second replica lead) grades the
+language pool exactly as the encoder pool's aggregate: the p90-forecast
+policy \textbf{passes the week} at TTFT p99 \SI{651}{\milli\second}
+(ITL p99 \SI{6.4}{\milli\second}) for 518.6 H100 GPU-hours --- slightly
+below the burst-sized static TP2$\times$2 fleet's 537.4 for the same
+span (0.96$\times$; replica scaling cannot morph TP2 into TP1, so the
+language pool's dynamic savings are structurally small --- the decisive
+savings are the encoder pool's). The reactive planner \textbf{fails the
+week outright} (TTFT p99 1{,}197\,\si{\milli\second}) while spending
+281.8 GPU-hours: half the budget, and the wrong tail --- at week scale
+as at window scale, spend is not the defect.
+
 \section{The week-scale aggregate}
 \label{sec:cl-aggregate}
 
