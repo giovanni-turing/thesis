@@ -3,24 +3,22 @@
 \label{cap:aiconfigurator}
 \chaptermark{Calibrating the Vision-Pool Cost Model}
 
-This chapter reports the construction and empirical validation of a
-silicon-calibrated cost model for the vision stage of the disaggregated
-serving architecture studied in this thesis. The model is built on
-\textit{aiconfigurator} (AIC), NVIDIA's offline deployment planner, whose
-performance database prices a model's operator graph against per-kernel
-latencies collected on the target GPU. Three results are established.
+This chapter builds and empirically validates a silicon-calibrated cost
+model for the vision stage of the disaggregated serving architecture,
+resting on \textit{aiconfigurator} (AIC), NVIDIA's offline deployment
+planner, which prices a model's operator graph against per-kernel
+latencies collected on the target GPU. Three results follow.
 First, the target consumer GPU (NVIDIA GeForce RTX~5090) was onboarded as a
-new AIC system, and the two operator families that dominate vision-encoder
-cost --- non-causal encoder attention and bf16 GEMM --- were collected on
-its silicon under locked clocks. Second, the resulting analytical
+new AIC system and the two operator families dominating vision-encoder
+cost --- non-causal encoder attention and bf16 GEMM --- collected on
+its silicon under locked clocks. Second, the analytical
 prediction of the full vision-encoder forward pass was validated against
 direct measurement of the same network on the same GPU at the same clocks:
-the collected attention operator agrees with physical measurement within
-3\%, and the end-to-end kernel-time ledger closes with no unexplained
-residual. Third, the calibrated encoder model was composed with Dynamo's
-discrete-event LLM-pool simulator in a first end-to-end two-pool
-simulation, establishing the pipeline used for the autoscaling experiments
-in the following chapters.
+the collected attention operator agrees within 3\%, and the end-to-end
+kernel-time ledger closes with no unexplained residual. Third, the
+calibrated encoder model was composed with Dynamo's discrete-event
+LLM-pool simulator in a first end-to-end two-pool simulation,
+establishing the pipeline for the autoscaling experiments that follow.
 
 \section{Why silicon data is required}
 \label{sec:aic-motivation}
@@ -28,84 +26,83 @@ in the following chapters.
 AIC ships collected performance data for datacenter systems (H100, H200,
 B200, B300, GB200, GB300), but its \texttt{encoder\_attention} operator ---
 the non-causal, KV-cache-free attention used by ViT-style vision encoders
---- has no data for any workstation- or consumer-class GPU. This gap is
-not softened by any fallback. Tracing the database's source-resolution
-logic and exercising it empirically on a system without encoder data
-(\texttt{rtx\_pro\_6000\_server}, the workstation sibling of the GPU used
-here) shows that the SILICON, HYBRID, and EMPIRICAL query modes all raise a
-hard \texttt{PerfDataNotAvailableError}; only the speed-of-light (SOL)
-mode answers, and it underestimates the measured operator latency by a
-factor of ${\approx}5.9$ at a representative shape (\SI{0.0061}{\milli\second}
-predicted vs.\ \SI{0.0358}{\milli\second} measured at batch~1,
-784~patches). The green entries that vision-language models show in AIC's
-support matrix on such systems are explained by the harness supplying no
-image dimensions: the encoder phase is skipped entirely, so the entry
-certifies text-only costing. Image-aware costing of a multimodal model on
-consumer hardware therefore requires collecting encoder data on that
-hardware --- the work of this chapter.
+--- has no data for any workstation- or consumer-class GPU. No fallback
+softens this gap: traced in source and exercised empirically on a system
+without encoder data (\texttt{rtx\_pro\_6000\_server}, the workstation
+sibling of the GPU used here), the SILICON, HYBRID, and EMPIRICAL query
+modes all raise a hard \texttt{PerfDataNotAvailableError}; only the
+speed-of-light (SOL) mode answers, underestimating the measured
+operator latency by a factor of ${\approx}5.9$ at a representative shape
+(\SI{0.0061}{\milli\second} predicted vs.\ \SI{0.0358}{\milli\second}
+measured at batch~1, 784~patches). Vision-language models show green in
+AIC's support matrix on such systems only because the harness supplies no
+image dimensions: the encoder phase is skipped, so the entry certifies
+text-only costing. Image-aware costing of a multimodal model on consumer
+hardware therefore requires collecting encoder data there --- this
+chapter's work.
 
 \section{System onboarding and data collection}
 \label{sec:aic-collection}
 
 \subsection{Target system}
 
-The vision pool's hardware class is represented by an NVIDIA GeForce
-RTX~5090 (GB202 die, consumer Blackwell, compute capability 12.0, with
+An NVIDIA GeForce RTX~5090 represents the vision pool's hardware class
+(GB202 die, consumer Blackwell, compute capability 12.0,
 \SI{32607}{\mebi\byte} GDDR7, observed board power limit \SI{600}{\watt},
-driver 595.71.05, CUDA~13.2; memory and power figures read from
+driver 595.71.05, CUDA~13.2; memory and power figures from
 \texttt{nvidia-smi} on the benchmark node, clock and throughput figures
-cross-checked against NVIDIA's published specification~\cite{NVIDIA5090Specs}). The system was registered in AIC as
+cross-checked against NVIDIA's published specification~\cite{NVIDIA5090Specs}). The system is registered in AIC as
 \texttt{rtx\_5090}: memory bandwidth and capacity follow the observed node
-values; tensor-core throughput is scaled from the same-die
+values; tensor-core throughput scales from the same-die
 \texttt{rtx\_pro\_6000\_server} entry's per-SM, per-MHz throughput at the
 official \SI{2407}{\mega\hertz} boost clock, yielding
 \SI{419}{\tera\flop\per\second} dense bf16, consistent with published
-specifications. All estimated fields are marked as such in the system
-file for later refinement.
+specifications. Estimated fields are marked as such in the system file
+for later refinement.
 
 \subsection{Collection methodology}
 
 Collection followed the upstream \texttt{aic-auto-collect} workflow, with
 one audit artifact (script plus captured output) per phase. Three
-methodological points matter for the validity of the data.
+methodological points matter.
 
-\paragraph{Kernel fidelity.} The vLLM encoder-attention collector does not
-hard-code a kernel choice; it calls vLLM's own backend selector
-(\texttt{get\_vit\_attn\_backend}) and benchmarks whatever kernel vLLM
-would use in production on the target GPU. On compute capability 12.0
-under vLLM~0.22.0 this resolves to FlashAttention~\cite{Dao2023FlashAttention2}
+\paragraph{Kernel fidelity.} The vLLM encoder-attention collector
+hard-codes no kernel choice; it calls vLLM's own backend selector
+(\texttt{get\_vit\_attn\_backend}) and benchmarks the kernel vLLM would
+use in production on the target GPU. On compute capability 12.0 under
+vLLM~0.22.0 this resolves to FlashAttention~\cite{Dao2023FlashAttention2}
 (\texttt{kernel\_source=vllm\_vit\_flash\_attn}), not the Triton fallback
-that older documentation suggests for non-datacenter parts. The measured
-kernel is therefore the deployed kernel by construction. Collection ran
+older documentation suggests for non-datacenter parts. The measured
+kernel is the deployed kernel by construction. Collection ran
 inside the pinned production container (\texttt{vllm/vllm-openai:v0.22.0});
 the collector module's compatibility gate (\texttt{vllm>=0.21.0}) rules
-out the older framework versions that AIC's manifest still lists.
+out the older framework versions AIC's manifest still lists.
 
 \paragraph{Clock control.} Consumer GPUs boost opportunistically, and
 isolated microbenchmark kernels ride higher clocks than sustained serving
-load. An initial collection at unlocked clocks produced latencies
-${\approx}17\%$ faster than the final dataset. All data reported here was
-recollected with the SM clock locked to \SI{2407}{\mega\hertz} and the
-memory clock to \SI{14001}{\mega\hertz}
-(\texttt{nvidia-smi -lgc/-lmc}, persistence mode enabled), matching the
-clock at which the system file's throughput figures are stated. Notably,
-the measured-to-predicted \emph{ratios} of Section~\ref{sec:aic-validation}
-are identical between the unlocked and locked datasets --- the clock state
+load: an initial collection at unlocked clocks ran ${\approx}17\%$
+faster than the final dataset. All data reported here was recollected
+at locked clocks --- SM \SI{2407}{\mega\hertz}, memory
+\SI{14001}{\mega\hertz}
+(\texttt{nvidia-smi -lgc/-lmc}, persistence mode enabled) --- the
+clock at which the system file's throughput figures are stated. The
+measured-to-predicted \emph{ratios} of Section~\ref{sec:aic-validation}
+are identical between the unlocked and locked datasets --- clock state
 scales both sides equally and cancels --- but only the locked dataset
 makes the absolute numbers interpretable.
 
 \paragraph{Documented gaps.} On a \SI{32}{\gibi\byte} card the GEMM base
-sweep's giant tail (e.g.\ $M{=}32768$, $N{=}65536$) cannot allocate; 1{,}157
-such cases fail with out-of-memory errors and 276 were pre-skipped by a
+sweep's giant tail (e.g.\ $M{=}32768$, $N{=}65536$) cannot allocate: 1{,}157
+cases fail with out-of-memory errors and 276 were pre-skipped by a
 \SI{4}{\gibi\byte} tensor-footprint cutoff, all recorded as gaps rather
-than filled synthetically. Repeated allocation failures were additionally
-found to corrupt CUDA-graph state and crash the collection process; the
-production runs therefore pre-skip doomed shapes, clear the allocator
-cache after failures, and restart the container between chunks. Seventeen
-small shapes ($M{\le}2$) that spuriously reported out-of-memory in the
+than filled synthetically. Repeated allocation failures also corrupt
+CUDA-graph state and crash the collector, so production runs
+pre-skip doomed shapes, clear the allocator cache after
+failures, and restart the container between chunks. Seventeen small
+shapes ($M{\le}2$) that spuriously reported out-of-memory in the
 fragmentation wake of giant-shape failures were requeued in a fresh
-container and all collected cleanly --- a failure mode worth noting for
-any collection campaign on memory-constrained cards.
+container and collected cleanly --- a failure mode worth noting on
+memory-constrained cards.
 
 \subsection{Collected dataset}
 
@@ -123,9 +120,9 @@ shape-infill extension of this section is recorded locally at commit
 configuration accompanies the workspace artifacts
 (Appendix~\ref{ap:artifacts}).}
 
-\paragraph{Targeted shape infill (correction, recorded).} A later audit of
-the exact shapes the two-pool cost model queries found that the campaign's
-log-spaced sweep grid did not include them: the 448-pixel image is 784
+\paragraph{Targeted shape infill (correction, recorded).} A later audit
+found that the campaign's log-spaced sweep grid missed the exact shapes
+the two-pool cost model queries: the 448-pixel image is 784
 patches, so every encoder-attention query interpolated between the
 collected $s{=}576$ and $s{=}1024$ lines, and the companion GEMMs at
 $m = 784N$ crossed into the sparsely-anchored giant-shape region for
@@ -137,50 +134,49 @@ bringing the dataset to \num{7760} attention and \num{34710} GEMM rows and
 making the 448-pixel query path grid-exact. The correction shifted
 predicted encoder costs by $+4.3\%$ at one image, $-5.8\%$ at six, and
 under $1\%$ at 32 and above. Two dataset states therefore appear in this
-document, and every number is labeled by exactly one of them: the
+document, each number labeled by exactly one: the
 \emph{raw slice} (\num{7679}/\num{34326} rows; single-image cost
 \SI{7.82}{\milli\second}) is the baseline the validation of
 Section~\ref{sec:aic-validation} was measured against, and the
 \emph{infilled slice} (\num{7760}/\num{34710} rows; single-image cost
 \SI{8.16}{\milli\second}) feeds every simulation result in
-Chapter~\ref{cap:twopool} and beyond. Every
-simulation result in Chapter~\ref{cap:twopool} was re-derived under the
-corrected data --- encoder-delay percentiles moved by at most
-${\approx}1\%$ and no finding changed --- and in the worker-sizing
+Chapter~\ref{cap:twopool} and beyond. Every result in
+Chapter~\ref{cap:twopool} was re-derived under the
+corrected data: encoder-delay percentiles moved by at most
+${\approx}1\%$, no finding changed, and in the worker-sizing
 experiments of the baseline chapter one marginal optimum shifted by a
 single worker (an episode whose configuration had sat \SI{3}{\milli\second}
-inside the tail bound). The magnitude of these shifts, against the
-$+4.3\%$ input correction, is itself evidence of how close to the bounds
-the affected verdicts sat --- and why grid-exact silicon data at the
-query shapes is worth the 465-case infill.
+inside the tail bound). Shifts this small against a $+4.3\%$ input
+correction show how close to the bounds the affected verdicts sat ---
+and why grid-exact silicon data at the query shapes is worth the
+465-case infill.
 
 {\renewcommand{\sectionmark}[1]{}%
 \section{From tables to a prediction: how AIC composes encoder latency}%
 \label{sec:aic-composition}}
 \sectionmark{How AIC composes a prediction}
 
-The validation that follows is only interpretable if the prediction's
-anatomy is explicit. AIC's estimate for one encoder forward is an
+AIC's estimate for one encoder forward is an
 \emph{arithmetic composition over an operator graph}: the model
-configuration is expanded into the concrete operator sequence --- per
-block, fused add-norm, the QKV projection GEMM, non-causal encoder
-attention, the output projection, and the two MLP GEMMs; after the
-27~blocks, four projector instances (the main merger and three DeepStack
-mergers) --- and the predicted latency is the \emph{sum} of one query per
+configuration expands into the concrete operator sequence (per
+block, fused add-norm, QKV projection, encoder attention, output
+projection, two MLP GEMMs; after the 27~blocks, four projector
+instances --- itemized with dimensions in the validation setup
+below), and the predicted latency is the \emph{sum} of one query per
 operator against the system's collected performance tables.
 Tensor-parallel communication terms are analytic and zero at TP=1.
 Nothing else enters: no dispatch overhead, no kernel-fusion policy, no
-scheduler --- by design, the prediction is a pure kernel-time ledger,
-which is precisely why it can be audited term-by-term against a kernel
-profile (Section~\ref{sec:aic-validation}).
+scheduler --- by design a pure kernel-time ledger, auditable
+term-by-term against a kernel profile
+(Section~\ref{sec:aic-validation}).
 
-Each per-operator query resolves through one of three strata, and naming
-them separates what is measured from what is modeled:
+Each per-operator query resolves through one of three strata, separating
+what is measured from what is modeled:
 
 \begin{enumerate}
-\item \textbf{Measured (exact-hit lookup).} If the queried shape is a
-collected grid point, the returned latency \emph{is} the silicon
-measurement --- for this system, the mean of six CUDA-graph replays of
+\item \textbf{Measured (exact-hit lookup).} At a collected grid point,
+the returned latency \emph{is} the silicon
+measurement --- here, the mean of six CUDA-graph replays of
 the production vLLM kernel at locked clocks. After the shape infill of
 Section~\ref{sec:aic-collection}, every 448-pixel encoder-attention query
 $(b{=}N,\, s{=}784)$ and every block-GEMM query $(m{=}784N)$ for
@@ -188,22 +184,21 @@ $N \le 64$ is an exact hit: on its operational domain, the encoder cost
 model is a lookup table of measurements, not a fitted model.
 \item \textbf{Interpolated.} Off-grid shapes are priced by piecewise
 multilinear interpolation between the bracketing collected points on each
-axis (batch, sequence length, GEMM dimensions), with a clamp that refuses
-locally non-monotone segments. There is no tunable resolution at query
-time --- the collected grid \emph{is} the discretization. The infill
-quantified what this stratum had cost here: the pre-infill 448-pixel
-path, interpolated between the $s{=}576$ and $s{=}1024$ lines, sat
-$+4.3\%$ to $-5.8\%$ from the exact measurements.
+axis (batch, sequence length, GEMM dimensions), with a clamp refusing
+locally non-monotone segments. Query time has no tunable resolution ---
+the collected grid \emph{is} the discretization. The pre-infill
+448-pixel path, interpolated between the $s{=}576$ and $s{=}1024$ lines,
+shows this stratum's cost here: $+4.3\%$ to $-5.8\%$ from the exact
+measurements.
 \item \textbf{Modeled (analytic bounds).} Beyond the grid edge the query
 extrapolates the outermost segment --- probed on the H100 tables out to
 147k-token contexts, this tracks the theoretical quadratic of attention
 within a few percent per octave --- and when a system has no collected
-data at all for an operator, only the speed-of-light mode answers, from
+data for an operator, only the speed-of-light mode answers, from
 FLOP and bandwidth ceilings alone. That analytic floor is
 ${\approx}5.9\times$ optimistic for encoder attention
-(Section~\ref{sec:aic-motivation}): the gap between stratum three and
-stratum one is the entire reason this chapter's collection campaign
-exists.
+(Section~\ref{sec:aic-motivation}): the gap between strata three and one
+is why this chapter's collection campaign exists.
 \end{enumerate}
 
 The strata also delimit what the composition \emph{cannot} see: operators
@@ -216,20 +211,20 @@ delegated to the discrete-event layer of Chapter~\ref{cap:twopool}.
 \subsection{Model versus silicon across the batch axis}
 \label{sec:aic-model-vs-silicon}
 
-Because the two-pool simulation dispatches the encoder in cross-request
-batches, the composed prediction $f(N)$ --- one forward over $N$ images
---- is its single most load-bearing curve, and it deserves its own
-measurement. Table~\ref{tab:aic-fn} and Figure~\ref{fig:aic-fn} compare
+The two-pool simulation dispatches the encoder in cross-request batches,
+so the composed prediction $f(N)$ --- one forward over $N$ images --- is
+its single most load-bearing curve.
+Table~\ref{tab:aic-fn} and Figure~\ref{fig:aic-fn} compare
 the composition against the
 extracted tower measured end-to-end at every quoted point (five
 replications of fifty CUDA-event iterations each, locked clocks; an
-every-integer sweep of $N \in [1,128]$ at lighter protocol agrees with
-these points within 1\%). The composed column is the infilled slice; the
+every-integer sweep of $N \in [1,128]$ at lighter protocol agrees
+within 1\%). The composed column is the infilled slice; the
 $N{=}1$ row differs from Table~\ref{tab:aic-validation} because both
 sides moved --- the prediction from raw to infilled data
 ($7.82 \to \SI{8.16}{\milli\second}$) and the measurement to this
 section's protocol ($11.360 \to \SI{11.30}{\milli\second}$, within
-${\approx}0.5\%$) --- which is why the ratio reads $1.38$ here against
+${\approx}0.5\%$) --- hence the ratio $1.38$ here against
 $1.45$ there.
 
 \begin{figure}[htbp]
@@ -271,7 +266,7 @@ ${\approx}1.37$ at small batches to $1.62$ at the 64-image dispatch cap.
 A constant ratio would indicate stack overhead; a growing one indicates
 \emph{per-image} costs missing from the operator graph. A kernel-level
 profile at $N{=}64$, mirroring the $N{=}1$ ledger of
-Section~\ref{sec:aic-validation}, closes the attribution term by term.
+Section~\ref{sec:aic-validation}, closes the attribution.
 The operators AIC models behave exactly as composed: attention is
 precisely linear per image (\SI{1.300}{\milli\second} at $N{=}1$,
 \SI{1.306}{\milli\second} at $N{=}64$ --- the windowed-attention
@@ -325,8 +320,8 @@ transfer to it unchanged, while the 32B projects into its
 handoff bytes scale by $5/4$, leaving the tower-dominated cost model
 intact. The tower (576M parameters, \SI{1.15}{\giga\byte} in bf16) was
 extracted from the full checkpoint into a standalone
-\texttt{Qwen3VLVisionModel} and verified to load and run independently;
-its configuration is field-by-field identical to the vision configuration
+\texttt{Qwen3VLVisionModel} and verified to run independently;
+its configuration is field-by-field identical to the one
 AIC's model graph is built from, so prediction and measurement describe
 the same network.
 
@@ -366,7 +361,7 @@ $1344^2$ & 7056  & $103.824 \pm 0.022$ & 89.347 & 1.16 \\
 \end{tabular}
 \end{table}
 
-The headline result is that \textbf{the analytical model matched the
+\textbf{The analytical model matched the
 empirical test}: a kernel-level profile of the measured forward pass
 accounts for the entire gap, term by term, with no unexplained residual.
 At $448^2$, the \SI{11.360}{\milli\second} wall time decomposes into
@@ -376,13 +371,13 @@ property of the HuggingFace eager execution stack used for measurement,
 deliberately outside AIC's scope. Within the kernel time, the attention
 kernels sum to \SI{1.300}{\milli\second} against a predicted
 \SI{1.342}{\milli\second} --- \textbf{agreement within ${\approx}3\%$}
-(strictly 3.2\%) on the operator that was actually collected. The GEMM total runs ${\approx}6\%$
+(strictly 3.2\%) on the collected operator. The GEMM total runs ${\approx}6\%$
 above prediction (HuggingFace selects different cutlass variants than
 vLLM's GEMM path), unfused elementwise operations and the projectors'
 layer norms account for a further ${\approx}0.25$ ms, and two modules sit
 outside AIC's operator graph altogether: the patch-embedding convolution
 (\SI{0.459}{\milli\second}, 4.8\% of kernel time --- an inefficient
-convolution shape, considerably more expensive than its FLOP count
+convolution shape, far costlier than its FLOP count
 suggests) and the DeepStack gather/concatenation
 (\SI{0.248}{\milli\second}). Removing the two unmodeled modules leaves
 \SI{8.92}{\milli\second} of AIC-comparable work against
@@ -392,13 +387,13 @@ DeepStack merger MLPs themselves \emph{are} modeled: AIC instantiates the
 projector four times, and forcing the instance count from four to one
 scales the predicted projector cost by exactly $4.00\times$.
 
-The gap's size ordering is consistent with this decomposition: it shrinks
+Consistent with this decomposition, the gap shrinks
 from $1.45\times$ at $448^2$ to $1.14$--$1.16\times$ at larger images as
 the fixed per-layer dispatch overhead amortizes over longer kernels.
 The residual effects --- dispatch patterns, kernel fusion, the serving
-framework's execution discipline --- are precisely the serving-stack
-phenomena that the discrete-event simulation of the next phase models
-explicitly; at this phase the analytical model's job is per-operator
+framework's execution discipline --- are the serving-stack
+phenomena the discrete-event simulation of the next phase models
+explicitly; the analytical model's job here is per-operator
 kernel cost, and at that job it is validated.
 
 \section{Two-pool composition}
@@ -423,18 +418,18 @@ interval) produces a complete AIPerf-style report (mean time-to-first-token
 measured silicon, analytical encoder costing, queueing composition, and
 the LLM-pool simulator interoperate end to end.
 
-The first of the fidelity upgrades this pipeline invites --- AIC engine
+The first fidelity upgrade this pipeline invites --- AIC engine
 timing for the language pool on the datacenter \texttt{h100\_sxm} system,
-replacing the simulator's default polynomial timing --- has since been
+replacing the simulator's default polynomial --- has since been
 carried out, driven by the real Azure multimodal trace rather than the
-synthetic smoke workload. It required no engine rebuild: the shipped
+synthetic smoke workload. No engine rebuild was required: the shipped
 inference runtime already exposes the engine-timing AIC surface, and
 enabling it only meant co-locating the AIC performance model with the
 replay runtime in one interpreter. The resulting
 calibrated-versus-polynomial deltas, the load sweeps to each pool's
 saturation knee, and everything built on them are
-Chapter~\ref{cap:twopool}'s subject; one pricing caveat stated here
-because it belongs to the cost model: the \texttt{h100\_sxm}
+Chapter~\ref{cap:twopool}'s subject. One pricing caveat belongs to the
+cost model and is stated here: the \texttt{h100\_sxm}
 context-attention grid is collected up to \num{16384}-token inputs, so
 the ${\approx}3.1\%$ of trace requests beyond it (up to
 ${\approx}149$k tokens --- including the frames-class prefills that
@@ -451,8 +446,8 @@ target consumer GPU under locked clocks, contributed upstream, and
 validated against physical measurement of the real network on the same
 hardware --- within ${\approx}3\%$ on the collected attention operator,
 with every remaining difference enumerated and bounded, and the composed
-forward bracketed by a conservative-direction measurement band. The chapter also documents
-two findings of independent value: AIC provides no usable fallback for
+forward bracketed by a conservative-direction measurement band. Two
+findings have independent value: AIC provides no usable fallback for
 encoder timing on systems without collected data (its support matrix can
 mask this by skipping the encoder phase), and unlocked consumer-GPU
 clocks silently inflate collected performance by ${\approx}17\%$ while

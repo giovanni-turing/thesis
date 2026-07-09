@@ -17,9 +17,9 @@ p99 $<$ \SI{100}{\milli\second}; encoder delay p99 $<$
 \SI{1}{\second}), scored together with provisioned GPU-time
 \emph{per hardware class} (RTX~5090-class worker-seconds for the encoder
 pool, H100 GPU-hours for the language pool; never summed across classes).
-Both baselines are given every structural advantage the predictive policy
-of Chapter~\ref{cap:closedloop} will have --- the same windows, the same
-actuation mechanics, the same cold-start leads --- so that whatever
+Both baselines get every structural advantage the predictive policy
+of Chapter~\ref{cap:closedloop} will have --- the same windows,
+actuation mechanics, and cold-start leads --- so whatever
 separates the policies is information, not plumbing.
 
 \section{Protocol}
@@ -29,15 +29,15 @@ The workload windows are the six burst episodes of
 Chapter~\ref{cap:trace-eda} (peak 1-minute image rates 337--370
 \si{img/s}, onsets 1--220 minutes) plus the calmest full day of the trace
 (2024-10-19; peak \SI{57}{img/s}) as the steady reference. Two episodes
-(burst2/6) fall in the trace's first 1.4 days, which the forecasting
-protocol reserves as model context (the temporal split is stated in
-Chapter~\ref{cap:closedloop}); they are graded here by the forecast-free
+(burst2/6) fall in the trace's first 1.4 days, reserved as forecast
+context (the temporal split is stated in
+Chapter~\ref{cap:closedloop}); they are graded here by forecast-free
 policies only. Each policy
 produces, per window, a worker schedule for the encoder pool ($C(t)$
 workers) and a configuration or replica schedule for the language pool
 ($\mathrm{TP}\times N$ H100 workers), and is graded on the resulting
 two-pool replay. Cold-start lead is modeled explicitly: a scale-up
-decision issued at time $t$ delivers usable capacity at $t+L$, with $L$
+decision issued at $t$ delivers usable capacity at $t+L$, with $L$
 swept per pool (encoder $L \in \{15,30,45,300\}$\,\si{\second},
 brackets spanning orchestration regimes above the measured
 3--5\,\si{\second} model-side floor; language
@@ -47,7 +47,7 @@ Scale-downs take effect immediately, guarded by a 3-minute hysteresis.
 \section{The static optimum: burst-shaped, calm-day expensive}
 \label{sec:base-static}
 
-An exhaustive grid search per window (encoder workers $C$ crossed with
+An exhaustive grid search (encoder workers $C$ crossed with
 language shapes $\mathrm{TP}\times N$, refined around the feasibility
 frontier; 101 evaluated points, all archived) yields the smallest
 SLA-feasible fleet per window
@@ -88,7 +88,7 @@ swings from 2 workers on the calm day to 16 on burst5 --- the
 order-of-magnitude missizing of Chapter~\ref{cap:trace-eda}, now as a
 fleet-sizing fact. Third, the single static fleet that survives
 \emph{all} windows --- $C{=}16$ encoders plus TP2$\times$2 (4 H100s),
-called the \emph{deployable static} hereafter --- overprovisions the calm
+hereafter the \emph{deployable static} --- overprovisions the calm
 day by $8\times$ on the vision side and $2\times$ on the language side,
 and carries a fleet-\emph{shape} difference (TP2 versus TP1) that no
 replica autoscaler can morph at runtime. Close-out checks confirm the
@@ -109,8 +109,8 @@ law --- window-mean TTFT/ITL under its 500/50\,ms targets, with
 1{,}079--3{,}495\,\si{\milli\second} across the fourteen; burst windows
 additionally fail ITL p99 at 121--162\,\si{\milli\second}). Variants A
 and B fail alike, so loop tuning is not the issue: the defect is the
-\emph{mean-based capacity conversion} --- sizing replicas so that mean
-throughput meets mean demand leaves no room for the tail that the SLA
+\emph{mean-based capacity conversion} --- sizing replicas so mean
+throughput meets mean demand leaves no room for the tail the SLA
 actually prices.
 
 Nor can spend buy the tail back under realistic lead. Holding a 60-second
@@ -119,8 +119,8 @@ replica lead and tightening the planner's window-mean targets from
 monotonically (18.6\,$\to$\,20.4) while TTFT p99 stays pinned at
 1{,}616--1{,}620\,\si{\milli\second} --- a 10\% spend increase buying
 nothing (Table~\ref{tab:base-ladder}). By the time the trailing window
-has seen the onset, the capacity it orders arrives after the queue has
-formed; the money is spent draining a backlog the policy could not
+sees the onset, the capacity it orders arrives after the queue has
+formed; the money drains a backlog the policy could not
 prevent. The failure is \emph{information timing}, not thrift.
 
 \begin{table}[htbp]
@@ -146,7 +146,7 @@ Planner target (TTFT/ITL, ms) & H100 GPU-h & TTFT p99 (ms) & ITL p99 (ms) \\
 \label{sec:base-reactive-enc}
 
 The encoder pool has no native reactive controller, so the fair strawman
-is constructed to be \emph{identically informed} with the predictive
+is built to be \emph{identically informed} with the predictive
 policy of the next chapter: the same worker-mapping law (workers
 $= \lceil \text{demand} / \rho \rceil$ at per-worker capacity rating
 $\rho$ \si{img/s}, hysteresis 3 minutes, lead $L$), fed by the trailing

@@ -62,7 +62,8 @@ and utilization-based monitoring. Closing the loop, forecast-driven
 per-pool worker schedules hold the tail latency objective through burst
 onsets that defeat an identically informed reactive controller at every
 tested cold-start lead, at 0.27--0.31 times the best static fleet's
-provisioned GPU-time over the covered week.
+provisioned GPU-time over the covered week --- behavior the thesis
+reproduces end-to-end on the live serving runtime.
 
 \begin{otherlanguage}{brazil}
 \chapter*{Resumo}
@@ -104,19 +105,19 @@ la\c{c}o, escalas de trabalhadores dirigidas por previs\~ao por
 in\'icios de rajada que derrotam um controlador reativo igualmente
 informado em todos os tempos de partida a frio testados, a 0,27--0,31
 do tempo de GPU provisionado da melhor frota est\'atica na semana
-coberta.
+coberta --- comportamento reproduzido de ponta a ponta no
+\emph{runtime} de servi\c{c}o real.
 \end{otherlanguage}
 
 % ---- Draft-status note (REMOVE for the defense/submission version) ----
 \chapter*{Note on this draft}
 This is a preliminary version (2026-07-09) prepared for advisor review.
-All experimental phases are complete and archived; every quantitative
-claim in the document traces to a versioned artifact through the
+All experimental phases are complete and archived --- including the
+live-runtime validation anchor (Chapter~\ref{cap:validation}) --- and
+every quantitative claim traces to a versioned artifact through the
 workspace's results ledger. Pending for the defense version:
-the validation-anchor experiment (the winning policy replayed against
-the live Dynamo runtime with mocked workers) and its short chapter;
 institutional formatting (departmental template, ABNT front matter,
-biblatex bibliography); and a final copy-edit. Chapter numbering may
+biblatex bibliography) and a final copy-edit. Chapter numbering may
 shift when the institutional template is adopted.
 
 \tableofcontents

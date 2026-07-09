@@ -9,24 +9,24 @@
 
 Chapter~\ref{cap:trace-eda} closed on a feasibility premise: the demand
 signal most dangerous to reactive scaling --- the vision pool's image rate
---- is also the most persistent, retaining autocorrelation at exactly the
-horizons provisioning needs. This chapter tests that premise directly. It
-benchmarks three pretrained time-series foundation models used
+--- is also the most persistent at exactly the horizons provisioning
+needs. This chapter tests that premise: three pretrained time-series
+foundation models run
 \emph{zero-shot} --- Google's TimesFM-2.0-500M~\cite{Das2024TimesFM},
 Amazon's Chronos-2 (120M)~\cite{Ansari2025Chronos2}, and Datadog's
 Toto-2.0-2.5B~\cite{Khwaja2026Toto2} --- against three classical baselines
-(naive persistence, exponential smoothing, and additive Holt--Winters
-\cite{Hyndman2021fpp3}) on all four demand signals of the trace, at five
-bin resolutions, under a single rolling-origin protocol. The questions are
-the ones a predictive autoscaler poses: how accurate is the forecast at the
-next step and across a 12-step horizon; whether conditioning on the other
-signals (covariates) helps; and whether the models' native quantile bands
-offer a better operating point than their point forecasts. Every number
-and figure is reproducible from versioned scripts in the workspace
-(\texttt{predictors/}), and the full forecast set --- 26 Parquet files,
-\num{21404640} forecast rows, each carrying the point forecast, nine
-quantiles, and the realized value, \num{20749440} of them on the common
-evaluation span --- is archived next to the metric tables.
+(naive persistence, exponential smoothing, additive Holt--Winters
+\cite{Hyndman2021fpp3}) on all four demand signals, at five bin
+resolutions, under one rolling-origin protocol. The questions are
+a predictive autoscaler's: accuracy at the next step and across a 12-step
+horizon; whether conditioning on the other signals (covariates) helps; and
+whether the models' native quantile bands offer a better operating point
+than their point forecasts. Every number and figure is reproducible from
+versioned scripts in the workspace (\texttt{predictors/}); the full
+forecast set --- 26 Parquet files, \num{21404640} forecast rows, each
+carrying the point forecast, nine quantiles, and the realized value,
+\num{20749440} on the common evaluation span --- is archived next
+to the metric tables.
 
 \section{Experimental protocol}
 \label{sec:pred-protocol}
@@ -39,23 +39,23 @@ resolutions of \SI{1}{\second}, \SI{15}{\second}, \SI{30}{\second},
 
 \paragraph{Rolling-origin grid.} A forecast \emph{origin} $o$ predicts
 bins $[o, o{+}H)$ from the context window $[o{-}C, o)$, with horizon
-$H{=}12$ \emph{bins} at the native cadence of each series --- a
-wall-clock span that scales with resolution, from 12 seconds at 1-second
-bins to 12 minutes at 1-minute bins. Origins advance in
-strides of $H$, so consecutive forecasts tile the timeline into a
+$H{=}12$ \emph{bins} at each series' native cadence --- 12 seconds of
+wall-clock at 1-second bins up to 12 minutes at 1-minute bins. Origins
+advance in
+strides of $H$: consecutive forecasts tile the timeline into a
 continuous, non-overlapping prediction path --- the signal a scaler would
-actually consume --- and every origin is a multiple of $H$, so all models
+consume --- and every origin is a multiple of $H$, so all models
 land on the same absolute bins wherever their context allows. The context
 budget $C$ is each model's maximum context minus headroom for the forecast
-tokens themselves, $(1\ \text{point} + 9\ \text{quantiles}) \times H = 120$
+tokens, $(1\ \text{point} + 9\ \text{quantiles}) \times H = 120$
 steps: $C = 1928$ for TimesFM (cap 2048), $3976$ for Toto-2 (cap 4096),
 and $8072$ for Chronos-2 (cap 8192). The baselines are given the TimesFM
 budget (1928). Cross-model comparisons are restricted to the
 \emph{common span} --- origins ${\geq}\,8076$, predictable by every model
 --- leaving 167 origins per model at \SI{1}{\minute} up to 49{,}727 at
-\SI{1}{\second}. One asymmetry must be read into every cross-resolution
-comparison: because the origin threshold is an index, not a wall-clock
-time, the common span covers 98.7\% of the week at 1-second bins but
+\SI{1}{\second}. One asymmetry affects every cross-resolution
+comparison: the origin threshold is an index, not a wall-clock time, so
+the common span covers 98.7\% of the week at 1-second bins but
 only the final \SI{33.4}{\hour} --- 20\% of the week, containing its
 largest burst --- at 1-minute bins. Within-column (same-resolution)
 model comparisons are unaffected; column-to-column WAPE levels are not
@@ -64,16 +64,15 @@ conditions.
 
 \paragraph{Models and modes.} Every model forecasts every signal from its
 own history alone (\emph{univariate} mode). The two models with a genuine
-covariate mechanism are additionally run in \emph{covariate} mode:
+covariate mechanism additionally run in \emph{covariate} mode:
 Chronos-2 forecasts each target with the other three series supplied as
 past-only covariates, its native conditioning path; Toto-2 forecasts all
 four signals jointly as one multivariate series, so its variate-axis
-attention mixes the signals. TimesFM has no covariate interface, making it the strict
-univariate-per-signal control: each signal forecast from its own history
-alone. (This is \emph{not} the request-rate-only policy a conventional
-autoscaler embodies --- that policy watches one signal for every pool,
-and its cost is quantified by the closed-loop experiments, not by this
-benchmark.) The baselines are configured
+attention mixes the signals. TimesFM has no covariate interface and is
+the strict univariate-per-signal control. (This is \emph{not} the
+request-rate-only policy of a conventional autoscaler, which watches one
+signal for every pool; the closed-loop experiments, not this benchmark,
+quantify that policy's cost.) The baselines are configured
 conventionally: exponential smoothing with $\alpha{=}0.3$; Holt--Winters
 ($\alpha{=}0.3$, $\beta{=}0.1$, $\gamma{=}0.1$) with a seasonal period of
 one hour of bins where two full cycles fit the context window
@@ -85,23 +84,23 @@ non-negative). The nine quantile levels $0.1, \ldots, 0.9$ are the
 intersection of the three models' native heads.
 
 \paragraph{Metrics.} Accuracy is reported as WAPE, $\sum_t |\hat y_t -
-y_t| \,/ \sum_t y_t$ --- a scale-free error that remains defined on bins
-where the signal is zero --- alongside MAE where absolute units aid
-interpretation. Metrics are computed at the first step ($h{=}1$), per
-horizon step, and pooled over the horizon (\emph{overall}), for the point
-forecast and for each quantile treated as a candidate point forecast. The
+y_t| \,/ \sum_t y_t$ --- scale-free and defined on zero-signal bins ---
+alongside MAE where absolute units aid interpretation. Metrics are
+computed at the first step ($h{=}1$), per horizon step, and pooled over
+the horizon (\emph{overall}), for the point forecast and for each
+quantile as a candidate point forecast. The
 full benchmark --- \num{21404640} forecast rows across eight model/mode
 configurations --- runs in about \SI{2.5}{\hour} wall-clock on one
 RTX~5090 (the baselines take about a minute each on CPU; Chronos-2 and
 Toto-2 dominate at roughly one hour and 80 minutes). Per decision the
-cost is small --- averaged over a configuration's ${\approx}54$k
+cost is small: averaged over a configuration's ${\approx}54$k
 origins, one 12-step forecast costs ${\approx}65$ (Chronos-2) to
 ${\approx}90$ (Toto-2) milliseconds of GPU time, comfortably inside any
 15--60-second decision cadence. The operationally honest cost comparison
 is deployment footprint, not benchmark wall-clock: a foundation-model
 forecaster is a GPU-resident 120M--2.5B-parameter service, EWMA a few
-lines of arithmetic --- the accuracy margins below have to be worth that
-asymmetry, which is what the closed-loop evaluation prices.
+lines of arithmetic --- the accuracy margins below must be worth that
+asymmetry, which the closed-loop evaluation prices.
 
 \section{Point-forecast accuracy}
 \label{sec:pred-point}
@@ -172,12 +171,11 @@ the four signals (e.g.\ images: 52.9\% vs.\
 54.2\% WAPE) --- and widens as bins shrink: at \SI{1}{\second}
 the best model forecasts images at 98.8\% WAPE against 146.1\% for EWMA
 and 156.9\% for naive, a one-third relative reduction. That sub-minute
-margin must be read against WAPE's no-skill floor: a forecaster that
-always predicts zero scores exactly 100\%, so at 1-second bins the
+margin must be read against WAPE's no-skill floor: always predicting
+zero scores exactly 100\%, so at 1-second bins the
 foundation models move from far-worse-than-zero (the baselines) to
 par-with-zero --- consistent with the white shot-noise floor of
-Section~\ref{sec:eda-predictability}, where individual bins are
-genuinely unpredictable. The operative reading is therefore: at
+Section~\ref{sec:eda-predictability}. The operative reading: at
 provisioning cadence (minutes), a modest but uniform accuracy edge plus
 robustness --- zero per-signal tuning, one model for all four signals,
 mild horizon decay; at sub-minute cadence, nothing forecasts single
@@ -190,11 +188,11 @@ at \SI{30}{\second} and finer; Chronos-2 takes the remaining coarse-bin
 cells --- requests at \SI{1}{\minute} and \SI{45}{\second}, images at
 \SI{1}{\minute}, context at \SI{45}{\second} --- and TimesFM the
 \SI{1}{\minute} context column. But the spreads
-among the three are small (typically under 2 WAPE points), several
-bolded column wins are decided by $\leq$0.1 WAPE point over 167 origins
---- below plausible sampling variability, and no significance test is
+are small (typically under 2 WAPE points) and several bolded column wins
+are decided by $\leq$0.1 WAPE point over 167 origins
+--- below plausible sampling variability, with no significance test
 attached --- so the honest reading is a three-way tie: model choice
-matters far less than the choice to use a foundation model at all, and
+matters far less than using a foundation model at all;
 Figure~\ref{fig:pred-models} shows the three point paths nearly
 coincident over the week's largest burst.
 
@@ -203,15 +201,15 @@ Third, \textbf{degradation across the horizon is mild}
 foundation models move from ${\approx}52\%$ WAPE at $h{=}1$ to
 ${\approx}53\text{--}54\%$ at $h{=}12$, while naive drifts from 61.8\% to
 67.9\% and Holt--Winters diverges. Twelve minutes of lead time costs the
-models almost nothing in accuracy once they hold the signal's long
-memory --- the operational budget identified by the burst-onset analysis
-(Section~\ref{sec:eda-vision}) is covered.
+models almost nothing once they hold the signal's long memory ---
+covering the operational budget identified by the burst-onset analysis
+(Section~\ref{sec:eda-vision}).
 
 Fourth, the \textbf{absolute} error levels calibrate expectations: even
 the best model carries ${\approx}53\%$ WAPE on 1-minute image bins and
-${\approx}99\%$ on 1-second bins. The sub-minute floor is the white
-shot-noise regime of Section~\ref{sec:eda-predictability} --- individual
-$k^2$-image arrivals are not predictable, only their envelope is. In MAE
+${\approx}99\%$ on 1-second bins. The sub-minute floor is the shot-noise
+regime of Section~\ref{sec:eda-predictability}: individual
+$k^2$-image arrivals are unpredictable, only their envelope is. In MAE
 terms the best 1-minute forecasts miss by ${\approx}1{,}302$ images
 (21.7 images/s against a common-span mean of ${\approx}41$ images/s ---
 this evaluation span contains the week's largest burst), 35.6 requests,
@@ -220,19 +218,18 @@ this evaluation span contains the week's largest burst), 35.6 requests,
 \section{Do covariates help?}
 \label{sec:pred-covariates}
 
-Table~\ref{tab:pred-cov} isolates the covariate effect: the mean relative
-change in overall point MAE from univariate to covariate mode, per
-resolution. The effect is marginal in both directions --- within
+Table~\ref{tab:pred-cov} isolates the covariate effect per resolution.
+The effect is marginal in both directions --- within
 $\pm0.4\%$ everywhere --- but its structure is consistent: covariates
 \emph{help} at \SI{15}{\second} and \SI{1}{\second} (both models,
 strongest for Chronos-2 at $-0.39\%$) and are neutral-to-harmful at
-coarser bins. This is the forecasting-side image of the decoupling result
+coarser bins. This is the forecasting-side image of the decoupling
 of Section~\ref{sec:eda-vision}: the request-rate covariate explains only
 $R^2{=}0.12$ of the image signal, so there is little cross-signal
-information for the mechanism to exploit at horizons where each signal's
+information to exploit at horizons where each signal's
 own history already carries its envelope; what remains surfaces only in
-the shot-noise regime, where any extra conditioning signal has value.
-The practical reading for a scaler is that per-pool forecasts can be run
+the shot-noise regime, where any extra conditioning has value.
+The practical reading: per-pool forecasts can run
 univariate --- simpler and cheaper --- unless the system operates on
 sub-15-second decision windows.
 
@@ -256,9 +253,9 @@ Toto-2    & $-0.04\%$ & $+0.08\%$ & $-0.02\%$ & $-0.25\%$ & $-0.24\%$ \\
 \label{sec:pred-quantiles}
 
 Each forecast carries nine quantiles, and a scaler need not consume the
-point path --- it could provision against p60, or p40, or whatever level
-tracks the signal best. Treating every quantile as a candidate point
-forecast answers whether that is worth doing. Across the 160 (model,
+point path --- it could provision against p60, p40, or whatever level
+tracks the signal best --- so every quantile is treated as a candidate
+point forecast. Across the 160 (model,
 mode, resolution, signal) cells, some quantile beats the point forecast
 in 51 --- but the wins concentrate entirely in the models whose point
 forecast is \emph{not} the median: TimesFM's mean head is beaten in 18 of
@@ -272,8 +269,8 @@ right-skewed, bursty rates predict: the conditional median already sits
 below the mean, so mean-like forecasts systematically overshoot after
 spikes and a slightly pessimistic quantile corrects them. The operational
 conclusion: with a median-point foundation model, the point path is
-already the best single operating line, and the quantile band's role is
-headroom sizing rather than point correction.
+already the best single operating line; the band's role is headroom
+sizing, not point correction.
 
 \paragraph{Is the band calibrated?} Headroom sizing is only sound if the
 band edges mean what they claim, so empirical coverage was computed over
@@ -297,23 +294,23 @@ monotonicity repair remain open --- see limitations.)
 \section{The forecast as a scaling signal}
 \label{sec:pred-signal}
 
-Figure~\ref{fig:pred-band} renders the benchmark's output the way an
-autoscaler would consume it, over the largest image burst of the week
+Figure~\ref{fig:pred-band} renders the benchmark's output as an
+autoscaler would consume it, over the week's largest image burst
 (peak \num{370}~images/s on 2024-10-21, the episode of
 Figure~\ref{fig:eda-sevenday}). Three properties matter operationally.
 The point path tracks the burst \emph{plateau} --- the provisioning
-envelope --- rather than chasing individual 1-minute spikes, which is the
+envelope --- rather than chasing individual 1-minute spikes: the
 desired behavior given the shot-noise floor. Individual bins pierce the
 p90 edge at close to the nominal rate (11\% of common-span image bins),
 so provisioning at p90 concedes calibrated, bounded exceedances rather
 than chasing every spike --- the headroom rule the closed loop
-operationalizes. Choosing \emph{which} quantile to hold is not aesthetic
-but economic --- a critical-fractile (newsvendor) choice, where the
+operationalizes. Choosing \emph{which} quantile to hold is economic,
+not aesthetic --- a critical-fractile (newsvendor) choice: the
 optimal level follows from the ratio of under-provisioning cost (SLO
 damage during a cold-start lead) to over-provisioning cost (idle
-GPU-seconds)~\cite{Arrow1951Newsvendor}; the closed-loop chapter derives
-its operating quantile from exactly that trade-off rather than fixing
-p90 by convention. And at the burst's collapse
+GPU-seconds)~\cite{Arrow1951Newsvendor}, and the closed-loop chapter
+derives its operating quantile from that trade-off rather than fixing
+p90 by convention. At the burst's collapse
 the stitched path lags by up to one horizon (12 minutes), the price of
 forecasting in $H$-step tiles; a scaler holding capacity 12 minutes too
 long is a far cheaper failure than one arriving 6 minutes late to a
@@ -325,13 +322,13 @@ says nothing about tail-latency protection, which depends on burst
 timing, provisioning lead, queue state, and the capacity conversion ---
 the closed-loop chapters score exactly that, as SLA compliance against
 provisioned worker-seconds, including burst-onset behavior under
-cold-start leads (the event the time-averaged metrics here cannot
-resolve). And the forecasts' timescale binds what they can control:
+cold-start leads (which time-averaged metrics cannot resolve). And the
+forecasts' timescale binds what they can control:
 minute-level paths are provisioning inputs --- worker counts under
-cold-start leads --- not scheduler signals; the second-scale
-head-of-line blocking of Chapter~\ref{cap:twopool} is handled by
-dispatch policy and capacity, with the forecast deciding how much
-capacity is standing when the flood arrives.
+cold-start leads --- not scheduler signals; dispatch policy and capacity
+handle the second-scale head-of-line blocking of
+Chapter~\ref{cap:twopool}, with the forecast deciding how much capacity
+is standing when the flood arrives.
 
 \begin{figure}[htbp]
 \centering
@@ -365,38 +362,37 @@ noise-level inter-model spreads in Table~\ref{tab:pred-wape}.}
 The benchmark inherits the trace's arrival-side construction: all signals
 are offered-work rates stamped at arrival, so decode-side forecasts
 predict offered load, not instantaneous decode occupancy. All models run
-zero-shot; fine-tuning on the trace's first days could shift both the
-absolute levels and the model ranking --- an unexercised lever that would
-bound the foundation models' upside (fit days 1--3, test 4--7), left as
-future work in favor of the operationally simpler zero-shot posture the
-thesis evaluates. Zero-shot itself carries a contamination caveat:
+zero-shot; fine-tuning on the trace's first days (fit days 1--3, test
+4--7) could shift both absolute levels and model ranking --- an
+unexercised lever that would bound the foundation models' upside, left
+as future work in favor of the operationally simpler zero-shot posture
+the thesis evaluates. Zero-shot itself carries a contamination caveat:
 Chronos-2 and Toto-2 postdate the trace's 2025 public release, so their
 pretraining corpora could in principle contain series derived from it;
 verbatim ingestion of these per-bin demand series is unlikely and cannot
 be ruled in or out from the public model cards --- while TimesFM-2.0
-\emph{predates} the release entirely and, at provisioning cadence
-(1-minute bins), lands within ${\approx}2$ WAPE
-points of the other two --- bounding any contamination advantage at
-about that size where the forecasts are consumed (the inter-model gaps
-are larger in the sub-minute shot-noise regime, where no model has
-skill to contaminate). The classical baselines are \emph{fixed-parameter}
+\emph{predates} the release entirely and lands within ${\approx}2$ WAPE
+points of the other two at provisioning cadence (1-minute bins),
+bounding any contamination advantage at about that size where the
+forecasts are consumed (the inter-model gaps are larger in the
+sub-minute shot-noise regime, where no model has skill to contaminate). The classical baselines are \emph{fixed-parameter}
 (textbook constants, no per-series search) and context-capped at
 TimesFM's budget for comparability --- operationally they would use full
 history at negligible cost, and Holt--Winters in particular never sees
 two full diurnal cycles here; a full-history seasonal baseline and
 per-series tuning would narrow the margins of
-Table~\ref{tab:pred-wape} and should be read as such. ARIMA --- the
+Table~\ref{tab:pred-wape}, which should be read accordingly. ARIMA --- the
 incumbent predictor in production autoscalers, including Dynamo's ---
 is absent from this accuracy benchmark but present where it matters
-more: the closed-loop chapters run Dynamo's own ARIMA predictor
-in the control loop as a baseline policy. Quantile calibration is now
+more: the closed-loop chapters run Dynamo's own ARIMA predictor as a
+baseline policy. Quantile calibration is
 partially assessed (Section~\ref{sec:pred-quantiles}: upper edge
 calibrated at 1-minute cadence, lower edge distorted by zero ties);
-horizon-conditional coverage and burst-conditional coverage remain
-open. Chronos-2 occasionally emits locally crossed
+horizon- and burst-conditional coverage remain open.
+Chronos-2 occasionally emits locally crossed
 quantiles (its head does not enforce monotonicity); values are recorded
-as produced apart from the global nonnegativity floor --- no
-monotonicity repair is applied. Finally, results derive from one
+as produced apart from the global nonnegativity floor, with no
+monotonicity repair. Finally, results derive from one
 seven-day trace of one production
 cluster, with its by-construction 50/50 modality split.
 
@@ -408,10 +404,9 @@ cell of a
 $5{\times}4$ resolution--signal grid --- a modest 2--9\% relative edge
 at provisioning cadence, growing to one-third relative at sub-minute
 bins where WAPE${\approx}100\%$ marks the no-skill floor --- and their
-accuracy decays only marginally
-across a 12-step horizon, confirming that the persistence identified in
-Chapter~\ref{cap:trace-eda} is exploitable in practice, at provisioning
-lead times that cover the median burst onset. The p90 band edge is
+accuracy decays only marginally across a 12-step horizon: the
+persistence identified in Chapter~\ref{cap:trace-eda} is exploitable at
+provisioning lead times that cover the median burst onset. The p90 band edge is
 empirically calibrated at 1-minute cadence (coverage 0.88--0.90 across
 all models and signals), making upper-quantile headroom a sound
 provisioning input. Cross-signal covariates are
@@ -421,6 +416,7 @@ improves on the point path, leaving the band as headroom rather than
 correction. The strongest model at fine resolutions (Toto-2 with joint
 multivariate attention) and at coarse resolutions (Chronos-2) differ by
 margins small enough that engineering considerations --- model size,
-latency, covariate interface --- can drive the choice. These forecasts,
-tiled contiguously at the serving cadence, are exactly the input the
-predictive autoscaling experiments of the following chapters consume.
+latency, covariate interface --- can drive the choice. Tiled
+contiguously at the serving cadence, these forecasts are exactly the
+input the following chapters' predictive autoscaling experiments
+consume.

@@ -14,7 +14,7 @@ chapter anchors that platform to the \emph{live} stack: the same
 policies, on the same workload, executed through Dynamo's real control
 plane in real time --- HTTP frontend with the in-process KV router,
 independent mocker worker processes discovered over etcd, metrics
-scraped by Prometheus, the SLA planner running as its own service, and
+scraped by Prometheus, the SLA planner as its own service, and
 scaling decisions actuated through the planner's VirtualConnector
 protocol by a worker-manager written for this thesis (nothing in the
 Dynamo tree consumes VirtualConnector decisions for live workers). The
@@ -96,8 +96,8 @@ fail; Chapter~\ref{cap:closedloop}) reproduces on the real stack.
 \section{What the live stack revealed}
 \label{sec:val-findings}
 
-The anchor's second product is the divergences it surfaced --- none of
-them policy-level, all of them worth knowing before a deployment:
+The anchor's second product is the divergences it surfaced --- none
+policy-level, all worth knowing before a deployment:
 
 \begin{description}
 \item[Live \texttt{startup\_time} inverts the offline semantics.]
