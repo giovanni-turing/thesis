@@ -224,18 +224,18 @@ artifact:   simulation/results/live51/twin_{fc_p90,fc,re}*.report.json (+_cap4 b
 command:    run_replay.sh grid_burst3_C7.jsonl aic <report> 2 --planner-config {planner_forecast_smoke,planner_ladder_t200_20}[.cap4] (fc: REPLAY_ENTRY=replay_with_forecast.py FORECAST_{MODEL=chronos,RESOLUTION=15s,T0="2024-10-18 10:18:00",QUANTILE∈{p50,p90}} FORECAST_REQ_SCALE=8 STARTUP_TIME=60)
 feeds:      tex/closedloop.tex §cl-llm "quantile dial on the language pool too" ¶ — reactive FAIL 3,494.7 ms / fc-p50 FAIL 2,164.2 (better-informed, still late) / fc-p90 PASS 651.1 (ITL 5.1); extends the encoder matrix's p50-misses-fast-onsets result to the LLM pool; also the anchor policy pair for Ch. validation
 supersedes: new (first LLM closed loop beyond burst1/burst4)
-commit:     (this commit)
+commit:     0eb7323
 
 ### 5.1 validation anchor — live Dynamo stack vs offline twins  (2026-07-09)
 artifact:   simulation/results/live51/live_runs/{live_fc,live_re,verify_flag}/{profile_export_aiperf.json,manager.jsonl,planner.log.gz}; twins twin_fc_p90_cap4/twin_re_cap4 (budget-matched); harness simulation/live51/ (run_live.sh, worker_manager.py, planner_live*.py, configs)
 command:    bash simulation/live51/run_live.sh {fc,re} grid_burst3_C7.jsonl <rundir> 59 2  (etcd+NATS dev compose, prom51 :9090 w/ per-run dynamo_namespace label, aiperf fixed-schedule mooncake replay, FORECAST_QUANTILE=p90)
 feeds:      tex/validation.tex Tab. val-anchor + chapter; intro scope ¶ (placeholder resolved); conclusion RQ3 — VERDICT AGREEMENT both directions: fc-p90 PASS live 695 vs twin 651 ms (+6.8%); reactive FAIL live 3,531 vs 3,495 ms (+1.0%); replica-seconds within 8%; demand path byte-identical 12 ticks (live tick1 29.86 rps/5.31 engine_rps = twin 29.86/5.30); spawn-to-ready measured 1.0 s → spawn-delay 59 s = 60 s lead
 supersedes: the intro's last placeholder (validation anchors)
-commit:     (this commit)
+commit:     0eb7323
 
 ### Live-path divergences + upstream fix fpm_observation_mode  (2026-07-09)
 artifact:   ai-dynamo/dynamo branch fix/planner-live-fpm-observation-mode commit 33a9babe01 (LOCAL — push awaits user); verification simulation/results/live51/live_runs/verify_flag/
 command:    (fix) PlannerConfig.fpm_observation_mode 'all': recv-mode drain → observe_fpm_extra via add_observations, 68 unit tests pass; (verify) SKIP_PARITY_PATCH=1 PLANNER_CFG_OVERRIDE=planner_fc_flag.json run_live.sh fc smoke_b3head — in-tree drain, Agg tick1 29.86/5.48=6, no monkeypatch
 feeds:      tex/validation.tex §val-findings — 4 findings: (1) live startup_time INVERTS offline semantics (registers immediately, stalls requests → routable-but-dead window; leads modeled by delayed spawn); (2) tracking-mode FPM sampling starves agg capacity model at calm load (0 mixed samples in 5 min @2 rps; offline ready tick 1) → fixed via flag; (3) live tick cadence can stall (one 245 s gap; forecast feed realigns to wall time); (4) budget-unit inconsistency (offline replay caps replicas at max_gpu_budget; live divides by decode_engine_num_gpu) — anchor twins budget-matched via max_gpu_budget=4, thesis offline results unaffected (budgets never bind)
 supersedes: new
-commit:     (this commit; dynamo-side 33a9babe01 local)
+commit:     0eb7323 (dynamo-side 33a9babe01 local)
