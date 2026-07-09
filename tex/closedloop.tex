@@ -217,7 +217,14 @@ Chapter~\ref{cap:baselines} (Table~\ref{tab:cl-aggregate}).
 requests): encoder-delay p99, provisioned worker-time, and per-episode
 compliance. ``Episodes'' grades each in-span burst episode separately
 (the aggregate p99 alone can mask sub-1\% episodes). Forecast policies
-use Chronos-2 at $\rho{=}15$; $L$ is the cold-start lead.}
+use Chronos-2 at $\rho{=}15$; $L$ is the cold-start lead. The three
+rows reading \SI{588}{\milli\second} are distinct runs --- their
+worker-time and worst-case delay differ --- that coincide at the
+zero-queueing service floor: a full-batch forward
+($f(64)=\SI{316.4}{\milli\second}$) plus the p99 handoff
+(\SI{272}{\milli\second}), which every adequately provisioned policy
+reaches because all share the same encoder. Rows above it
+(\SI{905}{\milli\second} and up) carry queueing on top of that floor.}
 \label{tab:cl-aggregate}
 \small
 \begin{tabular}{@{}lrrrl@{}}
