@@ -253,9 +253,14 @@ covers the largest burst (all leads, both conversions) and the binding
 mix (mapping validation); the remaining windows are priced by the grid
 and the knee formula rather than replayed end-to-end. Per-pool leads
 are swept as constants over each run, not stochastic; and the two
-out-of-span episodes (burst2/6, before forecast coverage begins) are
-graded only in the per-window matrix of Chapter~\ref{cap:baselines},
-not in the aggregate. Replay-level p99 noise is ${\approx}4\%$;
+out-of-span episodes (burst2/6, inside the trace's first 1.4 days,
+which the zero-shot forecasters consume as context before their first
+usable 15-second forecast) are graded only by the static grid and the
+language-pool reactive baselines of Chapter~\ref{cap:baselines} ---
+no dynamic \emph{encoder} policy, forecast or reactive, is scored on
+them, since the forecast is structurally absent there and the reactive
+strawman exists for comparison against it. A deployed system would not
+have this hole: it would enter the week with prior history as context. Replay-level p99 noise is ${\approx}4\%$;
 no quoted contrast is within that band.
 
 \section{Summary}
