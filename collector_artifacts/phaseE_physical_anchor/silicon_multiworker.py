@@ -176,6 +176,26 @@ def main():
             name, out["windows"][name].get("onset", ""), grid_cstar, aic_cstar,
             sil_cstar, infl, sil_row[ac]["p99"],
             "grid-match" if aic_cstar == grid_cstar else "MISMATCH"))
+    # Single-worker (W=1) end-to-end amplification: silicon p99 / AIC p99.
+    # NOTE: at 1 worker every window is deeply infeasible; this ratio is
+    # dominated by runaway-backlog depth (grows with window length AND
+    # sustained volume), so it is a saturation-regime illustration, NOT a
+    # clean per-op metric. The deployment-relevant amplification is the ~2x
+    # worker margin at the feasible knee (the C* result above).
+    swa = {}
+    for name, v in out["windows"].items():
+        a1 = v["aic_p99_by_W"]["1"]["p99"]; s1 = v["silicon_p99_by_W"]["1"]["p99"]
+        swa[name] = {"aic_p99": a1, "silicon_p99": s1,
+                     "ratio": round(s1 / a1, 2) if a1 else None}
+    out["single_worker_amplification"] = {
+        "note": "W=1 end-to-end p99 ratio; saturation-regime, backlog-depth "
+                "dominated (window length + volume), not a clean per-op metric",
+        "by_window": swa,
+        "range": [min(x["ratio"] for x in swa.values()),
+                  max(x["ratio"] for x in swa.values())],
+    }
+    print("single-worker amplification (W=1, sil/AIC p99):",
+          {k: x["ratio"] for k, x in swa.items()})
     dest = HERE / "silicon_multiworker.json"
     json.dump(out, open(dest, "w"), indent=1)
     print(f"-> {dest}")

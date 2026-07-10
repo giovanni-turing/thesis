@@ -1864,5 +1864,44 @@
     }
    }
   }
+ },
+ "single_worker_amplification": {
+  "note": "W=1 end-to-end p99 ratio; saturation-regime, backlog-depth dominated (window length + volume), not a clean per-op metric",
+  "by_window": {
+   "burst1": {
+    "aic_p99": 51889.7,
+    "silicon_p99": 1290133.7,
+    "ratio": 24.86
+   },
+   "burst2": {
+    "aic_p99": 56225.8,
+    "silicon_p99": 1081129.2,
+    "ratio": 19.23
+   },
+   "burst3": {
+    "aic_p99": 54169.6,
+    "silicon_p99": 155670.7,
+    "ratio": 2.87
+   },
+   "burst4": {
+    "aic_p99": 116416.7,
+    "silicon_p99": 2167323.2,
+    "ratio": 18.62
+   },
+   "burst5": {
+    "aic_p99": 43795.5,
+    "silicon_p99": 314758.7,
+    "ratio": 7.19
+   },
+   "burst6": {
+    "aic_p99": 38758.9,
+    "silicon_p99": 176747.7,
+    "ratio": 4.56
+   }
+  },
+  "range": [
+   2.87,
+   24.86
+  ]
  }
 }
