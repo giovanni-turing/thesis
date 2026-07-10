@@ -280,4 +280,4 @@ artifact:   simulation/results/aggregate44_rho/fc_p90_rho{10,20,25}_L{30,300}.js
 command:    run_agg_rho.sh (forecast_schedule.py p90/15s/hyst3 rho{10,20,25} x lead{30,300}, chronos parquet, converter over aggregate span); run_agg_ds4.sh (converter --handoff-gbps 6.25 = x4 payload @25Gbps, reusing each policy's .sched.json)
 feeds:      tex/closedloop.tex §week-aggregate — (rho) headline is a TUNABLE FRONTIER not a point: fc-p90 PASSES all rho — 588ms@rho10/15 (0.44/0.31x), 651@rho20 (0.238x), 899@rho25 (0.198x); even cheapest passing setting <0.2x static → answers "0.27-0.31 cherry-picked?"; (ds4) DeepStack x4 is a FABRIC requirement not a policy weakness: ALL policies violate at 4x payload incl static-C16 (1,311ms), common 1,087ms handoff floor; Fig fig:cl-framework-diff 3-panel (accuracy near-parity | closed-loop verdict | online fidelity)
 supersedes: single-point 0.27-0.31x framing (now the middle of a rho10-25 frontier); single-policy ds4 disclosure (now all-policy)
-commit:     (this commit)
+commit:     8f14e58
