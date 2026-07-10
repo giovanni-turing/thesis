@@ -315,4 +315,4 @@ artifact:   collector_artifacts/phaseE_physical_anchor/{measure_fn_silicon.py,fn
 command:    eda/.venv/bin/python measure_fn_silicon.py  (extracted ViT models/Qwen3-VL-8B-ViT, flash_attention_2, batch N{1,6,8,16,32,64} @448px, 5x50 iters, cuda.sync-timed) vs aic_f_n_postinfill.csv
 feeds:      tex/aiconfigurator.tex §validation (first whole-tower physical anchor ¶) + tex/conclusion.tex future work. Measured whole-tower f(N) tracks AIC composition at STABLE ~2.7-3.1x ratio for N>=6 (shape f(N) correct; offset = whole-tower-vs-operator gap: patch-embed/projector/DeepStack/dispatch not priced by attention+GEMM). N=1 6.2x (launch-overhead, non-serving), N=64 2.07x. CAVEAT: unlocked clocks (2385-2392 vs 2407 target) — ratio-stability across batch axis is the clock-invariant load-bearing observation; clean confirmation = locked-clock operator-isolated re-run + real-worker burst replay (future work). Also: DISK-FULL event corrupted the run's json write; recovered from run.log
 supersedes: the physical anchor as entirely-future-work (now partially fulfilled with caveat)
-commit:     (this commit)
+commit:     7bd06d2
