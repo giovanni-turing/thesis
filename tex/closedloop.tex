@@ -297,16 +297,23 @@ the three (Toto-2.0 is $20\times$ larger), so the headline rests on the
 cheapest forecaster, not the most accurate one (at this resolution the
 accuracy winner is Toto, Chapter~\ref{cap:predictors}).
 
-Nor is the $\rho{=}15$ operating point special. Sweeping the capacity
-rating over the whole span, the p90-forecast policy passes at every
-rating tested --- \SI{588}{\milli\second} at $\rho{\in}\{10,15\}$,
-\SI{651}{\milli\second} at $\rho{=}20$, \SI{899}{\milli\second} at
-$\rho{=}25$ --- tracing a cost frontier from 0.44$\times$ static (the
-conservative $\rho{=}10$) down to 0.18$\times$ (the aggressive
-$\rho{=}25$, still under the bound). The quoted 0.27--0.31$\times$ is
-the middle of a tunable range, not a cherry-picked point: even the
-cheapest passing setting spends under a fifth of the deployable static
-fleet.
+Nor is the $\rho{=}15$ operating point special. A full week-scale sweep
+--- three forecasting models $\times$ two quantiles $\times$ four
+capacity ratings $\times$ four leads, each a continuous replay of the
+covered span --- makes the quantile the decisive dial and the rating a
+cost knob. The p90-forecast policy passes \emph{all 48 of its cells}
+(every model, rating, and lead), tracing a cost frontier from
+0.44$\times$ static at the conservative $\rho{=}10$
+(\SI{588}{\milli\second}) down to 0.18$\times$ at the aggressive
+$\rho{=}25$ (\SI{899}{\milli\second}, still under the bound); the quoted
+0.27--0.31$\times$ is the middle of that tunable range, not a
+cherry-picked point. The p50-forecast policy, by contrast, passes
+\emph{none} of its 48 cells --- the median forecast is a cheap policy
+that fails the SLA at every rating, the week-scale echo of the
+mean-sizing defect. The rating trades cost against margin cleanly:
+p99 rises monotonically with $\rho$ (588 at $\rho{\le}15$, up to 899 at
+$\rho{=}25$) as the fleet shrinks, and even the cheapest passing setting
+spends under a fifth of the deployable static fleet.
 
 Two rows demand care. The reactive rows \emph{appear} to pass ---
 their aggregate p99 clears the bound --- but the per-episode column

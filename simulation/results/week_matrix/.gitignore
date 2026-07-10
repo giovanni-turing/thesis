@@ -1,0 +1,4 @@
+results/week_matrix/*.jsonl
+results/week_matrix/*.log
+results/week_matrix/jobs.txt
+results/week_matrix/driver*.out

@@ -288,3 +288,10 @@ command:    run_episode_twins.sh — run_replay.sh on grid_{burst1_C6,burst4_C7,
 feeds:      tex/closedloop.tex §cl-llm quantile-dial ¶ — the LLM verdict generalizes from burst3 to ALL burst episodes: fc-p90 PASSES each at the service floor (TTFT p99 651–706 ms across 1–220 min onsets: b3 651/b5 651/b4 651/b1 706) while reactive FAILS all four (b3 3495/b4 2776/b5 2152/b1 1615). Same categorical split at every onset speed — closes the "LLM evidence is window-anecdotal" gap
 supersedes: window-level-only LLM closed loop (burst1/3/4 individually); now the full episode set
 commit:     1ba9243
+
+### Week-scale rho x lead x model surface (112-cell local matrix)  (2026-07-09)
+artifact:   simulation/results/week_matrix/*.jsonl.stats.json (112 cells; raw jsonl auto-deleted); runner simulation/run_week_matrix.sh
+command:    run_week_matrix.sh — 20-way local xargs: forecast_schedule.py (aggregate window, p50/p90 x chronos/toto/timesfm x rho{10,15,20,25} x lead{15,30,45,300}) + converter over the 5.60-day span, encoder-workers 2. (E2B fan-out abandoned — template windows.json predates aggregate window, 404'd; local 24-core run faster.) NOTE: 3 rho25 cells corrupted by a mid-run disk-full event (raw jsonl filled /home), regenerated clean; driver now rm's raw jsonl per cell
+feeds:      tex/closedloop.tex §week-aggregate rho-frontier ¶ (UPGRADED from 2-lead to full surface) — fc-p90 passes ALL 48 cells (every model/rho/lead), cost frontier 0.44x (rho10, 588ms) -> 0.18x (rho25, 899ms), 0.27-0.31x is the middle; fc-p50 passes 0/48 (median policy fails SLA at every rating — week-scale mean-sizing defect); p90/rho15 cells reproduce the committed aggregate headline exactly (588.4ms, 0.273-0.309x) validating the whole surface
+supersedes: the 6-cell agg-rho partial sweep (now the full 112-cell surface, 3 models x 2 quantiles)
+commit:     (this commit)
