@@ -81,14 +81,20 @@ steady (24 h) & 24.0 & 2 & TP1$\times$2 & 48.0 & 48.0 \\
 \end{table}
 
 Three structural facts follow. First, \textbf{every burst window forces
-the language pool to TP2}: at TP1 no replica count is feasible, because
-the burst's long-prompt prefills pin TTFT p99 at
+the language pool to TP2, and the gain is the parallelism layout, not
+the GPU budget}. At TP1 no replica count is feasible: the burst's
+${\approx}36$k-token frames-class prefills pin TTFT p99 at
 ${\approx}$\SI{1285}{\milli\second} even at $N{=}16$ --- a
-\emph{prefill floor} that replica scaling cannot buy down and one
-parallelism change removes (TP2$\times$2:
-\SI{763}{\milli\second} on burst1's composed trace here;
-Chapter~\ref{cap:twopool} quotes \SI{748.4}{\milli\second} for the
-same shape on its isolation trace). Second, the encoder requirement
+\emph{prefill floor} that replica scaling cannot buy down. Holding the
+budget fixed isolates the mechanism: four TP1 replicas and one
+TP2$\times$2 group are both four H100s, yet TP1$\times$4 fails every
+burst window (TTFT p99 1{,}314--1{,}331\,\si{\milli\second}) while
+TP2$\times$2 passes every one (746--792\,\si{\milli\second}), a
+1.66--1.76$\times$ tail reduction from the layout alone
+(Table~\ref{tab:base-tp}). Intra-request tensor parallelism shortens the
+single long prefill that four independent replicas can only queue, not
+buy down; Chapter~\ref{cap:twopool} quotes \SI{748.4}{\milli\second} for
+the same shape on its isolation trace. Second, the encoder requirement
 swings from 2 workers on the calm day to 16 on burst5 --- the
 order-of-magnitude missizing of Chapter~\ref{cap:trace-eda}, now as a
 fleet-sizing fact. Third, the single static fleet that survives
@@ -99,6 +105,28 @@ and carries a fleet-\emph{shape} difference (TP2 versus TP1) that no
 replica autoscaler can morph at runtime. Close-out checks confirm the
 optima are robust to the router's tuning knobs (35 corner re-runs;
 no frontier movement).
+
+\begin{table}[htbp]
+\centering
+\caption{Iso-cost tensor parallelism on the language pool. TP1$\times$4
+and TP2$\times$2 both cost four H100s --- only the parallelism layout
+differs. TTFT p99 per burst window under the \SI{1000}{\milli\second}
+SLO (ITL p99 within bound in both columns); AIC timing on each window's
+composed trace at its static-optimal encoder count.}
+\label{tab:base-tp}
+\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Window & TP1$\times$4 p99 (ms) & TP2$\times$2 p99 (ms) & Tail cut \\
+\midrule
+burst1 & 1{,}318 \emph{(fail)} & 763 \emph{(pass)} & 1.73$\times$ \\
+burst2 & 1{,}331 \emph{(fail)} & 766 \emph{(pass)} & 1.74$\times$ \\
+burst3 & 1{,}314 \emph{(fail)} & 746 \emph{(pass)} & 1.76$\times$ \\
+burst4 & 1{,}317 \emph{(fail)} & 792 \emph{(pass)} & 1.66$\times$ \\
+burst5 & 1{,}316 \emph{(fail)} & 781 \emph{(pass)} & 1.68$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Reactive control on the language pool}
 \label{sec:base-reactive-llm}

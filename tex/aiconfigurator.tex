@@ -303,10 +303,15 @@ bound ($1.37$--$1.47$). End to end, replaying the burst3 image schedule
 through the encoder FIFO under AIC cost reproduces the simulator's p99
 encoder delay to the digit (54{,}169.6 versus 54{,}169.5\,ms), and under
 measured cost raises it $2.87\times$ --- the served silicon is slightly
-slower than the model, conservative for every infeasibility claim. This
-anchor was collected at near-boost but \emph{unlocked} clocks, so the
-ratio (clock-invariant) is the reported quantity; a locked-clock re-run
-for publication-grade absolutes remains future work
+slower than the model, conservative for every infeasibility claim. The first anchor ran at
+near-boost but \emph{unlocked} clocks; because the batch-axis ratio is
+clock-invariant it is the reported quantity, and a single-tenant re-run
+at stable clocks (SM held at \SI{2400}{\mega\hertz}, within $0.3\%$ of
+the \SI{2407}{\mega\hertz} target) reproduces it --- mean $1.47$ on the
+same batch grid, $1.43$ (band $1.32$--$1.62$) on a denser one --- and
+pins the absolutes to publication grade ($N{=}64$ within $0.09\%$ of the
+Section~\ref{sec:aic-validation} reference). What remains is one real
+encoder worker serving a burst replay end to end
 (Chapter~\ref{cap:conclusion}).
 
 Second, \textbf{the model and the silicon disagree about where batching
