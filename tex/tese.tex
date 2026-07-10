@@ -24,7 +24,9 @@
 
 \title{Predictive Per-Pool Provisioning for\\
 Modality-Disaggregated Multimodal Model Serving}
-\author{Giovanni Oliveira}
+\author{Giovanni Oliveira\\[2ex]
+{\normalsize Advisor: Prof.\ Dr.\ Fabio Kon}\\
+{\normalsize Co-advisor: Prof.\ Dr.\ Em\'ilio Francesquini}}
 \date{\today}
 
 \begin{document}
@@ -33,108 +35,86 @@ Modality-Disaggregated Multimodal Model Serving}
 
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-Multimodal large-model serving systems increasingly disaggregate by
-modality: a vision-encoder pool converts images into embedding tokens, and
-a language pool runs prefill and decode. Each pool must then be
-provisioned separately --- and the prevailing reactive practice, scaling
-on request rate or utilization, silently assumes those signals carry
-every pool's demand. Analyzing the first public production trace of a
-multimodal inference cluster (Azure, one million requests over seven
-days), this thesis shows that the assumption fails for the vision pool:
-image arrivals are nearly decoupled from request rate ($R^2 = 0.12$), an
-order of magnitude burstier, the fastest of them ramping to peak within
-replica cold-start times, and their extreme minutes are essentially
-disjoint from the request signal's (Jaccard 0.02). The same signal is also
-the most \emph{persistent}, hence forecastable at the lead times
-provisioning needs: zero-shot time-series foundation
-models beat fixed-parameter classical baselines on every demand signal
-at every resolution tested, with empirically calibrated p90 headroom at
-provisioning cadence. To convert forecasts into provisioning decisions,
-the thesis builds a calibrated two-pool simulation platform: encoder
-costs collected on RTX 5090 silicon for this work (contributed upstream
-to NVIDIA's aiconfigurator) and audited against physical measurement,
-composed with Dynamo's discrete-event language-pool simulator under
-calibrated H100 timing. The composed system reproduces the decoupling
-mechanically: the pools saturate an order of magnitude apart on steady
-traffic, and the largest burst breaks both --- the language pool through
-a prefill floor removed by one parallelism change, the vision pool
-through episodic queueing at 29\% mean utilization, invisible to rate-
-and utilization-based monitoring. Closing the loop, forecast-driven
-per-pool worker schedules hold the tail latency objective through burst
-onsets that defeat an identically informed reactive controller at every
-tested cold-start lead, at 0.27--0.31 times the deployable static
-encoder fleet's provisioned GPU-time over the covered week (with the
-language fleet at 0.96 times its burst-sized static shape)
+Multimodal model serving increasingly disaggregates by modality: a
+vision-encoder pool turns images into embedding tokens, a language pool
+runs prefill and decode. Each pool is then provisioned separately, yet the
+prevailing reactive practice --- scaling on request rate or utilization ---
+assumes those signals carry every pool's demand. On the first public
+production trace of a multimodal inference cluster (Azure, one million
+requests over seven days), that assumption fails for the vision pool: image
+arrivals are nearly decoupled from request rate ($R^2 = 0.12$), an order of
+magnitude burstier, and disjoint from it at the extremes (Jaccard 0.02),
+yet also the most \emph{persistent} --- forecastable at provisioning
+horizons, where zero-shot time-series foundation models beat classical
+baselines on every signal. A two-pool simulation platform --- encoder costs
+collected on RTX 5090 silicon (upstreamed to NVIDIA's aiconfigurator) and
+validated physically, composed with Dynamo's calibrated H100 language-pool
+simulator --- reproduces the decoupling mechanically: the pools' saturation
+knees sit an order of magnitude apart, and the largest burst breaks both (a
+shape-fixable prefill floor; episodic encoder queueing at 29\% mean
+utilization, invisible to rate- and utilization-based monitors). Closing the
+loop, forecast-driven per-pool schedules hold the tail-latency SLA through
+burst onsets that defeat an identically informed reactive controller, at
+0.27--0.31$\times$ the deployable static encoder fleet's GPU-time (the
+language fleet near-break-even, 0.96$\times$); both verdicts reproduce on the
+live Dynamo runtime.
 
 \medskip
 \noindent\textbf{Keywords:} multimodal model serving; modality
 disaggregation; autoscaling; time-series forecasting; GPU provisioning;
-tail latency --- behavior reproduced on the live serving runtime on the
-fastest-onset burst.
+tail latency.
 
 \begin{otherlanguage}{brazil}
 \chapter*{Resumo}
 \addcontentsline{toc}{chapter}{Resumo}
-Sistemas de servi\c{c}o de modelos multimodais cada vez mais se
-desagregam por modalidade: um \emph{pool} codificador de vis\~ao converte
-imagens em \emph{tokens} de \emph{embedding}, e um \emph{pool} de
-linguagem executa \emph{prefill} e \emph{decode}. Cada \emph{pool} passa
-ent\~ao a ser provisionado separadamente --- e a pr\'atica reativa
-vigente, escalar pela taxa de requisi\c{c}\~oes ou pela utiliza\c{c}\~ao,
-assume silenciosamente que esses sinais carregam a demanda de todos os
-\emph{pools}. Analisando o primeiro \emph{trace} p\'ublico de
-produ\c{c}\~ao de um \emph{cluster} de infer\^encia multimodal (Azure, um
-milh\~ao de requisi\c{c}\~oes em sete dias), esta disserta\c{c}\~ao
-mostra que a hip\'otese falha para o \emph{pool} de vis\~ao: as chegadas
-de imagens s\~ao quase desacopladas da taxa de requisi\c{c}\~oes
-($R^2 = 0{,}12$), uma ordem de magnitude mais intermitentes, com as mais r\'apidas
-atingindo o pico dentro do tempo de partida a frio de uma r\'eplica, e seus
-minutos extremos s\~ao essencialmente disjuntos dos do sinal de
-requisi\c{c}\~oes (Jaccard 0{,}02). O mesmo sinal \'e tamb\'em o mais
-\emph{persistente}, e portanto previs\'ivel nos horizontes que o
-provisionamento exige: modelos de funda\c{c}\~ao de s\'eries temporais,
-usados \emph{zero-shot}, superam as \emph{baselines} cl\'assicas de
-par\^ametros fixos em todos
-os sinais de demanda e resolu\c{c}\~oes testadas, com p90 empiricamente
-calibrado na cad\^encia de provisionamento. Para converter previs\~oes em
-decis\~oes de provisionamento, constr\'oi-se uma plataforma de
-simula\c{c}\~ao de dois \emph{pools} calibrada: custos do codificador
-coletados em sil\'icio RTX 5090 (contribu\'idos ao aiconfigurator da
-NVIDIA) e auditados contra medi\c{c}\~ao f\'isica, compostos com o
-simulador de eventos discretos do Dynamo sob tempos H100 calibrados. O
-sistema composto reproduz o desacoplamento mecanicamente: os \emph{pools}
-saturam separados por uma ordem de magnitude em tr\'afego
-estacion\'ario, e a
-maior rajada quebra ambos --- o de linguagem por um piso de
-\emph{prefill} remov\'ivel por uma mudan\c{c}a de paralelismo, o de
-vis\~ao por enfileiramento epis\'odico a 29\% de utiliza\c{c}\~ao
-m\'edia, invis\'ivel a monitores de taxa e utiliza\c{c}\~ao. Fechando o
-la\c{c}o, escalas de trabalhadores dirigidas por previs\~ao por
-\emph{pool} sustentam o objetivo de lat\^encia de cauda atrav\'es de
-in\'icios de rajada que derrotam um controlador reativo igualmente
-informado em todos os tempos de partida a frio testados, a 0,27--0,31
-do tempo de GPU provisionado da frota est\'atica implant\'avel de
-codificadores na semana coberta (com a frota de linguagem a 0,96 de
-sua forma est\'atica dimensionada para rajadas)
+O servi\c{c}o de modelos multimodais tem se desagregado por modalidade: um
+\emph{pool} codificador de vis\~ao converte imagens em \emph{tokens} de
+\emph{embedding}, e um \emph{pool} de linguagem executa \emph{prefill} e
+\emph{decode}. Cada \emph{pool} passa a ser provisionado separadamente, mas
+a pr\'atica reativa vigente --- escalar pela taxa de requisi\c{c}\~oes ou
+pela utiliza\c{c}\~ao --- assume que esses sinais carregam a demanda de
+todos os \emph{pools}. No primeiro \emph{trace} p\'ublico de produ\c{c}\~ao
+de um \emph{cluster} de infer\^encia multimodal (Azure, um milh\~ao de
+requisi\c{c}\~oes em sete dias), essa hip\'otese falha para o \emph{pool} de
+vis\~ao: as chegadas de imagens s\~ao quase desacopladas da taxa de
+requisi\c{c}\~oes ($R^2 = 0{,}12$), uma ordem de magnitude mais
+intermitentes e disjuntas dela nos extremos (Jaccard 0{,}02) --- por\'em
+tamb\'em as mais \emph{persistentes} e, portanto, previs\'iveis nos
+horizontes de provisionamento, onde modelos de funda\c{c}\~ao de s\'eries
+temporais, em \emph{zero-shot}, superam as \emph{baselines} cl\'assicas em
+todos os sinais. Uma plataforma de simula\c{c}\~ao de dois \emph{pools} ---
+custos do codificador medidos em sil\'icio RTX 5090 (contribu\'idos ao
+aiconfigurator da NVIDIA) e validados fisicamente, compostos com o simulador
+de eventos discretos do Dynamo sob tempos H100 calibrados --- reproduz o
+desacoplamento mecanicamente: os \emph{pools} saturam a escalas separadas
+por uma ordem de magnitude, e a maior rajada quebra ambos (um piso de
+\emph{prefill} corrig\'ivel por uma mudan\c{c}a de paralelismo; enfileiramento
+epis\'odico no codificador a 29\% de utiliza\c{c}\~ao m\'edia, invis\'ivel a
+monitores de taxa e utiliza\c{c}\~ao). Fechando o la\c{c}o, o escalonamento
+preditivo por \emph{pool} sustenta a SLA de lat\^encia de cauda em in\'icios
+de rajada que derrotam um controlador reativo igualmente informado, a
+0,27--0,31$\times$ o tempo de GPU da menor frota est\'atica vi\'avel de
+codificadores (com a frota de linguagem praticamente em equil\'ibrio,
+0,96$\times$); ambos os veredictos se reproduzem no \emph{runtime} real do
+Dynamo.
 
 \medskip
 \noindent\textbf{Palavras-chave:} servi\c{c}o de modelos multimodais;
 desagrega\c{c}\~ao por modalidade; autoescalonamento; previs\~ao de
-s\'eries temporais; provisionamento de GPU; lat\^encia de cauda --- comportamento reproduzido no \emph{runtime} de servi\c{c}o real
-na rajada de in\'icio mais r\'apido.
+s\'eries temporais; provisionamento de GPU; lat\^encia de cauda.
 \end{otherlanguage}
 
 % ---- Draft-status note (REMOVE for the defense/submission version) ----
 \chapter*{Note on this draft}
-This is a preliminary version (2026-07-09) prepared for advisor review.
+This is a preliminary version (2026-07-10) prepared for advisor review.
 All experimental phases are complete and archived --- including the
 live-runtime validation anchor (Chapter~\ref{cap:validation}) --- and
 every quantitative claim traces to a versioned artifact through the
-workspace's results ledger. Pending for the defense version:
-institutional formatting (departmental template, ABNT front matter,
-biblatex bibliography), figure regeneration to vector formats, and a
-final copy-edit. Chapter numbering may
-shift when the institutional template is adopted.
+workspace's results ledger. Figures are vector (two legacy plots
+excepted). Pending for the defense version: institutional formatting
+(departmental template, ABNT front matter, biblatex bibliography) and
+final institutional review. Chapter numbering may shift when the
+institutional template is adopted.
 
 \tableofcontents
 \cleardoublepage
