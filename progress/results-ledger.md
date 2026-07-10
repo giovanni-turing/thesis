@@ -379,4 +379,4 @@ artifact:   analysis/trace_eda/r_eval_windows.py; figuras/eda/eda_eval_windows.{
 command:    eda/.venv/bin/python analysis/trace_eda/r_eval_windows.py  (1-min image rate over the week; bands = grid_summary window spans incl. +/-10min pad, calm day 10-19, forecast context [trace start, FORECAST_T0 2024-10-16 21:39))
 feeds:      tex/trace-eda.tex NEW Fig fig:eda-windows (below fig:eda-sevenday) — shows the stratified sub-sample the experiments run on: b1-b6 + calm day + context split; explains why b2/b6 are forecast-free-only. Text links added in trace-eda §vision episodes ¶ and baselines §protocol
 supersedes: new (user-requested; the stratification previously existed only in prose)
-commit:     <pending>
+commit:     8f13ac3
