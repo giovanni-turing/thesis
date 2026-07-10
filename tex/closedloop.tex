@@ -211,6 +211,27 @@ week outright} (TTFT p99 1{,}197\,\si{\milli\second}) while spending
 281.8 GPU-hours: half the budget, and the wrong tail --- at week scale
 as at window scale, spend is not the defect.
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figuras/pred/pred_framework_diff.png}
+\caption{Why the framework differs, in three measurements.
+\textbf{(a)} On the image signal at provisioning cadence the predictors
+are near-parity --- the foundation models (blue) and Dynamo's shipped
+predictors (yellow: ARIMA, Prophet, Kalman) cluster within
+$0.02$ WAPE, and ARIMA ties Chronos. Accuracy alone does not separate
+them. \textbf{(b)} Yet on the burst3 closed loop the verdict is
+categorical: every mean-conversion policy fails the SLA --- Dynamo's
+shipped predictors (\SI{3{,}495}{\milli\second}, forecaster-invariant)
+and the forecast at the median quantile
+(\SI{2{,}164}{\milli\second}) alike --- while only the p90 forecast
+\emph{with a tail-aware conversion} passes (\SI{651}{\milli\second}).
+The differentiator is the signal and the conversion, not forecast
+accuracy. \textbf{(c)} And the verdict holds on the live Dynamo runtime:
+both policies' online tails track their offline twins within
+run noise (Chapter~\ref{cap:validation}).}
+\label{fig:cl-framework-diff}
+\end{figure}
+
 \section{The week-scale aggregate}
 \label{sec:cl-aggregate}
 
@@ -270,6 +291,17 @@ the three (Toto-2.0 is $20\times$ larger), so the headline rests on the
 cheapest forecaster, not the most accurate one (at this resolution the
 accuracy winner is Toto, Chapter~\ref{cap:predictors}).
 
+Nor is the $\rho{=}15$ operating point special. Sweeping the capacity
+rating over the whole span, the p90-forecast policy passes at every
+rating tested --- \SI{588}{\milli\second} at $\rho{\in}\{10,15\}$,
+\SI{651}{\milli\second} at $\rho{=}20$, \SI{899}{\milli\second} at
+$\rho{=}25$ --- tracing a cost frontier from 0.44$\times$ static (the
+conservative $\rho{=}10$) down to 0.18$\times$ (the aggressive
+$\rho{=}25$, still under the bound). The quoted 0.27--0.31$\times$ is
+the middle of a tunable range, not a cherry-picked point: even the
+cheapest passing setting spends under a fifth of the deployable static
+fleet.
+
 Two rows demand care. The reactive rows \emph{appear} to pass ---
 their aggregate p99 clears the bound --- but the per-episode column
 shows why that reading is wrong: reactive fails burst3 at every lead
@@ -313,10 +345,14 @@ quadruple that payload, and a sensitivity replay of the aggregate at
 the $4\times$ payload on the modeled 25\,Gbps link raises p99 handoff
 from 272 to 1{,}087\,\si{\milli\second} (encoder-delay p99
 1{,}404\,\si{\milli\second} --- an SLA violation from transfer
-alone). The \SI{588}{\milli\second} floor therefore assumes an
+alone). This is a fabric requirement, not a policy weakness: at the
+$4\times$ payload \emph{every} policy violates the bound, including the
+static $C{=}16$ fleet (p99 \SI{1{,}311}{\milli\second}), because the
+1{,}087\,\si{\milli\second} handoff floor is common to all. The
+\SI{588}{\milli\second} floor therefore assumes an
 embedding-only handoff or a ${\geq}100$\,Gbps inter-pool fabric, which
-restores the quoted numbers exactly (transfer scales linearly with
-payload over bandwidth). Per-pool leads
+restores the quoted numbers for every policy exactly (transfer scales
+linearly with payload over bandwidth). Per-pool leads
 are swept as constants per run, not stochastic; and the two
 out-of-span episodes (burst2/6, inside the trace's first 1.4 days,
 which the zero-shot forecasters consume as context before their first
