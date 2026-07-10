@@ -23,6 +23,14 @@ defect. Run a ledger-vs-tex sweep before any submission build.
 
 ---
 
+### Structural-additive LLM prefill (ctx) predictor ablation — NEGATIVE  (2026-07-09)
+artifact:   predictors/results/metrics/additive_structural_ablation.json
+command:    eda/.venv/bin/python predictors/additive_structural_ablation.py  (archive-only: reads predictors/results/{chronos,toto}_{ctx,images,requests}.parquet + analysis/trace_eda/series/rates_{1min,15s}.parquet + simulation/windows.json; no GPU/sim)
+feeds:      chapter in prep: tex/predictors.tex (closed-loop/predictors) — one ¶ recording the negative ablation; CLOSES the roadmap "structural-additive LLM predictor" QUEUED item (progress/thesis-roadmap.md L240)
+supersedes: new (first test of the additive decomposition hypothesis)
+result:     Decomposition ctx ~ a*req + b*img + c on realized series: R²=0.94 (1min) / 0.90 (15s), a≈1900 text-ctx/req, b≈70 ctx/img; image term = ~34–36% of ctx mass (ctx IS materially image-driven). BUT additive-vs-direct WAPE: pooled additive ties/slightly-worse everywhere (+0.07..+1.31 pp, = Ch4 covariate null); NO robust onset edge — sharpest detector (steep image-rise) FLIPS sign by resolution (additive +0.6..+2.0 pp WORSE at 1min, −1.5..−1.9 pp better at 15s, both regimes at ~70% WAPE). Mechanism (falsifies the vision-persistence rationale): at steep-image-rise onsets the IMAGE forecast is the WORST component (75–100% WAPE) vs direct-ctx 57–72% vs requests 33–38% — the image spike is unforecastable exactly where the edge was hypothesized, so the additive route inherits no vision advantage. Decision: CLOSE as negative, do NOT graduate to a planner run.
+commit:     f973bef (branch exp/additive-structural-predictor; not on master/main)
+
 ### Vision knee sweeps, post-infill  (2026-07-08)
 artifact:   simulation/results/sweeps/summary.json, vision_*_aic_s*.json
 command:    python3 simulation/sweep_load.py --pool vision --window {head2k,burst1} --speedups 1 2 4 8 16 32 --force  (grid-exact DB, parallel-chunk dispatch)

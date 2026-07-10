@@ -1,0 +1,273 @@
+{
+  "what": "structural-additive LLM prefill (ctx) predictor ablation, archive-only",
+  "wape_def": "sum|yhat - y| / sum|y| (matches predictors/precision.py)",
+  "decomposition": {
+    "1min": {
+      "fit_span": "full_series",
+      "n": 10080,
+      "intercept_c": -183.66553245342385,
+      "a_text_ctx_per_request": 1878.3248123617998,
+      "b_ctx_per_image": 72.1789533758897,
+      "R2": 0.9355287671487275,
+      "ctx_mass_fraction": {
+        "text_a_req": 0.645260795465324,
+        "image_b_img": 0.3553751981824437,
+        "intercept": -0.0006359936477696489
+      },
+      "mean_ctx": 288785.16805555555,
+      "mean_images": 1421.842261904762,
+      "mean_requests": 99.2063492063492
+    },
+    "15s": {
+      "fit_span": "full_series",
+      "n": 40320,
+      "intercept_c": -1677.467174190775,
+      "a_text_ctx_per_request": 1979.8624742217858,
+      "b_ctx_per_image": 69.68431830223562,
+      "R2": 0.8988861704081608,
+      "ctx_mass_fraction": {
+        "text_a_req": 0.6801420215611882,
+        "image_b_img": 0.34309278908354945,
+        "intercept": -0.02323481064468061
+      },
+      "mean_ctx": 72196.29201388889,
+      "mean_images": 355.4605654761905,
+      "mean_requests": 24.8015873015873
+    }
+  },
+  "scores": [
+    {
+      "model": "chronos",
+      "resolution": "1min",
+      "span": [
+        "2024-10-21 02:36:00",
+        "2024-10-22 11:59:00"
+      ],
+      "n_steps": 2004,
+      "dup_steps": {
+        "ctx": 0,
+        "requests": 0,
+        "images": 0
+      },
+      "burst_windows_in_span": [
+        "burst1"
+      ],
+      "image_rise_threshold": 5051.0,
+      "pooled": {
+        "n": 2004,
+        "wape_direct": 0.4336420308627503,
+        "wape_additive": 0.4356913171812975,
+        "delta_pp": 0.2049286318547172
+      },
+      "onset_burst_windows": {
+        "n": 499,
+        "wape_direct": 0.36048789645125495,
+        "wape_additive": 0.35866016319089367,
+        "delta_pp": -0.1827733260361286
+      },
+      "onset_ramp": {
+        "n": 250,
+        "wape_direct": 0.36811820935858824,
+        "wape_additive": 0.36620484201135206,
+        "delta_pp": -0.19133673472361834
+      },
+      "onset_steep_image_rise": {
+        "n": 101,
+        "wape_direct": 0.5778992452434443,
+        "wape_additive": 0.5980686602207164,
+        "delta_pp": 2.0169414977272093
+      }
+    },
+    {
+      "model": "toto",
+      "resolution": "1min",
+      "span": [
+        "2024-10-18 06:24:00",
+        "2024-10-22 11:59:00"
+      ],
+      "n_steps": 6096,
+      "dup_steps": {
+        "ctx": 0,
+        "requests": 0,
+        "images": 0
+      },
+      "burst_windows_in_span": [
+        "burst1",
+        "burst3",
+        "burst4",
+        "burst5"
+      ],
+      "image_rise_threshold": 4178.500000000003,
+      "pooled": {
+        "n": 6096,
+        "wape_direct": 0.4870209436437897,
+        "wape_additive": 0.48770163261279975,
+        "delta_pp": 0.06806889690100237
+      },
+      "onset_burst_windows": {
+        "n": 780,
+        "wape_direct": 0.3802650336815064,
+        "wape_additive": 0.3793482074051182,
+        "delta_pp": -0.09168262763881718
+      },
+      "onset_ramp": {
+        "n": 432,
+        "wape_direct": 0.41367623542280574,
+        "wape_additive": 0.41221874971754346,
+        "delta_pp": -0.14574857052622736
+      },
+      "onset_steep_image_rise": {
+        "n": 292,
+        "wape_direct": 0.5654179642082938,
+        "wape_additive": 0.5710100486937992,
+        "delta_pp": 0.5592084485505411
+      }
+    },
+    {
+      "model": "chronos",
+      "resolution": "15s",
+      "span": [
+        "2024-10-16 21:39:00",
+        "2024-10-22 11:59:45"
+      ],
+      "n_steps": 32244,
+      "dup_steps": {
+        "ctx": 0,
+        "requests": 0,
+        "images": 0
+      },
+      "burst_windows_in_span": [
+        "burst1",
+        "burst3",
+        "burst4",
+        "burst5"
+      ],
+      "image_rise_threshold": 1331.6000000000004,
+      "pooled": {
+        "n": 32244,
+        "wape_direct": 0.5975819039030792,
+        "wape_additive": 0.6106719329005968,
+        "delta_pp": 1.3090028997517655
+      },
+      "onset_burst_windows": {
+        "n": 3120,
+        "wape_direct": 0.5301779664607051,
+        "wape_additive": 0.5335614523171265,
+        "delta_pp": 0.3383485856421342
+      },
+      "onset_ramp": {
+        "n": 1728,
+        "wape_direct": 0.5748340563748268,
+        "wape_additive": 0.5829435834660923,
+        "delta_pp": 0.8109527091265556
+      },
+      "onset_steep_image_rise": {
+        "n": 1396,
+        "wape_direct": 0.7163628868753413,
+        "wape_additive": 0.7013459869192961,
+        "delta_pp": -1.501689995604527
+      }
+    },
+    {
+      "model": "toto",
+      "resolution": "15s",
+      "span": [
+        "2024-10-16 04:36:00",
+        "2024-10-22 11:59:45"
+      ],
+      "n_steps": 36336,
+      "dup_steps": {
+        "ctx": 0,
+        "requests": 0,
+        "images": 0
+      },
+      "burst_windows_in_span": [
+        "burst1",
+        "burst3",
+        "burst4",
+        "burst5"
+      ],
+      "image_rise_threshold": 1246.2000000000007,
+      "pooled": {
+        "n": 36336,
+        "wape_direct": 0.5836609131273615,
+        "wape_additive": 0.5944773998392078,
+        "delta_pp": 1.0816486711846318
+      },
+      "onset_burst_windows": {
+        "n": 3120,
+        "wape_direct": 0.5261108663396947,
+        "wape_additive": 0.5264361793441972,
+        "delta_pp": 0.03253130045024477
+      },
+      "onset_ramp": {
+        "n": 1728,
+        "wape_direct": 0.5695182492581292,
+        "wape_additive": 0.5718827733700773,
+        "delta_pp": 0.23645241119480964
+      },
+      "onset_steep_image_rise": {
+        "n": 1585,
+        "wape_direct": 0.7156927242387665,
+        "wape_additive": 0.6971711555734401,
+        "delta_pp": -1.8521568665326393
+      }
+    }
+  ],
+  "notes": [
+    "ContextTokens already includes text AND image tokens (converter trace_to_two_pool.py L27); the linear b*images term is a surrogate for a non-constant, saturating per-image increment (~277 tokens/img at 1 image, ~66 at 529 per tex/trace-eda.tex)."
+  ],
+  "component_forecastability_at_onsets": [
+    {
+      "model": "chronos",
+      "resolution": "1min",
+      "subset": "onset_steep_image_rise",
+      "n": 101,
+      "component_own_forecast_wape": {
+        "images": 0.7511622309684753,
+        "requests": 0.37680700421333313,
+        "ctx_direct": 0.5778993964195251
+      }
+    },
+    {
+      "model": "toto",
+      "resolution": "1min",
+      "subset": "onset_steep_image_rise",
+      "n": 292,
+      "component_own_forecast_wape": {
+        "images": 0.7332552671432495,
+        "requests": 0.32828792929649353,
+        "ctx_direct": 0.5654178857803345
+      }
+    },
+    {
+      "model": "chronos",
+      "resolution": "15s",
+      "subset": "onset_steep_image_rise",
+      "n": 1396,
+      "component_own_forecast_wape": {
+        "images": 0.9964718222618103,
+        "requests": 0.3748522102832794,
+        "ctx_direct": 0.7163628935813904
+      }
+    },
+    {
+      "model": "toto",
+      "resolution": "15s",
+      "subset": "onset_steep_image_rise",
+      "n": 1585,
+      "component_own_forecast_wape": {
+        "images": 1.0013163089752197,
+        "requests": 0.3747686743736267,
+        "ctx_direct": 0.7156928181648254
+      }
+    }
+  ],
+  "verdict": {
+    "decomposition_r2": "0.90-0.94; image term explains ~34-36% of ctx mass, so ctx IS materially image-driven",
+    "pooled": "additive ties or is slightly WORSE than direct everywhere (+0.07..+1.31 pp) \u2014 consistent with Ch4 covariate null",
+    "onset_edge": "NO robust onset edge. Small favorable deltas at 1min burst-windows (-0.1..-0.2 pp) are noise-level; the sharpest detector (steep image-rise) FLIPS sign by resolution: additive worse at 1min (+0.6..+2.0 pp), better at 15s (-1.5..-1.9 pp).",
+    "mechanism": "The hypothesis bet on vision persistence helping at onsets is FALSIFIED by the archive: at steep image-rise onsets the IMAGE forecast is the WORST component (75-100% WAPE) \u2014 worse than direct ctx (57-72%) and far worse than requests (33-38%). The image spike itself is unforecastable at onsets, so the additive route inherits no vision advantage; its tiny 15s edge traces to the well-forecast REQUESTS term, not images.",
+    "decision": "CLOSE as NEGATIVE. Do NOT graduate to a planner run. The direct ctx forecast already captures the image-driven component as well as (or better than) a structural decomposition can, because the image component is least forecastable exactly where the edge was expected."
+  }
+}
