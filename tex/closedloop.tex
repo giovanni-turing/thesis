@@ -196,6 +196,12 @@ and the p90 forecast passes at \SI{651}{\milli\second}. Headroom
 quantile, not signal access, separates pass from fail on fast onsets on
 \emph{both} pools. (This burst3 configuration is also the policy pair
 carried to the live-stack validation of Chapter~\ref{cap:validation}.)
+The verdict is not particular to burst3: replaying every burst episode
+end-to-end, the p90 forecast passes each one at the service floor
+(TTFT p99 651--706\,\si{\milli\second} across onsets of 1--220 minutes)
+while the reactive planner fails all four
+(1{,}615--3{,}495\,\si{\milli\second}) --- the same categorical split at
+every onset speed.
 
 \paragraph{The language pool at week scale.} A continuous replay of the
 full 5.60-day evaluation span through the planner (the composed trace
