@@ -287,4 +287,4 @@ artifact:   simulation/results/episode_twins/{burst1,burst4,burst5}_{fc,re}.repo
 command:    run_episode_twins.sh — run_replay.sh on grid_{burst1_C6,burst4_C7,burst5_C8}.jsonl aic TP2 N2 STARTUP_TIME=60; fc: replay_with_forecast chronos/p90/15s/SCALE8 per-window T0; re: planner_ladder_t200_20
 feeds:      tex/closedloop.tex §cl-llm quantile-dial ¶ — the LLM verdict generalizes from burst3 to ALL burst episodes: fc-p90 PASSES each at the service floor (TTFT p99 651–706 ms across 1–220 min onsets: b3 651/b5 651/b4 651/b1 706) while reactive FAILS all four (b3 3495/b4 2776/b5 2152/b1 1615). Same categorical split at every onset speed — closes the "LLM evidence is window-anecdotal" gap
 supersedes: window-level-only LLM closed loop (burst1/3/4 individually); now the full episode set
-commit:     (this commit)
+commit:     1ba9243
