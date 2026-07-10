@@ -1,0 +1,4 @@
+# transient run logs (stdout/stderr of the sweeps); results live in the JSON/CSV
+*.out
+*.err
+*.log
