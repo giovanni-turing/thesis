@@ -75,3 +75,11 @@ the single-worker case is even more infeasible — consistent with the ratio.
 - `anchor_flash_attention_2_5x50.json` — fa2 spot-check documenting its instability.
 - `summarize_anchor.py` — measured-vs-AIC table + phase-B cross-check.
 - `replay_burst3_fifo.py`, `burst3_fifo_replay.json`, `burst3_img_reqs.json` — (iii).
+
+## Stable-clock confirmation (2026-07-10)
+Re-run on a single-tenant GPU at stable clocks (SM 2377-2400 MHz, mem
+14001, persistence on) — `anchor_sdpa_locked2400.json`: ratio 1.32-1.62
+(mean 1.43), CI95 <=0.05 ms. Confirms the reported 1.37-1.62 band at
+steady clocks; absolutes now publication-grade (2400 vs the 2407 target
+is 0.3%, negligible). N=64: 511.68 ms measured vs the phase-B 511.23 —
+0.09% reproduction.
