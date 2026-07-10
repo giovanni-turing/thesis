@@ -294,4 +294,4 @@ artifact:   simulation/results/week_matrix/*.jsonl.stats.json (112 cells; raw js
 command:    run_week_matrix.sh — 20-way local xargs: forecast_schedule.py (aggregate window, p50/p90 x chronos/toto/timesfm x rho{10,15,20,25} x lead{15,30,45,300}) + converter over the 5.60-day span, encoder-workers 2. (E2B fan-out abandoned — template windows.json predates aggregate window, 404'd; local 24-core run faster.) NOTE: 3 rho25 cells corrupted by a mid-run disk-full event (raw jsonl filled /home), regenerated clean; driver now rm's raw jsonl per cell
 feeds:      tex/closedloop.tex §week-aggregate rho-frontier ¶ (UPGRADED from 2-lead to full surface) — fc-p90 passes ALL 48 cells (every model/rho/lead), cost frontier 0.44x (rho10, 588ms) -> 0.18x (rho25, 899ms), 0.27-0.31x is the middle; fc-p50 passes 0/48 (median policy fails SLA at every rating — week-scale mean-sizing defect); p90/rho15 cells reproduce the committed aggregate headline exactly (588.4ms, 0.273-0.309x) validating the whole surface
 supersedes: the 6-cell agg-rho partial sweep (now the full 112-cell surface, 3 models x 2 quantiles)
-commit:     (this commit)
+commit:     04908ca
