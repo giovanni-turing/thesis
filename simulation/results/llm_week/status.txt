@@ -5,3 +5,5 @@ llm-week-p50 rc=0 02:04:32
 week-toto rc=0 03:18:02
 week-timesfm rc=137 04:13:56
 llm-week-models done
+week-timesfm rc=0 06:26:56
+llm-week-models done

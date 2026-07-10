@@ -227,7 +227,12 @@ policy \textbf{passes the week} at TTFT p99 \SI{651}{\milli\second}
 below the burst-sized static TP2$\times$2 fleet's 537.4 for the same
 span (0.96$\times$; replica scaling cannot morph TP2 into TP1, so the
 language pool's dynamic savings are structurally small --- the decisive
-savings are the encoder pool's). The reactive planner \textbf{fails the
+savings are the encoder pool's). The week verdict is
+forecast-model-independent: replacing Chronos with Toto or TimesFM holds
+the tail at the identical \SI{651}{\milli\second} (both pass), shifting
+only the provisioning cost (625 and 641 versus 518.6 GPU-hours) --- the
+forecast model sets how much headroom is bought, not whether the SLA is
+met. The reactive planner \textbf{fails the
 week outright} (TTFT p99 1{,}197\,\si{\milli\second}) while spending
 281.8 GPU-hours: half the budget, and the wrong tail --- at week scale
 as at window scale, spend is not the defect.
