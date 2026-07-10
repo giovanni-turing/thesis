@@ -373,3 +373,10 @@ command:    forecast_schedule.py --window burst{1,3,4,5} --quantile p90 --rho 15
 feeds:      tex/closedloop.tex §cl-limits — RESOLVES the D1 review finding (economic headline priced on AIC, which underprices knee windows ~2x on silicon). RESULT: the winning p90/rho15/L30 schedule is silicon-FEASIBLE on all 4 in-span burst windows — AIC p99 588 -> silicon p99 784, both < 1000. The rho15/p90 headroom provisions 24-32 workers at burst peaks (vs silicon-feasible C* 12-16), so both hit their zero-queueing floors (588 AIC / 784 silicon) and the underprice is absorbed with NO added workers. Schedule unchanged + feasible => 0.27-0.31x worker-seconds ratio PRESERVED on silicon. burst2/6 forecast-free by design (excluded). NOTE: per-burst-window fc/static ws ratio is 1.12-1.30x (forecast tracks the peak there); the 0.27-0.31x is the full-week integral (calm-dominated), preserved because the schedule doesn't change. CAVEAT: measured f(N) is eager whole-tower (pessimistic bound); live-worker confirmation still future work
 supersedes: the closedloop 'untested — silicon-priced re-run is future work' caveat (now tested + resolved)
 commit:     c951424
+
+### Evaluation-window stratification figure (fig:eda-windows)  (2026-07-10)
+artifact:   analysis/trace_eda/r_eval_windows.py; figuras/eda/eda_eval_windows.{png,pdf}
+command:    eda/.venv/bin/python analysis/trace_eda/r_eval_windows.py  (1-min image rate over the week; bands = grid_summary window spans incl. +/-10min pad, calm day 10-19, forecast context [trace start, FORECAST_T0 2024-10-16 21:39))
+feeds:      tex/trace-eda.tex NEW Fig fig:eda-windows (below fig:eda-sevenday) — shows the stratified sub-sample the experiments run on: b1-b6 + calm day + context split; explains why b2/b6 are forecast-free-only. Text links added in trace-eda §vision episodes ¶ and baselines §protocol
+supersedes: new (user-requested; the stratification previously existed only in prose)
+commit:     <pending>

@@ -166,6 +166,20 @@ moves.}
 \label{fig:eda-sevenday}
 \end{figure}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figuras/eda/eda_eval_windows}
+\caption{The stratified sub-sample the experiments run on, over the same
+week. Shaded on the 1-minute image rate: the six largest burst episodes
+(b1--b6, each padded $\pm$10 minutes to its median-crossing envelope),
+the calmest full day (2024-10-19, the steady reference), and the leading
+1.4 days consumed as zero-shot forecast context and never graded ---
+which is why b2 and b6, falling inside it, are evaluated only by
+forecast-free policies (Chapters~\ref{cap:baselines}
+and~\ref{cap:closedloop}).}
+\label{fig:eda-windows}
+\end{figure}
+
 Table~\ref{tab:eda-persistence} summarizes the four demand signals at
 one-minute resolution. Two reading notes. First, the Hurst column is
 \emph{derived} from the spectral slope ($H = (1+\beta)/2$): one
@@ -251,7 +265,10 @@ carries almost no information about vision load.}
 The image-rate signal exceeds its 99th percentile (\num{224}~images/s) in
 101 one-minute windows; consecutive windows form 87 contiguous runs,
 which merge into 18 burst episodes after extending each run to its
-surrounding median crossings (runs sharing an envelope are one episode). The largest episode
+surrounding median crossings (runs sharing an envelope are one episode).
+The six largest, plus the calmest day, form the evaluation windows of
+Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}
+(Figure~\ref{fig:eda-windows}). The largest episode
 peaks at \num{370}~images/s while the request rate peaks at only
 \num{4.48} requests/s --- bursts are invisible in the request signal
 (Figure~\ref{fig:eda-sevenday}).
