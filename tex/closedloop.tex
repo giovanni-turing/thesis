@@ -34,8 +34,10 @@ ordered at $t$ arrives at $t{+}L$; the schedule is
 \emph{issued} $L$ early, precisely what a forecast permits) and
 3-minute scale-down hysteresis --- the same law, lead, and hysteresis as
 the reactive strawman of
-Section~\ref{sec:base-reactive-enc}, which differs only in reading the
-trailing observed rate instead of the forecast. For the \emph{language
+Section~\ref{sec:base-reactive-enc}, which reads the trailing observed
+\emph{point} rate (quantile ignored) rather than the p90 forecast band ---
+so the raw head-to-head bundles anticipation with headroom, and the two
+dials are separated by the p50-forecast and lead-invariance ablations below. For the \emph{language
 pool}, the forecast path replaces the planner's built-in predictor
 inside Dynamo's SLA-planner loop (a \texttt{forecast\_file}
 predictor registered in the planner's registry), so
@@ -156,8 +158,9 @@ ${\approx}$\SI{6.5}{\milli\second}, versus
 mirror of the encoder's lead-invariance. But the pass has a second
 necessary ingredient: a \emph{tail-aware capacity conversion}. Run with
 the planner's native conversion (replicas $=$ mean demand over mean
-per-replica throughput), the \emph{same forecast} fails almost exactly
-like the reactive baseline (Table~\ref{tab:cl-triad}): signal quality
+per-replica throughput), the \emph{same forecast} fails much like the
+reactive baseline --- marginally worse, in fact
+(Table~\ref{tab:cl-triad}): signal quality
 cannot compensate for a mean-to-tail conversion error.
 
 \begin{table}[htbp]
@@ -337,12 +340,16 @@ Nor is the $\rho{=}15$ operating point special. A full week-scale sweep
 capacity ratings $\times$ four leads, each a continuous replay of the
 covered span --- makes the quantile the decisive dial and the rating a
 cost knob. The p90-forecast policy passes \emph{all 48 of its cells}
-(every model, rating, and lead), tracing a cost frontier from
-0.44$\times$ static at the conservative $\rho{=}10$
+\emph{in aggregate} (every model, rating, and lead), tracing a cost frontier
+from 0.44$\times$ static at the conservative $\rho{=}10$
 (\SI{588}{\milli\second}) down to 0.18$\times$ at the aggressive
-$\rho{=}25$ (\SI{899}{\milli\second}, still under the bound); the quoted
-0.27--0.31$\times$ is the middle of that tunable range, not a
-cherry-picked point. The p50-forecast policy, by contrast, passes
+$\rho{=}25$ (\SI{899}{\milli\second}, still under the bound). The loose end
+of that frontier carries the same per-episode caveat this chapter applies to
+the reactive rows, though: these week cells are aggregate-graded, and the
+per-window matrix (Section~\ref{sec:cl-matrix}) shows $\rho{=}20$/25 dropping
+3/11 cells on burst5. Only $\rho\in\{10,15\}$ (0.44--0.31$\times$) is
+per-episode-clean; the quoted 0.27--0.31$\times$ sits at $\rho{=}15$, inside
+that verified range, not at the aggregate-only $\rho{>}15$ tail. The p50-forecast policy, by contrast, passes
 \emph{none} of its 48 cells --- the median forecast is a cheap policy
 that fails the SLA at every rating, the week-scale echo of the
 mean-sizing defect. The rating trades cost against margin cleanly:
@@ -412,6 +419,18 @@ policy, since the forecast is structurally absent there. A deployed
 system, entering the week with prior history as
 context, would not have this hole. Replay-level p99 noise is ${\approx}4\%$;
 no quoted contrast is within that band.
+
+Two further scopes bound the economic headline. First, the cost ratio is
+priced on the AIC encoder model, which Chapter~\ref{cap:aiconfigurator}
+shows underprices the p99-knee-limited burst windows by up to ${\approx}2\times$
+against measured (eager) silicon. The forecast policy provisions with the
+$\rho{=}15$/p90 headroom, not at the bare feasible $C^{*}$, so whether that
+headroom already absorbs the underprice or the physical ratio is larger is
+untested --- a silicon-priced closed-loop re-run is future work. Second,
+every quantity here --- the $8\times$/$2\times$ over-provisioning, the
+$\rho$ frontier, the 0.27--0.31$\times$ --- derives from a single Azure
+production trace over one 5.60-day span; generalization to other workloads,
+models, and datacenters is unaddressed.
 
 \section{Summary}
 \label{sec:cl-summary}

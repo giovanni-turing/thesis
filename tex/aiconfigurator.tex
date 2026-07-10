@@ -302,16 +302,20 @@ more slowly than the composition assumes). The production
 bound ($1.37$--$1.47$). End to end, replaying the burst3 image schedule
 through the encoder FIFO under AIC cost reproduces the simulator's p99
 encoder delay to the digit (54{,}169.6 versus 54{,}169.5\,ms), and under
-measured cost raises it $2.87\times$; on the denser burst5 schedule
-(555k images) the same measured-$f(N)$ FIFO widens the gap to $7.19\times$.
-The per-batch $1.4$--$1.6\times$ slowdown compounds through the FIFO
-backlog, sharply more so under heavier bursts --- the served silicon is
-slower than the model, and increasingly so where the burst is densest,
-conservative for every infeasibility claim. The first anchor ran at
+measured cost raises it $2.87\times$; on burst5 the same measured-$f(N)$
+FIFO widens it to $7.19\times$. At a single worker every window is deeply
+infeasible, so these ratios sit in the saturation regime and scale with
+the backlog the burst builds (window length and volume) rather than
+tracking a clean per-op factor --- an existence proof that measured
+service compounds the per-batch $1.4$--$1.6\times$ gap through the FIFO,
+the served silicon slower than the model, conservative for every
+infeasibility claim. The deployable consequence is quantified by the
+fleet-sizing search below, not by these one-worker ratios. The first anchor ran at
 near-boost but \emph{unlocked} clocks; because the batch-axis ratio is
 clock-invariant it is the reported quantity, and a single-tenant re-run
-at stable clocks (SM held at \SI{2400}{\mega\hertz}, within $0.3\%$ of
-the \SI{2407}{\mega\hertz} target) reproduces it --- mean $1.47$ on the
+at stable clocks (single-tenant, persistence-mode; the timed forwards
+delivered SM 2377--2385\,\si{\mega\hertz} under load, not a hard clock
+lock) reproduces it --- mean $1.47$ on the
 same batch grid, $1.43$ (band $1.32$--$1.62$) on a denser one --- and
 pins the absolutes to publication grade ($N{=}64$ within $0.09\%$ of the
 Section~\ref{sec:aic-validation} reference). What remains is one real
@@ -339,8 +343,11 @@ identical in every window, differing only in the per-batch cost $f(N)$
 (the encoder-delay p99 must clear the SLA and the backlog must not
 diverge) --- and $f(N)$ is a cheap, deterministic per-accelerator
 benchmark: the twelve batch sizes here are memoized in minutes. Re-running
-that same search with the measured 5090 $f(N)$ substituted for the
-composition re-derives the fleet across all six burst windows (the AIC
+that same search with the measured 5090 $f(N)$ --- the eager whole-tower
+measurement, the \emph{pessimistic} serving-stack bound established above,
+so the re-sizing is an upper bound a fused production encoder sits below ---
+substituted for the composition re-derives the fleet across all six burst
+windows (the AIC
 path first reproducing the grid's sizing exactly in every one). What
 decides robustness is which constraint binds $C^{*}$. Five of the six are
 sized at the p99 latency knee (\num{6}--\num{8} workers), where queueing
@@ -351,8 +358,8 @@ silicon at encoder-delay p99 1{,}420--1{,}846\,\si{\milli\second}. The sole
 exception is burst5, alone sized by the sustained-volume divergence bound
 (\num{16} workers, far above its p99 knee): that headroom absorbs the
 underprice untouched (p99 \SI{588}{} to \SI{784}{\milli\second}, both
-feasible). The optimism is corrected by ${\approx}2\times$ where the fleet
-sits at the latency knee and absorbed where it is divergence-sized, by the
+feasible). The optimism is corrected by up to ${\approx}2\times$ where the
+fleet sits at the latency knee and absorbed where it is divergence-sized, by the
 same queue search that produced the sizing; re-benchmarking $f(N)$ is the
 only per-silicon step.
 

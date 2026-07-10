@@ -182,8 +182,10 @@ to request latency but not to the worker (asynchronous DMA/NIC) ---
 optimistic for encoder throughput. A measured NIXL transfer curve can
 later replace the bound without touching anything downstream. The trace records no image sizes, so the
 uniform 448\textsuperscript{2} assumption of
-Chapter~\ref{cap:aiconfigurator} stands, with its known, bounded
-${\sim}1.14\times$ conservative bias on comparable ViT work.
+Chapter~\ref{cap:aiconfigurator} stands, with the cost model's
+${\sim}1.4$--$1.6\times$ conservative-direction gap to measured silicon at
+that resolution (Chapter~\ref{cap:aiconfigurator}; the $1.14\times$ figure
+holds only at the larger $896^2$+ sizes, not the costed $448^2$).
 
 {\renewcommand{\sectionmark}[1]{}%
 \section{Saturation knees: the decoupling, now in simulation}%
@@ -411,7 +413,8 @@ performed and remains future work.
 All encoder timing derives from a single RTX~5090 node (locked clocks);
 cross-unit silicon variance is unquantified. The vision pool inherits
 the uniform-448\textsuperscript{2}
-image assumption and AIC's ${\sim}1.14\times$ conservative encoder bias
+image assumption and AIC's ${\sim}1.4$--$1.6\times$ conservative-direction
+encoder gap at $448^2$
 (per-image cost scales roughly with patch count, so a $224^2$-dominated
 workload would run ${\approx}4\times$ cheaper per image and a
 $672^2$-dominated one ${\approx}2.25\times$ dearer --- shifting knee

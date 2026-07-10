@@ -45,7 +45,8 @@ construction: either pool replays in isolation on the same workload.
 The control loop itself is anchored to the live Dynamo stack: on the
 fastest-onset burst, the winning policy and the reactive baseline
 reproduce their simulated verdicts through the real control plane,
-with tails within 1--7\% and replica-time within 8\%.
+with TTFT p99 within 1--7\% (both ITL p99 also sub-bound) and
+replica-time within 8\%.
 
 \paragraph{RQ4 --- Closed-loop payoff: yes, with the mechanism
 identified.} On the encoder pool, the p90-forecast schedule meets the

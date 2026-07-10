@@ -28,7 +28,11 @@ separates the policies is information, not plumbing.
 The workload windows are the six largest burst episodes of
 Chapter~\ref{cap:trace-eda} (peak 1-minute image rates 337--370
 \si{img/s}, onsets 1--220 minutes) plus the calmest full day of the trace
-(2024-10-19; peak \SI{57}{img/s}) as the steady reference. Two episodes
+(2024-10-19; peak \SI{57}{img/s}) as the steady reference. Each burst window
+brackets its episode with a $\pm$10-minute calm margin (the median-crossing
+envelope of Section~\ref{sec:eda-vision}), so every replay begins and ends
+with a drained encoder queue rather than mid-burst; this padded span sets the
+window's GPU-time denominator. Two episodes
 (burst2/6) fall in the trace's first 1.4 days, reserved as forecast
 context (the temporal split is stated in
 Chapter~\ref{cap:closedloop}); they are graded here by every

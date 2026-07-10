@@ -210,8 +210,9 @@ least visible to conventional autoscaling is also the most persistent:
 pretrained time-series models forecast it, zero-shot, at the horizons
 provisioning requires. Scaling on these forecasts holds the tail latency
 objective through the burst onsets that defeat reactive control at every
-tested cold-start lead time, at a fraction of the GPU-hours of the best
-static fleet.
+tested cold-start lead time, at a fraction of the best static \emph{encoder}
+fleet's GPU-hours; the language pool, separately provisioned on its own
+hardware, is near-break-even.
 \end{quote}
 
 Four research questions structure the work.
@@ -271,7 +272,7 @@ planner's failure mode on the language pool is diagnostic --- all
 fourteen configurations satisfy their own window-mean control law while
 violating the tail SLA, tightening targets under lead raises spend
 without moving the tail, and the same forecast fed through the mean
-conversion fails identically --- so mean-based capacity conversion, not
+conversion fails likewise --- so mean-based capacity conversion, not
 loop tuning or signal quality, is what fails, and a measured tail-aware
 conversion repairs it.
 \end{description}
@@ -488,24 +489,34 @@ arrival-side information only: the rate signals stamp each request's full
 token volume at its arrival minute, which is faithful for encoder and
 prefill work but makes the decode series an offered-work upper bound. The
 trace records image counts, not sizes, so the encoder pool assumes a
-uniform $448^2$ image, with a measured, bounded conservative bias
-(${\approx}1.14\times$ on comparable work) documented where it matters.
-The simulation is open-loop and deterministic; the inter-pool seam
+uniform $448^2$ image, and its cost model carries a measured,
+conservative-direction gap to silicon (${\approx}1.4$--$1.6\times$ at
+$448^2$) documented where it matters. The inter-pool handoff is priced
+single-stream: at Qwen3-VL's full DeepStack payload the
+\SI{588}{\milli\second} floor and the 0.27--0.31$\times$ result assume an
+embedding-only handoff or a ${\geq}100$\,Gbps fabric, since on the default
+25\,Gbps link transfer alone violates the bound for every policy
+(Chapter~\ref{cap:closedloop}) --- a fabric requirement, not a policy
+weakness. The simulation is open-loop and deterministic; the inter-pool seam
 serializes each request's encoder and prefill phases (no speculative
 overlap); knee detection uses the thesis's evaluation SLA (TTFT and
 encoder-delay p99 under \SI{1}{\second}, inter-token p99 under
 \SI{100}{\milli\second}; Chapter~\ref{cap:twopool}), a design choice
-whose sensitivity is quantified there; and language-pool results cover
-the 8B model at TP1 with a 235B-TP8 spot-check, leaving intermediate
-family members unpriced. Forecasts are zero-shot --- no fine-tuning on
+whose sensitivity is quantified there; and language-pool results
+characterize the 8B model at TP1 but deploy it at TP2$\times$2 (the
+burst-feasible shape), with a 235B-TP8 spot-check, leaving intermediate
+family members unpriced. The burst-window language \emph{pass} at TP2 is
+also token-accounting-convention-dependent (Chapter~\ref{cap:twopool}); the
+TP1 prefill floor and the vision-pool verdict are not. Forecasts are zero-shot --- no fine-tuning on
 the trace --- the conservative reading of the foundation models'
 capability.
 Finally, the control loop itself is anchored to the real stack: the
 winning policy and the reactive baseline, replayed against the live
 Dynamo runtime (real control plane, mocked engines) on the
 fastest-onset burst, reproduce the simulated verdicts in both
-directions with tail latencies within 1--7\% and provisioned
-replica-time within 8\% (Chapter~\ref{cap:validation}); the physical
+directions with TTFT p99 within 1--7\% (both policies' ITL p99 also agree
+and stay far under bound, the forecast policy's low ITL differing more in
+relative terms) and provisioned replica-time within 8\% (Chapter~\ref{cap:validation}); the physical
 encoder-worker anchor remains future work.
 
 \section{Organization}

@@ -42,10 +42,11 @@ every pool's demand. Analyzing the first public production trace of a
 multimodal inference cluster (Azure, one million requests over seven
 days), this thesis shows that the assumption fails for the vision pool:
 image arrivals are nearly decoupled from request rate ($R^2 = 0.12$), an
-order of magnitude burstier, ramp to peak within replica cold-start
-times, and their extreme minutes are essentially disjoint from the
-request signal's (Jaccard 0.02). The same signal is also the most
-persistent --- the most forecastable: zero-shot time-series foundation
+order of magnitude burstier, the fastest of them ramping to peak within
+replica cold-start times, and their extreme minutes are essentially
+disjoint from the request signal's (Jaccard 0.02). The same signal is also
+the most \emph{persistent}, hence forecastable at the lead times
+provisioning needs: zero-shot time-series foundation
 models beat fixed-parameter classical baselines on every demand signal
 at every resolution tested, with empirically calibrated p90 headroom at
 provisioning cadence. To convert forecasts into provisioning decisions,
@@ -86,11 +87,12 @@ produ\c{c}\~ao de um \emph{cluster} de infer\^encia multimodal (Azure, um
 milh\~ao de requisi\c{c}\~oes em sete dias), esta disserta\c{c}\~ao
 mostra que a hip\'otese falha para o \emph{pool} de vis\~ao: as chegadas
 de imagens s\~ao quase desacopladas da taxa de requisi\c{c}\~oes
-($R^2 = 0{,}12$), uma ordem de magnitude mais intermitentes, atingem o
-pico dentro do tempo de partida a frio de uma r\'eplica, e seus minutos
-extremos s\~ao essencialmente disjuntos dos do sinal de requisi\c{c}\~oes
-(Jaccard 0{,}02). O mesmo sinal \'e tamb\'em o mais persistente --- o
-mais previs\'ivel: modelos de funda\c{c}\~ao de s\'eries temporais,
+($R^2 = 0{,}12$), uma ordem de magnitude mais intermitentes, com as mais r\'apidas
+atingindo o pico dentro do tempo de partida a frio de uma r\'eplica, e seus
+minutos extremos s\~ao essencialmente disjuntos dos do sinal de
+requisi\c{c}\~oes (Jaccard 0{,}02). O mesmo sinal \'e tamb\'em o mais
+\emph{persistente}, e portanto previs\'ivel nos horizontes que o
+provisionamento exige: modelos de funda\c{c}\~ao de s\'eries temporais,
 usados \emph{zero-shot}, superam as \emph{baselines} cl\'assicas de
 par\^ametros fixos em todos
 os sinais de demanda e resolu\c{c}\~oes testadas, com p90 empiricamente

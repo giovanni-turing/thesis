@@ -271,9 +271,10 @@ and prefill stages are not. Burst onsets are fast:
 baseline-to-peak in a median of \SI{6}{\minute}
 (10th percentile \SI{2}{\minute}, fastest \SI{1}{\minute}), with a median
 steepest single-minute jump of \num{208}~images/s. The onset time is the
-budget for any scaling decision; against replica cold-starts of
-tens of seconds to minutes, the fast half of these bursts cannot be
-tracked reactively (Figure~\ref{fig:eda-onsets}).
+budget for any scaling decision; the fastest of these onsets ramp to peak in
+1--2 minutes, comparable to or faster than replica cold-starts of tens of
+seconds to minutes --- whether that budget defeats reactive control is
+settled per policy in the closed-loop chapters (Figure~\ref{fig:eda-onsets}).
 
 \begin{figure}[htbp]
 \centering
@@ -282,8 +283,8 @@ tracked reactively (Figure~\ref{fig:eda-onsets}).
 ramp time is a median of \SI{6}{\minute}, with the fastest episodes reaching
 peak in one to two minutes. Right: fast onset does not mean small
 burst --- some of the steepest ramps reach the highest peaks. The onset
-time is the budget available to a scaling decision; the fast half of
-these episodes ramps faster than a replica cold-start.}
+time is the budget available to a scaling decision; the fastest episodes
+ramp to peak in one to two minutes, comparable to replica cold-start times.}
 \label{fig:eda-onsets}
 \end{figure}
 
@@ -305,8 +306,10 @@ a theorem, which Chapter~\ref{cap:predictors} tests empirically.
 signal (blue) retains autocorrelation $0.64$ at a five-minute lag and crosses
 $0.5$ only at \SI{69}{\minute}, against \SI{9}{\minute} for the request signal
 (green). The demand most invisible to request-rate monitoring is also the most
-forecastable at exactly the horizons provisioning needs --- the feasibility
-premise for the predictive-scaling contribution.}
+\emph{persistent} --- its envelope forecastable at the longest leads (though its
+per-bin accuracy is the lowest of the four signals, precisely because it is the
+burstiest; Chapter~\ref{cap:predictors}) --- the feasibility premise for the
+predictive-scaling contribution.}
 \label{fig:eda-acf}
 \end{figure}
 
