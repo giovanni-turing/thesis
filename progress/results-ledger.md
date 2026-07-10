@@ -308,4 +308,4 @@ artifact:   simulation/results/burst26_reactive/{burst2,burst6}_react_L{15,30,45
 command:    forecast_schedule.py --policy reactive (observed image rate, quantile ignored) rho15/15s/hyst3 x lead{15,30,45,300}, converter over burst2 (78376/13870) + burst6 (93867/9821)
 feeds:      tex/baselines.tex Tab. base-react-enc — reactive ENCODER now graded on ALL SIX bursts (burst2/6 need no forecast so they CAN be graded despite pre-context-window). Both L*=45s: burst2 588/588/588/4282; burst6 588/749/905/4606. New prose: burst6's 1-min onset PASSES at L<=45 (peak 337 img/s drains within a batch) unlike burst3's 1-min onset (same peak, thinner request stream, backlog outlasts lead) — onset speed AND volume both matter
 supersedes: reactive-encoder coverage that omitted burst2/6 (5-window table -> 6-window)
-commit:     (this commit; artifacts from branch caeb907)
+commit:     659df69 (branch caeb907)
