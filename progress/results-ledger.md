@@ -295,3 +295,10 @@ command:    run_week_matrix.sh — 20-way local xargs: forecast_schedule.py (agg
 feeds:      tex/closedloop.tex §week-aggregate rho-frontier ¶ (UPGRADED from 2-lead to full surface) — fc-p90 passes ALL 48 cells (every model/rho/lead), cost frontier 0.44x (rho10, 588ms) -> 0.18x (rho25, 899ms), 0.27-0.31x is the middle; fc-p50 passes 0/48 (median policy fails SLA at every rating — week-scale mean-sizing defect); p90/rho15 cells reproduce the committed aggregate headline exactly (588.4ms, 0.273-0.309x) validating the whole surface
 supersedes: the 6-cell agg-rho partial sweep (now the full 112-cell surface, 3 models x 2 quantiles)
 commit:     04908ca
+
+### Structural-additive LLM prefill predictor ablation — NEGATIVE (closes roadmap item)  (2026-07-09)
+artifact:   predictors/results/metrics/additive_structural_ablation.json; predictors/additive_structural_ablation.py
+command:    eda/.venv/bin/python predictors/additive_structural_ablation.py  (archive-only; no GPU/sim)
+feeds:      tex/predictors.tex §Do covariates help — new closing ¶; CLOSES roadmap "structural-additive LLM predictor" QUEUED item. R2=0.94, image term 34-36% of ctx mass (materially image-driven, NOT the trivial escape); additive ties/loses pooled (+0.07..+1.31pp); no onset edge (steep-rise flips sign by resolution); MECHANISM: image forecast is WORST component at onsets (75-100% WAPE vs direct-ctx 58-72% vs requests 33-38%) — image spike unforecastable exactly where the bet needed it. Do NOT graduate to planner run
+supersedes: new (last queued unrun idea)
+commit:     (this commit; artifacts from branch exp/additive-structural-predictor bee4c62)
