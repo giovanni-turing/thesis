@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 17430.13it/s]
+attn=flash_attention_2 px=448 patches=784
+   N   meas_ms   ci95   aic_ms  ratio   clk
+   1    50.706  4.801      nan    nan  2385
+   6    89.728  7.038      nan    nan  2385
+   8   118.153  0.537      nan    nan  2392
+  16   239.039  5.687      nan    nan  2392
+  32   493.265  6.113      nan    nan  2392
+  64   653.758 323.882      nan    nan  2400
+
+ratio range: None-None (mean None) -> /home/gio/tese/collector_artifacts/phaseE_physical_anchor/fn_silicon.json

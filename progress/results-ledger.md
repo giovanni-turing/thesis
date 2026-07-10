@@ -309,3 +309,10 @@ command:    forecast_schedule.py --policy reactive (observed image rate, quantil
 feeds:      tex/baselines.tex Tab. base-react-enc — reactive ENCODER now graded on ALL SIX bursts (burst2/6 need no forecast so they CAN be graded despite pre-context-window). Both L*=45s: burst2 588/588/588/4282; burst6 588/749/905/4606. New prose: burst6's 1-min onset PASSES at L<=45 (peak 337 img/s drains within a batch) unlike burst3's 1-min onset (same peak, thinner request stream, backlog outlasts lead) — onset speed AND volume both matter
 supersedes: reactive-encoder coverage that omitted burst2/6 (5-window table -> 6-window)
 commit:     659df69 (branch caeb907)
+
+### Physical encoder anchor (Phase E, first, unlocked-clock)  (2026-07-09)
+artifact:   collector_artifacts/phaseE_physical_anchor/{measure_fn_silicon.py,fn_silicon.json,run.log,README.md}
+command:    eda/.venv/bin/python measure_fn_silicon.py  (extracted ViT models/Qwen3-VL-8B-ViT, flash_attention_2, batch N{1,6,8,16,32,64} @448px, 5x50 iters, cuda.sync-timed) vs aic_f_n_postinfill.csv
+feeds:      tex/aiconfigurator.tex §validation (first whole-tower physical anchor ¶) + tex/conclusion.tex future work. Measured whole-tower f(N) tracks AIC composition at STABLE ~2.7-3.1x ratio for N>=6 (shape f(N) correct; offset = whole-tower-vs-operator gap: patch-embed/projector/DeepStack/dispatch not priced by attention+GEMM). N=1 6.2x (launch-overhead, non-serving), N=64 2.07x. CAVEAT: unlocked clocks (2385-2392 vs 2407 target) — ratio-stability across batch axis is the clock-invariant load-bearing observation; clean confirmation = locked-clock operator-isolated re-run + real-worker burst replay (future work). Also: DISK-FULL event corrupted the run's json write; recovered from run.log
+supersedes: the physical anchor as entirely-future-work (now partially fulfilled with caveat)
+commit:     (this commit)

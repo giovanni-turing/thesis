@@ -80,16 +80,19 @@ third of the best static encoder fleet's GPU-time.
 \section{Future work}
 \label{sec:conc-future}
 
-Four extensions are queued by design. \emph{A physical encoder anchor}:
-one real encoder worker served on the RTX~5090 under a burst replay ---
-the silicon-side complement to the live control-loop anchor of
-Chapter~\ref{cap:validation}. \emph{A structural
-language-pool predictor}: the prefill signal decomposes as text-borne
-demand plus an image-driven component with higher persistence; a
-predictor additive in the vision forecast should pay precisely at
-onsets, where regime shifts are vision-driven --- the pooled-average
-null of Chapter~\ref{cap:predictors} does not cover that
-onset-conditioned case. \emph{The seam as a preview channel}: in a
+Three extensions remain. \emph{Completing the physical encoder anchor}:
+Chapter~\ref{cap:aiconfigurator} reports a first whole-tower measurement
+on the 5090 whose $f(N)$ tracks the AIC composition at a stable
+batch-axis ratio, at unlocked clocks; the clean confirmation is a
+locked-clock, operator-isolated re-run and one real encoder worker
+serving a burst replay end to end --- the full silicon-side complement
+to the live control-loop anchor of Chapter~\ref{cap:validation}.
+(A fourth candidate --- a structural language-pool predictor that
+forecasts prefill demand as text-borne plus image-driven components ---
+was tested and closed: Chapter~\ref{cap:predictors} shows the additive
+decomposition buys nothing even at onsets, because the image component
+is least forecastable exactly there.) \emph{The seam as a preview
+channel}: in a
 modality-disaggregated system the vision pool's admitted work is an
 exact, short-horizon preview of language-pool arrivals
 (horizon $\approx$ encoder sojourn); useless for replica lead, but free

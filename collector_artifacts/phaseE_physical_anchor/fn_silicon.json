@@ -1,0 +1,54 @@
+{
+ "attn": "flash_attention_2",
+ "px": 448,
+ "clocks_mhz_observed": "2385-2392",
+ "clocks_locked": false,
+ "note": "unlocked clocks near boost (2385-2392 vs 2407 target); ratios clock-robust, absolutes ~fast. flash_attn2 on real RTX 5090.",
+ "rows": [
+  {
+   "N": 1,
+   "meas_ms": 50.706,
+   "ci95_ms": 4.801,
+   "aic_ms": 8.162,
+   "ratio_meas_over_aic": 6.212
+  },
+  {
+   "N": 6,
+   "meas_ms": 89.728,
+   "ci95_ms": 7.038,
+   "aic_ms": 31.792,
+   "ratio_meas_over_aic": 2.822
+  },
+  {
+   "N": 8,
+   "meas_ms": 118.153,
+   "ci95_ms": 0.537,
+   "aic_ms": 43.126,
+   "ratio_meas_over_aic": 2.74
+  },
+  {
+   "N": 16,
+   "meas_ms": 239.039,
+   "ci95_ms": 5.687,
+   "aic_ms": 82.217,
+   "ratio_meas_over_aic": 2.907
+  },
+  {
+   "N": 32,
+   "meas_ms": 493.265,
+   "ci95_ms": 6.113,
+   "aic_ms": 160.196,
+   "ratio_meas_over_aic": 3.079
+  },
+  {
+   "N": 64,
+   "meas_ms": 653.758,
+   "ci95_ms": 323.882,
+   "aic_ms": 316.369,
+   "ratio_meas_over_aic": 2.066
+  }
+ ],
+ "ratio_mean": 3.305,
+ "ratio_min": 2.066,
+ "ratio_max": 6.212
+}
