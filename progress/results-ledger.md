@@ -332,11 +332,12 @@ supersedes: the "locked-clock re-run for publication-grade absolutes = future wo
 commit:     1feb1de (artifact); ledger+tex reconciliation: 66e33fd
 
 ### LLM week-scale p50 + model coverage — the conversion-vs-quantile distinction  (2026-07-10)
-artifact:   simulation/results/llm_week/week_fc_p50.report.json (+week_fc_p90_{toto,timesfm} pending)
+artifact:   simulation/results/llm_week/{week_fc_p50,week_fc_p90_toto,week_fc_p90_timesfm}.report.json (all 3 models complete; timesfm re-run after an OOM SIGKILL)
 command:    run_llm_week_p50.sh / run_llm_week_models.sh — run_replay.sh on composed trace, FORECAST_QUANTILE=p50 (and p90 x toto/timesfm), aic TP2 N2 STARTUP_TIME=60, 5.60-day span
 feeds:      tex/closedloop.tex §cl-llm week paragraph — LLM week p50 PASSES (TTFT p99 827.8 ms, 319.9 GPU-h, 38% cheaper than p90's 651ms/519GPU-h) — OPPOSITE of encoder p50 (fails 0/48). NOT forced into false symmetry: the honest finding is the CONVERSION is universal (mean-reactive fails both pools, tail-aware forecast passes both) while the QUANTILE is pool-specific (adds most where signal is burstiest — image demand floods encoder FIFO at p50 mean-sizing; smoother ctx-token demand served OK at p50). This is a CLEANER statement of the thesis's core claim (conversion is the defect) than a forced p50-fails-both symmetry. Per-window burst3 p50-fails-fast-onset claim (line 210) stays correct + correctly scoped to fast onsets
 supersedes: the (wrong) expectation that LLM p50 would fail at week scale mirroring encoder
-commit:     0e48ee4
+MODEL-INDEPENDENCE (2026-07-10, commit da790f3): all 3 TSFMs pass the week at the IDENTICAL 651.1 ms tail; only provisioning cost shifts (chronos 518.6 < toto 625.3 < timesfm 641.1 GPU-h) — forecast model sets headroom bought, not SLA pass/fail. Landed in tex/closedloop.tex week ¶
+commit:     0e48ee4 (p50); da790f3 (toto/timesfm + model-indep clause)
 
 ### Iso-cost TP1x4 vs TP2x2 language-pool comparison (Table base-tp)  (2026-07-10)
 artifact:   simulation/results/grid/llm_burst{1..5}_C*_{N4_aic,N2_TP2_aic}.json (existing static-optimal grid points; NO new run — analysis only)
