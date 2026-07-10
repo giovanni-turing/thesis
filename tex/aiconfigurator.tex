@@ -285,21 +285,28 @@ kernel-path bound, the eager measurement a pessimistic serving-stack
 bound (production vLLM fuses much of the elementwise work), and a
 production encoder is expected to sit between them --- an expectation,
 not a measurement. A first physical anchor of the served \emph{whole
-tower} (the extracted ViT run under \texttt{flash\_attention\_2} on the
-5090, batch axis swept at $448^2$) tests the composed prediction end to
-end: measured whole-tower latency tracks the AIC composition at a
-stable ratio across the batch range --- $2.7$--$3.1\times$ for
-$N\in\{6,\ldots,32\}$, i.e.\ the composition's \emph{shape} $f(N)$ is
-right and the offset is the expected whole-tower-versus-operator gap
-(patch embed, projector, DeepStack mergers, and dispatch, which the
-attention+GEMM composition does not price). The single-image point sits
-higher ($6.2\times$) where fixed launch overhead dominates a forward the
-batched serving regime never issues, and the largest batch lower
-($2.1\times$ at $N{=}64$). This anchor was collected at near-boost but
-\emph{unlocked} clocks, so its absolute ratios are indicative rather than
-final; the ratio's stability across the batch axis --- the clock-invariant
-quantity --- is the load-bearing observation, and a locked-clock,
-operator-isolated re-run remains the clean confirmation
+tower} (the extracted ViT run on the 5090, batch axis swept at $448^2$,
+five replications of fifty CUDA-event-timed forwards each) tests the
+composed prediction end to end. Measured whole-tower latency tracks the
+AIC composition at a ratio rising from $1.37$ at $N{=}1$ to $1.62$ at
+$N{=}64$ (mean $1.47$ over $N\in\{1,6,8,16,32,64\}$) --- squarely
+within the $1.4$--$1.6\times$ conservative-direction band the batch-axis
+validation of Section~\ref{sec:aic-validation} attributes term by term
+to unmodeled patch-embed convolution and DeepStack glue. The measured
+curve reproduces that section's independent $5\times50$ silicon
+reference to within $\pm0.7\%$ at every shared $N$ (511.26 versus
+511.23\,ms at $N{=}64$), a same-methodology cross-check, and reproduces
+its ratio \emph{growth} with batch (the fixed-overhead terms amortize
+more slowly than the composition assumes). The production
+\texttt{flash\_attention\_2} kernel path sits nearer the optimistic
+bound ($1.37$--$1.47$). End to end, replaying the burst3 image schedule
+through the encoder FIFO under AIC cost reproduces the simulator's p99
+encoder delay to the digit (54{,}169.6 versus 54{,}169.5\,ms), and under
+measured cost raises it $2.87\times$ --- the served silicon is slightly
+slower than the model, conservative for every infeasibility claim. This
+anchor was collected at near-boost but \emph{unlocked} clocks, so the
+ratio (clock-invariant) is the reported quantity; a locked-clock re-run
+for publication-grade absolutes remains future work
 (Chapter~\ref{cap:conclusion}).
 
 Second, \textbf{the model and the silicon disagree about where batching

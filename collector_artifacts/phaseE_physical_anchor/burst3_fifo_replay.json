@@ -1,0 +1,37 @@
+{
+  "window": "burst3",
+  "n_image_reqs": 1241,
+  "total_images": 143240,
+  "horizon_s": 1601.3,
+  "workers": 1,
+  "cap": 64,
+  "f64_aic_ms": 316.369,
+  "f64_measured_ms": 511.262,
+  "replay_aic": {
+    "label": "AIC f(N) [sim cost model]",
+    "encoder_delay_ms": {
+      "p50": 0.0,
+      "p90": 21961.677,
+      "p99": 54169.571,
+      "max": 63447.535
+    },
+    "busy_s": 711.9
+  },
+  "replay_measured": {
+    "label": "MEASURED f(N) [sdpa, this silicon]",
+    "encoder_delay_ms": {
+      "p50": 0.0,
+      "p90": 86919.773,
+      "p99": 155348.6,
+      "max": 180869.486
+    },
+    "busy_s": 1143.8
+  },
+  "sim_reference_encoder_delay_ms": {
+    "p50": 0.0,
+    "p90": 21961.621,
+    "p99": 54169.533,
+    "max": 63447.488
+  },
+  "attn_used": "sdpa"
+}
