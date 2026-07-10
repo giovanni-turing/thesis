@@ -57,6 +57,7 @@ def load_trace() -> cudf.DataFrame:
 def save_fig(fig, name: str):
     path = os.path.join(FIGDIR, name)
     fig.savefig(path, bbox_inches="tight")
+    fig.savefig(os.path.splitext(path)[0] + ".pdf", bbox_inches="tight")  # vector
     plt.close(fig)
     print(f"figure: {path}")
 

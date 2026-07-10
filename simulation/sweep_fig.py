@@ -169,6 +169,7 @@ def main() -> None:
                  "(2 encoder × 2 LLM workers)", fontsize=10.5, color=INK)
     out = SWEEPS / "knees.png"
     fig.savefig(out, bbox_inches="tight")
+    fig.savefig(str(out).replace(".png", ".pdf"), bbox_inches="tight")  # vector
     print(f"wrote {out}")
 
 

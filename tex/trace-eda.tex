@@ -43,7 +43,7 @@ schema documentation (Figure~\ref{fig:eda-ctx-vs-img}).
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.72\linewidth]{figuras/eda/eda_a_context_vs_numimages.png}
+\includegraphics[width=0.72\linewidth]{figuras/eda/eda_a_context_vs_numimages}
 \caption{Median context tokens conditioned on image count (image-bearing
 requests). Context rises monotonically with images but the \emph{per-image}
 increment decays --- from ${\approx}277$ tokens at one image to ${\approx}66$
@@ -111,7 +111,7 @@ Vision: video/frame analysis    & 3.4\%  & \textbf{85.7\%} & 32.9\% & 400 / 31{,
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figuras/eda/eda_l_request_clusters.png}
+\includegraphics[width=\linewidth]{figuras/eda/eda_l_request_clusters}
 \caption{Unsupervised $k$-means archetypes ($k{=}4$ by silhouette). Left:
 requests in the (context, generation) plane; the two text archetypes (blue,
 orange) separate by output length, the two vision archetypes (green) by scale.
@@ -145,7 +145,7 @@ window rather than weekly cycles.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figuras/eda/eda_e_arrival_process.png}
+\includegraphics[width=\linewidth]{figuras/eda/eda_e_arrival_process}
 \caption{The arrival process is not Poisson at any scale. Left: the empirical
 inter-arrival survival curve is far heavier than the matched exponential.
 Middle: per-second counts are overdispersed against Poisson$(1.65)$. Right: the
@@ -158,7 +158,7 @@ it.}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figuras/eda/eda_c_seven_day_signals.png}
+\includegraphics[width=\linewidth]{figuras/eda/eda_c_seven_day_signals}
 \caption{The two pools' arrival signals over the full week on a shared clock.
 The language-pool request rate (top) is quasi-stationary around its mean;
 the vision-pool image rate (bottom) is dominated by a handful of multi-hour
@@ -239,7 +239,7 @@ the information asymmetry itself.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.72\linewidth]{figuras/eda/eda_d_img_vs_req_scatter.png}
+\includegraphics[width=0.72\linewidth]{figuras/eda/eda_d_img_vs_req_scatter}
 \caption{Image rate against request rate over one-minute windows. The
 best-fit constant-fraction line ($15.1$ img/req) explains only $R^2 = 0.12$:
 the same request rate coincides with image rates spanning two orders of
@@ -282,7 +282,7 @@ settled per policy in the closed-loop chapters (Figure~\ref{fig:eda-onsets}).
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figuras/eda/eda_i_burst_onsets.png}
+\includegraphics[width=\linewidth]{figuras/eda/eda_i_burst_onsets}
 \caption{Burst onset speed across the 18 episodes. Left: the baseline-to-peak
 ramp time is a median of \SI{6}{\minute}, with the fastest episodes reaching
 peak in one to two minutes. Right: fast onset does not mean small
@@ -310,7 +310,7 @@ a theorem, which Chapter~\ref{cap:predictors} tests empirically.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.72\linewidth]{figuras/eda/eda_d_acf.png}
+\includegraphics[width=0.72\linewidth]{figuras/eda/eda_d_acf}
 \caption{Autocorrelation of the two arrival signals versus lag. The image
 signal (blue) retains autocorrelation $0.64$ at a five-minute lag and crosses
 $0.5$ only at \SI{69}{\minute}, against \SI{9}{\minute} for the request signal
@@ -378,7 +378,7 @@ images/s        & 100\% & 20.1\% & 6.9\% & \textbf{3.9\%} & 2.6\% \\
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figuras/eda/eda_q_multires.png}
+\includegraphics[width=\linewidth]{figuras/eda/eda_q_multires}
 \caption{Sensitivity to the observation window. Left: excess dispersion
 (CV$^2$) versus window size --- the image signal (blue) stays an order of
 magnitude burstier than the request signal (green) across every window and

@@ -167,6 +167,7 @@ fig.suptitle("Accuracy does not explain the verdict: the framework differs in "
 
 FIGOUT.parent.mkdir(parents=True, exist_ok=True)
 fig.savefig(FIGOUT, bbox_inches="tight")
+fig.savefig(str(FIGOUT).replace(".png", ".pdf"), bbox_inches="tight")  # vector
 print("wrote", FIGOUT)
 # report the numbers used for a sanity read
 print("(a) bars:", [(b[0], round(b[1], 3)) for b in bars_a])

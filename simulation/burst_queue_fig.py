@@ -67,6 +67,7 @@ ax2.annotate(f"peak {int(queue[peak]):,} images queued",
 
 fig.tight_layout()
 fig.savefig(OUT, bbox_inches="tight")
+fig.savefig(str(OUT).replace(".png", ".pdf"), bbox_inches="tight")  # vector
 print("figure:", OUT)
 print(f"peak queue {int(queue.max())} at t={series[peak]['t']}s; "
       f"seconds queue>1000: {(queue > 1000).sum()}; busy max {int(busy.max())}")

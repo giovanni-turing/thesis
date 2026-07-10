@@ -101,6 +101,7 @@ def fig_horizon() -> None:
                  x=0.02, ha="left", color=INK, fontsize=11)
     fig.tight_layout(rect=(0, 0, 1, 0.97))
     fig.savefig(FIGDIR / "pred_horizon_wape.png", bbox_inches="tight")
+    fig.savefig(FIGDIR / "pred_horizon_wape.pdf", bbox_inches="tight")  # vector
     plt.close(fig)
 
 
@@ -137,6 +138,7 @@ def fig_band() -> tuple[str, str]:
                  loc="left", color=INK)
     fig.tight_layout()
     fig.savefig(FIGDIR / "pred_forecast_band.png", bbox_inches="tight")
+    fig.savefig(FIGDIR / "pred_forecast_band.pdf", bbox_inches="tight")  # vector
     plt.close(fig)
     return name, str(w.loc[w.y_true.idxmax(), "ts"])
 
@@ -171,6 +173,7 @@ def fig_heatmap() -> None:
     cb.ax.tick_params(labelsize=7)
     fig.tight_layout()
     fig.savefig(FIGDIR / "pred_wape_heatmap.png", bbox_inches="tight")
+    fig.savefig(FIGDIR / "pred_wape_heatmap.pdf", bbox_inches="tight")  # vector
     plt.close(fig)
 
 
