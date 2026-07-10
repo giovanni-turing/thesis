@@ -260,3 +260,10 @@ command:    trace_to_two_pool.py --offset 250399 --max-requests 749601 --encoder
 feeds:      tex/closedloop.tex limitations — 4× payload on the modeled 25 Gbps link: handoff p99 272→1,087 ms, encoder-delay p99 1,404 ms (SLA violation from transfer alone); the 588 ms floor assumes embedding-only handoff or a ≥100 Gbps fabric (restores quoted numbers exactly); tex/twopool.tex handoff ¶ now points here instead of promising a "scheduled correction"
 supersedes: the unfulfilled "payload correction scheduled for the closed-loop runs" promise
 commit:     337211e
+
+### Dynamo shipped-predictor accuracy vs FMs on the image signal  (2026-07-09)
+artifact:   predictors/results_dynamo/{consolidated.json,comparison_table.csv,<pred>_<res>.json}; runner predictors/dynamo_predictors_bench.py
+command:    dynamo_predictors_bench.py --predictor {arima,kalman,prophet,constant} --res {1min,15s} --window 512 (via ai-dynamo/dynamo/.venv python; arima/prophet@15s capped 300 origins, disclosed); rolling-origin h=1 on the common span origin>=8076 (chronos ctx), WAPE=sum|y-yhat|/sum|y|
+feeds:      tex/predictors.tex §Point-forecast accuracy new "Second" ¶ — Dynamo's shipped predictors (arima/kalman/prophet/constant) run through Ch4's protocol on the IMAGE signal all sit at/below the classical frontier, none reaches the FM level: @1min arima 0.521 (ties classical) vs FM 0.515 (~1pt); @15s arima 0.668 vs FM 0.637, kalman 0.811 & prophet 0.733 trail even naive 0.764. VALIDATION: constant reproduces archived naive WAPE exactly (0.6180/0.7638) — grid+metric identical to the FM table. Framing: modest at 1min, clearer at 15s; the point is the shipped predictors do NOT beat the FMs, so a forecast-capable planner gains nothing from predictor choice (mechanical in Ch closedloop)
+supersedes: new — Ch4 benched FMs vs naive/EWMA/HW but never vs Dynamo's specific shipped predictors
+commit:     (this commit)

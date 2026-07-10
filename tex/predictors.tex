@@ -196,6 +196,26 @@ matters far less than using a foundation model at all;
 Figure~\ref{fig:pred-models} shows the three point paths nearly
 coincident over the week's largest burst.
 
+The comparison extends to the predictors a production planner actually
+ships. Dynamo's SLA planner selects a load predictor from a fixed
+registry --- ARIMA, Kalman, Prophet, or constant --- and forecasts the
+request, input-, and output-length signals with it; run through the
+same rolling-origin protocol on the image signal (their shipped
+defaults; validated by the constant predictor reproducing the naive
+baseline's WAPE exactly), all four sit at or below the classical
+frontier and none reaches the foundation-model level. At
+\SI{1}{\minute} the best shipped predictor (ARIMA, 0.521 WAPE) ties the
+classical baselines and trails the best foundation model (0.515) by
+about a WAPE point; at \SI{15}{\second} the gap widens --- ARIMA 0.668
+against 0.637, while Kalman (0.811) and Prophet (0.733) trail even
+naive persistence (0.764). The separation is modest at provisioning
+cadence and clearer at the finer resolution where the vision signal is
+burstiest; the operative point is not that foundation models forecast
+this signal dramatically better, but that the shipped predictors do not
+forecast it better --- so a planner already capable of forecasting gains
+nothing here from its predictor choice, which the closed loop
+(Chapter~\ref{cap:closedloop}) turns into a mechanical result.
+
 Third, \textbf{degradation across the horizon is mild}
 (Figure~\ref{fig:pred-horizon}): for images at \SI{1}{\minute} the
 foundation models move from ${\approx}52\%$ WAPE at $h{=}1$ to
