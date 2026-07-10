@@ -1,0 +1,6 @@
+Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 15743.61it/s]
+[burst3] 1241 image reqs; measuring silicon f(N) on demand...
+  silicon f(N) measured for N=[1, 4, 9, 16, 17, 25, 33, 36, 41, 49, 57, 64]
+  AIC-sim  p99 60253 ms [FAIL]
+  SILICON  p99 174395 ms [FAIL]  ratio 2.894
+-> collector_artifacts/phaseE_physical_anchor/silicon_burst3.json
