@@ -1,0 +1,62 @@
+{
+ "threshold_img_per_bin": 3360,
+ "bin_s": 15,
+ "span": [
+  "2024-10-16 21:39:00",
+  "2024-10-22 12:00:00"
+ ],
+ "note": "false alarm = path crosses threshold while observed does NOT, outside true episode windows, over the full 5.60-day span",
+ "false_alarms": {
+  "chronos": {
+   "point": {
+    "count": 1,
+    "bins": 28684,
+    "rate_per_day": 0.201
+   },
+   "p50": {
+    "count": 1,
+    "bins": 28684,
+    "rate_per_day": 0.201
+   },
+   "p90": {
+    "count": 486,
+    "bins": 28684,
+    "rate_per_day": 97.593
+   }
+  },
+  "toto": {
+   "point": {
+    "count": 0,
+    "bins": 28684,
+    "rate_per_day": 0.0
+   },
+   "p50": {
+    "count": 0,
+    "bins": 28684,
+    "rate_per_day": 0.0
+   },
+   "p90": {
+    "count": 507,
+    "bins": 28684,
+    "rate_per_day": 101.81
+   }
+  },
+  "timesfm": {
+   "point": {
+    "count": 0,
+    "bins": 28684,
+    "rate_per_day": 0.0
+   },
+   "p50": {
+    "count": 0,
+    "bins": 28684,
+    "rate_per_day": 0.0
+   },
+   "p90": {
+    "count": 348,
+    "bins": 28684,
+    "rate_per_day": 69.881
+   }
+  }
+ }
+}

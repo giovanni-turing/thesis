@@ -125,9 +125,24 @@ detections on the two fastest onsets (burst3: crossed \SI{105}{\second}
 before the signal itself, \SI{165}{\second} of usable issue-time lead;
 burst4: zero delay, \SI{120}{\second} usable lead) --- with zero false
 alarms across the calm day for every model. The point and p50 paths
-detect the same onsets 55 minutes to 4 hours late, or never. The p90
+detect the same onsets 55 minutes to 4 hours late, or never.
+
+A binary reading of the detector must be qualified, though. Counting
+threshold crossings over the \emph{whole} 5.60-day span (outside the
+true episodes), the p90 path crosses on 70--102 bins per day where the
+observed rate does not --- while point and p50 cross essentially never
+($\leq$1 per day). Read as an alarm, p90 is trigger-happy. But the p90
+path is not used as an alarm: it is the \emph{provisioning quantile},
+and a band that sits above the burst threshold during moderate activity
+is the calibrated headroom (coverage 0.88--0.90,
+Chapter~\ref{cap:predictors}) doing its job --- over-provisioning
+slightly, exactly the cost the $\rho$-frontier already prices
+(0.27--0.44$\times$ static). The distinction is the point: p90 is a good
+provisioning signal precisely because it is a permissive detector, while
+point and p50 are clean detectors that fail as provisioning signals
+(they size to the mean and miss the onset). The p90
 band is not a generic safety margin: at provisioning cadence it is a
-calibrated early-warning channel.
+calibrated early-warning channel whose cost is accounted for.
 
 \section{Language pool: the conversion result}
 \label{sec:cl-llm}
