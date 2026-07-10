@@ -49,6 +49,36 @@ run from the load sweeps onward (the wheel's per-request Python timing
 callback inflated extreme tail maxima only --- documented in
 Chapter~\ref{cap:twopool}).
 
+\section{Supplementary figures}
+\label{ap:supp-figs}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figuras/pred/pred_wape_heatmap}
+\caption{Overall point WAPE (\%, annotated) for every model and every
+(signal, resolution) cell on the common span; shading is each cell's WAPE
+relative to the best model in its column, bold marks the column best. The
+foundation-model rows are uniformly near-white --- within a few percent of
+the per-cell optimum everywhere --- while the baseline rows darken as bins
+shrink. Toto-2 with covariates carries most column wins at \SI{15}{\second}
+and \SI{1}{\second}; Chronos-2 and TimesFM take the coarse-bin columns.
+Holt--Winters is the worst model in every column --- worse than naive
+persistence --- because extrapolating a fitted trend across a 12-step
+horizon is precisely wrong for bursty, mean-reverting rates.}
+\label{fig:pred-heatmap}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figuras/pred/pred_models_burst}
+\caption{All three foundation models over the same burst (univariate
+point paths, \SI{1}{\minute} bins): the paths are nearly coincident ---
+riding the plateau, ignoring single-bin spikes, and releasing the regime
+within about one tile of its collapse --- the visual form of the
+noise-level inter-model spreads in Table~\ref{tab:pred-wape}.}
+\label{fig:pred-models}
+\end{figure}
+
 \section{Figure and table manifest}
 
 \begin{table}[htbp]

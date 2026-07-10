@@ -106,8 +106,8 @@ asymmetry, which the closed-loop evaluation prices.
 \label{sec:pred-point}
 
 Table~\ref{tab:pred-wape} reports overall point WAPE on the common span at
-the two extreme resolutions; Figure~\ref{fig:pred-heatmap} extends the
-picture to all twenty (resolution, signal) cells and
+the two extreme resolutions; Figure~\ref{fig:pred-heatmap} (appendix)
+extends the picture to all twenty (resolution, signal) cells and
 Figure~\ref{fig:pred-horizon} resolves it across the horizon. Four
 findings.
 
@@ -134,22 +134,6 @@ Toto-2 (cov)    & 33.6 & 53.1 & 43.3 & \textbf{37.4} & & \textbf{62.9} & 98.8 & 
 \bottomrule
 \end{tabular}
 \end{table}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{figuras/pred/pred_wape_heatmap}
-\caption{Overall point WAPE (\%, annotated) for every model and every
-(signal, resolution) cell on the common span; shading is each cell's WAPE
-relative to the best model in its column, bold marks the column best. The
-foundation-model rows are uniformly near-white --- within a few percent of
-the per-cell optimum everywhere --- while the baseline rows darken as bins
-shrink. Toto-2 with covariates carries most column wins at \SI{15}{\second}
-and \SI{1}{\second}; Chronos-2 and TimesFM take the coarse-bin columns.
-Holt--Winters is the worst model in every column --- worse than naive
-persistence --- because extrapolating a fitted trend across a 12-step
-horizon is precisely wrong for bursty, mean-reverting rates.}
-\label{fig:pred-heatmap}
-\end{figure}
 
 \begin{figure}[htbp]
 \centering
@@ -191,8 +175,8 @@ are decided by $\leq$0.1 WAPE point over 167 origins
 --- below plausible sampling variability, with no significance test
 attached --- so the honest reading is a three-way tie: model choice
 matters far less than using a foundation model at all;
-Figure~\ref{fig:pred-models} shows the three point paths nearly
-coincident over the week's largest burst.
+Figure~\ref{fig:pred-models} (appendix) shows the three point paths
+nearly coincident over the week's largest burst.
 
 The comparison extends to production practice: Dynamo's SLA planner
 selects a load predictor from a fixed
@@ -376,17 +360,6 @@ edge --- as a calibrated p90 should, roughly 10\% of the time (measured:
 releases the regime with at most a 12-minute (one-horizon) lag at the
 collapse around 21:00.}
 \label{fig:pred-band}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{figuras/pred/pred_models_burst}
-\caption{All three foundation models over the same burst (univariate
-point paths, \SI{1}{\minute} bins): the paths are nearly coincident ---
-riding the plateau, ignoring single-bin spikes, and releasing the regime
-within about one tile of its collapse --- the visual form of the
-noise-level inter-model spreads in Table~\ref{tab:pred-wape}.}
-\label{fig:pred-models}
 \end{figure}
 
 \section{Limitations}
