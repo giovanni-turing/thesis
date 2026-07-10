@@ -31,8 +31,11 @@ Chapter~\ref{cap:trace-eda} (peak 1-minute image rates 337--370
 (2024-10-19; peak \SI{57}{img/s}) as the steady reference. Two episodes
 (burst2/6) fall in the trace's first 1.4 days, reserved as forecast
 context (the temporal split is stated in
-Chapter~\ref{cap:closedloop}); they are graded here by the static grid
-and the language-pool reactive baseline only. Each policy
+Chapter~\ref{cap:closedloop}); they are graded here by every
+forecast-free policy --- the static grid, the language-pool reactive
+baseline, and the reactive encoder baseline (which watches the observed
+image rate, needing no forecast) --- but not by any forecast policy.
+Each policy
 produces, per window, a worker schedule for the encoder pool ($C(t)$
 workers) and a configuration or replica schedule for the language pool
 ($\mathrm{TP}\times N$ H100 workers), and is graded on the resulting
@@ -168,25 +171,31 @@ SLA violation. $L^{*}$ = largest lead at which the SLA holds.}
 Window & $L{=}15$\,s & 30\,s & 45\,s & 300\,s & $L^{*}$ \\
 \midrule
 burst1 (onset 220\,min) & 588 & 588 & 588 & 638 & 300\,s \\
+burst2 (onset 48\,min) & 588 & 588 & 588 & \textbf{4{,}282} & 45\,s \\
 burst3 (onset 1\,min) & \textbf{9{,}481} & \textbf{16{,}079} &
 \textbf{28{,}342} & \textbf{54{,}170} & none \\
 burst4 (onset 60\,min) & 588 & 588 & 588 & \textbf{3{,}063} & 45\,s \\
 burst5 (onset 35\,min) & 588 & 588 & 588 & \textbf{6{,}729} & 45\,s \\
+burst6 (onset 1\,min) & 588 & 749 & 905 & \textbf{4{,}606} & 45\,s \\
 steady (24\,h) & 548 & 682 & 734 & 884 & 300\,s \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The pattern tracks onset speed exactly. Slow ramps (burst1, the calm
-day) are reactive-scalable at any tested lead. Medium onsets survive
-only sub-minute leads ($L^{*}{=}$\SI{45}{\second} --- below the lead
-times realistically available to pod-scheduled GPU workers). And the
-one-minute onset of burst3 defeats the reactive controller at
-\emph{every} lead, including \SI{15}{\second}: p99 encoder delay
-9.5--54\,\si{\second}, degrading toward the never-scaled limit as lead
-grows. Watching the right signal is necessary but not sufficient ---
-by the time a trailing window registers a fast onset, no affordable
-lead time can deliver the workers before the queue does the damage.
+The pattern tracks onset speed and peak volume together. Slow ramps
+(burst1, the calm day) are reactive-scalable at any tested lead; medium
+onsets survive only sub-minute leads ($L^{*}{=}$\SI{45}{\second} ---
+below the lead times realistically available to pod-scheduled GPU
+workers). The two fastest onsets diverge by volume: burst6's one-minute
+onset is caught at short leads ($L^{*}{=}$\SI{45}{\second}) because its
+peak (\SI{337}{img/s}) drains within a batch, whereas burst3's
+one-minute onset defeats the controller at \emph{every} lead, including
+\SI{15}{\second} (p99 encoder delay 9.5--54\,\si{\second}, degrading
+toward the never-scaled limit) --- the same peak arriving against a
+thinner request stream, so the backlog outlasts any affordable lead.
+Watching the right signal is necessary but not sufficient: by the time a
+trailing window registers a fast, high-volume onset, no affordable lead
+time can deliver the workers before the queue does the damage.
 
 \section{Summary}
 \label{sec:base-summary}

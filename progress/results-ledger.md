@@ -302,3 +302,10 @@ command:    eda/.venv/bin/python predictors/additive_structural_ablation.py  (ar
 feeds:      tex/predictors.tex §Do covariates help — new closing ¶; CLOSES roadmap "structural-additive LLM predictor" QUEUED item. R2=0.94, image term 34-36% of ctx mass (materially image-driven, NOT the trivial escape); additive ties/loses pooled (+0.07..+1.31pp); no onset edge (steep-rise flips sign by resolution); MECHANISM: image forecast is WORST component at onsets (75-100% WAPE vs direct-ctx 58-72% vs requests 33-38%) — image spike unforecastable exactly where the bet needed it. Do NOT graduate to planner run
 supersedes: new (last queued unrun idea)
 commit:     305f75f (branch bee4c62)
+
+### Reactive-encoder baseline extended to burst2 + burst6 (all 6 bursts graded)  (2026-07-09)
+artifact:   simulation/results/burst26_reactive/{burst2,burst6}_react_L{15,30,45,300}.jsonl.stats.json; runner simulation/run_burst26_reactive.sh (branch exp/burst26-reactive-encoder caeb907)
+command:    forecast_schedule.py --policy reactive (observed image rate, quantile ignored) rho15/15s/hyst3 x lead{15,30,45,300}, converter over burst2 (78376/13870) + burst6 (93867/9821)
+feeds:      tex/baselines.tex Tab. base-react-enc — reactive ENCODER now graded on ALL SIX bursts (burst2/6 need no forecast so they CAN be graded despite pre-context-window). Both L*=45s: burst2 588/588/588/4282; burst6 588/749/905/4606. New prose: burst6's 1-min onset PASSES at L<=45 (peak 337 img/s drains within a batch) unlike burst3's 1-min onset (same peak, thinner request stream, backlog outlasts lead) — onset speed AND volume both matter
+supersedes: reactive-encoder coverage that omitted burst2/6 (5-window table -> 6-window)
+commit:     (this commit; artifacts from branch caeb907)
