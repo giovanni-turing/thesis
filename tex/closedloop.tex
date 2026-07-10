@@ -384,11 +384,12 @@ linearly with payload over bandwidth). Per-pool leads
 are swept as constants per run, not stochastic; and the two
 out-of-span episodes (burst2/6, inside the trace's first 1.4 days,
 which the zero-shot forecasters consume as context before their first
-usable 15-second forecast) are graded only by the static grid and the
-language-pool reactive baselines of Chapter~\ref{cap:baselines} ---
-no dynamic \emph{encoder} policy, forecast or reactive, is scored on
-them, since the forecast is structurally absent there and the reactive
-strawman exists for comparison against it. A deployed system, entering the week with prior history as
+usable 15-second forecast) are graded by the forecast-free baselines of
+Chapter~\ref{cap:baselines} --- the static grid, the language-pool
+reactive planner, and the reactive encoder strawman (which watches the
+observed image rate and needs no forecast) --- but by no \emph{forecast}
+policy, since the forecast is structurally absent there. A deployed
+system, entering the week with prior history as
 context, would not have this hole. Replay-level p99 noise is ${\approx}4\%$;
 no quoted contrast is within that band.
 
