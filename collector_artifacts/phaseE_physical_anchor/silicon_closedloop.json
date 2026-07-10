@@ -1,0 +1,49 @@
+{
+ "policy": "p90/rho15/L30 (chronos)",
+ "sla_ms": 1000.0,
+ "static_C": 16,
+ "windows": {
+  "burst1": {
+   "fc_worker_s": 536813,
+   "static_worker_s": 479029,
+   "ratio": 1.121,
+   "aic_p99": 588.4,
+   "aic_feasible": true,
+   "silicon_p99": 783.6,
+   "silicon_feasible": true,
+   "sched_peak": 27
+  },
+  "burst3": {
+   "fc_worker_s": 31838,
+   "static_worker_s": 25915,
+   "ratio": 1.229,
+   "aic_p99": 588.4,
+   "aic_feasible": true,
+   "silicon_p99": 783.6,
+   "silicon_feasible": true,
+   "sched_peak": 24
+  },
+  "burst4": {
+   "fc_worker_s": 235429,
+   "static_worker_s": 181427,
+   "ratio": 1.298,
+   "aic_p99": 588.4,
+   "aic_feasible": true,
+   "silicon_p99": 783.6,
+   "silicon_feasible": true,
+   "sched_peak": 32
+  },
+  "burst5": {
+   "fc_worker_s": 87926,
+   "static_worker_s": 77726,
+   "ratio": 1.131,
+   "aic_p99": 588.4,
+   "aic_feasible": true,
+   "silicon_p99": 783.6,
+   "silicon_feasible": true,
+   "sched_peak": 26
+  }
+ },
+ "aggregate_ratio_over_windows": 1.167,
+ "all_silicon_feasible": true
+}

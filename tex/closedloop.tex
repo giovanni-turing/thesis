@@ -423,10 +423,14 @@ no quoted contrast is within that band.
 Two further scopes bound the economic headline. First, the cost ratio is
 priced on the AIC encoder model, which Chapter~\ref{cap:aiconfigurator}
 shows underprices the p99-knee-limited burst windows by up to ${\approx}2\times$
-against measured (eager) silicon. The forecast policy provisions with the
-$\rho{=}15$/p90 headroom, not at the bare feasible $C^{*}$, so whether that
-headroom already absorbs the underprice or the physical ratio is larger is
-untested --- a silicon-priced closed-loop re-run is future work. Second,
+against measured (eager) silicon. Replaying the winning p90/$\rho{=}15$
+schedule under that measured $f(N)$, however, leaves it feasible on every
+in-span burst window (encoder-delay p99 \SI{784}{} versus
+\SI{588}{\milli\second} under AIC, both under the bound): the $\rho{=}15$/p90
+headroom provisions 24--32 workers at the burst peaks, far above the 12--16
+the silicon fleet requires, so the underprice is absorbed with no added
+workers and the 0.27--0.31$\times$ ratio is preserved on silicon (a
+live-worker, non-eager confirmation remains future work). Second,
 every quantity here --- the $8\times$/$2\times$ over-provisioning, the
 $\rho$ frontier, the 0.27--0.31$\times$ --- derives from a single Azure
 production trace over one 5.60-day span; generalization to other workloads,
