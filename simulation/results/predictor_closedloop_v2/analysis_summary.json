@@ -1,0 +1,88 @@
+{
+  "steady24h": {
+    "decode_worker_seconds": {
+      "arima": 88012.03892033859,
+      "kalman": 88015.58613076153,
+      "prophet": 88012.34095367962
+    },
+    "decode_worker_seconds_spread_s": 3.5472104229411343,
+    "p99_itl_ms": {
+      "arima": 32.987633004784584,
+      "kalman": 32.987633004784584,
+      "prophet": 32.987633004784584
+    },
+    "p99_itl_spread_ms": 0.0,
+    "p99_ttft_ms": {
+      "arima": 1111.7422560002306,
+      "kalman": 1111.7422560002306,
+      "prophet": 1111.7422560002306
+    },
+    "p99_ttft_spread_ms": 0.0,
+    "mean_ttft_ms": {
+      "arima": 133.1924719622468,
+      "kalman": 133.1921676827928,
+      "prophet": 133.19263389936435
+    },
+    "mean_ttft_spread_ms": 0.00046621657153878004,
+    "mean_itl_ms": {
+      "arima": 8.524610469446227,
+      "kalman": 8.524609119149314,
+      "prophet": 8.5246197933461
+    },
+    "mean_itl_spread_ms": 1.067419678513204e-05,
+    "scale_action_count": {
+      "arima": 43,
+      "kalman": 43,
+      "prophet": 43
+    },
+    "distinct_schedules": 1,
+    "passfail": {
+      "arima": "FAIL",
+      "kalman": "FAIL",
+      "prophet": "FAIL"
+    }
+  },
+  "burst4": {
+    "decode_worker_seconds": {
+      "arima": 14835.12955065051,
+      "kalman": 14770.013179724547,
+      "prophet": 14704.951289086654
+    },
+    "decode_worker_seconds_spread_s": 130.17826156385672,
+    "p99_itl_ms": {
+      "arima": 151.37476400006562,
+      "kalman": 151.34496500017121,
+      "prophet": 151.6376940002665
+    },
+    "p99_itl_spread_ms": 0.292729000095278,
+    "p99_ttft_ms": {
+      "arima": 2783.9918110016733,
+      "kalman": 2775.763718000613,
+      "prophet": 2783.9918110016733
+    },
+    "p99_ttft_spread_ms": 8.228093001060188,
+    "mean_ttft_ms": {
+      "arima": 311.80590456779,
+      "kalman": 311.81421860167126,
+      "prophet": 312.8736843314266
+    },
+    "mean_ttft_spread_ms": 1.0677797636366222,
+    "mean_itl_ms": {
+      "arima": 8.620270972825699,
+      "kalman": 8.624803385448539,
+      "prophet": 8.65027537621875
+    },
+    "mean_itl_spread_ms": 0.03000440339305044,
+    "scale_action_count": {
+      "arima": 89,
+      "kalman": 89,
+      "prophet": 87
+    },
+    "distinct_schedules": 3,
+    "passfail": {
+      "arima": "FAIL",
+      "kalman": "FAIL",
+      "prophet": "FAIL"
+    }
+  }
+}

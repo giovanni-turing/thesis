@@ -98,7 +98,16 @@ onset pays for lead; a policy that \emph{anticipates} it does not.
 \item[Model choice is second-order.] All three foundation models pass
 all 60 p90/$\rho{15}$ cells, consistent with the small cross-model
 spreads of Chapter~\ref{cap:predictors}; quantile and
-capacity rating dominate the choice of forecaster.
+capacity rating dominate the choice of forecaster. The same holds for
+the predictor a production planner ships: swapping Dynamo's own load
+predictor among ARIMA, Kalman, and Prophet leaves the SLA verdict
+unchanged on both a decode-bound day and a slow-onset burst (identical
+served-latency percentiles on the former, within \SI{1}{\milli\second}
+of mean TTFT on the latter, all failing together), because the
+integer-replica conversion quantizes the differing forecasts onto the
+same worker schedule. Predictor choice is second-order on both the
+forecasting and the served-latency side; the signal and the conversion
+are not.
 \item[Capacity rating trades cost against fragility.] At $\rho \in
 \{10,15\}$ the p90 policy is 60/60; loosening to $\rho{=}20$/25 drops
 3/11 cells (concentrated on burst5, the binding static window, via
