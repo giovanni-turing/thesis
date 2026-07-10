@@ -76,8 +76,8 @@ Reactive & TTFT p99 (ms) & 3{,}531 & 3{,}495 & $+1.0\%$ \\
 
 The anchor holds in both verdict directions
 (Table~\ref{tab:val-anchor}): the forecast policy passes the tail SLA
-live exactly as simulated, the reactive policy fails live exactly as
-simulated --- its p99 within 1\% of the simulation --- and provisioned
+live exactly as simulated, the reactive policy fails likewise --- its
+p99 within 1\% of the simulation --- and provisioned
 replica-time agrees within 8\%. The agreement extends below the
 aggregate numbers. The demand path is \emph{byte-identical}: for the
 first twelve planner ticks the live and offline planners log the same
@@ -89,7 +89,7 @@ the clock differs. The capacity beliefs then drift within their
 expected band (the regression is tuned from sampled forward passes,
 which arrive in different order live), but the \emph{applied} capacity
 --- after the budget cap --- tracks the same trajectory, and the
-client-observed tails land within run noise of the simulated ones.
+client-observed TTFT tails land within run noise of the simulated ones.
 The burst3 policy split itself (p90 passes where p50 and reactive
 fail; Chapter~\ref{cap:closedloop}) reproduces on the real stack.
 
@@ -105,8 +105,7 @@ Offline, a scaling-up mocker with \texttt{startup\_time} is invisible
 to the router until ready. Live, the same option registers the worker
 \emph{immediately} and stalls its requests: a routable-but-dead window
 that a load-aware router --- seeing an idle-looking worker ---
-preferentially fills. Cold-start leads were therefore modeled by
-delaying the spawn itself.
+preferentially fills; hence the delayed-spawn modeling of the Setup.
 \item[The live planner's capacity model starves at calm load.] The live
 planner samples worker metrics in tracking mode --- the \emph{latest}
 forward pass per worker, once per load tick --- while the offline
@@ -142,7 +141,6 @@ only in simulation), and mocked engine execution --- it validates the
 Chapter~\ref{cap:aiconfigurator} anchored physically on the encoder
 side. Within that scope the conclusion is direct: the platform's
 closed-loop behavior transfers to the real stack within run noise, in
-both the passing and the failing direction, and the divergences that
-do exist are identified, explained, and in one case fixed upstream ---
-they are properties of the harnesses, not of the policies this thesis
-compares.
+both verdict directions, and the divergences that do exist ---
+identified, explained, in one case fixed upstream --- are properties
+of the harnesses, not of the policies this thesis compares.

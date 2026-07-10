@@ -6,12 +6,11 @@
 \chapter{Related Work}
 \label{cap:related}
 
-Five bodies of work border this thesis: serving systems for large language
-models, serving systems for \emph{multimodal} models, autoscalers for
-model serving, workload characterization studies, and time-series
-forecasting models. This chapter reviews each through the lens the thesis
-argues from --- \emph{which load signal a system watches, and what it does
-with it} --- and closes with a positioning summary. Vocabulary follows
+Five bodies of work border this thesis: LLM serving systems,
+\emph{multimodal} serving systems, autoscalers for model serving,
+workload characterization, and time-series forecasting. This chapter reviews each through the lens the thesis
+argues from: \emph{which load signal a system watches, and what it does
+with it}. Vocabulary follows
 Chapter~\ref{cap:intro}: a \emph{pool} is an independently sized set of
 workers for one inference stage; \emph{scaling} changes a pool's worker
 count over time under latency service-level objectives (SLOs).
@@ -20,36 +19,32 @@ count over time under latency service-level objectives (SLOs).
 \label{sec:rel-llm}
 
 Modern LLM serving rests on engine-level scheduling: Orca's
-iteration-level scheduling, admitting and evicting requests at
-token-iteration rather than request granularity~\cite{Yu2022Orca};
-vLLM's PagedAttention, virtualizing the KV cache against memory
-fragmentation to make large continuous batches
-practical~\cite{Kwon2023vLLM}; SGLang's structured-program execution and
-prefix-cache reuse~\cite{Zheng2024SGLang}; Sarathi-Serve's chunked
-prefills piggybacked onto decode batches to tame the throughput--latency
-trade-off~\cite{Agrawal2024SarathiServe}; FastServe's preemptive
+iteration-level scheduling~\cite{Yu2022Orca}; vLLM's PagedAttention,
+virtualizing the KV cache against memory
+fragmentation~\cite{Kwon2023vLLM}; SGLang's structured-program execution
+and prefix-cache reuse~\cite{Zheng2024SGLang}; Sarathi-Serve's chunked
+prefills piggybacked onto decode
+batches~\cite{Agrawal2024SarathiServe}; FastServe's preemptive
 scheduling against head-of-line blocking~\cite{Wu2023FastServe}. All
 operate \emph{within} a fixed fleet: they decide which request runs
 where and when, not how many workers should exist.
 
 A second line disaggregates the two phases of LLM inference themselves.
 Splitwise~\cite{Patel2024Splitwise} and DistServe~\cite{Zhong2024DistServe}
-place prefill and decode on separate pools sized and scheduled to their
-own bottlenecks, with substantial goodput-per-GPU gains; Mooncake
-operates the split in production at Moonshot AI, organized around a
-disaggregated KV cache with prediction-based early rejection under
-overload~\cite{Qin2025Mooncake}; DynaServe generalizes the split into an
+place prefill and decode on separate pools sized to their own
+bottlenecks, with goodput-per-GPU gains; Mooncake operates the split in
+production, with prediction-based early rejection under
+overload~\cite{Qin2025Mooncake}; DynaServe generalizes it into an
 elastic spectrum between aggregated and disaggregated
 execution~\cite{Ruan2025DynaServe}. NVIDIA Dynamo packages the
 architecture as a datacenter-scale framework --- KV-aware routing, tiered
-KV-cache management, disaggregated worker pools, an SLA-driven
-planner~\cite{Dynamo2025} --- and is the platform this thesis builds its
-simulation on. This line establishes the thesis's premise: heterogeneous
-inference stages deserve separately provisioned pools. Its control
-planes, however, schedule and admit \emph{within} whatever fleet exists;
-how each pool's size should track demand is delegated to an autoscaler
---- and, as Section~\ref{sec:rel-autoscale} shows, that autoscaler
-watches request-level signals.
+KV-cache management, an SLA-driven planner~\cite{Dynamo2025} --- and is
+the platform this thesis builds its simulation on. This line establishes
+the thesis's premise: heterogeneous stages deserve separately
+provisioned pools. Its control planes, however, schedule and admit
+\emph{within} whatever fleet exists; each pool's size is delegated to an
+autoscaler --- which, as Section~\ref{sec:rel-autoscale} shows, watches
+request-level signals.
 
 \section{Serving multimodal models}
 \label{sec:rel-mm}
@@ -57,24 +52,23 @@ watches request-level signals.
 Multimodal inference prepends an encoding stage to prefill and decode,
 and a recent line of systems disaggregates it. ModServe, whose
 production trace this thesis analyzes, decouples image encoding from
-language-model execution at cluster scale and reports 25--41\% GPU-hour
-savings from modality-aware placement and scaling on Azure
-traffic~\cite{Qiu2025ModServe}. EPD disaggregation moves encode,
+language-model execution at cluster scale, reporting 25--41\% GPU-hour
+savings from modality-aware placement and
+scaling~\cite{Qiu2025ModServe}. EPD disaggregation moves encode,
 prefill, and decode onto dedicated resources with asynchronous
-inter-stage transfer of multimodal tokens, reporting large gains in
-memory headroom, supported batch sizes, and TTFT SLO
-attainment~\cite{Singh2025EPD}. HydraInfer pursues the same three-stage
-split with hybrid scheduling of encode and decode
-instances~\cite{Dong2025HydraInfer}; vLLM-Omni extends stage
-disaggregation to any-to-any multimodal pipelines mixing autoregressive
-and diffusion components~\cite{vLLMOmni2026}. ElasticMM makes
+inter-stage transfer, reporting gains in memory headroom, supported
+batch sizes,
+and TTFT SLO attainment~\cite{Singh2025EPD}. HydraInfer pursues the same
+split with hybrid scheduling~\cite{Dong2025HydraInfer}; vLLM-Omni
+extends stage disaggregation to any-to-any multimodal
+pipelines~\cite{vLLMOmni2026}. ElasticMM makes
 encoder-pool elasticity explicit, scaling modality-decoupled resource
 groups at runtime~\cite{Liu2025ElasticMM}; RServe occupies the opposite
-design point, overlapping encoding with prefill inside a single
+design point, overlapping encoding with prefill in a single
 instance~\cite{Guo2025RServe}; and cross-tier deployments placing the
 compute-bound encode stage on consumer-class GPUs --- the hardware split
-this thesis's encoder pool adopts --- have been costed
-explicitly~\cite{Yu2026HeteroServe}. Encoder disaggregation has also
+this thesis's encoder pool adopts --- have been
+costed~\cite{Yu2026HeteroServe}. Encoder disaggregation has also
 reached the mainstream engines: vLLM and SGLang now ship
 encoder-separated serving modes with elastic encoder
 scaling.\footnote{Grey-literature convention: engine blog posts are
@@ -87,22 +81,20 @@ SGLang}, \url{https://www.lmsys.org/blog/2026-01-12-epd/}. Both
 accessed 2026-07-07.}
 
 These systems settle the architecture question --- the encoder pool
-exists, separately deployed, separately scalable, shipping in mainstream
-engines --- and thereby make the question this thesis answers
-operational rather than hypothetical. Their scaling decisions are driven
-by currently observed load (queue depths, utilization, arrival rates),
-inheriting the reactive loop of Section~\ref{sec:rel-autoscale}; none
-asks \emph{what demand signal} an encoder pool should be provisioned on,
-whether that signal is visible in the request \emph{rate} a conventional
-autoscaler watches (Chapter~\ref{cap:trace-eda} shows it is not ---
-though it is computable from request \emph{content}, since every request
-declares its image count at admission), or whether it is forecastable at
-the horizons replica cold starts require (Chapter~\ref{cap:predictors}
-shows it is). ModServe's own trace analysis documents bursty,
-heterogeneous image traffic --- the motivating observation --- but its
-scaling remains reactive; to our knowledge, the released
-trace's per-pool demand signals were not characterized as forecasting
-targets before this thesis.
+exists, separately deployed and scaled, shipping in mainstream engines
+--- and make the question this thesis answers operational rather than
+hypothetical. Their scaling is driven by currently observed load (queue
+depths, utilization, arrival rates), inheriting the reactive loop of
+Section~\ref{sec:rel-autoscale}; none asks \emph{what demand signal} an
+encoder pool should be provisioned on, whether that signal is visible in
+the request \emph{rate} a conventional autoscaler watches
+(Chapter~\ref{cap:trace-eda} shows it is not, though it is computable
+from request \emph{content}), or whether it is forecastable at the
+horizons replica cold starts require (Chapter~\ref{cap:predictors} shows
+it is). ModServe's own trace analysis documents bursty, heterogeneous
+image traffic, but its scaling remains reactive; to our knowledge, the
+released trace's per-pool demand signals were not characterized as
+forecasting targets before this thesis.
 
 \section{Autoscaling for model serving}
 \label{sec:rel-autoscale}
@@ -111,26 +103,24 @@ SLO-aware autoscaling predates LLMs. In general-purpose orchestration
 the reactive loop is standardized infrastructure: Kubernetes' Horizontal
 Pod Autoscaler scales on aggregate utilization or custom metrics, KEDA
 generalizes the trigger to event sources, and Knative's KPA regulates on
-request concurrency~\cite{K8sAutoscalers} --- all watching signals of
-the one request stream, the inheritance this thesis interrogates. For ML
+request concurrency~\cite{K8sAutoscalers} --- all watching the one
+request stream, the inheritance this thesis interrogates. For ML
 serving, Swayam derived provisioning rules from SLA
 models~\cite{Gujarati2017Swayam}; MArk combined proactive and reactive
-scaling over heterogeneous cloud instances~\cite{Zhang2019MArk};
-Clockwork built latency predictability bottom-up, making worker
-performance modelable~\cite{Gujarati2020Clockwork}; INFaaS automated
-model-variant selection and scaling behind a model-less
-interface~\cite{Romero2021INFaaS}; AlpaServe showed that statistical
+scaling over heterogeneous instances~\cite{Zhang2019MArk};
+Clockwork made worker performance predictable
+bottom-up~\cite{Gujarati2020Clockwork}; INFaaS automated model-variant
+selection and scaling~\cite{Romero2021INFaaS}; AlpaServe showed that statistical
 multiplexing across model-parallel replicas changes the provisioning
 calculus~\cite{Li2023AlpaServe}. Closest in spirit to per-pool
 provisioning, InferLine sized each stage of multi-model prediction
-\emph{pipelines} under an end-to-end tail-latency SLO, pairing a
-low-frequency planner with a high-frequency reactive
-tuner~\cite{Crankshaw2020InferLine} --- but its stages are pre-LLM
-models fed by the one request stream, so the question of \emph{which
+\emph{pipelines} under an end-to-end tail-latency
+SLO~\cite{Crankshaw2020InferLine} --- but its stages are pre-LLM
+models fed by signals of the one request stream, so the question of \emph{which
 signal} sizes each stage never arises. At the infrastructure level,
 Google's Autopilot established history-driven (including
-time-series--based) autoscaling as production
-practice~\cite{Rzadca2020Autopilot}. The common thread: the watched
+time-series--based)
+autoscaling as production practice~\cite{Rzadca2020Autopilot}. The common thread: the watched
 signal is the aggregate request stream or utilization --- for
 single-stage, text-only services, a reasonable proxy for the one pool's
 demand.
@@ -138,15 +128,15 @@ demand.
 The LLM era stressed this loop from two sides. On the supply side, cold
 starts grew: loading tens of gigabytes of weights makes replica
 provisioning a tens-of-seconds-to-minutes operation; ServerlessLLM
-attacks that latency with multi-tier checkpoint loading and
-locality-aware startup~\cite{Fu2024ServerlessLLM}, and BlitzScale
+attacks it with multi-tier checkpoint
+loading~\cite{Fu2024ServerlessLLM}, and BlitzScale
 multicasts weights over the GPU network to make scale-up
 near-live~\cite{Zhang2025BlitzScale} --- shrinking, but not eliminating,
 the lead time a scaling decision must cover. On the demand side, load
 became burstier and less stationary, prompting scheduling-level
-responses (Llumnix, rescheduling requests across replicas to absorb
-dynamics~\cite{Llumnix2024}), SLO-differentiated autoscalers (Chiron,
-scaling interactive and batch LLM pools hierarchically under separate
+responses (Llumnix, rescheduling requests across
+replicas~\cite{Llumnix2024}), SLO-differentiated autoscalers (Chiron,
+scaling interactive and batch pools under separate
 SLOs~\cite{Patke2025Chiron}), token-granularity GPU pooling across
 models in production at Alibaba~\cite{Xiang2025Aegaeon}, and, recently,
 \emph{forecast-aware} capacity management: SageServe combines a traffic
@@ -164,16 +154,16 @@ second, slower \emph{forecast-driven} loop that predicts the aggregate
 request rate and mean sequence lengths with classical models (ARIMA,
 Kalman, Prophet) to set replica floors under the reactive
 loop~\cite{Dynamo2025}.\footnote{Planner
-behavior as described here is version-specific: it follows the planner
-design documentation of the Dynamo 1.x line and inspection of the source
-tree at the commit used for this thesis's simulations (v1.3.0 source
-build; accessed 2026-07-07). See Appendix~\ref{ap:artifacts}.} Its
+behavior is version-specific: it follows the Dynamo 1.x planner design
+documentation and inspection of the source tree at the commit used for
+this thesis's simulations (v1.3.0 source build; accessed 2026-07-07).
+See Appendix~\ref{ap:artifacts}.} Its
 reactive SLA loop is the baseline of this thesis's evaluation (run
 unmodified, planner-in-the-loop, Chapter~\ref{cap:baselines}); its
 predictive loop still watches a single averaged
 text-side stream --- a limitation its own design notes state.
 Autoscalers purpose-built for \emph{disaggregated} LLM serving are the
-newest arrivals and the closest neighbors of this thesis: ByteDance's
+closest neighbors: ByteDance's
 HeteroScale coordinates scaling of heterogeneous prefill and decode
 pools in production~\cite{Li2025TamingChaos}, and TokenScale sizes the
 two pools on per-stage token-velocity signals rather than the request
@@ -196,7 +186,7 @@ modeling burden exactly where a multi-pool system multiplies it.
 \section{Workload characterization and traces}
 \label{sec:rel-workload}
 
-The statistical phenomena underlying the workload analysis have deep
+The statistical phenomena underlying the workload analysis have
 precedent. Self-similarity and long-range dependence --- burstiness no
 aggregation window removes --- were established for Ethernet traffic by
 Leland et al.~\cite{Leland1994}, for wide-area TCP traffic by Paxson and
@@ -213,11 +203,10 @@ Azure LLM inference traces released with
 Splitwise~\cite{Patel2024Splitwise} and refreshed with
 DynamoLLM~\cite{Stojkovic2025DynamoLLM}; BurstGPT's year-long trace and
 arrival-burstiness analysis~\cite{Wang2024BurstGPT}; ServeGen's
-characterization and generative modeling of Alibaba production
-workloads, which notes that realistic workloads must be composed per
-category rather than as one stream~\cite{Xiang2025ServeGen}; and
-Aegaeon's multi-month view of bursty, long-tailed multi-model traffic in
-Alibaba's Model Studio~\cite{Xiang2025Aegaeon}. All are text-centric:
+generative modeling of Alibaba production workloads, which notes that
+realistic workloads must be composed per category rather than as one
+stream~\cite{Xiang2025ServeGen}; and Aegaeon's multi-month view of
+bursty multi-model traffic at Alibaba~\cite{Xiang2025Aegaeon}. All are text-centric:
 their request descriptors are token counts and timestamps. The
 \textit{AzureLMMInferenceDataset2025} released with
 ModServe~\cite{Qiu2025ModServe} is, to our knowledge, the first public
@@ -245,18 +234,17 @@ training~\cite{Woo2024Moirai}; Lag-Llama's probabilistic
 head~\cite{Rasul2023LagLlama}; Time-MoE's billion-parameter
 sparse scaling~\cite{Shi2025TimeMoE}; and Datadog's Toto family, trained
 at scale on observability telemetry --- the domain closest to serving
-demand signals --- released with the BOOM benchmark of observability
-series~\cite{Cohen2024Toto,Cohen2025BOOM} and scaled up in
+demand signals --- released with the BOOM observability
+benchmark~\cite{Cohen2024Toto,Cohen2025BOOM} and scaled up in
 Toto-2~\cite{Khwaja2026Toto2}. Public benchmarks such as GIFT-Eval
 compare these models across broad corpora~\cite{Aksu2024GIFTEval}, but
 their domains (energy, retail, weather, cloud telemetry) do not include
 inference-serving demand, and the deployment-relevant questions ---
-accuracy at a specific provisioning cadence, degradation across the
-lead-time horizon, the value of cross-signal covariates --- are not
-posed in autoscaling terms. The zero-shot property is what makes TSFMs
+accuracy at a specific provisioning cadence, lead-time degradation,
+cross-signal covariate value --- are not posed in autoscaling terms. The zero-shot property is what makes TSFMs
 interesting here: per-pool provisioning multiplies the signals to
-forecast, and a pretrained model removes the per-signal fitting and
-tuning burden classical pipelines impose. Chapter~\ref{cap:predictors}
+forecast, and a pretrained model removes the per-signal fitting burden
+classical pipelines impose. Chapter~\ref{cap:predictors}
 fills that slot: a rolling-origin, provisioning-framed, zero-shot
 benchmark of three TSFMs against classical baselines on all four demand
 signals of a production multimodal trace, with the forecast consumed as
@@ -272,14 +260,13 @@ operating quantile empirically under that framing.
 
 Systems questions of this kind are standardly answered in simulation.
 Vidur simulates LLM serving at cluster scale from profiled and learned
-kernel timings, validated against real deployments and motivated by the
-cost of sweeping deployment configurations on
-hardware~\cite{Agrawal2024Vidur}; LLMServingSim co-simulates the
+kernel timings, validated against real
+deployments~\cite{Agrawal2024Vidur}; LLMServingSim co-simulates the
 accelerator and the serving stack, its 2.0 release targeting
 heterogeneous and disaggregated serving
 infrastructure~\cite{Cho2024LLMServingSim,Cho2026LLMServingSim2}
-(positioned with Vidur in Table~\ref{tab:rel-positioning}: simulation
-without modality disaggregation or scaling policy); Dynamo ships a
+(with Vidur in Table~\ref{tab:rel-positioning}: simulation without
+modality disaggregation or scaling policy); Dynamo ships a
 discrete-event simulator of its own worker pools (the \emph{mocker}),
 which this thesis drives through
 \texttt{dynamo.replay}~\cite{Dynamo2025}; and aiconfigurator searches
@@ -289,11 +276,8 @@ GPUs~\cite{AIConfigurator2025}. All model \emph{text} token processing:
 none prices a vision-encoder stage, and aiconfigurator's encoder
 operator had no performance data for any consumer- or workstation-class
 GPU before this work (Chapter~\ref{cap:aiconfigurator}). This thesis
-therefore composes its platform from parts --- the encoder pool costed
-on silicon collected and physically validated for this purpose, the
-language pool on Dynamo's simulator under calibrated H100 timing --- and
-quantifies the fidelity of each seam (Chapter~\ref{cap:twopool}) rather
-than assuming it.
+therefore composes its platform from parts and quantifies the fidelity
+of each seam (Chapter~\ref{cap:twopool}) rather than assuming it.
 
 \section{Positioning}
 \label{sec:rel-positioning}

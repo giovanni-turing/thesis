@@ -8,10 +8,10 @@
 \label{cap:baselines}
 \chaptermark{Provisioning Baselines}
 
-Any claim that predictive provisioning pays must be made against the two
-policies a practitioner would reach for: the best \emph{static}
-fleet, and a \emph{reactive} autoscaler. This chapter establishes both on
-the platform of Chapter~\ref{cap:twopool}, under the evaluation SLA
+Any claim that predictive provisioning pays must be made against the
+two policies a practitioner would reach for --- the best \emph{static}
+fleet and a \emph{reactive} autoscaler --- both established here on the
+platform of Chapter~\ref{cap:twopool}, under the evaluation SLA
 defined there (per window: language TTFT p99 $<$ \SI{1}{\second} and ITL
 p99 $<$ \SI{100}{\milli\second}; encoder delay p99 $<$
 \SI{1}{\second}), scored together with provisioned GPU-time
@@ -31,14 +31,14 @@ Chapter~\ref{cap:trace-eda} (peak 1-minute image rates 337--370
 (2024-10-19; peak \SI{57}{img/s}) as the steady reference. Each burst window
 brackets its episode with a $\pm$10-minute calm margin (the median-crossing
 envelope of Section~\ref{sec:eda-vision}), so every replay begins and ends
-with a drained encoder queue rather than mid-burst; this padded span sets the
+with a drained encoder queue; this padded span sets the
 window's GPU-time denominator. Two episodes
 (burst2/6) fall in the trace's first 1.4 days, reserved as forecast
 context (the temporal split is stated in
 Chapter~\ref{cap:closedloop}); they are graded here by every
 forecast-free policy --- the static grid, the language-pool reactive
-baseline, and the reactive encoder baseline (which watches the observed
-image rate, needing no forecast) --- but not by any forecast policy.
+baseline, and the reactive encoder baseline (which needs no forecast)
+--- but not by any forecast policy.
 Each policy
 produces, per window, a worker schedule for the encoder pool ($C(t)$
 workers) and a configuration or replica schedule for the language pool
@@ -88,15 +88,15 @@ the language pool to TP2, and the gain is the parallelism layout, not
 the GPU budget}. At TP1 no replica count is feasible: the burst's
 ${\approx}36$k-token frames-class prefills pin TTFT p99 at
 ${\approx}$\SI{1285}{\milli\second} even at $N{=}16$ --- a
-\emph{prefill floor} that replica scaling cannot buy down. Holding the
-budget fixed isolates the mechanism: four TP1 replicas and one
+\emph{prefill floor} that replica scaling cannot buy down. Four TP1
+replicas and one
 TP2$\times$2 group are both four H100s, yet TP1$\times$4 fails every
 burst window (TTFT p99 1{,}314--1{,}331\,\si{\milli\second}) while
 TP2$\times$2 passes every one (746--792\,\si{\milli\second}), a
 1.66--1.76$\times$ tail reduction from the layout alone
 (Table~\ref{tab:base-tp}). Intra-request tensor parallelism shortens the
-single long prefill that four independent replicas can only queue, not
-buy down; Chapter~\ref{cap:twopool} quotes \SI{748.4}{\milli\second} for
+single long prefill that independent replicas can only queue;
+Chapter~\ref{cap:twopool} quotes \SI{748.4}{\milli\second} for
 the same shape on its isolation trace. Second, the encoder requirement
 swings from 2 workers on the calm day to 16 on burst5 --- the
 order-of-magnitude missizing of Chapter~\ref{cap:trace-eda}, now as a
@@ -137,11 +137,11 @@ burst5 & 1{,}316 \emph{(fail)} & 781 \emph{(pass)} & 1.68$\times$ \\
 The reactive baseline is Dynamo's SLA planner --- the production
 controller of the platform this thesis targets --- run through the same
 replay path, in both its shipped load-based variant (A) and its
-SLA-target variant (B, ARIMA-driven throughput loop plus load loop), across the seven windows (14 configurations, each at its window's optimal TP shape). The result is uniform:
-\textbf{all fourteen configurations satisfy the planner's own control
+SLA-target variant (B, ARIMA-driven throughput loop plus load loop), across the seven windows (14 configurations, each at its window's optimal TP shape).
+\textbf{All fourteen configurations satisfy the planner's own control
 law --- window-mean TTFT/ITL under its 500/50\,ms targets, with
 2--4$\times$ margin --- while violating the tail SLA} (TTFT p99
-1{,}079--3{,}495\,\si{\milli\second} across the fourteen; burst windows
+1{,}079--3{,}495\,\si{\milli\second}; burst windows
 additionally fail ITL p99 at 121--162\,\si{\milli\second}). Variants A
 and B fail alike, so loop tuning is not the issue: the defect is the
 \emph{mean-based capacity conversion} --- sizing replicas so mean
@@ -155,8 +155,7 @@ monotonically (18.6\,$\to$\,20.4) while TTFT p99 stays pinned at
 1{,}616--1{,}620\,\si{\milli\second} --- a 10\% spend increase buying
 nothing (Table~\ref{tab:base-ladder}). By the time the trailing window
 sees the onset, the capacity it orders arrives after the queue has
-formed; the money drains a backlog the policy could not
-prevent. The failure is \emph{information timing}, not thrift.
+formed: the failure is \emph{information timing}, not thrift.
 
 \begin{table}[htbp]
 \centering
@@ -223,22 +222,21 @@ one-minute onset defeats the controller at \emph{every} lead, including
 \SI{15}{\second} (p99 encoder delay 9.5--54\,\si{\second}, degrading
 toward the never-scaled limit) --- the same peak arriving against a
 thinner request stream, so the backlog outlasts any affordable lead.
-Watching the right signal is necessary but not sufficient: by the time a
-trailing window registers a fast, high-volume onset, no affordable lead
-time can deliver the workers before the queue does the damage.
+Watching the right signal is necessary but not sufficient: against a
+fast, high-volume onset, no affordable lead delivers workers before the
+queue does the damage.
 
 \section{Summary}
 \label{sec:base-summary}
 
-The two reference points are now fixed. The static optimum is
+The static optimum is
 burst-shaped: deployable only as 16 encoders + TP2$\times$2, i.e.\
 $8\times$/$2\times$ calm-day overprovisioning plus a TP-shape change no
 replica scaler performs (RQ1's missizing, priced). The reactive
 alternative fails on both pools for the same structural reason ---
-its information arrives too late and is converted through means: on the
-language pool all fourteen configurations meet their own window-mean law
-while violating the tail SLA, and spend cannot buy the tail back under
-lead; on the encoder pool even the correct, per-pool signal read
-reactively loses every window whose onset is faster than the lead time.
-What remains open is whether \emph{forecasting} those same per-pool
-signals closes the gap --- the subject of the next chapter.
+information arriving too late, converted through means: all fourteen
+language-pool configurations meet their own window-mean law while
+violating the tail SLA, spend cannot buy the tail back under lead, and
+even the correct encoder signal read reactively loses every window whose
+onset is faster than the lead time. Whether \emph{forecasting} those
+same per-pool signals closes the gap is the subject of the next chapter.

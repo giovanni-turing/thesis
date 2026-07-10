@@ -14,10 +14,10 @@ evidence.
 conventional autoscaler watches does not carry the vision pool's demand:
 statistically (a constant-fraction model explains $R^2 = 0.12$ of the
 image-rate series, against $0.65$ for decode; extreme minutes essentially
-disjoint, Jaccard $0.02$), and mechanically (the composed system's pools
-saturate an order of magnitude apart on steady traffic, and the encoder
-pool fails its tail bound at the trace's own recorded rate, at 29\% mean
-utilization, invisibly to rate- and utilization-based monitors). The
+disjoint, Jaccard $0.02$), and mechanically (pools saturating an order of
+magnitude apart on steady traffic; the encoder pool failing its tail
+bound at the trace's own recorded rate and 29\% mean utilization,
+invisibly to rate- and utilization-based monitors). The
 missizing is priced by the static grid: burst-feasible fleets need
 6--16 encoder workers and a TP2 language shape against 2 workers and TP1
 on the calm day --- an $8\times$/$2\times$ overprovisioning plus a fleet-shape
@@ -29,9 +29,8 @@ twenty (resolution, signal) cells under one rolling-origin protocol;
 accuracy degrades only marginally across a twelve-step horizon (covering
 the median burst onset); covariates are nearly irrelevant at
 provisioning cadence --- the forecasting-side echo of the decoupling ---
-and the p90 band edge is empirically calibrated (coverage 0.88--0.90)
-at provisioning cadence, which is what later converts forecasts into
-provisionable headroom.
+and the p90 band edge is empirically calibrated (coverage 0.88--0.90),
+which is what later converts forecasts into provisionable headroom.
 
 \paragraph{RQ3 --- Platform validity: yes, with measured fidelity.} The
 encoder cost model was collected on silicon for this thesis
@@ -59,9 +58,8 @@ removes queueing, leaving the service floor
 bursts under realistic replica leads only when combined with a
 tail-aware capacity conversion (a measured belief-to-knee ratio); fed
 through the planner's native mean-based conversion, the same forecast
-fails like the reactive baseline --- mean-based capacity conversion, not
-loop tuning, is the reactive planner's defect, and no spend level
-repairs it under lead. Over the 5.60-day covered span the policy holds
+fails like the reactive baseline --- the defect is the conversion, not
+loop tuning, and no spend level repairs it under lead. Over the 5.60-day covered span the policy holds
 the SLA in aggregate and inside every episode at
 \textbf{0.27--0.31$\times$ the deployable static encoder fleet's
 provisioned worker-time} (the language fleet passes the same span at
@@ -70,13 +68,12 @@ dissolves under per-episode grading --- the trace chapter's
 dashboard-masking, recurring in the evaluation metric.
 
 \paragraph{The thesis statement, revisited.} Every clause is now
-number-backed: the pools' demands decouple ($R^2=0.12$, Jaccard
-$0.02$), saturate far apart (order of magnitude on steady traffic), the
-least visible signal is the most persistent and is forecastable
-zero-shot at provisioning horizons (twenty of twenty cells), and scaling
-on those forecasts holds the tail objective through the onsets that
-defeat reactive control at every tested lead, at roughly a quarter to a
-third of the best static encoder fleet's GPU-time.
+backed by the numbers above: the pools' demands decouple and saturate far apart (RQ1),
+the least visible signal is the most persistent and forecastable
+zero-shot at provisioning horizons (RQ2), and scaling on those forecasts
+holds the tail objective through the onsets that defeat reactive control
+at every tested lead, at roughly a quarter to a third of the best static
+encoder fleet's GPU-time (RQ4).
 
 \paragraph{What bounds these claims.} The evidence is one seven-day
 production trace with an offered-work upper bound on decode demand; the
@@ -85,8 +82,8 @@ inter-pool handoff is an analytic single-stream bound, so the
 handoff or a ${\geq}100$\,Gbps fabric; the encoder cost model is
 silicon-validated but eager, a conservative bound a fused production stack
 sits below; and the vision-pool control loop is exercised in simulation and
-against the measured silicon cost, not yet as a live serving loop. None of
-these reverses the direction of the results --- each leans conservative ---
+against the measured silicon cost, not yet as a live serving loop. None
+reverses the direction of the results --- each leans conservative ---
 but each scopes their generality (Chapters~\ref{cap:closedloop} and
 \ref{cap:twopool} detail them).
 
@@ -97,16 +94,15 @@ Three extensions remain. \emph{Completing the physical encoder anchor}:
 Chapter~\ref{cap:aiconfigurator} reports a first whole-tower measurement
 on the 5090 whose $f(N)$ tracks the AIC composition at a stable
 batch-axis ratio; a single-tenant stable-clock re-run has since pinned
-the absolutes to publication grade (SM held at \SI{2400}{\mega\hertz},
-$N{=}64$ within $0.09\%$ of the batch-axis reference), leaving one real
-encoder worker serving a burst replay end to end as the remaining
-silicon-side complement to the live control-loop anchor of
-Chapter~\ref{cap:validation}.
-(A fourth candidate --- a structural language-pool predictor that
-forecasts prefill demand as text-borne plus image-driven components ---
-was tested and closed: Chapter~\ref{cap:predictors} shows the additive
-decomposition buys nothing even at onsets, because the image component
-is least forecastable exactly there.) \emph{The seam as a preview
+the absolutes (single-tenant stable clocks, $N{=}64$ within
+$0.09\%$ of the batch-axis reference); what remains is one real encoder
+worker serving a burst replay end to end, the silicon-side complement to
+the live control-loop anchor of Chapter~\ref{cap:validation}.
+(A fourth --- a structural language-pool predictor forecasting prefill
+demand as text-borne plus image-driven components --- was tested and
+closed: the additive decomposition buys nothing even at onsets, because
+the image component is least forecastable exactly there;
+Chapter~\ref{cap:predictors}.) \emph{The seam as a preview
 channel}: in a
 modality-disaggregated system the vision pool's admitted work is an
 exact, short-horizon preview of language-pool arrivals
@@ -115,5 +111,4 @@ information at scheduling timescales (chunked-prefill planning, KV
 pre-allocation) --- a natural planner extension. \emph{Workload
 breadth}: image-size-aware encoder costing when a trace with size
 information becomes available, the intermediate model family members,
-and fine-tuned (rather than zero-shot) forecasters as the upper bound on
-the forecasting side.
+and fine-tuned forecasters as the forecasting-side upper bound.

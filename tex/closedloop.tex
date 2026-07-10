@@ -28,9 +28,8 @@ forecast path of the image-rate signal (15-second bins, rolling
 origin) is read at
 quantile $q$, converted to a worker count
 $C(t) = \lceil \hat{y}_q(t) / \rho \rceil$ at per-worker capacity rating
-$\rho$ \si{img/s}, and actuated with cold-start lead $L$ (capacity
-ordered at $t$ arrives at $t{+}L$; the schedule is
-\emph{issued} $L$ early, precisely what a forecast permits) and
+$\rho$ \si{img/s}, and actuated with cold-start lead $L$ (the schedule
+is \emph{issued} $L$ early, precisely what a forecast permits) and
 3-minute scale-down hysteresis --- the same law, lead, and hysteresis as
 the reactive strawman of
 Section~\ref{sec:base-reactive-enc}, which reads the trailing observed
@@ -44,8 +43,7 @@ predictive and reactive language-pool policies share the production
 actuation path end to end; replica lead is enforced by the simulator's
 native worker-startup delay.
 
-\paragraph{Temporal split, stated as such.} The evaluation follows a
-train/test-style temporal discipline against contamination. The trace's
+\paragraph{Temporal split.} The trace's
 first 1.4 days are consumed as forecast \emph{context} --- the
 zero-shot models' rolling history before their first usable
 15-second forecast --- and are never graded; the remaining 5.60 days
@@ -87,28 +85,25 @@ The ablations locate why, and what each dial buys:
 $\rho{=}15$ it passes only 23/60 cells and fails even the calm day
 (p99 \SI{1073}{\milli\second} at every lead --- the median forecast
 sizes to the mean, allocates one worker, and reproduces on the vision
-pool the mean-sizing defect that breaks the reactive planner on
-the language pool). The calibrated p90 band edge
+pool the reactive planner's mean-sizing defect). The calibrated p90 band edge
 (Chapter~\ref{cap:predictors}: empirical coverage 0.88--0.90 at this
 cadence) is what converts a point forecast into provisionable headroom.
 \item[Lead-invariance is the signature of anticipation.] The p90 policy
-is flat from $L{=}15$ to \SI{300}{\second} on every window --- the
-p99 does not move --- while the reactive twin degrades monotonically with
+is flat (p99 unchanged) from $L{=}15$ to \SI{300}{\second} on every window, while the
+reactive twin degrades monotonically with
 lead toward its never-scaled limit. A policy that must \emph{observe} an
 onset pays for lead; a policy that \emph{anticipates} it does not.
 \item[Model choice is second-order.] All three foundation models pass
 all 60 p90/$\rho{15}$ cells, consistent with the small cross-model
-spreads of Chapter~\ref{cap:predictors}; quantile and
-capacity rating dominate the choice of forecaster. The same holds for
+spreads of Chapter~\ref{cap:predictors}. The same holds for
 the predictor a production planner ships: swapping Dynamo's own load
 predictor among ARIMA, Kalman, and Prophet leaves the SLA verdict
 unchanged on both a decode-bound day and a slow-onset burst (identical
 served-latency percentiles on the former, within \SI{1}{\milli\second}
 of mean TTFT on the latter, all failing together), because the
 integer-replica conversion quantizes the differing forecasts onto the
-same worker schedule. Predictor choice is second-order on both the
-forecasting and the served-latency side; the signal and the conversion
-are not.
+same worker schedule. Predictor choice is second-order on both sides;
+the signal and the conversion are not.
 \item[Capacity rating trades cost against fragility.] At $\rho \in
 \{10,15\}$ the p90 policy is 60/60; loosening to $\rho{=}20$/25 drops
 3/11 cells (concentrated on burst5, the binding static window, via
@@ -132,26 +127,25 @@ A binary reading of the detector must be qualified, though. Counting
 threshold crossings over the \emph{whole} 5.60-day span (outside the
 true episodes), the p90 path crosses on 70--102 bins per day where the
 observed rate does not --- while point and p50 cross essentially never
-($\leq$1 per day). Read as an alarm, p90 is trigger-happy. But it
-is not used as an alarm: it is the \emph{provisioning quantile},
-and a band that sits above the burst threshold during moderate activity
-is the calibrated headroom (coverage 0.88--0.90,
-Chapter~\ref{cap:predictors}) doing its job --- over-provisioning
-slightly, exactly the cost the $\rho$-frontier already prices
-(0.27--0.44$\times$ static). The distinction is the point: p90 is a good
-provisioning signal precisely because it is a permissive detector, while
-point and p50 are clean detectors that fail as provisioning signals
-(they size to the mean and miss the onset). The p90
-band is not a generic safety margin: at provisioning cadence it is a
-calibrated early-warning channel whose cost is accounted for.
+($\leq$1 per day). Read as an alarm, p90 is trigger-happy; but it is
+used as the \emph{provisioning quantile}, not an alarm, and a band that
+sits above the burst threshold during moderate activity is the
+calibrated headroom (coverage 0.88--0.90, Chapter~\ref{cap:predictors})
+doing its job --- over-provisioning slightly, exactly the cost the
+$\rho$-frontier already prices (0.27--0.44$\times$ static). The
+distinction is the point: p90 is a good provisioning signal precisely
+\emph{because} it is a permissive detector --- not a generic safety
+margin but, at provisioning cadence, a calibrated early-warning channel
+whose cost is accounted for --- while point and p50 are clean detectors
+that fail as provisioning signals, sizing to the mean and missing the
+onset.
 
 \section{Language pool: the conversion result}
 \label{sec:cl-llm}
 
-On the language pool the same experiment isolates a different lesson.
-With the forecast feeding Dynamo's planner and replicas subject to
-realistic startup leads of 60--300 seconds, the policy passes the burst
-window at every lead --- TTFT p99 736--757\,\si{\milli\second}, ITL p99
+On the language pool, with the forecast feeding Dynamo's planner and
+replicas subject to realistic startup leads of 60--300 seconds, the
+policy passes the burst window at every lead --- TTFT p99 736--757\,\si{\milli\second}, ITL p99
 ${\approx}$\SI{6.5}{\milli\second}, versus
 \SI{751}{\milli\second} with instant workers --- the language-pool
 mirror of the encoder's lead-invariance. But the pass has a second
@@ -217,19 +211,18 @@ The verdict is not particular to burst3: replaying every burst episode
 end-to-end, the p90 forecast passes each one at the service floor
 (TTFT p99 651--706\,\si{\milli\second} across onsets of 1--220 minutes)
 while the reactive planner fails all four
-(1{,}615--3{,}495\,\si{\milli\second}) --- the same categorical split at
-every onset speed.
+(1{,}615--3{,}495\,\si{\milli\second}).
 
-\paragraph{The language pool at week scale.} A continuous replay of the
-full 5.60-day evaluation span through the planner (the composed trace
-under the winning encoder schedule, 60-second replica lead) grades the
-language pool exactly as the encoder pool's aggregate: the p90-forecast
-policy \textbf{passes the week} at TTFT p99 \SI{651}{\milli\second}
+\paragraph{The language pool at week scale.} In a continuous replay of
+the full 5.60-day evaluation span through the planner (the composed
+trace under the winning encoder schedule, 60-second replica lead), the
+p90-forecast policy \textbf{passes the week} at TTFT p99
+\SI{651}{\milli\second}
 (ITL p99 \SI{6.4}{\milli\second}) for 518.6 H100 GPU-hours --- slightly
 below the burst-sized static TP2$\times$2 fleet's 537.4 for the same
 span (0.96$\times$; replica scaling cannot morph TP2 into TP1, so the
-language pool's dynamic savings are structurally small --- the decisive
-savings are the encoder pool's). The week verdict is
+language pool's dynamic savings are structurally small). The week
+verdict is
 forecast-model-independent: replacing Chronos with Toto or TimesFM holds
 the tail at the identical \SI{651}{\milli\second} (both pass), shifting
 only the provisioning cost (625 and 641 versus 518.6 GPU-hours) --- the
@@ -270,7 +263,7 @@ and the forecast at the median quantile
 \emph{with a tail-aware conversion} passes (\SI{651}{\milli\second}).
 The differentiator is the signal and the conversion, not forecast
 accuracy. \textbf{(c)} And the verdict holds on the live Dynamo runtime:
-both policies' online tails track their offline twins within
+both policies' online TTFT tails track their offline twins within
 run noise (Chapter~\ref{cap:validation}).}
 \label{fig:cl-framework-diff}
 \end{figure}
@@ -326,7 +319,7 @@ versus 7.74M worker-seconds, at p99 \SI{588}{\milli\second} versus the
 static fleet's 565). The forecaster does not carry the result:
 regenerating the p90 schedules from the other two model archives leaves
 the verdict unchanged --- Toto at the same service floor for
-0.27--0.31$\times$, TimesFM at 0.26--0.30$\times$ (its 300-second-lead
+0.28--0.31$\times$, TimesFM at 0.26--0.30$\times$ (its 300-second-lead
 schedule admits mild queueing, p99 \SI{664}{\milli\second}, still
 passing) --- a $\leq$4\% cost spread across models. The table quotes
 Chronos-2 deliberately: at 120M parameters it is the \emph{smallest} of
@@ -348,13 +341,11 @@ the reactive rows, though: these week cells are aggregate-graded, and the
 per-window matrix (Section~\ref{sec:cl-matrix}) shows $\rho{=}20$/25 dropping
 3/11 cells on burst5. Only $\rho\in\{10,15\}$ (0.44--0.31$\times$) is
 per-episode-clean; the quoted 0.27--0.31$\times$ sits at $\rho{=}15$, inside
-that verified range, not at the aggregate-only $\rho{>}15$ tail. The p50-forecast policy, by contrast, passes
-\emph{none} of its 48 cells --- the median forecast is a cheap policy
-that fails the SLA at every rating, the week-scale echo of the
-mean-sizing defect. The rating trades cost against margin cleanly:
-p99 rises monotonically with $\rho$ (588 at $\rho{\le}15$, up to 899 at
-$\rho{=}25$) as the fleet shrinks, and even the cheapest passing setting
-spends under a fifth of the deployable static fleet.
+that verified range, not at the aggregate-only $\rho{>}15$ tail. The
+p50-forecast policy, by contrast, passes \emph{none} of its 48 cells ---
+the week-scale echo of the mean-sizing defect. The rating trades cost
+against margin cleanly: p99 rises monotonically with $\rho$ (588 at
+$\rho{\le}15$, up to 899 at $\rho{=}25$) as the fleet shrinks.
 
 Two rows demand care. The reactive rows \emph{appear} to pass ---
 their aggregate p99 clears the bound --- but the per-episode column
@@ -362,19 +353,17 @@ shows why that reading is wrong: reactive fails burst3 at every lead
 (Section~\ref{sec:base-reactive-enc}), and the aggregate hides it
 because burst3's ${\approx}3{,}100$ requests are under half a percent
 of the span. This is the dashboard-masking phenomenon of
-Chapter~\ref{cap:trace-eda} --- burst failures invisible to averaged
-monitoring --- recurring inside the evaluation metric itself, and is
-why this thesis grades aggregate \emph{and} per-episode compliance
-jointly. The p50 row completes the symmetry: a median forecast is an
-excellent \emph{cost} policy (0.12$\times$) that fails the SLA
-outright --- cheaper than useful, as mean-based sizing was on
-the language pool.
+Chapter~\ref{cap:trace-eda} recurring inside the evaluation metric
+itself, and is why this thesis grades aggregate \emph{and} per-episode
+compliance jointly. The p50 row completes the symmetry: an excellent
+\emph{cost} policy (0.12$\times$) that fails the SLA outright ---
+cheaper than useful.
 
 \section{Limitations}
 \label{sec:cl-limits}
 
 The schedules consume archived rolling-origin forecasts --- honest with
-respect to information (no value is used before its issue time) but
+respect to information but
 offline: a deployed controller would re-forecast on drift, and its
 inference cost (${\sim}$seconds per tick on CPU-class hardware for the
 models used) is not charged to the fleet. The per-worker capacity rating
@@ -408,15 +397,12 @@ embedding-only handoff or a ${\geq}100$\,Gbps inter-pool fabric, which
 restores the quoted numbers for every policy exactly (transfer scales
 linearly with payload over bandwidth). Per-pool leads
 are swept as constants per run, not stochastic; and the two
-out-of-span episodes (burst2/6, inside the trace's first 1.4 days,
-which the zero-shot forecasters consume as context before their first
-usable 15-second forecast) are graded by the forecast-free baselines of
-Chapter~\ref{cap:baselines} --- the static grid, the language-pool
-reactive planner, and the reactive encoder strawman (which watches the
-observed image rate and needs no forecast) --- but by no \emph{forecast}
-policy, since the forecast is structurally absent there. A deployed
-system, entering the week with prior history as
-context, would not have this hole. Replay-level p99 noise is ${\approx}4\%$;
+out-of-span episodes (burst2/6, inside the first 1.4 days consumed as
+forecast context) are graded only by the forecast-free baselines of
+Chapter~\ref{cap:baselines}, never by a \emph{forecast} policy --- the
+forecast is structurally absent there, a hole a deployed system
+entering the week with prior history would not have.
+Replay-level p99 noise is ${\approx}4\%$;
 no quoted contrast is within that band.
 
 Two further scopes bound the economic headline. First, the cost ratio is
@@ -442,9 +428,9 @@ RQ4 is answered affirmatively, with the mechanism identified per pool.
 On the encoder pool, forecasting the pool's own signal at the calibrated
 p90 edge holds the tail SLA at every cold-start lead tested --- including
 the one-minute onset that defeats an identically informed reactive
-controller at \emph{every} lead --- because the forecast detects onsets
-at or before the signal itself; anticipated capacity removes queueing
-entirely, leaving the service-time floor. On the language pool the same
+controller at \emph{every} lead --- because onsets are detected at or
+before the signal itself, leaving only the service-time floor. On the
+language pool the same
 anticipation passes bursts under realistic replica leads, but only
 through a tail-aware capacity conversion, derived here as a measured
 belief-to-knee ratio, that repairs the mean-based sizing defect shared
