@@ -38,18 +38,18 @@ Modality-Disaggregated Multimodal Model Serving}
 Multimodal model serving increasingly disaggregates by modality: a
 vision-encoder pool turns images into embedding tokens, a language pool
 runs prefill and decode. Each pool is then provisioned separately, yet the
-prevailing reactive practice --- scaling on request rate or utilization ---
+prevailing reactive practice (scaling on request rate or utilization)
 assumes those signals carry every pool's demand. On the first public
 production trace of a multimodal inference cluster (Azure, one million
 requests over seven days), that assumption fails for the vision pool: image
 arrivals are nearly decoupled from request rate ($R^2 = 0.12$), an order of
-magnitude burstier, and disjoint from it at the extremes (Jaccard 0.02),
-yet also the most \emph{persistent} --- forecastable at provisioning
+magnitude burstier, and disjoint from it at the extremes (Jaccard 0.02).
+Yet they are also the most \emph{persistent}: forecastable at provisioning
 horizons, where zero-shot time-series foundation models beat classical
-baselines on every signal. A two-pool simulation platform --- encoder costs
+baselines on every signal. A two-pool simulation platform, its encoder costs
 collected on RTX 5090 silicon (upstreamed to NVIDIA's aiconfigurator) and
 validated physically, composed with Dynamo's calibrated H100 language-pool
-simulator --- reproduces the decoupling mechanically: the pools' saturation
+simulator, reproduces the decoupling mechanically: the pools' saturation
 knees sit an order of magnitude apart, and the largest burst breaks both (a
 shape-fixable prefill floor; episodic encoder queueing at 29\% mean
 utilization, invisible to rate- and utilization-based monitors). Closing the
@@ -71,21 +71,21 @@ O servi\c{c}o de modelos multimodais tem se desagregado por modalidade: um
 \emph{pool} codificador de vis\~ao converte imagens em \emph{tokens} de
 \emph{embedding}, e um \emph{pool} de linguagem executa \emph{prefill} e
 \emph{decode}. Cada \emph{pool} passa a ser provisionado separadamente, mas
-a pr\'atica reativa vigente --- escalar pela taxa de requisi\c{c}\~oes ou
-pela utiliza\c{c}\~ao --- assume que esses sinais carregam a demanda de
+a pr\'atica reativa vigente (escalar pela taxa de requisi\c{c}\~oes ou
+pela utiliza\c{c}\~ao) assume que esses sinais carregam a demanda de
 todos os \emph{pools}. No primeiro \emph{trace} p\'ublico de produ\c{c}\~ao
 de um \emph{cluster} de infer\^encia multimodal (Azure, um milh\~ao de
 requisi\c{c}\~oes em sete dias), essa hip\'otese falha para o \emph{pool} de
 vis\~ao: as chegadas de imagens s\~ao quase desacopladas da taxa de
 requisi\c{c}\~oes ($R^2 = 0{,}12$), uma ordem de magnitude mais
-intermitentes e disjuntas dela nos extremos (Jaccard 0{,}02) --- por\'em
-tamb\'em as mais \emph{persistentes} e, portanto, previs\'iveis nos
+intermitentes e disjuntas dela nos extremos (Jaccard 0{,}02). Por\'em
+s\~ao tamb\'em as mais \emph{persistentes} e, portanto, previs\'iveis nos
 horizontes de provisionamento, onde modelos de funda\c{c}\~ao de s\'eries
 temporais, em \emph{zero-shot}, superam as \emph{baselines} cl\'assicas em
-todos os sinais. Uma plataforma de simula\c{c}\~ao de dois \emph{pools} ---
+todos os sinais. Uma plataforma de simula\c{c}\~ao de dois \emph{pools}, com
 custos do codificador medidos em sil\'icio RTX 5090 (contribu\'idos ao
 aiconfigurator da NVIDIA) e validados fisicamente, compostos com o simulador
-de eventos discretos do Dynamo sob tempos H100 calibrados --- reproduz o
+de eventos discretos do Dynamo sob tempos H100 calibrados, reproduz o
 desacoplamento mecanicamente: os \emph{pools} saturam a escalas separadas
 por uma ordem de magnitude, e a maior rajada quebra ambos (um piso de
 \emph{prefill} corrig\'ivel por uma mudan\c{c}a de paralelismo; enfileiramento
