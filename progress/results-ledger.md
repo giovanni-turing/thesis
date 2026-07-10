@@ -301,4 +301,4 @@ artifact:   predictors/results/metrics/additive_structural_ablation.json; predic
 command:    eda/.venv/bin/python predictors/additive_structural_ablation.py  (archive-only; no GPU/sim)
 feeds:      tex/predictors.tex §Do covariates help — new closing ¶; CLOSES roadmap "structural-additive LLM predictor" QUEUED item. R2=0.94, image term 34-36% of ctx mass (materially image-driven, NOT the trivial escape); additive ties/loses pooled (+0.07..+1.31pp); no onset edge (steep-rise flips sign by resolution); MECHANISM: image forecast is WORST component at onsets (75-100% WAPE vs direct-ctx 58-72% vs requests 33-38%) — image spike unforecastable exactly where the bet needed it. Do NOT graduate to planner run
 supersedes: new (last queued unrun idea)
-commit:     (this commit; artifacts from branch exp/additive-structural-predictor bee4c62)
+commit:     305f75f (branch bee4c62)
