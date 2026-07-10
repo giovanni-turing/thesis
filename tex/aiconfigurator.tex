@@ -342,15 +342,21 @@ identical in every window, differing only in the per-batch cost $f(N)$
 diverge) --- and $f(N)$ is a cheap, deterministic per-accelerator
 benchmark: the twelve batch sizes here are memoized in minutes. Re-running
 that same search with the measured 5090 $f(N)$ substituted for the
-composition re-derives the fleet directly. The dense burst5 is unchanged
-at \num{16} workers --- its volume-forced sizing already carries the
-headroom to absorb the $1.4$--$1.6\times$ underprice, and encoder-delay
-p99 moves only \SI{588}{} to \SI{784}{\milli\second}, both feasible ---
-while the lean burst3, sized right at the p99 knee, grows from \num{7} to
-\num{13}, its composition-sized fleet failing on silicon at
-\SI{1863}{\milli\second}. The optimism is absorbed where the fleet is
-large and corrected where it is lean, by the same queue search that
-produced the sizing; re-benchmarking $f(N)$ is the only per-silicon step.
+composition re-derives the fleet across all six burst windows (the AIC
+path first reproducing the grid's sizing exactly in every one). What
+decides robustness is which constraint binds $C^{*}$. Five of the six are
+sized at the p99 latency knee (\num{6}--\num{8} workers), where queueing
+is steep; there the $1.4$--$1.6\times$ per-batch underprice amplifies to a
+near-doubling of the fleet ($1.86$--$2.17\times$, median $2\times$ --- e.g.\
+burst3 grows \num{7}$\to$\num{13}), each composition-sized fleet failing on
+silicon at encoder-delay p99 1{,}420--1{,}846\,\si{\milli\second}. The sole
+exception is burst5, alone sized by the sustained-volume divergence bound
+(\num{16} workers, far above its p99 knee): that headroom absorbs the
+underprice untouched (p99 \SI{588}{} to \SI{784}{\milli\second}, both
+feasible). The optimism is corrected by ${\approx}2\times$ where the fleet
+sits at the latency knee and absorbed where it is divergence-sized, by the
+same queue search that produced the sizing; re-benchmarking $f(N)$ is the
+only per-silicon step.
 
 \section{Validation against physical measurement}
 \label{sec:aic-validation}
