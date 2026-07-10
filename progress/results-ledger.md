@@ -329,7 +329,7 @@ artifact:   collector_artifacts/phaseE_physical_anchor/anchor_sdpa_locked2400.js
 command:    eda/.venv/bin/python bench_encoder_anchor.py  (sdpa, single-tenant GPU, persistence-on stable clocks SM 2377-2400 / mem 14001; 5x50 @448px, N{1,2,4,6,8,16,32,64}) vs aic_f_n_postinfill.csv
 feeds:      tex/aiconfigurator.tex §validation (anchor ¶ — was "locked-clock re-run = future work") + tex/conclusion.tex future-work item. Single-tenant STABLE-clock re-run reproduces the unlocked anchor's batch-axis ratio: mean 1.47 on the matched grid {1,6,8,16,32,64} (=1.469, the reported unlocked mean to the digit); 1.43 / band 1.32-1.62 on the denser grid (adds N=2,4 dipping to 1.32-1.33); N=64 511.68 ms within 0.09% of the phase-B 511.23 ref; CI95<=0.05 ms. Absolutes now publication-grade (SM held 2400 = 0.3% off the 2407 target). CAVEAT: artifact clocks_locked=False — clocks were STABLE via single-tenant + persistence, NOT a hard -lgc lock; remaining Phase-E future work is one REAL encoder worker serving a burst replay end to end (here burst replay was a faithful simulate_vision_pool port, burst3_fifo_replay.json, not a live worker)
 supersedes: the "locked-clock re-run for publication-grade absolutes = future work" framing — commit 1feb1de landed this confirmation but was never ledgered; this stamps it and narrows the open item to the real-worker burst replay
-commit:     1feb1de (artifact); ledger+tex reconciliation: <pending this session>
+commit:     1feb1de (artifact); ledger+tex reconciliation: 66e33fd
 
 ### LLM week-scale p50 + model coverage — the conversion-vs-quantile distinction  (2026-07-10)
 artifact:   simulation/results/llm_week/week_fc_p50.report.json (+week_fc_p90_{toto,timesfm} pending)
@@ -343,4 +343,4 @@ artifact:   simulation/results/grid/llm_burst{1..5}_C*_{N4_aic,N2_TP2_aic}.json 
 command:    tabulate ttft_ms.p99 from matched-encoder-C pairs: llm_<W>_C<C>_N4_aic (TP1x4 = 4 GPU) vs llm_<W>_C<C>_N2_TP2_aic (TP2x2 = 4 GPU), windows burst1-5
 feeds:      tex/baselines.tex §"static optimum" — NEW Table tab:base-tp + sharpened structural-fact #1. At IDENTICAL 4-GPU cost TP1x4 FAILS every burst window (TTFT p99 1314-1331 ms) while TP2x2 PASSES every one (746-792 ms), a 1.66-1.76x tail cut from the parallelism LAYOUT alone. Isolates the TP benefit from GPU budget — answers "why TP2 not TP1 for an 8B model": the burst bottleneck is a per-request PREFILL-LATENCY floor (36k-token frames-class prefills), not throughput; only intra-request tensor-parallelism shortens the single prefill that independent replicas can only queue. ITL p99 within bound in both columns (decode never the issue). Win is concentrated in the p90/p99 tail (means 176-223 vs 112-139 ms close)
 supersedes: the prior TP1-vs-TP2 framing that contrasted the TP1x16 plateau (16 GPU) against TP2x2 (4 GPU) — now the clean iso-cost 4-GPU A/B across all 5 windows
-commit:     <pending this session>
+commit:     66e33fd
