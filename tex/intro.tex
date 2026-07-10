@@ -495,9 +495,11 @@ Finally, the control loop itself is anchored to the real stack: the
 winning policy and the reactive baseline, replayed against the live
 Dynamo runtime (real control plane, mocked engines) on the
 fastest-onset burst, reproduce the simulated verdicts in both
-directions with TTFT p99 within 1--7\% (both policies' ITL p99 also agree
-and stay far under bound, the forecast policy's low ITL differing more in
-relative terms) and provisioned replica-time within 8\% (Chapter~\ref{cap:validation}); the physical
+directions with TTFT p99 within 1--7\% (the ITL p99 verdicts also agree
+in both directions: sub-bound for the forecast policy, 11.5 versus
+5.3\,ms, and \emph{above} the \SI{100}{\milli\second} bound for the
+reactive policy, 150.7 versus 160.3\,ms) and provisioned replica-time
+within 8\% (Chapter~\ref{cap:validation}); the physical
 encoder-worker anchor remains future work.
 
 \section{Organization}
