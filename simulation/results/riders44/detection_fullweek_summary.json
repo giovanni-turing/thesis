@@ -1,0 +1,89 @@
+{
+ "detection_delay_source": "detection_delay.json",
+ "fullweek_fa_source": "fullweek_false_alarms.json",
+ "combined": {
+  "chronos": {
+   "p90_fullweek_fa_per_day": 97.593,
+   "p90_fullweek_fa_count": 486,
+   "point_p50_fa_per_day": 0.201
+  },
+  "toto": {
+   "p90_fullweek_fa_per_day": 101.81,
+   "p90_fullweek_fa_count": 507,
+   "point_p50_fa_per_day": 0.0
+  },
+  "timesfm": {
+   "p90_fullweek_fa_per_day": 69.881,
+   "p90_fullweek_fa_count": 348,
+   "point_p50_fa_per_day": 0.0
+  }
+ },
+ "p90_onset_detection": {
+  "chronos": [
+   [
+    "ep1/burst1",
+    true,
+    -210.0
+   ],
+   [
+    "ep3/burst3",
+    true,
+    165.0
+   ],
+   [
+    "ep4/burst4",
+    true,
+    120.0
+   ],
+   [
+    "ep5/burst5",
+    true,
+    30.0
+   ]
+  ],
+  "toto": [
+   [
+    "ep1/burst1",
+    true,
+    -30.0
+   ],
+   [
+    "ep3/burst3",
+    true,
+    -15.0
+   ],
+   [
+    "ep4/burst4",
+    true,
+    120.0
+   ],
+   [
+    "ep5/burst5",
+    true,
+    30.0
+   ]
+  ],
+  "timesfm": [
+   [
+    "ep1/burst1",
+    true,
+    -30.0
+   ],
+   [
+    "ep3/burst3",
+    true,
+    -15.0
+   ],
+   [
+    "ep4/burst4",
+    true,
+    120.0
+   ],
+   [
+    "ep5/burst5",
+    true,
+    -150.0
+   ]
+  ]
+ }
+}

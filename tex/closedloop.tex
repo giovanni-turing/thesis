@@ -232,6 +232,21 @@ week outright} (TTFT p99 1{,}197\,\si{\milli\second}) while spending
 281.8 GPU-hours: half the budget, and the wrong tail --- at week scale
 as at window scale, spend is not the defect.
 
+The quantile matters less here than on the encoder pool, and the
+contrast is diagnostic. The p50 forecast also \textbf{passes the week}
+on the language pool (TTFT p99 \SI{828}{\milli\second}, for 319.9
+GPU-hours --- 38\% cheaper than p90, with correspondingly less tail
+headroom), whereas on the encoder pool p50 fails every one of its 48
+week-scale cells. The mechanism is the burstiness gap: the tail-aware
+conversion is applied to both forecasts, but image demand is bursty
+enough that a median forecast's mean-sizing floods the encoder FIFO,
+while the smoother context-token demand is served adequately even at
+p50 once the conversion supplies enough replicas. What is universal
+across pools is the \emph{conversion} --- mean-based reactive control
+fails both, tail-aware forecast control passes both; what is
+pool-specific is how much the \emph{quantile} adds, and it adds most
+where the signal is burstiest.
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figuras/pred/pred_framework_diff.png}
