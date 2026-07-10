@@ -133,13 +133,15 @@ minute, 938 at one hour
 (Figure~\ref{fig:eda-arrival}; a seven-day record cannot establish
 asymptotically unbounded growth, but within the window every aggregation
 scale an autoscaler could use is overdispersed).
-Spectrally, a real diurnal harmonic family (\SI{24}{\hour} line with
+Spectrally, a diurnal harmonic family (\SI{24}{\hour} line with
 12/8/\SI{6}{\hour} overtones; in the request signal the 12- and 8-hour
 harmonics exceed the 24-hour fundamental, indicating a multi-peaked daily
 profile) sits on a strong $1/f^{\beta}$ long-range-dependent background.
-A bin-exact significance test rejects any \emph{non-harmonic} sub-diurnal
-spectral line, and periods of \SI{84}{\hour} and above are record-length
-artifacts of the seven-day window rather than weekly cycles.
+No sharp non-harmonic line dominates the sub-diurnal band above that
+background --- the few sub-diurnal peaks that surface are consistent with
+sidelobes of the diurnal line in a seven-cycle record --- and periods of
+\SI{84}{\hour} and above are record-length artifacts of the seven-day
+window rather than weekly cycles.
 
 \begin{figure}[htbp]
 \centering
@@ -294,9 +296,14 @@ ramp to peak in one to two minutes, comparable to replica cold-start times.}
 \label{sec:eda-predictability}
 
 The image signal pairs the highest burstiness with the strongest
-persistence: 69 minutes of autocorrelation half-life
-(autocorrelation 0.64 at a 5-minute lag) and $H \approx 0.93$
-(Figure~\ref{fig:eda-acf}). Its
+persistence: 69 minutes of autocorrelation half-life on the raw series
+(autocorrelation 0.64 at a 5-minute lag) and $H \approx 0.93$, the latter
+fit as the $1/f^{\beta}$ slope over the sub-diurnal band (10 minutes to
+12 hours, clear of the diurnal fundamental), so it reflects scale-free
+structure rather than the daily cycle (Figure~\ref{fig:eda-acf}). The
+image-versus-request \emph{contrast} (69 versus 9 minutes) is robust to
+seasonality in any case, both signals carrying the same diurnal component.
+Its
 long-range dependence also suggests that purely short-memory models
 (Poisson or low-order ARMA) may structurally underfit it --- a risk, not
 a theorem, which Chapter~\ref{cap:predictors} tests empirically.

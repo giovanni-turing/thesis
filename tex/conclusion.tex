@@ -78,6 +78,18 @@ on those forecasts holds the tail objective through the onsets that
 defeat reactive control at every tested lead, at roughly a quarter to a
 third of the best static encoder fleet's GPU-time.
 
+\paragraph{What bounds these claims.} The evidence is one seven-day
+production trace with an offered-work upper bound on decode demand; the
+inter-pool handoff is an analytic single-stream bound, so the
+\SI{588}{\milli\second} floor and the cost ratio assume an embedding-only
+handoff or a ${\geq}100$\,Gbps fabric; the encoder cost model is
+silicon-validated but eager, a conservative bound a fused production stack
+sits below; and the vision-pool control loop is exercised in simulation and
+against the measured silicon cost, not yet as a live serving loop. None of
+these reverses the direction of the results --- each leans conservative ---
+but each scopes their generality (Chapters~\ref{cap:closedloop} and
+\ref{cap:twopool} detail them).
+
 \section{Future work}
 \label{sec:conc-future}
 
