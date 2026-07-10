@@ -36,7 +36,7 @@ property of the simulated serving system itself.
 \label{sec:sim-arch}
 
 Dynamo's discrete-event worker simulator (the \emph{mocker}, as this
-document calls it throughout; marketed as DynoSim) models text
+document calls it; marketed as DynoSim) models text
 token processing only, so the vision stage cannot live inside it. The
 composition instead runs the vision pool as an event-driven FIFO of $C$
 encoder workers \emph{inside the workload converter}, costed per forward
@@ -407,8 +407,7 @@ would strain even TP2, and the honest reading is that the burst-window
 language verdict is convention-dependent while the vision verdict is
 not. The choice made here --- \texttt{ContextTokens} verbatim --- keeps
 the workload self-consistent with the trace at the cost of
-target-model consistency; a both-conventions sensitivity run was not
-performed and remains future work.
+target-model consistency; a both-conventions sensitivity run remains future work.
 
 All encoder timing derives from a single RTX~5090 node (locked clocks);
 cross-unit silicon variance is unquantified. The vision pool inherits

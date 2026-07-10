@@ -13,7 +13,7 @@ new AIC system and the two operator families dominating vision-encoder
 cost --- non-causal encoder attention and bf16 GEMM --- collected on
 its silicon under locked clocks. Second, the analytical
 prediction of the full vision-encoder forward pass was validated against
-direct measurement of the same network on the same GPU at the same clocks:
+direct measurement of the same network, GPU, and clocks:
 the collected attention operator agrees within ${\approx}3\%$, and the end-to-end
 kernel-time ledger closes with no unexplained residual. Third, the
 calibrated encoder model was composed with Dynamo's discrete-event
@@ -57,7 +57,7 @@ values; tensor-core throughput scales from the same-die
 \texttt{rtx\_pro\_6000\_server} entry's per-SM, per-MHz throughput at the
 official \SI{2407}{\mega\hertz} boost clock, yielding
 \SI{419}{\tera\flop\per\second} dense bf16, consistent with published
-specifications. Estimated fields are marked as such in the system file
+specifications. Estimated fields are marked in the system file
 for later refinement.
 
 \subsection{Collection methodology}
@@ -101,7 +101,7 @@ pre-skip doomed shapes, clear the allocator cache after
 failures, and restart the container between chunks. Seventeen small
 shapes ($M{\le}2$) that spuriously reported out-of-memory in the
 fragmentation wake of giant-shape failures were requeued in a fresh
-container and collected cleanly --- a failure mode worth noting on
+container and collected cleanly --- a failure mode on
 memory-constrained cards.
 
 \subsection{Collected dataset}
@@ -133,7 +133,7 @@ container, collector code, locked clocks; zero errors) and merged,
 bringing the dataset to \num{7760} attention and \num{34710} GEMM rows and
 making the 448-pixel query path grid-exact. The correction shifted
 predicted encoder costs by $+4.3\%$ at one image, $-5.8\%$ at six, and
-under $1\%$ at 32 and above. Two dataset states therefore appear in this
+under $1\%$ at 32 and above. Two dataset states appear in this
 document, each number labeled by exactly one: the
 \emph{raw slice} (\num{7679}/\num{34326} rows; single-image cost
 \SI{7.82}{\milli\second}) is the baseline the validation of
@@ -312,7 +312,7 @@ the served silicon slower than the model, conservative for every
 infeasibility claim. The deployable consequence is quantified by the
 fleet-sizing search below, not by these one-worker ratios. The first anchor ran at
 near-boost but \emph{unlocked} clocks; because the batch-axis ratio is
-clock-invariant it is the reported quantity, and a single-tenant re-run
+clock-invariant it is the reported quantity, and a re-run
 at stable clocks (single-tenant, persistence-mode; the timed forwards
 delivered SM 2377--2385\,\si{\mega\hertz} under load, not a hard clock
 lock) reproduces it --- mean $1.47$ on the

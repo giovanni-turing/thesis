@@ -22,9 +22,8 @@ against the deployable static fleet.
 \section{From forecast to worker schedule}
 \label{sec:cl-controller}
 
-The controller is deliberately minimal, so any advantage is
-attributable to the information source rather than control
-sophistication. For the \emph{encoder pool}, the archived stitched
+The controller is deliberately minimal, so any advantage traces to
+the information source, not control sophistication. For the \emph{encoder pool}, the archived stitched
 forecast path of the image-rate signal (15-second bins, rolling
 origin) is read at
 quantile $q$, converted to a worker count
@@ -133,8 +132,8 @@ A binary reading of the detector must be qualified, though. Counting
 threshold crossings over the \emph{whole} 5.60-day span (outside the
 true episodes), the p90 path crosses on 70--102 bins per day where the
 observed rate does not --- while point and p50 cross essentially never
-($\leq$1 per day). Read as an alarm, p90 is trigger-happy. But the p90
-path is not used as an alarm: it is the \emph{provisioning quantile},
+($\leq$1 per day). Read as an alarm, p90 is trigger-happy. But it
+is not used as an alarm: it is the \emph{provisioning quantile},
 and a band that sits above the burst threshold during moderate activity
 is the calibrated headroom (coverage 0.88--0.90,
 Chapter~\ref{cap:predictors}) doing its job --- over-provisioning
@@ -159,7 +158,7 @@ mirror of the encoder's lead-invariance. But the pass has a second
 necessary ingredient: a \emph{tail-aware capacity conversion}. Run with
 the planner's native conversion (replicas $=$ mean demand over mean
 per-replica throughput), the \emph{same forecast} fails much like the
-reactive baseline --- marginally worse, in fact
+reactive baseline --- marginally worse
 (Table~\ref{tab:cl-triad}): signal quality
 cannot compensate for a mean-to-tail conversion error.
 

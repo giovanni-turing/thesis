@@ -26,12 +26,11 @@ one per pool, continuously, under load that moves by the minute.
 
 This thesis studies how the pools of a modality-disaggregated multimodal
 serving system should be scaled, and defends a specific answer: each pool
-must be provisioned on a forecast of \emph{its own} demand signal. The
-argument builds across the document. In a production multimodal
+must be provisioned on a forecast of \emph{its own} demand signal. In a production multimodal
 trace, vision demand is nearly decoupled from the request rate a
 conventional autoscaler watches, and the burstiest demand signal is also
-the most persistent --- the most forecastable
-(Chapter~\ref{cap:trace-eda}). Pretrained time-series foundation models
+the most \emph{persistent}, hence forecastable at the horizons provisioning
+needs (Chapter~\ref{cap:trace-eda}). Pretrained time-series foundation models
 turn that persistence into zero-shot forecasts that beat classical
 baselines on every demand signal at every resolution tested
 (Chapter~\ref{cap:predictors}). A vision-stage cost model, collected on

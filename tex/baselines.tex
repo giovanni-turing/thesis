@@ -9,7 +9,7 @@
 \chaptermark{Provisioning Baselines}
 
 Any claim that predictive provisioning pays must be made against the two
-policies a practitioner would actually reach for: the best \emph{static}
+policies a practitioner would reach for: the best \emph{static}
 fleet, and a \emph{reactive} autoscaler. This chapter establishes both on
 the platform of Chapter~\ref{cap:twopool}, under the evaluation SLA
 defined there (per window: language TTFT p99 $<$ \SI{1}{\second} and ITL
@@ -42,8 +42,7 @@ image rate, needing no forecast) --- but not by any forecast policy.
 Each policy
 produces, per window, a worker schedule for the encoder pool ($C(t)$
 workers) and a configuration or replica schedule for the language pool
-($\mathrm{TP}\times N$ H100 workers), and is graded on the resulting
-two-pool replay. Cold-start lead is modeled explicitly: a scale-up
+($\mathrm{TP}\times N$ H100 workers), and is graded on the two-pool replay. Cold-start lead is modeled explicitly: a scale-up
 decision issued at $t$ delivers usable capacity at $t+L$, with $L$
 swept per pool (encoder $L \in \{15,30,45,300\}$\,\si{\second},
 brackets spanning orchestration regimes above the measured
@@ -138,8 +137,7 @@ burst5 & 1{,}316 \emph{(fail)} & 781 \emph{(pass)} & 1.68$\times$ \\
 The reactive baseline is Dynamo's SLA planner --- the production
 controller of the platform this thesis targets --- run through the same
 replay path, in both its shipped load-based variant (A) and its
-SLA-target variant (B, ARIMA-driven throughput loop plus load loop), across the seven windows (14 configurations
-total, each at its window's optimal TP shape). The result is uniform:
+SLA-target variant (B, ARIMA-driven throughput loop plus load loop), across the seven windows (14 configurations, each at its window's optimal TP shape). The result is uniform:
 \textbf{all fourteen configurations satisfy the planner's own control
 law --- window-mean TTFT/ITL under its 500/50\,ms targets, with
 2--4$\times$ margin --- while violating the tail SLA} (TTFT p99
@@ -148,7 +146,7 @@ additionally fail ITL p99 at 121--162\,\si{\milli\second}). Variants A
 and B fail alike, so loop tuning is not the issue: the defect is the
 \emph{mean-based capacity conversion} --- sizing replicas so mean
 throughput meets mean demand leaves no room for the tail the SLA
-actually prices.
+prices.
 
 Nor can spend buy the tail back under realistic lead. Holding a 60-second
 replica lead and tightening the planner's window-mean targets from
@@ -183,7 +181,7 @@ Planner target (TTFT/ITL, ms) & H100 GPU-h & TTFT p99 (ms) & ITL p99 (ms) \\
 \label{sec:base-reactive-enc}
 
 The encoder pool has no native reactive controller, so the fair strawman
-is built to be \emph{identically informed} with the predictive
+is \emph{identically informed} with the predictive
 policy of the next chapter: the same worker-mapping law (workers
 $= \lceil \text{demand} / \rho \rceil$ at per-worker capacity rating
 $\rho$ \si{img/s}, hysteresis 3 minutes, lead $L$), fed by the trailing
