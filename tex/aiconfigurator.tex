@@ -302,8 +302,14 @@ more slowly than the composition assumes). The production
 bound ($1.37$--$1.47$). End to end, replaying the burst3 image schedule
 through the encoder FIFO under AIC cost reproduces the simulator's p99
 encoder delay to the digit (54{,}169.6 versus 54{,}169.5\,ms), and under
-measured cost raises it $2.87\times$ --- the served silicon is slightly
-slower than the model, conservative for every infeasibility claim. The first anchor ran at
+measured cost raises it $2.87\times$. A live per-batch silicon replay ---
+each dispatched batch size measured on the 5090 at stable clocks, the FIFO
+then replayed on those times --- reproduces this on burst3 ($2.89\times$)
+and shows the gap \emph{widening} to $6.65\times$ on the denser burst5
+schedule (555k images): the per-batch $1.4$--$1.6\times$ slowdown compounds
+through the FIFO backlog, sharply more so under heavier bursts. The served
+silicon is slower than the model, and increasingly so where the burst is
+densest --- conservative for every infeasibility claim. The first anchor ran at
 near-boost but \emph{unlocked} clocks; because the batch-axis ratio is
 clock-invariant it is the reported quantity, and a single-tenant re-run
 at stable clocks (SM held at \SI{2400}{\mega\hertz}, within $0.3\%$ of
