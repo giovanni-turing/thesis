@@ -1,0 +1,175 @@
+#!/usr/bin/env python
+"""Multi-worker silicon feasibility (Phase 5.2 extension #2).
+
+Question: the single-worker silicon replay trivially fails, but the
+*deployable* claim is a C-worker fleet. Does the AIC-sized encoder fleet
+(the grid's feasible C*) still meet the encoder-delay SLA when the per-batch
+service time is REAL RTX-5090 silicon, or does the measured 1.4-1.6x f(N)
+inflation push the FIFO over the bound and demand more workers?
+
+Method: reuse the grid's EXACT vision-pool dispatch (import
+simulate_vision_pool + percentiles from workload/trace_to_two_pool.py --
+greedy cross-request batching to cap, parallel-chunk dispatch for oversized
+requests) and swap only the encoder cost object:
+  * AICEncoder      -- f(N) from aic_f_n_postinfill.csv (the grid's costing)
+  * MeasuredEncoder -- f(N) = the stable-clock silicon anchor, linearly
+                       interpolated between the 12 measured N points; the
+                       measured points already cover N=64 and the request
+                       remainders, and cross-request batching totals in 1..64
+                       are interpolated (f(N) is smooth: fixed overhead + ~linear).
+No GPU: the silicon f(N) is the memoized stable-clock measurement.
+
+Per window, sweep worker count W and report the minimum feasible C* for each
+cost model (encoder-delay p99 < 1000 ms), i.e. how far the AIC sizing must be
+inflated to survive real silicon.
+"""
+import bisect
+import csv
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, "/home/gio/tese/workload")
+from trace_to_two_pool import simulate_vision_pool, percentiles, build_series  # noqa: E402
+
+HERE = Path(__file__).resolve().parent
+CAP = 64
+TOKENS_PER_IMAGE = 196
+LLM_HIDDEN = 4096
+BYTES_PER_ELEM = 2
+SLA_MS = 1000.0
+HANDOFF_RTT_MS = 0.2
+HANDOFF_GBPS = 25.0
+
+
+def handoff_ms(n_img):
+    if HANDOFF_GBPS <= 0 or n_img <= 0:
+        return 0.0
+    n_bytes = TOKENS_PER_IMAGE * n_img * LLM_HIDDEN * BYTES_PER_ELEM
+    return HANDOFF_RTT_MS + n_bytes / (HANDOFF_GBPS * 1e9 / 8) * 1e3
+
+
+class _Encoder:
+    """Duck-type of EncoderCostModel: latency_ms(n)->(ms, n_post),
+    chunked_service_ms(n, cap)->ms, post_merge_tokens(n)->int."""
+    def _f(self, n):  # ms for a single forward of n images
+        raise NotImplementedError
+
+    def latency_ms(self, n):
+        return (self._f(int(n)), TOKENS_PER_IMAGE * int(n))
+
+    def chunked_service_ms(self, num_images, cap):
+        full, rem = divmod(int(num_images), cap)
+        total = full * self._f(cap) if full else 0.0
+        if rem:
+            total += self._f(rem)
+        return total
+
+    def post_merge_tokens(self, num_images):
+        return TOKENS_PER_IMAGE * max(0, int(num_images))
+
+
+class AICEncoder(_Encoder):
+    def __init__(self):
+        p = HERE.parent / "phaseB_batch_validation" / "aic_f_n_postinfill.csv"
+        self.tab = {int(float(r["n_images"])): float(r["aic_ms"])
+                    for r in csv.DictReader(open(p))}
+
+    def _f(self, n):
+        return self.tab.get(n) or self.tab[min(self.tab, key=lambda x: abs(x - n))]
+
+
+class MeasuredEncoder(_Encoder):
+    """Stable-clock silicon f(N), linearly interpolated between measured N."""
+    def __init__(self, measured_fn):
+        self.xs = sorted(int(k) for k in measured_fn)
+        self.ys = [float(measured_fn[str(x)]) for x in self.xs]
+
+    def _f(self, n):
+        n = int(n)
+        if n <= self.xs[0]:
+            return self.ys[0] * n / self.xs[0]  # scale from smallest anchor
+        if n >= self.xs[-1]:
+            return self.ys[-1]
+        j = bisect.bisect_left(self.xs, n)
+        if self.xs[j] == n:
+            return self.ys[j]
+        x0, x1, y0, y1 = self.xs[j - 1], self.xs[j], self.ys[j - 1], self.ys[j]
+        return y0 + (y1 - y0) * (n - x0) / (x1 - x0)
+
+
+def load_reqs(path):
+    """burst_reqs.json: [[arrival_s, n_images], ...] -> (arr_ms, idx, n) FIFO."""
+    raw = json.load(open(path))
+    raw = sorted(raw, key=lambda r: r[0])
+    return [(float(a) * 1000.0, i, int(n)) for i, (a, n) in enumerate(raw)]
+
+
+def eval_point(reqs, n_workers, encoder, total_reqs):
+    """Replicates the grid's vision feasibility gate exactly:
+    feasible = (encoder_delay p99 < SLA) AND (not queue_divergent).
+    The grid's p99 is over ALL window requests: text-only requests enter
+    as 0-delay, so we pad (total_reqs - n_image_reqs) zeros before the
+    percentile (else the tail percentile is taken over image reqs only and
+    over-reads by ~15-20% on text-heavy windows)."""
+    finish, batches, _chunked = simulate_vision_pool(reqs, n_workers, CAP, encoder)
+    delays = [(finish[i] - arr) + handoff_ms(n) for arr, i, n in reqs if n > 0]
+    delays += [0.0] * max(0, total_reqs - len(delays))
+    p99 = percentiles(delays)["p99"]
+    t_end_ms = max((fin for _s, fin, _t, _nf in batches), default=0.0)
+    series = build_series(reqs, batches, t_end_ms)
+    arr_end_ms = max((arr for arr, _i, _n in reqs), default=0.0)
+    arr_end_sec = min(len(series) - 1, int(arr_end_ms // 1000)) if series else 0
+    q = [s["queue_imgs_end"] for s in series[: arr_end_sec + 1]]
+    q_median = sorted(q)[len(q) // 2] if q else 0
+    q_end = q[-1] if q else 0
+    divergent = bool(q_end > 10 * max(1, q_median))
+    return p99, divergent, ((p99 < SLA_MS) and not divergent)
+
+
+def feasible_cstar(reqs, encoder, sweep, total_reqs):
+    row = {}
+    cstar = None
+    for w in sweep:
+        p99, div, feas = eval_point(reqs, w, encoder, total_reqs)
+        row[str(w)] = {"p99": round(p99, 1), "div": div}
+        if cstar is None and feas:
+            cstar = w
+    return cstar, row
+
+
+def main():
+    sweep = list(range(1, 21)) + [24, 28, 32, 40, 48]
+    aic = AICEncoder()
+    out = {"sla_ms": SLA_MS, "sweep": sweep, "windows": {}}
+    # total_reqs = the grid window's request count (image+text); text-only enter as 0-delay
+    for win, reqs_file, grid_cstar, total_reqs in [("burst3", "burst3_reqs.json", 7, 3093),
+                                                   ("burst5", "burst5_reqs.json", 16, 8983)]:
+        reqs = load_reqs(HERE / reqs_file)
+        meas = MeasuredEncoder(json.load(open(HERE / "oneworker_artifact" /
+                                              f"silicon_{win}.json"))["measured_fn"])
+        aic_cstar, aic_row = feasible_cstar(reqs, aic, sweep, total_reqs)
+        sil_cstar, sil_row = feasible_cstar(reqs, meas, sweep, total_reqs)
+        infl = (sil_cstar / aic_cstar) if (aic_cstar and sil_cstar) else None
+        out["windows"][win] = {
+            "n_image_reqs": len(reqs), "total_images": sum(n for _, _, n in reqs),
+            "grid_cstar_reported": grid_cstar,
+            "aic_feasible_cstar": aic_cstar, "silicon_feasible_cstar": sil_cstar,
+            "worker_inflation_x": round(infl, 2) if infl else None,
+            "aic_p99_by_W": aic_row, "silicon_p99_by_W": sil_row,
+        }
+        gk = str(grid_cstar)
+        print(f"[{win}] reqs={len(reqs)} imgs={sum(n for _,_,n in reqs)}  "
+              f"grid C*={grid_cstar}")
+        print(f"   AIC      feasible C* = {aic_cstar}  (@C*grid p99="
+              f"{aic_row[gk]['p99']} div={aic_row[gk]['div']})")
+        print(f"   SILICON  feasible C* = {sil_cstar}  (@C*grid p99="
+              f"{sil_row[gk]['p99']} div={sil_row[gk]['div']})  "
+              f"worker-inflation {out['windows'][win]['worker_inflation_x']}x")
+    dest = HERE / "silicon_multiworker.json"
+    json.dump(out, open(dest, "w"), indent=1)
+    print(f"-> {dest}")
+
+
+if __name__ == "__main__":
+    main()
