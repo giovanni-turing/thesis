@@ -335,6 +335,23 @@ capacity is, if anything, lower than simulated, making burst-time
 saturation earlier, not later --- and the band they define is carried as
 a documented sensitivity rather than absorbed.
 
+The fleet-sizing consequence is a calibration input, not a hazard. The
+encoder-worker count is set by a single queue-feasibility search ---
+identical in every window, differing only in the per-batch cost $f(N)$
+(the encoder-delay p99 must clear the SLA and the backlog must not
+diverge) --- and $f(N)$ is a cheap, deterministic per-accelerator
+benchmark: the twelve batch sizes here are memoized in minutes. Re-running
+that same search with the measured 5090 $f(N)$ substituted for the
+composition re-derives the fleet directly. The dense burst5 is unchanged
+at \num{16} workers --- its volume-forced sizing already carries the
+headroom to absorb the $1.4$--$1.6\times$ underprice, and encoder-delay
+p99 moves only \SI{588}{} to \SI{784}{\milli\second}, both feasible ---
+while the lean burst3, sized right at the p99 knee, grows from \num{7} to
+\num{13}, its composition-sized fleet failing on silicon at
+\SI{1863}{\milli\second}. The optimism is absorbed where the fleet is
+large and corrected where it is lean, by the same queue search that
+produced the sizing; re-benchmarking $f(N)$ is the only per-silicon step.
+
 \section{Validation against physical measurement}
 \label{sec:aic-validation}
 
