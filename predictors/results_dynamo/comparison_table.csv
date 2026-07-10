@@ -1,0 +1,17 @@
+resolution,predictor,wape,origins_used,origins_available
+1min,dynamo:arima,0.5213,167,167
+1min,dynamo:kalman,0.5399,167,167
+1min,dynamo:prophet,0.5264,167,167
+1min,dynamo:constant,0.618,167,167
+1min,fm_best:toto/uni,0.5153,,
+1min,baseline:naive,0.618,,
+1min,baseline:ewma,0.5217,,
+1min,baseline:holt_winters,0.5946,,
+15s,dynamo:arima,0.6675,300,2687
+15s,dynamo:kalman,0.8111,2687,2687
+15s,dynamo:prophet,0.7328,300,2687
+15s,dynamo:constant,0.7638,2687,2687
+15s,fm_best:toto/cov,0.6374,,
+15s,baseline:naive,0.7638,,
+15s,baseline:ewma,0.7736,,
+15s,baseline:holt_winters,0.9917,,

@@ -1,0 +1,21 @@
+[
+  {
+    "predictor": "arima",
+    "resolution": "15s",
+    "signal": "images",
+    "horizon": 1,
+    "metric": "WAPE = sum|y-yhat|/sum|y|",
+    "window": 512,
+    "n_origins_available": 2687,
+    "n_origins_used": 300,
+    "common_span_first_origin": 8076,
+    "common_span_last_origin": 40308,
+    "wape": 0.6675057844093691,
+    "mae": 279.0663683073063,
+    "n_fail": 0,
+    "n_nonfinite": 0,
+    "fail_examples": [],
+    "seconds": 229.1,
+    "orig_per_s": 1.31
+  }
+]

@@ -1,0 +1,21 @@
+[
+  {
+    "predictor": "kalman",
+    "resolution": "15s",
+    "signal": "images",
+    "horizon": 1,
+    "metric": "WAPE = sum|y-yhat|/sum|y|",
+    "window": 512,
+    "n_origins_available": 2687,
+    "n_origins_used": 2687,
+    "common_span_first_origin": 8076,
+    "common_span_last_origin": 40308,
+    "wape": 0.8110959662461797,
+    "mae": 295.09826527510154,
+    "n_fail": 0,
+    "n_nonfinite": 0,
+    "fail_examples": [],
+    "seconds": 22.6,
+    "orig_per_s": 119.14
+  }
+]
