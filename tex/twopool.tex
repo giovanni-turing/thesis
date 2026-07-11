@@ -197,7 +197,12 @@ $<\SI{1}{\second}$ \emph{and} inter-token latency (ITL, the per-token
 decode gap that TPOT summarizes) p99 $<\SI{100}{\milli\second}$
 (first token within a second and at least 10~tokens/s for the worst
 percentile user); the vision pool must hold encoder delay p99
-$<\SI{1}{\second}$, matching the language TTFT budget. Summing the two
+$<\SI{1}{\second}$, matching the language TTFT budget. This encoder
+percentile is taken over \emph{all} requests --- a text-only request
+incurs zero encoder delay, so it is a user-population tail, not a
+vision-pool-conditional one; the stage-conditional (image-bearing)
+variant is reported alongside it where the distinction matters
+(Chapter~\ref{cap:baselines}). Summing the two
 stage budgets gives ${\approx}\SI{2}{\second}$ to first token at roughly
 the p98 level (a union bound over two p99s, not an end-to-end p99
 guarantee; end-to-end tails are reported directly where composed runs

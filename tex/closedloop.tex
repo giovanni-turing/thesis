@@ -35,7 +35,8 @@ as the reactive strawman of
 Section~\ref{sec:base-reactive-enc}, which reads the trailing observed
 \emph{point} rate (quantile ignored) rather than the p90 forecast band;
 the raw head-to-head therefore bundles anticipation with headroom, and the two
-dials are separated by the p50-forecast and lead-invariance ablations below. For the \emph{language
+dials are separated by the p50-forecast, lead-invariance, and
+reactive-with-headroom ablations below. For the \emph{language
 pool}, the forecast path replaces the planner's built-in predictor
 inside Dynamo's SLA-planner loop (a \texttt{forecast\_file}
 predictor registered in the planner's registry), so
@@ -139,6 +140,24 @@ margin but, at provisioning cadence, a calibrated early-warning channel
 whose cost is accounted for. Point and p50 are the opposite, clean detectors
 that fail as provisioning signals, sizing to the mean and missing the
 onset.
+
+\paragraph{Anticipation versus headroom, separated directly.} The raw
+forecast-versus-reactive contrast changes two dials at once --- the
+forecast both looks ahead and reads a p90 band, while the reactive
+strawman reads a trailing \emph{point} rate. To isolate them we run the
+reactive controller with the tail-aware headroom it was denied: the
+trailing-window p90 of the observed image rate (windows of 2--8\,min) at
+the same $\rho{=}15$ and lead, but still no forecast. On the slow onset
+(burst1) and at week scale this reactive-with-headroom controller passes,
+as the point reactive already does; but on the one-minute onset (burst3)
+it fails at every lead and window (p99 $1{,}973$--$11{,}568$\,\si{\milli\second}
+against the forecast's \SI{588}{\milli\second}), even though the headroom
+cuts its p99 up to $8\times$ below the point reactive. Tail-aware headroom
+is therefore necessary but not sufficient on a fast onset: calibrated to
+past load, it cannot stand up the replicas a sub-minute spike demands,
+which only anticipation places ahead of the onset. The p90-forecast's
+fast-onset win is anticipation; the headroom is the shared dial that helps
+every policy but decides none.
 
 \section{Language pool: the conversion result}
 \label{sec:cl-llm}

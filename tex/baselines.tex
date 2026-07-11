@@ -85,6 +85,17 @@ steady (24 h) & 24.0 & 2 & TP1$\times$2 & 48.0 & 48.0 \\
 \end{tabular}
 \end{table}
 
+The encoder $C^{*}$ minimize the all-request encoder-delay p99
+(Chapter~\ref{cap:twopool}); under the stage-conditional metric
+(image-bearing requests only, excluding the ${\approx}50\%$ text-only
+requests that never enter the encoder) the burst optima rise by one to
+two workers --- burst1 to 7, burst3/burst4 to 8, burst6 to 8
+(58.2/3.6/25.2/10.9 5090-hours), burst2/burst5/steady unchanged. The
+deployable static $C{=}16$ is set by burst5, which is image-dense and so
+identical under either metric, so the cost headline of
+Chapter~\ref{cap:closedloop} is unchanged; only the per-window table
+shifts.
+
 Three structural facts follow. First, \textbf{every burst window forces
 the language pool to TP2, and the gain is the parallelism layout, not
 the GPU budget}. At TP1 no replica count is feasible: the burst's
@@ -157,9 +168,12 @@ replica lead and tightening the planner's window-mean targets from
 400/40 to 200/20\,\si{\milli\second} on burst1 raises GPU-hours
 monotonically (18.6\,$\to$\,20.4) while TTFT p99 stays pinned at
 1{,}616--1{,}620\,\si{\milli\second} --- a 10\% spend increase buying
-nothing (Table~\ref{tab:base-ladder}). By the time the trailing window
-sees the onset, the capacity it orders arrives after the queue has
-formed: the failure is \emph{information timing}, not thrift.
+nothing (Table~\ref{tab:base-ladder}). Burst1's onset is 220 minutes, so
+a trailing window sees it in ample time; tightening the window-\emph{mean}
+targets nonetheless cannot buy the tail, because the sizing stays
+mean-based. The failure here is the \emph{conversion}, not thrift, and not
+timing --- the complement of the fast-onset case, where timing is decisive
+(the encoder triad above).
 
 \begin{table}[htbp]
 \centering
