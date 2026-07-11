@@ -43,7 +43,7 @@ the decoupling as measured behavior: saturation knees an order of
 magnitude apart, the largest burst breaking the pools in structurally
 different ways (Chapter~\ref{cap:twopool}). Closing the loop, per-pool
 provisioning --- the vision pool's forecast anticipating its onsets, the
-language pool's forecast converted tail-aware --- holds
+language pool's demand converted tail-aware --- holds
 the tail latency objective through burst onsets that defeat an
 identically informed reactive controller, at a fraction of the
 deployable static
@@ -360,9 +360,10 @@ Figure~\ref{fig:intro-arch} sketches the system.
 \end{tikzpicture}}
 \caption{The two-pool system under study. The trace drives an
 AIC-costed encoder pool composed with Dynamo's discrete-event language
-pool through a timestamp-shift seam; a per-pool forecaster converts each
-pool's own demand signal into its worker schedule under cold-start lead
-times. Solid arrows carry requests; the dashed arrow carries the
+pool through a timestamp-shift seam; a per-pool provisioner maps each
+pool's own demand signal to its worker schedule under cold-start lead
+times --- the vision pool by \emph{forecast} (anticipatory), the language
+pool by tail-aware \emph{conversion} of a held signal. Solid arrows carry requests; the dashed arrow carries the
 materialized demand signals the controller consumes.}
 \label{fig:intro-arch}
 \end{figure}
@@ -465,8 +466,8 @@ static-optimal worker-grid frontier per window (burst windows need 6--8
 encoder workers at trace rate against 2 on a calm day, TP2 language
 shapes throughout); the reactive SLA-planner baseline, which satisfies
 its own window-mean control law while violating the tail SLA; and the
-contribution proper: per-pool
-forecasts driving worker schedules under cold-start lead, scored as SLA
+contribution proper: the vision pool's forecast
+driving its encoder worker schedules under cold-start lead, scored as SLA
 compliance $\times$ provisioned worker-time in a per-window issue-time
 factorial (windows $\times$ forecasting models $\times$ realizable leads,
 graded under both readiness models; a broader 560-cell target-time grid
@@ -521,7 +522,7 @@ Finally, the control loop itself is anchored to the real stack: the
 winning policy and the reactive baseline, replayed against the live
 Dynamo runtime (real control plane, mocked engines) on the
 fastest-onset burst, reproduce the simulated verdicts in both
-directions with TTFT p99 within 1.0--6.8\% (the ITL p99 verdicts also agree
+directions with TTFT p99 within 1.1--6.8\% (the ITL p99 verdicts also agree
 in both directions: sub-bound for the forecast policy, 11.5 versus
 9.7\,ms, and \emph{above} the \SI{100}{\milli\second} bound for the
 reactive policy, 150.7 versus 152.7\,ms) and provisioned replica-time

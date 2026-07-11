@@ -56,17 +56,21 @@ callback inflated extreme tail maxima only --- documented in
 Chapter~\ref{cap:twopool}).
 
 The GPU EDA environment (\texttt{eda/.venv}: cuDF/cuML/CuPy) and the
-aiconfigurator/ai-dynamo environment
-(\texttt{ai-dynamo/aiconfigurator/.venv}, \texttt{dynamo/.venv}) are
-separate virtual environments \emph{external} to this thesis checkout,
-pinned to the versions in Table~\ref{tab:ap-env} and restorable from them
-together with the upstream commits cited in
-Table~\ref{tab:ap-manifest} (aiconfigurator campaign \texttt{1e8b9cac},
-infill \texttt{656ac8ca}; the Dynamo live-planner branch commit
-\texttt{33a9babe01}). The scripts resolve all data paths from
-\texttt{TESE\_ROOT} (default: the repo root), so the headline encoder
-pipeline relocates cleanly; only these two interpreters must be
-reconstructed from the pinned versions above.
+aiconfigurator/ai-dynamo environments
+(\texttt{ai-dynamo/aiconfigurator/.venv},
+\texttt{ai-dynamo/dynamo/.venv}) are separate virtual environments
+\emph{external} to this thesis checkout, pinned to the principal versions
+in Table~\ref{tab:ap-env}; no full dependency lock is tracked in this
+repository, so the table fixes the load-bearing versions rather than
+every transitive dependency. Of the commits cited in
+Table~\ref{tab:ap-manifest}, the collected aiconfigurator campaign
+(\texttt{1e8b9cac}) is the upstream draft PR, while the infill
+(\texttt{656ac8ca}) and the Dynamo live-planner branch
+(\texttt{33a9babe01}) are \emph{local} commits (push/archival pending).
+The \emph{load-bearing issue-time encoder pipeline} (the issue-time
+generator, the two-pool converter, and the factorial/aggregate drivers)
+resolves its data paths from \texttt{TESE\_ROOT} and relocates cleanly;
+some older, historical scripts still hard-code absolute paths.
 
 \section{Supplementary figures}
 \label{ap:supp-figs}
@@ -107,8 +111,8 @@ noise-level inter-model spreads in Table~\ref{tab:pred-wape}.}
 artifact. Paths relative to the workspace root; leading directories
 shared with the script column are elided from artifacts. EDA scripts run
 under \texttt{eda/.venv} (GPU); simulation drivers under the
-aiconfigurator venv (converter) and \texttt{dynamo/.venv} (replay,
-source build).}
+aiconfigurator venv (converter) and \texttt{ai-dynamo/dynamo/.venv}
+(replay, source build).}
 \label{tab:ap-manifest}\\
 \toprule
 Element & Script & Primary artifact \\
