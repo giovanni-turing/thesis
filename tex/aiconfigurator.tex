@@ -55,8 +55,10 @@ cross-checked against NVIDIA's published specification~\cite{NVIDIA5090Specs}). 
 values; tensor-core throughput scales from the same-die
 \texttt{rtx\_pro\_6000\_server} entry's per-SM, per-MHz throughput at the
 official \SI{2407}{\mega\hertz} boost clock, yielding
-\SI{419}{\tera\flop\per\second} dense bf16. Estimated fields are marked
-in the system file for later refinement.
+\SI{209.5}{\tera\flop\per\second} dense bf16 (FP32 accumulate; the
+FP16-accumulate rate is $2\times$ this). Estimated fields are marked in
+the system file for later refinement; the measured encoder cost model
+does not consume this ceiling (it is used only by the SOL fallback below).
 
 \subsection{Collection methodology}
 
@@ -299,7 +301,7 @@ is quantified by the fleet-sizing search below. The anchor ran at
 near-boost but \emph{unlocked} clocks; the clock-invariant batch-axis
 ratio is the reported quantity, and a re-run at stable clocks
 (single-tenant, persistence-mode; delivered SM
-2377--2385\,\si{\mega\hertz} under load, not a hard lock) reproduces it: mean $1.47$ on the same batch
+2377--2400\,\si{\mega\hertz} under load, rising with batch, not a hard lock) reproduces it: mean $1.47$ on the same batch
 grid, $1.43$ (band $1.32$--$1.62$) on a denser one, pinning the
 absolutes to publication grade ($N{=}64$ within $0.09\%$ of the
 Table~\ref{tab:aic-fn} reference). What remains is one real

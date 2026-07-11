@@ -132,10 +132,9 @@ one minute to 938 at one hour
 (Figure~\ref{fig:eda-arrival}; a seven-day record cannot establish
 asymptotically unbounded growth, but within the window every aggregation
 scale an autoscaler could use is overdispersed).
-Spectrally, a diurnal harmonic family (\SI{24}{\hour} line with
-12/8/\SI{6}{\hour} overtones; in the request signal the 12- and 8-hour
-harmonics exceed the 24-hour fundamental, indicating a multi-peaked daily
-profile) sits on a strong $1/f^{\beta}$ long-range-dependent background.
+Spectrally, a diurnal harmonic family (\SI{24}{\hour} fundamental with
+weaker 12/8/\SI{6}{\hour} overtones) sits on a strong $1/f^{\beta}$
+long-range-dependent background.
 No sharp non-harmonic line dominates the sub-diurnal band above that
 background; the few sub-diurnal peaks that surface are consistent with
 sidelobes of the diurnal line in a seven-cycle record. Periods of
@@ -228,7 +227,7 @@ requests/s            & 0.32 & \SI{9}{\minute}  & $1/f^{0.66}$ & ${\approx}0.83$
 context tokens/s      & 0.85 & \SI{15}{\minute} & $1/f^{0.72}$ & ${\approx}0.86$ \\
 \quad vision-borne part & --- & ---             & $1/f^{0.74}$ & ${\approx}0.87$ \\
 \quad text-borne part   & --- & ---             & $1/f^{0.51}$ & ${\approx}0.76$ \\
-generated tokens/s$^\dagger$ & 0.40 & \SI{5}{\minute}  & $1/f^{0.82}$ & ${\approx}0.91$ \\
+generated tokens/s$^\dagger$ & 0.40 & \SI{5}{\minute}  & $1/f^{0.81}$ & ${\approx}0.91$ \\
 images/s              & \textbf{3.83} & \textbf{\SI{69}{\minute}} & $1/f^{0.86}$ & $\boldsymbol{{\approx}0.93}$ \\
 \bottomrule
 \end{tabular}
@@ -346,8 +345,8 @@ these tests; Chapter~\ref{cap:predictors}'s covariate experiments probe
 that direction and find nearly nothing to exploit at provisioning
 cadence.) At request level,
 image count and generation length are independent (Spearman $-0.06$;
-median generation stays at 50--140 tokens across image counts from 1 to
-529). At window level, the image--generation cross-correlation peaks
+per-bucket median generation shows no monotonic trend, swinging
+non-monotonically across image counts from 1 to 529). At window level, the image--generation cross-correlation peaks
 sharply at lag zero with no lead. Below the one-minute scale, all signals
 reach a white shot-noise floor: finer-grained inputs add noise, not
 information, though the required decision frequency again depends on

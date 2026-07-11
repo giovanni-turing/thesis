@@ -93,8 +93,8 @@ ${\approx}$\SI{1285}{\milli\second} even at $N{=}16$. This is a
 replicas and one
 TP2$\times$2 group are both four H100s, yet TP1$\times$4 fails every
 burst window (TTFT p99 1{,}314--1{,}331\,\si{\milli\second}) while
-TP2$\times$2 passes every one (746--792\,\si{\milli\second}), a
-1.66--1.76$\times$ tail reduction from the layout alone
+TP2$\times$2 passes every one (763--846\,\si{\milli\second}), a
+1.55--1.74$\times$ tail reduction from the layout alone
 (Table~\ref{tab:base-tp}). Intra-request tensor parallelism shortens the
 single long prefill that independent replicas can only queue;
 Chapter~\ref{cap:twopool} quotes \SI{748.4}{\milli\second} for
@@ -125,7 +125,7 @@ Window & TP1$\times$4 p99 (ms) & TP2$\times$2 p99 (ms) & Tail cut \\
 \midrule
 burst1 & 1{,}318 \emph{(fail)} & 763 \emph{(pass)} & 1.73$\times$ \\
 burst2 & 1{,}331 \emph{(fail)} & 766 \emph{(pass)} & 1.74$\times$ \\
-burst3 & 1{,}314 \emph{(fail)} & 746 \emph{(pass)} & 1.76$\times$ \\
+burst3 & 1{,}315 \emph{(fail)} & 846 \emph{(pass)} & 1.55$\times$ \\
 burst4 & 1{,}317 \emph{(fail)} & 792 \emph{(pass)} & 1.66$\times$ \\
 burst5 & 1{,}316 \emph{(fail)} & 781 \emph{(pass)} & 1.68$\times$ \\
 \bottomrule
