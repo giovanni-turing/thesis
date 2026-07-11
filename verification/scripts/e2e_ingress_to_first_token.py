@@ -1,11 +1,13 @@
 #!/usr/bin/env python
-"""TASK 2 (B6/P0-6): true end-to-end ingress-to-first-token p99.
+"""TASK 2 (B6/P0-6): modelled end-to-end ingress-to-first-token p99.
 
 The thesis reports the encoder-delay p99 (588 ms) and the language TTFT p99
 (651 ms) SEPARATELY and never combines them per request, even though a real
 request traverses BOTH pools: ingress -> encoder pool (encoder_delay) -> LLM
-pool (TTFT) -> first token. The true user-visible tail is the p99 of the
-per-request SUM, which depends on how the two delays are CORRELATED (image
+pool (TTFT) -> first token. The user-visible tail is the p99 of the
+per-request SUM (encoder_delay recovered EXACTLY, prefill TTFT MODELLED by
+AIC and validated -- hence a modelled reconstruction, not a request-linked
+replay measurement), which depends on how the two delays are CORRELATED (image
 count drives encoder_delay; image+text tokens = ContextTokens drive prefill
 TTFT, so the tails are positively coupled).
 
@@ -101,7 +103,9 @@ def main():
                           "mean": rep["mean_ttft_ms"], "max": rep["max_ttft_ms"]},
     }
 
-    # ---- true end-to-end ingress-to-first-token ----
+    # ---- modelled end-to-end ingress-to-first-token ----
+    # (encoder_delay recovered exactly; prefill TTFT modelled per-request by
+    #  AIC and validated against the week replay -- hence "modelled", not "true")
     e2e = enc_delay + ttft
     corr_all = float(np.corrcoef(enc_delay, ttft)[0, 1])
     corr_img = float(np.corrcoef(enc_delay[img_mask], ttft[img_mask])[0, 1])
@@ -126,7 +130,7 @@ def main():
         "comparison_p99": {
             "encoder_delay_only": round(enc_p99, 2),
             "language_ttft_only": round(ttft_p99, 2),
-            "true_end_to_end": round(e2e_p99, 2),
+            "modelled_end_to_end": round(e2e_p99, 2),
             "naive_additive_p99+p99": round(enc_p99 + ttft_p99, 2),
             "lower_bound_max_of_marginals": round(max(enc_p99, ttft_p99), 2),
             "e2e_over_language_ttft": round(e2e_p99 / ttft_p99, 3),
@@ -138,7 +142,7 @@ def main():
         "image_bearing_only_p99_ms": {
             "encoder_delay": round(float(np.percentile(enc_delay[img_mask], 99)), 2),
             "language_ttft": round(float(np.percentile(ttft[img_mask], 99)), 2),
-            "true_end_to_end": round(float(np.percentile(e2e[img_mask], 99)), 2)},
+            "modelled_end_to_end": round(float(np.percentile(e2e[img_mask], 99)), 2)},
     }
     json.dump(out, open(OUT, "w"), indent=1)
 
@@ -150,10 +154,10 @@ def main():
           "max", ttft_val["modeled_max"])
     print("   replay :", ttft_val["replay_report"])
     print(f"\nMARGINAL p99:  encoder_delay {enc_p99:.1f} ms   language_TTFT {ttft_p99:.1f} ms")
-    print(f"TRUE e2e p99:  {e2e_p99:.1f} ms   (naive additive {enc_p99+ttft_p99:.1f}, "
+    print(f"MODELLED e2e p99:  {e2e_p99:.1f} ms   (naive additive {enc_p99+ttft_p99:.1f}, "
           f"lower bound {max(enc_p99,ttft_p99):.1f})")
     print(f"correlation enc vs ttft: all {corr_all:.3f}, image-only {corr_img:.3f}")
-    print(f"image-bearing e2e p99: {out['image_bearing_only_p99_ms']['true_end_to_end']} ms")
+    print(f"image-bearing e2e p99: {out['image_bearing_only_p99_ms']['modelled_end_to_end']} ms")
     print(f"-> {OUT}")
 
 

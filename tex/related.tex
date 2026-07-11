@@ -334,7 +334,8 @@ multimodal inference trace}, with the forecast consumed downstream by a serving
 planner in closed loop rather than scored on accuracy alone
 (Chapters~\ref{cap:predictors} and~\ref{cap:closedloop}). Third, a silicon-calibrated
 consumer-class vision encoder has already been costed for cross-tier
-placement~\cite{Yu2026HeteroServe}; the narrow claim is the first to integrate such a
+placement~\cite{Yu2026HeteroServe}; the narrow claim is, to our knowledge,
+the first to integrate such a
 consumer-class-GPU encoder cost model into a \emph{deployment planner}
 (aiconfigurator's per-operator performance database, which held no consumer- or
 workstation-class GPU data for the encoder operator before this work), with the
@@ -345,7 +346,7 @@ brings. (Chapters~\ref{cap:baselines}
 and~\ref{cap:closedloop} supply the quantitative payoff behind the
 calibrated-simulation checkmark: the tail SLA held in aggregate and
 per-episode at
-0.57--0.61 times the deployable static encoder fleet's provisioned
+0.62 times the deployable static encoder fleet's provisioned
 worker-time, versus static-optimal and reactive baselines.) The last
 column is where the comparison runs the other way, and deliberately so:
 the disaggregated-serving systems and production autoscalers above are

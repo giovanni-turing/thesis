@@ -65,8 +65,9 @@ through the planner's native mean-based conversion, the same forecast
 fails like the reactive baseline: the defect is the conversion, not
 loop tuning, and no setting in the tested target ladder repairs it under lead. Over the 5.60-day covered span the policy holds
 the SLA in aggregate and inside every episode at
-\textbf{0.57--0.61$\times$ the deployable static encoder fleet's
-provisioned worker-time} (the language fleet passes the same span at
+\textbf{0.62$\times$ the deployable static encoder fleet's
+provisioned worker-time} (actuated on forecast issue time and
+lead-invariant across the archive's realizable range; the language fleet passes the same span at
 0.96$\times$ its burst-sized static shape); the reactive controller's apparent aggregate pass
 dissolves under per-episode grading: the trace chapter's
 dashboard-masking, recurring in the evaluation metric.
@@ -76,7 +77,7 @@ backed by the numbers above: the pools' demands decouple and saturate far apart 
 the least visible signal is the most persistent and forecastable
 zero-shot at provisioning horizons (RQ2), and scaling on those forecasts
 holds the tail objective through the onsets that defeat reactive control
-at every tested lead, at roughly half to two-thirds of the best static
+at every tested lead, at roughly two-thirds of the best static
 encoder fleet's GPU-time (RQ4).
 
 \paragraph{What bounds these claims.} The evidence is one seven-day

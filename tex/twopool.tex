@@ -206,16 +206,21 @@ variant is reported alongside it where the distinction matters
 stage budgets gives ${\approx}\SI{2}{\second}$ to first token at roughly
 the p98 level (a union bound over two p99s, not an end-to-end p99
 guarantee). Reconstructed on the aggregate composed run --- recovering
-each request's ingress time, adding its measured encoder delay to its
-AIC-modelled prefill TTFT (a modelled reconstruction, not a request-linked
-replay measurement) --- the ingress-to-first-token p99 is
-${\approx}\SI{1.30}{\second}$, close to the naive sum of the two marginals
-(${\approx}\SI{0.59}{}$ and ${\approx}\SI{0.65}{\second}$) rather than
+each request's ingress time and adding its measured encoder delay
+(recovered exactly, p99 \SI{588}{\milli\second}) to its per-request
+prefill TTFT (modelled by AIC and validated against the week replay to
+within 8\% at p99: \SI{706}{} modelled versus \SI{651}{\milli\second}
+replayed), a modelled reconstruction rather than a request-linked replay
+measurement --- the ingress-to-first-token p99 is
+${\approx}\SI{1.24}{}$--$\SI{1.30}{\second}$ (the range spanning the
+replay-measured and modelled prefill tails), close to the naive sum of
+the two marginals (${\approx}\SI{0.59}{}$ plus ${\approx}\SI{0.65}{}$--%
+$\SI{0.71}{\second}$) rather than
 their max, because the two tails are positively correlated ($r{=}0.52$ on
 image-bearing requests): the same frames-class requests drive both large
 encoder batches and long prefills. It sits within the \SI{2}{\second}
 union budget but is roughly twice either per-stage marginal, so the two
-separately reported percentiles understate the actual first-token wait.
+separately reported percentiles understate the modelled first-token wait.
 The
 specific bounds double Dynamo's default planner targets
 ($500/\SI{50}{\milli\second}$, window-mean) applied as tail bounds,

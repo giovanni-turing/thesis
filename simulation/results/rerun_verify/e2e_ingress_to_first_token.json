@@ -41,7 +41,7 @@
  "comparison_p99": {
   "encoder_delay_only": 588.37,
   "language_ttft_only": 705.94,
-  "true_end_to_end": 1295.17,
+  "modelled_end_to_end": 1295.17,
   "naive_additive_p99+p99": 1294.31,
   "lower_bound_max_of_marginals": 705.94,
   "e2e_over_language_ttft": 1.835,
@@ -54,6 +54,6 @@
  "image_bearing_only_p99_ms": {
   "encoder_delay": 825.07,
   "language_ttft": 706.8,
-  "true_end_to_end": 1348.83
+  "modelled_end_to_end": 1348.83
  }
 }
