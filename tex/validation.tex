@@ -54,7 +54,10 @@ re-run through the replay platform of the preceding chapters.
 \centering
 \caption{Live stack versus offline twin on burst3 (evaluation SLA:
 TTFT p99 $<$ \SI{1}{\second}, ITL p99 $<$
-\SI{100}{\milli\second}; budget-matched at 4 TP2 replicas).}
+\SI{100}{\milli\second}; budget-matched at 4 TP2 replicas). ITL p99 is the
+per-request inter-token latency $(\text{RequestLatency}-\text{TTFT})/(\text{OSL}-1)$
+computed like-for-like in both columns, matching aiperf's live metric and
+Dynamo's SLA definition (ITL${=}$TPOT).}
 \label{tab:val-anchor}
 \small
 \begin{tabular}{@{}llrrr@{}}
@@ -62,12 +65,12 @@ TTFT p99 $<$ \SI{1}{\second}, ITL p99 $<$
 Policy & Metric & Live & Offline twin & $\Delta$ \\
 \midrule
 Forecast p90 & TTFT p99 (ms) & 695 & 651 & $+6.8\%$ \\
- & ITL p99 (ms) & 11.5 & 5.3 & $+6.2$\,ms \\
+ & ITL p99 (ms) & 11.5 & 9.7 & $+1.8$\,ms \\
  & replica-seconds & 6{,}063 & 6{,}400 & $-5.3\%$ \\
  & verdict & \textbf{PASS} & \textbf{PASS} & agree \\
 \midrule
 Reactive & TTFT p99 (ms) & 3{,}531 & 3{,}495 & $+1.0\%$ \\
- & ITL p99 (ms) & 150.7 & 160.3 & $-6.0\%$ \\
+ & ITL p99 (ms) & 150.7 & 152.7 & $-1.3\%$ \\
  & replica-seconds & 1{,}799 & 1{,}948 & $-7.6\%$ \\
  & verdict & \textbf{FAIL} & \textbf{FAIL} & agree \\
 \bottomrule
