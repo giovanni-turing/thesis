@@ -459,8 +459,10 @@ shapes throughout); the reactive SLA-planner baseline, which satisfies
 its own window-mean control law while violating the tail SLA; and the
 contribution proper: per-pool
 forecasts driving worker schedules under cold-start lead, scored as SLA
-compliance $\times$ provisioned worker-time in a 560-cell factorial
-(windows, forecasting models, quantiles, leads, capacity ratings). At
+compliance $\times$ provisioned worker-time in a per-window issue-time
+factorial (windows $\times$ forecasting models $\times$ realizable leads,
+graded under both readiness models; a broader 560-cell target-time grid
+located the operating point). At
 the operating rating ($\rho{=}15$) the p90-forecast policy delivers the
 RQ4 verdict (every window at every forecast-issued lead from 15 to
 \SI{165}{\second} --- burst windows at the \SI{588}{\milli\second}

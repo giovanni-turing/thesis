@@ -257,7 +257,9 @@ and validated), not a request-linked replay measurement.
 
 - **Modelled e2e p99 = 1295 ms** (modelled TTFT 706). Using the replay's own
   TTFT p99 (651) instead, the near-comonotonic tail gives ≈ 588 + 651 = **1239 ms**.
-  So the modelled ingress-to-first-token p99 is **≈ 1.24–1.30 s — roughly 2× the
+  So (NB: 1.30 s is the per-request JOINT reconstruction; 1.24 s is a marginal
+  sensitivity from summing the replay's aggregate TTFT tail, NOT a second joint
+  reconstruction) the modelled ingress-to-first-token p99 is **≈ 1.30 s — roughly 2× the
   encoder marginal (588) and ~2× the language marginal (651/706).**
 - **Why e2e p99 ≈ the naive additive sum (1295 ≈ 1294):** encoder_delay and TTFT
   are **positively correlated** (Pearson 0.42 all requests, **0.53 image-bearing**)

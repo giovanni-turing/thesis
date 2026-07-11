@@ -38,8 +38,11 @@ from pathlib import Path
 import pandas as pd
 
 HERE = Path(__file__).resolve().parent
+# Portable: TESE_TRACE overrides; else TESE_ROOT/data/...; else repo root
+# (simulation/ -> parent).
 TRACE = os.environ.get("TESE_TRACE",
-    "/home/gio/tese/data/AzureLMMInferenceTrace_multimodal.csv.gz")
+    str(Path(os.environ.get("TESE_ROOT", HERE.parent))
+        / "data/AzureLMMInferenceTrace_multimodal.csv.gz"))
 WINDOWS = Path(os.environ.get("TESE_WINDOWS", HERE / "windows.json"))
 
 

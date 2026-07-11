@@ -94,9 +94,13 @@ within its expected band throughout, because the regression is tuned
 from sampled forward passes that arrive in different order live; but the
 \emph{applied} capacity,
 after the budget cap, tracks the same trajectory. The
-client-observed TTFT tails land within run noise of the simulated ones.
-The burst3 policy split itself (p90 passes where p50 and reactive
-fail; Chapter~\ref{cap:closedloop}) reproduces on the real stack.
+client-observed TTFT tails land within 1--7\% of the simulated ones
+(a single live run per policy, so this is a point difference between the
+two systems, not a repeated-run noise band). The burst3 policy split
+reproduces on the real stack in the two policies carried live: the p90
+forecast passes where the reactive baseline fails. (The p50 leg of the
+split --- p50 also failing --- is established offline only,
+Chapter~\ref{cap:closedloop}; no live p50 run was performed.)
 
 \section{What the live stack revealed}
 \label{sec:val-findings}
@@ -131,8 +135,14 @@ reproducible live; decision \emph{values} at matching times are.
 \item[Budget units differ between paths.] The offline replay caps
 replicas at \texttt{max\_gpu\_budget}; the live planner divides the
 same field by GPUs-per-replica. The anchor comparison equalizes the
-caps; the thesis's offline results are unaffected (their budgets never
-bind), but the unit inconsistency is a reportable upstream defect.
+caps. The cap \emph{does} bind in these episode replays --- the
+tail-aware forecast requests up to 24 language replicas and
+\texttt{max\_gpu\_budget}${=}8$ clamps it to 8 --- so the reported
+language provisioning is the post-cap \emph{applied} capacity, at which
+the policy still meets the SLA; what the cap changes is the provisioned
+count, not the pass/fail verdict, and the live/offline unit inconsistency
+changes neither (both equalized to the same applied cap). The
+inconsistency remains a reportable upstream defect.
 \end{description}
 
 \section{Scope of the anchor}
@@ -145,7 +155,9 @@ only in simulation), and mocked engine execution. It validates the
 \emph{control loop}, not GPU silicon, which is what
 Chapter~\ref{cap:aiconfigurator} anchored physically on the encoder
 side. Within that scope the conclusion is direct: the platform's
-closed-loop behavior transfers to the real stack within run noise, in
-both verdict directions, and the divergences that do exist
+closed-loop behavior transfers to the real stack within 1--7\% on every
+compared metric (one live run per policy, so a point difference rather
+than a noise band), in both verdict directions, and the divergences that
+do exist
 (identified, explained, in one case fixed on a local branch to be proposed upstream) are properties
 of the harnesses, not of the policies this thesis compares.

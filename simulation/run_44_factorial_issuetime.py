@@ -111,7 +111,7 @@ def main():
         errs = [r for r in results if r["readiness"] == rd and "error" in r]
         print(f"{rd:6s}: {npass}/{len(sub)} feasible | p99 range "
               f"{min(p99s):.1f}-{max(p99s):.1f} ms | {len(errs)} errors")
-    print(f"-> {OUTDIR}/factorial_issuetime_{QUANTILE}_results.json")
+    print(f"-> {OUTDIR}/factorial_issuetime_{QUANTILE}_rho{RHO}_results.json")
 
 
 if __name__ == "__main__":

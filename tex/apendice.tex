@@ -88,21 +88,26 @@ noise-level inter-model spreads in Table~\ref{tab:pred-wape}.}
 \clearpage
 \section{Figure and table manifest}
 
-\begin{table}[htbp]
-\centering
+{\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}p{0.30\linewidth}p{0.34\linewidth}p{0.32\linewidth}@{}}
 \caption{Manuscript element $\to$ generating script $\to$ primary
 artifact. Paths relative to the workspace root; leading directories
 shared with the script column are elided from artifacts. EDA scripts run
 under \texttt{eda/.venv} (GPU); simulation drivers under the
 aiconfigurator venv (converter) and \texttt{dynamo/.venv} (replay,
 source build).}
-\label{tab:ap-manifest}
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}p{0.30\linewidth}p{0.34\linewidth}p{0.32\linewidth}@{}}
+\label{tab:ap-manifest}\\
 \toprule
 Element & Script & Primary artifact \\
 \midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\scriptsize\emph{(Table~\ref{tab:ap-manifest} continued)}}\\
+\toprule
+Element & Script & Primary artifact \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
 Fig.~\ref{fig:intro-arch} & (TikZ, in source) & --- \\
 Figs.~\ref{fig:eda-ctx-vs-img}--\ref{fig:eda-multires};
 Tabs.~\ref{tab:eda-archetypes},~\ref{tab:eda-persistence},~\ref{tab:eda-multires},~\ref{tab:eda-percentiles} &
@@ -159,7 +164,7 @@ Per-window factorial (60-cell p90 headline + p50; $\rho$-rating
   target-time exploratory grid
   \texttt{\{gen\_cells\_44.py, e2b\_fleet.py\}} &
   \texttt{simulation/results/ factorial\_issuetime/
-  factorial\_issuetime\_\{p50\_rho15, p90\_rho\{15,20,25\}\}\_results.json};
+  factorial\_issuetime\_\{p50\_rho15, p90\_rho\{10,15,20,25\}\}\_results.json};
   target-time grid \texttt{results/ results\_44.jsonl} \\
 Week-scale surface (\S\ref{sec:cl-aggregate}; quantile-decisive,
   rating-cost) &
@@ -193,9 +198,7 @@ Physical encoder anchor (\S\ref{sec:aic-validation}, future work) &
   \{bench\_encoder\_anchor, silicon\_in\_loop, silicon\_multiworker\}.py} &
   \texttt{anchor\_sdpa\_*.json; oneworker\_artifact/;
   silicon\_multiworker.json} \\
-\bottomrule
-\end{tabular}
-\end{table}
+\end{longtable}}
 
 Workspace layout: \texttt{analysis/trace\_eda/} (GPU EDA),
 \texttt{predictors/} (TSFM benchmark), \texttt{collector\_artifacts/}

@@ -12,9 +12,14 @@ factory in a fixed order (local_planner.py: _num_req_predictor,
 _isl_predictor, _osl_predictor) — the factory hands out variate bindings
 in that sequence. Clocking: the planner feeds one observation per
 throughput tick; the predictor counts add_data_point calls and returns
-the archived forecast for the NEXT tick's bin. Run with the throughput
+a SINGLE archived bin sampled one control-minute ahead (the bin at index
+4*ticks at 15-s resolution) -- it does NOT aggregate the minute's four
+15-s bins, and the series starts at T0-1min. Run with the throughput
 adjustment interval equal to the forecast bin (60 s for 1-min bins) so
-per-bin totals map 1:1 onto per-interval counts.
+per-bin totals map 1:1 onto per-interval counts. The language-pool result
+is therefore a same-input conversion comparison on a held, sampled
+signal (a synthetic sampled-signal experiment), not a timing or
+anticipation instrument (see tex/closedloop.tex language-pool caveat).
 
 Configuration (env — PlannerConfig has no extension fields):
   FORECAST_DIR        predictors/results (chronos_*.parquet live here)
