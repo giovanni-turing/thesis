@@ -66,7 +66,7 @@ hole is the price of zero-shot honesty, not a property of the method.
 
 The full factorial (5 in-span windows $\times$ \{3 TSFMs $\times$
 \{p50, p90\} forecast policies, + reactive\} $\times$ 4 leads $\times$ 4
-capacity ratings; 560 cells, every cell an independent two-pool replay)
+capacity ratings; 560 cells, each a two-pool replay)
 yields one headline row: \textbf{the p90-forecast policy at
 $\rho{=}15$ meets the SLA in all 60 of its cells --- every window, every
 model, every lead from 15 to 165 seconds} (the H=12 15-second forecast
@@ -339,7 +339,8 @@ Static $C{=}8$ (deployable) & 644 & 3.87 & 1.00$\times$ & pass \\
 Static $C{=}2$ (calm-day optimum) & \textbf{2{,}953} & 0.97 &
 0.25$\times$ & fail \\
 Forecast p90, $L{=}30$\,s & 588 & 2.38 & 0.61$\times$ & pass \\
-Forecast p90, $L{=}300$\,s & 588 & 2.12 & 0.55$\times$ & pass \\
+Forecast p90, $L{=}165$\,s (max issued) & 588 & 2.21 & 0.57$\times$ & pass \\
+Forecast p90, $L{=}300$\,s (target-time UB) & 588 & 2.12 & 0.55$\times$ & pass \\
 Forecast p50, $L{=}30$\,s & \textbf{3{,}047} & 0.96 & 0.25$\times$ &
 fail \\
 Reactive, $L{=}30$\,s & 588 & 2.61 & 0.67$\times$ & \textbf{fails
@@ -351,15 +352,17 @@ burst3} \\
 \end{table}
 
 The headline: \textbf{the p90-forecast schedule meets the tail SLA over
-the aggregate \emph{and} inside every in-span episode at 0.55--0.61
-times the deployable static encoder fleet's provisioned worker-time} (2.12--2.38M
-versus 3.87M worker-seconds, at p99 \SI{588}{\milli\second} versus the
-static fleet's 644). The forecaster does not carry the result.
+the aggregate \emph{and} inside every in-span episode at 0.57--0.61
+times the deployable static encoder fleet's provisioned worker-time}
+(2.21--2.38M at realizable forecast-issued leads, versus 3.87M
+worker-seconds, at p99 \SI{588}{\milli\second} versus the
+static fleet's 644; the \SI{300}{\second} target-time cell reaches 2.12M
+but is not an issued lead). The forecaster does not carry the result.
 Regenerating the p90 schedules from the other two model archives leaves
-the verdict unchanged: Toto at the same service floor for
-0.56--0.62$\times$, TimesFM at 0.52--0.60$\times$ (its 300-second-lead
-schedule admits mild queueing, p99 \SI{664}{\milli\second}, still
-passing). The cost spread across models is $\leq$4\%. The table quotes
+the verdict unchanged: Toto and TimesFM pass at the same service floor
+across the realizable-lead range, within the ${\leq}4\%$ cross-model cost
+spread (TimesFM's \SI{300}{\second} target-time cell admits mild queueing,
+p99 \SI{664}{\milli\second}, still passing). The table quotes
 Chronos-2 deliberately: at 120M parameters it is the \emph{smallest} of
 the three (Toto-2.0 is $20\times$ larger), so the headline rests on the
 cheapest forecaster, not the most accurate one (at this resolution the
@@ -380,7 +383,7 @@ of that frontier carries the same per-episode caveat this chapter applies to
 the reactive rows, though: these week cells are aggregate-graded, and the
 per-window matrix (Section~\ref{sec:cl-matrix}) shows $\rho{=}20$/25 dropping
 3/11 cells on burst5. Only $\rho\in\{10,15\}$ (0.88--0.58$\times$) is
-per-episode-clean; the quoted 0.55--0.61$\times$ sits at $\rho{=}15$, inside
+per-episode-clean; the quoted 0.57--0.61$\times$ sits at $\rho{=}15$, inside
 that verified range, not at the aggregate-only $\rho{>}15$ tail. The
 p50-forecast policy, by contrast, passes \emph{none} of its 48 cells:
 the week-scale echo of the mean-sizing defect. The rating trades cost
@@ -421,8 +424,10 @@ replayed end-to-end. The replay is open-loop: arrivals follow the trace
 regardless of experienced latency, so overload cannot shed or defer
 demand as clients would --- policies are compared under identical
 offered load, and the decode signal is the offered-work upper bound of
-Chapter~\ref{cap:trace-eda}, conservative in the same direction for
-every policy. The inter-pool handoff is priced single-stream
+Chapter~\ref{cap:trace-eda}. The offered-load comparison is applied
+identically to every policy; real clients' abandonment, backpressure, or
+retries under overload could shift the realized demand in either
+direction, which this open-loop replay does not model. The inter-pool handoff is priced single-stream
 (${\approx}1.6$\,MB per image); Qwen3-VL's DeepStack projections
 quadruple that payload, and a sensitivity replay of the aggregate at
 the $4\times$ payload on the modeled 25\,Gbps link raises p99 handoff
@@ -456,7 +461,7 @@ headroom provisions 24--32 workers at the burst peaks, far above the 12--16
 the silicon fleet requires, so the underprice is absorbed with no added
 workers: the winning schedule's provisioned worker-time, the numerator
 of the cost ratio, is unchanged on silicon. The reported
-\textbf{0.55--0.61$\times$} is therefore the AIC-model headline; a fully
+\textbf{0.57--0.61$\times$} is therefore the AIC-model headline; a fully
 silicon-costed comparison would also enlarge the static \emph{denominator}
 --- on measured silicon the deployable static fleet is bound by burst2's
 genuine batching knee (${\approx}2\times$), not by burst5's endpoint
@@ -464,7 +469,7 @@ artifact --- so the silicon ratio would fall between that AIC headline and
 the lower value the larger fleet implies. That silicon accounting, and a
 live-worker non-eager confirmation, remain future work. Second,
 every quantity here (the $4\times$/$2\times$ over-provisioning, the
-$\rho$ frontier, the 0.55--0.61$\times$) derives from a single Azure
+$\rho$ frontier, the 0.57--0.61$\times$) derives from a single Azure
 production trace over one 5.60-day span; generalization to other workloads,
 models, and datacenters is unaddressed.
 
@@ -473,15 +478,18 @@ models, and datacenters is unaddressed.
 
 RQ4 is answered affirmatively, with the mechanism identified per pool.
 On the encoder pool, forecasting the pool's own signal at the calibrated
-p90 edge holds the tail SLA at every cold-start lead tested, including
+p90 edge holds the tail SLA at every forecast-issued lead tested
+(15--\SI{165}{\second}), including
 the one-minute onset that defeats an identically informed reactive
-controller at \emph{every} lead, because onsets are detected at or
-before the signal itself, leaving only the service-time floor. On the
+controller at \emph{every} lead, because the p90 band's graduated headroom
+stands capacity up before the peak --- anticipating the gradual onsets and
+covering the fastest one through standing headroom rather than clean
+detection --- leaving only the service-time floor. On the
 language pool the same
 anticipation passes bursts under realistic replica leads, but only
 through a tail-aware capacity conversion, derived here as a measured
 belief-to-knee ratio, that repairs the mean-based sizing defect shared
 by every reactive configuration tested. Priced over the covered week,
-the policy meets the SLA in aggregate and per-episode at 0.55--0.61
+the policy meets the SLA in aggregate and per-episode at 0.57--0.61
 times the deployable static encoder fleet's worker-time --- the thesis
 statement's economic clause, now number-backed.

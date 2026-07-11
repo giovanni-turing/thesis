@@ -55,10 +55,10 @@ Scale-downs take effect immediately, guarded by a 3-minute hysteresis.
 \section{The static optimum: burst-shaped, calm-day expensive}
 \label{sec:base-static}
 
-An exhaustive grid search (encoder workers $C$ crossed with
+A grid search (encoder workers $C$ crossed with
 language shapes $\mathrm{TP}\times N$, refined around the feasibility
 frontier; 101 evaluated points, all archived) yields the smallest
-SLA-feasible fleet per window
+grid-feasible fleet per window
 (Table~\ref{tab:base-grid}).
 
 \begin{table}[htbp]
@@ -95,7 +95,7 @@ deployable static $C{=}8$ is the same under either metric --- the binding
 burst windows peak at eight workers either way --- so the choice of
 metric reshapes only the per-window table, not the deployable fleet that
 carries the cost headline of Chapter~\ref{cap:closedloop}
-(0.55--0.61$\times$ static).
+(0.57--0.61$\times$ static).
 
 Three structural facts follow. First, \textbf{every burst window forces
 the language pool to TP2, and the gain is the parallelism layout, not
