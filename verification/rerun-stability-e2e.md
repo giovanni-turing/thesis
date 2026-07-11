@@ -241,23 +241,30 @@ per-request coupling of the two delays.
 |---|---|
 | encoder-delay only (marginal) | 588 |
 | language TTFT only (marginal) | 706 modeled / **651 replay** |
-| **true end-to-end ingress→first-token** | **1295** |
+| **modelled end-to-end ingress→first-token** | **1295** |
 | naive additive (p99 + p99) | 1294 |
 | lower bound max(marginals) | 706 |
-| image-bearing-only e2e p99 | 1349 |
+| image-bearing-only e2e p99 | 1335 |
 
-- **True e2e p99 = 1295 ms** (modeled TTFT). Using the replay's own TTFT p99
-  (651) instead, the near-comonotonic tail gives ≈ 588 + 651 = **1239 ms**. So
-  the true ingress-to-first-token p99 is **≈ 1.24–1.30 s — roughly 2× the
-  encoder marginal (588) and ~2× the language marginal (651).**
+NOTE (issue-time update): the script now reads the issue-time schedule's
+per-request file (`fc_p90_L30_issuetime.jsonl`) rather than the target-time
+`fc_p90_L30.jsonl`. All-request modelled e2e p99 is unchanged at **1295.17 ms**;
+image-bearing changes 1348.83 → **1335.43 ms**. This is a MODELLED
+reconstruction (encoder delay recovered exactly; prefill TTFT modelled by AIC
+and validated), not a request-linked replay measurement.
+
+- **Modelled e2e p99 = 1295 ms** (modelled TTFT 706). Using the replay's own
+  TTFT p99 (651) instead, the near-comonotonic tail gives ≈ 588 + 651 = **1239 ms**.
+  So the modelled ingress-to-first-token p99 is **≈ 1.24–1.30 s — roughly 2× the
+  encoder marginal (588) and ~2× the language marginal (651/706).**
 - **Why e2e p99 ≈ the naive additive sum (1295 ≈ 1294):** encoder_delay and TTFT
-  are **positively correlated** (Pearson 0.42 all requests, **0.52 image-bearing**)
+  are **positively correlated** (Pearson 0.42 all requests, **0.53 image-bearing**)
   because both are driven by the same large multi-image "frames-class" requests —
   many images ⇒ large encoder batch + handoff **and** huge `ContextTokens` ⇒ long
   prefill. The tails coincide, so the sum's p99 nearly reaches the comonotonic
   upper bound. The two separately-reported numbers therefore **understate the
-  actual user wait by ~2×**, and the mistake is not conservative — it is exactly
-  the regime where adding the marginals is *right*.
+  modelled first-token wait by ~2×**, and the mistake is not conservative — it is
+  exactly the regime where adding the marginals is *right*.
 
 ### Proposed tex edits (not applied)
 

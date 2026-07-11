@@ -159,12 +159,15 @@ Onset detection (\S\ref{sec:cl-matrix}) &
   \texttt{results/riders44/ detection\_delay.json} \\
 Tab.~\ref{tab:cl-aggregate} (0.62$\times$ headline is the issue-time
   schedule; \texttt{run\_44\_aggregate.sh} gives the target-time bound) &
+  \texttt{simulation/ run\_44\_aggregate\_issuetime.sh}, wrapping
   \texttt{verification/scripts/ forecast\_schedule\_issuetime.py}
-  (issue-time); \texttt{simulation/ run\_44\_aggregate.sh} (target-time)
-  &
-  \texttt{results/aggregate44/ fc\_p90\_L\{30,165\}\_issuetime.*};
+  (\texttt{--strict-rewarm} for the sensitivity); target-time bound from
+  \texttt{simulation/ run\_44\_aggregate.sh} &
+  \texttt{simulation/results/ aggregate44/
+  fc\_p90\_L\{15,30,45,165\}\_issuetime.*};
   \texttt{aggregate44\_rho/ *\_issuetime.*} ($\rho$ frontier);
-  \texttt{aggregate44/ *.stats.json} \\
+  \texttt{aggregate44\_strict/ fc\_p90\_L*\_strict.*} (re-warm
+  sensitivity) \\
 Encoder cold start (Ch.~\ref{cap:intro} n., \S\ref{sec:base-protocol}) &
   \texttt{collector\_artifacts/ phaseD\_cold\_start/} &
   \texttt{trials.jsonl} \\

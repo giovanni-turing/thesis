@@ -32,10 +32,10 @@
  },
  "end_to_end_ingress_to_first_token_ms": {
   "p50": 21.94,
-  "p90": 140.75,
-  "p95": 286.72,
+  "p90": 140.53,
+  "p95": 286.61,
   "p99": 1295.17,
-  "mean": 91.23,
+  "mean": 90.59,
   "max": 39473.45
  },
  "comparison_p99": {
@@ -48,12 +48,12 @@
   "e2e_over_naive_additive": 1.001
  },
  "correlation_enc_vs_ttft": {
-  "all_requests": 0.415,
-  "image_requests_only": 0.516
+  "all_requests": 0.424,
+  "image_requests_only": 0.527
  },
  "image_bearing_only_p99_ms": {
-  "encoder_delay": 825.07,
+  "encoder_delay": 799.41,
   "language_ttft": 706.8,
-  "modelled_end_to_end": 1348.83
+  "modelled_end_to_end": 1335.43
  }
 }

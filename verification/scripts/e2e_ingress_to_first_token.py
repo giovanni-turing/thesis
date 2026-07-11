@@ -38,9 +38,12 @@ sys.path.insert(0, "/home/gio/tese/workload")
 from trace_to_two_pool import load_window  # noqa: E402
 
 OFFSET, MAXREQ = 250399, 749601
-JSONL = "/home/gio/tese/simulation/results/aggregate44/fc_p90_L30.jsonl"
+# Issue-time schedule (the headline policy). The 124 MB per-request jsonl is a
+# gitignored, regenerable intermediate -- regenerate with:
+#   simulation/run_44_aggregate_issuetime.sh   (writes fc_p90_L30_issuetime.jsonl)
+JSONL = "/home/gio/tese/simulation/results/aggregate44/fc_p90_L30_issuetime.jsonl"
 REPORT = "/home/gio/tese/simulation/results/llm_week/week_fc_p90.report.json"
-STATS = "/home/gio/tese/simulation/results/aggregate44/fc_p90_L30.jsonl.stats.json"
+STATS = "/home/gio/tese/simulation/results/aggregate44/fc_p90_L30_issuetime.jsonl.stats.json"
 OUT = "/home/gio/tese/simulation/results/rerun_verify/e2e_ingress_to_first_token.json"
 
 

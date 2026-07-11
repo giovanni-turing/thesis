@@ -55,8 +55,9 @@ tail SLA on every window at every cold-start lead from 15 to 165 seconds
 one-minute-onset burst that defeats an identically
 informed reactive controller at every lead. It does so because the p90
 forecast band holds anticipatory provisioning headroom that matures within
-the cold-start lead: clean threshold detection anticipates the gradual
-onsets (burst4/5) but lags the fastest (burst3), yet the graduated headroom
+the cold-start lead: under the honest 15-second threshold clean detection
+anticipates only the clearly-gradual onset (burst4) while the faster ones
+(burst3, burst5) lag, yet the graduated headroom
 still stands capacity up before the spike, leaving the service floor
 (\SI{588}{\milli\second} p99). On the language pool, forecasts pass
 bursts under realistic replica leads only when combined with a

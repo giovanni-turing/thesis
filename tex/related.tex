@@ -84,9 +84,14 @@ accessed 2026-07-07.}
 These systems settle the architecture question: the encoder pool
 exists, separately deployed and scaled, shipping in mainstream engines.
 They make the question this thesis answers operational rather than
-hypothetical. Their scaling is driven by currently observed load (queue
-depths, utilization, arrival rates), inheriting the reactive loop of
-Section~\ref{sec:rel-autoscale}; none asks \emph{what demand signal} an
+hypothetical. Their scaling is predominantly reactive, driven by
+currently observed load (queue depths, utilization, arrival rates),
+inheriting the reactive loop of Section~\ref{sec:rel-autoscale}; the one
+exception, ElasticMM, adds a \emph{proactive} step, but only a static
+allocation of idle instances by a long-run burst-tolerance
+(peak-to-average) heuristic over aggregate load --- not a per-pool demand
+forecast (its own design calls short-term per-stream arrivals
+``difficult to predict''). None forecasts \emph{what demand signal} an
 encoder pool should be provisioned on, whether that signal is visible in
 the request \emph{rate} a conventional autoscaler watches
 (Chapter~\ref{cap:trace-eda} shows it is not, though it is computable
@@ -361,6 +366,10 @@ cluster is the natural next step of this work
 \centering
 \caption{Positioning against the closest related work. \checkmark\ =
 addressed; $\sim$ = partially (see text); --- = not addressed. The
+``Forecast'' column marks scaling driven by an explicit time-series
+demand forecast (\checkmark); $\sim$ marks a proactive heuristic on
+aggregate or leading-indicator signals (long-run periodicity, burst
+tolerance, token velocity) rather than a per-pool demand forecast. The
 last column reports the evaluation modality: this thesis's $\sim$
 denotes silicon-calibrated simulation with physical encoder anchors and
 a mocked-engine live-runtime replay; a real-cluster closed loop is
@@ -373,11 +382,11 @@ future work.}
  & Modality & Per-pool & Forecast & Calibrated & Real-cluster \\
 Work & disagg. & signals & scaling & simulation & GPU eval. \\
 \midrule
-ModServe~\cite{Qiu2025ModServe} & \checkmark & $\sim$ & --- & --- & \checkmark \\
+ModServe~\cite{Qiu2025ModServe} & \checkmark & \checkmark & --- & --- & \checkmark \\
 EPD / HydraInfer~\cite{Singh2025EPD,Dong2025HydraInfer} & \checkmark & --- & --- & --- & \checkmark \\
-ElasticMM~\cite{Liu2025ElasticMM} & \checkmark & $\sim$ & --- & --- & \checkmark \\
+ElasticMM~\cite{Liu2025ElasticMM} & \checkmark & $\sim$ & $\sim$ & --- & \checkmark \\
 SageServe / WarmServe~\cite{Jaiswal2025SageServe,WarmServe2025} & --- & --- & \checkmark & --- & \checkmark \\
-TokenScale / HeteroScale~\cite{Lai2025TokenScale,Li2025TamingChaos} & --- & $\sim$ & --- & --- & \checkmark \\
+TokenScale / HeteroScale~\cite{Lai2025TokenScale,Li2025TamingChaos} & --- & $\sim$ & $\sim$ & --- & \checkmark \\
 Dynamo (planner)~\cite{Dynamo2025} & $\sim$ & --- & $\sim$ & $\sim$ & \checkmark \\
 Vidur / LLMServingSim~2.0~\cite{Agrawal2024Vidur,Cho2026LLMServingSim2} & --- & --- & --- & $\sim$ & $\sim$ \\
 \textbf{This thesis} & \checkmark & \checkmark & \checkmark & \checkmark & $\sim$ \\

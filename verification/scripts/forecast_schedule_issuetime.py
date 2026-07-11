@@ -63,6 +63,15 @@ def main() -> None:
     ap.add_argument("--max-workers", type=int, default=32)
     ap.add_argument("--out", required=True)
     ap.add_argument("--ledger-out", default=None, help="optional issue/decision ledger JSON")
+    ap.add_argument("--strict-rewarm", action="store_true",
+                    help="drop the lifetime warm pool: a matured level stays warm only "
+                         "for --warm-hold-s, after which it retires and a later scale-up "
+                         "to it must be re-ordered (re-pay lead). Cost sensitivity bound; "
+                         "makes the schedule mildly lead-dependent.")
+    ap.add_argument("--warm-hold-s", type=float, default=165.0,
+                    help="strict-rewarm only: seconds a matured level stays warm "
+                         "(default = the H=12 archive horizon, so a level lives its "
+                         "tile's coverage window [O+L, O+165+L]).")
     args = ap.parse_args()
 
     if args.resolution != "15s":
@@ -106,17 +115,27 @@ def main() -> None:
     issue_s = ts_s - (h - 1) * BIN_S
     ready_time = issue_s + L                                # order matures here
 
-    # ready_i = max hdesired_j over j with ready_time_j <= ts_s_i  (matured orders).
-    # Sweep in time order; maintain running max keyed by maturity <= current ts.
+    # ready_i = max hdesired_j over matured orders (ready_time_j <= ts_s_i).
     # Because ready_time is not monotone in i (h varies within a tile), sort the
-    # maturities and merge.
+    # maturities. Two readiness models:
+    #   * default (warm pool): a level, once matured, stays available forever
+    #     (a monotone running-max envelope). This matches the converter's LIFO
+    #     free slot reactivation and approximates a deployed rolling-origin
+    #     controller that re-forecasts every level within its horizon. Cost is
+    #     essentially lead-invariant.
+    #   * --strict-rewarm: a matured level stays warm only for --warm-hold-s and
+    #     then retires; a later scale-up back to it must be re-ordered (re-pay
+    #     lead). No infinite warm pool. Cost becomes mildly lead-dependent; this
+    #     is the conservative sensitivity bound on the headline.
+    import bisect
     order = sorted(range(n), key=lambda j: ready_time[j])
+    rts_sorted = [ready_time[j] for j in order]
     avail = [args.min_workers] * n
     ledger = []
+    HOLD = float(args.warm_hold_s)
     ptr = 0
     running_max = args.min_workers
-    # process target bins in ts order (already sorted by ts)
-    matured = []  # (ready_time, level) already merged into running_max
+    matured = []  # indices whose orders have matured (ready_time <= current ts)
     for i in range(n):
         ti = ts_s[i]
         while ptr < n and ready_time[order[ptr]] <= ti + 1e-9:
@@ -125,15 +144,22 @@ def main() -> None:
                 running_max = hdesired[j]
             matured.append(order[ptr])
             ptr += 1
-        # running_max is a monotone-nondecreasing envelope of matured levels;
-        # that is fine for an *up-lead* readiness gate: an increase is available
-        # once matured. Down-now is enforced by the min with hdesired below.
-        ready_i = running_max
-        avail[i] = min(hdesired[i], ready_i)
+        if not args.strict_rewarm:
+            # warm pool: monotone envelope of every matured level.
+            ready_i = running_max
+            just_pool = matured
+        else:
+            # strict: only orders still warm now -- matured within [ti-HOLD, ti].
+            a = bisect.bisect_left(rts_sorted, ti - HOLD)
+            b = bisect.bisect_right(rts_sorted, ti + 1e-9)
+            warm = [order[k] for k in range(a, b)]
+            ready_i = max((hdesired[j] for j in warm), default=args.min_workers)
+            just_pool = warm
+        avail[i] = min(hdesired[i], max(ready_i, args.min_workers))
         # record the binding issue for increases (for the ledger / invariant check)
         if i == 0 or avail[i] > avail[i - 1]:
-            # find a matured j that justifies this level with the smallest issue
-            just = [j for j in matured if hdesired[j] >= avail[i]]
+            # find a warm/matured j that justifies this level with the smallest issue
+            just = [j for j in just_pool if hdesired[j] >= avail[i]]
             jbest = min(just, key=lambda j: issue_s[j]) if just else i
             ledger.append({
                 "target_ts": str(pd.Timestamp(ts[i])),
@@ -142,6 +168,7 @@ def main() -> None:
                 "justifying_h": int(h[jbest]),
                 "ready_ts": str(pd.Timestamp(int(ready_time[jbest] * 1e9))),
                 "lead_s": L,
+                "model": "strict-rewarm" if args.strict_rewarm else "warm-pool",
             })
 
     # ---- issue<=decision invariant: every unit of available capacity at ts_i

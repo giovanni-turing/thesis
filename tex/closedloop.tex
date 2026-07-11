@@ -102,7 +102,12 @@ reactive twin degrades monotonically with
 lead toward its never-scaled limit (burst3: 16{,}079 to
 54{,}170\,\si{\milli\second}). A policy that must \emph{observe} an
 onset pays for lead; a policy that provisions from an already-issued
-forecast band does not, up to the lead the archive supplies.
+forecast band does not, up to the lead the archive supplies. (This is a
+\emph{feasibility} invariance: the \SI{588}{\milli\second} floor holds
+under both a warm-pool and a strict re-warm readiness model; the
+provisioned \emph{cost} is flat under the former and mildly
+lead-dependent, 0.59--0.62$\times$, under the latter ---
+Section~\ref{sec:cl-aggregate}.)
 \item[Model choice is second-order.] All three foundation models pass
 all 60 p90/$\rho{15}$ cells, consistent with the small cross-model
 spreads of Chapter~\ref{cap:predictors}. The same holds for
@@ -251,7 +256,9 @@ matrix's quantile result: reactive fails at TTFT p99
 p50 detection lagged fast onsets in Section~\ref{sec:cl-matrix});
 and the p90 forecast passes at \SI{651}{\milli\second}. Headroom
 quantile, not signal access, separates pass from fail on fast onsets on
-\emph{both} pools. (This burst3 configuration is also the policy pair
+\emph{both} pools --- on the language pool this is the conversion dial
+under a held forecast cursor, not a second anticipation test. (This
+burst3 configuration is also the policy pair
 carried to the live-stack validation of Chapter~\ref{cap:validation}.)
 The verdict is not particular to burst3: replaying every burst episode
 end-to-end, the p90 forecast passes each one at the service floor
@@ -380,7 +387,17 @@ both ends): it is the tiled forecast's availability, not the nominal
 lead, that bounds how early capacity can be ordered. Indexing by target
 time instead is an optimistic bound that grows cheaper at longer,
 less-realizable leads (2.38M at $L{=}30$ to 2.12M at the non-realizable
-$L{=}300$), and no issue-time schedule realizes it. The forecaster does
+$L{=}300$), and no issue-time schedule realizes it. This flatness
+assumes a \emph{warm-pool} readiness model: a scaled-down replica can
+return without re-paying cold start, which matches the converter's LIFO
+slot reactivation and a deployed rolling-origin controller that
+re-forecasts every level within its horizon. Under a strict re-warm
+model instead --- a retired replica re-orders and re-pays lead --- the
+cost is mildly lead-dependent (0.62$\times$ at $L{=}15$ falling to
+0.59$\times$ at $L{=}165$), still passing at the \SI{588}{\milli\second}
+floor at every lead; \textbf{0.62$\times$} is therefore the conservative
+figure across both readiness models, and the flat lead-invariance is
+specific to the warm-pool one. The forecaster does
 not carry the result.
 Regenerating the p90 schedules from the other two model archives leaves
 the verdict unchanged: Toto and TimesFM pass at the same service floor
@@ -504,8 +521,8 @@ p90 edge holds the tail SLA at every forecast-issued lead tested
 (15--\SI{165}{\second}), including
 the one-minute onset that defeats an identically informed reactive
 controller at \emph{every} lead, because the p90 band's graduated headroom
-stands capacity up before the peak --- anticipating the more gradual
-onsets and covering the fastest one through standing headroom rather than
+stands capacity up before the peak --- anticipating the clearly-gradual
+onset and covering the faster ones through standing headroom rather than
 clean detection --- leaving only the service-time floor. On the
 language pool the same forecast, converted tail-aware, passes bursts
 under realistic replica leads --- a \emph{conversion} result, tested
