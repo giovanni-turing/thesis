@@ -1,0 +1,1 @@
+burst1 [react_point[p90,W=1b/240s]]: 183 steps, workers 1..25, provisioned 366599 worker-s over the 29939s window (static C*x span for comparison; drain tail extra)

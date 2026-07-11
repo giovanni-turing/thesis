@@ -1,0 +1,1 @@
+burst1 [issue-time L=30s q=p90 rho=15]: 155 steps, workers 5..27, provisioned 540203 worker-s over 29939s (invariant issue<=decision OK)

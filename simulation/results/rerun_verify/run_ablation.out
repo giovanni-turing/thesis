@@ -1,0 +1,55 @@
+fc_p90_burst3_L30 burst3
+fc_p90_burst3_L300 burst3
+react_point_burst3_L30 burst3
+react_p90_W120_burst3_L30 burst3
+react_p90_W240_burst3_L30 burst3
+react_p90_W480_burst3_L30 burst3
+done fc_p90_burst3_L30
+done fc_p90_burst3_L300
+done react_point_burst3_L30
+done react_p90_W120_burst3_L30
+done react_p90_W240_burst3_L30
+done react_p90_W480_burst3_L30
+react_point_burst3_L300 burst3
+react_p90_W120_burst3_L300 burst3
+fc_p90_burst1_L30 burst1
+react_p90_W240_burst3_L300 burst3
+react_p90_W480_burst3_L300 burst3
+react_point_burst1_L30 burst1
+done react_point_burst3_L300
+done react_p90_W120_burst3_L300
+done react_p90_W240_burst3_L300
+done react_p90_W480_burst3_L300
+done fc_p90_burst1_L30
+react_p90_W120_burst1_L30 burst1
+react_p90_W240_burst1_L30 burst1
+fc_p90_burst1_L300 burst1
+done react_point_burst1_L30
+react_p90_W480_burst1_L30 burst1
+react_point_burst1_L300 burst1
+react_p90_W120_burst1_L300 burst1
+done fc_p90_burst1_L300
+done react_p90_W240_burst1_L30
+done react_p90_W120_burst1_L30
+done react_p90_W480_burst1_L30
+done react_point_burst1_L300
+react_p90_W240_burst1_L300 burst1
+react_p90_W480_burst1_L300 burst1
+done react_p90_W120_burst1_L300
+done react_p90_W240_burst1_L300
+done react_p90_W480_burst1_L300
+bursts done 01:42:57
+react_p90_W120_burst1_L30 aggregate
+react_p90_W240_burst1_L30 aggregate
+react_p90_W480_burst1_L30 aggregate
+react_p90_W120_burst1_L300 aggregate
+react_p90_W240_burst1_L300 aggregate
+react_p90_W480_burst1_L300 aggregate
+FAIL react_p90_W120_aggregate_L30 (see /home/gio/tese/simulation/results/rerun_verify/react_p90_W120_aggregate_L30.sim.log)
+FAIL react_p90_W480_aggregate_L30 (see /home/gio/tese/simulation/results/rerun_verify/react_p90_W480_aggregate_L30.sim.log)
+FAIL react_p90_W240_aggregate_L30 (see /home/gio/tese/simulation/results/rerun_verify/react_p90_W240_aggregate_L30.sim.log)
+FAIL react_p90_W120_aggregate_L300 (see /home/gio/tese/simulation/results/rerun_verify/react_p90_W120_aggregate_L300.sim.log)
+FAIL react_p90_W240_aggregate_L300 (see /home/gio/tese/simulation/results/rerun_verify/react_p90_W240_aggregate_L300.sim.log)
+FAIL react_p90_W480_aggregate_L300 (see /home/gio/tese/simulation/results/rerun_verify/react_p90_W480_aggregate_L300.sim.log)
+aggregate done 01:43:07
+ALL DONE 01:43:07

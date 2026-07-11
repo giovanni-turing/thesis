@@ -1,0 +1,1 @@
+aggregate [react_quantile[p90,W=32b/480s]]: 1209 steps, workers 1..31, provisioned 2190749 worker-s over the 483660s window (static C*x span for comparison; drain tail extra)

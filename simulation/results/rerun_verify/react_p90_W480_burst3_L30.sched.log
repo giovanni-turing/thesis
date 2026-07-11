@@ -1,0 +1,1 @@
+burst3 [react_quantile[p90,W=32b/480s]]: 19 steps, workers 1..24, provisioned 22988 worker-s over the 1620s window (static C*x span for comparison; drain tail extra)

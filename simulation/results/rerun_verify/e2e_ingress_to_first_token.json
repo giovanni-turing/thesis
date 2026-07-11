@@ -1,0 +1,59 @@
+{
+ "window": "aggregate fc_p90_L30",
+ "offset": 250399,
+ "requests": 749601,
+ "requests_with_images": 350168,
+ "encoder_delay_validation": {
+  "p99_recovered_here": 588.37,
+  "p99_converter_stats": 588.37,
+  "matches": true
+ },
+ "ttft_validation": {
+  "modeled": {
+   "p50": 17.62,
+   "p90": 83.85,
+   "p95": 144.77,
+   "p99": 705.94
+  },
+  "modeled_mean": 50.32,
+  "modeled_max": 4498.14,
+  "replay_report": {
+   "p50": 22.652428030967712,
+   "p90": 96.67659801244736,
+   "p95": 178.89134097099304,
+   "p99": 651.1395369768143,
+   "mean": 58.16261241740819,
+   "max": 4365.869123071432
+  }
+ },
+ "marginals_p99_ms": {
+  "encoder_delay": 588.37,
+  "language_ttft": 705.94
+ },
+ "end_to_end_ingress_to_first_token_ms": {
+  "p50": 21.94,
+  "p90": 140.75,
+  "p95": 286.72,
+  "p99": 1295.17,
+  "mean": 91.23,
+  "max": 39473.45
+ },
+ "comparison_p99": {
+  "encoder_delay_only": 588.37,
+  "language_ttft_only": 705.94,
+  "true_end_to_end": 1295.17,
+  "naive_additive_p99+p99": 1294.31,
+  "lower_bound_max_of_marginals": 705.94,
+  "e2e_over_language_ttft": 1.835,
+  "e2e_over_naive_additive": 1.001
+ },
+ "correlation_enc_vs_ttft": {
+  "all_requests": 0.415,
+  "image_requests_only": 0.516
+ },
+ "image_bearing_only_p99_ms": {
+  "encoder_delay": 825.07,
+  "language_ttft": 706.8,
+  "true_end_to_end": 1348.83
+ }
+}

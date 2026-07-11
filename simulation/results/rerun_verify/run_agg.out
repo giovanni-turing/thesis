@@ -1,0 +1,13 @@
+sched OK react_p90_W120_aggregate_L30 (39019 B)
+sched OK react_p90_W240_aggregate_L30 (31118 B)
+sched OK react_p90_W480_aggregate_L30 (20804 B)
+sched OK react_p90_W120_aggregate_L300 (22814 B)
+sched OK react_p90_W240_aggregate_L300 (25827 B)
+sched OK react_p90_W480_aggregate_L300 (18009 B)
+done react_p90_W480_aggregate_L30
+done react_p90_W240_aggregate_L30
+done react_p90_W120_aggregate_L30
+done react_p90_W120_aggregate_L300
+done react_p90_W240_aggregate_L300
+done react_p90_W480_aggregate_L300
+AGG ABLATION DONE 01:46:01
