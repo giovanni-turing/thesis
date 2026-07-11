@@ -258,7 +258,7 @@ service floor), where a reactive controller watching the \emph{same}
 image signal loses the fastest-onset burst at every lead (p99
 9.5--54\,\si{\second}); regime anticipation, not signal choice, is
 the operative advantage. Over the 5.60-day covered span the policy
-meets the SLA in aggregate and inside every episode at 0.27--0.31 times
+meets the SLA in aggregate and inside every episode at 0.55--0.61 times
 the deployable static encoder fleet's provisioned worker-time. And the
 reactive planner's language-pool failure is diagnostic: all fourteen
 configurations satisfy their own window-mean control law while violating
@@ -439,7 +439,7 @@ reproduced as system behavior.
 
 \item \textbf{Baselines and the closed predictive-scaling loop}
 (Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}). The
-static-optimal worker-grid frontier per window (burst windows need 6--16
+static-optimal worker-grid frontier per window (burst windows need 6--8
 encoder workers at trace rate against 2 on a calm day, TP2 language
 shapes throughout); the reactive SLA-planner baseline, which satisfies
 its own window-mean control law while violating the tail SLA; and the
@@ -450,7 +450,7 @@ compliance $\times$ provisioned worker-time in a 560-cell factorial
 the operating rating ($\rho{=}15$) the p90-forecast policy delivers the
 RQ4 verdict (every window at every lead from 15 to \SI{300}{\second},
 at the zero-queueing service
-floor, at a quarter to a third of the deployable static encoder fleet's
+floor, at over half to two-thirds of the deployable static encoder fleet's
 worker-time), while the reactive controller, watching the \emph{same}
 per-pool signal, loses the fastest-onset burst at every lead and sees
 its apparent aggregate pass dissolve under per-episode grading.
@@ -474,7 +474,7 @@ uniform $448^2$ image, and its cost model carries a measured,
 conservative-direction gap to silicon (${\approx}1.4$--$1.6\times$ at
 $448^2$) documented where it matters. The inter-pool handoff is priced
 single-stream: at Qwen3-VL's full DeepStack payload the
-\SI{588}{\milli\second} floor and the 0.27--0.31$\times$ result assume an
+\SI{588}{\milli\second} floor and the 0.55--0.61$\times$ result assume an
 embedding-only handoff or a ${\geq}100$\,Gbps fabric, since on the default
 25\,Gbps link transfer alone violates the bound for every policy
 (Chapter~\ref{cap:closedloop}) --- a fabric requirement, not a policy

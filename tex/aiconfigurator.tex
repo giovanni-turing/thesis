@@ -334,18 +334,21 @@ the measured 5090 $f(N)$ (the eager whole-tower measurement, the
 fused production encoder sits below) re-derives the fleet across all
 six burst windows (the AIC path first reproducing the grid's sizing
 exactly in every one). What decides robustness is which constraint
-binds $C^{*}$. Five of the six are sized at the p99 latency knee
+binds $C^{*}$. All six are sized at the p99 latency knee
 (\num{6}--\num{8} workers), where queueing is steep; there the
 $1.4$--$1.6\times$ per-batch underprice amplifies to a near-doubling of
 the fleet ($1.86$--$2.17\times$, median $2\times$; e.g.\ burst3
 grows \num{7}$\to$\num{13}), each composition-sized fleet failing on
-silicon at encoder-delay p99 1{,}420--1{,}846\,\si{\milli\second}. The
-sole exception, burst5, is alone sized by the sustained-volume
-divergence bound (\num{16} workers, far above its p99 knee), and that
-headroom absorbs the underprice untouched (p99 588 to
-\SI{784}{\milli\second}, both feasible). The optimism is thus corrected
-by up to ${\approx}2\times$ at the latency knee and absorbed where
-divergence-sized, by the same queue search that produced the sizing;
+silicon at encoder-delay p99 1{,}420--1{,}846\,\si{\milli\second}.
+Burst5 is no exception: its honest AIC size is \num{8} workers, set by
+the same p99 knee, not the \num{16} an earlier sustained-volume
+divergence flag reported. That flag was an endpoint artifact --- the
+backlog slope is ${\approx}0$ over the arrival window and the tiled-trace
+backlog constant, so $C{=}8$ is feasible at week scale (encoder-delay p99
+\SI{644}{\milli\second}) --- so burst5 too amplifies ${\approx}2\times$ on
+silicon rather than absorbing the underprice from spare headroom. The
+optimism is thus corrected by up to ${\approx}2\times$ at the latency knee
+across every window, by the same queue search that produced the sizing;
 re-benchmarking $f(N)$ is the only per-silicon step.
 
 \section{Validation against physical measurement}

@@ -78,7 +78,7 @@ burst1 & 8.32 & 6 & TP2$\times$2 & 49.9 & 33.3 \\
 burst2 & 1.90 & 8 & TP2$\times$2 & 15.2 & 7.6 \\
 burst3 & 0.45 & 7 & TP2$\times$2 & 3.2 & 1.8 \\
 burst4 & 3.15 & 7 & TP2$\times$2 & 22.1 & 12.6 \\
-burst5 & 1.35 & 16 & TP2$\times$2 & 21.6 & 5.4 \\
+burst5 & 1.35 & 8 & TP2$\times$2 & 10.8 & 5.4 \\
 burst6 & 1.37 & 6 & TP2$\times$2 & 8.2 & 5.5 \\
 steady (24 h) & 24.0 & 2 & TP1$\times$2 & 48.0 & 48.0 \\
 \bottomrule
@@ -91,10 +91,11 @@ The encoder $C^{*}$ minimize the all-request encoder-delay p99
 requests that never enter the encoder) the burst optima rise by one to
 two workers --- burst1 to 7, burst3/burst4 to 8, burst6 to 8
 (58.2/3.6/25.2/10.9 5090-hours), burst2/burst5/steady unchanged. The
-deployable static $C{=}16$ is set by burst5, which is image-dense and so
-identical under either metric, so the cost headline of
-Chapter~\ref{cap:closedloop} is unchanged; only the per-window table
-shifts.
+deployable static $C{=}8$ is set by burst5, which is image-dense and so
+identical under either metric; the choice of metric therefore reshapes
+only the per-window table, not the deployable fleet that carries the
+cost headline of Chapter~\ref{cap:closedloop} (0.55--0.61$\times$
+static).
 
 Three structural facts follow. First, \textbf{every burst window forces
 the language pool to TP2, and the gain is the parallelism layout, not
@@ -111,12 +112,12 @@ TP2$\times$2 passes every one (763--846\,\si{\milli\second}), a
 single long prefill that independent replicas can only queue;
 Chapter~\ref{cap:twopool} quotes \SI{748.4}{\milli\second} for
 the same shape on its isolation trace. Second, the encoder requirement
-swings from 2 workers on the calm day to 16 on burst5: the
+swings from 2 workers on the calm day to 8 on burst5: the
 order-of-magnitude missizing of Chapter~\ref{cap:trace-eda}, now as a
 fleet-sizing fact. Third, the single static fleet that survives
-\emph{all} windows, $C{=}16$ encoders plus TP2$\times$2 (4 H100s),
+\emph{all} windows, $C{=}8$ encoders plus TP2$\times$2 (4 H100s),
 hereafter the \emph{deployable static}, overprovisions the calm
-day by $8\times$ on the vision side and $2\times$ on the language side.
+day by $4\times$ on the vision side and $2\times$ on the language side.
 It also carries a fleet-\emph{shape} difference (TP2 versus TP1) that no
 replica autoscaler can morph at runtime. Close-out checks confirm the
 optima are robust to the router's tuning knobs (35 corner re-runs;
@@ -248,8 +249,8 @@ queue does the damage.
 \label{sec:base-summary}
 
 The static optimum is
-burst-shaped: deployable only as 16 encoders + TP2$\times$2, i.e.\
-$8\times$/$2\times$ calm-day overprovisioning plus a TP-shape change no
+burst-shaped: deployable only as 8 encoders + TP2$\times$2, i.e.\
+$4\times$/$2\times$ calm-day overprovisioning plus a TP-shape change no
 replica scaler performs (RQ1's missizing, priced). The reactive
 alternative fails on both pools for the same structural reason,
 information arriving too late and converted through means: all fourteen
