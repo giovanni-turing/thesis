@@ -225,9 +225,11 @@ language pool's dynamic savings are structurally small). The week
 verdict is
 forecast-model-independent: replacing Chronos with Toto or TimesFM holds
 the tail at the identical \SI{651}{\milli\second} (both pass), shifting
-only the provisioning cost (625 and 641 versus 518.6 GPU-hours). The
-forecast model sets how much headroom is bought, not whether the SLA is
-met. The reactive planner \textbf{fails the
+only the provisioning cost (625 and 641 versus 518.6 GPU-hours ---
+1.16$\times$ and 1.19$\times$ the burst-static fleet, so the language
+pool's near-break-even cost is Chronos-specific; the pass/fail
+\emph{verdict} is model-independent, the cost is not). The forecast
+model sets how much headroom is bought, not whether the SLA is met. The reactive planner \textbf{fails the
 week outright} (TTFT p99 1{,}197\,\si{\milli\second}) while spending
 281.8 GPU-hours: half the budget, and the wrong tail. At week scale
 as at window scale, spend is not the defect.
@@ -335,7 +337,9 @@ cost knob. The p90-forecast policy passes \emph{all 48 of its cells}
 \emph{in aggregate} (every model, rating, and lead), tracing a cost frontier
 from 0.44$\times$ static at the conservative $\rho{=}10$
 (\SI{588}{\milli\second}) down to 0.18$\times$ at the aggressive
-$\rho{=}25$ (\SI{899}{\milli\second}, still under the bound). The loose end
+$\rho{=}25$ (\SI{899}{\milli\second} for Chronos; the p90 loose end at
+$\rho{=}25$ is TimesFM at \SI{994}{\milli\second}, Toto at
+\SI{882}{\milli\second}, all still under the bound). The loose end
 of that frontier carries the same per-episode caveat this chapter applies to
 the reactive rows, though: these week cells are aggregate-graded, and the
 per-window matrix (Section~\ref{sec:cl-matrix}) shows $\rho{=}20$/25 dropping

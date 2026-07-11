@@ -37,9 +37,10 @@ window's GPU-time denominator. Two episodes
 (burst2/6) fall in the trace's first 1.4 days, reserved as forecast
 context (the temporal split is stated in
 Chapter~\ref{cap:closedloop}); they are graded here by every
-forecast-free policy (the static grid, the language-pool reactive
-baseline, and the reactive encoder baseline, which needs no forecast),
-but not by any forecast policy.
+policy that needs no archived forecast (the static grid, the
+language-pool reactive baseline, and the reactive encoder baseline ---
+the reactive planner's own ARIMA loop is internal, not the archived
+zero-shot forecast these windows lack), but not by any forecast policy.
 Each policy
 produces, per window, a worker schedule for the encoder pool ($C(t)$
 workers) and a configuration or replica schedule for the language pool

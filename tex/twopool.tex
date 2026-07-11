@@ -308,7 +308,8 @@ the full SLA, with margin, at the episode's rate. The vision pool's
 failure has no such fix: its p99 encoder delay
 of \SI{5.0}{\second} ($5\times$ the bound) arises from episodic
 queueing while mean utilization sits at 29\%, is invisible to rate- and
-utilization-based monitors, and yields only to capacity (the grid,
+mean-utilization monitors (the minute-mean stays low even as the 1-minute
+peak busy fraction reaches 0.90), and yields only to capacity (the grid,
 AIC-costed; up to ${\approx}2\times$ more on measured silicon,
 Chapter~\ref{cap:aiconfigurator}: six
 encoder workers, $3\times$ this topology, are needed at the trace's own
