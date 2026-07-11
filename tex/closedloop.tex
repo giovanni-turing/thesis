@@ -104,9 +104,11 @@ on the vision pool the reactive planner's mean-sizing defect). The calibrated p9
 cadence) is what converts a point forecast into provisionable headroom.
 \item[Lead-invariance is the signature of anticipation.] Actuated on
 true forecast issue time (each 180-second tile's 12-step forecast ordered
-at its origin, honouring issue $\le$ decision), the p90 policy holds the
-service-floor p99 unchanged from $L{=}15$ to \SI{165}{\second} --- the
-archive's maximum issued lead --- on every window, while the
+at its origin, honouring issue $\le$ decision), the p90 policy holds its
+per-window p99 unchanged across leads from $L{=}15$ to \SI{165}{\second}
+--- the archive's maximum issued lead --- at the \SI{588}{\milli\second}
+service floor on every burst window and feasible (below
+\SI{734}{\milli\second}) on the calm day, while the
 reactive twin degrades monotonically with
 lead toward its never-scaled limit (burst3: 16{,}079 to
 54{,}170\,\si{\milli\second}). A policy that must \emph{observe} an
@@ -129,9 +131,12 @@ integer-replica conversion quantizes the differing forecasts onto the
 same worker schedule. Predictor choice is second-order on both sides;
 the signal and the conversion are not.
 \item[Capacity rating trades cost against fragility.] At $\rho \in
-\{10,15\}$ the p90 policy is 60/60; loosening to $\rho{=}20$/25 drops
-3/11 cells (concentrated on burst5, the binding static window, via
-backlog that the window never drains). The reactive policy, by contrast,
+\{10,15,20\}$ the p90 policy is \emph{60/60} on the issue-time factorial
+under both readiness models, though margin tightens with $\rho$
+(per-window p99 rises from the \SI{588}{\milli\second} floor to
+\SI{746}{}/\SI{860}{\milli\second} warm/strict at $\rho{=}20$); only
+$\rho{=}25$ drops cells --- 9 of 60, all on burst5, the binding static
+window, via backlog it never drains. The reactive policy, by contrast,
 is insensitive to $\rho$ (13--14 of 20 cells at every rating): no
 capacity rating repairs late information.
 \end{description}
@@ -208,7 +213,12 @@ bin, not a re-issued origin --- so this pool tests the \emph{conversion}
 under a held forecast signal rather than language-side anticipation; the
 anticipation result is the encoder pool's, and this pool's insensitivity
 to replica lead is a property of the tail-aware conversion, not of a
-second scale-ahead controller.) The pass has a second
+second scale-ahead controller. Concretely the hook reads a single
+15-second forecast bin per planner tick, scaled to the tick's
+60-second interval, from a cursor one interval ahead of $T_0$, and
+advances by whole ticks --- a fixed, one-interval-stale sampled-bin read,
+adequate for the conversion comparison it supports but not a timing or
+anticipation instrument.) The pass has a second
 necessary ingredient: a \emph{tail-aware capacity conversion}. Run with
 the planner's native conversion (replicas $=$ mean demand over mean
 per-replica throughput), the \emph{same forecast} fails much like the
@@ -378,7 +388,7 @@ Static $C{=}2$ (calm-day optimum) & \textbf{2{,}953} & 0.97 &
 0.25$\times$ & fail \\
 Forecast p90, $L{=}30$\,s (issue-time) & 588 & 2.41 & 0.62$\times$ & pass \\
 Forecast p90, $L{=}165$\,s (issue-time, max) & 588 & 2.41 & 0.62$\times$ & pass \\
-Forecast p50, $L{=}30$\,s & \textbf{3{,}047} & 0.96 & 0.25$\times$ &
+Forecast p50, $L{=}30$\,s & \textbf{2{,}735} & 0.98 & 0.25$\times$ &
 fail \\
 Reactive, $L{=}30$\,s & 588 & 2.61 & 0.67$\times$ & \textbf{fails
 burst3} \\
@@ -434,11 +444,18 @@ frontier from 0.89$\times$ static at the conservative $\rho{=}10$
 $\rho{=}25$ (\SI{748}{\milli\second}, still under the aggregate bound).
 The cheap end of that frontier carries the same per-episode caveat this
 chapter applies to the reactive rows, though: these week costs are
-aggregate-graded, and the per-window matrix (Section~\ref{sec:cl-matrix})
-shows $\rho{=}20$/25 dropping cells on burst5. Only $\rho\in\{10,15\}$
-(0.62--0.89$\times$) is per-episode-clean; the quoted 0.62$\times$ sits at
-$\rho{=}15$, inside that verified range, not at the aggregate-only
-$\rho{>}15$ tail. The
+aggregate-graded, and the per-window factorial (Section~\ref{sec:cl-matrix})
+shows only $\rho{=}25$ dropping cells (9, all burst5).
+$\rho\in\{10,15,20\}$ is per-episode-clean, spanning 0.48--0.89$\times$.
+The headline sits at $\rho{=}15$ (0.62$\times$): a \emph{deliberately
+conservative} operating point that holds the \SI{588}{\milli\second}
+floor with margin. $\rho{=}20$ also passes 60/60 --- more cheaply, at
+${\approx}0.48\times$ (aggregate 0.46--0.48$\times$ across readiness
+models and realizable leads) --- but runs closer to the bound (per-window
+p99 to \SI{860}{\milli\second} under strict re-warm), so the extra
+${\sim}0.14\times$ saving is bought against tail margin; the thesis
+reports the conservative point and notes $\rho{=}20$ as the cheapest
+per-episode-clean rating. The
 p50-forecast policy, by contrast, fails at week scale --- the echo of
 the mean-sizing defect, and consistent with its per-window issue-time
 factorial clearing only 23--24 of 60 cells

@@ -41,14 +41,17 @@ WINDOWS = ["burst1", "burst3", "burst4", "burst5", "steady24h"]
 MODELS = ["chronos", "toto", "timesfm"]
 LEADS = [15, 30, 45, 165]
 QUANTILE = os.environ.get("QUANTILE", "p90")  # p90 = headline; p50 = ablation
+RHO = os.environ.get("RHO", "15")             # capacity rating (img/s per worker)
 
 
 def run(window, model, lead, strict):
-    tag = f"{window}_{model}_L{lead}_{'strict' if strict else 'warm'}"
+    # tag includes QUANTILE+RHO so concurrent runs with different configs never
+    # collide on the shared scratch dir (schedules differ by rho/quantile).
+    tag = f"{QUANTILE}_rho{RHO}_{window}_{model}_L{lead}_{'strict' if strict else 'warm'}"
     sched = SCRATCH / f"{tag}.sched.json"
     outjsonl = SCRATCH / f"{tag}.jsonl"
     parquet = ROOT / f"predictors/results/{model}_images.parquet"
-    g = [EDA_PY, str(GEN), "--window", window, "--quantile", QUANTILE, "--rho", "15",
+    g = [EDA_PY, str(GEN), "--window", window, "--quantile", QUANTILE, "--rho", RHO,
          "--cold-start-s", str(lead), "--parquet", str(parquet), "--out", str(sched)]
     if strict:
         g.append("--strict-rewarm")
@@ -99,7 +102,7 @@ def main():
                        "{warm-pool,strict-rewarm}; issue-time actuation; "
                        "denominator static C8; feasible = p99<1000ms & not divergent",
                "results": results},
-              open(OUTDIR / f"factorial_issuetime_{QUANTILE}_results.json", "w"), indent=1)
+              open(OUTDIR / f"factorial_issuetime_{QUANTILE}_rho{RHO}_results.json", "w"), indent=1)
     print("=" * 60)
     for rd in ("warm", "strict"):
         sub = [r for r in results if r["readiness"] == rd and "error" not in r]

@@ -151,14 +151,21 @@ LLM lead sweep + capacity mapping (\S\ref{sec:cl-llm}) &
   \texttt{replay\_with\_forecast.py} &
   \texttt{results/riders44/ \{ladder\_*, fc\_lead*, fc\_scale*,
   tp2knee\_*\}.report.json} \\
-Per-window factorial (60-cell p90 headline + p50, \S\ref{sec:cl-matrix});
-  Tab.~\ref{tab:base-react-enc} &
-  \texttt{simulation/ run\_44\_factorial\_issuetime.py} (issue-time,
-  warm{+}strict); target-time exploratory grid
+Per-window factorial (60-cell p90 headline + p50; $\rho$-rating
+  surface, \S\ref{sec:cl-matrix}); Tab.~\ref{tab:base-react-enc} &
+  \texttt{simulation/ run\_44\_factorial\_issuetime.py}
+  (\texttt{QUANTILE}/\texttt{RHO} env; issue-time, warm{+}strict);
+  target-time exploratory grid
   \texttt{\{gen\_cells\_44.py, e2b\_fleet.py\}} &
   \texttt{simulation/results/ factorial\_issuetime/
-  factorial\_issuetime\_\{p90,p50\}\_results.json}; target-time grid
-  \texttt{results/ results\_44.jsonl} \\
+  factorial\_issuetime\_\{p50\_rho15, p90\_rho\{15,20,25\}\}\_results.json};
+  target-time grid \texttt{results/ results\_44.jsonl} \\
+Week-scale surface (\S\ref{sec:cl-aggregate}; quantile-decisive,
+  rating-cost) &
+  \texttt{simulation/ run\_44\_week\_surface\_issuetime.py} (96 issue-time
+  aggregate cells) &
+  \texttt{simulation/results/ week\_surface\_issuetime/
+  week\_surface\_issuetime\_results.json} \\
 Onset detection (\S\ref{sec:cl-matrix}) &
   \texttt{simulation/ detect\_onsets\_44.py} &
   \texttt{results/riders44/ detection\_delay.json} \\
@@ -169,10 +176,10 @@ Tab.~\ref{tab:cl-aggregate} (0.62$\times$ headline is the issue-time
   (\texttt{--strict-rewarm} for the sensitivity); target-time bound from
   \texttt{simulation/ run\_44\_aggregate.sh} &
   under \texttt{simulation/results/}:
-  \texttt{aggregate44/ fc\_p90\_L\{15,30,45,165\}\_issuetime.*},
+  \texttt{aggregate44/ fc\_\{p90\_L\{15,30,45,165\},p50\_L30\}\_issuetime.*},
   \texttt{aggregate44\_rho/ *\_issuetime.*} ($\rho$ frontier),
-  \texttt{aggregate44\_strict/ fc\_p90\_L*\_strict.*} (re-warm
-  sensitivity) \\
+  \texttt{aggregate44\_strict/ \{fc\_p90\_L*, fc\_p50\_L30,
+  fc\_p90\_rho20\_L*\}\_strict.*} (re-warm sensitivity) \\
 Encoder cold start (Ch.~\ref{cap:intro} n., \S\ref{sec:base-protocol}) &
   \texttt{collector\_artifacts/ phaseD\_cold\_start/} &
   \texttt{trials.jsonl} \\

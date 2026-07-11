@@ -98,10 +98,12 @@ the request \emph{rate} a conventional autoscaler watches
 (Chapter~\ref{cap:trace-eda} shows it is not, though it is computable
 from request \emph{content}), or whether it is forecastable at the
 horizons replica cold starts require (Chapter~\ref{cap:predictors} shows
-it is). ModServe's own trace analysis documents bursty, heterogeneous
-image traffic, but its scaling remains reactive; to our knowledge, the
-released trace's per-pool demand signals were not characterized as
-forecasting targets before this thesis.
+it is). ModServe's own trace analysis documents the per-modality
+signals, their independence and burstiness, and even the \emph{difficulty}
+of forecasting them (a 79\% error for existing LLM traffic
+predictors~\cite{Qiu2025ModServe}); what it does not do --- and what this
+thesis contributes --- is benchmark forecasts of those signals at
+provisioning horizons and consume them in closed-loop per-pool scaling.
 
 \section{Autoscaling for model serving}
 \label{sec:rel-autoscale}
@@ -219,9 +221,11 @@ their request descriptors are token counts and timestamps. The
 ModServe~\cite{Qiu2025ModServe} is, to our knowledge, the first public
 production trace of a \emph{multimodal} inference cluster;
 Chapter~\ref{cap:trace-eda} contributes what the autoscaling question
-needs from it: the per-pool demand-signal view (decoupling, burst
-anatomy, persistence gradient) that no prior characterization, including
-ModServe's own, provides.
+needs from it: the per-pool demand-signal view --- the \emph{quantified}
+decoupling ($R^2{=}0.12$), burst anatomy, and persistence gradient ---
+that ModServe's qualitative per-modality analysis (which notes the
+signals' independence and burstiness but not their forecastability at
+provisioning horizons) does not provide.
 
 \section{Time-series forecasting for provisioning}
 \label{sec:rel-forecast}

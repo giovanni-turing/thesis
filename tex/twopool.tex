@@ -212,8 +212,13 @@ prefill TTFT (modelled by AIC and validated against the week replay to
 within 8\% at p99: \SI{706}{} modelled versus \SI{651}{\milli\second}
 replayed), a modelled reconstruction rather than a request-linked replay
 measurement --- the ingress-to-first-token p99 is
-${\approx}\SI{1.24}{}$--$\SI{1.30}{\second}$ (the range spanning the
-replay-measured and modelled prefill tails), close to the naive sum of
+${\approx}\SI{1.30}{\second}$: the per-request joint reconstruction,
+each request's replay-recorded encoder delay plus its modelled prefill.
+(A lower estimate of ${\approx}\SI{1.24}{\second}$ follows from summing
+the replay's own \emph{aggregate} TTFT tail, \SI{651}{} rather than the
+modelled \SI{706}{\milli\second}, with the encoder tail under the same
+near-comonotonic coupling --- a marginal sensitivity, not a second joint
+reconstruction.) Either way it is close to the naive sum of
 the two marginals (${\approx}\SI{0.59}{}$ plus ${\approx}\SI{0.65}{}$--%
 $\SI{0.71}{\second}$) rather than
 their max, because the two tails are positively correlated ($r{=}0.52$ on

@@ -63,8 +63,11 @@ usable lead `= t_actual - t_issue`. Two thresholds are reported:
 | burst4 | 15:50:45 | 15:47:00 | 9 | -225 | **+345** | ANTICIPATED |
 | burst5 | 14:46:15 | 14:44:30 | 11 | -105 | **+255** | ANTICIPATED |
 
-This **reproduces codex's B4 table exactly**: burst4/5 anticipated, burst1/3 late.
-Toto/TimesFM agree on the verdicts (TimesFM never crosses on burst3).
+This **reproduces codex's B4 table exactly** at this 1-minute-p99 threshold:
+burst4/5 anticipated, burst1/3 late. (At the honest 15-second-cadence threshold
+below, only burst4 anticipates; burst5 is ~1005 s late — that is the threshold
+the manuscript uses.) Toto/TimesFM agree on the verdicts (TimesFM never crosses
+on burst3).
 
 ### p90 result at the honest thr_15s (15-s-cadence p99), Chronos
 
@@ -83,8 +86,10 @@ episodes — are gone; those were the -30-minute search-window contamination.
 **Correction required.** The claim in `closedloop.tex` that the p90 paths cross
 "within -105 to +210 seconds of the true crossing on every in-span onset" and
 that burst3 "crossed 105 s before the signal itself, 165 s of usable issue-time
-lead" is an artifact of the contaminated pre-episode search. Honestly: the p90
-threshold crossing anticipates the two *gradual* onsets (burst4, burst5) and is
+lead" is an artifact of the contaminated pre-episode search. Honestly: at the
+1-minute threshold the p90 crossing anticipates the two *gradual* onsets (burst4,
+burst5) — but at the honest 15-second-cadence threshold only burst4 crosses ahead
+(burst5 is ~1005 s late) — and is
 *late* on the fastest onset (burst3, +45 s, h=1, no usable lead) and on the slow
 onset's first in-episode crossing (burst1, +420 s). Full JSON (all models, both
 thresholds): `simulation/results/rerun_verify/onset_audit_issuetime.json`.

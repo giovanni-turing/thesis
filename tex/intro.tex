@@ -253,8 +253,9 @@ planner) during the trace's burst episodes?
 Chapters~\ref{cap:baselines} and~\ref{cap:closedloop} answer yes, and
 locate \emph{why}: the forecast-driven encoder schedule holds the tail
 bound on every window at every forecast-issued cold-start lead from 15 to
-\SI{165}{\second} (p99 \SI{588}{\milli\second}, the zero-queueing
-service floor), where a reactive controller watching the \emph{same}
+\SI{165}{\second} (the burst windows at the \SI{588}{\milli\second}
+zero-queueing service floor, the calm day below \SI{734}{\milli\second}),
+where a reactive controller watching the \emph{same}
 image signal loses the fastest-onset burst at every lead (p99
 9.5--54\,\si{\second}); anticipatory provisioning headroom, not signal
 choice, is the operative advantage. Over the 5.60-day covered span the policy

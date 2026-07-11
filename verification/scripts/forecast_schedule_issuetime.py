@@ -43,7 +43,10 @@ from pathlib import Path
 
 import pandas as pd
 
-sys.path.insert(0, "/home/gio/tese/simulation")
+# Portable: repo root from TESE_ROOT env, else inferred from this file
+# (verification/scripts/ -> parents[2]).
+_ROOT = os.environ.get("TESE_ROOT") or str(Path(__file__).resolve().parents[2])
+sys.path.insert(0, os.path.join(_ROOT, "simulation"))
 from forecast_schedule import window_start_ts  # reuse trace-anchored window start
 
 BIN_S = 15.0
@@ -53,7 +56,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--window", required=True)
-    ap.add_argument("--parquet", default="/home/gio/tese/predictors/results/chronos_images.parquet")
+    ap.add_argument("--parquet", default=os.path.join(_ROOT, "predictors/results/chronos_images.parquet"))
     ap.add_argument("--resolution", default="15s")
     ap.add_argument("--quantile", default="p90")
     ap.add_argument("--rho", type=float, default=15.0)
@@ -81,7 +84,8 @@ def main() -> None:
         sys.exit(f"cold-start-s={L}: the H=12 15-s archive supplies at most "
                  f"(12-1)*15 = 165 s of issued lead. Refusing to fabricate lead.")
 
-    win = json.loads((Path("/home/gio/tese/simulation/windows.json")).read_text())[args.window]
+    _winjson = os.environ.get("TESE_WINDOWS") or os.path.join(_ROOT, "simulation/windows.json")
+    win = json.loads(Path(_winjson).read_text())[args.window]
     t0 = window_start_ts(win["offset"])
     span_s = win["span_s"]
 
