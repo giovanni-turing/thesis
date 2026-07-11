@@ -1,5 +1,7 @@
 # Remediation Plan — Delivering a Defensible Thesis
 
+> **SUPERSEDED-WORDING.** Where this historical planning doc says "true e2e" / "true end-to-end", read "**modelled** ingress-to-first-token reconstruction" (exact encoder delay + modelled prefill; 1.30 s joint, 1.24 s marginal). The applied manuscript and scripts use "modelled".
+
 **Author:** Claude · **Date:** 2026-07-10 · Inputs: `adjudicated-issues.md`,
 `false-positives.md`, the six `verify-*.md` passes, and my own artifact recomputes.
 

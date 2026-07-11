@@ -1,5 +1,7 @@
 # Headline cascade — corrected-number spec (B5 resolution)
 
+> **SUPERSEDED-WORDING.** Where this historical planning doc says "true e2e" / "true end-to-end", read "**modelled** ingress-to-first-token reconstruction" (exact encoder delay + modelled prefill; 1.30 s joint, 1.24 s marginal). The applied manuscript and scripts use "modelled".
+
 **Decision (user):** report ONLY the AIC-consistent number; retire 0.27–0.31×.
 **Root cause:** burst5's C=16 was an endpoint-divergence artifact; honest AIC
 deployable static = **C=8** (burst5 is p99-knee-limited at 8, stable at every

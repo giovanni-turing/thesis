@@ -12,9 +12,11 @@ factory in a fixed order (local_planner.py: _num_req_predictor,
 _isl_predictor, _osl_predictor) — the factory hands out variate bindings
 in that sequence. Clocking: the planner feeds one observation per
 throughput tick; the predictor counts add_data_point calls and returns
-a SINGLE archived bin sampled one control-minute ahead (the bin at index
-4*ticks at 15-s resolution) -- it does NOT aggregate the minute's four
-15-s bins, and the series starts at T0-1min. Run with the throughput
+a SINGLE archived bin of the held forecast path (the bin at index
+4*ticks at 15-s resolution) -- NOT a future-horizon prediction: it does
+NOT aggregate the minute's four 15-s bins, the series starts at T0-1min,
+and the indexing samples roughly the current control minute, not a
+look-ahead. This is a same-input conversion signal, not anticipation. Run with the throughput
 adjustment interval equal to the forecast bin (60 s for 1-min bins) so
 per-bin totals map 1:1 onto per-interval counts. The language-pool result
 is therefore a same-input conversion comparison on a held, sampled
@@ -121,7 +123,7 @@ class _ForecastFilePredictor(P.BasePredictor):
         return r, c, g
 
     def predict_next(self) -> float:
-        r, c, g = self._bin(self.ticks)  # next bin = one past the observed ones
+        r, c, g = self._bin(self.ticks)  # indexed bin of the held path (same-input conversion; not a future-horizon prediction)
         if self.kind == "req":
             # FORECAST_REQ_SCALE: tail-aware capacity mapping through the
             # planner's mean-based conversion — scale the predicted request

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Rebuild the 60-cell p90/rho=15 encoder factorial under ISSUE-TIME actuation.
+"""Rebuild the encoder factorial under ISSUE-TIME actuation (QUANTILE/RHO env;
+default p90/rho15; also run at rho{10,20,25} and QUANTILE=p50 for the surface).
 
 The archived 560-cell grid (gen_cells_44.py / run_cell.py) used the TARGET-time
 controller (forecast_schedule.py) at leads {15,30,45,300}. The manuscript now
@@ -14,7 +15,7 @@ Portable: paths resolve from TESE_ROOT (default = repo root inferred from this
 file); interpreter venvs from EDA_PY / AIC_PY env (pandas generator + AIC
 converter respectively). Per-request .jsonl intermediates go to a scratch dir
 (TESE_SCRATCH, default /tmp) and are not kept; the committed evidence is
-results/factorial_issuetime/factorial_issuetime_results.json.
+results/factorial_issuetime/factorial_issuetime_{QUANTILE}_rho{RHO}_results.json.
 """
 import json
 import os

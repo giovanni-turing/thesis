@@ -89,7 +89,7 @@ noise-level inter-model spreads in Table~\ref{tab:pred-wape}.}
 \section{Figure and table manifest}
 
 {\scriptsize\setlength{\tabcolsep}{3pt}
-\begin{longtable}{@{}p{0.30\linewidth}p{0.34\linewidth}p{0.32\linewidth}@{}}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedright\arraybackslash}p{0.34\linewidth}>{\raggedright\arraybackslash}p{0.32\linewidth}@{}}
 \caption{Manuscript element $\to$ generating script $\to$ primary
 artifact. Paths relative to the workspace root; leading directories
 shared with the script column are elided from artifacts. EDA scripts run
@@ -182,7 +182,8 @@ Tab.~\ref{tab:cl-aggregate} (0.62$\times$ headline is the issue-time
   (\texttt{--strict-rewarm} for the sensitivity); target-time bound from
   \texttt{simulation/ run\_44\_aggregate.sh} &
   under \texttt{simulation/results/}:
-  \texttt{aggregate44/ fc\_\{p90\_L\{15,30,45,165\},p50\_L30\}\_issuetime.*},
+  \texttt{aggregate44/ fc\_p90\_L\{15,30,45,165\}\_issuetime.*},
+  \texttt{fc\_p50\_L30\_issuetime.*},
   \texttt{aggregate44\_rho/ *\_issuetime.*} ($\rho$ frontier),
   \texttt{aggregate44\_strict/ \{fc\_p90\_L*, fc\_p50\_L30,
   fc\_p90\_rho20\_L*\}\_strict.*} (re-warm sensitivity) \\
@@ -192,7 +193,10 @@ Encoder cold start (Ch.~\ref{cap:intro} n., \S\ref{sec:base-protocol}) &
 Tab.~\ref{tab:val-anchor}; live divergences (\S\ref{sec:val-findings}) &
   \texttt{simulation/live51/ worker\_manager.py} (live control plane:
   etcd/NATS, KV router, per-process TP2 mockers, Prometheus, planner) &
-  \texttt{simulation/results/ live51/ twin\_fc*, twin\_re*} \\
+  offline twins \texttt{simulation/results/ live51/ twin\_fc*, twin\_re*};
+  live runs \texttt{live51/ live\_runs/ \{live\_fc, live\_re,
+  verify\_flag\}/ \{planner.log.gz, manager.jsonl,
+  profile\_export\_aiperf.json\}} \\
 Physical encoder anchor (\S\ref{sec:aic-validation}, future work) &
   \texttt{collector\_artifacts/ phaseE\_physical\_anchor/
   \{bench\_encoder\_anchor, silicon\_in\_loop, silicon\_multiworker\}.py} &

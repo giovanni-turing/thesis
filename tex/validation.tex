@@ -94,7 +94,7 @@ within its expected band throughout, because the regression is tuned
 from sampled forward passes that arrive in different order live; but the
 \emph{applied} capacity,
 after the budget cap, tracks the same trajectory. The
-client-observed TTFT tails land within 1--7\% of the simulated ones
+client-observed TTFT tails land within 1.0--6.8\% of the simulated ones
 (a single live run per policy, so this is a point difference between the
 two systems, not a repeated-run noise band). The burst3 policy split
 reproduces on the real stack in the two policies carried live: the p90
@@ -155,9 +155,12 @@ only in simulation), and mocked engine execution. It validates the
 \emph{control loop}, not GPU silicon, which is what
 Chapter~\ref{cap:aiconfigurator} anchored physically on the encoder
 side. Within that scope the conclusion is direct: the platform's
-closed-loop behavior transfers to the real stack within 1--7\% on every
-compared metric (one live run per policy, so a point difference rather
-than a noise band), in both verdict directions, and the divergences that
+closed-loop behavior transfers to the real stack in both verdict
+directions --- TTFT differs by 1.0--6.8\% and provisioned replica-seconds
+by 5.3--7.6\%, and the ITL SLA verdicts agree (though the forecast policy's
+ITL differs by \SI{1.8}{\milli\second}, 18.6\%, both far under the
+\SI{100}{\milli\second} bound) --- across one live run per policy (a point
+difference, not a repeated-trial noise band), and the divergences that
 do exist
 (identified, explained, in one case fixed on a local branch to be proposed upstream) are properties
 of the harnesses, not of the policies this thesis compares.
