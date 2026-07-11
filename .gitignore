@@ -11,6 +11,7 @@ __pycache__/
 .claude
 .codex
 .agents
+/papers/
 # KvikIO/GPUDirect-Storage cuFile logs
 cufile.log
 # LaTeX build artifacts (tese.tex root); keep sources + figures, drop aux
@@ -45,4 +46,8 @@ simulation/results/cap_sensitivity/*.log
 # 4.4 aggregate/rider intermediates: stats+schedules+reports tracked; composed traces reproducible
 simulation/results/aggregate44/*.jsonl
 simulation/results/aggregate44/*.log
+simulation/results/aggregate44_rho/*.jsonl
+simulation/results/aggregate44_rho/*.log
+simulation/results/aggregate44_strict/*.jsonl
+simulation/results/aggregate44_strict/*.log
 simulation/results/riders44/*.log

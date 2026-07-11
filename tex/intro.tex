@@ -26,7 +26,10 @@ one per pool, continuously, under load that moves by the minute.
 
 This thesis studies how the pools of a modality-disaggregated multimodal
 serving system should be scaled, and defends a specific answer: each pool
-must be provisioned on a forecast of \emph{its own} demand signal. In a production multimodal
+must be provisioned on \emph{its own} demand signal --- the vision pool,
+whose signal is not rate-visible, on a \emph{forecast} of it
+(anticipatory provisioning); the language pool, whose signal is
+rate-visible, on a tail-aware \emph{conversion} of it. In a production multimodal
 trace, vision demand is nearly decoupled from the request rate a
 conventional autoscaler watches. Yet the burstiest demand signal is also
 the most \emph{persistent}: forecastable at the horizons provisioning
@@ -38,7 +41,9 @@ physical measurement (Chapter~\ref{cap:aiconfigurator}), composed with a
 calibrated discrete-event simulation of the language pool, reproduces
 the decoupling as measured behavior: saturation knees an order of
 magnitude apart, the largest burst breaking the pools in structurally
-different ways (Chapter~\ref{cap:twopool}). Closing the loop, per-pool forecasts hold
+different ways (Chapter~\ref{cap:twopool}). Closing the loop, per-pool
+provisioning --- the vision pool's forecast anticipating its onsets, the
+language pool's forecast converted tail-aware --- holds
 the tail latency objective through burst onsets that defeat an
 identically informed reactive controller, at a fraction of the
 deployable static
@@ -246,8 +251,10 @@ exposes the latency tails the simulator's default polynomial flattens
 (TTFT p99 $+24\%$ on the steady window; on the burst window the
 polynomial misses a $1.9\times$ SLA violation outright).
 
-\item[RQ4 --- Closed-loop payoff.] Does provisioning each pool on a
-forecast of its own signal improve SLA compliance and GPU-hours over the
+\item[RQ4 --- Closed-loop payoff.] Does provisioning each pool on its
+own signal --- a \emph{forecast} for the vision pool, a tail-aware
+\emph{conversion} for the language pool --- improve SLA compliance and
+GPU-hours over the
 two reference policies (the best static configuration and a reactive
 planner) during the trace's burst episodes?
 Chapters~\ref{cap:baselines} and~\ref{cap:closedloop} answer yes, and
@@ -339,8 +346,9 @@ Figure~\ref{fig:intro-arch} sketches the system.
   \scriptsize SLO: TTFT p99 $<$ 1 s,\\
   \scriptsize ITL p99 $<$ 100 ms};
 \node[ctrl, above=1.25cm of $(vis.north)!0.5!(llm.north)$] (fc)
-  {\textbf{Per-pool forecaster} (zero-shot TSFM)\\
-  \scriptsize image rate $\to C(t)$ \quad token rates $\to N(t)$\\
+  {\textbf{Per-pool provisioner} (zero-shot TSFM)\\
+  \scriptsize image rate $\to C(t)$: forecast (anticipatory)\\
+  \scriptsize token rates $\to N(t)$: tail-aware conversion (held cursor)\\
   \scriptsize quantile headroom, cold-start lead};
 \draw[arr] (trace) -- node[lbl, above] {requests} (vis);
 \draw[arr] (vis) -- node[lbl, above] {seam:\\arrival $+$ delay}

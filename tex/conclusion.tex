@@ -6,7 +6,9 @@
 
 This thesis asked how the pools of a modality-disaggregated
 multimodal serving system should be scaled, and defended a specific
-answer: each pool on a forecast of its own demand signal. The four
+answer: each pool on its own demand signal --- the vision pool
+forecast-anticipated (its signal being forecastable but not
+rate-visible), the language pool tail-aware converted. The four
 research questions of Chapter~\ref{cap:intro} can now be answered from
 evidence.
 
@@ -43,7 +45,8 @@ violation the polynomial misses outright. Per-pool attribution is by
 construction: either pool replays in isolation on the same workload.
 The control loop itself is anchored to the live Dynamo stack: on the
 fastest-onset burst, the winning policy and the reactive baseline
-reproduce their simulated verdicts through the real control plane,
+reproduce their simulated verdicts through the real control plane with
+mocked engines,
 with TTFT p99 within 1.0--6.8\% (ITL p99 verdicts agreeing too: forecast
 sub-bound, reactive above bound in both) and
 replica-time within 5.3--7.6\%.
@@ -79,8 +82,9 @@ dashboard-masking, recurring in the evaluation metric.
 \paragraph{The thesis statement, revisited.} Every clause is now
 backed by the numbers above: the pools' demands decouple and saturate far apart (RQ1),
 the least visible signal is the most persistent and forecastable
-zero-shot at provisioning horizons (RQ2), and scaling on those forecasts
-holds the tail objective through the onsets that defeat reactive control
+zero-shot at provisioning horizons (RQ2), and scaling the vision pool on
+those forecasts --- with the language pool on their tail-aware conversion
+--- holds the tail objective through the onsets that defeat reactive control
 at every tested lead, at roughly two-thirds of the best static
 encoder fleet's GPU-time (RQ4).
 

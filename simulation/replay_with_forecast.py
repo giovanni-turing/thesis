@@ -16,9 +16,11 @@ a SINGLE archived bin of the held forecast path (the bin at index
 4*ticks at 15-s resolution) -- NOT a future-horizon prediction: it does
 NOT aggregate the minute's four 15-s bins, the series starts at T0-1min,
 and the indexing samples roughly the current control minute, not a
-look-ahead. This is a same-input conversion signal, not anticipation. Run with the throughput
-adjustment interval equal to the forecast bin (60 s for 1-min bins) so
-per-bin totals map 1:1 onto per-interval counts. The language-pool result
+look-ahead. This is a same-input conversion signal, not anticipation. The planner's
+throughput adjustment interval is 60 s; at 1-min forecast bins that maps
+1:1, and at the 15-s bins the reported language runs use, the stride-4
+indexing above samples one bin per 60-s interval (it does not aggregate
+the four). The language-pool result
 is therefore a same-input conversion comparison on a held, sampled
 signal (a synthetic sampled-signal experiment), not a timing or
 anticipation instrument (see tex/closedloop.tex language-pool caveat).
