@@ -184,7 +184,11 @@ replicas subject to realistic startup leads of 60--300 seconds, the
 policy passes the burst window at every lead (TTFT p99 736--757\,\si{\milli\second}, ITL p99
 ${\approx}$\SI{6.5}{\milli\second}, versus
 \SI{751}{\milli\second} with instant workers): the language-pool
-mirror of the encoder's lead-invariance. But the pass has a second
+counterpart of the encoder's lead-invariance. (The language forecast hook
+consumes a fixed per-tick cursor --- the current forecast tile's target
+bin, not a re-issued origin --- so this pool tests the \emph{conversion}
+under a held forecast signal rather than language-side anticipation; the
+anticipation result is the encoder pool's.) The pass has a second
 necessary ingredient: a \emph{tail-aware capacity conversion}. Run with
 the planner's native conversion (replicas $=$ mean demand over mean
 per-replica throughput), the \emph{same forecast} fails much like the

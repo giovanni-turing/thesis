@@ -136,9 +136,11 @@ Fig.~\ref{fig:sim-burst-queue} &
 Cap sensitivity (\S\ref{sec:sim-limitations}) &
   \texttt{workload/trace\_to\_two\_pool.py} &
   \texttt{results/cap\_sensitivity/} \\
-Tab.~\ref{tab:base-grid} &
-  \texttt{simulation/sweep\_grid.py} (+35 close-out corner runs) &
-  \texttt{results/grid/ grid\_summary.json} \\
+Tab.~\ref{tab:base-grid} (burst5 $C^{*}$ corrected to 8) &
+  \texttt{simulation/sweep\_grid.py} (+35 close-out corner runs);
+  burst5 stability correction \texttt{verification/scripts/ burst5\_stability.py} &
+  \texttt{results/grid/ grid\_summary.json} (burst5 row superseded by
+  \texttt{verification/ rerun-stability-e2e.md}) \\
 Reactive planner (\S\ref{sec:base-reactive-llm}) &
   \texttt{simulation/ run\_32\_reactive.sh} &
   \texttt{results/reactive32/ r32\{A,B\}\_*.report.json} \\
