@@ -119,8 +119,11 @@ from aiconfigurator.sdk.backends.factory import get_backend
 from aiconfigurator.sdk.models import get_model
 from aiconfigurator.sdk.perf_database import get_database
 
+# Portable: TESE_TRACE overrides; else TESE_ROOT/data/...; else repo root
+# inferred from this file (workload/ -> parents[1]).
+_ROOT = os.environ.get("TESE_ROOT") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TRACE = os.environ.get("TESE_TRACE",
-    "/home/gio/tese/data/AzureLMMInferenceTrace_multimodal.csv.gz")
+    os.path.join(_ROOT, "data/AzureLMMInferenceTrace_multimodal.csv.gz"))
 LLM_HIDDEN = 4096  # Qwen3-VL-8B projector output / LLM hidden size
 BYTES_PER_ELEM = 2  # bf16 embeddings on the wire
 

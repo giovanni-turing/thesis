@@ -195,6 +195,12 @@ schedule starts at 1 worker), not by cheap re-scale-ups.
 
 ## Proposed honest rewrite
 
+> **SUPERSEDED (historical proposal).** The applied manuscript went further than
+> the wording sketched below: it scopes anticipation to burst4 at the honest
+> 15-second threshold (burst5 only at the 1-minute threshold), attributes the
+> pass to graduated headroom, and quotes the 15--165 s realizable-lead range.
+> These proposals are kept only as a record of the intermediate reasoning.
+
 Only the **mechanism narrative and the 300-s/every-onset claims** need to change.
 The **encoder headline results are unaffected**: p90/ρ=15 still passes every
 window at the service floor and still beats the reactive twin, which still fails

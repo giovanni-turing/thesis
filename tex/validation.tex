@@ -82,15 +82,17 @@ The anchor holds in both verdict directions
 live exactly as simulated; the reactive policy fails likewise, its
 p99 within 1\% of the simulation; and provisioned
 replica-time agrees within 8\%. The agreement extends below the
-aggregate numbers. The demand path is \emph{byte-identical}: for the
+aggregate numbers. The \emph{demand} path is byte-identical: for the
 first twelve planner ticks the live and offline planners log the same
-predicted demand to the second decimal (first tick, live:
-\texttt{29.86 rps / 5.31 engine\_rps = 6 replicas}; offline:
-\texttt{29.86 / 5.30 = 6}), because the predictor, registry,
-construction order, and capacity conversion are the same code; only
-the clock differs. The capacity beliefs then drift within their
-expected band (the regression is tuned from sampled forward passes,
-which arrive in different order live), but the \emph{applied} capacity,
+predicted demand to the second decimal (first tick \texttt{29.86 rps} in
+both, both computing \texttt{6 replicas}), because the predictor,
+registry, construction order, and demand conversion are the same code;
+only the clock differs. The \emph{capacity} belief, by contrast, already
+differs at the first tick (live \texttt{5.71} versus offline
+\texttt{5.30 engine\_rps}, both still yielding 6 replicas) and drifts
+within its expected band throughout, because the regression is tuned
+from sampled forward passes that arrive in different order live; but the
+\emph{applied} capacity,
 after the budget cap, tracks the same trajectory. The
 client-observed TTFT tails land within run noise of the simulated ones.
 The burst3 policy split itself (p90 passes where p50 and reactive

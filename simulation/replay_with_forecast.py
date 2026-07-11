@@ -100,6 +100,12 @@ class _ForecastFilePredictor(P.BasePredictor):
         # slowly and sticks near the window start).
         res = os.environ.get("FORECAST_RESOLUTION", "1min")
         bin_s = pd.Timedelta(res.replace("min", "m")).total_seconds()
+        # NOTE: this SAMPLES the single bin at index 4*idx (one bin per control
+        # minute at 15-s resolution); it does NOT aggregate the minute's four
+        # 15-s bins. The language-pool experiment is therefore a conversion test
+        # on this held, sampled signal -- a synthetic sampled-signal experiment,
+        # not a timing/anticipation instrument (see the language-pool caveat in
+        # tex/closedloop.tex). The series also starts at T0-1min (load_series).
         idx = int(idx * max(1, round(60.0 / bin_s)))
         req = self.series["requests"]
         i = min(idx, len(req) - 1)

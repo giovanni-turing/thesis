@@ -35,7 +35,7 @@ SCRATCH = Path(os.environ.get("TESE_SCRATCH", tempfile.gettempdir())) / "factori
 OUTDIR.mkdir(parents=True, exist_ok=True)
 SCRATCH.mkdir(parents=True, exist_ok=True)
 WINS = json.load(open(WINJSON))
-ENV = {**os.environ, "TESE_WINDOWS": str(WINJSON)}
+ENV = {**os.environ, "TESE_WINDOWS": str(WINJSON), "TESE_ROOT": str(ROOT)}
 
 WINDOWS = ["burst1", "burst3", "burst4", "burst5", "steady24h"]
 MODELS = ["chronos", "toto", "timesfm"]
@@ -97,7 +97,7 @@ def main():
                   flush=True)
             results.append(res)
     results.sort(key=lambda r: (r["readiness"], r["window"], r["model"], r["lead"]))
-    json.dump({"grid": QUANTILE + "/rho15 x {burst1,burst3,burst4,burst5,steady24h} x "
+    json.dump({"grid": QUANTILE + "/rho" + RHO + " x {burst1,burst3,burst4,burst5,steady24h} x "
                        "{chronos,toto,timesfm} x leads{15,30,45,165} x "
                        "{warm-pool,strict-rewarm}; issue-time actuation; "
                        "denominator static C8; feasible = p99<1000ms & not divergent",

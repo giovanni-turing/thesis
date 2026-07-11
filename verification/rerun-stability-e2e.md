@@ -166,6 +166,8 @@ justification is the artifact.
 
 ### Proposed tex edits (not applied)
 
+> **SUPERSEDED (historical proposal).** The applied manuscript uses "modelled reconstruction", separates the 1.30 s joint reconstruction from the 1.24 s marginal sensitivity, and (for burst5) reports the honest C*=8. These sketches are kept only as a record.
+
 1. **`tex/baselines.tex` Table `tab:base-grid` (line 81)** — burst5 `C*` `16`
    is the artifact. If keeping the AIC-consistent story, change burst5 `C*` to
    **8** (5090 GPU-h 21.6 → **10.8**, H100 GPU-h 5.4 → **2.7**), and edit the
@@ -267,6 +269,8 @@ and validated), not a request-linked replay measurement.
   exactly the regime where adding the marginals is *right*.
 
 ### Proposed tex edits (not applied)
+
+> **SUPERSEDED (historical proposal).** The applied manuscript uses "modelled reconstruction", separates the 1.30 s joint reconstruction from the 1.24 s marginal sensitivity, and (for burst5) reports the honest C*=8. These sketches are kept only as a record.
 
 - Add one sentence wherever the 588 ms (encoder) and 651 ms (TTFT) tails are
   reported as the pipeline's latency (e.g. `tex/conclusion.tex` ~line 58,

@@ -1,5 +1,5 @@
 {
- "grid": "p90/rho15 x {burst1,burst3,burst4,burst5,steady24h} x {chronos,toto,timesfm} x leads{15,30,45,165} x {warm-pool,strict-rewarm}; issue-time actuation; denominator static C8; feasible = p99<1000ms & not divergent",
+ "grid": "p90/rho25 x {burst1,burst3,burst4,burst5,steady24h} x {chronos,toto,timesfm} x leads{15,30,45,165} x {warm-pool,strict-rewarm}; issue-time actuation; denominator static C8; feasible = p99<1000ms & not divergent",
  "results": [
   {
    "window": "burst1",

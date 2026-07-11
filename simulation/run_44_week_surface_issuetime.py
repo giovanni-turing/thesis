@@ -28,7 +28,7 @@ OUTDIR = ROOT / "simulation/results/week_surface_issuetime"
 SCRATCH = Path(os.environ.get("TESE_SCRATCH", tempfile.gettempdir())) / "week_surface_issuetime"
 OUTDIR.mkdir(parents=True, exist_ok=True)
 SCRATCH.mkdir(parents=True, exist_ok=True)
-ENV = {**os.environ, "TESE_WINDOWS": str(WINJSON)}
+ENV = {**os.environ, "TESE_WINDOWS": str(WINJSON), "TESE_ROOT": str(ROOT)}
 AGG = json.load(open(WINJSON))["aggregate"]
 STATIC_C8 = 8 * AGG["span_s"]
 

@@ -24,13 +24,14 @@ AIC_PY="${AIC_PY:-$ROOT/ai-dynamo/aiconfigurator/.venv/bin/python}"
 CONV="$ROOT/workload/trace_to_two_pool.py"
 GEN="$ROOT/verification/scripts/forecast_schedule_issuetime.py"
 PARQUET="$ROOT/predictors/results/chronos_images.parquet"
+export TESE_ROOT="$ROOT"
 export TESE_WINDOWS="$ROOT/simulation/windows.json"
 OFFSET=250399; MAXREQ=749601
 
-run() {  # $1 out-dir  $2 tag  $3 lead  $4 rho  $5 extra-gen-flags
-  local D=$1 TAG=$2 L=$3 RHO=$4 EXTRA=$5
+run() {  # $1 out-dir  $2 tag  $3 lead  $4 rho  $5 extra-gen-flags  [$6 quantile=p90]
+  local D=$1 TAG=$2 L=$3 RHO=$4 EXTRA=$5 Q=${6:-p90}
   mkdir -p "$D"
-  $EDA_PY $GEN --window aggregate --quantile p90 --rho "$RHO" --cold-start-s "$L" \
+  $EDA_PY $GEN --window aggregate --quantile "$Q" --rho "$RHO" --cold-start-s "$L" \
       --parquet "$PARQUET" $EXTRA \
       --out "$D/$TAG.sched.json" --ledger-out "$D/$TAG.ledger.json" \
       > "$D/$TAG.sched.log" 2>&1 || { echo "SCHED FAIL $TAG"; return; }
@@ -49,6 +50,14 @@ for L in 15 30 45 165; do run "$A" "fc_p90_L${L}_issuetime" "$L" 15 "" ; done
 for RHO in 10 20 25; do run "$R" "fc_p90_rho${RHO}_L30_issuetime" 30 "$RHO" "" ; done
 # strict re-warm sensitivity: p90/rho15 at every lead (0.59-0.62x, lead-dependent)
 for L in 15 30 45 165; do run "$S" "fc_p90_L${L}_strict" "$L" 15 "--strict-rewarm" ; done
+# p50 aggregate row (fails; warm 2735ms/0.25x, strict 2955ms/0.25x)
+run "$A" fc_p50_L30_issuetime 30 15 "" p50
+run "$S" fc_p50_L30_strict    30 15 "--strict-rewarm" p50
+# rho20 aggregate endpoints (the ~0.48x clean-band cheap point; warm+strict, L15/L165)
+for L in 15 165; do
+  run "$R" "fc_p90_rho20_L${L}_issuetime" "$L" 20 ""
+  run "$S" "fc_p90_rho20_L${L}_strict"    "$L" 20 "--strict-rewarm"
+done
 
 echo "=== issue-time aggregate complete; summary (ws / 3,869,278 = ratio) ==="
 for f in "$A"/fc_p90_L*_issuetime.jsonl.stats.json \

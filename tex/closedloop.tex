@@ -56,10 +56,14 @@ split or within it: every forecast value is issued at or before the
 bin it predicts --- issue time $=$ target $-\,(h{-}1){\cdot}15$\,s, so
 the $h{=}1$ nowcast carries zero usable lead and longer horizons
 strictly precede (rolling origin, Chapter~\ref{cap:predictors}) --- and
-no policy constant is selected by outcomes on the evaluation span. Each
+no policy constant is \emph{tuned} on the evaluation span. Each
 is either derived from capacity measurement (the encoder cost model,
 the belief-to-knee conversion) or swept with all values reported
-(headroom quantile, capacity rating, cold-start leads). A deployed
+(headroom quantile, capacity rating, cold-start leads); the headline
+rating $\rho{=}15$ is then chosen \emph{ex post} as the conservative
+operating point (Section~\ref{sec:cl-aggregate} shows $\rho{=}20$ also
+clean, more cheaply), with the whole frontier reported rather than a
+value selected to flatter the result. A deployed
 system would enter the week with prior history as context; the warm-up
 hole is the price of zero-shot honesty, not a property of the method.
 
@@ -173,7 +177,7 @@ sits above the burst threshold during moderate activity is the
 calibrated headroom (coverage 0.88--0.90, Chapter~\ref{cap:predictors})
 doing its job: over-provisioning slightly, exactly the cost the
 $\rho$-frontier already prices (the per-episode-clean band
-$\rho\in\{10,15\}$ costs 0.62--0.89$\times$ static). The
+$\rho\in\{10,15,20\}$ costs 0.48--0.89$\times$ static). The
 distinction is the point: p90 is a good provisioning signal precisely
 \emph{because} it is a permissive detector --- not a generic safety
 margin but, at provisioning cadence, a calibrated early-warning channel
@@ -213,12 +217,15 @@ bin, not a re-issued origin --- so this pool tests the \emph{conversion}
 under a held forecast signal rather than language-side anticipation; the
 anticipation result is the encoder pool's, and this pool's insensitivity
 to replica lead is a property of the tail-aware conversion, not of a
-second scale-ahead controller. Concretely the hook reads a single
-15-second forecast bin per planner tick, scaled to the tick's
-60-second interval, from a cursor one interval ahead of $T_0$, and
-advances by whole ticks --- a fixed, one-interval-stale sampled-bin read,
-adequate for the conversion comparison it supports but not a timing or
-anticipation instrument.) The pass has a second
+second scale-ahead controller. Concretely the hook, starting one minute
+before $T_0$, reads a \emph{single} 15-second forecast bin per planner
+tick --- the bin at tick index $4t$, its value pre-scaled to the tick's
+60-second rate --- and steps four bins (one minute) per tick: it
+\emph{samples} one bin per control minute rather than aggregating the
+minute's four bins. This is adequate for the conversion comparison it
+supports but is not a timing or anticipation instrument, so the
+language-pool result is best read as a synthetic sampled-signal
+experiment.) The pass has a second
 necessary ingredient: a \emph{tail-aware capacity conversion}. Run with
 the planner's native conversion (replicas $=$ mean demand over mean
 per-replica throughput), the \emph{same forecast} fails much like the
