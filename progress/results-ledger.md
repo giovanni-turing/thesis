@@ -445,5 +445,5 @@ feeds:      thesis-wide (this commit). A SEVENTH review flagged the LIVE-VALIDAT
   (7) factorial driver obsolete final print (missing rho) -> fixed; replay_with_forecast.py docstring "NEXT tick's bin" -> accurate (samples single bin at 4t, no aggregation, starts T0-1min); B6 historical note separates 1.30 joint from 1.24 marginal.
   (8) LAYOUT: tab:ap-manifest "Float too large by 109.6pt" -> converted to longtable (breaks across pages); \usepackage{longtable} added. Build 131pp, 0 undefined, no float-too-large, no longtable errors.
 supersedes: the implied live p50 run; "within run noise"; "budgets never bind"; the intro 560-cell factorial; the uncommitted rho10 claim; forecast_schedule.py hardcoded trace; the manifest float overflow
-commit:     cc7350d
+commit:     b7af7f5
 Residual (structural, not a defect): eda/ and ai-dynamo/ are external venvs (separate repos in the workspace tree per CLAUDE.md); scripts are env-portable but those interpreters can't be vendored into this repo.
