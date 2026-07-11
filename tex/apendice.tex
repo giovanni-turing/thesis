@@ -155,6 +155,15 @@ Tab.~\ref{tab:cl-aggregate} &
 Encoder cold start (Ch.~\ref{cap:intro} n., \S\ref{sec:base-protocol}) &
   \texttt{collector\_artifacts/ phaseD\_cold\_start/} &
   \texttt{trials.jsonl} \\
+Tab.~\ref{tab:val-anchor}; live divergences (\S\ref{sec:val-findings}) &
+  \texttt{simulation/live51/ worker\_manager.py} (live control plane:
+  etcd/NATS, KV router, per-process TP2 mockers, Prometheus, planner) &
+  \texttt{simulation/results/ live51/ twin\_fc*, twin\_re*} \\
+Physical encoder anchor (\S\ref{sec:aic-validation}, future work) &
+  \texttt{collector\_artifacts/ phaseE\_physical\_anchor/
+  \{bench\_encoder\_anchor, silicon\_in\_loop, silicon\_multiworker\}.py} &
+  \texttt{anchor\_sdpa\_*.json; oneworker\_artifact/;
+  silicon\_multiworker.json} \\
 \bottomrule
 \end{tabular}
 \end{table}

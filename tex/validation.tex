@@ -119,8 +119,8 @@ published pass into the same regression feed the replay uses;
 with it, the live planner is ready at its first tick and computes the
 offline twin's first decision.
 \item[Tick cadence stretches under stall.] The live planner's 60-second
-ticks held cadence except one 245-second stall, after which the
-forecast feed realigned to wall time; the offline virtual clock can
+ticks held cadence except one ${\approx}120$-second stall in the archived
+run, after which the forecast feed realigned to wall time; the offline virtual clock can
 never stall. Decision \emph{count} is therefore not exactly
 reproducible live; decision \emph{values} at matching times are.
 \item[Budget units differ between paths.] The offline replay caps
