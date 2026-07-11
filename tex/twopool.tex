@@ -205,8 +205,17 @@ variant is reported alongside it where the distinction matters
 (Chapter~\ref{cap:baselines}). Summing the two
 stage budgets gives ${\approx}\SI{2}{\second}$ to first token at roughly
 the p98 level (a union bound over two p99s, not an end-to-end p99
-guarantee; end-to-end tails are reported directly where composed runs
-appear). The
+guarantee). Computed directly on the aggregate composed run --- recovering
+each request's ingress time and adding its encoder delay to its prefill
+TTFT --- the true ingress-to-first-token p99 is
+${\approx}\SI{1.30}{\second}$, close to the naive sum of the two marginals
+(${\approx}\SI{0.59}{}$ and ${\approx}\SI{0.65}{\second}$) rather than
+their max, because the two tails are positively correlated ($r{=}0.52$ on
+image-bearing requests): the same frames-class requests drive both large
+encoder batches and long prefills. It sits within the \SI{2}{\second}
+union budget but is roughly twice either per-stage marginal, so the two
+separately reported percentiles understate the actual first-token wait.
+The
 specific bounds double Dynamo's default planner targets
 ($500/\SI{50}{\milli\second}$, window-mean) applied as tail bounds,
 an interactivity envelope consistent with common practice in
