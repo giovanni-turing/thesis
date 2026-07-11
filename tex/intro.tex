@@ -260,8 +260,9 @@ image signal loses the fastest-onset burst at every lead (p99
 choice, is the operative advantage. Over the 5.60-day covered span the policy
 meets the SLA in aggregate and inside every episode at 0.62 times
 the deployable static encoder fleet's provisioned worker-time (actuated
-on forecast issue time, lead-invariant across the archive's realizable
-range). And the
+on forecast issue time; lead-invariant across the archive's realizable
+range under a warm-pool readiness model, 0.59--0.62$\times$ under a
+strict re-warm one). And the
 reactive planner's language-pool failure is diagnostic: all fourteen
 configurations satisfy their own window-mean control law while violating
 the tail SLA, tightening targets under lead raises spend without moving
@@ -387,9 +388,13 @@ rather than silently absorbed.
 
 \begin{enumerate}
 \item \textbf{A characterization of production multimodal inference
-traffic as per-pool demand signals} (Chapter~\ref{cap:trace-eda}): to
-our knowledge the first \emph{forecast-framed} per-pool characterization
-of a production multimodal trace (prior work scales the image pool
+traffic as per-pool demand signals} (Chapter~\ref{cap:trace-eda}): the
+per-modality independence and burstiness of this trace are already noted
+qualitatively (ModServe), but this thesis is, to our knowledge, the first
+to \emph{quantify} the decoupling ($R^2{=}0.12$) and to frame the per-pool
+signals as \emph{forecasting targets} --- benchmarked zero-shot at
+provisioning horizons and consumed by a closed-loop per-pool scaler ---
+rather than as a reactive load signal (prior work scales the image pool
 reactively on observed token load; Chapter~\ref{cap:related}), possible
 only since the trace's 2025 release. Fully scripted, GPU-accelerated analysis
 establishing the vision--request decoupling, burst anatomy, and

@@ -206,7 +206,7 @@ variant is reported alongside it where the distinction matters
 stage budgets gives ${\approx}\SI{2}{\second}$ to first token at roughly
 the p98 level (a union bound over two p99s, not an end-to-end p99
 guarantee). Reconstructed on the aggregate composed run --- recovering
-each request's ingress time and adding its measured encoder delay
+each request's ingress time and adding its replay-recorded encoder delay
 (recovered exactly, p99 \SI{588}{\milli\second}) to its per-request
 prefill TTFT (modelled by AIC and validated against the week replay to
 within 8\% at p99: \SI{706}{} modelled versus \SI{651}{\milli\second}

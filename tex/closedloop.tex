@@ -52,9 +52,11 @@ form the evaluation span, on which every closed-loop verdict in this
 chapter is scored (episodes burst1/3/4/5 and the calm day; the two
 pre-coverage episodes are graded only by forecast-free policies,
 Chapter~\ref{cap:baselines}). No information flows backward across the
-split or within it: every forecast value is issued strictly before the
-bins it predicts (rolling origin, Chapter~\ref{cap:predictors}), and no
-policy constant is selected by outcomes on the evaluation span. Each
+split or within it: every forecast value is issued at or before the
+bin it predicts --- issue time $=$ target $-\,(h{-}1){\cdot}15$\,s, so
+the $h{=}1$ nowcast carries zero usable lead and longer horizons
+strictly precede (rolling origin, Chapter~\ref{cap:predictors}) --- and
+no policy constant is selected by outcomes on the evaluation span. Each
 is either derived from capacity measurement (the encoder cost model,
 the belief-to-knee conversion) or swept with all values reported
 (headroom quantile, capacity rating, cold-start leads). A deployed
@@ -64,16 +66,22 @@ hole is the price of zero-shot honesty, not a property of the method.
 \section{Encoder pool: the lead-time result}
 \label{sec:cl-matrix}
 
-The full factorial (5 in-span windows $\times$ \{3 TSFMs $\times$
-\{p50, p90\} forecast policies, + reactive\} $\times$ 4 leads $\times$ 4
-capacity ratings; 560 cells, each a two-pool replay)
-yields one headline row: \textbf{the p90-forecast policy at
-$\rho{=}15$ meets the SLA in all 60 of its cells --- every window, every
-model, every lead from 15 to 165 seconds} (the H=12 15-second forecast
+The p90-forecast policy at $\rho{=}15$ is graded on a per-window
+factorial --- 5 in-span windows $\times$ 3 TSFMs $\times$ 4 realizable
+issued leads $\{15,30,45,165\}$\,s, each a two-pool replay rebuilt under
+\emph{issue-time} actuation (honouring the archive's tiled issue times) ---
+and \textbf{meets the SLA in all 60 of its cells: every window, every
+model, every lead}, under \emph{both} a warm-pool and a strict re-warm
+readiness model (the four burst windows pinned at the
+\SI{588}{\milli\second} service floor; the calm day 548--\SI{734}{\milli\second}).
+The broader exploratory grid that located this operating point (adding
+p50, the reactive baseline, four capacity ratings, and a non-realizable
+\SI{300}{\second} target-time lead; 560 target-time cells) is superseded
+for the forecast headline by this issue-time rebuild: the H=12 15-second
 archive supplies at most $(12{-}1)\times15 = \SI{165}{\second}$ of
-forecast-issued lead; the shipped 300-second cell reaches the same floor
-only by target-time indexing and is an upper bound, not an issued lead).
-By contrast, the identically
+forecast-issued lead, and the \SI{300}{\second} cell reached the same
+floor only by target-time indexing --- an upper bound, not an issued
+lead. By contrast, the identically
 informed reactive controller loses burst3 at every lead and
 burst4/5 beyond 45 seconds (Table~\ref{tab:base-react-enc}). On the
 burst windows the p90 schedule's p99 encoder delay is pinned at
@@ -87,10 +95,11 @@ The ablations locate why, and what each dial buys:
 
 \begin{description}
 \item[Quantile is the decisive dial.] The p50 policy is not viable: at
-$\rho{=}15$ it passes only 23/60 cells and fails even the calm day
-(p99 \SI{1073}{\milli\second} at every lead: the median forecast
-sizes to the mean, allocates one worker, and reproduces on the vision
-pool the reactive planner's mean-sizing defect). The calibrated p90 band edge
+$\rho{=}15$ it clears only 23--24 of its 60 issue-time cells (24 under
+the warm-pool readiness model, 23 under strict re-warm) and fails even
+the calm day (p99 \SI{1073}{\milli\second} at every lead and model: the
+median forecast sizes to the mean, allocates one worker, and reproduces
+on the vision pool the reactive planner's mean-sizing defect). The calibrated p90 band edge
 (Chapter~\ref{cap:predictors}: empirical coverage 0.88--0.90 at this
 cadence) is what converts a point forecast into provisionable headroom.
 \item[Lead-invariance is the signature of anticipation.] Actuated on
@@ -252,8 +261,10 @@ Replaying burst3 end-to-end (60-second replica lead, tail-aware
 conversion throughout) yields the language-pool mirror of the encoder
 matrix's quantile result: reactive fails at TTFT p99
 3{,}495\,\si{\milli\second}; the p50 forecast fails at
-2{,}164\,\si{\milli\second} (better-informed but still late, as
-p50 detection lagged fast onsets in Section~\ref{sec:cl-matrix});
+2{,}164\,\si{\milli\second} (better-informed but still
+under-provisioned: at a held forecast cursor the p50 band sizes to the
+mean, the same mean-to-tail conversion defect the encoder matrix shows,
+not a timing lag on this pool);
 and the p90 forecast passes at \SI{651}{\milli\second}. Headroom
 quantile, not signal access, separates pass from fail on fast onsets on
 \emph{both} pools --- on the language pool this is the conversion dial
@@ -341,8 +352,10 @@ compliance. ``Episodes'' grades each in-span burst episode separately
 use Chronos-2 at $\rho{=}15$; $L$ is the cold-start lead. Forecast
 worker-time is actuated on forecast \emph{issue} time (each 180-second
 tile's 12-step forecast is ordered at its origin, honouring
-issue~$\le$~decision) and is lead-invariant across the archive's
-realizable 15--\SI{165}{\second} issued-lead range (2.41M at both ends);
+issue~$\le$~decision) and, under the warm-pool readiness model, is
+lead-invariant across the archive's realizable 15--\SI{165}{\second}
+issued-lead range (2.41M at both ends; 0.59--0.62$\times$ under strict
+re-warm, see text);
 indexing by \emph{target} time instead --- assuming capacity placed
 exactly at each bin rather than ordered at forecast-issue time --- is an
 optimistic bound, cheaper at longer, less-realizable leads (2.38M at
@@ -411,10 +424,12 @@ accuracy winner is Toto, Chapter~\ref{cap:predictors}).
 Nor is the $\rho{=}15$ operating point special. A full week-scale sweep
 (three forecasting models $\times$ two quantiles $\times$ four
 capacity ratings $\times$ four leads, each a continuous replay of the
-covered span) makes the quantile the decisive dial and the rating a
-cost knob. Under issue-time actuation the p90-forecast policy passes its
-cells \emph{in aggregate} at every rating, tracing a cost frontier
-from 0.89$\times$ static at the conservative $\rho{=}10$
+covered span --- run first at target time to locate the operating point,
+its load-bearing cells then rebuilt at issue time) makes the quantile the
+decisive dial and the rating a cost knob. Under issue-time actuation the
+p90-forecast policy (Chronos; the numerator is near model-invariant)
+passes its cells \emph{in aggregate} at every rating, tracing a cost
+frontier from 0.89$\times$ static at the conservative $\rho{=}10$
 (\SI{588}{\milli\second}) down to 0.40$\times$ at the aggressive
 $\rho{=}25$ (\SI{748}{\milli\second}, still under the aggregate bound).
 The cheap end of that frontier carries the same per-episode caveat this
@@ -424,8 +439,10 @@ shows $\rho{=}20$/25 dropping cells on burst5. Only $\rho\in\{10,15\}$
 (0.62--0.89$\times$) is per-episode-clean; the quoted 0.62$\times$ sits at
 $\rho{=}15$, inside that verified range, not at the aggregate-only
 $\rho{>}15$ tail. The
-p50-forecast policy, by contrast, passes \emph{none} of its cells:
-the week-scale echo of the mean-sizing defect. The rating trades cost
+p50-forecast policy, by contrast, fails at week scale --- the echo of
+the mean-sizing defect, and consistent with its per-window issue-time
+factorial clearing only 23--24 of 60 cells
+(Section~\ref{sec:cl-matrix}). The rating trades cost
 against margin cleanly: p99 rises monotonically with $\rho$ (588 at
 $\rho{\le}15$, up to 748 at $\rho{=}25$) as the fleet shrinks.
 
@@ -532,5 +549,7 @@ measured belief-to-knee ratio, which repairs the mean-based sizing defect
 shared by every reactive configuration tested. Priced over the covered
 week, the policy meets the SLA in aggregate and per-episode at 0.62
 times the deployable static encoder fleet's worker-time (actuated on
-forecast issue time, lead-invariant across the archive's realizable
-range) --- the thesis statement's economic clause, now number-backed.
+forecast issue time; lead-invariant across the archive's realizable
+range under the warm-pool readiness model, 0.59--0.62$\times$ under
+strict re-warm) --- the thesis statement's economic clause, now
+number-backed.

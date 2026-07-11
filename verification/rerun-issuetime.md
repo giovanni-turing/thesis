@@ -14,8 +14,12 @@ Sim outputs: `simulation/results/rerun_verify/`.
 
 1. **B4 (onset audit) — the mechanism claim is wrong, as codex found.** Restricted
    to each declared episode, the p90 path is **LATE** on burst1 and burst3 and
-   **anticipates** only burst4 and burst5. "Onsets are detected at or before the
-   signal itself on *every* onset" (closedloop.tex, conclusion.tex RQ4) is false.
+   **anticipates** burst4 (and burst5 only under the looser 1-minute-p99 threshold;
+   at the honest 15-second-cadence threshold burst5 is ~1005 s **late** — see the
+   two threshold tables below). "Onsets are detected at or before the
+   signal itself on *every* onset" (closedloop.tex, conclusion.tex RQ4) is false;
+   the manuscript now says the graduated headroom, not clean detection, carries the
+   pass, and anticipation is scoped to burst4 at the honest threshold.
 2. **B2 (issue-time actuation) — the flat-p99 result SURVIVES honest actuation.**
    Rebuilt to honour the archive's tiled issue times (issue ≤ decision enforced
    and asserted), the p90/ρ=15 encoder schedule still holds encoder-delay

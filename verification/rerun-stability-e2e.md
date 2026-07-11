@@ -197,7 +197,7 @@ justification is the artifact.
 
 ---
 
-## TASK 2 (B6) — true ingress-to-first-token p99 ≈ 1.30 s (≈ 2× either marginal)
+## TASK 2 (B6) — modelled ingress-to-first-token p99 ≈ 1.30 s (≈ 2× either marginal)
 
 ### The bug
 The thesis reports the encoder-delay p99 (588 ms) and the language TTFT p99

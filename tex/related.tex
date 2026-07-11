@@ -53,8 +53,9 @@ request-level signals.
 Multimodal inference prepends an encoding stage to prefill and decode,
 and a recent line of systems disaggregates it. ModServe, whose
 production trace this thesis analyzes, decouples image encoding from
-language-model execution at cluster scale, reporting 25--41\% GPU-hour
-savings from modality-aware placement and
+language-model execution at cluster scale, reporting 25--41.3\%
+serving-cost savings (fewer GPUs at SLO, from 3.3--5.5$\times$ higher
+throughput) via modality-aware placement and
 scaling~\cite{Qiu2025ModServe}. EPD disaggregation moves encode,
 prefill, and decode onto dedicated resources with asynchronous
 inter-stage transfer, reporting gains in memory headroom, supported
@@ -321,8 +322,10 @@ signal rewards forecasting --- together with the calibrated platform
 that makes it quantitative. The thesis makes three precedence claims, each deliberately narrow. ModServe already
 autoscales image and text pools on a modality-specific signal --- image tokens per
 second --- and contrasts this with request-rate
-autoscaling~\cite{Qiu2025ModServe}; what it does not do is forecast that signal or
-quantify how far it departs from request rate. The first claim is therefore not the
+autoscaling~\cite{Qiu2025ModServe}; what it does not do is drive that autoscaler
+with an explicit future-horizon \emph{forecast} of the signal --- it reacts to
+real-time token load against an SLO-attainment threshold --- or quantify how far
+the signal departs from request rate. The first claim is therefore not the
 per-pool characterization but its \emph{forecast-driven} sharpening: to our knowledge,
 the first work to measure that the vision pool's arrival signal is nearly decoupled
 from request rate ($R^2 = \num{0.123}$, versus $\num{0.654}$ for decode demand;

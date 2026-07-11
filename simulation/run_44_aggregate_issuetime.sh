@@ -16,12 +16,15 @@
 # Regenerates the committed .sched/.stats/.ledger artifacts; the 124 MB
 # per-request .jsonl intermediates are gitignored and reproduced here.
 set -u
-EDA_PY=/home/gio/tese/eda/.venv/bin/python
-AIC_PY=/home/gio/tese/ai-dynamo/aiconfigurator/.venv/bin/python
-CONV=/home/gio/tese/workload/trace_to_two_pool.py
-GEN=/home/gio/tese/verification/scripts/forecast_schedule_issuetime.py
-PARQUET=/home/gio/tese/predictors/results/chronos_images.parquet
-export TESE_WINDOWS=/home/gio/tese/simulation/windows.json
+# Portable: TESE_ROOT defaults to the repo root (this script lives in
+# simulation/); interpreter venvs from EDA_PY / AIC_PY env with local defaults.
+ROOT="${TESE_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+EDA_PY="${EDA_PY:-$ROOT/eda/.venv/bin/python}"
+AIC_PY="${AIC_PY:-$ROOT/ai-dynamo/aiconfigurator/.venv/bin/python}"
+CONV="$ROOT/workload/trace_to_two_pool.py"
+GEN="$ROOT/verification/scripts/forecast_schedule_issuetime.py"
+PARQUET="$ROOT/predictors/results/chronos_images.parquet"
+export TESE_WINDOWS="$ROOT/simulation/windows.json"
 OFFSET=250399; MAXREQ=749601
 
 run() {  # $1 out-dir  $2 tag  $3 lead  $4 rho  $5 extra-gen-flags
@@ -36,9 +39,9 @@ run() {  # $1 out-dir  $2 tag  $3 lead  $4 rho  $5 extra-gen-flags
       > "$D/$TAG.log" 2>&1 && echo "done $TAG" || echo "FAIL $TAG"
 }
 
-A=/home/gio/tese/simulation/results/aggregate44
-R=/home/gio/tese/simulation/results/aggregate44_rho
-S=/home/gio/tese/simulation/results/aggregate44_strict
+A="$ROOT/simulation/results/aggregate44"
+R="$ROOT/simulation/results/aggregate44_rho"
+S="$ROOT/simulation/results/aggregate44_strict"
 
 # headline: warm-pool p90/rho15 at every realizable lead (0.62x, flat)
 for L in 15 30 45 165; do run "$A" "fc_p90_L${L}_issuetime" "$L" 15 "" ; done

@@ -151,9 +151,14 @@ LLM lead sweep + capacity mapping (\S\ref{sec:cl-llm}) &
   \texttt{replay\_with\_forecast.py} &
   \texttt{results/riders44/ \{ladder\_*, fc\_lead*, fc\_scale*,
   tp2knee\_*\}.report.json} \\
-Tab.~\ref{tab:base-react-enc}; 560-cell matrix (\S\ref{sec:cl-matrix}) &
-  \texttt{simulation/ \{gen\_cells\_44.py, e2b\_fleet.py\}} &
-  \texttt{results/results\_44.jsonl} \\
+Per-window factorial (60-cell p90 headline + p50, \S\ref{sec:cl-matrix});
+  Tab.~\ref{tab:base-react-enc} &
+  \texttt{simulation/ run\_44\_factorial\_issuetime.py} (issue-time,
+  warm{+}strict); target-time exploratory grid
+  \texttt{\{gen\_cells\_44.py, e2b\_fleet.py\}} &
+  \texttt{simulation/results/ factorial\_issuetime/
+  factorial\_issuetime\_\{p90,p50\}\_results.json}; target-time grid
+  \texttt{results/ results\_44.jsonl} \\
 Onset detection (\S\ref{sec:cl-matrix}) &
   \texttt{simulation/ detect\_onsets\_44.py} &
   \texttt{results/riders44/ detection\_delay.json} \\
@@ -163,9 +168,9 @@ Tab.~\ref{tab:cl-aggregate} (0.62$\times$ headline is the issue-time
   \texttt{verification/scripts/ forecast\_schedule\_issuetime.py}
   (\texttt{--strict-rewarm} for the sensitivity); target-time bound from
   \texttt{simulation/ run\_44\_aggregate.sh} &
-  \texttt{simulation/results/ aggregate44/
-  fc\_p90\_L\{15,30,45,165\}\_issuetime.*};
-  \texttt{aggregate44\_rho/ *\_issuetime.*} ($\rho$ frontier);
+  under \texttt{simulation/results/}:
+  \texttt{aggregate44/ fc\_p90\_L\{15,30,45,165\}\_issuetime.*},
+  \texttt{aggregate44\_rho/ *\_issuetime.*} ($\rho$ frontier),
   \texttt{aggregate44\_strict/ fc\_p90\_L*\_strict.*} (re-warm
   sensitivity) \\
 Encoder cold start (Ch.~\ref{cap:intro} n., \S\ref{sec:base-protocol}) &
