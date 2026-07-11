@@ -69,7 +69,11 @@ The full factorial (5 in-span windows $\times$ \{3 TSFMs $\times$
 capacity ratings; 560 cells, every cell an independent two-pool replay)
 yields one headline row: \textbf{the p90-forecast policy at
 $\rho{=}15$ meets the SLA in all 60 of its cells --- every window, every
-model, every lead from 15 to 300 seconds}. By contrast, the identically
+model, every lead from 15 to 165 seconds} (the H=12 15-second forecast
+archive supplies at most $(12{-}1)\times15 = \SI{165}{\second}$ of
+forecast-issued lead; the shipped 300-second cell reaches the same floor
+only by target-time indexing and is an upper bound, not an issued lead).
+By contrast, the identically
 informed reactive controller loses burst3 at every lead and
 burst4/5 beyond 45 seconds (Table~\ref{tab:base-react-enc}). On the
 burst windows the p90 schedule's p99 encoder delay is pinned at
@@ -89,11 +93,16 @@ sizes to the mean, allocates one worker, and reproduces on the vision
 pool the reactive planner's mean-sizing defect). The calibrated p90 band edge
 (Chapter~\ref{cap:predictors}: empirical coverage 0.88--0.90 at this
 cadence) is what converts a point forecast into provisionable headroom.
-\item[Lead-invariance is the signature of anticipation.] The p90 policy
-is flat (p99 unchanged) from $L{=}15$ to \SI{300}{\second} on every window, while the
+\item[Lead-invariance is the signature of anticipation.] Actuated on
+true forecast issue time (each 180-second tile's 12-step forecast ordered
+at its origin, honouring issue $\le$ decision), the p90 policy holds the
+service-floor p99 unchanged from $L{=}15$ to \SI{165}{\second} --- the
+archive's maximum issued lead --- on every window, while the
 reactive twin degrades monotonically with
-lead toward its never-scaled limit. A policy that must \emph{observe} an
-onset pays for lead; a policy that \emph{anticipates} it does not.
+lead toward its never-scaled limit (burst3: 16{,}079 to
+54{,}170\,\si{\milli\second}). A policy that must \emph{observe} an
+onset pays for lead; a policy that provisions from an already-issued
+forecast band does not, up to the lead the archive supplies.
 \item[Model choice is second-order.] All three foundation models pass
 all 60 p90/$\rho{15}$ cells, consistent with the small cross-model
 spreads of Chapter~\ref{cap:predictors}. The same holds for
@@ -113,16 +122,24 @@ is insensitive to $\rho$ (13--14 of 20 cells at every rating): no
 capacity rating repairs late information.
 \end{description}
 
-\paragraph{Mechanism: onsets are detected in time, or before.}
+\paragraph{Mechanism: graduated headroom, not clean detection.}
 Reading the archived forecast paths as a burst detector (threshold
-\SI{224}{img/s}) confirms the anticipation reading directly: the p90
-paths cross the threshold within $-105$ to $+210$ seconds of the true
-crossing on every in-span onset, with zero false
-alarms across the calm day for every model. That includes \emph{pre-signal}
-detections on the two fastest onsets (burst3: crossed \SI{105}{\second}
-before the signal itself, \SI{165}{\second} of usable issue-time lead;
-burst4: zero delay, \SI{120}{\second} usable lead). The point and p50 paths
-detect the same onsets 55 minutes to 4 hours late, or never.
+\SI{224}{img/s}), restricted to each declared episode and scored at true
+forecast issue time, the p90 band crosses the threshold \emph{ahead} of
+the observed rate on the two gradual onsets (burst4 by \SI{225}{\second},
+a \SI{345}{\second} usable issue-lead; burst5 by \SI{105}{\second},
+\SI{255}{\second}) but \emph{lags} on the fastest onset (burst3, issued at
+$h{=}1$, no usable lead) and on burst1's first in-episode crossing. The
+closed-loop pass on burst3 therefore does not rest on clean pre-signal
+detection: it rests on the p90 band's \emph{graduated headroom}, which
+lifts provisioned capacity to ${\approx}21$ workers several minutes ahead
+of the peak --- from near-term nowcasts that mature within the cold-start
+lead --- so capacity is standing when the spike lands. This is the same
+permissive, over-provisioning behaviour the $\rho$-frontier already
+prices, here read as an anticipatory provisioning signal rather than a
+clean alarm. The point and p50 paths, sizing to the mean, detect the same
+onsets 55 minutes to 4 hours late, or never; and the p90 band shows zero
+false alarms across the calm day for every model.
 
 A binary reading of the detector must be qualified, though. Counting
 threshold crossings over the \emph{whole} 5.60-day span (outside the

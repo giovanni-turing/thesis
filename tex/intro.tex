@@ -252,12 +252,12 @@ two reference policies (the best static configuration and a reactive
 planner) during the trace's burst episodes?
 Chapters~\ref{cap:baselines} and~\ref{cap:closedloop} answer yes, and
 locate \emph{why}: the forecast-driven encoder schedule holds the tail
-bound on every window at every cold-start lead from 15 to
-\SI{300}{\second} (p99 \SI{588}{\milli\second}, the zero-queueing
+bound on every window at every forecast-issued cold-start lead from 15 to
+\SI{165}{\second} (p99 \SI{588}{\milli\second}, the zero-queueing
 service floor), where a reactive controller watching the \emph{same}
 image signal loses the fastest-onset burst at every lead (p99
-9.5--54\,\si{\second}); regime anticipation, not signal choice, is
-the operative advantage. Over the 5.60-day covered span the policy
+9.5--54\,\si{\second}); anticipatory provisioning headroom, not signal
+choice, is the operative advantage. Over the 5.60-day covered span the policy
 meets the SLA in aggregate and inside every episode at 0.55--0.61 times
 the deployable static encoder fleet's provisioned worker-time. And the
 reactive planner's language-pool failure is diagnostic: all fourteen
@@ -448,15 +448,16 @@ forecasts driving worker schedules under cold-start lead, scored as SLA
 compliance $\times$ provisioned worker-time in a 560-cell factorial
 (windows, forecasting models, quantiles, leads, capacity ratings). At
 the operating rating ($\rho{=}15$) the p90-forecast policy delivers the
-RQ4 verdict (every window at every lead from 15 to \SI{300}{\second},
-at the zero-queueing service
+RQ4 verdict (every window at every forecast-issued lead from 15 to
+\SI{165}{\second}, at the zero-queueing service
 floor, at over half to two-thirds of the deployable static encoder fleet's
 worker-time), while the reactive controller, watching the \emph{same}
 per-pool signal, loses the fastest-onset burst at every lead and sees
 its apparent aggregate pass dissolve under per-episode grading.
-Mechanisms: regime
-anticipation on the encoder pool (the p90 forecast crosses onset
-thresholds at or before the signal itself, zero calm-day false alarms);
+Mechanisms: anticipatory provisioning headroom
+on the encoder pool (the p90 band stands capacity up before the peak,
+anticipating gradual onsets and covering the fastest one through graduated
+headroom, zero calm-day false alarms);
 on the language pool, a derived tail-aware capacity conversion (a
 measured belief-to-knee ratio) as the second necessary ingredient.
 \end{enumerate}
