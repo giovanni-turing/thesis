@@ -255,6 +255,18 @@ headroom under a provisioning lead time is a critical-fractile
 (newsvendor) problem~\cite{Arrow1951Newsvendor}, long applied to
 staffing under uncertain demand; the closed-loop chapters select the
 operating quantile empirically under that framing.
+The conversion from that quantile forecast to a replica count has an equally classical
+anchor. Sizing servers so that a mean-rate estimate of load leaves a safety margin for
+the tail is the \emph{square-root safety-staffing} rule of many-server queueing: in
+the Halfin--Whitt heavy-traffic regime the economical staffing level is the offered
+load plus a margin that grows like its square
+root~\cite{HalfinWhitt1981,Borst2004Dimensioning}, exactly the quality-and-efficiency
+trade-off that dimensions call centers under a delay target. This thesis's tail-aware
+capacity conversion (Chapter~\ref{cap:closedloop}) is the serving analogue: it sizes
+the encoder and language pools not on mean per-replica throughput --- the M/M/c
+``offered-load'' term~\cite{Gross2018QueueingFundamentals} --- but on the tail-knee
+rate a replica sustains under the SLA, so the extra replicas are precisely the
+safety staffing the percentile requires.
 
 \section{Simulators and performance models}
 \label{sec:rel-sim}
@@ -301,13 +313,32 @@ discrete-event serving simulation each exist, several in production. The
 contribution is the demonstration that in multimodal serving these must
 meet --- that no single signal can size both pools, and that the missing
 signal rewards forecasting --- together with the calibrated platform
-that makes it quantitative. The thesis makes three
-precedence claims, each deliberately narrow: to our knowledge, the first
-per-pool demand-signal characterization of a production multimodal
-inference trace; the first provisioning-framed, zero-shot benchmark of
-time-series foundation models on serving demand signals; and the first
-silicon-calibrated encoder cost model for a consumer-class GPU in a
-deployment planner, contributed upstream.
+that makes it quantitative. The thesis makes three precedence claims, each deliberately narrow. ModServe already
+autoscales image and text pools on a modality-specific signal --- image tokens per
+second --- and contrasts this with request-rate
+autoscaling~\cite{Qiu2025ModServe}; what it does not do is forecast that signal or
+quantify how far it departs from request rate. The first claim is therefore not the
+per-pool characterization but its \emph{forecast-driven} sharpening: to our knowledge,
+the first work to measure that the vision pool's arrival signal is nearly decoupled
+from request rate ($R^2 = \num{0.123}$, versus $\num{0.654}$ for decode demand;
+Chapter~\ref{cap:trace-eda}) and to turn that measured inversion --- the burstiest,
+least rate-visible signal is also the most forecastable --- into a per-pool predictive
+provisioning signal. Second, zero-shot time-series foundation models have already been
+benchmarked on cloud demand for provisioning: Diao et al.\ compare Chronos against
+classical and deep forecasters for Redshift-Serverless resource
+scaling~\cite{Diao2024Forecasting}, and Toner et al.\ evaluate zero-shot foundation
+models on cloud data for the same purpose~\cite{Toner2025ZeroShot}. Narrowed against
+them, the claim is the first \emph{provisioning-framed, rolling-origin} zero-shot
+benchmark of such models on the \emph{per-pool demand signals of a production
+multimodal inference trace}, with the forecast consumed downstream by a serving
+planner in closed loop rather than scored on accuracy alone
+(Chapters~\ref{cap:predictors} and~\ref{cap:closedloop}). Third, a silicon-calibrated
+consumer-class vision encoder has already been costed for cross-tier
+placement~\cite{Yu2026HeteroServe}; the narrow claim is the first to integrate such a
+consumer-class-GPU encoder cost model into a \emph{deployment planner}
+(aiconfigurator's per-operator performance database, which held no consumer- or
+workstation-class GPU data for the encoder operator before this work), with the
+calibration contributed upstream (Chapter~\ref{cap:aiconfigurator}).
 Table~\ref{tab:rel-positioning} summarizes the landscape against the four
 ingredients the claim requires, plus the evaluation modality each work
 brings. (Chapters~\ref{cap:baselines}
