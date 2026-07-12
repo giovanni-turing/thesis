@@ -1,0 +1,18 @@
+{
+ "attn_backend": "AttentionBackendEnum.FLASH_ATTN",
+ "sm_clock": "2400",
+ "results": {
+  "8": {
+   "vllm_eager_ms": 42.177,
+   "p50": 42.172
+  },
+  "32": {
+   "vllm_eager_ms": 178.343,
+   "p50": 178.338
+  },
+  "64": {
+   "vllm_eager_ms": 333.732,
+   "p50": 333.725
+  }
+ }
+}
