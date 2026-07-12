@@ -507,6 +507,6 @@
    "mean": 148569.0
   }
  },
- "median_context_vs_images_slope_tokens_per_image": 64.4002881389214,
- "median_context_vs_images_intercept": 5474.485707028887
+ "median_context_vs_images_slope_tokens_per_image": 64.40028813892138,
+ "median_context_vs_images_intercept": 5474.485707028881
 }

@@ -60,3 +60,11 @@ fabel/
 codex/
 scratchtiles.py
 scratchtiles.json
+simulation/results/**/*.log
+simulation/results/*.log
+simulation/results/logs_idle/
+analysis/trace_eda/**/*.log
+analysis/trace_eda/cufile.log
+vit-embed-server/
+simulation/results/**/*canary*.jsonl
+simulation/results/*canary*.jsonl
