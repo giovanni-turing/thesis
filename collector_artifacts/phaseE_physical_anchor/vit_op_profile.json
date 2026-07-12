@@ -1,0 +1,20 @@
+{
+ "8": {
+  "total_ms": 55.41,
+  "matmul": 43.74,
+  "elementwise": 11.35,
+  "other": 0.31
+ },
+ "32": {
+  "total_ms": 246.57,
+  "matmul": 166.38,
+  "elementwise": 78.97,
+  "other": 1.22
+ },
+ "64": {
+  "total_ms": 498.32,
+  "matmul": 329.36,
+  "elementwise": 166.57,
+  "other": 2.4
+ }
+}

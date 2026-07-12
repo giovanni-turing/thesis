@@ -1,0 +1,5 @@
+Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 16108.81it/s]
+N=8: Σops=35.8ms  ffn_gemm=19.9  attn_gemm=10.4  merger=3.0  patch_embed=1.6  norm=0.9
+N=32: Σops=136.1ms  ffn_gemm=77.7  attn_gemm=38.8  merger=10.7  patch_embed=5.8  norm=3.2
+N=64: Σops=271.1ms  ffn_gemm=154.7  attn_gemm=75.9  merger=21.3  patch_embed=11.0  norm=8.2
+DONE

@@ -50,5 +50,6 @@
  ],
  "ratio_mean": 3.305,
  "ratio_min": 2.066,
- "ratio_max": 6.212
+ "ratio_max": 6.212,
+ "invalid_note": "CONTENDED run \u2014 GPU shared during measurement; not a valid anchor, excluded"
 }

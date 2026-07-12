@@ -1,113 +1,114 @@
 {
-  "experiment": "phase5.2_physical_encoder_anchor",
-  "timestamp_utc": "2026-07-10T01:09:45.468961+00:00",
-  "attn_requested": "flash_attention_2",
-  "attn_used": "flash_attention_2",
-  "model_dir": "/home/gio/tese/models/Qwen3-VL-8B-ViT",
-  "n_params": 576388336,
-  "load_s": 0.26,
-  "protocol": {
-    "nruns": 5,
-    "iters": 50,
-    "warmup": 10,
-    "image_px": 448,
-    "grid": 28
+ "experiment": "phase5.2_physical_encoder_anchor",
+ "timestamp_utc": "2026-07-10T01:09:45.468961+00:00",
+ "attn_requested": "flash_attention_2",
+ "attn_used": "flash_attention_2",
+ "model_dir": "/home/gio/tese/models/Qwen3-VL-8B-ViT",
+ "n_params": 576388336,
+ "load_s": 0.26,
+ "protocol": {
+  "nruns": 5,
+  "iters": 50,
+  "warmup": 10,
+  "image_px": 448,
+  "grid": 28
+ },
+ "aic_reference_csv": "/home/gio/tese/.claude/worktrees/agent-a02391a31bf24f66b/collector_artifacts/phaseB_batch_validation/aic_f_n_postinfill.csv",
+ "clocks_locked": true,
+ "gpu_state_before": {
+  "name": "NVIDIA GeForce RTX 5090",
+  "sm_clock_mhz": 2400,
+  "max_sm_clock_mhz": 3105,
+  "power_w": 55.04,
+  "temp_c": 38,
+  "throttle_hex": "0x0000000000000000",
+  "mem_used_mib": 1726
+ },
+ "gpu_state_after": {
+  "name": "NVIDIA GeForce RTX 5090",
+  "sm_clock_mhz": 2400,
+  "max_sm_clock_mhz": 3105,
+  "power_w": 408.87,
+  "temp_c": 55,
+  "throttle_hex": "0x0000000000000000",
+  "mem_used_mib": 5272
+ },
+ "torch": "2.12.1+cu130",
+ "cuda": "13.0",
+ "python": "3.14.0rc2",
+ "rows": [
+  {
+   "n_images": 1,
+   "patches": 784,
+   "post_merge_tokens": 196,
+   "mean_ms": 11.2181,
+   "ci95_ms": 0.0803,
+   "p50_ms": 11.2154,
+   "p99_ms": 11.4751,
+   "min_ms": 11.0143,
+   "sm_clock_mhz": 2385,
+   "sm_clock_all": [
+    2377,
+    2385,
+    2385,
+    2385,
+    2385
+   ],
+   "peak_mem_gb": 1.242,
+   "ms_per_img": 11.2181,
+   "aic_pred_ms": 8.162,
+   "ratio_meas_over_pred": 1.3744
   },
-  "aic_reference_csv": "/home/gio/tese/.claude/worktrees/agent-a02391a31bf24f66b/collector_artifacts/phaseB_batch_validation/aic_f_n_postinfill.csv",
-  "clocks_locked": false,
-  "gpu_state_before": {
-    "name": "NVIDIA GeForce RTX 5090",
-    "sm_clock_mhz": 2400,
-    "max_sm_clock_mhz": 3105,
-    "power_w": 55.04,
-    "temp_c": 38,
-    "throttle_hex": "0x0000000000000000",
-    "mem_used_mib": 1726
+  {
+   "n_images": 8,
+   "patches": 6272,
+   "post_merge_tokens": 1568,
+   "mean_ms": 54.0604,
+   "ci95_ms": 0.0236,
+   "p50_ms": 54.0535,
+   "p99_ms": 54.2884,
+   "min_ms": 53.9392,
+   "sm_clock_mhz": 2392,
+   "sm_clock_all": [
+    2392,
+    2392,
+    2392,
+    2392,
+    2392
+   ],
+   "peak_mem_gb": 1.538,
+   "ms_per_img": 6.7576,
+   "aic_pred_ms": 43.126,
+   "ratio_meas_over_pred": 1.2535
   },
-  "gpu_state_after": {
-    "name": "NVIDIA GeForce RTX 5090",
-    "sm_clock_mhz": 2400,
-    "max_sm_clock_mhz": 3105,
-    "power_w": 408.87,
-    "temp_c": 55,
-    "throttle_hex": "0x0000000000000000",
-    "mem_used_mib": 5272
-  },
-  "torch": "2.12.1+cu130",
-  "cuda": "13.0",
-  "python": "3.14.0rc2",
-  "rows": [
-    {
-      "n_images": 1,
-      "patches": 784,
-      "post_merge_tokens": 196,
-      "mean_ms": 11.2181,
-      "ci95_ms": 0.0803,
-      "p50_ms": 11.2154,
-      "p99_ms": 11.4751,
-      "min_ms": 11.0143,
-      "sm_clock_mhz": 2385,
-      "sm_clock_all": [
-        2377,
-        2385,
-        2385,
-        2385,
-        2385
-      ],
-      "peak_mem_gb": 1.242,
-      "ms_per_img": 11.2181,
-      "aic_pred_ms": 8.162,
-      "ratio_meas_over_pred": 1.3744
-    },
-    {
-      "n_images": 8,
-      "patches": 6272,
-      "post_merge_tokens": 1568,
-      "mean_ms": 54.0604,
-      "ci95_ms": 0.0236,
-      "p50_ms": 54.0535,
-      "p99_ms": 54.2884,
-      "min_ms": 53.9392,
-      "sm_clock_mhz": 2392,
-      "sm_clock_all": [
-        2392,
-        2392,
-        2392,
-        2392,
-        2392
-      ],
-      "peak_mem_gb": 1.538,
-      "ms_per_img": 6.7576,
-      "aic_pred_ms": 43.126,
-      "ratio_meas_over_pred": 1.2535
-    },
-    {
-      "n_images": 64,
-      "patches": 50176,
-      "post_merge_tokens": 12544,
-      "mean_ms": 465.7424,
-      "ci95_ms": 0.0694,
-      "p50_ms": 465.7245,
-      "p99_ms": 466.2967,
-      "min_ms": 465.2125,
-      "sm_clock_mhz": 2400,
-      "sm_clock_all": [
-        2400,
-        2400,
-        2400,
-        2400,
-        2400
-      ],
-      "peak_mem_gb": 3.912,
-      "ms_per_img": 7.2772,
-      "aic_pred_ms": 316.369,
-      "ratio_meas_over_pred": 1.4721
-    }
-  ],
-  "ratio_summary": {
-    "min": 1.254,
-    "max": 1.472,
-    "mean": 1.367,
-    "spread_pct": 16.0
+  {
+   "n_images": 64,
+   "patches": 50176,
+   "post_merge_tokens": 12544,
+   "mean_ms": 465.7424,
+   "ci95_ms": 0.0694,
+   "p50_ms": 465.7245,
+   "p99_ms": 466.2967,
+   "min_ms": 465.2125,
+   "sm_clock_mhz": 2400,
+   "sm_clock_all": [
+    2400,
+    2400,
+    2400,
+    2400,
+    2400
+   ],
+   "peak_mem_gb": 3.912,
+   "ms_per_img": 7.2772,
+   "aic_pred_ms": 316.369,
+   "ratio_meas_over_pred": 1.4721
   }
+ ],
+ "ratio_summary": {
+  "min": 1.254,
+  "max": 1.472,
+  "mean": 1.367,
+  "spread_pct": 16.0
+ },
+ "clock_lock_note": "externally locked via nvidia-smi -lgc/-lmc (SM 2400 MHz / MEM 14001 MHz); bench self-lock needs sudo so it recorded false, but clocks were pinned for the whole run (sm_clock steady 2400 MHz, throttle 0x0000000000000000)"
 }

@@ -1,0 +1,17 @@
+{
+ "8": {
+  "eager_ms": 58.64,
+  "compiled_ms": 47.64,
+  "speedup": 1.231
+ },
+ "32": {
+  "eager_ms": 253.68,
+  "compiled_ms": 179.09,
+  "speedup": 1.416
+ },
+ "64": {
+  "eager_ms": 511.21,
+  "compiled_ms": 355.91,
+  "speedup": 1.436
+ }
+}

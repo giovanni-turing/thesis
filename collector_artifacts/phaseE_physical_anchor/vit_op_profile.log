@@ -1,0 +1,13 @@
+Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 17024.98it/s]
+/home/gio/tese/eda/.venv/lib/python3.14/site-packages/torch/profiler/profiler.py:272: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+USDT:2026-07-12 03:58:56 3854536:3854536 ActivityProfilerController.cpp:415] profiler_start
+USDT:2026-07-12 03:58:57 3854536:3854536 ActivityProfilerController.cpp:455] profiler_stop
+N=8: total=55.4ms  matmul=43.7  elementwise=11.4  other=0.3
+USDT:2026-07-12 03:58:58 3854536:3854536 ActivityProfilerController.cpp:415] profiler_start
+USDT:2026-07-12 03:59:01 3854536:3854536 ActivityProfilerController.cpp:455] profiler_stop
+N=32: total=246.6ms  matmul=166.4  elementwise=79.0  other=1.2
+USDT:2026-07-12 03:59:05 3854536:3854536 ActivityProfilerController.cpp:415] profiler_start
+USDT:2026-07-12 03:59:10 3854536:3854536 ActivityProfilerController.cpp:455] profiler_stop
+N=64: total=498.3ms  matmul=329.4  elementwise=166.6  other=2.4
+DONE

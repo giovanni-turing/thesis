@@ -1,223 +1,224 @@
 {
-  "experiment": "phase5.2_physical_encoder_anchor",
-  "timestamp_utc": "2026-07-10T01:22:40.262091+00:00",
-  "attn_requested": "sdpa",
-  "attn_used": "sdpa",
-  "model_dir": "/home/gio/tese/models/Qwen3-VL-8B-ViT",
-  "n_params": 576388336,
-  "load_s": 0.25,
-  "protocol": {
-    "nruns": 5,
-    "iters": 50,
-    "warmup": 10,
-    "image_px": 448,
-    "grid": 28
+ "experiment": "phase5.2_physical_encoder_anchor",
+ "timestamp_utc": "2026-07-10T01:22:40.262091+00:00",
+ "attn_requested": "sdpa",
+ "attn_used": "sdpa",
+ "model_dir": "/home/gio/tese/models/Qwen3-VL-8B-ViT",
+ "n_params": 576388336,
+ "load_s": 0.25,
+ "protocol": {
+  "nruns": 5,
+  "iters": 50,
+  "warmup": 10,
+  "image_px": 448,
+  "grid": 28
+ },
+ "aic_reference_csv": "/home/gio/tese/collector_artifacts/phaseB_batch_validation/aic_f_n_postinfill.csv",
+ "clocks_locked": true,
+ "gpu_state_before": {
+  "name": "NVIDIA GeForce RTX 5090",
+  "sm_clock_mhz": 2400,
+  "max_sm_clock_mhz": 3105,
+  "power_w": 53.36,
+  "temp_c": 33,
+  "throttle_hex": "0x0000000000000000",
+  "mem_used_mib": 1726
+ },
+ "gpu_state_after": {
+  "name": "NVIDIA GeForce RTX 5090",
+  "sm_clock_mhz": 2400,
+  "max_sm_clock_mhz": 3105,
+  "power_w": 394.42,
+  "temp_c": 56,
+  "throttle_hex": "0x0000000000000000",
+  "mem_used_mib": 5500
+ },
+ "torch": "2.12.1+cu130",
+ "cuda": "13.0",
+ "python": "3.14.0rc2",
+ "rows": [
+  {
+   "n_images": 1,
+   "patches": 784,
+   "post_merge_tokens": 196,
+   "mean_ms": 11.3238,
+   "ci95_ms": 0.0216,
+   "p50_ms": 11.3223,
+   "p99_ms": 11.4322,
+   "min_ms": 11.1952,
+   "sm_clock_mhz": 2377,
+   "sm_clock_all": [
+    2385,
+    2377,
+    2377,
+    2377,
+    2377
+   ],
+   "peak_mem_gb": 1.241,
+   "ms_per_img": 11.3238,
+   "aic_pred_ms": 8.162,
+   "ratio_meas_over_pred": 1.3874
   },
-  "aic_reference_csv": "/home/gio/tese/collector_artifacts/phaseB_batch_validation/aic_f_n_postinfill.csv",
-  "clocks_locked": false,
-  "gpu_state_before": {
-    "name": "NVIDIA GeForce RTX 5090",
-    "sm_clock_mhz": 2400,
-    "max_sm_clock_mhz": 3105,
-    "power_w": 53.36,
-    "temp_c": 33,
-    "throttle_hex": "0x0000000000000000",
-    "mem_used_mib": 1726
+  {
+   "n_images": 2,
+   "patches": 1568,
+   "post_merge_tokens": 392,
+   "mean_ms": 17.5466,
+   "ci95_ms": 0.0103,
+   "p50_ms": 17.5492,
+   "p99_ms": 17.6249,
+   "min_ms": 17.4233,
+   "sm_clock_mhz": 2377,
+   "sm_clock_all": [
+    2377,
+    2377,
+    2377,
+    2377,
+    2385
+   ],
+   "peak_mem_gb": 1.284,
+   "ms_per_img": 8.7733,
+   "aic_pred_ms": 13.271,
+   "ratio_meas_over_pred": 1.3222
   },
-  "gpu_state_after": {
-    "name": "NVIDIA GeForce RTX 5090",
-    "sm_clock_mhz": 2400,
-    "max_sm_clock_mhz": 3105,
-    "power_w": 394.42,
-    "temp_c": 56,
-    "throttle_hex": "0x0000000000000000",
-    "mem_used_mib": 5500
+  {
+   "n_images": 4,
+   "patches": 3136,
+   "post_merge_tokens": 784,
+   "mean_ms": 30.7096,
+   "ci95_ms": 0.0148,
+   "p50_ms": 30.7086,
+   "p99_ms": 30.7913,
+   "min_ms": 30.6099,
+   "sm_clock_mhz": 2385,
+   "sm_clock_all": [
+    2385,
+    2385,
+    2392,
+    2385,
+    2385
+   ],
+   "peak_mem_gb": 1.368,
+   "ms_per_img": 7.6774,
+   "aic_pred_ms": 23.127,
+   "ratio_meas_over_pred": 1.3279
   },
-  "torch": "2.12.1+cu130",
-  "cuda": "13.0",
-  "python": "3.14.0rc2",
-  "rows": [
-    {
-      "n_images": 1,
-      "patches": 784,
-      "post_merge_tokens": 196,
-      "mean_ms": 11.3238,
-      "ci95_ms": 0.0216,
-      "p50_ms": 11.3223,
-      "p99_ms": 11.4322,
-      "min_ms": 11.1952,
-      "sm_clock_mhz": 2377,
-      "sm_clock_all": [
-        2385,
-        2377,
-        2377,
-        2377,
-        2377
-      ],
-      "peak_mem_gb": 1.241,
-      "ms_per_img": 11.3238,
-      "aic_pred_ms": 8.162,
-      "ratio_meas_over_pred": 1.3874
-    },
-    {
-      "n_images": 2,
-      "patches": 1568,
-      "post_merge_tokens": 392,
-      "mean_ms": 17.5466,
-      "ci95_ms": 0.0103,
-      "p50_ms": 17.5492,
-      "p99_ms": 17.6249,
-      "min_ms": 17.4233,
-      "sm_clock_mhz": 2377,
-      "sm_clock_all": [
-        2377,
-        2377,
-        2377,
-        2377,
-        2385
-      ],
-      "peak_mem_gb": 1.284,
-      "ms_per_img": 8.7733,
-      "aic_pred_ms": 13.271,
-      "ratio_meas_over_pred": 1.3222
-    },
-    {
-      "n_images": 4,
-      "patches": 3136,
-      "post_merge_tokens": 784,
-      "mean_ms": 30.7096,
-      "ci95_ms": 0.0148,
-      "p50_ms": 30.7086,
-      "p99_ms": 30.7913,
-      "min_ms": 30.6099,
-      "sm_clock_mhz": 2385,
-      "sm_clock_all": [
-        2385,
-        2385,
-        2392,
-        2385,
-        2385
-      ],
-      "peak_mem_gb": 1.368,
-      "ms_per_img": 7.6774,
-      "aic_pred_ms": 23.127,
-      "ratio_meas_over_pred": 1.3279
-    },
-    {
-      "n_images": 6,
-      "patches": 4704,
-      "post_merge_tokens": 1176,
-      "mean_ms": 43.4002,
-      "ci95_ms": 0.0116,
-      "p50_ms": 43.4047,
-      "p99_ms": 43.5044,
-      "min_ms": 43.264,
-      "sm_clock_mhz": 2385,
-      "sm_clock_all": [
-        2385,
-        2385,
-        2385,
-        2385,
-        2385
-      ],
-      "peak_mem_gb": 1.454,
-      "ms_per_img": 7.2334,
-      "aic_pred_ms": 31.792,
-      "ratio_meas_over_pred": 1.3651
-    },
-    {
-      "n_images": 8,
-      "patches": 6272,
-      "post_merge_tokens": 1568,
-      "mean_ms": 58.5876,
-      "ci95_ms": 0.0105,
-      "p50_ms": 58.5894,
-      "p99_ms": 58.7072,
-      "min_ms": 58.4508,
-      "sm_clock_mhz": 2392,
-      "sm_clock_all": [
-        2392,
-        2392,
-        2392,
-        2392,
-        2392
-      ],
-      "peak_mem_gb": 1.538,
-      "ms_per_img": 7.3235,
-      "aic_pred_ms": 43.126,
-      "ratio_meas_over_pred": 1.3585
-    },
-    {
-      "n_images": 16,
-      "patches": 12544,
-      "post_merge_tokens": 3136,
-      "mean_ms": 123.3754,
-      "ci95_ms": 0.0136,
-      "p50_ms": 123.3732,
-      "p99_ms": 123.5887,
-      "min_ms": 123.1843,
-      "sm_clock_mhz": 2392,
-      "sm_clock_all": [
-        2392,
-        2392,
-        2392,
-        2392,
-        2392
-      ],
-      "peak_mem_gb": 1.878,
-      "ms_per_img": 7.711,
-      "aic_pred_ms": 82.217,
-      "ratio_meas_over_pred": 1.5006
-    },
-    {
-      "n_images": 32,
-      "patches": 25088,
-      "post_merge_tokens": 6272,
-      "mean_ms": 253.8946,
-      "ci95_ms": 0.0346,
-      "p50_ms": 253.8911,
-      "p99_ms": 254.2088,
-      "min_ms": 253.5847,
-      "sm_clock_mhz": 2392,
-      "sm_clock_all": [
-        2392,
-        2392,
-        2392,
-        2392,
-        2392
-      ],
-      "peak_mem_gb": 2.557,
-      "ms_per_img": 7.9342,
-      "aic_pred_ms": 160.196,
-      "ratio_meas_over_pred": 1.5849
-    },
-    {
-      "n_images": 64,
-      "patches": 50176,
-      "post_merge_tokens": 12544,
-      "mean_ms": 511.6829,
-      "ci95_ms": 0.0496,
-      "p50_ms": 511.6794,
-      "p99_ms": 512.2039,
-      "min_ms": 511.2013,
-      "sm_clock_mhz": 2400,
-      "sm_clock_all": [
-        2400,
-        2392,
-        2400,
-        2392,
-        2400
-      ],
-      "peak_mem_gb": 3.91,
-      "ms_per_img": 7.995,
-      "aic_pred_ms": 316.369,
-      "ratio_meas_over_pred": 1.6174
-    }
-  ],
-  "ratio_summary": {
-    "min": 1.322,
-    "max": 1.617,
-    "mean": 1.433,
-    "spread_pct": 20.6
+  {
+   "n_images": 6,
+   "patches": 4704,
+   "post_merge_tokens": 1176,
+   "mean_ms": 43.4002,
+   "ci95_ms": 0.0116,
+   "p50_ms": 43.4047,
+   "p99_ms": 43.5044,
+   "min_ms": 43.264,
+   "sm_clock_mhz": 2385,
+   "sm_clock_all": [
+    2385,
+    2385,
+    2385,
+    2385,
+    2385
+   ],
+   "peak_mem_gb": 1.454,
+   "ms_per_img": 7.2334,
+   "aic_pred_ms": 31.792,
+   "ratio_meas_over_pred": 1.3651
+  },
+  {
+   "n_images": 8,
+   "patches": 6272,
+   "post_merge_tokens": 1568,
+   "mean_ms": 58.5876,
+   "ci95_ms": 0.0105,
+   "p50_ms": 58.5894,
+   "p99_ms": 58.7072,
+   "min_ms": 58.4508,
+   "sm_clock_mhz": 2392,
+   "sm_clock_all": [
+    2392,
+    2392,
+    2392,
+    2392,
+    2392
+   ],
+   "peak_mem_gb": 1.538,
+   "ms_per_img": 7.3235,
+   "aic_pred_ms": 43.126,
+   "ratio_meas_over_pred": 1.3585
+  },
+  {
+   "n_images": 16,
+   "patches": 12544,
+   "post_merge_tokens": 3136,
+   "mean_ms": 123.3754,
+   "ci95_ms": 0.0136,
+   "p50_ms": 123.3732,
+   "p99_ms": 123.5887,
+   "min_ms": 123.1843,
+   "sm_clock_mhz": 2392,
+   "sm_clock_all": [
+    2392,
+    2392,
+    2392,
+    2392,
+    2392
+   ],
+   "peak_mem_gb": 1.878,
+   "ms_per_img": 7.711,
+   "aic_pred_ms": 82.217,
+   "ratio_meas_over_pred": 1.5006
+  },
+  {
+   "n_images": 32,
+   "patches": 25088,
+   "post_merge_tokens": 6272,
+   "mean_ms": 253.8946,
+   "ci95_ms": 0.0346,
+   "p50_ms": 253.8911,
+   "p99_ms": 254.2088,
+   "min_ms": 253.5847,
+   "sm_clock_mhz": 2392,
+   "sm_clock_all": [
+    2392,
+    2392,
+    2392,
+    2392,
+    2392
+   ],
+   "peak_mem_gb": 2.557,
+   "ms_per_img": 7.9342,
+   "aic_pred_ms": 160.196,
+   "ratio_meas_over_pred": 1.5849
+  },
+  {
+   "n_images": 64,
+   "patches": 50176,
+   "post_merge_tokens": 12544,
+   "mean_ms": 511.6829,
+   "ci95_ms": 0.0496,
+   "p50_ms": 511.6794,
+   "p99_ms": 512.2039,
+   "min_ms": 511.2013,
+   "sm_clock_mhz": 2400,
+   "sm_clock_all": [
+    2400,
+    2392,
+    2400,
+    2392,
+    2400
+   ],
+   "peak_mem_gb": 3.91,
+   "ms_per_img": 7.995,
+   "aic_pred_ms": 316.369,
+   "ratio_meas_over_pred": 1.6174
   }
+ ],
+ "ratio_summary": {
+  "min": 1.322,
+  "max": 1.617,
+  "mean": 1.433,
+  "spread_pct": 20.6
+ },
+ "clock_lock_note": "externally locked via nvidia-smi -lgc/-lmc (SM 2400 MHz / MEM 14001 MHz); bench self-lock needs sudo so it recorded false, but clocks were pinned for the whole run (sm_clock steady 2400 MHz, throttle 0x0000000000000000)"
 }

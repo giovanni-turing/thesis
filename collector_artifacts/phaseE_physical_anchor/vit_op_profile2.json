@@ -1,0 +1,26 @@
+{
+ "8": {
+  "sum_ops_ms": 35.81,
+  "ffn_gemm": 19.94,
+  "attn_gemm": 10.36,
+  "merger": 2.96,
+  "patch_embed": 1.62,
+  "norm": 0.93
+ },
+ "32": {
+  "sum_ops_ms": 136.14,
+  "ffn_gemm": 77.73,
+  "attn_gemm": 38.78,
+  "merger": 10.68,
+  "patch_embed": 5.76,
+  "norm": 3.18
+ },
+ "64": {
+  "sum_ops_ms": 271.08,
+  "ffn_gemm": 154.75,
+  "attn_gemm": 75.9,
+  "merger": 21.3,
+  "patch_embed": 10.96,
+  "norm": 8.18
+ }
+}

@@ -51,3 +51,12 @@ simulation/results/aggregate44_rho/*.log
 simulation/results/aggregate44_strict/*.jsonl
 simulation/results/aggregate44_strict/*.log
 simulation/results/riders44/*.log
+.env
+opus/
+grok/
+glm/
+gemini/
+fabel/
+codex/
+scratchtiles.py
+scratchtiles.json
