@@ -244,9 +244,11 @@ saturation attributable by construction?
 Chapters~\ref{cap:aiconfigurator} and~\ref{cap:twopool} build that
 platform: the collected encoder-attention operator agrees with physical
 measurement within ${\approx}3\%$, the end-to-end kernel ledger closes
-with no unexplained residual, and the composed forward carries an
-attributed, conservative-direction measurement band
-(${\approx}1.4$--$1.6\times$) rather than an assumed accuracy; the language pool's calibrated timing
+with no unexplained residual, and a matched-engine silicon measurement of
+the serving engine's own vision tower (vLLM) validates the composed forward
+to within $12.8\%$ across the $N\le64$ batch axis --- the earlier ${\approx}1.4$--$1.6\times$
+figure is an execution-engine difference (HuggingFace eager vs.\ vLLM's
+kernels; Appendix~\ref{app:engine-sensitivity}); the language pool's calibrated timing
 exposes the latency tails the simulator's default polynomial flattens
 (TTFT p99 $+24\%$ on the steady window; on the burst window the
 polynomial misses a $1.9\times$ SLA violation outright).
@@ -497,9 +499,13 @@ arrival-side information only: the rate signals stamp each request's full
 token volume at its arrival minute, which is faithful for encoder and
 prefill work but makes the decode series an offered-work upper bound. The
 trace records image counts, not sizes, so the encoder pool assumes a
-uniform $448^2$ image, and its cost model carries a measured,
-conservative-direction gap to silicon (${\approx}1.4$--$1.6\times$ at
-$448^2$) documented where it matters. The inter-pool handoff is priced
+uniform $448^2$ image, and its cost model is validated against the serving
+engine's own vision tower --- a
+matched-engine (vLLM) silicon check over a dense sweep ($N{=}1$--$512$, 69
+batch sizes) on a standalone vision-tower forward, holding within $12.8\%$
+across the whole $N\le64$ serving regime, with the earlier ${\approx}1.4$--$1.6\times$ figure
+attributed to an alternate execution engine (HuggingFace eager),
+predominantly execution-stack-specific (Appendix~\ref{app:engine-sensitivity}). The inter-pool handoff is priced
 single-stream: at Qwen3-VL's full DeepStack payload the
 \SI{588}{\milli\second} floor and the 0.62$\times$ result assume an
 embedding-only handoff or a ${\geq}100$\,Gbps fabric, since on the default

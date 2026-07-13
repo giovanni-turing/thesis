@@ -37,8 +37,11 @@ which is what later converts forecasts into provisionable headroom.
 \paragraph{RQ3 --- Platform validity: yes, with measured fidelity.} The
 encoder cost model was collected on silicon for this thesis
 (and contributed upstream), validated to ${\approx}3\%$ on its dominant
-operator with a fully attributed residual ledger and a
-conservative-direction composed-forward band; the language pool runs
+operator with a fully attributed residual ledger, and a composed
+forward that matches vLLM's own vision tower to within $12.8\%$
+(the earlier ${\approx}1.4\text{--}1.6\times$ gap was HuggingFace
+execution overhead, an execution-stack difference;
+Appendix~\ref{app:engine-sensitivity}); the language pool runs
 under calibrated engine timing whose delta against the simulator's
 default polynomial is quantified, including a burst-window SLA
 violation the polynomial misses outright. Per-pool attribution is by
@@ -93,22 +96,25 @@ production trace with an offered-work upper bound on decode demand; the
 inter-pool handoff is an analytic single-stream bound, so the
 \SI{588}{\milli\second} floor and the cost ratio assume an embedding-only
 handoff or a ${\geq}100$\,Gbps fabric; the encoder cost model is
-silicon-validated but eager, a conservative bound a fused production stack
-sits below; and the vision-pool control loop is exercised in simulation and
+silicon-validated against a standalone eager forward through vLLM's
+own vision-tower implementation to within $12.8\%$ (a matched-engine check over
+a dense $N{=}1$--$64$ sweep on a standalone vision-tower forward; the
+${\approx}1.4\text{--}1.6\times$ HuggingFace-eager gap was a slower
+execution stack, not the serving path; Appendix~\ref{app:engine-sensitivity});
+and the vision-pool control loop is exercised in simulation and
 against the measured silicon cost, not yet as a live serving loop. None
-reverses the direction of the results (each leans conservative),
-but each scopes their generality (Chapters~\ref{cap:closedloop} and
+reverses the direction of the results --- the encoder cost model in
+particular is validated rather than conservatively biased --- but each
+scopes their generality (Chapters~\ref{cap:closedloop} and
 \ref{cap:twopool} detail them).
 
 \section{Future work}
 \label{sec:conc-future}
 
 Three extensions remain. \emph{Completing the physical encoder anchor}:
-Chapter~\ref{cap:aiconfigurator} reports a first whole-tower measurement
-on the 5090 whose $f(N)$ tracks the AIC composition at a stable
-batch-axis ratio; a single-tenant stable-clock re-run has since pinned
-the absolutes ($N{=}64$ within
-$0.09\%$ of the batch-axis reference). What remains is one real encoder
+Chapter~\ref{cap:aiconfigurator} reports a dense whole-tower sweep on the
+5090 (69 batch sizes, $N{=}1$--$512$) whose measured $f(N)$ matches the AIC
+composition to within $12.8\%$ across the whole $N\le64$ serving regime. What remains is one real encoder
 worker serving a burst replay end to end and, beyond it, the full
 closed loop on a real GPU serving cluster: the honest complement to
 the mocked-engine control-loop anchor of Chapter~\ref{cap:validation},

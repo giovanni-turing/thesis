@@ -63,10 +63,11 @@ aiconfigurator/ai-dynamo environments
 in Table~\ref{tab:ap-env}; no full dependency lock is tracked in this
 repository, so the table fixes the load-bearing versions rather than
 every transitive dependency. Of the commits cited in
-Table~\ref{tab:ap-manifest}, the collected aiconfigurator campaign
-(\texttt{1e8b9cac}) is the upstream draft PR, while the infill
-(\texttt{656ac8ca}) and the Dynamo live-planner branch
-(\texttt{33a9babe01}) are \emph{local} commits (push/archival pending).
+Table~\ref{tab:ap-manifest}, the encoder campaign now
+runs through commit \texttt{b55dd0b7} (infill \texttt{656ac8ca}, collector
+fix \texttt{12306db5}, large-batch ViT coverage \texttt{492a3444}), pushed
+to the fork and open on draft PR~\#1312; only the Dynamo live-planner
+branch (\texttt{33a9babe01}) remains a local commit (archival pending).
 The \emph{load-bearing issue-time encoder pipeline} (the issue-time
 generator, the two-pool converter, and the factorial/aggregate drivers)
 resolves its data paths from \texttt{TESE\_ROOT} and relocates cleanly;
@@ -103,6 +104,140 @@ noise-level inter-model spreads in Table~\ref{tab:pred-wape}.}
 \end{figure}
 
 \clearpage
+\section[Encoder cost model: engine sensitivity]{Execution-engine sensitivity of the encoder cost model}
+\label{app:engine-sensitivity}
+
+The batch-axis discrepancy of Section~\ref{sec:aic-model-vs-silicon}
+between AIC's composed encoder forward and end-to-end measurement is
+predominantly execution-stack-specific across the $N\le64$ serving regime
+(residual up to $+12.7\%$) --- a property of the \emph{execution engine}
+used for measurement more than of the cost model. This appendix reports
+the engine-by-engine evidence that
+supports that reframing, together with the encoder-coverage contributions
+returned upstream.
+
+Table~\ref{tab:app-engine} times the same Qwen3-VL vision-tower forward
+(bf16, $448^2$, RTX~5090 under an external \texttt{nvidia-smi} clock lock,
+target SM~2400\,/\,mem~14001\,\si{\mega\hertz}) under four
+execution paths, against AIC's composition. This external lock is a
+separate recollection from the Phase-E self-lock attempt of the
+Environment section (which required \texttt{sudo} and delivered only the
+softer persistence-mode band recorded there, ``not a hard lock''); for
+this recollection the archive holds per-$N$ SM readings spanning
+2377--2400\,\si{\mega\hertz} (median 2400); no memory-clock reading and no
+lock-command log were captured.
+
+\begin{table}[htbp]
+\centering
+\caption{Encoder forward latency (ms) over $N$ images of $448^2$ under
+four execution engines vs.\ the AIC composition. HuggingFace and
+\texttt{torch.compile} are the \texttt{transformers} module; vLLM is its
+own \texttt{Qwen3\_VisionTransformer} with the FlashAttention backend
+(the standalone eager vLLM vision-tower implementation). The final column is the ratio of
+vLLM---the engine AIC's collected kernels are drawn from---to the
+composition.}
+\label{tab:app-engine}
+\small
+\begin{tabular}{rrrrrrr}
+\toprule
+$N$ & AIC & HF-SDPA & HF-FA2 & vLLM-FA & \texttt{compile} & vLLM/AIC \\
+\midrule
+1  & 8.2   & 11.3  & 11.2  & 8.0   & 10.1  & 0.98 \\
+8  & 43.1  & 58.7  & 54.1  & 42.2  & 48.8  & 0.98 \\
+32 & 160.2 & 253.8 & 232.0 & 178.3 & 186.0 & 1.11 \\
+64 & 316.4 & 511.6 & 465.7 & 333.7 & 370.6 & 1.05 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The four table rows are anchor shapes within a dense sweep;
+Figure~\ref{fig:app-engines} plots the engines across the batch axis (vLLM
+and both HuggingFace backends at all 69 sizes, \texttt{torch.compile} at
+13).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figuras/aic/aic_fn_engines}
+\caption{Dense $f(N)$ for the four execution engines vs.\ the AIC
+composition ($448^2$, RTX~5090 external lock target SM~2400\,/\,mem~14001\,\si{\mega\hertz}, delivered SM 2377--2400\,\si{\mega\hertz};
+vLLM: 69 batch sizes, per-$N$ Student-$t$ $95\%$ CI below \SI{0.06}{\milli\second}; HuggingFace swept at 69 batch sizes and \texttt{torch.compile} at 13, both with wider CIs).
+\emph{Left}: forward latency (log--log). \emph{Right}: each engine relative
+to the composition; the shaded band marks $\pm12.8\%$ and the dotted line
+the FIFO cap ($N{=}64$). vLLM --- the engine AIC's kernels are drawn from
+--- stays inside the band across the entire serving regime and drifts to
+$+21.8\%$ only past the cap, a regime the pool never batches into;
+HuggingFace-SDPA sits near $1.3$--$1.4\times$ at small $N$ and climbs to $1.69\times$ by $N{=}512$;
+\texttt{torch.compile} sits between. The AIC curve is the load-bearing
+postinfill snapshot for $N\le128$ and the current composed model beyond,
+persisted as \texttt{aic\_fn\_engines\_aiccurve.csv}.}
+\label{fig:app-engines}
+\end{figure}
+
+Three observations. (i)~The HuggingFace-transformers eager forward
+(SDPA attention) runs $1.36$--$1.61\times$ above the composition, rising
+with $N$; switching its attention backend to FlashAttention-2 recovers
+part of it ($1.25\times$ at $N{=}8$, $1.47\times$ at $N{=}64$) but leaves
+the unfused elementwise, DeepStack, and patch-embed overhead intact.
+(ii)~vLLM's \emph{own} vision tower through its FlashAttention
+backend --- the standalone eager vLLM vision-tower implementation ---
+matches the composition to within $11.4\%$
+($-2.2\%,+11.3\%,+5.5\%$ at $N{=}8/32/64$). This is the
+like-for-like anchor: AIC's collected operators \emph{are} vLLM's kernels
+(the attention rows carry
+\texttt{kernel\_source=vllm\_vit\_flash\_attn}; the GEMMs are vLLM
+\texttt{RowParallelLinear}). (iii)~\texttt{torch.compile}
+(max-autotune) accelerates the HuggingFace forward by $1.2$--$1.4\times$,
+landing near vLLM's numbers, but is the default execution of neither
+engine. The earlier $1.4$--$1.6\times$ ``gap'' is thus the
+HuggingFace$\to$vLLM execution-stack difference; against the engine it
+targets, the composition stays within $12.8\%$ across the whole $N\le64$
+serving regime (residual up to $+12.7\%$ inside the regime, growing to
+$+21.8\%$ only past the FIFO cap at $N{=}512$).
+
+\emph{Scope.} The matched-engine check times eager vLLM's standalone
+vision-tower forward on synthetic GPU-resident inputs with randomly
+initialised weights (latency is shape-determined, so weight values are not
+expected to materially affect these dense-kernel timings): it is the forward compute, not the complete serving path (image
+preprocessing, host-to-device transfer, request scheduling, prefill). It is
+a dense $N{=}1$--$512$ sweep --- 69 batch sizes, five replications of fifty
+timed forwards each, per-$N$ Student-$t$ $95\%$ CI below \SI{0.06}{\milli\second} ---
+rather than a three-shape anchor. Fed through the encoder FIFO (the
+AIC-sized winning week schedule of Chapter~\ref{cap:closedloop} replayed
+with $f(N)$ repriced at the measured vLLM curve, interpolated per dispatched
+batch), it leaves the week-scale encoder-delay p99 at \SI{606}{\milli\second}
+(from \SI{589}{\milli\second} under AIC), non-divergent, so the AIC-priced
+cost ratio carries no separate silicon penalty. The agreement generalises
+across image resolution: repeating the sweep at $224^2$, $320^2$, $448^2$,
+$640^2$ and $896^2$ (batched regime $N{\ge}8$) holds vLLM within $12.8\%$ of
+the composition at $448^2$ and below (mean ratio $0.99$--$1.05$) and within
+$15.5\%$ at the two largest resolutions (mean $1.09$--$1.11$ at
+$640^2$/$896^2$, AIC slightly under-pricing the largest forwards --- the same
+direction as the beyond-cap batch drift). A live-worker confirmation over the
+full serving path (with weight-loaded provenance) remains future work.
+Artifacts:
+\texttt{collector\_artifacts/\allowbreak phaseE\_physical\_anchor/\allowbreak}\texttt{vllm\_\allowbreak eager\_\allowbreak dense.\{py,json\}}
+(dense sweep), \texttt{vllm\_\allowbreak multires.\{py,json\}} (resolution sweep) and
+\texttt{tier2\_\allowbreak vllm\_\allowbreak replay.py} (queue replay).
+
+\paragraph{Encoder-coverage contributions (upstream).} Two gaps in AIC's
+encoder path were found and returned to the \texttt{aiconfigurator}
+project (draft PR). First, the operator graph omitted the pixel-to-hidden
+patch-embedding \textsc{gemm}; a \emph{subsequent} branch added a guarded
+\texttt{encoder\_patch\_embed\_gemm} ($\approx0.3\%$ of the forward at
+$N{=}64$; the DeepStack mergers were already modelled). This addition
+postdates the load-bearing simulation snapshot of the main text, in which
+the operator is absent, so the two are consistent. Second, the perf
+tables blanked the ViT's
+large-batch shapes --- the \textsc{gemm} token-count grid stopped at
+$m{=}\num{32768}$ (the ViT needs $m{=}784N$ up to \num{401408}) and the
+attention grid at batch~$64$ (the ViT is queried at batch~$=N$,
+$\text{isl}{=}784$) --- so past $N{\approx}42$ the model extrapolated beyond
+the grid; ViT-shape rows at large $m$ and attention rows to batch~$512$
+were collected on the 5090 (a collector out-of-memory fix, releasing the
+cache and adapting the timing-copy count, made the giant shapes
+collectable on a 32\,GB card). These are additive data/tooling
+corrections; the committed rows are preserved exactly.
+
 \section{Figure and table manifest}
 
 {\scriptsize\setlength{\tabcolsep}{3pt}
@@ -215,11 +350,23 @@ Tab.~\ref{tab:val-anchor}; live divergences (\S\ref{sec:val-findings}) &
   \texttt{live\_runs/ \{live\_fc, live\_re,
   verify\_flag\}/ \{planner.log.gz, manager.jsonl,
   profile\_export\_aiperf.json\}} \\
-Physical encoder anchor (\S\ref{sec:aic-validation}, future work) &
+Physical encoder anchor (\S\ref{sec:aic-validation}; collected, reported
+in Appendix~\ref{app:engine-sensitivity}) &
   \texttt{collector\_artifacts/ phaseE\_physical\_anchor/
   \{bench\_encoder\_anchor, silicon\_in\_loop, silicon\_multiworker\}.py} &
   \texttt{anchor\_sdpa\_*.json; oneworker\_artifact/;
   silicon\_multiworker.json} \\
+Matched-engine vLLM dense sweep + queue replay
+  (Fig.~\ref{fig:app-engines}, Appendix~\ref{app:engine-sensitivity}) &
+  \texttt{collector\_artifacts/ phaseE\_physical\_anchor/
+  \{vllm\_eager\_dense, vllm\_multires, vit\_compile\_dense,
+  tier2\_vllm\_replay, make\_engine\_fig\}.py} &
+  \texttt{vllm\_eager\_dense.json; vllm\_multires.json;
+  vit\_compile\_dense.\{json,log\}; merged\_sdpa.csv; merged\_fa2.csv;
+  \{winsched,static\_c8\}\_\allowbreak\{ctrl\_aic,\allowbreak
+  treatment\_vllm\}.stats.json;
+  replay\_provenance.md; figuras/aic/ aic\_fn\_engines.pdf,
+  aic\_fn\_engines\_\allowbreak aiccurve.csv} \\
 \end{longtable}}
 
 Workspace layout: \texttt{analysis/trace\_eda/} (GPU EDA),
@@ -229,5 +376,5 @@ Workspace layout: \texttt{analysis/trace\_eda/} (GPU EDA),
 simulation), \texttt{simulation/} (sweep/grid/planner drivers and
 results), \texttt{tex/} + \texttt{figuras/} (this document). The
 collected AIC datasets were contributed upstream as draft PR
-ai-dynamo/aiconfigurator~\#1312 (campaign at commit \texttt{1e8b9cac};
-infill recorded locally at \texttt{656ac8ca}, push pending).
+ai-dynamo/aiconfigurator~\#1312 (campaign through commit \texttt{b55dd0b7}, pushed and open on
+the draft PR).

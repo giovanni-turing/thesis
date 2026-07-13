@@ -532,23 +532,36 @@ Replay-level p99 noise is ${\approx}4\%$;
 no quoted contrast is within that band.
 
 Two further scopes bound the economic headline. First, the cost ratio is
-priced on the AIC encoder model, which Chapter~\ref{cap:aiconfigurator}
-shows underprices the p99-knee-limited burst windows by up to ${\approx}2\times$
-against measured (eager) silicon. Replaying the winning p90/$\rho{=}15$
-schedule under that measured $f(N)$, however, leaves it feasible on every
-in-span burst window (encoder-delay p99 784 versus
-\SI{588}{\milli\second} under AIC, both under the bound): the $\rho{=}15$/p90
+priced on the AIC encoder model, which Appendix~\ref{app:engine-sensitivity}
+shows is silicon-representative for the engine it targets: vLLM's own
+Qwen3-VL vision tower --- a standalone eager forward through its own
+vision-tower implementation --- matches AIC to within 12.8\%, because
+AIC's collected operators \emph{are} vLLM's kernels. The earlier apparent
+${\approx}2\times$ gap was an execution-stack artifact of measuring
+HuggingFace-transformers eager (the ${\approx}1.4$--$1.6\times$
+HuggingFace$\to$vLLM overhead), predominantly an execution-stack difference. Replaying the winning p90/$\rho{=}15$ schedule with the encoder repriced at
+the directly-measured vLLM $f(N)$ --- the dense sweep of
+Appendix~\ref{app:engine-sensitivity} interpolated per dispatched batch ---
+holds the week-scale encoder-delay p99 at \SI{606}{\milli\second} (versus
+\SI{589}{\milli\second} under AIC), non-divergent and far under the
+\SI{1000}{\milli\second} bound, and leaves the schedule's provisioned
+worker-time --- the numerator of the cost ratio --- unchanged. The same
+schedule under the slower HuggingFace-eager $f(N)$, an upper bound on the
+engine gap, also stays feasible on every in-span burst window (encoder-delay
+p99 784 versus \SI{588}{\milli\second} under AIC): the $\rho{=}15$/p90
 headroom provisions 24--32 workers at the burst peaks, far above the 12--16
-the silicon fleet requires, so the underprice is absorbed with no added
-workers: the winning schedule's provisioned worker-time, the numerator
-of the cost ratio, is unchanged on silicon. The reported
-\textbf{0.62$\times$} is therefore the AIC-model headline; a fully
-silicon-costed comparison would also enlarge the static \emph{denominator}
---- on measured silicon the deployable static fleet is bound by burst2's
-genuine batching knee (${\approx}2\times$), not by burst5's endpoint
-artifact --- so the silicon ratio would fall between that AIC headline and
-the lower value the larger fleet implies. That silicon accounting, and a
-live-worker non-eager confirmation, remain future work. Second,
+even that slower stack requires, so the gap is absorbed with no added
+workers. The reported \textbf{0.62$\times$} therefore holds on the
+measured standalone vLLM vision-tower forward cost, not only the AIC model: vLLM's per-forward cost
+matches the composition to within 12.8\% across the whole $N\le64$ serving
+regime (the FIFO cap; canonical residuals $-2.2\%$, $+11.3\%$, $+5.5\%$ at
+$N\in\{8,32,64\}$), and the static $C{=}8$ \emph{denominator} itself stays
+feasible when repriced at the same vLLM cost (encoder-delay p99
+\SI{692}{\milli\second} versus \SI{647}{\milli\second} under AIC,
+non-divergent), so no separate silicon penalty enlarges either the schedule
+or the denominator. A live-worker confirmation over
+the full serving path (the check reprices a standalone eager vision-tower
+forward on synthetic inputs) remains future work. Second,
 every quantity here (the $4\times$/$2\times$ over-provisioning, the
 $\rho$ frontier, the 0.62$\times$) derives from a single Azure
 production trace over one 5.60-day span; generalization to other workloads,
