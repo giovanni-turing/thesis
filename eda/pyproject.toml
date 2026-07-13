@@ -1,0 +1,38 @@
+[project]
+name = "eda"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "accelerate>=1.14.0",
+    "bitsandbytes>=0.49.2",
+    "chronos-forecasting>=2.3.1",
+    "cucim-cu13==26.6.*",
+    "cudf-cu13==26.6.*",
+    "cugraph-cu13==26.6.*",
+    "cuml-cu13==26.6.*",
+    "cuvs-cu13==26.6.*",
+    "cuxfilter-cu13==26.6.*",
+    "dask-cudf-cu13==26.6.*",
+    "datasets>=5.0.0",
+    "flash-attn",
+    "ipywidgets>=8.1.8",
+    "jupyterlab>=4.6.1",
+    "matplotlib>=3.11.0",
+    "nvforest-cu13==26.6.*",
+    "nx-cugraph-cu13==26.6.*",
+    "plotly>=6.8.0",
+    "pylibraft-cu13==26.6.*",
+    "raft-dask-cu13==26.6.*",
+    "torch>=2.12.1",
+    "torchvision>=0.27.1",
+    "toto-models>=1.0.0",
+    "transformers>=5.13.0",
+]
+
+[[tool.uv.index]]
+url = "https://pypi.nvidia.com/"
+
+[tool.uv.sources]
+flash-attn = { path = "flash_attn-2.8.3+cu130torch2.12-cp314-cp314-linux_x86_64.whl" }
