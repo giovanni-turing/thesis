@@ -2,7 +2,6 @@
 # Each subproject below is its own independent git checkout — never track them here.
 /ai-dynamo/
 /rapids/
-/eda/
 /models/
 *.whl
 # scratch/venvs
