@@ -67,3 +67,12 @@ analysis/trace_eda/cufile.log
 vit-embed-server/
 simulation/results/**/*canary*.jsonl
 simulation/results/*canary*.jsonl
+
+# large result artifacts are stored compressed (scripts/decompress_large_results.sh); ignore reconstructed originals
+simulation/results/llm_week/week_re.log
+simulation/results/llm_week/week_fc_p90.log
+predictors/results/chronos_covariates.parquet
+predictors/results/toto_covariates.parquet
+simulation/results/rerun_verify/week_static_C6.jsonl
+simulation/results/rerun_verify/week_static_C7.jsonl
+simulation/results/rerun_verify/week_static_C8.jsonl
