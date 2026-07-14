@@ -32,6 +32,17 @@ tex/*.fls
 tex/*.fdb_latexmk
 tex/*.synctex.gz
 tex/tese.pdf
+# Beamer defense slides: keep slides.tex + .latexmkrc + fig/ (scripts+figures), drop aux + compiled deck
+slides/slides.pdf
+slides/slides.aux
+slides/slides.log
+slides/slides.nav
+slides/slides.snm
+slides/slides.toc
+slides/slides.out
+slides/slides.fls
+slides/slides.fdb_latexmk
+slides/slides.synctex.gz
 # benchmark checkpoint parts: reproducible intermediates of the assembled results/*.parquet
 predictors/results/parts/
 # load-sweep intermediates: point JSONs/summary/figure/series are tracked; raw traces+logs are reproducible
