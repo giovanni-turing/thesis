@@ -1,0 +1,17 @@
+{
+ "timesfm": {
+  "enc_p99": 588.4,
+  "enc_requests": 931628,
+  "provisioned_ws": 2803229.6
+ },
+ "toto": {
+  "enc_p99": 588.4,
+  "enc_requests": 872980,
+  "provisioned_ws": 2535179.7
+ },
+ "chronos": {
+  "enc_p99": 588.4,
+  "enc_requests": 749601,
+  "provisioned_ws": 2410754.7
+ }
+}
