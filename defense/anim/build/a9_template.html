@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A9 — Request-anatomy KDE</title>
+<script>/*__PLOTLY__*/</script>
+<style>
+  :root { color-scheme: light;
+    --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --border:rgba(11,11,11,0.10); --blue:#2a78d6; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { background:var(--page); color:var(--ink); overflow:hidden;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif; display:flex; flex-direction:column; }
+  header { display:flex; align-items:center; gap:14px; padding:12px 24px 6px; flex-wrap:wrap; }
+  header h1 { font-size:21px; font-weight:650; }
+  header .sub { font-size:12.5px; color:var(--ink-2); margin-top:2px; max-width:560px; }
+  .ctl { display:flex; align-items:center; gap:6px; }
+  .ctl .lbl { font-size:10px; color:var(--muted); font-weight:600; letter-spacing:0.06em; text-align:right; line-height:1.2; }
+  select, .seg button { font:inherit; font-size:13px; padding:6px 10px; border:1px solid var(--border);
+    border-radius:8px; background:var(--surface); color:var(--ink); cursor:pointer; }
+  .seg { display:flex; border:1px solid var(--border); border-radius:9px; overflow:hidden; background:var(--surface); }
+  .seg button { border:0; border-radius:0; font-weight:600; color:var(--ink-2); font-size:12px; padding:6px 10px; }
+  .seg button + button { border-left:1px solid var(--border); }
+  .seg button.on { background:var(--ink); color:#fff; }
+  #stats { padding:2px 24px 4px; font-size:13.5px; color:var(--ink-2); }
+  #stats b { color:var(--ink); }
+  #plot { flex:1; margin:0 24px 6px; background:var(--surface);
+    border:1px solid var(--border); border-radius:14px; min-height:0; }
+  footer { display:flex; gap:14px; align-items:center; padding:2px 24px 8px; font-size:10.5px; color:var(--muted); }
+  footer .spacer { flex:1; }
+  a.back { color:var(--blue); text-decoration:none; font-size:12px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Request anatomy — 3D density over (context, generation)</h1>
+    <div class="sub">Binned Gaussian KDE of all 1,000,000 requests in log–log token space.
+      ContextTokens embeds the vision tokens (≈277/img → 66/img at scale): ctx ≈ text + img·tok(img).</div>
+  </div>
+  <div class="ctl" style="margin-left:auto">
+    <span class="lbl">IMAGE RANGE<br>(k×k grids)</span>
+    <select id="loSel"></select><span style="color:var(--muted)">→</span><select id="hiSel"></select>
+  </div>
+  <div class="ctl">
+    <div class="seg" id="presets">
+      <button data-r="0,9" class="on">all</button>
+      <button data-r="0,0">text-only</button>
+      <button data-r="1,1">1 image</button>
+      <button data-r="2,5">tiled k≤10</button>
+      <button data-r="6,9">frames k&gt;10</button>
+    </div>
+  </div>
+  <div class="ctl">
+    <span class="lbl">Z</span>
+    <div class="seg" id="zmode">
+      <button data-z="share" class="on">% of selection</button>
+      <button data-z="log">log₁₀ count</button>
+    </div>
+  </div>
+  <div class="ctl">
+    <span class="lbl">KERNEL σ<br>(grid cells)</span>
+    <select id="sigmaSel">
+      <option value="0">0 (raw bins)</option>
+      <option value="1">1</option>
+      <option value="1.6" selected>1.6</option>
+      <option value="2.5">2.5</option>
+    </select>
+  </div>
+</header>
+<div id="stats"></div>
+<div id="plot"></div>
+<footer>
+  <span>Real data: all 1M requests of AzureLMMInferenceTrace_multimodal (per-bucket 110×110 log-space histograms; kernel applied client-side — a binned KDE)</span>
+  <span>drag to orbit · scroll to zoom · buckets follow the k×k grid structure; thesis frames class = k&gt;10</span>
+  <span class="spacer"></span>
+  <a class="back" href="index.html">← launcher</a>
+</footer>
+<script>
+const DATA = /*__DATA__*/;
+
+const NX = DATA.nx, NY = DATA.ny;
+let lo = 0, hi = DATA.buckets.length - 1, zmode = "share", sigma = 1.6;
+
+/* selectors */
+const loSel = document.getElementById("loSel"), hiSel = document.getElementById("hiSel");
+for (const s of [loSel, hiSel])
+  DATA.buckets.forEach((b, i) => {
+    const o = document.createElement("option");
+    o.value = i; o.textContent = `${b.name} (${b.imgs})`;
+    s.appendChild(o);
+  });
+loSel.value = lo; hiSel.value = hi;
+loSel.onchange = () => { lo = +loSel.value; if (hi < lo) { hi = lo; hiSel.value = hi; } clearPreset(); render(); };
+hiSel.onchange = () => { hi = +hiSel.value; if (lo > hi) { lo = hi; loSel.value = lo; } clearPreset(); render(); };
+function clearPreset() { document.querySelectorAll("#presets button").forEach(b => b.classList.remove("on")); }
+document.querySelectorAll("#presets button").forEach(b => b.onclick = () => {
+  [lo, hi] = b.dataset.r.split(",").map(Number);
+  loSel.value = lo; hiSel.value = hi;
+  clearPreset(); b.classList.add("on"); render();
+});
+document.querySelectorAll("#zmode button").forEach(b => b.onclick = () => {
+  zmode = b.dataset.z;
+  document.querySelectorAll("#zmode button").forEach(o => o.classList.toggle("on", o === b));
+  render();
+});
+document.getElementById("sigmaSel").onchange = e => { sigma = +e.target.value; render(); };
+
+/* grid math */
+function sumGrids() {
+  const g = new Float64Array(NX * NY);
+  for (let i = lo; i <= hi; i++) {
+    const src = DATA.buckets[i].grid;
+    for (let j = 0; j < g.length; j++) g[j] += src[j];
+  }
+  return g;
+}
+function blur(g, s) {
+  if (s <= 0) return g;
+  const r = Math.ceil(3 * s), kern = [];
+  let ks = 0;
+  for (let d = -r; d <= r; d++) { const v = Math.exp(-d * d / (2 * s * s)); kern.push(v); ks += v; }
+  for (let i = 0; i < kern.length; i++) kern[i] /= ks;
+  const tmp = new Float64Array(NX * NY), out = new Float64Array(NX * NY);
+  for (let ix = 0; ix < NX; ix++)
+    for (let iy = 0; iy < NY; iy++) {
+      let acc = 0;
+      for (let d = -r; d <= r; d++) {
+        const jx = ix + d;
+        if (jx >= 0 && jx < NX) acc += kern[d + r] * g[jx * NY + iy];
+      }
+      tmp[ix * NY + iy] = acc;
+    }
+  for (let ix = 0; ix < NX; ix++)
+    for (let iy = 0; iy < NY; iy++) {
+      let acc = 0;
+      for (let d = -r; d <= r; d++) {
+        const jy = iy + d;
+        if (jy >= 0 && jy < NY) acc += kern[d + r] * tmp[ix * NY + jy];
+      }
+      out[ix * NY + iy] = acc;
+    }
+  return out;
+}
+
+/* axes: centers in log10 space; ticks labeled in tokens */
+const xs = [], ys = [];
+for (let i = 0; i < NX; i++) xs.push(DATA.xlo + (i + 0.5) / NX * (DATA.xhi - DATA.xlo));
+for (let i = 0; i < NY; i++) ys.push(DATA.ylo + (i + 0.5) / NY * (DATA.yhi - DATA.ylo));
+const tickv = [0, 1, 2, 3, 4, 5], tickt = ["1", "10", "100", "1k", "10k", "100k"];
+const RAMP = [[0, "#fcfcfb"], [0.08, "#cde2fb"], [0.25, "#9ec5f4"], [0.45, "#6da7ec"],
+              [0.65, "#3987e5"], [0.82, "#256abf"], [1, "#0d366b"]];
+
+function render() {
+  const total = DATA.buckets.slice(lo, hi + 1).reduce((a, b) => a + b.count, 0);
+  const g = blur(sumGrids(), sigma);
+  // z matrix: plotly wants z[y][x]
+  const z = [];
+  for (let iy = 0; iy < NY; iy++) {
+    const row = new Array(NX);
+    for (let ix = 0; ix < NX; ix++) {
+      const v = g[ix * NY + iy];
+      row[ix] = zmode === "share" ? v / Math.max(total, 1) * 100 : Math.log10(v + 1);
+    }
+    z.push(row);
+  }
+  const names = DATA.buckets.slice(lo, hi + 1).map(b => b.name).join(", ");
+  document.getElementById("stats").innerHTML =
+    `Selection: <b>${names}</b> · <b>${total.toLocaleString("en-US")}</b> requests ` +
+    `(<b>${(total / DATA.total * 100).toFixed(2)}%</b> of the trace) · ` +
+    `bucket medians ctx ${DATA.buckets[lo].med_ctx.toLocaleString("en-US")}` +
+    (hi > lo ? `–${DATA.buckets[hi].med_ctx.toLocaleString("en-US")}` : "") +
+    ` tok · z = ${zmode === "share" ? "% of selected requests per cell" : "log₁₀(smoothed count + 1)"}`;
+  Plotly.react("plot", [{
+    type: "surface", x: xs, y: ys, z,
+    colorscale: RAMP, showscale: true,
+    colorbar: { title: { text: zmode === "share" ? "%" : "log₁₀ n" }, thickness: 14, len: 0.6 },
+    contours: { z: { show: true, usecolormap: true, project: { z: true } } },
+    lighting: { ambient: 0.72, diffuse: 0.7, specular: 0.12, roughness: 0.7 },
+  }], {
+    uirevision: "keep",
+    margin: { l: 0, r: 0, t: 8, b: 0 },
+    paper_bgcolor: "#fcfcfb",
+    scene: {
+      xaxis: { title: { text: "context tokens (log)" }, tickvals: tickv, ticktext: tickt,
+               gridcolor: "#e1e0d9", zerolinecolor: "#c3c2b7" },
+      yaxis: { title: { text: "generated tokens (log)" }, tickvals: tickv.slice(0, 5), ticktext: tickt.slice(0, 5),
+               gridcolor: "#e1e0d9", zerolinecolor: "#c3c2b7" },
+      zaxis: { title: { text: zmode === "share" ? "% of selection" : "log₁₀ count" }, gridcolor: "#e1e0d9" },
+      aspectratio: { x: 1.35, y: 1, z: 0.55 },
+      camera: { eye: { x: 1.55, y: -1.7, z: 0.9 } },
+    },
+  }, { displayModeBar: false, responsive: true });
+}
+{
+  const m = location.hash.match(/r=(\d+),(\d+)/);
+  if (m) {
+    lo = Math.min(+m[1], DATA.buckets.length - 1); hi = Math.min(+m[2], DATA.buckets.length - 1);
+    if (lo > hi) [lo, hi] = [hi, lo];
+    loSel.value = lo; hiSel.value = hi;
+    clearPreset();
+    document.querySelectorAll("#presets button").forEach(b => {
+      const [a, c] = b.dataset.r.split(",").map(Number);
+      if (a === lo && c === hi) b.classList.add("on");
+    });
+  }
+}
+render();
+addEventListener("resize", () => Plotly.Plots.resize("plot"));
+</script>
+</body>
+</html>

@@ -19,7 +19,7 @@
     display: flex; flex-direction: column; padding: 28px 40px 18px; }
   h1 { font-size: 26px; font-weight: 650; letter-spacing: -0.01em; }
   .sub { font-size: 14px; color: var(--ink-2); margin: 4px 0 22px; }
-  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: start; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 16px; align-items: start; }
   .card { cursor: pointer; display: flex; flex-direction: column; color: inherit;
     background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
     padding: 20px 22px 16px; transition: box-shadow .12s, transform .12s; }
@@ -49,7 +49,7 @@
 <body>
 <h1>Defense animations</h1>
 <div class="sub">Master's defense · <i>Predictive Per-Pool Provisioning for Modality-Disaggregated Multimodal Model Serving</i>
- — every pixel is ledger-verified simulator output · fully offline · press <kbd>1</kbd>–<kbd>4</kbd> to open</div>
+ — every pixel is ledger-verified simulator output · fully offline · press <kbd>1</kbd>–<kbd>5</kbd> to open</div>
 
 <div class="cards">
   <div class="card" data-href="a1_invisible_failure.html" id="k1">
@@ -129,6 +129,25 @@
       <a href="a8_onset_map.html">open</a>
     </div>
     <div class="slide">Answers "how general is the reactive failure?" in one picture.</div>
+
+  <div class="card" data-href="a9_dataset_kde.html" id="k5">
+    <span class="kbd-chip">5</span>
+    <h2><span>A9 · SLIDE "DATASET CHARACTERIZATION"</span>Request-anatomy KDE</h2>
+    <p>All <b>1M requests</b> as a rotatable 3D density over (context, generation)
+    tokens in log–log space, with an <b>image-count range selector</b> (k×k
+    buckets). Slide from text-only to the frames class and watch the mountain
+    range collapse into a needle at ctx≈36k, gen≈50 — the archetypes, live.</p>
+    <div class="nums">
+      <div class="num"><span class="dot" style="background:var(--blue)"></span>binned Gaussian KDE · σ &amp; z-scale selectable</div>
+      <div class="num"><span class="dot" style="background:var(--green)"></span>ctx ≈ text + img·tok(img) (≈277→66 tok/img)</div>
+      <div class="num"><span class="dot" style="background:var(--violet)"></span>frames k&gt;10: 2.7% of requests, a point mass</div>
+    </div>
+    <div class="links" onclick="event.stopPropagation()">
+      <a href="a9_dataset_kde.html">all</a>
+      <a href="a9_dataset_kde.html#r=0,0">text-only</a>
+      <a href="a9_dataset_kde.html#r=6,9">frames</a>
+    </div>
+    <div class="slide">Plotly surface (inlined, offline) · drag to orbit · buckets follow the k² structure.</div>
   </div>
 </div>
 
@@ -143,7 +162,7 @@
 for (const c of document.querySelectorAll(".card"))
   c.addEventListener("click", e => { if (e.target.tagName !== "A") location.href = c.dataset.href; });
 addEventListener("keydown", e => {
-  const m = { "1": "k1", "2": "k2", "3": "k3", "4": "k4" }[e.key];
+  const m = { "1": "k1", "2": "k2", "3": "k3", "4": "k4", "5": "k5" }[e.key];
   if (m) location.href = document.getElementById(m).dataset.href;
 });
 </script>

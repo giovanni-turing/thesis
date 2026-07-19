@@ -599,3 +599,12 @@ verify:     burst2/6 L<=45 reproduce thesis Tab 7.3 (588/588/588; 588/749/905) -
 view:       scatter onset-minutes(log) x peak img/s; fill=reactive verdict at selected lead {15,30,45,165}, ring=forecast verdict (dashed gray = no forecast, context days); e13 flagged; click-through to A2; summary line (L=30: reactive fails 9/18, forecast 1/18)
 feeds:      Q&A / generality defense ("how general is the reactive failure?"); launcher card 4
 commit:     see next commit
+
+## Defense animation A9 "request-anatomy KDE" (3D dataset view)
+date:       2026-07-19
+artifact:   defense/anim/a9_dataset_kde.html (5.1 MB self-contained: inlined plotly.min.js from eda venv); build/{extract_a9,build_a9}.py + a9_template.html
+inputs:     all 1,000,000 trace requests -> per-image-bucket 110x110 histograms of (log10 ctx+1, log10 gen+1); 10 buckets by k=round(sqrt(NumImages)) (text-only, k=1,2,3, 4-6, 7-10, 11-17, 18-23, 24-33, >=34); client-side separable-Gaussian smoothing = binned KDE (sigma selectable 0/1/1.6/2.5 cells), z = % of selection or log10 count
+verify:     bucket counts sum to 1,000,000 (text-only exactly 500,000 = thesis 50/50 split); bucket medians reproduce thesis anatomy (ctx 792 text-only -> 55,527 at k>=34; frames-class gen short)
+view:       rotatable plotly surface, image-range selectors + presets (all/text-only/1img/tiled/frames), deep links #r=lo,hi; frames class renders as a near point mass at ctx~36k gen~50 (tail-deterministic image-context coupling)
+feeds:      dataset-characterization slide; launcher card 5
+commit:     see next commit
