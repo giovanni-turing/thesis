@@ -42,7 +42,7 @@
   .plabel .wnow b { font-size: 15px; font-variant-numeric: tabular-nums; }
   .rowchart { flex: 1; position: relative; background: var(--surface);
     border: 1px solid var(--border); border-radius: 10px; }
-  .odo { width: 385px; display: flex; gap: 6px; align-items: center; }
+  .odo { width: 455px; display: flex; gap: 6px; align-items: center; }
   .odo .cell { flex: 1; border: 1px solid var(--border); border-radius: 9px;
     background: var(--surface); padding: 4px 8px; height: 100%;
     display: flex; flex-direction: column; justify-content: center; }
@@ -170,6 +170,9 @@ for (const r of ROWS) {
         <div class="v"><span id="${r.tag}_cost">0</span><span style="font-size:11px"> wh</span></div>
         <div class="u"><span id="${r.tag}_ratio">–</span>× vs static C8</div>
         <div class="u">incl. warm-up <b id="${r.tag}_cost2">0</b> wh</div></div>
+      <div class="cell"><div class="k">mean delay so far</div>
+        <div class="v" id="${r.tag}_avg">–</div>
+        <div class="u">image-bearing req.</div></div>
       <div class="cell"><div class="k">p99 so far (SLA &lt; 1 s)</div>
         <div class="v" id="${r.tag}_p99">–</div>
         <div class="u">all requests</div></div>
@@ -314,6 +317,7 @@ function updateRow(r) {
   $(r.tag + "_cost2").textContent = Math.round(run.cost2[b] / 3600).toLocaleString("en-US");
   const c8 = DATA.runs.static_C8.cost[b] || 1;
   $(r.tag + "_ratio").textContent = (run.cost[b] / c8).toFixed(2);
+  $(r.tag + "_avg").textContent = fmtMs(run.avgi[b]);
   const p = run.p99run[b], pe = $(r.tag + "_p99");
   pe.textContent = fmtMs(p);
   pe.style.color = p > SLA ? css("--critical") : "#006300";

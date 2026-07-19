@@ -112,6 +112,10 @@ for tag in POLICIES:
     assert abs(p99_all - exp) / exp < 0.01, f"{tag}: recovered {p99_all} vs {exp}"
     dmax = np.zeros(nb)
     np.maximum.at(dmax, arr_bin[is_img], delays[is_img])
+    # running mean delay over image-bearing requests
+    cnt_i = np.zeros(nb); np.add.at(cnt_i, arr_bin[is_img], 1)
+    sum_i = np.zeros(nb); np.add.at(sum_i, arr_bin[is_img], delays[is_img])
+    avgi = np.cumsum(sum_i) / np.maximum(np.cumsum(cnt_i), 1)
     cnt = np.zeros(nb); np.add.at(cnt, arr_bin, 1)
     ccnt = np.cumsum(cnt).astype(int)
     order = np.argsort(rel_ms, kind="stable")
@@ -135,6 +139,7 @@ for tag in POLICIES:
         "dmax": [round(float(v), 1) for v in dmax],
         "cost": cost.round(0).astype(int).tolist(),
         "cost2": (cost + warm).round(0).astype(int).tolist(),
+        "avgi": [round(float(v), 1) for v in avgi],
         "p99run": [round(float(v), 1) for v in p99run],
         "ep_p99": ep,
         "stats": verif[tag],
