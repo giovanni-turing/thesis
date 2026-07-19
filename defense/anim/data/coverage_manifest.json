@@ -3,19 +3,19 @@
  "forecast_span_requests": 749601,
  "per_model_maxspan": {
   "timesfm": {
-   "requests": null,
-   "pct_of_1M": null,
-   "ttft_p99": null
+   "requests": 931628,
+   "pct_of_1M": 93.2,
+   "ttft_p99": 651.1
   },
   "toto": {
-   "requests": null,
-   "pct_of_1M": null,
-   "ttft_p99": null
+   "requests": 872980,
+   "pct_of_1M": 87.3,
+   "ttft_p99": 651.1
   },
   "chronos": {
-   "requests": null,
-   "pct_of_1M": null,
-   "ttft_p99": null
+   "requests": 749601,
+   "pct_of_1M": 75.0,
+   "ttft_p99": 651.1
   }
  },
  "context_days_requests": 250399,
@@ -555,6 +555,15 @@
    "ok": true
   },
   {
+   "fleet": "A11",
+   "run": "week_fc_timesfm_L60",
+   "pool": "language",
+   "requests": 749601,
+   "expect": 749601,
+   "full": null,
+   "ok": true
+  },
+  {
    "fleet": "A12",
    "run": "burst3_fc_toto",
    "pool": "language",
@@ -684,6 +693,78 @@
    "fleet": "A12",
    "run": "week_reactive",
    "pool": "language",
+   "requests": 749601,
+   "expect": 749601,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst3_fc_timesfm",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst5_fc_timesfm",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst4_fc_timesfm",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst1_fc_timesfm",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "week_fc_timesfm",
+   "pool": "language",
+   "requests": 749601,
+   "expect": 749601,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A14",
+   "run": "timesfm max-span E2E",
+   "pool": "both (E2E)",
+   "requests": 931628,
+   "expect": 931628,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A14",
+   "run": "toto max-span E2E",
+   "pool": "both (E2E)",
+   "requests": 872980,
+   "expect": 872980,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A14",
+   "run": "chronos max-span E2E",
+   "pool": "both (E2E)",
    "requests": 749601,
    "expect": 749601,
    "full": null,

@@ -57,7 +57,7 @@ for wk, m in META.items():
              "requests": int(win["max_requests"]), "date": m["t0"].split(" ")[0],
              "t0_day_s": int(hh[0]) * 3600 + int(hh[1]) * 60 + int(hh[2])}
     wout = {"meta": wmeta, "offered": None, "runs": {}}
-    for arm in ("fc_toto", "fc_chronos", "reactive"):
+    for arm in ("fc_toto", "fc_chronos", "fc_timesfm", "reactive"):
         tag = f"{wk}_{arm}"
         st = verif[tag]
         trace_path = ROOT / st["composed_trace"]

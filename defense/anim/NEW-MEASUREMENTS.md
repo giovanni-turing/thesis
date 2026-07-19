@@ -18,7 +18,7 @@ per-request measurement below possible.
 **Gap (tex/twopool.tex §sim-knees):** the composed first-token latency (~1.30 s)
 was "a modelled reconstruction rather than a request-linked replay measurement."
 
-**New (A12, `a12_runs`, 15 cells):** each request's **own** encoder delay (recovered
+**New (A12, `a12_runs`, 20 cells):** each request's **own** encoder delay (recovered
 from the seam) + its **own** replayed TTFT — a request-linked join, arrival
 alignment asserted < 1 ms.
 - burst3 forecast E2E p99 **1,239.5 ms** (enc 588.4 + TTFT 651.1) = the modelled
@@ -35,7 +35,7 @@ alignment asserted < 1 ms.
 both pools with per-request records —
 encoder (static C8 / static C2 / reactive) and language (static TP2×2 /
 reactive planner), each exactly 1,000,000. `coverage_manifest.json`:
-encoder_all_1M **True**, language_all_1M **True**, complete **True**.
+`encoder_all_1M_covered` **true**, `language_all_1M_covered` **true**, `per_model_maxspan_covered` **true**, `complete` **true**.
 
 ## 3. Per-model forecast coverage → ~full trace  (closes the warm-up boundary)
 
@@ -48,8 +48,19 @@ grow the context as history accrues instead of waiting for a full window →
 first forecast at **12:03:00 (3 min in)** for all three models. Coverage
 75/87/93 % → **99.96 %**. Thesis archives untouched (new `*_expctx.parquet`).
 
-**New (A15, `a15_runs`, 3 runs):** each model E2E over span_expctx =
-**999,599 req (99.96 % of 1M)**, both pools, per-request records. *[running]*
+**New (A15, `a15_runs`, 3 runs) — COMPLETE:** each model E2E over span_expctx =
+**999,599 req (99.96 % of 1M)**, both pools, per-request records:
+
+| model | requests | enc p99 | TTFT p99 | ITL p99 | GPU-h |
+| --- | --- | --- | --- | --- | --- |
+| TimesFM | 999,599 | 588.4 | **651.1** | 6.2 | 704.68 |
+| Toto | 999,599 | 588.4 | **651.1** | 6.1 | 757.17 |
+| Chronos | 999,599 | 588.4 | **651.1** | 6.0 | 776.85 |
+
+**The point:** identical **651.1 ms** to the fixed-context A14 runs, but coverage
+goes 75.0/87.3/93.2 % → **99.96 % for all three**. Expanding context closes the
+warm-up hole *at zero cost to the SLA outcome* — so the thesis caveat becomes
+"≈3 minutes of warm-up", not 1.4 days, with an E2E measurement behind it.
 
 ## 4. Per-model max-span E2E: model-independence, end to end  (reinforces)
 
@@ -67,8 +78,13 @@ not an accuracy-benchmark inference.
 
 ## 5. Three-model interactive coverage everywhere  (reinforces)
 
-**New:** A2 (encoder), A11 (language), A12 (composed) each toggle
-**Chronos / Toto / TimesFM**.
+**New — COMPLETE:** A2 (encoder), A11 (language), A12 (composed) each toggle
+**Chronos / Toto / TimesFM**, all arms measured (no modelled tiles).
+- A11 week TimesFM **651.1 ms** (556.88 GPU-h) — matches its ledger anchor exactly;
+  A12 week TimesFM **651.1 ms** → composed E2E p99 **1,239.5 ms** (610.65 GPU-h).
+- A12 composed E2E p99 is **1,239.5 ms for all three models** on burst3/5/4 and
+  week (burst1: chronos 1239.5, TimesFM 1258.4, Toto 1259.2) — model-independence
+  holds at the composed level too.
 - A2 TimesFM encoder fleet (`a2tf_runs`, 36 cells): reproduces the ledgered
   TimesFM factorial; e13 fails **identically** to Chronos/Toto (model-independent
   forecast-miss).
@@ -78,7 +94,7 @@ not an accuracy-benchmark inference.
 
 **Gap:** reactive failure shown on the top-6 episodes only.
 
-**New (A2 extra episodes, `a2x_runs`, 88 cells = e7…e18 × policy × lead):**
+**New (A2 extra episodes, `a2x_runs`, 100 tags = e7…e18 × policy × lead):**
 - Reactive fails **9 of 18** episodes at L=30 s (onset map).
 - **e13** (263 img/s, 7-min onset, isolated after the calm stretch) is a genuine
   **p90 forecast-miss boundary case** — both policies fail; only static C8 passes;
@@ -91,7 +107,7 @@ not an accuracy-benchmark inference.
 **Gap:** language closed-loop replayed end-to-end only for burst1/3/week; rest
 priced by the grid + knee formula.
 
-**New (A11, `a11_runs`, 51 cells):** 4 burst windows + full week ×
+**New (A11, `a11_runs`, 52 cells):** 4 burst windows + full week ×
 {Chronos, Toto, TimesFM, reactive} × replica-lead {60,120,300} s, planner-in-loop,
 per-request records.
 - Forecast **651 ms PASS** vs reactive **3.49 s FAIL** (window-mean law met,
@@ -113,8 +129,9 @@ AND failing). Confirms the 0.62× is conservative.
 ## Roll-up
 
 New simulation runs this session (excluding the ledgered thesis set):
-A2 encoder fleets 40+36+36+88, A11 language 51, A12 composed 15, A13 full-trace 5,
-A14 max-span 3, A15 expanding 3, expanding-context forecast archives 12 parquets —
+A2 encoder fleets 40+36+36+100, A11 language **52**, A12 composed **20**,
+A13 full-trace 5, A14 max-span 3, A15 expanding 3,
+expanding-context forecast archives 12 parquets —
 plus the dynamo per-request source patch. Every request of the 1,000,000-request
 trace is simulated through both pools; each forecast model is covered to
 99.96 % E2E; and the Ch. 6 modelled reconstruction is upgraded to a measured

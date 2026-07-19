@@ -708,3 +708,76 @@ finding:    The phaseE run is an INDEPENDENT REPRODUCTION that confirms those ex
 action:     NO thesis .tex edits made (user agreed). phaseE work kept as committed verification only. ENCODER_ANCHOR_SUMMARY.md status header corrected.
 feeds:      NOTHING new into the manuscript. Supersedes the "feeds tex/conclusion.tex / completes future-work" claims in the earlier phaseE ledger entries this date.
 commit:     (uncommitted)
+
+## Provenance DB — all execution results (raw traces + projections) in Postgres (2026-07-19)
+date:       2026-07-19
+artifact:   provenance/ (schema/{01_schema,02_views,03_comments,04_lineage}.sql;
+            loader/{db,ingest_common,runid,loaders,main}.py; README.md, requirements.txt).
+            DB = ssd2 PostgreSQL 16, schema `provenance` (localhost:5433 / technonous MCP postgres_query).
+command:    psql -h localhost -p 5433 -U goku -d postgres -f provenance/schema/01_schema.sql
+            && python3 provenance/loader/main.py --projections && python3 provenance/loader/main.py --raw
+            && for f in 02_views 04_lineage 03_comments; do psql ... -f provenance/schema/$f.sql; done
+result:     Consolidated 1,961 result files (~15 GB) into ONE relational store: 71.4M rows / ~12 GB,
+            91 tables (result-kinds K1-K13 + per-experiment partitions), 10 views. RAW traces as rows
+            (llm_request 10.6M, encoder_series 10.2M, composed_request 33.7M, forecast 16.7M,
+            worker_schedule 214K, measured_request 7.8K) + typed PROJECTIONS, all sharing runs.run_id.
+            Retraction handling via runs.is_current (query the current_* views).
+lineage:    v_llm_drift recomputes p99 TTFT from raw llm_request vs stored llm_run_summary =>
+            worst 0.39% over 71 runs, all rowcounts match => projections faithfully derived from raw.
+            Idempotent: sha256 in ingest_log => full re-run loads 0 new rows.
+feeds:      NOTHING into the manuscript — infrastructure/tooling. Makes THIS ledger queryable
+            (normalized into provenance.ledger_entry) and results answerable in NL->SQL.
+supersedes: nothing (complements, does not replace, this Markdown ledger).
+commit:     (uncommitted)
+
+## Provenance DB — ingested + verified the 8 new-measurement families (2026-07-19)
+date:       2026-07-19
+artifact:   defense/anim/NEW-MEASUREMENTS.md (source list); provenance/ (added table cost_accounting,
+            view v_cost_frontier_dual; a2t/a2tf/a15 dir->experiment mappings + partitions).
+command:    psql ... -f provenance/schema/01_schema.sql && python3 provenance/loader/main.py --only K3,K4,K5,K6,K8b,K14
+result:     Checked/reviewed/included the 8 families; every checkable endpoint reproduces the doc:
+              1 A12 composed E2E — loaded (burst3 fc 651.1 TTFT + 588.4 enc = 1239.5; reactive lang 10573.7).
+              2 A13 full-trace — coverage complete=True, encoder+language all-1M (loaded earlier).
+              3 expctx forecasts 12 parquets loaded; A15 composed 999,599 x3 (=99.96%) loaded.
+              4 A14 max-span — chronos/toto/timesfm all 651.1 ms TTFT (byte-identical, model-independent).
+              5 a2t(toto)/a2tf(timesfm) fleets relabelled out of 'misc' (36+36 cells).
+              6 e13 encoder p99 IDENTICAL across chronos/toto/timesfm (5312/6093/6786) — model-independent miss.
+              7 A11 reactive lead-invariant (burst5 2151.6/2151.6/2154.6 @ L60/120/300).
+              8 dual cost accounting 40 cells -> cost_accounting; burst5-L165 order-flip reproduced
+                (order_ratio 0.923 < readiness_ratio 1.073, reactive fails 3250 ms).
+pending:    A15 language E2E, A12 TimesFM language arms, A11 week_fc_timesfm_L60 still generating
+            (per-request records written only at run completion). Loader is idempotent + finisher-ready:
+            a plain `python3 provenance/loader/main.py` re-run ingests them once they land on disk.
+feeds:      NOTHING into the manuscript — DB inclusion/verification only. [[provenance-db]]
+commit:     (uncommitted)
+
+## A15 expanding-context E2E + week TimesFM arms -> A11/A12 three-model boards (2026-07-19)
+date:       2026-07-19
+artifact:   defense/anim/data/a15_runs/ (3 runs), defense/anim/data/a12_runs/week_fc_timesfm.*,
+            defense/anim/data/a11_runs/week_fc_timesfm_L60.*, rebuilt
+            defense/anim/a11_llm_race.html (2.59 MB) + a12_composed_e2e.html (0.89 MB),
+            defense/anim/data/{a11_data,a12_data,coverage_manifest}.json,
+            defense/anim/MEASUREMENTS-REFERENCE.md (new).
+command:    python3 defense/anim/build/gen_a15_expctx_e2e.py            # expanding-ctx E2E, both pools
+            bash defense/anim/build/finish_tf_update.sh                 # week arms -> extract -> build -> manifest
+            python3 provenance/loader/main.py                           # ingest (9 reports, 4,600,518 req rows)
+result:     A15 (expanding context, FORECAST_SUFFIX=_expctx): all 3 models 999,599 req
+              (99.96% of 1M) through BOTH pools, per-request records —
+              enc_p99 588.4 / TTFT p99 651.1 / ITL p99 6.0-6.2 for every model;
+              GPU-h 704.68 timesfm, 757.17 toto, 776.85 chronos.
+              => identical 651.1 ms to fixed-context A14 while coverage goes
+                 75.0/87.3/93.2% -> 99.96%: the warm-up hole closes at ZERO SLA cost.
+            Week TimesFM arms: a11 week_fc_timesfm_L60 = 651.1 ms (556.88 GPU-h,
+              matches ledger_expected exactly); a12 week_fc_timesfm = 651.1 ms (610.65 GPU-h)
+              -> composed E2E p99 1,239.5 ms. Both 749,601 req.
+            A11 (52 tags) + A12 (20 arms) extracted clean and rebuilt as full
+              Chronos/Toto/TimesFM toggles; screenshot-verified on the TimesFM arm.
+            A12 composed E2E p99 = 1,239.5 ms for ALL THREE models on burst3/5/4 + week
+              (burst1: chronos 1239.5 / timesfm 1258.4 / toto 1259.2) — model-independence
+              holds at the composed level, not just per-pool.
+            coverage_manifest.json re-run: FULL-COVERAGE GUARANTEE MET = True.
+feeds:      defense animations A11/A12 (three-model); NEW-MEASUREMENTS.md §3 and §5;
+            candidate for tex/closedloop.tex (warm-up caveat 1.4 days -> ~3 min, now E2E-measured)
+            and tex/twopool.tex (composed reconstruction -> measured, all models).
+supersedes: the "[running]" placeholder in NEW-MEASUREMENTS.md §3; the 2-model A11/A12 boards.
+commit:     (this commit)

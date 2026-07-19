@@ -52,7 +52,7 @@ for wk, m in META.items():
              "date": m["t0"].split(" ")[0],
              "t0_day_s": int(t0[0]) * 3600 + int(t0[1]) * 60 + int(t0[2])}
     wout = {"meta": wmeta, "offered": None, "runs": {}}
-    for policy in ("fc_chronos", "fc_toto", "reactive"):
+    for policy in ("fc_chronos", "fc_toto", "fc_timesfm", "reactive"):
         for lead in m.get("leads", LEADS):
             tag = f"{wk}_{policy}_L{lead}"
             st = verif[tag]

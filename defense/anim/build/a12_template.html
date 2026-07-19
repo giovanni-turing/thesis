@@ -90,7 +90,7 @@
   <div class="ctl">
     <span class="lbl">FORECAST<br>MODEL</span>
     <div class="seg" id="modelSeg">
-      <button data-m="toto" class="on">Toto-2</button><button data-m="chronos">Chronos-2</button>
+      <button data-m="toto" class="on">Toto</button><button data-m="chronos">Chronos</button><button data-m="timesfm">TimesFM</button>
     </div>
   </div>
   <div class="transport">
@@ -359,7 +359,7 @@ function updateReadouts() {
 function drawAll() {
   const { fc, re } = runs();
   drawOffered();
-  drawLane("fcChart", fc, css("--fc"), `FORECAST pipeline (${model === "toto" ? "Toto-2" : "Chronos-2"} p90, both pools)`);
+  drawLane("fcChart", fc, css("--fc"), `FORECAST pipeline (${({toto:"Toto-2",chronos:"Chronos-2",timesfm:"TimesFM-2.0"})[model]} p90, both pools)`);
   drawLane("reChart", re, css("--re"), "REACTIVE pipeline (both pools)");
   updateReadouts();
 }
@@ -419,7 +419,7 @@ addEventListener("resize", drawAll);
 {
   const mW = location.hash.match(/w=([a-z0-9]+)/);
   selectWindow(mW && DATA.windows[mW[1]] ? mW[1] : "burst3");
-  const mM = location.hash.match(/m=(chronos|toto)/);
+  const mM = location.hash.match(/m=(chronos|toto|timesfm)/);
   if (mM) {
     model = mM[1];
     document.querySelectorAll("#modelSeg button").forEach(x => x.classList.toggle("on", x.dataset.m === model));

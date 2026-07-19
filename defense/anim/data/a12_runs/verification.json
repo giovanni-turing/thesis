@@ -103,5 +103,40 @@
   "gpu_h": 281.46,
   "requests": 749601,
   "composed_trace": "defense/anim/data/a6_runs/react_L30.jsonl"
+ },
+ "burst3_fc_timesfm": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.2,
+  "gpu_h": 4.87,
+  "requests": 3093,
+  "composed_trace": "defense/anim/data/a2tf_runs/burst3_forecast_timesfm_L30.jsonl"
+ },
+ "burst5_fc_timesfm": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.1,
+  "gpu_h": 21.18,
+  "requests": 8983,
+  "composed_trace": "defense/anim/data/a2tf_runs/burst5_forecast_timesfm_L30.jsonl"
+ },
+ "burst4_fc_timesfm": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.1,
+  "gpu_h": 49.74,
+  "requests": 25639,
+  "composed_trace": "defense/anim/data/a2tf_runs/burst4_forecast_timesfm_L30.jsonl"
+ },
+ "burst1_fc_timesfm": {
+  "ttft_p99": 671.3,
+  "itl_p99": 5.4,
+  "gpu_h": 93.82,
+  "requests": 64804,
+  "composed_trace": "defense/anim/data/a2tf_runs/burst1_forecast_timesfm_L30.jsonl"
+ },
+ "week_fc_timesfm": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.9,
+  "gpu_h": 610.65,
+  "requests": 749601,
+  "composed_trace": "defense/anim/data/a12_runs/week_encoder_timesfm.jsonl"
  }
 }

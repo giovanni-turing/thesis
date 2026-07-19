@@ -274,5 +274,96 @@
   "ledger_expected": 1196.6,
   "note": "within documented ~4% planner-in-loop run noise (ledgered 1196.6)",
   "requests": 749601
+ },
+ "burst3_fc_timesfm_L60": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.3,
+  "gpu_h": 3.49,
+  "ledger_expected": null,
+  "requests": 3093
+ },
+ "burst3_fc_timesfm_L120": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.3,
+  "gpu_h": 3.56,
+  "ledger_expected": null,
+  "requests": 3093
+ },
+ "burst3_fc_timesfm_L300": {
+  "ttft_p99": 669.4,
+  "itl_p99": 5.6,
+  "gpu_h": 3.42,
+  "ledger_expected": null,
+  "requests": 3093
+ },
+ "burst5_fc_timesfm_L60": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.3,
+  "gpu_h": 20.3,
+  "ledger_expected": null,
+  "requests": 8983
+ },
+ "burst5_fc_timesfm_L120": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.3,
+  "gpu_h": 19.43,
+  "ledger_expected": null,
+  "requests": 8983
+ },
+ "burst5_fc_timesfm_L300": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.3,
+  "gpu_h": 20.56,
+  "ledger_expected": null,
+  "requests": 8983
+ },
+ "burst4_fc_timesfm_L60": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.2,
+  "gpu_h": 48.74,
+  "ledger_expected": null,
+  "requests": 25639
+ },
+ "burst4_fc_timesfm_L120": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.2,
+  "gpu_h": 45.24,
+  "ledger_expected": null,
+  "requests": 25639
+ },
+ "burst4_fc_timesfm_L300": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.3,
+  "gpu_h": 42.44,
+  "ledger_expected": null,
+  "requests": 25639
+ },
+ "burst1_fc_timesfm_L60": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.2,
+  "gpu_h": 99.9,
+  "ledger_expected": null,
+  "requests": 64804
+ },
+ "burst1_fc_timesfm_L120": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.2,
+  "gpu_h": 119.31,
+  "ledger_expected": null,
+  "requests": 64804
+ },
+ "burst1_fc_timesfm_L300": {
+  "ttft_p99": 672.2,
+  "itl_p99": 5.7,
+  "gpu_h": 81.22,
+  "ledger_expected": null,
+  "requests": 64804
+ },
+ "week_fc_timesfm_L60": {
+  "ttft_p99": 651.1,
+  "itl_p99": 6.1,
+  "gpu_h": 556.88,
+  "ledger_expected": 651.1,
+  "requests": 749601
  }
 }

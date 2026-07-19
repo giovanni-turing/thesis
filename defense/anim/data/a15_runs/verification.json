@@ -1,0 +1,32 @@
+{
+ "timesfm": {
+  "enc_p99": 588.4,
+  "enc_requests": 999599,
+  "lang_requests": 999599,
+  "completed": 999599,
+  "ttft_p99": 651.1,
+  "itl_p99": 6.2,
+  "gpu_h": 704.68,
+  "pct_of_1M": 99.96
+ },
+ "toto": {
+  "enc_p99": 588.4,
+  "enc_requests": 999599,
+  "lang_requests": 999599,
+  "completed": 999599,
+  "ttft_p99": 651.1,
+  "itl_p99": 6.1,
+  "gpu_h": 757.17,
+  "pct_of_1M": 99.96
+ },
+ "chronos": {
+  "enc_p99": 588.4,
+  "enc_requests": 999599,
+  "lang_requests": 999599,
+  "completed": 999599,
+  "ttft_p99": 651.1,
+  "itl_p99": 6.0,
+  "gpu_h": 776.85,
+  "pct_of_1M": 99.96
+ }
+}
