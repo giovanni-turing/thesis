@@ -620,3 +620,60 @@ commit:     see next commit
 addendum (same date): A10 "language pool board" DROPPED at author's decision (page + builder removed,
 launcher back to 5 cards). Its underlying numbers remain ledgered in the original riders44/live51/llm_week
 entries; nothing else references it.
+
+---
+date:       2026-07-19
+result:     "One real encoder end-to-end" anchor (completes conclusion future-work item). Live Qwen3-VL ViT on RTX 5090 replays all 6 burst windows through the 1-worker FIFO converter; silicon encoder-delay p99 vs AIC-sim, in eager AND serving-mode (torch.compile reduce-overhead / CUDA graphs = vLLM path).
+artifact:   collector_artifacts/phaseE_physical_anchor/{burst_anchor_all.py,burst_anchor_all.json,burst_anchor_all.log,reqs/burst{1..6}.json,make_anchor_fig.py -> encoder_anchor.pdf}
+command:    cd collector_artifacts/phaseE_physical_anchor && eda/.venv/bin/python burst_anchor_all.py  (SM clock as-set; 13 distinct f(N) sizes, N<=64)
+numbers:    f(64) ms: AIC 316.4 / compiled 350.7 (1.11x) / eager 460.8 (1.46x). Encoder-delay p99 silicon/AIC per window -- compiled geomean 1.37x (range 1.17-1.57), eager geomean 5.10x (range 2.2-10.1). ALL windows saturate the 1-worker pool (p99 55-206 s), both AIC and silicon FAIL the 1000ms SLA by 50x+ -> two-pool vision-bottleneck verdict holds under real silicon.
+finding:    (1) verdict unchanged: real serving-mode encoder saturates every burst as hard as AIC-sim; (2) AIC is mildly OPTIMISTIC not conservative -- per-forward 11% low, amplified to ~1.37x end-to-end by queue saturation at 1 worker; (3) execution mode is decisive: HF-eager overstates the gap ~4x (5.1x vs 1.37x) -- anchor MUST match the compiled/CUDA-graph serving path.
+caveat:     1-worker harness runs deep into saturation, which amplifies the 11% per-forward gap to 1.37x; a run at the provisioned worker count would land nearer 1.11x. Memoized-f(N) FIFO replay (not continuous real-time serve).
+feeds:      candidate for tex/conclusion.tex (completes "one real encoder ... end to end") + an appendix figure; reinforces tex/aiconfigurator.tex AIC-validation. NOT yet in manuscript.
+supersedes: partially discharges the sim-only caveat on the vision-pool control loop (tex/conclusion.tex).
+commit:     (uncommitted)
+
+---
+date:       2026-07-19
+result:     MASTER encoder anchor -- CLEAN, confound-free at 2400 MHz (supersedes the boost-clock burst_anchor_all). Replays all 6 bursts through the faithful multi-worker FIFO (simulate_vision_pool) using DENSE banked 2400 f(N): AIC / vLLM-serving / HF-eager. Key fix: (a) user locked GPU clock to 2400 (was free-boosting 2857-2887, ~1.19x confound); (b) headline uses banked 2400 curves so no fresh-measurement clock dependence.
+artifact:   collector_artifacts/phaseE_physical_anchor/{anchor_master.py -> anchor_master.json, make_master_figs.py -> anchor_fidelity.pdf + anchor_provisioning.pdf, ENCODER_ANCHOR_SUMMARY.md}
+command:    ai-dynamo/aiconfigurator/.venv/bin/python anchor_master.py  (CPU, aic venv); figs via eda/.venv + make_master_figs.py
+numbers:    per-forward f(64)@2400: AIC 316.4 / vLLM 333.6 (1.054x, within +/-12.8% band all N) / HF-eager 511.6 (1.617x) / torch.compile 370.6 (1.172x). WORKER INFLATION (min feasible C*, p99<1s): vLLM geomean 1.027x (identical count 5/6 windows; only b1 7v6), HF-eager 1.784x (up to 2.17x). 1-worker saturated p99 sil/AIC: vLLM 1.22x, eager 9.7x (backlog-dominated, not the clean metric).
+finding:    real serving encoder (vLLM) needs the SAME provisioning AIC predicts -> AIC vision-pool provisioning VALIDATED end-to-end; verdict (vision bottleneck / needs headroom) confirmed on silicon; AIC mildly OPTIMISTIC ~5% not conservative; HF-eager overstates provisioning ~1.8x (execution-mode artifact, must use compiled/CUDA-graph serving path). The TRUE serving path is vLLM (banked, ci95 0.006ms), NOT torch.compile (which overstates ~11%).
+supersedes: burst_anchor_all.json (boost-clock 2887 + torch.compile proxy: 1.37x/5.1x) kept on disk per user but superseded; also the prior eager-only silicon_multiworker.json (2.17x inflation = eager artifact).
+pending:    fn_repro.json (fresh 2392-locked reproduction of banked curves), fn_multires.json (224/336/448/672px generality). Still open: full live closed loop on real GPU cluster (conclusion's remaining future-work item).
+feeds:      tex/conclusion.tex (move "one real encoder end-to-end" future-work -> delivered) + tex/aiconfigurator.tex appendix (anchor figures). NOT yet in manuscript.
+commit:     (uncommitted)
+
+addendum (same date): FULL EWMA sweep complete (208 cells, 0 errors) -- verification/scripts/sweep_ewma.py -> verification/results/ewma_sweep.json. Extends the L30 result above across leads{15,30,45,165} x readiness{warm,strict} x rho{10,15,20,25} + a p50 arm, all 4 variants (chronos control + ewma-{add,mult,wsc}). Chronos control reproduces every committed figure to the digit: per-window p99 589 (floor)/681 calm; week 0.62x flat over leads (warm), 0.62->0.59x (strict); rho-frontier 0.89/0.62/0.48/0.40x at rho10/15/20/25; p50 aggregate 2758.8ms/0.254x FAIL. Per-window p99 is lead-invariant (warm) for every variant; strict mirrors it on p99. EWMA per-episode verdicts unchanged across the whole sweep: add & wsc FAIL burst3 (1285/2084) AND burst5 (backlog-divergent) at every lead/readiness; mult PASSES all episodes but its rho-frontier is 1.32/1.09/0.94/0.83x (never < static until rho25, where the foundation policy itself loses burst5). p50 arm: all forecasters FAIL (chronos 2759, all three EWMA variants 1076 -- identical, since ewma p50=point). Fed into: tex/closedloop.tex Table tab:cl-ewma (8.1) + the "A cheap forward forecaster does not get the result for free" paragraph (thesis builds clean, 137pp, ref resolved). Conclusion: the forecaster is load-bearing; accuracy is second-order but the calibrated p90 band SHAPE is not -- the TSFM's state-adaptive band covers fast onsets without calm over-provisioning, which no standard forward-EWMA calibration achieves.
+commit:     see next commit
+
+## Defense animations A11 (language-pool race) + A12 (composed E2E) + source-build patch
+date:       2026-07-19
+patch:      ai-dynamo/dynamo source build (lib/mocker + bindings): PlannerReplayBridge.report_jsonl_path
+            threads per-request record capture through the PLANNER replay path (the recording
+            machinery existed for the non-planner path only). Rebuilt maturin --release --features
+            aic-forward-pass. Enables per-request TTFT/ITL/arrival from planner-in-loop replays.
+A11:        defense/anim/a11_llm_race.html (1.97 MB); 39 dynamo.replay planner runs
+            (defense/anim/data/a11_runs/): 4 burst windows x {fc_chronos, fc_toto, reactive}
+            x replica-lead {60,120,300} + week x 3 @ L60. Verify: every L60 anchor reproduces
+            the ledgered twin exactly on TTFT p99 (burst3 651.1/3494.7; burst5 651.1/2151.6;
+            burst4 651.1/2775.8; burst1 705.5/1615.5; week 651.1/651.1/1194.8~1196.6). Reactive
+            cells within documented ~4% planner run-noise. Running TTFT/ITL p99 recovered from
+            per-request records (nearest-rank; heavy-tail percentile-convention drift <5% vs report,
+            verdict-invariant). Replica staircase parsed from planner "Scaling events" log.
+A12:        defense/anim/a12_composed_e2e.html (0.69 MB); 15 TRUE E2E arms
+            (defense/anim/data/a12_runs/): language planner replayed on EACH policy's own
+            encoder-composed trace (a2/a2t/a6/aggregate44, all ledger-verified), 4 bursts + week
+            x {fc_toto, fc_chronos, reactive}. REQUEST-LINKED join: ingress->first-token =
+            encoder delay (recovered from seam, FIFO key-match) + replayed TTFT (session_id =
+            trace line order; alignment asserted <1ms). RESULT: burst3 fc E2E p99 1,239.5 ms
+            (enc 588.4 + ttft 651.1) == thesis Ch.6 modelled reconstruction (~1.24-1.30 s) --
+            UPGRADED FROM MODELLED TO MEASURED. burst3 reactive E2E 21,868 ms (enc 16,079 compounds
+            into ttft 10,574): composed reactive WORSE than per-pool grading. week fc 1,239.5 vs
+            reactive 1,695.9.
+speedup:    mocker virtual clock simulates 5.6 days in minutes at EXACT validity (event-ordered
+            discrete-event sim); arrival timestamps NEVER compressed (that would change queueing
+            physics -- it is the knee-sweep instrument, not a fast-forward).
+launcher:   index.html -> 7 cards (A11=key6, A12=key7)
+commit:     see next commit

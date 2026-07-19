@@ -1,0 +1,10 @@
+=== eager ===
+Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 17652.07it/s]
+  f(N=1)=9.865  [1/64]
+  f(N=13)=88.215  [13/64]
+  f(N=25)=178.829  [25/64]
+  f(N=37)=265.193  [37/64]
+  f(N=49)=353.172  [49/64]
+  f(N=61)=488.344  [61/64]
+/home/gio/snap/code/247/.local/share/uv/python/cpython-3.14.0rc2-linux-x86_64-gnu/lib/python3.14/multiprocessing/resource_tracker.py:297: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/loky-3357307-pcs5a7_o'}
+  warnings.warn(

@@ -1,0 +1,64 @@
+needed f(N) for 13 sizes: [1, 4, 9, 16, 17, 25, 28, 33, 36, 41, 49, 57, 64]
+
+=== loading ViT (eager) ===
+Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 8886.56it/s]
+  measuring f(N) [eager] at SM 195 MHz ...
+    f(N=1) = 9.52 ms  [1/13]
+    f(N=36) = 256.46 ms  [9/13]
+    f(N=64) = 460.77 ms  [13/13]
+  burst1  eager    p99   465131 ms  (AIC 56263, ratio 8.267)
+  burst2  eager    p99   535515 ms  (AIC 61385, ratio 8.724)
+  burst3  eager    p99   134280 ms  (AIC 60253, ratio 2.229)
+  burst4  eager    p99  1339280 ms  (AIC 132704, ratio 10.092)
+  burst5  eager    p99   169010 ms  (AIC 49709, ratio 3.4)
+  burst6  eager    p99   141130 ms  (AIC 44194, ratio 3.193)
+  [eager] done in 339s
+
+=== loading ViT (compiled) ===
+Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 21492.92it/s]
+  measuring f(N) [compiled] at SM 2887 MHz ...
+    f(N=1) = 9.36 ms  [1/13]
+W0719 07:14:03.856000 3269208 torch/_dynamo/convert_frame.py:1853] [5/8] torch._dynamo hit config.recompile_limit (8)
+W0719 07:14:03.856000 3269208 torch/_dynamo/convert_frame.py:1853] [5/8]    function: 'torch_dynamo_resume_in_get_vision_bilinear_indices_and_weights_at_193' (/home/gio/tese/eda/.venv/lib/python3.14/site-packages/transformers/vision_utils.py:193)
+W0719 07:14:03.856000 3269208 torch/_dynamo/convert_frame.py:1853] [5/8]    last reason: 5/7: len(___stack0) == 33                                     # for t, h, w in grid_thw.tolist():  # transformers/vision_utils.py:193 in torch_dynamo_resume_in_get_vision_bilinear_indices_and_weights_at_193
+W0719 07:14:03.856000 3269208 torch/_dynamo/convert_frame.py:1853] [5/8] User stack trace:
+W0719 07:14:03.856000 3269208 torch/_dynamo/convert_frame.py:1853] [5/8]   File "/home/gio/tese/eda/.venv/lib/python3.14/site-packages/transformers/vision_utils.py", line 193, in torch_dynamo_resume_in_get_vision_bilinear_indices_and_weights_at_193
+W0719 07:14:03.856000 3269208 torch/_dynamo/convert_frame.py:1853] [5/8]     for t, h, w in grid_thw.tolist():
+W0719 07:14:03.856000 3269208 torch/_dynamo/convert_frame.py:1853] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W0719 07:14:03.856000 3269208 torch/_dynamo/convert_frame.py:1853] [5/8] To diagnose recompilation issues, see https://docs.pytorch.org/docs/main/user_guide/torch_compiler/compile/programming_model.recompilation.html
+W0719 07:14:03.867000 3269208 torch/_dynamo/convert_frame.py:1853] [8/8] torch._dynamo hit config.recompile_limit (8)
+W0719 07:14:03.867000 3269208 torch/_dynamo/convert_frame.py:1853] [8/8]    function: 'torch_dynamo_resume_in_get_vision_position_ids_at_84' (/home/gio/tese/eda/.venv/lib/python3.14/site-packages/transformers/vision_utils.py:84)
+W0719 07:14:03.867000 3269208 torch/_dynamo/convert_frame.py:1853] [8/8]    last reason: 8/7: len(___stack1) == 33                                     # for (t, h, w), merge_size in zip(grid_thw.tolist(), spatial_merge_size.tolist()):  # transformers/vision_utils.py:84 in torch_dynamo_resume_in_get_vision_position_ids_at_84
+W0719 07:14:03.867000 3269208 torch/_dynamo/convert_frame.py:1853] [8/8] User stack trace:
+W0719 07:14:03.867000 3269208 torch/_dynamo/convert_frame.py:1853] [8/8]   File "/home/gio/tese/eda/.venv/lib/python3.14/site-packages/transformers/vision_utils.py", line 84, in torch_dynamo_resume_in_get_vision_position_ids_at_84
+W0719 07:14:03.867000 3269208 torch/_dynamo/convert_frame.py:1853] [8/8]     for (t, h, w), merge_size in zip(grid_thw.tolist(), spatial_merge_size.tolist()):
+W0719 07:14:03.867000 3269208 torch/_dynamo/convert_frame.py:1853] [8/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W0719 07:14:03.867000 3269208 torch/_dynamo/convert_frame.py:1853] [8/8] To diagnose recompilation issues, see https://docs.pytorch.org/docs/main/user_guide/torch_compiler/compile/programming_model.recompilation.html
+W0719 07:14:03.882000 3269208 torch/_dynamo/convert_frame.py:1853] [20/8] torch._dynamo hit config.recompile_limit (8)
+W0719 07:14:03.882000 3269208 torch/_dynamo/convert_frame.py:1853] [20/8]    function: 'torch_dynamo_resume_in_forward_at_246' (/home/gio/tese/eda/.venv/lib/python3.14/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py:246)
+W0719 07:14:03.882000 3269208 torch/_dynamo/convert_frame.py:1853] [20/8]    last reason: 20/7: len(splits[0]) == 33                                     # for q, k, v in zip(*splits)  # transformers/models/qwen3_vl/modeling_qwen3_vl.py:262 in torch_dynamo_resume_in_forward_at_246
+W0719 07:14:03.882000 3269208 torch/_dynamo/convert_frame.py:1853] [20/8] User stack trace:
+W0719 07:14:03.882000 3269208 torch/_dynamo/convert_frame.py:1853] [20/8]   File "/home/gio/tese/eda/.venv/lib/python3.14/site-packages/transformers/models/qwen3_vl/modeling_qwen3_vl.py", line 262, in torch_dynamo_resume_in_forward_at_246
+W0719 07:14:03.882000 3269208 torch/_dynamo/convert_frame.py:1853] [20/8]     for q, k, v in zip(*splits)
+W0719 07:14:03.882000 3269208 torch/_dynamo/convert_frame.py:1853] [20/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W0719 07:14:03.882000 3269208 torch/_dynamo/convert_frame.py:1853] [20/8] To diagnose recompilation issues, see https://docs.pytorch.org/docs/main/user_guide/torch_compiler/compile/programming_model.recompilation.html
+    f(N=36) = 195.86 ms  [9/13]
+W0719 07:14:28.657000 3269208 torch/_inductor/cudagraph_utils.py:434] [__cudagraphs] CUDAGraph supports dynamic shapes by recording a new graph for each distinct input size. Recording too many CUDAGraphs may lead to extra overhead. We have observed 9 distinct sizes. Please consider the following options for better performance: a) padding inputs to a few fixed number of shapes; or b) set torch._inductor.config.triton.cudagraph_skip_dynamic_graphs=True. Set torch._inductor.config.triton.cudagraph_dynamic_shape_warn_limit=None to silence this warning.
+W0719 07:14:28.659000 3269208 torch/_inductor/cudagraph_utils.py:434] [__cudagraphs] CUDAGraph supports dynamic shapes by recording a new graph for each distinct input size. Recording too many CUDAGraphs may lead to extra overhead. We have observed 9 distinct sizes. Please consider the following options for better performance: a) padding inputs to a few fixed number of shapes; or b) set torch._inductor.config.triton.cudagraph_skip_dynamic_graphs=True. Set torch._inductor.config.triton.cudagraph_dynamic_shape_warn_limit=None to silence this warning.
+W0719 07:14:28.659000 3269208 torch/_inductor/cudagraph_utils.py:434] [__cudagraphs] CUDAGraph supports dynamic shapes by recording a new graph for each distinct input size. Recording too many CUDAGraphs may lead to extra overhead. We have observed 9 distinct sizes. Please consider the following options for better performance: a) padding inputs to a few fixed number of shapes; or b) set torch._inductor.config.triton.cudagraph_skip_dynamic_graphs=True. Set torch._inductor.config.triton.cudagraph_dynamic_shape_warn_limit=None to silence this warning.
+W0719 07:14:28.661000 3269208 torch/_inductor/cudagraph_utils.py:434] [__cudagraphs] CUDAGraph supports dynamic shapes by recording a new graph for each distinct input size. Recording too many CUDAGraphs may lead to extra overhead. We have observed 9 distinct sizes. Please consider the following options for better performance: a) padding inputs to a few fixed number of shapes; or b) set torch._inductor.config.triton.cudagraph_skip_dynamic_graphs=True. Set torch._inductor.config.triton.cudagraph_dynamic_shape_warn_limit=None to silence this warning.
+W0719 07:14:28.668000 3269208 torch/_inductor/cudagraph_utils.py:434] [__cudagraphs] CUDAGraph supports dynamic shapes by recording a new graph for each distinct input size. Recording too many CUDAGraphs may lead to extra overhead. We have observed 9 distinct sizes. Please consider the following options for better performance: a) padding inputs to a few fixed number of shapes; or b) set torch._inductor.config.triton.cudagraph_skip_dynamic_graphs=True. Set torch._inductor.config.triton.cudagraph_dynamic_shape_warn_limit=None to silence this warning.
+W0719 07:14:28.669000 3269208 torch/_inductor/cudagraph_utils.py:434] [__cudagraphs] CUDAGraph supports dynamic shapes by recording a new graph for each distinct input size. Recording too many CUDAGraphs may lead to extra overhead. We have observed 9 distinct sizes. Please consider the following options for better performance: a) padding inputs to a few fixed number of shapes; or b) set torch._inductor.config.triton.cudagraph_skip_dynamic_graphs=True. Set torch._inductor.config.triton.cudagraph_dynamic_shape_warn_limit=None to silence this warning.
+W0719 07:14:28.671000 3269208 torch/_inductor/cudagraph_utils.py:434] [__cudagraphs] CUDAGraph supports dynamic shapes by recording a new graph for each distinct input size. Recording too many CUDAGraphs may lead to extra overhead. We have observed 9 distinct sizes. Please consider the following options for better performance: a) padding inputs to a few fixed number of shapes; or b) set torch._inductor.config.triton.cudagraph_skip_dynamic_graphs=True. Set torch._inductor.config.triton.cudagraph_dynamic_shape_warn_limit=None to silence this warning.
+W0719 07:14:28.732000 3269208 torch/_inductor/cudagraph_utils.py:434] [__cudagraphs] CUDAGraph supports dynamic shapes by recording a new graph for each distinct input size. Recording too many CUDAGraphs may lead to extra overhead. We have observed 9 distinct sizes. Please consider the following options for better performance: a) padding inputs to a few fixed number of shapes; or b) set torch._inductor.config.triton.cudagraph_skip_dynamic_graphs=True. Set torch._inductor.config.triton.cudagraph_dynamic_shape_warn_limit=None to silence this warning.
+W0719 07:14:28.874000 3269208 torch/_inductor/cudagraph_utils.py:434] [__cudagraphs] CUDAGraph supports dynamic shapes by recording a new graph for each distinct input size. Recording too many CUDAGraphs may lead to extra overhead. We have observed 9 distinct sizes. Please consider the following options for better performance: a) padding inputs to a few fixed number of shapes; or b) set torch._inductor.config.triton.cudagraph_skip_dynamic_graphs=True. Set torch._inductor.config.triton.cudagraph_dynamic_shape_warn_limit=None to silence this warning.
+    f(N=64) = 350.74 ms  [13/13]
+  burst1  compiled p99    88152 ms  (AIC 56263, ratio 1.567)
+  burst2  compiled p99    95815 ms  (AIC 61385, ratio 1.561)
+  burst3  compiled p99    70262 ms  (AIC 60253, ratio 1.166)
+  burst4  compiled p99   205689 ms  (AIC 132704, ratio 1.55)
+  burst5  compiled p99    59473 ms  (AIC 49709, ratio 1.196)
+  burst6  compiled p99    54769 ms  (AIC 44194, ratio 1.239)
+  [compiled] done in 334s
+
+DONE -> /home/gio/tese/collector_artifacts/phaseE_physical_anchor/burst_anchor_all.json
