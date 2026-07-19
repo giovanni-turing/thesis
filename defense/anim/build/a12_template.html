@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A12 — The composed system</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb;
+    --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+    --fc: #2a78d6; --re: #eb6834; --good: #0ca30c; --critical: #d03b3b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: var(--page); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; overflow: hidden; }
+  header { display: flex; align-items: center; gap: 14px; padding: 8px 20px 4px; }
+  header h1 { font-size: 20px; font-weight: 650; letter-spacing: -0.01em; }
+  header .sub { font-size: 12px; color: var(--ink-2); margin-top: 1px; }
+  .clock { font-variant-numeric: tabular-nums; font-size: 21px; font-weight: 650;
+    padding: 2px 10px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); min-width: 162px; text-align: center; }
+  .clock small { display: block; font-size: 9.5px; font-weight: 500; color: var(--muted); letter-spacing: 0.08em; }
+  .ctl { display: flex; align-items: center; gap: 6px; }
+  .ctl .lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; font-weight: 600; text-align: right; line-height: 1.2; }
+  .seg { display: flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; background: var(--surface); }
+  .seg button { font: inherit; font-size: 12px; font-weight: 600; padding: 5px 9px;
+    border: 0; background: transparent; cursor: pointer; color: var(--ink-2); white-space: nowrap; }
+  .seg button small { display: block; font-size: 9.5px; font-weight: 500; color: inherit; opacity: 0.75; }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button.on { background: var(--ink); color: #fff; }
+  .transport { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .transport button, .transport select { font: inherit; font-size: 13px; padding: 6px 11px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; color: var(--ink); }
+  .transport button.primary { background: var(--ink); color: #fff; border-color: var(--ink); min-width: 84px; }
+  #scrubwrap { padding: 0 20px 2px; }
+  #scrub { width: 100%; accent-color: var(--ink); height: 18px; cursor: pointer; }
+  main { flex: 1; display: flex; flex-direction: column; gap: 7px; padding: 0 20px 4px; min-height: 0; }
+  .strip { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    position: relative; height: 13.5%; min-height: 78px; }
+  .strip canvas, .lanechart canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .lane { flex: 1; display: flex; gap: 7px; min-height: 0; }
+  .lanechart { flex: 1; position: relative; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px; }
+  .lanebadges { width: 240px; display: flex; flex-direction: column; gap: 5px; }
+  .tile { border: 1px solid var(--border); border-radius: 9px; padding: 4px 9px 4px; background: var(--surface); }
+  .tile .k { font-size: 10px; color: var(--muted); letter-spacing: 0.03em; white-space: nowrap; }
+  .tile .v { font-size: 17.5px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.14; }
+  .tile .u { font-size: 10px; color: var(--ink-2); }
+  .tile.duo { display: flex; gap: 10px; }
+  .tile.duo > div { flex: 1; }
+  .verdict-tile { border-radius: 9px; padding: 6px 9px; border: 1px solid var(--border);
+    background: var(--surface); display: none; }
+  .verdict-tile.show { display: block; }
+  .verdict-tile .big { font-size: 16.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .verdict-tile .note { font-size: 10px; color: var(--ink-2); line-height: 1.3; margin-top: 1px; }
+  .vd-pass { border-left: 5px solid var(--good); }
+  .vd-fail { border-left: 5px solid var(--critical); }
+  footer { display: flex; gap: 14px; align-items: center; padding: 3px 20px 6px;
+    font-size: 10.5px; color: var(--muted); }
+  footer .spacer { flex: 1; }
+  kbd { background: var(--grid); border-radius: 4px; padding: 0 4px; font-size: 10.5px; }
+  #infoBtn { cursor: pointer; border: 1px solid var(--border); background: var(--surface);
+    border-radius: 50%; width: 19px; height: 19px; font-size: 11px; color: var(--ink-2); }
+  #infoBox { display: none; position: absolute; right: 20px; bottom: 30px; z-index: 20;
+    max-width: 640px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; font-size: 12px; color: var(--ink-2);
+    box-shadow: 0 8px 30px rgba(11,11,11,0.15); line-height: 1.5; }
+  #infoBox.show { display: block; }
+  #tooltip { position: fixed; z-index: 30; pointer-events: none; display: none;
+    background: var(--ink); color: #fff; border-radius: 8px; padding: 7px 10px;
+    font-size: 12px; line-height: 1.5; font-variant-numeric: tabular-nums;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>The composed system</h1>
+    <div class="sub">true E2E, both pools: each policy's encoder schedule →<br>seam → Dynamo planner · request-linked first-token wait</div>
+  </div>
+  <div class="clock"><small id="clockDate">· UTC</small><span id="clock">–</span></div>
+  <div class="ctl">
+    <span class="lbl">EPISODE</span>
+    <div class="seg" id="winSeg"></div>
+  </div>
+  <div class="ctl">
+    <span class="lbl">FORECAST<br>MODEL</span>
+    <div class="seg" id="modelSeg">
+      <button data-m="toto" class="on">Toto-2</button><button data-m="chronos">Chronos-2</button>
+    </div>
+  </div>
+  <div class="transport">
+    <button id="playBtn" class="primary">▶ Play</button>
+    <select id="speedSel" title="full-pass duration"></select>
+    <button id="resetBtn">↺ Reset</button>
+  </div>
+</header>
+<div id="scrubwrap"><input id="scrub" type="range" min="0" max="1618" step="1" value="0"></div>
+
+<main>
+  <div class="strip" id="offeredStrip"><canvas></canvas></div>
+
+  <div class="lane">
+    <div class="lanechart" id="fcChart"><canvas></canvas></div>
+    <div class="lanebadges">
+      <div class="tile"><div class="k">FORECAST · full pipeline</div>
+        <div class="u">encoder p90/ρ15/L30 → planner + tail-aware, L60</div></div>
+      <div class="tile duo"><div><div class="k">encoder p99 so far</div>
+          <div class="v" id="fcEnc">–</div><div class="u">delay at the seam</div></div>
+        <div><div class="k">TTFT p99 so far</div><div class="v" id="fcTtft">–</div>
+          <div class="u">language pool</div></div></div>
+      <div class="tile"><div class="k">E2E ingress → first token · p99 so far</div>
+        <div class="v" id="fcE2e">–</div>
+        <div class="u">union budget ≈ 2 s (two p99 bounds)</div></div>
+      <div class="verdict-tile" id="fcVerdict">
+        <div class="big" id="fcVerdictBig"></div>
+        <div class="note" id="fcNote"></div></div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <div class="lanechart" id="reChart"><canvas></canvas></div>
+    <div class="lanebadges">
+      <div class="tile"><div class="k">REACTIVE · full pipeline</div>
+        <div class="u">encoder reactive/ρ15/L30 → SLA planner (ARIMA), L60</div></div>
+      <div class="tile duo"><div><div class="k">encoder p99 so far</div>
+          <div class="v" id="reEnc">–</div><div class="u">delay at the seam</div></div>
+        <div><div class="k">TTFT p99 so far</div><div class="v" id="reTtft">–</div>
+          <div class="u">language pool</div></div></div>
+      <div class="tile"><div class="k">E2E ingress → first token · p99 so far</div>
+        <div class="v" id="reE2e">–</div>
+        <div class="u">union budget ≈ 2 s (two p99 bounds)</div></div>
+      <div class="verdict-tile" id="reVerdict">
+        <div class="big" id="reVerdictBig"></div>
+        <div class="note" id="reNote"></div></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>Real E2E simulator output · defense/anim/data/a12_runs/ + the ledger-verified composed traces (a2/a2t/a6/aggregate44)</span>
+  <span><kbd>space</kbd> play · <kbd>←</kbd><kbd>→</kbd> step · <kbd>R</kbd> reset</span>
+  <span class="spacer"></span>
+  <span id="spendNote"></span>
+  <button id="infoBtn">i</button>
+  <div id="infoBox">
+    <b>Scope.</b> The full two-pool pipeline per policy: the encoder FIFO runs under the
+    policy's own worker schedule (forecast p90/ρ15/L30 issue-time, or reactive/ρ15/L30 —
+    the ledger-verified converter runs), its per-request delays are folded into the seam
+    trace, and Dynamo's planner replays THAT trace (forecast_file + tail-aware conversion,
+    or the reactive SLA planner; TP2 replicas, L=60). Every dot is a request-linked
+    measurement: ingress→first-token = its own encoder delay + its own replayed TTFT —
+    the thesis Ch. 6 reconstruction upgraded from modelled to measured (the thesis quotes
+    ≈1.30 s modelled for the winning week configuration). The mocker's virtual clock
+    simulates days in minutes with exact validity; arrival timestamps are never
+    compressed. The union budget line (2 s) is the thesis's two-stage budget
+    (a union bound over two p99s, ≈p98 end-to-end, not an end-to-end p99 SLA); per-stage
+    verdicts use the per-pool bounds. Note the compounding: the reactive encoder's
+    queueing clumps arrivals into the language pool, so the composed reactive system is
+    WORSE than per-pool grading suggests.
+  </div>
+</footer>
+<div id="tooltip"></div>
+
+<script>
+const DATA = /*__DATA__*/;
+
+const SLA_T = DATA.meta.sla_ttft, UNION = DATA.meta.union_budget_ms;
+const WIN_ORDER = DATA.meta.win_order;
+let winKey = "burst3";
+let model = "toto";
+let playhead = 0, playing = false, lastTs = null, hoverT = null;
+
+const W = () => DATA.windows[winKey];
+const SPAN = () => W().meta.span_s;
+const BIN = () => W().meta.bin_s;
+const NB = () => W().offered.length;
+const runs = () => ({ fc: W().runs["fc_" + model], re: W().runs.reactive });
+
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmtClock = s => {
+  const w = W().meta.t0_day_s + s;
+  return `${String(Math.floor(w/3600)%24).padStart(2,"0")}:${String(Math.floor(w/60)%60).padStart(2,"0")}:${String(Math.floor(w)%60).padStart(2,"0")}`;
+};
+const fmtMs = v => v >= 10000 ? (v/1000).toFixed(1).replace(/\.0$/,"") + " s"
+               : v >= 1000 ? (v/1000).toFixed(2) + " s" : Math.round(v) + " ms";
+
+/* episode selector */
+const winSeg = document.getElementById("winSeg");
+for (const wk of WIN_ORDER) {
+  const b = document.createElement("button");
+  b.dataset.w = wk;
+  b.innerHTML = `${wk}<small>${DATA.windows[wk].meta.label}</small>`;
+  if (wk === winKey) b.classList.add("on");
+  b.onclick = () => selectWindow(wk);
+  winSeg.appendChild(b);
+}
+function selectWindow(wk) {
+  winKey = wk; playhead = 0; setPlaying(false);
+  document.querySelectorAll("#winSeg button").forEach(x => x.classList.toggle("on", x.dataset.w === wk));
+  const scrub = document.getElementById("scrub");
+  scrub.max = SPAN() - 1; scrub.value = 0;
+  document.getElementById("clockDate").textContent = W().meta.date + " · UTC";
+  buildSpeeds();
+}
+function buildSpeeds() {
+  const sel = document.getElementById("speedSel");
+  const cur = sel.dataset.dur || "60";
+  sel.innerHTML = "";
+  for (const d of [120, 60, 30, 15]) {
+    const o = document.createElement("option");
+    o.value = String(SPAN() / d); o.textContent = `pass in ${d} s`;
+    o.dataset.dur = String(d);
+    if (String(d) === cur) o.selected = true;
+    sel.appendChild(o);
+  }
+  sel.onchange = () => { sel.dataset.dur = sel.selectedOptions[0].dataset.dur; };
+}
+
+/* canvas helpers */
+const PADL = 56, PADR = 14;
+function setupCanvas(el) {
+  const c = el.querySelector("canvas"), ctx = c.getContext("2d");
+  const r = el.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+  c.width = r.width * dpr; c.height = r.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w: r.width, h: r.height };
+}
+function haloText(ctx, text, x, y, color) {
+  ctx.strokeStyle = css("--surface"); ctx.lineWidth = 3; ctx.strokeText(text, x, y);
+  ctx.fillStyle = color; ctx.fillText(text, x, y);
+}
+function xTickStep() {
+  const s = SPAN();
+  return s > 100000 ? 86400 : s > 20000 ? 3600 : s > 8000 ? 1800 : s > 3000 ? 900 : 300;
+}
+function drawCursor(ctx, x, top, bot) {
+  if (playhead > 0 && playhead < SPAN()) {
+    ctx.strokeStyle = css("--ink"); ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x(playhead), top); ctx.lineTo(x(playhead), bot); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  if (hoverT !== null && hoverT <= playhead) {
+    ctx.strokeStyle = css("--muted"); ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(x(hoverT), top); ctx.lineTo(x(hoverT), bot); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+/* offered strip */
+function drawOffered() {
+  const el = document.getElementById("offeredStrip");
+  const { ctx, w, h } = setupCanvas(el);
+  const padT = 16, padB = 14;
+  const x = t => PADL + t / SPAN() * (w - PADL - PADR);
+  const off = W().offered;
+  const yMaxRaw = Math.max(...off);
+  const mag = Math.pow(10, Math.floor(Math.log10(yMaxRaw)));
+  const yMax = [1, 2, 5, 10].map(k => k * mag).find(v => v >= yMaxRaw);
+  const y = v => h - padB - Math.min(v, yMax) / yMax * (h - padT - padB);
+  ctx.font = "600 12px system-ui"; ctx.fillStyle = css("--ink-2");
+  ctx.textAlign = "left"; ctx.textBaseline = "top";
+  ctx.fillText(`Ingress request load (req/s per ${BIN()}-s bin) — the RAW trace arrivals, before either pool`, PADL, 1);
+  ctx.strokeStyle = css("--axis"); ctx.beginPath(); ctx.moveTo(PADL, y(0)); ctx.lineTo(w - PADR, y(0)); ctx.stroke();
+  ctx.font = "10.5px system-ui"; ctx.fillStyle = css("--muted");
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  ctx.fillText(yMax, PADL - 6, y(yMax)); ctx.fillText("0", PADL - 6, y(0));
+  const uptoB = Math.min(Math.floor(playhead / BIN()), NB() - 1);
+  ctx.fillStyle = "rgba(42,120,214,0.6)";
+  ctx.beginPath(); ctx.moveTo(x(0), y(0));
+  for (let b = 0; b <= uptoB; b++) ctx.lineTo(x(b * BIN() + BIN()/2), y(off[b]));
+  ctx.lineTo(x(Math.min(playhead, SPAN())), y(0)); ctx.closePath(); ctx.fill();
+  drawCursor(ctx, x, padT, h - padB);
+}
+
+/* lane: E2E dots (log) */
+function drawLane(elId, run, hue, label) {
+  const el = document.getElementById(elId);
+  const { ctx, w, h } = setupCanvas(el);
+  const x = t => PADL + t / SPAN() * (w - PADL - PADR);
+  const uptoB = Math.min(Math.floor(playhead / BIN()), NB() - 1);
+  const padT = 17, padB = 16;
+  const dTop = padT, dBot = h - padB;
+  const lo = Math.log10(15), hi = Math.log10(120000);
+  const dy = ms => dBot - (Math.min(Math.max(Math.log10(Math.max(ms, 15)), lo), hi) - lo) / (hi - lo) * (dBot - dTop);
+  ctx.font = "600 12px system-ui"; ctx.textAlign = "left"; ctx.textBaseline = "top";
+  ctx.fillStyle = hue; ctx.fillText(label, PADL, 1);
+  ctx.fillStyle = css("--ink-2"); ctx.font = "600 10.5px system-ui";
+  ctx.fillText(`worst ingress→first-token per ${BIN()}-s bin (log)`, w - PADR - 250, 3);
+  ctx.font = "10px system-ui";
+  for (const [v, lbl] of [[100,"100 ms"],[1000,"1 s"],[2000,"2 s"],[10000,"10 s"],[60000,"60 s"]]) {
+    const gy = dy(v);
+    const isSla = v === 2000;
+    ctx.strokeStyle = isSla ? css("--critical") : css("--grid");
+    ctx.setLineDash(isSla ? [5,4] : []);
+    ctx.lineWidth = isSla ? 1.5 : 1;
+    ctx.beginPath(); ctx.moveTo(PADL, gy); ctx.lineTo(w - PADR, gy); ctx.stroke();
+    ctx.setLineDash([]); ctx.lineWidth = 1;
+    ctx.fillStyle = isSla ? css("--critical") : css("--muted");
+    ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.fillText(lbl, PADL - 6, gy);
+    ctx.textAlign = "left";
+  }
+  ctx.font = "600 10px system-ui"; ctx.textAlign = "right"; ctx.textBaseline = "bottom";
+  haloText(ctx, "union budget ≈ 2 s (two p99 bounds)", w - PADR - 2, dy(2000) - 2, css("--critical"));
+  for (let b = 0; b <= uptoB; b++) {
+    const d = run.dmax[b];
+    if (d <= 0) continue;
+    ctx.fillStyle = d > UNION ? css("--critical") : hue;
+    ctx.beginPath(); ctx.arc(x(b * BIN() + BIN()/2), dy(d), 2.4, 0, 6.2832); ctx.fill();
+  }
+  ctx.font = "10px system-ui"; ctx.fillStyle = css("--muted");
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  const step = xTickStep();
+  const start = Math.ceil(W().meta.t0_day_s / step) * step - W().meta.t0_day_s;
+  for (let t = start; t <= SPAN(); t += step) ctx.fillText(fmtClock(t).slice(0, 5), x(t), dBot + 3);
+  drawCursor(ctx, x, padT, dBot);
+}
+
+/* badges */
+const $ = id => document.getElementById(id);
+function laneTicker(prefix, run) {
+  const b = Math.min(Math.floor(playhead / BIN()), NB() - 1);
+  const set = (id, v, bound) => {
+    const e = $(id); e.textContent = fmtMs(v);
+    e.style.color = v > bound ? css("--critical") : "#006300";
+  };
+  set(prefix + "Enc", run.enc_p99run[b], 1000);
+  set(prefix + "Ttft", run.ttft_p99run[b], SLA_T);
+  set(prefix + "E2e", run.p99run[b], UNION);
+  const done = playhead >= SPAN() - 1;
+  const v = $(prefix + "Verdict");
+  v.classList.toggle("show", done);
+  if (done) {
+    const s = run.stats;
+    const pass = s.enc_p99 < 1000 && s.ttft_p99 < SLA_T && s.itl_p99 < 100;
+    v.classList.toggle("vd-pass", pass); v.classList.toggle("vd-fail", !pass);
+    $(prefix + "VerdictBig").textContent =
+      `${pass ? "PASS" : "FAIL"} · E2E p99 ${fmtMs(s.e2e_p99)}`;
+    $(prefix + "VerdictBig").style.color = pass ? "#006300" : css("--critical");
+    $(prefix + "Note").textContent =
+      `enc ${fmtMs(s.enc_p99)} + TTFT ${fmtMs(s.ttft_p99)} · ITL p99 ${s.itl_p99} ms · worst request ${fmtMs(s.e2e_max)}`;
+  }
+}
+function updateReadouts() {
+  const { fc, re } = runs();
+  const t = Math.min(Math.floor(playhead), SPAN() - 1);
+  $("clock").textContent = fmtClock(t);
+  $("scrub").value = t;
+  laneTicker("fc", fc); laneTicker("re", re);
+  $("spendNote").textContent =
+    `language fleets: forecast ${fc.stats.gpu_h.toFixed(1)} · reactive ${re.stats.gpu_h.toFixed(1)} H100 GPU-h — the composed reactive system compounds both pools' failures`;
+}
+
+/* main loop */
+function drawAll() {
+  const { fc, re } = runs();
+  drawOffered();
+  drawLane("fcChart", fc, css("--fc"), `FORECAST pipeline (${model === "toto" ? "Toto-2" : "Chronos-2"} p90, both pools)`);
+  drawLane("reChart", re, css("--re"), "REACTIVE pipeline (both pools)");
+  updateReadouts();
+}
+function frame(ts) {
+  if (playing) {
+    if (lastTs !== null) {
+      playhead += (ts - lastTs) / 1000 * (+$("speedSel").value);
+      if (playhead >= SPAN() - 1) { playhead = SPAN() - 1; setPlaying(false); }
+    }
+  }
+  lastTs = ts;
+  drawAll();
+  requestAnimationFrame(frame);
+}
+function setPlaying(p) { playing = p; $("playBtn").textContent = p ? "❚❚ Pause" : "▶ Play"; }
+
+/* controls */
+$("playBtn").onclick = () => { if (playhead >= SPAN() - 1) playhead = 0; setPlaying(!playing); };
+$("resetBtn").onclick = () => { playhead = 0; setPlaying(false); };
+$("scrub").oninput = e => { playhead = +e.target.value; };
+$("infoBtn").onclick = () => $("infoBox").classList.toggle("show");
+document.querySelectorAll("#modelSeg button").forEach(b => b.onclick = () => {
+  model = b.dataset.m;
+  document.querySelectorAll("#modelSeg button").forEach(x => x.classList.toggle("on", x === b));
+});
+addEventListener("keydown", e => {
+  if (e.code === "Space") { e.preventDefault(); $("playBtn").onclick(); }
+  else if (e.key === "ArrowRight") playhead = Math.min(SPAN() - 1, playhead + SPAN()/54);
+  else if (e.key === "ArrowLeft") playhead = Math.max(0, playhead - SPAN()/54);
+  else if (e.key.toLowerCase() === "r") $("resetBtn").onclick();
+});
+
+/* hover */
+const tt = $("tooltip");
+for (const id of ["offeredStrip", "fcChart", "reChart"]) {
+  const el = document.getElementById(id);
+  el.addEventListener("mousemove", e => {
+    const r = el.getBoundingClientRect();
+    const t = Math.round((e.clientX - r.left - PADL) / (r.width - PADL - PADR) * SPAN());
+    if (t < 0 || t > Math.min(playhead, SPAN() - 1)) { hoverT = null; tt.style.display = "none"; return; }
+    hoverT = t;
+    const { fc, re } = runs();
+    const b = Math.min(Math.floor(t / BIN()), NB() - 1);
+    tt.innerHTML = `<div style="font-weight:700">${fmtClock(t)} UTC</div>`
+      + `<div>ingress ${W().offered[b]} req/s</div>`
+      + `<div><span style="color:#86b6ef">●</span> forecast E2E p99→ ${fmtMs(fc.p99run[b])} (enc ${fmtMs(fc.enc_p99run[b])} · ttft ${fmtMs(fc.ttft_p99run[b])})</div>`
+      + `<div><span style="color:#f0a284">●</span> reactive E2E p99→ ${fmtMs(re.p99run[b])} (enc ${fmtMs(re.enc_p99run[b])} · ttft ${fmtMs(re.ttft_p99run[b])})</div>`;
+    tt.style.display = "block";
+    tt.style.left = Math.min(e.clientX + 14, innerWidth - 330) + "px";
+    tt.style.top = (e.clientY + 14) + "px";
+  });
+  el.addEventListener("mouseleave", () => { hoverT = null; tt.style.display = "none"; });
+}
+
+/* boot */
+addEventListener("resize", drawAll);
+{
+  const mW = location.hash.match(/w=([a-z0-9]+)/);
+  selectWindow(mW && DATA.windows[mW[1]] ? mW[1] : "burst3");
+  const mM = location.hash.match(/m=(chronos|toto)/);
+  if (mM) {
+    model = mM[1];
+    document.querySelectorAll("#modelSeg button").forEach(x => x.classList.toggle("on", x.dataset.m === model));
+  }
+  const mT = location.hash.match(/t=(\d+)/);
+  if (mT) playhead = Math.min(SPAN() - 1, +mT[1]);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

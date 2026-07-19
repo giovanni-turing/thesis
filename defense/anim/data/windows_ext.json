@@ -202,5 +202,13 @@
   "peak_1min_img_per_s": 225.45,
   "onset_min": 3,
   "in_coverage": false
+ },
+ "fulltrace": {
+  "offset": 0,
+  "max_requests": 1000000,
+  "note": "FULL 7-day trace [2024-10-15 12:00:00.269000 .. 2024-10-22 11:59:59.964000]; coverage batch",
+  "requests": 1000000,
+  "span_s": 604799.7,
+  "t0": "2024-10-15 12:00:00.269000"
  }
 }

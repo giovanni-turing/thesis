@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A11 — The race: language pool</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb;
+    --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+    --fc: #2a78d6;      /* forecast lane: blue  */
+    --re: #eb6834;      /* reactive lane: orange */
+    --good: #0ca30c; --critical: #d03b3b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: var(--page); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; overflow: hidden; }
+  header { display: flex; align-items: center; gap: 14px; padding: 8px 20px 4px; }
+  header h1 { font-size: 20px; font-weight: 650; letter-spacing: -0.01em; }
+  header .sub { font-size: 12px; color: var(--ink-2); margin-top: 1px; }
+  .clock { font-variant-numeric: tabular-nums; font-size: 21px; font-weight: 650;
+    padding: 2px 10px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); min-width: 162px; text-align: center; }
+  .clock small { display: block; font-size: 9.5px; font-weight: 500; color: var(--muted); letter-spacing: 0.08em; }
+  .ctl { display: flex; align-items: center; gap: 6px; }
+  .ctl .lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; font-weight: 600; text-align: right; line-height: 1.2; }
+  .seg { display: flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; background: var(--surface); }
+  .seg button { font: inherit; font-size: 12px; font-weight: 600; padding: 5px 8px;
+    border: 0; background: transparent; cursor: pointer; color: var(--ink-2); white-space: nowrap; }
+  .seg button small { display: block; font-size: 9.5px; font-weight: 500; color: inherit; opacity: 0.75; }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button.on { background: var(--ink); color: #fff; }
+  .seg button:disabled { opacity: 0.35; cursor: default; }
+  .transport { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .transport button, .transport select { font: inherit; font-size: 13px; padding: 6px 11px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; color: var(--ink); }
+  .transport button.primary { background: var(--ink); color: #fff; border-color: var(--ink); min-width: 84px; }
+  #scrubwrap { padding: 0 20px 2px; }
+  #scrub { width: 100%; accent-color: var(--ink); height: 18px; cursor: pointer; }
+  main { flex: 1; display: flex; flex-direction: column; gap: 7px; padding: 0 20px 4px; min-height: 0; }
+  .strip { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    position: relative; height: 13.5%; min-height: 78px; }
+  .strip canvas, .lanechart canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .lane { flex: 1; display: flex; gap: 7px; min-height: 0; }
+  .lanechart { flex: 1; position: relative; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px; }
+  .lanebadges { width: 236px; display: flex; flex-direction: column; gap: 5px; }
+  .tile { border: 1px solid var(--border); border-radius: 9px; padding: 4px 9px 4px; background: var(--surface); }
+  .tile .k { font-size: 10px; color: var(--muted); letter-spacing: 0.03em; white-space: nowrap; }
+  .tile .v { font-size: 17.5px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.14; }
+  .tile .u { font-size: 10px; color: var(--ink-2); }
+  .tile.duo { display: flex; gap: 10px; }
+  .tile.duo > div { flex: 1; }
+  .verdict-tile { border-radius: 9px; padding: 6px 9px; border: 1px solid var(--border);
+    background: var(--surface); display: none; }
+  .verdict-tile.show { display: block; }
+  .verdict-tile .big { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .verdict-tile .note { font-size: 10px; color: var(--ink-2); line-height: 1.3; margin-top: 1px; }
+  .vd-pass { border-left: 5px solid var(--good); }
+  .vd-fail { border-left: 5px solid var(--critical); }
+  footer { display: flex; gap: 14px; align-items: center; padding: 3px 20px 6px;
+    font-size: 10.5px; color: var(--muted); }
+  footer .spacer { flex: 1; }
+  kbd { background: var(--grid); border-radius: 4px; padding: 0 4px; font-size: 10.5px; }
+  #infoBtn { cursor: pointer; border: 1px solid var(--border); background: var(--surface);
+    border-radius: 50%; width: 19px; height: 19px; font-size: 11px; color: var(--ink-2); }
+  #infoBox { display: none; position: absolute; right: 20px; bottom: 30px; z-index: 20;
+    max-width: 620px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; font-size: 12px; color: var(--ink-2);
+    box-shadow: 0 8px 30px rgba(11,11,11,0.15); line-height: 1.5; }
+  #infoBox.show { display: block; }
+  #tooltip { position: fixed; z-index: 30; pointer-events: none; display: none;
+    background: var(--ink); color: #fff; border-radius: 8px; padding: 7px 10px;
+    font-size: 12px; line-height: 1.5; font-variant-numeric: tabular-nums;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>The race: language pool</h1>
+    <div class="sub">forecast + tail-aware conversion vs. reactive SLA planner,<br>both through Dynamo's planner on H100 TP2 replicas</div>
+  </div>
+  <div class="clock"><small id="clockDate">· UTC</small><span id="clock">–</span></div>
+  <div class="ctl">
+    <span class="lbl">EPISODE</span>
+    <div class="seg" id="winSeg"></div>
+  </div>
+  <div class="ctl">
+    <span class="lbl">FORECAST<br>MODEL</span>
+    <div class="seg" id="modelSeg">
+      <button data-m="toto" class="on">Toto-2</button><button data-m="chronos">Chronos-2</button>
+    </div>
+  </div>
+  <div class="ctl">
+    <span class="lbl">REPLICA<br>LEAD L</span>
+    <div class="seg" id="leadSeg">
+      <button data-l="60" class="on">60 s</button><button data-l="120">120 s</button>
+      <button data-l="300">300 s</button>
+    </div>
+  </div>
+  <div class="transport">
+    <button id="playBtn" class="primary">▶ Play</button>
+    <select id="speedSel" title="full-pass duration"></select>
+    <button id="resetBtn">↺ Reset</button>
+  </div>
+</header>
+<div id="scrubwrap"><input id="scrub" type="range" min="0" max="1618" step="1" value="0"></div>
+
+<main>
+  <div class="strip" id="offeredStrip"><canvas></canvas></div>
+
+  <div class="lane">
+    <div class="lanechart" id="fcChart"><canvas></canvas></div>
+    <div class="lanebadges">
+      <div class="tile duo"><div><div class="k">FORECAST · TP2 replicas</div>
+          <div class="v" style="color:#1c5cab" id="fcW">–</div></div>
+        <div><div class="k">p99 ITL so far</div><div class="v" id="fcQ">–</div>
+          <div class="u">SLA &lt; 100 ms</div></div></div>
+      <div class="tile"><div class="k">cost so far (provisioned H100 time)</div>
+        <div class="v"><span id="fcCost">0</span><span style="font-size:12px"> GPU-h</span></div>
+        <div class="u" id="fcCostWs"></div></div>
+      <div class="tile duo"><div><div class="k">mean TTFT so far</div>
+          <div class="v" id="fcAvg">–</div><div class="u">all requests</div></div>
+        <div><div class="k">p99 so far (SLA)</div><div class="v" id="fcP99run">–</div>
+          <div class="u">all requests</div></div></div>
+      <div class="verdict-tile" id="fcVerdict">
+        <div class="big" id="fcVerdictBig"></div>
+        <div class="note" id="fcNote"></div></div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <div class="lanechart" id="reChart"><canvas></canvas></div>
+    <div class="lanebadges">
+      <div class="tile duo"><div><div class="k">REACTIVE · TP2 replicas</div>
+          <div class="v" style="color:#b5431a" id="reW">–</div></div>
+        <div><div class="k">p99 ITL so far</div><div class="v" id="reQ">–</div>
+          <div class="u">SLA &lt; 100 ms</div></div></div>
+      <div class="tile"><div class="k">cost so far (provisioned H100 time)</div>
+        <div class="v"><span id="reCost">0</span><span style="font-size:12px"> GPU-h</span></div>
+        <div class="u" id="reCostWs"></div></div>
+      <div class="tile duo"><div><div class="k">mean TTFT so far</div>
+          <div class="v" id="reAvg">–</div><div class="u">all requests</div></div>
+        <div><div class="k">p99 so far (SLA)</div><div class="v" id="reP99run">–</div>
+          <div class="u">all requests</div></div></div>
+      <div class="verdict-tile" id="reVerdict">
+        <div class="big" id="reVerdictBig"></div>
+        <div class="note" id="reNote"></div></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>Real dynamo.replay output · defense/anim/data/a11_runs/ · L60 anchors reproduce the ledgered twins exactly (651.1 / 3,494.7 ms on burst3); other leads + Toto are new runs, same configs</span>
+  <span><kbd>space</kbd> play · <kbd>←</kbd><kbd>→</kbd> step · <kbd>1</kbd>–<kbd>4</kbd> lead · <kbd>R</kbd> reset</span>
+  <span class="spacer"></span>
+  <span id="spendNote"></span>
+  <button id="infoBtn">i</button>
+  <div id="infoBox">
+    <b>Scope.</b> Language pool (Qwen3-VL-8B on H100, TP2 replicas) through Dynamo's real
+    planner code in offline replay (virtual clock, AIC-calibrated h100_sxm timing), on the
+    ledgered composed grid traces (encoder delays folded in at each window's static-optimal
+    C). The <b>forecast</b> lane feeds the archived Toto-2 or Chronos-2 p90 path (15-s bins,
+    held-cursor sampling) through the tail-aware capacity conversion (FORECAST_REQ_SCALE=8,
+    the measured belief-to-knee ratio); the <b>reactive</b> lane is the planner's shipped SLA
+    loop (ARIMA, 200/20 ms window-mean targets). Replica lead = mocker startup_time.
+    Per-request TTFT/ITL records come from a small source-build extension made for this
+    animation (PlannerReplayBridge report_jsonl_path — the recording machinery existed in the
+    non-planner path; the patch threads it through the planner bridge); recovered running
+    p99s converge to each run's report, and every L=60 cell reproduces its ledgered twin.
+    burst3 runs under the live-validation budget cap (4 replicas) — the exact configuration
+    validated on the live Dynamo stack (Ch. 9: 651→695 ms, 3.49→3.53 s). This pool's
+    forecast test is a <i>conversion</i> result under a held cursor, not anticipation
+    (thesis language-pool caveat); the language race shows the conversion holding at every
+    replica lead.
+  </div>
+</footer>
+<div id="tooltip"></div>
+
+<script>
+const DATA = /*__DATA__*/;
+
+/* ---------- state ---------- */
+const SLA = DATA.meta.sla_ttft;   // TTFT p99 bound (ms)
+const WIN_ORDER = DATA.meta.win_order;
+let winKey = "burst3";
+let lead = 60;
+let model = "toto";
+let playhead = 0, playing = false, lastTs = null, hoverT = null;
+
+const W = () => DATA.windows[winKey];
+const SPAN = () => W().meta.span_s;
+const BIN = () => W().meta.bin_s;
+const NB = () => W().offered.length;
+const fcKey = () => "fc_" + model + "_L" + lead;
+const runs = () => ({ fc: W().runs[fcKey()], re: W().runs["reactive_L"+lead] });
+
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmtClock = s => {
+  const w = W().meta.t0_day_s + s;
+  return `${String(Math.floor(w/3600)%24).padStart(2,"0")}:${String(Math.floor(w/60)%60).padStart(2,"0")}:${String(Math.floor(w)%60).padStart(2,"0")}`;
+};
+const fmtMs = v => v >= 10000 ? (v/1000).toFixed(1).replace(/\.0$/,"") + " s"
+                 : v >= 1000 ? (v/1000).toFixed(2) + " s" : Math.round(v) + " ms";
+
+/* ---------- episode selector ---------- */
+const winSeg = document.getElementById("winSeg");
+for (const wk of WIN_ORDER) {
+  const b = document.createElement("button");
+  b.dataset.w = wk;
+  const nice = wk === "steady24h" ? "calm day" : wk;
+  b.innerHTML = `${nice}<small>${DATA.windows[wk].meta.label === nice ? DATA.windows[wk].meta.date : DATA.windows[wk].meta.label}</small>`;
+  if (wk === winKey) b.classList.add("on");
+  b.onclick = () => selectWindow(wk);
+  winSeg.appendChild(b);
+}
+function selectWindow(wk) {
+  winKey = wk; playhead = 0; setPlaying(false);
+  document.querySelectorAll("#winSeg button").forEach(x => x.classList.toggle("on", x.dataset.w === wk));
+  const scrub = document.getElementById("scrub");
+  scrub.max = SPAN() - 1; scrub.value = 0;
+  document.getElementById("clockDate").textContent = W().meta.date + " · UTC";
+  // the week window is ledgered at L=60 only
+  const only60 = wk === "week";
+  document.querySelectorAll("#leadSeg button").forEach(x => {
+    x.disabled = only60 && x.dataset.l !== "60";
+  });
+  if (only60 && lead !== 60) {
+    lead = 60;
+    document.querySelectorAll("#leadSeg button").forEach(x =>
+      x.classList.toggle("on", x.dataset.l === "60"));
+  }
+  buildSpeeds();
+}
+/* full-pass duration presets (playback speed = span / duration) */
+function buildSpeeds() {
+  const sel = document.getElementById("speedSel");
+  const cur = sel.dataset.dur || "60";
+  sel.innerHTML = "";
+  for (const d of [120, 60, 30, 15]) {
+    const o = document.createElement("option");
+    o.value = String(SPAN() / d); o.textContent = `pass in ${d} s`;
+    o.dataset.dur = String(d);
+    if (String(d) === cur) o.selected = true;
+    sel.appendChild(o);
+  }
+  sel.onchange = () => { sel.dataset.dur = sel.selectedOptions[0].dataset.dur; };
+}
+
+/* ---------- canvas helpers ---------- */
+const PADL = 56, PADR = 14;
+function setupCanvas(el) {
+  const c = el.querySelector("canvas"), ctx = c.getContext("2d");
+  const r = el.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+  c.width = r.width * dpr; c.height = r.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w: r.width, h: r.height };
+}
+function haloText(ctx, text, x, y, color) {
+  ctx.strokeStyle = css("--surface"); ctx.lineWidth = 3; ctx.strokeText(text, x, y);
+  ctx.fillStyle = color; ctx.fillText(text, x, y);
+}
+function xTickStep() {
+  const s = SPAN();
+  return s > 40000 ? 14400 : s > 20000 ? 3600 : s > 8000 ? 1800 : s > 3000 ? 900 : 300;
+}
+function drawXTicks(ctx, x, yTop, w) {
+  ctx.font = "10px system-ui"; ctx.fillStyle = css("--muted");
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  const step = xTickStep();
+  const start = Math.ceil(W().meta.t0_day_s / step) * step - W().meta.t0_day_s;
+  for (let t = start; t <= SPAN(); t += step) ctx.fillText(fmtClock(t).slice(0, 5), x(t), yTop);
+}
+
+/* ---------- offered strip ---------- */
+function drawOffered() {
+  const el = document.getElementById("offeredStrip");
+  const { ctx, w, h } = setupCanvas(el);
+  const padT = 16, padB = 14;
+  const x = t => PADL + t / SPAN() * (w - PADL - PADR);
+  const off = W().offered;
+  const yMaxRaw = Math.max(...off);
+  const mag = Math.pow(10, Math.floor(Math.log10(yMaxRaw)));
+  const yMax = [1, 2, 5, 10].map(k => k * mag).find(v => v >= yMaxRaw);
+  const y = v => h - padB - Math.min(v, yMax) / yMax * (h - padT - padB);
+  ctx.font = "600 12px system-ui"; ctx.fillStyle = css("--ink-2");
+  ctx.textAlign = "left"; ctx.textBaseline = "top";
+  ctx.fillText(`Offered request load (req/s per ${BIN()}-s bin, encoder-shifted composed trace) — same replay for both lanes`, PADL, 1);
+  ctx.strokeStyle = css("--axis"); ctx.beginPath(); ctx.moveTo(PADL, y(0)); ctx.lineTo(w - PADR, y(0)); ctx.stroke();
+  ctx.font = "10.5px system-ui"; ctx.fillStyle = css("--muted");
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  ctx.fillText(yMax >= 1000 ? (yMax/1000)+"k" : yMax, PADL - 6, y(yMax)); ctx.fillText("0", PADL - 6, y(0));
+  const uptoB = Math.min(Math.floor(playhead / BIN()), NB() - 1);
+  ctx.fillStyle = "rgba(42,120,214,0.6)";
+  ctx.beginPath(); ctx.moveTo(x(0), y(0));
+  for (let b = 0; b <= uptoB; b++) ctx.lineTo(x(b * BIN() + BIN()/2), y(off[b]));
+  ctx.lineTo(x(Math.min(playhead, SPAN())), y(0)); ctx.closePath(); ctx.fill();
+  drawCursor(ctx, x, padT, h - padB);
+}
+
+/* ---------- lane chart ---------- */
+function drawLane(elId, run, hue, label) {
+  const el = document.getElementById(elId);
+  const { ctx, w, h } = setupCanvas(el);
+  const x = t => PADL + t / SPAN() * (w - PADL - PADR);
+  const upto = Math.floor(playhead);
+  const uptoB = Math.min(Math.floor(playhead / BIN()), NB() - 1);
+  const bandH = Math.floor(h * 0.30), padT = 15, gap = 13, padB = 16;
+  // workers band
+  const wMax = (W().meta.budget || 8) + 1;
+  const wy = v => bandH - Math.min(v, wMax) / wMax * (bandH - padT);
+  ctx.font = "600 12px system-ui"; ctx.textAlign = "left"; ctx.textBaseline = "top";
+  ctx.fillStyle = hue; ctx.fillText(label, PADL, 1);
+  ctx.fillStyle = css("--ink-2"); ctx.font = "600 10.5px system-ui";
+  ctx.fillText("TP2 replicas (budget " + (W().meta.budget||8) + ")", w - PADR - 128, 3);
+  ctx.strokeStyle = css("--grid");
+  for (const gv of [10, 20, 30]) { const gy = wy(gv);
+    ctx.beginPath(); ctx.moveTo(PADL, gy); ctx.lineTo(w - PADR, gy); ctx.stroke();
+    ctx.fillStyle = css("--muted"); ctx.font = "10px system-ui";
+    ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.fillText(gv, PADL - 6, gy);
+    ctx.textAlign = "left";
+  }
+
+  ctx.strokeStyle = hue; ctx.lineWidth = 2.5; ctx.lineJoin = "miter";
+  ctx.beginPath();
+  let prev = run.sched[0][1]; ctx.moveTo(x(0), wy(prev));
+  for (const [ts, wk] of run.sched) {
+    if (ts > upto) break;
+    ctx.lineTo(x(ts), wy(prev)); ctx.lineTo(x(ts), wy(wk)); prev = wk;
+  }
+  ctx.lineTo(x(Math.min(upto, SPAN())), wy(prev)); ctx.stroke(); ctx.lineWidth = 1;
+  ctx.strokeStyle = css("--axis");
+  ctx.beginPath(); ctx.moveTo(PADL, bandH); ctx.lineTo(w - PADR, bandH); ctx.stroke();
+
+  // delay band (log)
+  const dTop = bandH + gap, dBot = h - padB;
+  const lo = Math.log10(8), hi = Math.log10(30000);
+  const dy = ms => dBot - (Math.min(Math.max(Math.log10(Math.max(ms, 5)), lo), hi) - lo) / (hi - lo) * (dBot - dTop);
+  ctx.font = "600 10.5px system-ui"; ctx.fillStyle = css("--ink-2");
+  ctx.textBaseline = "top";
+  ctx.fillText(`worst TTFT per ${BIN()}-s bin of arrivals (log)`, PADL, dTop - 12);
+  ctx.font = "10px system-ui";
+  for (const [v, lbl] of [[10,"10 ms"],[100,"100 ms"],[1000,"1 s"],[10000,"10 s"]]) {
+    const gy = dy(v);
+    ctx.strokeStyle = v === 1000 ? css("--critical") : css("--grid");
+    ctx.setLineDash(v === 1000 ? [5,4] : []);
+    ctx.lineWidth = v === 1000 ? 1.5 : 1;
+    ctx.beginPath(); ctx.moveTo(PADL, gy); ctx.lineTo(w - PADR, gy); ctx.stroke();
+    ctx.setLineDash([]); ctx.lineWidth = 1;
+    ctx.fillStyle = v === 1000 ? css("--critical") : css("--muted");
+    ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.fillText(lbl, PADL - 6, gy);
+    ctx.textAlign = "left";
+  }
+  ctx.font = "600 10px system-ui"; ctx.textAlign = "right"; ctx.textBaseline = "bottom";
+  haloText(ctx, "SLA: TTFT p99 < 1 s", w - PADR - 2, dy(1000) - 2, css("--critical"));
+  for (let b = 0; b <= uptoB; b++) {
+    const d = run.dmax[b];
+    if (d <= 0) continue;
+    ctx.fillStyle = d > SLA ? css("--critical") : hue;
+    ctx.beginPath(); ctx.arc(x(b * BIN() + BIN()/2), dy(d), 2.4, 0, 6.2832); ctx.fill();
+  }
+  ctx.textAlign = "center";
+  drawXTicks(ctx, x, dBot + 3, w);
+  drawCursor(ctx, x, padT, dBot);
+}
+
+function drawCursor(ctx, x, top, bot) {
+  if (playhead > 0 && playhead < SPAN()) {
+    ctx.strokeStyle = css("--ink"); ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x(playhead), top); ctx.lineTo(x(playhead), bot); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  if (hoverT !== null && hoverT <= playhead) {
+    ctx.strokeStyle = css("--muted"); ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(x(hoverT), top); ctx.lineTo(x(hoverT), bot); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+/* ---------- badges & tickers ---------- */
+const $ = id => document.getElementById(id);
+function workersAt(sched, t) {
+  let c = sched[0][1];
+  for (const [ts, w] of sched) { if (ts <= t) c = w; else break; }
+  return c;
+}
+function laneTicker(prefix, run) {
+  const t = Math.min(Math.floor(playhead), SPAN() - 1);
+  const b = Math.min(Math.floor(playhead / BIN()), NB() - 1);
+  $(prefix + "W").textContent = workersAt(run.sched, t);
+  const ip = run.ip99run[b], qe = $(prefix + "Q");
+  qe.textContent = ip >= 1000 ? (ip / 1000).toFixed(2) + " s" : Math.round(ip) + " ms";
+  qe.style.color = ip > 100 ? css("--critical") : "#006300";
+  $(prefix + "Cost").textContent = (run.cost[b] / 3600).toFixed(1);
+  $(prefix + "CostWs").textContent = "TP2 · " + workersAt(run.sched, t) * 2 + " H100s now";
+  $(prefix + "Avg").textContent = fmtMs(run.avg[b]);
+  const p = run.p99run[b];
+  const pe = $(prefix + "P99run");
+  pe.textContent = fmtMs(p);
+  pe.style.color = p > SLA ? css("--critical") : "#006300";
+  const done = playhead >= SPAN() - 1;
+  const v = $(prefix + "Verdict");
+  v.classList.toggle("show", done);
+  if (done) {
+    const pass = run.stats.ttft_p99 < SLA && run.stats.itl_p99 < 100;
+    v.classList.toggle("vd-pass", pass); v.classList.toggle("vd-fail", !pass);
+    $(prefix + "VerdictBig").textContent = (pass ? "PASS · " : "FAIL · ") + fmtMs(run.stats.ttft_p99) + " p99";
+    $(prefix + "VerdictBig").style.color = pass ? "#006300" : css("--critical");
+    $(prefix + "Note").textContent = noteFor(prefix, run, pass);
+  }
+}
+function noteFor(prefix, run, pass) {
+  const p = run.stats.ttft_p99;
+  if (prefix === "fc")
+    return pass ? "tail-aware conversion (belief-to-knee, SCALE=8) sizes to the tail knee"
+      : `${(p/SLA).toFixed(1)}× the SLA`;
+  if (pass) return "reactive suffices here";
+  return `${(p/SLA).toFixed(1)}× the SLA — meets its own window-mean law (ITL p99 ${run.stats.itl_p99} ms also ${run.stats.itl_p99 > 100 ? "FAILS" : "passes"}); mean-based conversion`;
+}
+function updateReadouts() {
+  const { fc, re } = runs();
+  const t = Math.min(Math.floor(playhead), SPAN() - 1);
+  $("clock").textContent = fmtClock(t);
+  $("scrub").value = t;
+  laneTicker("fc", fc); laneTicker("re", re);
+  const reFail = re.stats.ttft_p99 >= SLA || re.stats.itl_p99 >= 100;
+  $("spendNote").textContent =
+    `run totals: forecast ${fc.stats.gpu_h.toFixed(1)} GPU-h · reactive ${re.stats.gpu_h.toFixed(1)} GPU-h — `
+    + (reFail ? "reactive satisfies its own window-mean control law while violating the tail SLA"
+              : "both pass here");
+}
+
+/* ---------- main loop ---------- */
+function drawAll() {
+  const { fc, re } = runs();
+  drawOffered();
+  drawLane("fcChart", fc, css("--fc"), `FORECAST (${model === "toto" ? "Toto-2" : "Chronos-2"} p90 + tail-aware conversion)`);
+  drawLane("reChart", re, css("--re"), "REACTIVE (SLA planner, ARIMA, 200/20 ms window-mean targets)");
+  updateReadouts();
+}
+function frame(ts) {
+  if (playing) {
+    if (lastTs !== null) {
+      playhead += (ts - lastTs) / 1000 * (+$("speedSel").value);
+      if (playhead >= SPAN() - 1) { playhead = SPAN() - 1; setPlaying(false); }
+    }
+  }
+  lastTs = ts;
+  drawAll();
+  requestAnimationFrame(frame);
+}
+function setPlaying(p) { playing = p; $("playBtn").textContent = p ? "❚❚ Pause" : "▶ Play"; }
+
+/* ---------- controls ---------- */
+$("playBtn").onclick = () => { if (playhead >= SPAN() - 1) playhead = 0; setPlaying(!playing); };
+$("resetBtn").onclick = () => { playhead = 0; setPlaying(false); };
+$("scrub").oninput = e => { playhead = +e.target.value; };
+$("infoBtn").onclick = () => $("infoBox").classList.toggle("show");
+document.querySelectorAll("#modelSeg button").forEach(b => b.onclick = () => {
+  model = b.dataset.m;
+  document.querySelectorAll("#modelSeg button").forEach(x => x.classList.toggle("on", x === b));
+});
+document.querySelectorAll("#leadSeg button").forEach(b => b.onclick = () => {
+  lead = +b.dataset.l;
+  document.querySelectorAll("#leadSeg button").forEach(x => x.classList.toggle("on", x === b));
+});
+addEventListener("keydown", e => {
+  if (e.code === "Space") { e.preventDefault(); $("playBtn").onclick(); }
+  else if (e.key === "ArrowRight") playhead = Math.min(SPAN() - 1, playhead + SPAN()/54);
+  else if (e.key === "ArrowLeft") playhead = Math.max(0, playhead - SPAN()/54);
+  else if (e.key.toLowerCase() === "r") $("resetBtn").onclick();
+  else if ("1234".includes(e.key)) document.querySelectorAll("#leadSeg button")[+e.key - 1].click();
+});
+
+/* ---------- hover tooltip ---------- */
+const tt = $("tooltip");
+for (const id of ["offeredStrip", "fcChart", "reChart"]) {
+  const el = document.getElementById(id);
+  el.addEventListener("mousemove", e => {
+    const r = el.getBoundingClientRect();
+    const t = Math.round((e.clientX - r.left - PADL) / (r.width - PADL - PADR) * SPAN());
+    if (t < 0 || t > Math.min(playhead, SPAN() - 1)) { hoverT = null; tt.style.display = "none"; return; }
+    hoverT = t;
+    const { fc, re } = runs();
+    const b = Math.min(Math.floor(t / BIN()), NB() - 1);
+    tt.innerHTML = `<div style="font-weight:700">${fmtClock(t)} UTC</div>`
+      + `<div>offered ${W().offered[b]} req/s</div>`
+      + `<div><span style="color:#86b6ef">●</span> forecast: ${workersAt(fc.sched, t)} replicas · TTFT p99→ ${fmtMs(fc.p99run[b])}</div>`
+      + `<div><span style="color:#f0a284">●</span> reactive: ${workersAt(re.sched, t)} replicas · TTFT p99→ ${fmtMs(re.p99run[b])}</div>`;
+    tt.style.display = "block";
+    tt.style.left = Math.min(e.clientX + 14, innerWidth - 290) + "px";
+    tt.style.top = (e.clientY + 14) + "px";
+  });
+  el.addEventListener("mouseleave", () => { hoverT = null; tt.style.display = "none"; });
+}
+
+/* ---------- boot ---------- */
+addEventListener("resize", drawAll);
+{
+  const mW = location.hash.match(/w=([a-z0-9]+)/);
+  selectWindow(mW && DATA.windows[mW[1]] ? mW[1] : "burst3");
+  const mM = location.hash.match(/m=(chronos|toto)/);
+  if (mM) {
+    model = mM[1];
+    document.querySelectorAll("#modelSeg button").forEach(x => x.classList.toggle("on", x.dataset.m === model));
+  }
+  const mL = location.hash.match(/L=(\d+)/);
+  if (mL && DATA.meta.leads.includes(+mL[1])) {
+    lead = +mL[1];
+    document.querySelectorAll("#leadSeg button").forEach(x => x.classList.toggle("on", +x.dataset.l === lead));
+  }
+  const mT = location.hash.match(/t=(\d+)/);
+  if (mT) playhead = Math.min(SPAN() - 1, +mT[1]);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

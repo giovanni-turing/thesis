@@ -1,0 +1,107 @@
+{
+ "burst3_fc_toto": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.1,
+  "gpu_h": 6.31,
+  "requests": 3093,
+  "composed_trace": "defense/anim/data/a2t_runs/burst3_forecast_toto_L30.jsonl"
+ },
+ "burst3_fc_chronos": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.1,
+  "gpu_h": 6.34,
+  "requests": 3093,
+  "composed_trace": "defense/anim/data/a2_runs/burst3_forecast_L30.jsonl"
+ },
+ "burst3_reactive": {
+  "ttft_p99": 10573.7,
+  "itl_p99": 160.8,
+  "gpu_h": 1.04,
+  "requests": 3093,
+  "composed_trace": "defense/anim/data/a2_runs/burst3_reactive_L30.jsonl"
+ },
+ "burst5_fc_toto": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.1,
+  "gpu_h": 20.93,
+  "requests": 8983,
+  "composed_trace": "defense/anim/data/a2t_runs/burst5_forecast_toto_L30.jsonl"
+ },
+ "burst5_fc_chronos": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.1,
+  "gpu_h": 20.98,
+  "requests": 8983,
+  "composed_trace": "defense/anim/data/a2_runs/burst5_forecast_L30.jsonl"
+ },
+ "burst5_reactive": {
+  "ttft_p99": 2181.6,
+  "itl_p99": 145.9,
+  "gpu_h": 3.39,
+  "requests": 8983,
+  "composed_trace": "defense/anim/data/a2_runs/burst5_reactive_L30.jsonl"
+ },
+ "burst4_fc_toto": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.1,
+  "gpu_h": 48.87,
+  "requests": 25639,
+  "composed_trace": "defense/anim/data/a2t_runs/burst4_forecast_toto_L30.jsonl"
+ },
+ "burst4_fc_chronos": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.1,
+  "gpu_h": 49.44,
+  "requests": 25639,
+  "composed_trace": "defense/anim/data/a2_runs/burst4_forecast_L30.jsonl"
+ },
+ "burst4_reactive": {
+  "ttft_p99": 2807.0,
+  "itl_p99": 151.1,
+  "gpu_h": 8.13,
+  "requests": 25639,
+  "composed_trace": "defense/anim/data/a2_runs/burst4_reactive_L30.jsonl"
+ },
+ "burst1_fc_toto": {
+  "ttft_p99": 671.6,
+  "itl_p99": 5.5,
+  "gpu_h": 72.54,
+  "requests": 64804,
+  "composed_trace": "defense/anim/data/a2t_runs/burst1_forecast_toto_L30.jsonl"
+ },
+ "burst1_fc_chronos": {
+  "ttft_p99": 651.1,
+  "itl_p99": 5.2,
+  "gpu_h": 114.32,
+  "requests": 64804,
+  "composed_trace": "defense/anim/data/a2_runs/burst1_forecast_L30.jsonl"
+ },
+ "burst1_reactive": {
+  "ttft_p99": 1664.7,
+  "itl_p99": 124.1,
+  "gpu_h": 20.51,
+  "requests": 64804,
+  "composed_trace": "defense/anim/data/a2_runs/burst1_reactive_L30.jsonl"
+ },
+ "week_fc_toto": {
+  "ttft_p99": 651.1,
+  "itl_p99": 6.3,
+  "gpu_h": 609.18,
+  "requests": 749601,
+  "composed_trace": "defense/anim/data/a6_runs/toto_p90_L30.jsonl"
+ },
+ "week_fc_chronos": {
+  "ttft_p99": 651.1,
+  "itl_p99": 6.3,
+  "gpu_h": 550.21,
+  "requests": 749601,
+  "composed_trace": "simulation/results/aggregate44/fc_p90_L30_issuetime.jsonl"
+ },
+ "week_reactive": {
+  "ttft_p99": 1191.6,
+  "itl_p99": 21.1,
+  "gpu_h": 281.46,
+  "requests": 749601,
+  "composed_trace": "defense/anim/data/a6_runs/react_L30.jsonl"
+ }
+}
