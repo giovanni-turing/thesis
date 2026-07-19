@@ -1,0 +1,58 @@
+[
+ {
+  "model": "chronos",
+  "window": "aggregate",
+  "lead": 30,
+  "rho": 15,
+  "q": "p90",
+  "readiness": "warm",
+  "p99_ms": 589.301,
+  "max_ms": 35902.512,
+  "divergent": false,
+  "ws": 2410754.7,
+  "ratio_vs_static": 0.6231,
+  "feasible": true
+ },
+ {
+  "model": "ewma-add",
+  "window": "aggregate",
+  "lead": 30,
+  "rho": 15,
+  "q": "p90",
+  "readiness": "warm",
+  "p99_ms": 589.301,
+  "max_ms": 11621.039,
+  "divergent": false,
+  "ws": 2696099.3,
+  "ratio_vs_static": 0.6968,
+  "feasible": true
+ },
+ {
+  "model": "ewma-mult",
+  "window": "aggregate",
+  "lead": 30,
+  "rho": 15,
+  "q": "p90",
+  "readiness": "warm",
+  "p99_ms": 589.301,
+  "max_ms": 19720.246,
+  "divergent": false,
+  "ws": 4217578.8,
+  "ratio_vs_static": 1.09,
+  "feasible": true
+ },
+ {
+  "model": "ewma-wsc",
+  "window": "aggregate",
+  "lead": 30,
+  "rho": 15,
+  "q": "p90",
+  "readiness": "warm",
+  "p99_ms": 589.301,
+  "max_ms": 19720.246,
+  "divergent": false,
+  "ws": 2163749.5,
+  "ratio_vs_static": 0.5592,
+  "feasible": true
+ }
+]

@@ -157,13 +157,15 @@ threshold only --- on burst5 (by \SI{105}{\second}; under the tighter
 (burst3, issued at $h{=}1$, no usable lead) and on burst1's first
 in-episode crossing. The
 closed-loop pass on burst3 therefore does not rest on clean pre-signal
-detection: it rests on the p90 band's \emph{graduated headroom}, which
-lifts provisioned capacity to ${\approx}21$ workers several minutes ahead
-of the peak --- from near-term nowcasts that mature within the cold-start
-lead --- so capacity is standing when the spike lands. This is the same
+detection --- the forecast lags the onset (issued at $h{=}1$). It rests on
+the p90 band's \emph{graduated headroom}: the calibrated band already sits
+elevated during the ambient activity \emph{before} the spike (the
 permissive, over-provisioning behaviour the $\rho$-frontier already
-prices, here read as an anticipatory provisioning signal rather than a
-clean alarm. The point and p50 paths, sizing to the mean, detect the same
+prices), lifting provisioned capacity to ${\approx}21$ workers, so capacity
+is standing when the one-minute spike lands --- the near-term nowcast adding
+at most the cold-start lead of placement, not the several minutes an onset
+this fast would need to be caught by detection. This is standing headroom
+read as a provisioning signal, not onset anticipation. The point and p50 paths, sizing to the mean, detect the same
 onsets 55 minutes to 4 hours late, or never; and the p90 band shows zero
 false alarms across the calm day for every model.
 
@@ -199,9 +201,76 @@ against the forecast's \SI{588}{\milli\second}), even though the headroom
 cuts its p99 up to $8\times$ below the point reactive. Tail-aware headroom
 is therefore necessary but not sufficient on a fast onset: calibrated to
 past load, it cannot stand up the replicas a sub-minute spike demands,
-which only anticipation places ahead of the onset. The p90-forecast's
-fast-onset win is anticipation; the headroom is the shared dial that helps
-every policy but decides none.
+which only a forward forecast band places ahead of the onset. The
+p90-forecast's fast-onset win is thus the forward band's better-placed
+standing headroom, not onset foresight --- genuine anticipatory lead is
+measured only on the gradual onset (burst4, ${+}\SI{345}{\second}$); the
+trailing-window headroom, at equal $\rho$, cannot match that placement on a
+sub-minute onset.
+
+\paragraph{A cheap forward forecaster does not get the result for free.}
+The accuracy benchmark's near-parity (Chapter~\ref{cap:predictors}) raises the
+question of whether the foundation model is load-bearing at all, or whether a
+classical \emph{forward} forecaster at a calibrated quantile would reproduce
+the headline. It does not (Table~\ref{tab:cl-ewma}). Driving the identical
+encoder loop with a forward EWMA point path --- its p90 empirically calibrated
+on the 1.4-day forecast-context window to the same 0.88--0.90 coverage as the
+foundation-model band, by three standard schemes (additive and multiplicative
+split-conformal, and a width-scaled native band) --- exposes a
+coverage-versus-cost bind. The two cheap calibrations clear the
+\emph{burst-masked} week aggregate (0.70$\times$ and 0.56$\times$, both at
+aggregate p99 \SI{589}{\milli\second}) but \emph{fail} the fast onset (burst3
+p99 1{,}285 and 2{,}084\,\si{\milli\second}) and the high-volume onset
+(burst5, backlog-divergent) under per-episode grading --- the same
+dashboard-masking the reactive baseline shows (Section~\ref{sec:cl-aggregate}),
+now on a forward forecaster. The one calibration that clears every episode
+(multiplicative, burst3 \SI{747}{\milli\second}) over-provisions moderate
+activity and costs 1.09$\times$ static, with no rating below $\rho{=}25$
+bringing it under the static fleet ($\rho$-frontier 1.32/1.09/0.94/0.83$\times$
+at $\rho\in\{10,15,20,25\}$) --- and $\rho{=}25$ is where even the foundation
+policy loses burst5. Only the zero-shot foundation-model band clears every
+episode \emph{and} beats static (0.62$\times$). The refinement of ``model
+choice is second-order'' is thus precise: forecast \emph{accuracy} is
+second-order (ARIMA ties Chronos, Chapter~\ref{cap:predictors}), but the
+calibrated p90 band \emph{shape} is not --- a state-adaptive band that lifts
+at onsets without inflating in calm is what simultaneously holds the tail and
+stays cheap, and it is what the foundation models supply zero-shot while
+standard forward-EWMA calibrations do not. The Chronos control reproduces the
+committed figures to the digit throughout (burst3 \SI{589}{\milli\second};
+week 0.62$\times$; $\rho$-frontier 0.89/0.62/0.48/0.40$\times$; the p50 arm
+fails at \SI{2759}{\milli\second}/0.25$\times$; archive
+\texttt{verification/results/ewma\_sweep.json}).
+
+\begin{table}[htbp]
+\centering
+\caption{Forward-EWMA calibrated-p90 versus the foundation-model policy
+through the \emph{identical} encoder loop ($\rho{=}15$, issue-time actuation,
+warm-pool; each EWMA p90 calibrated on the 1.4-day context to 0.88--0.90
+coverage). Per-window encoder-delay p99 is lead-invariant over
+$L\in\{15,\ldots,165\}$\,s; ``agg'' is the week-scale cost versus the
+deployable static $C{=}8$ fleet. \emph{Every} policy clears the aggregate p99
+at the \SI{589}{\milli\second} service floor --- the burst-masking of
+Section~\ref{sec:cl-aggregate} --- so the operative verdict is per-episode.}
+\label{tab:cl-ewma}
+\small
+\begin{tabular}{@{}lrrrrrrl@{}}
+\toprule
+Forecaster (p90) & burst1 & burst3 & burst4 & burst5 & steady & agg &
+per-episode \\
+ & \multicolumn{5}{c}{encoder-delay p99 (\si{\milli\second})} &
+$\times$static & verdict \\
+\midrule
+Foundation (Chronos)  & 589 & 589             & 589 & 589            & 681 & 0.62 & \textbf{pass all} \\
+EWMA, add-conformal   & 658 & \textbf{1{,}285}& 589 & div$^\dagger$  & 418 & 0.70 & fail b3,\,b5 \\
+EWMA, mult-conformal  & 589 & 747             & 589 & 589            & 418 & 1.09 & pass all \\
+EWMA, width-scaled    & 611 & \textbf{2{,}084}& 589 & div$^\dagger$  & 736 & 0.56 & fail b3,\,b5 \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\footnotesize $^\dagger$ backlog-divergent (the queue never drains): a hard
+SLA failure, distinct from a finite tail over the bound.}
+\end{table}
 
 \section{Language pool: the conversion result}
 \label{sec:cl-llm}
@@ -529,7 +598,11 @@ Chapter~\ref{cap:baselines}, never by a \emph{forecast} policy --- the
 forecast is structurally absent there, a hole a deployed system
 entering the week with prior history would not have.
 Replay-level p99 noise is ${\approx}4\%$;
-no quoted contrast is within that band.
+no quoted \emph{policy} contrast (forecast vs.\ reactive, p50 vs.\ p90,
+static vs.\ forecast) is within that band --- the within-noise agreements
+quoted above (the vLLM reprice, 606 vs.\ \SI{589}{\milli\second}; the
+cross-model cost spread, ${\leq}4\%$) are robustness checks, where
+coincidence at replay noise is the intended result, not policy comparisons.
 
 Two further scopes bound the economic headline. First, the cost ratio is
 priced on the AIC encoder model, which Appendix~\ref{app:engine-sensitivity}
@@ -557,8 +630,10 @@ matches the composition to within 12.8\% across the whole $N\le64$ serving
 regime (the FIFO cap; canonical residuals $-2.2\%$, $+11.3\%$, $+5.5\%$ at
 $N\in\{8,32,64\}$), and the static $C{=}8$ \emph{denominator} itself stays
 feasible when repriced at the same vLLM cost (encoder-delay p99
-\SI{692}{\milli\second} versus \SI{647}{\milli\second} under AIC,
-non-divergent), so no separate silicon penalty enlarges either the schedule
+\SI{692}{\milli\second} versus \SI{647}{\milli\second} under AIC in that
+reprice harness, non-divergent; the Table~\ref{tab:cl-aggregate} aggregate
+reads \SI{644}{\milli\second} under AIC, a ${<}0.5\%$ harness difference
+within run noise), so no separate silicon penalty enlarges either the schedule
 or the denominator. A live-worker confirmation over
 the full serving path (the check reprices a standalone eager vision-tower
 forward on synthetic inputs) remains future work. Second,
