@@ -116,8 +116,13 @@ for tag in POLICIES:
     cnt_i = np.zeros(nb); np.add.at(cnt_i, arr_bin[is_img], 1)
     sum_i = np.zeros(nb); np.add.at(sum_i, arr_bin[is_img], delays[is_img])
     avgi = np.cumsum(sum_i) / np.maximum(np.cumsum(cnt_i), 1)
+    # running count of SLA-infracting requests (encoder delay > 1 s bound)
+    vcnt = np.zeros(nb); np.add.at(vcnt, arr_bin[delays > 1000.0], 1)
+    viol = np.cumsum(vcnt).astype(int)
     cnt = np.zeros(nb); np.add.at(cnt, arr_bin, 1)
     ccnt = np.cumsum(cnt).astype(int)
+    if "creq" not in payload:
+        payload["creq"] = ccnt.tolist()   # cumulative requests per bin (same for all runs)
     order = np.argsort(rel_ms, kind="stable")
     d_by = delays[order]
     p99run = np.zeros(nb)
@@ -139,12 +144,14 @@ for tag in POLICIES:
         "dmax": [round(float(v), 1) for v in dmax],
         "cost": cost.round(0).astype(int).tolist(),
         "cost2": (cost + warm).round(0).astype(int).tolist(),
+        "viol": viol.tolist(),
         "avgi": [round(float(v), 1) for v in avgi],
         "p99run": [round(float(v), 1) for v in p99run],
         "ep_p99": ep,
         "stats": verif[tag],
     }
-    print(f"{tag}: ok (p99 {p99_all:.1f} ~ {exp}); episodes " +
+    print(f"{tag}: ok (p99 {p99_all:.1f} ~ {exp}); infractions {viol[-1]:,} "
+          f"({viol[-1]/len(delays)*100:.2f}%); episodes " +
           " ".join(f"{k}:{v:.0f}" for k, v in ep.items()))
 
 OUT.write_text(json.dumps(payload, separators=(",", ":")))
