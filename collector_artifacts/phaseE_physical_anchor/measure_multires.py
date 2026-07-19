@@ -11,7 +11,7 @@ from transformers.models.qwen3_vl.modeling_qwen3_vl import Qwen3VLVisionModel
 
 HERE = Path(__file__).resolve().parent
 PATCH, IN_FEATURES = 16, 3 * 2 * 16 * 16
-RES = [224, 336, 448, 672]
+RES = [224, 448, 672]  # G=px//16 must be even (2x2 spatial merge): 336(G=21) invalid; AIC has these
 GRID_N = [1, 2, 4, 8, 12, 16, 24, 32, 48, 64]
 
 
@@ -53,7 +53,10 @@ for mode in ("eager", "compiled"):
     for px in RES:
         res[mode][str(px)] = {}
         for n in GRID_N:
-            res[mode][str(px)][str(n)] = measure(model, px, n)
+            try:
+                res[mode][str(px)][str(n)] = measure(model, px, n)
+            except Exception as e:
+                print(f"  SKIP px={px} N={n}: {type(e).__name__} {str(e)[:60]}", flush=True)
         print(f"  px={px}: f(64)={res[mode][str(px)]['64']} ms", flush=True)
         json.dump(res, open(HERE / "fn_multires.json", "w"), indent=1)
     del base, model; torch.cuda.empty_cache()

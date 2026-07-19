@@ -82,8 +82,18 @@ boost clock (2887 MHz) and reported 1.37×/5.1× — **superseded** by this clea
   vs banked compile 371 ms differ ~9% — different compile mode; irrelevant, since
   the serving path is vLLM 333.6 ms, not torch.compile — this just confirms
   torch.compile overstates the serving cost and must not be used as the proxy.)
-- **Multi-resolution generality** (`measure_multires.py` → `fn_multires.json`):
-  live ViT at 224/336/448/672px vs AIC(image_px). [RUNNING — see fn_multires.json]
+- **Multi-resolution generality** (`measure_multires.py` → `fn_multires.json`,
+  `anchor_multires.pdf`): live ViT at **224 / 448 / 672px** vs AIC(image_px)
+  (336px is invalid for Qwen3-VL — grid G=21 is odd, incompatible with the 2×2
+  spatial merge). **CONFIRMED: the AIC-vs-silicon relationship is resolution-
+  stable** — the ratio stays in a bounded band across the 3× range with no
+  resolution-specific breakdown, and actually *tightens* at higher resolution
+  (torch.compile÷AIC: 224px ~1.3–1.55, 448px ~1.2–1.3, 672px ~1.1–1.26; HF-eager
+  1.2–1.8). The gap is largest at small resolution because AIC's unmodeled fixed
+  ops (patch-embed + deepstack merger) are a bigger fraction there — consistent
+  with the known composition gap. CAVEAT: this uses the torch.compile proxy +
+  eager across resolutions; the definitive **vLLM serving-path** validation
+  (1.05×) is at the trace's own 448px (banked). So AIC is not 448-specific.
 
 ## What this means for the thesis
 
