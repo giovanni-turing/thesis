@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Defense animations — launcher</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb;
+    --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --border: rgba(11,11,11,0.10);
+    --blue: #2a78d6; --green: #008300; --orange: #eb6834;
+    --violet: #4a3aa7; --good: #0ca30c; --critical: #d03b3b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--page); color: var(--ink); min-height: 100vh;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; padding: 28px 40px 18px; }
+  h1 { font-size: 26px; font-weight: 650; letter-spacing: -0.01em; }
+  .sub { font-size: 14px; color: var(--ink-2); margin: 4px 0 22px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: start; }
+  .card { cursor: pointer; display: flex; flex-direction: column; color: inherit;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 20px 22px 16px; transition: box-shadow .12s, transform .12s; }
+  .card:hover { box-shadow: 0 10px 32px rgba(11,11,11,0.12); transform: translateY(-2px); }
+  .kbd-chip { align-self: flex-start; font-size: 11px; font-weight: 700; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 6px; padding: 1px 7px; margin-bottom: 10px; }
+  .card h2 { font-size: 18.5px; font-weight: 700; line-height: 1.25; }
+  .card h2 span { display: block; font-size: 12px; font-weight: 600; color: var(--muted);
+    letter-spacing: 0.08em; margin-bottom: 3px; }
+  .card p { font-size: 13px; color: var(--ink-2); line-height: 1.5; margin-top: 8px; }
+  .nums { margin-top: 6px; padding-top: 14px; display: flex; flex-direction: column; gap: 5px; }
+  .num { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; color: var(--ink-2); }
+  .num b { font-size: 16px; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+  .num .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; align-self: center; }
+  .slide { margin-top: 12px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--grid);
+    padding-top: 8px; }
+  .links { margin-top: 6px; font-size: 11.5px; }
+  .links a { color: var(--blue); text-decoration: none; margin-right: 12px; }
+  .links a:hover { text-decoration: underline; }
+  footer { margin-top: 20px; font-size: 11.5px; color: var(--muted); display: flex; gap: 18px;
+    flex-wrap: wrap; align-items: baseline; }
+  footer .spacer { flex: 1; }
+  kbd { background: var(--grid); border-radius: 4px; padding: 0 5px; font-size: 11px; }
+  .warn { color: var(--critical); font-weight: 650; }
+</style>
+</head>
+<body>
+<h1>Defense animations</h1>
+<div class="sub">Master's defense · <i>Predictive Per-Pool Provisioning for Modality-Disaggregated Multimodal Model Serving</i>
+ — every pixel is ledger-verified simulator output · fully offline · press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> to open</div>
+
+<div class="cards">
+  <div class="card" data-href="a1_invisible_failure.html" id="k1">
+    <span class="kbd-chip">1</span>
+    <h2><span>A1 · SLIDE “THE MECHANICS OF DECOUPLING”</span>The invisible failure</h2>
+    <p>The operator's dashboard vs. reality, replayed second-by-second through the
+    largest burst window (8.3 h at the trace's own rate, 2 encoder workers).
+    Request rate flat, utilization 29%, everything green — while the encoder FIFO
+    floods past 1,000 queued images 805 seconds' worth and the tail SLA burns.</p>
+    <div class="nums">
+      <div class="num"><span class="dot" style="background:var(--good)"></span>dashboard verdict <b>HEALTHY all day</b></div>
+      <div class="num"><span class="dot" style="background:var(--critical)"></span>encoder-delay p99 <b>5,013 ms</b> (5× SLA)</div>
+      <div class="num"><span class="dot" style="background:var(--blue)"></span>peak backlog <b>4,701 images</b> · worst second <b>2,726</b></div>
+    </div>
+    <div class="links" onclick="event.stopPropagation()">
+      <a href="a1_invisible_failure.html#t=0">start</a>
+      <a href="a1_invisible_failure.html#t=25000">near peak</a>
+      <a href="a1_invisible_failure.html#t=29939">verdict</a>
+    </div>
+    <div class="slide">Data: archived burst-window series (sweeps/); cross-checks asserted at build.</div>
+  </div>
+
+  <div class="card" data-href="a2_the_race.html" id="k2">
+    <span class="kbd-chip">2</span>
+    <h2><span>A2 · SLIDE “FORECAST HOLDS WHERE REACTIVE BREAKS”</span>The race</h2>
+    <p>Forecast (Chronos-2 p90, issue-time) vs. reactive under the identical law —
+    <b>9 episodes</b> across the onset gradient × <b>lead slider</b> 15/30/45/165 s
+    (keys 1–4). Live tickers: cost (both accountings), mean delay, running p99,
+    queue. 128 converter runs; every ledgered endpoint reproduced exactly.</p>
+    <div class="nums">
+      <div class="num"><span class="dot" style="background:var(--orange)"></span>burst3 reactive <b>9.5 → 54 s</b> by lead</div>
+      <div class="num"><span class="dot" style="background:var(--blue)"></span>forecast pinned at <b>588 ms</b>, queue <b>0</b></div>
+      <div class="num"><span class="dot" style="background:var(--critical)"></span>e13: the honest boundary — <b>both fail</b> (forecast miss)</div>
+    </div>
+    <div class="links" onclick="event.stopPropagation()">
+      <a href="a2_the_race.html#w=burst3&L=30">burst3</a>
+      <a href="a2_the_race.html#w=e11&L=15">e11 (2-min, new)</a>
+      <a href="a2_the_race.html#w=e13&L=30&t=1798">e13 verdict</a>
+      <a href="a2_the_race.html#w=steady24h&L=45">calm day</a>
+    </div>
+    <div class="slide">35/40 core cells match the ledger to the 3rd decimal; e-cells are new runs, same law.</div>
+  </div>
+
+  <div class="card" data-href="a6_the_week.html" id="k3">
+    <span class="kbd-chip">3</span>
+    <h2><span>A6 · SLIDE “HEADLINE ECONOMICS”</span>The week</h2>
+    <p>Five policies racing over the full 5.60-day evaluation span (749,601
+    requests) with <b>Toto-2</b> as the forecaster: worker ribbons, cost odometers
+    with live ×-vs-static, mean + running p99, SLA-infraction counters, and
+    per-episode verdict chips lighting as the week unfolds.</p>
+    <div class="nums">
+      <div class="num"><span class="dot" style="background:var(--blue)"></span>Toto p90 <b>0.62× static · 588 ms</b> · every episode ✓</div>
+      <div class="num"><span class="dot" style="background:var(--orange)"></span>reactive aggregate green, <b>burst3 ✗ 16.1 s</b> — masked</div>
+      <div class="num"><span class="dot" style="background:var(--violet)"></span>p50 <b>0.26×</b> but fails · C2 <b>59× the infractions</b></div>
+    </div>
+    <div class="links" onclick="event.stopPropagation()">
+      <a href="a6_the_week.html#t=0">start</a>
+      <a href="a6_the_week.html#t=200000">mid-week</a>
+      <a href="a6_the_week.html#t=483658">final table</a>
+    </div>
+    <div class="slide">All 5 endpoints reproduce the ledgered week numbers (week-surface Toto cells, aggregate44).</div>
+  </div>
+</div>
+
+<footer>
+  <span><b>Shared controls:</b> <kbd>space</kbd> play/pause · <kbd>←</kbd><kbd>→</kbd> step · <kbd>R</kbd> reset · scrub · speed · hover for synced crosshair · <kbd>ⓘ</kbd> methodology</span>
+  <span class="warn">Q&A watchpoint: e13 = p90 forecast-miss boundary case (also fails inside the ledgered aggregates; only static C8 passes it). Own it before they find it.</span>
+  <span class="spacer"></span>
+  <span>defense/anim/ · builds in build/ · provenance in progress/results-ledger.md</span>
+</footer>
+
+<script>
+for (const c of document.querySelectorAll(".card"))
+  c.addEventListener("click", e => { if (e.target.tagName !== "A") location.href = c.dataset.href; });
+addEventListener("keydown", e => {
+  const m = { "1": "k1", "2": "k2", "3": "k3" }[e.key];
+  if (m) location.href = document.getElementById(m).dataset.href;
+});
+</script>
+</body>
+</html>
