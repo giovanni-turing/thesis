@@ -49,7 +49,7 @@
 <body>
 <h1>Defense animations</h1>
 <div class="sub">Master's defense · <i>Predictive Per-Pool Provisioning for Modality-Disaggregated Multimodal Model Serving</i>
- — every pixel is ledger-verified simulator output · fully offline · press <kbd>1</kbd>–<kbd>5</kbd> to open</div>
+ — every pixel is ledger-verified simulator output · fully offline · press <kbd>1</kbd>–<kbd>7</kbd> to open</div>
 
 <div class="cards">
   <div class="card" data-href="a1_invisible_failure.html" id="k1">
@@ -155,6 +155,48 @@
 
   </div>
 
+  <div class="card" data-href="a11_llm_race.html" id="k6">
+    <span class="kbd-chip">6</span>
+    <h2><span>A11 · SLIDE “PER-POOL MECHANISM” (LANGUAGE)</span>The race: language pool</h2>
+    <p>The A2 race, now for the <b>language pool</b> through Dynamo's real planner:
+    forecast + tail-aware conversion vs. the reactive SLA planner, <b>5 windows</b>
+    (incl. the full week) × <b>Chronos↔Toto</b> × replica lead 60/120/300 s.
+    Live: TP2-replica staircase, running TTFT/ITL p99, GPU-h. 39 planner replays,
+    every L60 anchor reproducing the ledgered twin.</p>
+    <div class="nums">
+      <div class="num"><span class="dot" style="background:var(--blue)"></span>forecast <b>651 ms · PASS</b> at every lead</div>
+      <div class="num"><span class="dot" style="background:var(--orange)"></span>reactive <b>3.49 s · FAIL</b> — own window-mean law met, tail violated</div>
+      <div class="num"><span class="dot" style="background:var(--violet)"></span>week: forecast 651 ms vs reactive 1.19 s at ½ the cost</div>
+    </div>
+    <div class="links" onclick="event.stopPropagation()">
+      <a href="a11_llm_race.html#w=burst3&m=toto&L=60">burst3</a>
+      <a href="a11_llm_race.html#w=week&m=toto">week</a>
+      <a href="a11_llm_race.html#w=burst5&m=chronos&L=300">burst5·L300</a>
+    </div>
+    <div class="slide">defense/anim/data/a11_runs/ · per-request records via the source-build PlannerReplayBridge patch.</div>
+
+  </div>
+
+  <div class="card" data-href="a12_composed_e2e.html" id="k7">
+    <span class="kbd-chip">7</span>
+    <h2><span>A12 · THE COMPOSED SYSTEM (BOTH POOLS, E2E)</span>Composed two-pool system</h2>
+    <p>True end-to-end: each policy's <b>encoder</b> schedule → seam → <b>language</b>
+    planner, with a <b>request-linked</b> ingress→first-token measurement (each
+    request's own encoder delay + its own replayed TTFT). Upgrades the thesis Ch. 6
+    <i>modelled</i> reconstruction to <i>measured</i>.</p>
+    <div class="nums">
+      <div class="num"><span class="dot" style="background:var(--blue)"></span>forecast E2E p99 <b>1.24 s</b> = enc 588 + TTFT 651 — matches thesis ≈1.30 s</div>
+      <div class="num"><span class="dot" style="background:var(--critical)"></span>reactive E2E p99 <b>21.9 s</b> — encoder 16 s compounds into language 10.5 s</div>
+      <div class="num"><span class="dot" style="background:var(--green)"></span>per-pool grading understates the composed failure</div>
+    </div>
+    <div class="links" onclick="event.stopPropagation()">
+      <a href="a12_composed_e2e.html#w=burst3&m=toto">burst3</a>
+      <a href="a12_composed_e2e.html#w=week&m=toto">week</a>
+    </div>
+    <div class="slide">defense/anim/data/a12_runs/ + ledger-verified composed traces · alignment asserted &lt; 1 ms.</div>
+
+  </div>
+
 </div>
 
 <footer>
@@ -168,7 +210,7 @@
 for (const c of document.querySelectorAll(".card"))
   c.addEventListener("click", e => { if (e.target.tagName !== "A") location.href = c.dataset.href; });
 addEventListener("keydown", e => {
-  const m = { "1": "k1", "2": "k2", "3": "k3", "4": "k4", "5": "k5" }[e.key];
+  const m = { "1": "k1", "2": "k2", "3": "k3", "4": "k4", "5": "k5", "6": "k6", "7": "k7" }[e.key];
   if (m) location.href = document.getElementById(m).dataset.href;
 });
 </script>

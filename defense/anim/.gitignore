@@ -10,3 +10,10 @@ data/a2x_runs/*.jsonl
 data/a2x_runs/*.series.json
 data/a2t_runs/*.jsonl
 data/a2t_runs/*.series.json
+data/a11_runs/*.requests.jsonl
+data/a11_runs/*.log
+data/a12_runs/*.requests.jsonl
+data/a12_runs/*.log
+data/a13_runs/*.jsonl
+data/a13_runs/*.series.json
+data/a13_runs/*.log
