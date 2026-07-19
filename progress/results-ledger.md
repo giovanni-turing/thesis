@@ -616,3 +616,7 @@ inputs:     riders44/fc_lead{60,90,120,300} (736.3/744.2/757.2/757.2), riders44/
 view:       (1) lead sweep - forecast lead-invariant vs reactive target-ladder band vs static lines; (2) conversion triad; (3) burst3 quantile split offline-vs-LIVE grouped bars; (4) week cost-vs-tail scatter with burst-static cost line (0.96x)
 feeds:      slides "Per-pool mechanism" + "What makes it work: the ablation ledger"; launcher card 6
 commit:     see next commit
+
+addendum (same date): A10 "language pool board" DROPPED at author's decision (page + builder removed,
+launcher back to 5 cards). Its underlying numbers remain ledgered in the original riders44/live51/llm_week
+entries; nothing else references it.
