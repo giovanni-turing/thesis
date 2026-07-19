@@ -4,3 +4,5 @@
 data/a2_runs/*.jsonl
 data/a2_runs/*.series.json
 build/shots/
+data/a6_runs/*.jsonl
+data/a6_runs/*.series.json

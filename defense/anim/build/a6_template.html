@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A6 — The week</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb;
+    --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+    --good: #0ca30c; --critical: #d03b3b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: var(--page); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; overflow: hidden; }
+  header { display: flex; align-items: center; gap: 16px; padding: 8px 20px 4px; }
+  header h1 { font-size: 20px; font-weight: 650; letter-spacing: -0.01em; }
+  header .sub { font-size: 12.5px; color: var(--ink-2); margin-top: 1px; }
+  .clock { font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 650;
+    padding: 3px 12px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); min-width: 205px; text-align: center; }
+  .clock small { display: block; font-size: 9.5px; font-weight: 500; color: var(--muted); letter-spacing: 0.08em; }
+  .transport { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .transport button, .transport select { font: inherit; font-size: 13.5px; padding: 6px 12px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; color: var(--ink); }
+  .transport button.primary { background: var(--ink); color: #fff; border-color: var(--ink); min-width: 88px; }
+  #scrubwrap { padding: 0 20px 2px; }
+  #scrub { width: 100%; accent-color: var(--ink); height: 18px; cursor: pointer; }
+  main { flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 0 20px 4px; min-height: 0; }
+  .strip { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    position: relative; height: 15%; min-height: 84px; }
+  .strip canvas, .rowchart canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .prow { flex: 1; display: flex; gap: 8px; min-height: 0; align-items: stretch; }
+  .plabel { width: 150px; display: flex; flex-direction: column; justify-content: center; }
+  .plabel .name { font-size: 12.5px; font-weight: 700; line-height: 1.25; }
+  .plabel .desc { font-size: 10px; color: var(--ink-2); margin-top: 2px; line-height: 1.3; }
+  .plabel .wnow { font-size: 11px; color: var(--ink-2); margin-top: 3px; }
+  .plabel .wnow b { font-size: 15px; font-variant-numeric: tabular-nums; }
+  .rowchart { flex: 1; position: relative; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px; }
+  .odo { width: 385px; display: flex; gap: 6px; align-items: center; }
+  .odo .cell { flex: 1; border: 1px solid var(--border); border-radius: 9px;
+    background: var(--surface); padding: 4px 8px; height: 100%;
+    display: flex; flex-direction: column; justify-content: center; }
+  .odo .k { font-size: 9.5px; color: var(--muted); white-space: nowrap; }
+  .odo .v { font-size: 16.5px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.15; }
+  .odo .u { font-size: 9.5px; color: var(--ink-2); white-space: nowrap; }
+  .chips { display: flex; flex-wrap: wrap; gap: 3px; align-content: center; width: 132px; }
+  .chip { font-size: 9px; font-weight: 700; font-variant-numeric: tabular-nums;
+    border: 1px solid var(--border); border-radius: 999px; padding: 2px 6px;
+    color: var(--muted); background: var(--surface); white-space: nowrap; }
+  .chip.pass { background: rgba(12,163,12,0.14); color: #006300; border-color: rgba(12,163,12,0.3); }
+  .chip.fail { background: rgba(208,59,59,0.15); color: var(--critical); border-color: rgba(208,59,59,0.35); }
+  .masknote { font-size: 9px; color: var(--critical); font-weight: 650; display: none; width: 132px; line-height: 1.25; }
+  .masknote.show { display: block; }
+  footer { display: flex; gap: 14px; align-items: center; padding: 3px 20px 6px;
+    font-size: 10.5px; color: var(--muted); }
+  footer .spacer { flex: 1; }
+  kbd { background: var(--grid); border-radius: 4px; padding: 0 4px; font-size: 10.5px; }
+  #infoBtn { cursor: pointer; border: 1px solid var(--border); background: var(--surface);
+    border-radius: 50%; width: 19px; height: 19px; font-size: 11px; color: var(--ink-2); }
+  #infoBox { display: none; position: absolute; right: 20px; bottom: 30px; z-index: 20;
+    max-width: 620px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; font-size: 12px; color: var(--ink-2);
+    box-shadow: 0 8px 30px rgba(11,11,11,0.15); line-height: 1.5; }
+  #infoBox.show { display: block; }
+  #tooltip { position: fixed; z-index: 30; pointer-events: none; display: none;
+    background: var(--ink); color: #fff; border-radius: 8px; padding: 7px 10px;
+    font-size: 11.5px; line-height: 1.5; font-variant-numeric: tabular-nums;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>The week: five policies over the 5.60-day evaluation span</h1>
+    <div class="sub">749,601 requests · 11.4M images · encoder pool, ρ=15, L=30 s · forecast = <b>Toto-2.0</b> p90/p50 (issue-time)</div>
+  </div>
+  <div class="clock"><small id="clockDate">UTC</small><span id="clock">–</span></div>
+  <div class="transport">
+    <button id="playBtn" class="primary">▶ Play</button>
+    <select id="speedSel" title="full-pass duration">
+      <option value="4030">pass in 2 min</option>
+      <option value="5374" selected>pass in 90 s</option>
+      <option value="8061">pass in 60 s</option>
+      <option value="16122">pass in 30 s</option>
+    </select>
+    <button id="resetBtn">↺ Reset</button>
+  </div>
+</header>
+<div id="scrubwrap"><input id="scrub" type="range" min="0" max="483659" step="60" value="0"></div>
+
+<main>
+  <div class="strip" id="offeredStrip"><canvas></canvas></div>
+  <!-- policy rows injected -->
+</main>
+
+<footer>
+  <span>Real simulator output · defense/anim/data/a6_runs/ · all 5 endpoints reproduce the ledgered week numbers (week-surface Toto cells, aggregate44, rerun_verify)</span>
+  <span><kbd>space</kbd> play · <kbd>←</kbd><kbd>→</kbd> ±2 h · <kbd>R</kbd> reset</span>
+  <span class="spacer"></span>
+  <button id="infoBtn">i</button>
+  <div id="infoBox">
+    <b>Scope.</b> Full 15-s-forecast-covered span (2024-10-16 21:39 UTC → trace end;
+    burst2/6 fall in the forecast-context days before it). All five policies replay the
+    identical open-loop trace through the AIC-costed encoder FIFO under the manuscript's
+    load-bearing snapshot graph. Forecast rows consume the archived <b>Toto-2.0</b>
+    (2.5 B-parameter TSFM) quantile paths actuated on forecast issue time at ρ=15,
+    L=30 s — the thesis headline (0.62×) uses Chronos-2; Toto's ledgered week cell is
+    0.6176× at the same 588 ms floor, the ≤4% cross-model spread. Cost odometers show
+    the ledgered readiness-billed convention; "incl. warm-up" bills each upward
+    worker-increment's 30-s warm-up from order (exact for reactive, upper bound for
+    forecast). Episode chips grade each in-span episode's own p99 (all requests inside
+    its window); the reactive row's aggregate p99 passes while its burst3 chip fails —
+    the dashboard-masking phenomenon the thesis grades jointly for.
+    Running p99 is recovered from per-request seam timestamps and converges to each
+    run's ledgered verdict.
+  </div>
+</footer>
+<div id="tooltip"></div>
+
+<script>
+const DATA = /*__DATA__*/;
+
+/* ---------- constants ---------- */
+const SLA = DATA.meta.sla_ms;
+const SPAN = DATA.meta.span_s;
+const B = DATA.meta.bin_s;
+const NB = DATA.offered.length;
+const EPS = DATA.meta.episodes;
+const T0 = new Date(DATA.meta.t0_iso.replace(" ", "T") + "Z");
+const ROWS = [
+  { tag: "static_C8",   hue: "#52514e", name: "STATIC C=8",       desc: "deployable static (burst-sized)" },
+  { tag: "toto_p90_L30", hue: "#2a78d6", name: "FORECAST p90",    desc: "Toto-2 p90 · issue-time · anticipatory" },
+  { tag: "react_L30",   hue: "#eb6834", name: "REACTIVE",         desc: "trailing observed rate" },
+  { tag: "toto_p50_L30", hue: "#4a3aa7", name: "FORECAST p50",    desc: "Toto-2 median · sizes to the mean" },
+  { tag: "static_C2",   hue: "#898781", name: "STATIC C=2",       desc: "calm-day optimum" },
+];
+let playhead = 0, playing = false, lastTs = null, hoverT = null;
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function clockAt(s) {
+  const d = new Date(T0.getTime() + s * 1000);
+  const hh = String(d.getUTCHours()).padStart(2,"0"), mm = String(d.getUTCMinutes()).padStart(2,"0"),
+        ss = String(d.getUTCSeconds()).padStart(2,"0");
+  return { date: `${MON[d.getUTCMonth()]} ${d.getUTCDate()}, 2024 · UTC`, time: `${hh}:${mm}:${ss}`,
+           short: `${MON[d.getUTCMonth()]} ${d.getUTCDate()}` };
+}
+const fmtMs = v => v >= 10000 ? (v/1000).toFixed(1).replace(/\.0$/,"") + " s"
+               : v >= 1000 ? (v/1000).toFixed(2) + " s" : Math.round(v) + " ms";
+
+/* ---------- build rows ---------- */
+const main = document.querySelector("main");
+for (const r of ROWS) {
+  const el = document.createElement("div");
+  el.className = "prow"; el.dataset.tag = r.tag;
+  el.innerHTML = `
+    <div class="plabel">
+      <div class="name" style="color:${r.hue}">${r.name}</div>
+      <div class="desc">${r.desc}</div>
+      <div class="wnow">workers <b id="${r.tag}_w">–</b> · queue <b id="${r.tag}_q">0</b></div>
+    </div>
+    <div class="rowchart" id="${r.tag}_chart"><canvas></canvas></div>
+    <div class="odo">
+      <div class="cell"><div class="k">cost so far</div>
+        <div class="v"><span id="${r.tag}_cost">0</span><span style="font-size:11px"> wh</span></div>
+        <div class="u"><span id="${r.tag}_ratio">–</span>× vs static C8</div>
+        <div class="u">incl. warm-up <b id="${r.tag}_cost2">0</b> wh</div></div>
+      <div class="cell"><div class="k">p99 so far (SLA &lt; 1 s)</div>
+        <div class="v" id="${r.tag}_p99">–</div>
+        <div class="u">all requests</div></div>
+      <div style="display:flex;flex-direction:column;gap:2px;justify-content:center">
+        <div class="chips" id="${r.tag}_chips"></div>
+        <div class="masknote" id="${r.tag}_mask">aggregate p99 stays green — burst3 (&lt;0.5% of requests) is masked</div>
+      </div>
+    </div>`;
+  main.appendChild(el);
+  const chips = el.querySelector(`#${r.tag}_chips`);
+  for (const e of EPS) {
+    const c = document.createElement("span");
+    c.className = "chip"; c.id = `${r.tag}_chip_${e.key}`; c.textContent = e.label.split(" ·")[0];
+    chips.appendChild(c);
+  }
+  const wk = document.createElement("span");
+  wk.className = "chip"; wk.id = `${r.tag}_chip_week`; wk.textContent = "week";
+  chips.appendChild(wk);
+}
+
+/* ---------- canvas helpers ---------- */
+const PADL = 46, PADR = 10;
+function setupCanvas(el) {
+  const c = el.querySelector("canvas"), ctx = c.getContext("2d");
+  const r = el.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+  c.width = r.width * dpr; c.height = r.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w: r.width, h: r.height };
+}
+function dayTicks(ctx, x, yText, w) {
+  ctx.font = "9.5px system-ui"; ctx.fillStyle = css("--muted");
+  ctx.textAlign = "left"; ctx.textBaseline = "top";
+  const startDay = new Date(Date.UTC(2024, 9, 17));
+  for (let d = 0; d < 6; d++) {
+    const t = (startDay.getTime() + d * 86400000 - T0.getTime()) / 1000;
+    if (t < 0 || t > SPAN) continue;
+    ctx.strokeStyle = css("--grid");
+    ctx.beginPath(); ctx.moveTo(x(t), 12); ctx.lineTo(x(t), yText - 1); ctx.stroke();
+    ctx.fillText(clockAt(t).short, x(t) + 3, yText);
+  }
+}
+function epBands(ctx, x, top, bot) {
+  for (const e of EPS) {
+    ctx.fillStyle = e.key === "steady24h" ? "rgba(12,163,12,0.05)" : "rgba(42,120,214,0.07)";
+    ctx.fillRect(x(e.start_s), top, x(e.end_s) - x(e.start_s), bot - top);
+  }
+}
+function drawCursor(ctx, x, top, bot) {
+  if (playhead > 0 && playhead < SPAN) {
+    ctx.strokeStyle = css("--ink"); ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x(playhead), top); ctx.lineTo(x(playhead), bot); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  if (hoverT !== null && hoverT <= playhead) {
+    ctx.strokeStyle = css("--muted"); ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(x(hoverT), top); ctx.lineTo(x(hoverT), bot); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+/* ---------- offered strip ---------- */
+function drawOffered() {
+  const el = document.getElementById("offeredStrip");
+  const { ctx, w, h } = setupCanvas(el);
+  const padT = 16, padB = 13;
+  const x = t => PADL + t / SPAN * (w - PADL - PADR);
+  const yMax = 500;
+  const y = v => h - padB - Math.min(v, yMax) / yMax * (h - padT - padB);
+  epBands(ctx, x, padT, h - padB);
+  ctx.font = "600 12px system-ui"; ctx.fillStyle = css("--ink-2");
+  ctx.textAlign = "left"; ctx.textBaseline = "top";
+  ctx.fillText("Offered image load (peak img/s per 5-min bin) — shaded: the graded episodes", PADL, 1);
+  ctx.strokeStyle = css("--axis");
+  ctx.beginPath(); ctx.moveTo(PADL, y(0)); ctx.lineTo(w - PADR, y(0)); ctx.stroke();
+  ctx.font = "10px system-ui"; ctx.fillStyle = css("--muted");
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  ctx.fillText("500", PADL - 5, y(500)); ctx.fillText("0", PADL - 5, y(0));
+  const uptoB = Math.min(Math.floor(playhead / B), NB - 1);
+  ctx.fillStyle = "rgba(42,120,214,0.6)";
+  ctx.beginPath(); ctx.moveTo(x(0), y(0));
+  for (let b = 0; b <= uptoB; b++) ctx.lineTo(x(b * B + B/2), y(DATA.offered[b]));
+  ctx.lineTo(x(Math.min(playhead, SPAN)), y(0)); ctx.closePath(); ctx.fill();
+  // episode labels
+  ctx.font = "600 9.5px system-ui"; ctx.textAlign = "center"; ctx.textBaseline = "top";
+  for (const e of EPS) {
+    ctx.fillStyle = css("--ink-2");
+    ctx.fillText(e.label.split(" ·")[0], x((e.start_s + e.end_s) / 2), padT - 2);
+  }
+  dayTicks(ctx, x, h - padB + 2, w);
+  drawCursor(ctx, x, padT, h - padB);
+}
+
+/* ---------- policy rows ---------- */
+function drawRow(r) {
+  const run = DATA.runs[r.tag];
+  const el = document.getElementById(r.tag + "_chart");
+  const { ctx, w, h } = setupCanvas(el);
+  const x = t => PADL + t / SPAN * (w - PADL - PADR);
+  const padT = 5, padB = 4;
+  const wMax = 33;
+  const wy = v => h - padB - Math.min(v, wMax) / wMax * (h - padT - padB);
+  epBands(ctx, x, padT, h - padB);
+  ctx.strokeStyle = css("--grid");
+  for (const gv of [16, 32]) {
+    ctx.beginPath(); ctx.moveTo(PADL, wy(gv)); ctx.lineTo(w - PADR, wy(gv)); ctx.stroke();
+    ctx.font = "9px system-ui"; ctx.fillStyle = css("--muted");
+    ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.fillText(gv, PADL - 4, wy(gv));
+  }
+  const upto = Math.floor(playhead);
+  const uptoB = Math.min(Math.floor(playhead / B), NB - 1);
+  // busy fill
+  ctx.fillStyle = r.hue + "2e";
+  ctx.beginPath(); ctx.moveTo(x(0), wy(0));
+  for (let b = 0; b <= uptoB; b++) ctx.lineTo(x(b * B + B/2), wy(run.busy[b]));
+  ctx.lineTo(x(Math.min(upto, SPAN)), wy(0)); ctx.closePath(); ctx.fill();
+  // provisioned staircase
+  ctx.strokeStyle = r.hue; ctx.lineWidth = 2;
+  ctx.beginPath();
+  let prev = run.sched[0][1]; ctx.moveTo(x(0), wy(prev));
+  for (const [ts, wk] of run.sched) {
+    if (ts > upto) break;
+    ctx.lineTo(x(ts), wy(prev)); ctx.lineTo(x(ts), wy(wk)); prev = wk;
+  }
+  ctx.lineTo(x(Math.min(upto, SPAN)), wy(prev)); ctx.stroke(); ctx.lineWidth = 1;
+  drawCursor(ctx, x, padT, h - padB);
+}
+
+/* ---------- readouts ---------- */
+const $ = id => document.getElementById(id);
+function workersAt(sched, t) {
+  let c = sched[0][1];
+  for (const [ts, w] of sched) { if (ts <= t) c = w; else break; }
+  return c;
+}
+function updateRow(r) {
+  const run = DATA.runs[r.tag];
+  const t = Math.min(Math.floor(playhead), SPAN - 1);
+  const b = Math.min(Math.floor(playhead / B), NB - 1);
+  $(r.tag + "_w").textContent = workersAt(run.sched, t);
+  $(r.tag + "_q").textContent = run.qmax[b].toLocaleString("en-US");
+  $(r.tag + "_cost").textContent = Math.round(run.cost[b] / 3600).toLocaleString("en-US");
+  $(r.tag + "_cost2").textContent = Math.round(run.cost2[b] / 3600).toLocaleString("en-US");
+  const c8 = DATA.runs.static_C8.cost[b] || 1;
+  $(r.tag + "_ratio").textContent = (run.cost[b] / c8).toFixed(2);
+  const p = run.p99run[b], pe = $(r.tag + "_p99");
+  pe.textContent = fmtMs(p);
+  pe.style.color = p > SLA ? css("--critical") : "#006300";
+  for (const e of EPS) {
+    const chip = $(r.tag + "_chip_" + e.key);
+    if (playhead >= e.end_s) {
+      const v = run.ep_p99[e.key], pass = v < SLA;
+      chip.className = "chip " + (pass ? "pass" : "fail");
+      chip.textContent = `${e.label.split(" ·")[0]} ${pass ? "✓" : "✗"} ${fmtMs(v)}`;
+      if (r.tag === "react_L30" && e.key === "burst3" && !pass)
+        $(r.tag + "_mask").classList.add("show");
+    } else {
+      chip.className = "chip";
+      chip.textContent = e.label.split(" ·")[0];
+    }
+  }
+  const wk = $(r.tag + "_chip_week");
+  if (playhead >= SPAN - 1) {
+    const pass = run.stats.p99_ms < SLA && !run.stats.queue_divergent;
+    wk.className = "chip " + (pass ? "pass" : "fail");
+    wk.textContent = `week ${pass ? "✓" : "✗"} ${fmtMs(run.stats.p99_ms)}`;
+  } else { wk.className = "chip"; wk.textContent = "week"; }
+}
+function updateReadouts() {
+  const t = Math.min(Math.floor(playhead), SPAN - 1);
+  const c = clockAt(t);
+  $("clock").textContent = c.time;
+  $("clockDate").textContent = c.date;
+  $("scrub").value = t;
+  for (const r of ROWS) updateRow(r);
+}
+
+/* ---------- main loop ---------- */
+function drawAll() {
+  drawOffered();
+  for (const r of ROWS) drawRow(r);
+  updateReadouts();
+}
+function frame(ts) {
+  if (playing) {
+    if (lastTs !== null) {
+      playhead += (ts - lastTs) / 1000 * (+$("speedSel").value);
+      if (playhead >= SPAN - 1) { playhead = SPAN - 1; setPlaying(false); }
+    }
+  }
+  lastTs = ts;
+  drawAll();
+  requestAnimationFrame(frame);
+}
+function setPlaying(p) { playing = p; $("playBtn").textContent = p ? "❚❚ Pause" : "▶ Play"; }
+
+/* ---------- controls ---------- */
+$("playBtn").onclick = () => { if (playhead >= SPAN - 1) playhead = 0; setPlaying(!playing); };
+$("resetBtn").onclick = () => { playhead = 0; setPlaying(false); };
+$("scrub").oninput = e => { playhead = +e.target.value; };
+$("infoBtn").onclick = () => $("infoBox").classList.toggle("show");
+addEventListener("keydown", e => {
+  if (e.code === "Space") { e.preventDefault(); $("playBtn").onclick(); }
+  else if (e.key === "ArrowRight") playhead = Math.min(SPAN - 1, playhead + 7200);
+  else if (e.key === "ArrowLeft") playhead = Math.max(0, playhead - 7200);
+  else if (e.key.toLowerCase() === "r") $("resetBtn").onclick();
+});
+
+/* ---------- hover tooltip ---------- */
+const tt = $("tooltip");
+const hoverEls = ["offeredStrip", ...ROWS.map(r => r.tag + "_chart")];
+for (const id of hoverEls) {
+  const el = document.getElementById(id);
+  el.addEventListener("mousemove", e => {
+    const rct = el.getBoundingClientRect();
+    const t = Math.round((e.clientX - rct.left - PADL) / (rct.width - PADL - PADR) * SPAN);
+    if (t < 0 || t > Math.min(playhead, SPAN - 1)) { hoverT = null; tt.style.display = "none"; return; }
+    hoverT = t;
+    const b = Math.min(Math.floor(t / B), NB - 1);
+    let html = `<div style="font-weight:700">${clockAt(t).short} ${clockAt(t).time} UTC</div>`
+      + `<div>offered (bin max) ${DATA.offered[b]} img/s</div>`;
+    for (const r of ROWS) {
+      const run = DATA.runs[r.tag];
+      html += `<div><span style="color:${r.hue}">●</span> ${r.name.toLowerCase()}: `
+        + `${workersAt(run.sched, t)} w · q ${run.qmax[b].toLocaleString("en-US")} · p99→ ${fmtMs(run.p99run[b])}</div>`;
+    }
+    tt.innerHTML = html;
+    tt.style.display = "block";
+    tt.style.left = Math.min(e.clientX + 14, innerWidth - 310) + "px";
+    tt.style.top = Math.min(e.clientY + 14, innerHeight - 150) + "px";
+  });
+  el.addEventListener("mouseleave", () => { hoverT = null; tt.style.display = "none"; });
+}
+
+/* ---------- boot ---------- */
+addEventListener("resize", drawAll);
+{
+  const mT = location.hash.match(/t=(\d+)/);
+  if (mT) playhead = Math.min(SPAN - 1, +mT[1]);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

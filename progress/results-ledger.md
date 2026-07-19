@@ -547,3 +547,13 @@ thesis accounting update). Key facts: order-billing FLIPS the burst5 L165 cost
 order (reactive 101.4k ws > forecast 93.6k, and reactive fails); reactive burst3
 order-billed total is lead-INVARIANT (30,875.8 ws at L15/30/45) while its p99
 degrades 9.5->28 s — same spend, worse tail with lead.
+
+## Defense animation A6 "the week" (Toto-2, 5.60-day aggregate; interactive, offline HTML)
+date:       2026-07-19
+artifact:   defense/anim/a6_the_week.html (0.37 MB); defense/anim/data/a6_runs/ (5 aggregate runs + verification.json)
+command:    python3 defense/anim/build/gen_a6_runs.py && eda/.venv/bin/python defense/anim/build/extract_a6.py && python3 defense/anim/build/build_a6.py
+inputs:     windows.json "aggregate" (offset 250399, 749,601 req, 5.60 d) x 5 policies: toto p90/p50 (issue-time gen, toto_images.parquet, rho15 L30), reactive (15s rho15 L30 hyst3), static C8/C2; converter + snapshot shim + --series-out
+verify:     all 5 endpoints reproduce ledgered cells exactly: toto p90 588.37 / 2,389,710 ws = 0.6176x (week_surface_issuetime toto rho15 L30); toto p50 1,937.67 / 1,012,440 ws FAIL; reactive 588.37 / 2,611,320 ws (aggregate44); static C8 644.44 / 3,869,279 ws (rerun_verify); static C2 2,952.78 / 967,320 ws (aggregate44). Per-episode p99 computed from recovered per-request delays: toto p90 = 588 on every episode (calm 548); reactive passes aggregate+4 episodes but burst3 = 16,079 (masking, annotated in UI); toto p50 fails burst3 (28,610) AND calm day (1,073); C2 fails all four bursts. Screenshots reviewed (mid + end, 1080p)
+feeds:      defense slide "Headline economics" (Table cl-aggregate animated, Toto variant; demonstrates model-independence of the 0.62x verdict)
+supersedes: nothing (presentation artifact)
+commit:     see next commit

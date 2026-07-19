@@ -10,6 +10,7 @@ network, no CDN) — open it in any browser, present alongside the Beamer PDF.
 | File | Animation | Slide it serves |
 |------|-----------|-----------------|
 | `a1_invisible_failure.html` | A1 "The invisible failure" — split-screen replay of the largest burst window: the operator's dashboard (request rate, utilization — green all day) vs reality (offered image load, encoder FIFO backlog, SLA-excess in red). Ends on the verdict pair: HEALTHY dashboard vs encoder-delay p99 = 5,013 ms (5× the SLA) at 28.9% mean utilization. | "The mechanics of decoupling" |
+| `a6_the_week.html` | A6 "The week" — five policies racing over the full 5.60-day evaluation span (749,601 requests): static C8, **Toto-2 p90** (issue-time, ρ=15, L=30 s), reactive, Toto p50, static C2. Per row: worker ribbon, cost odometer in both accountings with live ×-vs-static ratio, running p99, and per-episode verdict chips (b3/b5/b4/calm/b1 + week) that light as the playhead passes each episode. Reactive's aggregate p99 stays green while its burst3 chip goes red — the dashboard-masking phenomenon, annotated live. All 5 endpoints reproduce the ledgered week numbers (Toto p90: 588 ms at 0.6176× static). | "Headline economics" |
 | `a2_the_race.html` | A2 "The race" — forecast (Chronos p90, issue-time) vs reactive (trailing observed rate), identical law/ρ/hysteresis. **Episode selector** across the onset gradient (burst3 1-min · burst5 35-min · burst4 60-min · burst1 220-min · calm day) × **cold-start-lead slider** (15/30/45/165 s; keys 1–4) = 40 ledger-verified converter runs. Per lane: worker staircase + busy, per-bin worst-delay dots (log, SLA line), and **live tickers**: cost so far (worker-h), mean delay (image-bearing), running p99 (all requests — converges to the ledgered verdict), queue now/peak. On burst3 reactive climbs 9.5→54 s while forecast pins at 588 ms with peak queue 0; on slower onsets both pass (reactive even costs more on the calm day); at L165 reactive newly fails burst4/5. | "Forecast holds the SLA where reactive breaks" |
 
 ## Controls (all pages)
@@ -32,6 +33,10 @@ python3 build/gen_a2_fleet.py                   # 5 windows x {forecast,reactive
 eda/.venv/bin/python build/extract_a2_fleet.py  # per-request delays + running cost/mean/p99 tickers -> data/a2_data.json
 python3 build/build_a2.py                       # -> a2_the_race.html
 # (build/gen_a2_runs.py + build/extract_a2.py are the superseded burst3-only v1)
+# A6 (5 aggregate-week runs; ~10 min)
+python3 build/gen_a6_runs.py            # toto p90/p50, reactive, static C8/C2 over the 5.60-day span, ledger-asserted
+eda/.venv/bin/python build/extract_a6.py  # 300-s bins + running tickers + per-episode p99 -> data/a6_data.json
+python3 build/build_a6.py               # -> a6_the_week.html
 ```
 
 A2 provenance notes: `gen_a2_runs.py` refuses to proceed unless each run's p99

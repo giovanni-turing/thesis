@@ -1,0 +1,52 @@
+{
+ "toto_p90_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 35807.108,
+  "provisioned_ws": 2389709.5,
+  "queue_divergent": false,
+  "ledger_expected": {
+   "p99_ms": 588.37,
+   "provisioned_ws": 2389710
+  }
+ },
+ "toto_p50_L30": {
+  "p99_ms": 1937.674,
+  "max_ms": 43094.884,
+  "provisioned_ws": 1012439.8,
+  "queue_divergent": false,
+  "ledger_expected": {
+   "p99_ms": 1937.67,
+   "provisioned_ws": 1012440
+  }
+ },
+ "react_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 35807.108,
+  "provisioned_ws": 2611319.7,
+  "queue_divergent": false,
+  "ledger_expected": {
+   "p99_ms": 588.37,
+   "provisioned_ws": 2611319.7
+  }
+ },
+ "static_C8": {
+  "p99_ms": 644.44,
+  "max_ms": 7484.051,
+  "provisioned_ws": 3869278.8,
+  "queue_divergent": false,
+  "ledger_expected": {
+   "p99_ms": 644.44,
+   "provisioned_ws": 3869278.8
+  }
+ },
+ "static_C2": {
+  "p99_ms": 2952.781,
+  "max_ms": 19672.298,
+  "provisioned_ws": 967319.7,
+  "queue_divergent": false,
+  "ledger_expected": {
+   "p99_ms": 2952.781,
+   "provisioned_ws": 967319.7
+  }
+ }
+}
