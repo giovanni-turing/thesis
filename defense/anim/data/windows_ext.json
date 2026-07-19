@@ -210,5 +210,29 @@
   "requests": 1000000,
   "span_s": 604799.7,
   "t0": "2024-10-15 12:00:00.269000"
+ },
+ "span_timesfm": {
+  "offset": 68372,
+  "max_requests": 931628,
+  "requests": 931628,
+  "span_s": 575819.7,
+  "t0": "2024-10-15 20:03:00.260000",
+  "note": "timesfm FULL forecastable span: [2024-10-15 20:03:00.260000 .. trace end], 931628 requests (93.2% of 1M)"
+ },
+ "span_toto": {
+  "offset": 127020,
+  "max_requests": 872980,
+  "requests": 872980,
+  "span_s": 545039.9,
+  "t0": "2024-10-16 04:36:00.113000",
+  "note": "toto FULL forecastable span: [2024-10-16 04:36:00.113000 .. trace end], 872980 requests (87.3% of 1M)"
+ },
+ "span_chronos": {
+  "offset": 250399,
+  "max_requests": 749601,
+  "requests": 749601,
+  "span_s": 483659.8,
+  "t0": "2024-10-16 21:39:00.118000",
+  "note": "chronos FULL forecastable span: [2024-10-16 21:39:00.118000 .. trace end], 749601 requests (75.0% of 1M)"
  }
 }

@@ -1,0 +1,254 @@
+{
+ "burst3_forecast_timesfm_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 904.739,
+  "provisioned_ws": 23453.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst3_forecast_timesfm_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 904.739,
+  "provisioned_ws": 23363.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst3_forecast_timesfm_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 904.739,
+  "provisioned_ws": 23273.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst3_forecast_timesfm_L165": {
+  "p99_ms": 588.37,
+  "max_ms": 904.739,
+  "provisioned_ws": 22553.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst5_forecast_timesfm_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 883.807,
+  "provisioned_ws": 96807.8,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst5_forecast_timesfm_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 883.807,
+  "provisioned_ws": 96747.8,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst5_forecast_timesfm_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 883.807,
+  "provisioned_ws": 96657.8,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst5_forecast_timesfm_L165": {
+  "p99_ms": 588.37,
+  "max_ms": 11004.377,
+  "provisioned_ws": 95252.0,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst4_forecast_timesfm_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 883.807,
+  "provisioned_ws": 263626.8,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst4_forecast_timesfm_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 883.807,
+  "provisioned_ws": 263476.8,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst4_forecast_timesfm_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 883.807,
+  "provisioned_ws": 263326.8,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst4_forecast_timesfm_L165": {
+  "p99_ms": 588.37,
+  "max_ms": 6947.046,
+  "provisioned_ws": 259983.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst1_forecast_timesfm_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 1262.345,
+  "provisioned_ws": 553026.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst1_forecast_timesfm_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 1262.345,
+  "provisioned_ws": 552771.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst1_forecast_timesfm_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 1262.345,
+  "provisioned_ws": 552516.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst1_forecast_timesfm_L165": {
+  "p99_ms": 588.37,
+  "max_ms": 2892.042,
+  "provisioned_ws": 549853.0,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "steady24h_forecast_timesfm_L15": {
+  "p99_ms": 671.975,
+  "max_ms": 2109.788,
+  "provisioned_ws": 167845.8,
+  "queue_divergent": false,
+  "ledger_expected": 671.975
+ },
+ "steady24h_forecast_timesfm_L30": {
+  "p99_ms": 671.975,
+  "max_ms": 2109.788,
+  "provisioned_ws": 167815.8,
+  "queue_divergent": false,
+  "ledger_expected": 671.975
+ },
+ "steady24h_forecast_timesfm_L45": {
+  "p99_ms": 671.975,
+  "max_ms": 2109.788,
+  "provisioned_ws": 167785.8,
+  "queue_divergent": false,
+  "ledger_expected": 671.975
+ },
+ "steady24h_forecast_timesfm_L165": {
+  "p99_ms": 671.975,
+  "max_ms": 2109.788,
+  "provisioned_ws": 167545.8,
+  "queue_divergent": false,
+  "ledger_expected": 671.975
+ },
+ "e11_forecast_timesfm_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 1192.468,
+  "provisioned_ws": 32247.8,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e11_forecast_timesfm_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 1192.468,
+  "provisioned_ws": 32082.8,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e11_forecast_timesfm_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 1192.468,
+  "provisioned_ws": 31917.8,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e11_forecast_timesfm_L165": {
+  "p99_ms": 588.37,
+  "max_ms": 2906.169,
+  "provisioned_ws": 29344.0,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e10_forecast_timesfm_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 904.739,
+  "provisioned_ws": 25407.9,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e10_forecast_timesfm_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 904.739,
+  "provisioned_ws": 25242.9,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e10_forecast_timesfm_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 904.739,
+  "provisioned_ws": 25077.9,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e10_forecast_timesfm_L165": {
+  "p99_ms": 588.37,
+  "max_ms": 904.739,
+  "provisioned_ws": 23404.8,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e17_forecast_timesfm_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 991.827,
+  "provisioned_ws": 28377.9,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e17_forecast_timesfm_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 991.827,
+  "provisioned_ws": 28092.9,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e17_forecast_timesfm_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 991.827,
+  "provisioned_ws": 27807.9,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e17_forecast_timesfm_L165": {
+  "p99_ms": 606.618,
+  "max_ms": 991.827,
+  "provisioned_ws": 25482.9,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e13_forecast_timesfm_L15": {
+  "p99_ms": 5312.083,
+  "max_ms": 7171.374,
+  "provisioned_ws": 25764.4,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e13_forecast_timesfm_L30": {
+  "p99_ms": 6093.214,
+  "max_ms": 8177.792,
+  "provisioned_ws": 25389.4,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e13_forecast_timesfm_L45": {
+  "p99_ms": 6093.214,
+  "max_ms": 8177.792,
+  "provisioned_ws": 25014.4,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e13_forecast_timesfm_L165": {
+  "p99_ms": 6786.617,
+  "max_ms": 9971.733,
+  "provisioned_ws": 22014.4,
+  "queue_divergent": false,
+  "ledger_expected": null
+ }
+}

@@ -92,7 +92,7 @@
   <div class="ctl">
     <span class="lbl">FORECAST<br>MODEL</span>
     <div class="seg" id="modelSeg">
-      <button data-m="chronos" class="on">Chronos-2</button><button data-m="toto">Toto-2</button>
+      <button data-m="chronos" class="on">Chronos</button><button data-m="toto">Toto</button><button data-m="timesfm">TimesFM</button>
     </div>
   </div>
   <div class="ctl">
@@ -218,7 +218,8 @@ const W = () => DATA.windows[winKey];
 const SPAN = () => W().meta.span_s;
 const BIN = () => W().meta.bin_s;
 const NB = () => W().offered.length;
-const fcKey = () => (model === "toto" ? "forecast_toto_L" : "forecast_L") + lead;
+const FCPREFIX = { chronos: "forecast_L", toto: "forecast_toto_L", timesfm: "forecast_timesfm_L" };
+const fcKey = () => FCPREFIX[model] + lead;
 const runs = () => ({ fc: W().runs[fcKey()], re: W().runs["reactive_L"+lead] });
 
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
@@ -477,7 +478,7 @@ function updateReadouts() {
 function drawAll() {
   const { fc, re } = runs();
   drawOffered();
-  drawLane("fcChart", fc, css("--fc"), `FORECAST (${model === "toto" ? "Toto-2" : "Chronos-2"} p90, issue-time)`);
+  drawLane("fcChart", fc, css("--fc"), `FORECAST (${({chronos:"Chronos-2",toto:"Toto-2",timesfm:"TimesFM-2.0"})[model]} p90, issue-time)`);
   drawLane("reChart", re, css("--re"), "REACTIVE (trailing observed rate)");
   updateReadouts();
 }
@@ -542,7 +543,7 @@ addEventListener("resize", drawAll);
 {
   const mW = location.hash.match(/w=([a-z0-9]+)/);
   selectWindow(mW && DATA.windows[mW[1]] ? mW[1] : "burst3");
-  const mM = location.hash.match(/m=(chronos|toto)/);
+  const mM = location.hash.match(/m=(chronos|toto|timesfm)/);
   if (mM) {
     model = mM[1];
     document.querySelectorAll("#modelSeg button").forEach(x => x.classList.toggle("on", x.dataset.m === model));

@@ -38,12 +38,16 @@ ONSET_LABEL = {"burst1": "220-min onset", "burst3": "1-min onset",
 
 RUNS_X = ROOT / "defense/anim/data/a2x_runs"
 RUNS_T = ROOT / "defense/anim/data/a2t_runs"
+RUNS_TF = ROOT / "defense/anim/data/a2tf_runs"
 verif = json.load(open(RUNS / "verification.json"))
 verif.update(json.load(open(RUNS_X / "verification.json")))
 verif.update(json.load(open(RUNS_T / "verification.json")))
+verif.update(json.load(open(RUNS_TF / "verification.json")))
 def rdir(wk, policy="forecast"):
     if policy == "forecast_toto":
         return RUNS_T
+    if policy == "forecast_timesfm":
+        return RUNS_TF
     return RUNS_X if wk.startswith("e") else RUNS
 
 raw = pd.read_csv(ROOT / "data/AzureLMMInferenceTrace_multimodal.csv.gz")
@@ -92,7 +96,7 @@ for wk in WINDOWS:
              "t0_day_s": int(t0.hour * 3600 + t0.minute * 60 + t0.second)}
     wout = {"meta": wmeta, "offered": None, "runs": {}}
 
-    for policy in ("forecast", "forecast_toto", "reactive"):
+    for policy in ("forecast", "forecast_toto", "forecast_timesfm", "reactive"):
         for lead in LEADS:
             tag = f"{wk}_{policy}_L{lead}"
             st = verif[tag]
