@@ -566,3 +566,10 @@ verify:     detection replicates analysis/trace_eda/i_burst_anatomy.py exactly (
 findings:   (a) reactive fails at EVERY lead on e10/e11/e17 (isolated replay p99 7.7-9.2 s at L15 -> 39-54 s at L165) and on e13/e14/e15; fails e12/e16 only at long leads -- more burst3-class evidence. (b) e13 (2024-10-20 18:22, peak 263 img/s, 7-min onset, isolated burst after the calm stretch) is a GENUINE p90 FORECAST MISS: forecast fails isolated at every lead (5.3-6.8 s) AND inside the ledgered week aggregates -- p90 4,551 ms (identical for chronos rho15, chronos rho10, toto rho15: the band never lifted, so every rating maps it to the same minimal fleet), reactive 2,892, p50 16,118, static C2 7,877; ONLY static C8 passes (882 ms). Reactive beats the forecast on e13. Masked in the thesis's grading: e13 is not a top-6 declared episode (~0.2% of span requests), so aggregate p99 (588) and declared-episode grading both pass. (c) e8's isolated forecast fail at L165 only (4,235) is an isolation artifact -- passes (588) inside the aggregate.
 implication: thesis claims as written remain true (aggregate + declared top-6 episodes); e13 bounds the p90-headroom mechanism -- calibrated ~90% coverage means missed bursts exist, and an isolated moderate burst rising from calm history is the miss mode. Candidate thesis addition: grade all 18 episodes in the aggregate, report e13 as the p90 boundary case (mirrors the reactive dashboard-masking argument applied to the winning policy).
 commit:     see next commit
+
+addendum (same date, A2): Toto-2 forecast arm added as a header toggle (Chronos-2 <-> Toto-2).
+36 new runs (defense/anim/data/a2t_runs/, gen_a2_toto.py): 20 core-window cells reproduce the
+ledgered Toto factorial rows exactly (588.37 on bursts, 548.363 calm; ws to the 0.1); e10/e11/e17
+pass at the floor with Toto; e13 fails byte-identically to Chronos (5312/6093/6787 by lead) --
+both models' p90 bands quantize to the same worker counts there: the miss is the signal's, not
+the model's. A6 already used Toto per the user's original instruction.

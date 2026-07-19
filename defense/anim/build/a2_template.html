@@ -81,13 +81,19 @@
 <body>
 <header>
   <div>
-    <h1>The race: forecast vs.&nbsp;reactive</h1>
-    <div class="sub">Identical law, ρ=15, 3-min hysteresis · only the information differs</div>
+    <h1>The race</h1>
+    <div class="sub">forecast vs. reactive · identical law, ρ=15,<br>3-min hysteresis · only the information differs</div>
   </div>
   <div class="clock"><small id="clockDate">· UTC</small><span id="clock">–</span></div>
   <div class="ctl">
     <span class="lbl">EPISODE</span>
     <div class="seg" id="winSeg"></div>
+  </div>
+  <div class="ctl">
+    <span class="lbl">FORECAST<br>MODEL</span>
+    <div class="seg" id="modelSeg">
+      <button data-m="chronos" class="on">Chronos-2</button><button data-m="toto">Toto-2</button>
+    </div>
   </div>
   <div class="ctl">
     <span class="lbl">COLD-START<br>LEAD L</span>
@@ -159,7 +165,9 @@
   <div id="infoBox">
     <b>Scope.</b> Both controllers use the identical worker law (C = ⌈demand/ρ⌉, ρ = 15 img/s,
     3-min scale-down hysteresis) and cold-start lead L on the same open-loop trace replay.
-    The <b>forecast</b> lane reads the archived Chronos-2 p90 path actuated on forecast
+    The <b>forecast</b> lane reads the archived Chronos-2 <i>or</i> Toto-2 p90 path
+    (header toggle; core-window Toto endpoints match the ledgered Toto factorial rows,
+    e-window Toto cells are new runs) actuated on forecast
     <i>issue</i> time (warm-pool readiness); the <b>reactive</b> lane reads the trailing
     observed 15-s image rate. Every curve is converter output (the exact ledgered pipeline
     re-run with per-second series, under the manuscript's load-bearing snapshot encoder
@@ -203,13 +211,15 @@ const SLA = DATA.meta.sla_ms;
 const WIN_ORDER = DATA.meta.win_order;
 let winKey = "burst3";
 let lead = 30;
+let model = "chronos";
 let playhead = 0, playing = false, lastTs = null, hoverT = null;
 
 const W = () => DATA.windows[winKey];
 const SPAN = () => W().meta.span_s;
 const BIN = () => W().meta.bin_s;
 const NB = () => W().offered.length;
-const runs = () => ({ fc: W().runs["forecast_L"+lead], re: W().runs["reactive_L"+lead] });
+const fcKey = () => (model === "toto" ? "forecast_toto_L" : "forecast_L") + lead;
+const runs = () => ({ fc: W().runs[fcKey()], re: W().runs["reactive_L"+lead] });
 
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const fmtClock = s => {
@@ -467,7 +477,7 @@ function updateReadouts() {
 function drawAll() {
   const { fc, re } = runs();
   drawOffered();
-  drawLane("fcChart", fc, css("--fc"), "FORECAST (Chronos-2 p90, issue-time)");
+  drawLane("fcChart", fc, css("--fc"), `FORECAST (${model === "toto" ? "Toto-2" : "Chronos-2"} p90, issue-time)`);
   drawLane("reChart", re, css("--re"), "REACTIVE (trailing observed rate)");
   updateReadouts();
 }
@@ -489,6 +499,10 @@ $("playBtn").onclick = () => { if (playhead >= SPAN() - 1) playhead = 0; setPlay
 $("resetBtn").onclick = () => { playhead = 0; setPlaying(false); };
 $("scrub").oninput = e => { playhead = +e.target.value; };
 $("infoBtn").onclick = () => $("infoBox").classList.toggle("show");
+document.querySelectorAll("#modelSeg button").forEach(b => b.onclick = () => {
+  model = b.dataset.m;
+  document.querySelectorAll("#modelSeg button").forEach(x => x.classList.toggle("on", x === b));
+});
 document.querySelectorAll("#leadSeg button").forEach(b => b.onclick = () => {
   lead = +b.dataset.l;
   document.querySelectorAll("#leadSeg button").forEach(x => x.classList.toggle("on", x === b));
@@ -528,6 +542,11 @@ addEventListener("resize", drawAll);
 {
   const mW = location.hash.match(/w=([a-z0-9]+)/);
   selectWindow(mW && DATA.windows[mW[1]] ? mW[1] : "burst3");
+  const mM = location.hash.match(/m=(chronos|toto)/);
+  if (mM) {
+    model = mM[1];
+    document.querySelectorAll("#modelSeg button").forEach(x => x.classList.toggle("on", x.dataset.m === model));
+  }
   const mL = location.hash.match(/L=(\d+)/);
   if (mL && DATA.meta.leads.includes(+mL[1])) {
     lead = +mL[1];

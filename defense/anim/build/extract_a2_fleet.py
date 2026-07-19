@@ -37,9 +37,14 @@ ONSET_LABEL = {"burst1": "220-min onset", "burst3": "1-min onset",
                "e17": "6-min onset · new", "e13": "7-min · forecast-miss"}
 
 RUNS_X = ROOT / "defense/anim/data/a2x_runs"
+RUNS_T = ROOT / "defense/anim/data/a2t_runs"
 verif = json.load(open(RUNS / "verification.json"))
 verif.update(json.load(open(RUNS_X / "verification.json")))
-rdir = lambda wk: RUNS_X if wk.startswith("e") else RUNS
+verif.update(json.load(open(RUNS_T / "verification.json")))
+def rdir(wk, policy="forecast"):
+    if policy == "forecast_toto":
+        return RUNS_T
+    return RUNS_X if wk.startswith("e") else RUNS
 
 raw = pd.read_csv(ROOT / "data/AzureLMMInferenceTrace_multimodal.csv.gz")
 ts = raw["TIMESTAMP"].str.replace("Z", "", regex=False).str.pad(23, "right", "0")
@@ -87,11 +92,11 @@ for wk in WINDOWS:
              "t0_day_s": int(t0.hour * 3600 + t0.minute * 60 + t0.second)}
     wout = {"meta": wmeta, "offered": None, "runs": {}}
 
-    for policy in ("forecast", "reactive"):
+    for policy in ("forecast", "forecast_toto", "reactive"):
         for lead in LEADS:
             tag = f"{wk}_{policy}_L{lead}"
             st = verif[tag]
-            series = json.load(open(rdir(wk) / f"{tag}.series.json"))["series"]
+            series = json.load(open(rdir(wk, policy) / f"{tag}.series.json"))["series"]
             q = np.array([r["queue_imgs_end"] for r in series[:span]])
             bz = np.array([r["busy_workers_end"] for r in series[:span]])
             a = np.array([r["img_arrived"] for r in series[:span]])
@@ -102,7 +107,7 @@ for wk in WINDOWS:
             busy = bz.reshape(nb, B).max(1)
             if wout["offered"] is None:
                 wout["offered"] = a.reshape(nb, B).max(1).tolist()
-            sched = json.load(open(rdir(wk) / f"{tag}.sched.json"))
+            sched = json.load(open(rdir(wk, policy) / f"{tag}.sched.json"))
             # provisioned worker-seconds cumulative at bin ends
             edges = np.arange(1, nb + 1) * B
             cost = np.zeros(nb)
@@ -131,7 +136,7 @@ for wk in WINDOWS:
                     warm += (c - prevc) * np.clip(np.minimum(edges, t_step) - a0,
                                                   0, t_step - a0)
                 prevc = c
-            delays = recover_delays(w, rel_ms, rdir(wk) / f"{tag}.jsonl")
+            delays = recover_delays(w, rel_ms, rdir(wk, policy) / f"{tag}.jsonl")
             s = np.sort(delays)
             p99_all = s[min(len(s) - 1, int(len(s) * 99 / 100))]
             assert abs(p99_all - st["p99_ms"]) / st["p99_ms"] < 0.01, \
