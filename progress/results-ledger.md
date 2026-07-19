@@ -700,3 +700,11 @@ result:     ALL 1,000,000 trace requests simulated through BOTH pools:
             per-model max-span forecast coverage is A14 (timesfm 931,628 / toto 872,980 / chronos 749,601).
 speedup:    mocker virtual clock; 1M-req replay in ~30-45 min wall at EXACT validity; arrivals never compressed.
 commit:     see next commit
+
+---
+date:       2026-07-19
+result:     CORRECTION OF RECORD (not a new experiment). The phaseE encoder anchor was mis-framed in the entries above as "completing the conclusion's one-real-encoder future-work item." It does NOT. Double-check during thesis-edit prep found the thesis ALREADY reports the AIC-end-to-end validation: vLLM-repriced week-schedule FIFO replay -> encoder-delay p99 606ms vs 589ms AIC (non-divergent, 6-8 workers) + multi-resolution 224^2-896^2 (aiconfigurator.tex ~345-357; apendice.tex engine-sensitivity ~207-219).
+finding:    The phaseE run is an INDEPENDENT REPRODUCTION that confirms those existing claims (per-burst C* 6,8,7,7,7,6; vLLM inflation 1.03x; per-forward 1.05x; multi-res stable) and found NO error. It is NOT new thesis content. The real open item = a LIVE worker (loaded weights, real-time forwards over the full serving path); phaseE memoizes f(N) (same as the thesis's tier2_vllm_replay), so it does NOT deliver it.
+action:     NO thesis .tex edits made (user agreed). phaseE work kept as committed verification only. ENCODER_ANCHOR_SUMMARY.md status header corrected.
+feeds:      NOTHING new into the manuscript. Supersedes the "feeds tex/conclusion.tex / completes future-work" claims in the earlier phaseE ledger entries this date.
+commit:     (uncommitted)

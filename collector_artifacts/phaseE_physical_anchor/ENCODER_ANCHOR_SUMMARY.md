@@ -1,9 +1,24 @@
-# One real encoder, end-to-end — the physical vision-pool anchor
+# Encoder end-to-end anchor — independent reproduction (verification only)
 
 **Date:** 2026-07-19 (overnight autonomous run)
-**Closes:** the first Future-Work item of `tex/conclusion.tex` ("what remains is
-one real encoder worker serving a burst replay end to end") and reinforces the
-AIC encoder-cost validation of `tex/aiconfigurator.tex`.
+
+**STATUS / SCOPE (corrected 2026-07-19):** this is an **independent reproduction**
+that *confirms* the AIC-end-to-end validation the thesis **already reports** — it
+is NOT new thesis content and does NOT close a future-work item.
+- The thesis already replays the week schedule through the FIFO with measured
+  vLLM `f(N)` → encoder-delay p99 **606 ms vs 589 ms under AIC**, non-divergent,
+  6–8 workers, plus multi-resolution 224²–896² (`aiconfigurator.tex` §~345–357;
+  `apendice.tex` §engine-sensitivity, lines ~207–219).
+- This run does the same kind of thing (measure `f(N)` live, memoize, replay
+  through the faithful FIFO) per burst window, for vLLM/eager/torch.compile, and
+  reproduces the thesis's numbers (per-burst C\* 6,8,7,7,7,6; vLLM inflation
+  1.03×; per-forward 1.05×; multi-res stable) — a consistency check that found
+  **no error** in the thesis's claims.
+- The genuine open future-work item ("one real encoder worker serving a burst
+  replay end to end") is a **live worker** — loaded weights, real-time forwards
+  driving the queue over the full serving path — which this run does **not** do
+  (it memoizes `f(N)`, exactly like the thesis's `tier2_vllm_replay`). The thesis
+  correctly still lists it as future work. **No thesis edits were made.**
 
 ## What was measured
 
