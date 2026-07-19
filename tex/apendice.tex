@@ -237,7 +237,7 @@ attention grid at batch~$64$ (the ViT is queried at batch~$=N$,
 $\text{isl}{=}784$) --- so past $N{\approx}42$ the model extrapolated beyond
 the grid; ViT-shape rows at large $m$ and attention rows to batch~$512$
 were collected on the 5090 (a collector out-of-memory fix, releasing the
-cache and adapting the timing-copy count, made the giant shapes
+cache and adapting the timing-copy count, made the ViT's large-$m$ shapes
 collectable on a 32\,GB card). These are additive data/tooling
 corrections; the committed rows are preserved exactly.
 

@@ -132,8 +132,10 @@ unchanged on both a decode-bound day and a slow-onset burst (identical
 served-latency percentiles on the former, within \SI{1}{\milli\second}
 of mean TTFT on the latter, all failing together), because the
 integer-replica conversion quantizes the differing forecasts onto the
-same worker schedule. Predictor choice is second-order on both sides;
-the signal and the conversion are not.
+same worker schedule. Predictor choice is second-order \emph{within} the foundation-model and
+shipped-predictor families; the signal, the conversion, and --- across the
+wider forecaster class --- the calibrated band \emph{shape} are not
+(Table~\ref{tab:cl-ewma}).
 \item[Capacity rating trades cost against fragility.] At $\rho \in
 \{10,15,20\}$ the p90 policy is \emph{60/60} on the issue-time factorial
 under both readiness models, though margin tightens with $\rho$
@@ -378,7 +380,7 @@ the tail at the identical \SI{651}{\milli\second} (both pass), shifting
 only the provisioning cost (625 and 641 versus 518.6 GPU-hours ---
 1.16$\times$ and 1.19$\times$ the burst-static fleet, so the language
 pool's near-break-even cost is Chronos-specific; the pass/fail
-\emph{verdict} is model-independent, the cost is not). The forecast
+\emph{verdict} is model-independent among the foundation models, the cost is not). The forecast
 model sets how much headroom is bought, not whether the SLA is met. The reactive planner \textbf{fails the
 week outright} (TTFT p99 1{,}197\,\si{\milli\second}) while spending
 281.8 GPU-hours: half the budget, and the wrong tail. At week scale
@@ -497,8 +499,9 @@ cost is mildly lead-dependent (0.62$\times$ at $L{=}15$ falling to
 0.59$\times$ at $L{=}165$), still passing at the \SI{588}{\milli\second}
 floor at every lead; \textbf{0.62$\times$} is therefore the conservative
 figure across both readiness models, and the flat lead-invariance is
-specific to the warm-pool one. The forecaster does
-not carry the result.
+specific to the warm-pool one. Among the foundation models, the forecaster does not carry the result ---
+though a cheaper forward forecaster does not suffice
+(Table~\ref{tab:cl-ewma}).
 Regenerating the p90 schedules from the other two model archives leaves
 the verdict unchanged: Toto and TimesFM pass at the same service floor
 across the realizable-lead range, within the ${\leq}4\%$ cross-model cost

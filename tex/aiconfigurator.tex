@@ -92,17 +92,23 @@ are identical between the unlocked and locked datasets (clock state
 scales both sides equally and cancels), but only the locked dataset
 makes the absolute numbers interpretable.
 
-\paragraph{Documented gaps.} On a \SI{32}{\gibi\byte} card the GEMM base
-sweep's giant tail (e.g.\ $M{=}32768$, $N{=}65536$) cannot allocate: 1{,}157
-cases fail with out-of-memory errors and 276 were pre-skipped by a
-\SI{4}{\gibi\byte} tensor-footprint cutoff, all recorded as gaps rather
-than filled synthetically. Repeated allocation failures also corrupt
-CUDA-graph state and crash the collector, so production runs
-pre-skip doomed shapes, clear the allocator cache after
-failures, and restart the container between chunks. Seventeen small
-shapes ($M{\le}2$) that spuriously reported out-of-memory in the
-fragmentation wake of giant-shape failures were requeued in a fresh
-container and collected cleanly.
+\paragraph{Out-of-envelope shapes, not coverage gaps.} The GEMM base
+sweep's giant tail is memory-infeasible on this \SI{32}{\gibi\byte} card and
+lies outside the cost model's operational domain: at $M{=}32768$,
+$N{=}65536$ the bf16 output tensor alone is \SI{4}{\gibi\byte} ($2^{32}$
+bytes) and the operands push the footprint past device memory, so 1{,}157
+such shapes fail to allocate and 276 more are pre-skipped by a
+\SI{4}{\gibi\byte} tensor-footprint cutoff --- left empty rather than filled
+synthetically, an exclusion at the hardware envelope, not a hole in the data
+the encoder is priced from (the collected grid runs exactly to the memory
+limit: at $N{=}65536$, up to $M{=}16384$ but not $M{=}32768$; and the
+Qwen3-VL tower this system costs never queries the square-giant regime,
+$n\le\num{5120}$). Repeated allocation failures also corrupt CUDA-graph
+state and crash the collector, so production runs pre-skip doomed shapes,
+clear the allocator cache after failures, and restart the container between
+chunks; seventeen small shapes ($M{\le}2$) that \emph{spuriously} reported
+out-of-memory in the fragmentation wake of those failures --- the only
+genuine gaps --- were requeued in a fresh container and collected cleanly.
 
 \subsection{Collected dataset}
 

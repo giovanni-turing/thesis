@@ -487,7 +487,11 @@ on the encoder pool (the p90 band stands capacity up before the peak,
 anticipating the clearly-gradual onset and covering the faster ones through
 graduated headroom, zero calm-day false alarms);
 on the language pool, a derived tail-aware capacity conversion (a
-measured belief-to-knee ratio) as the second necessary ingredient.
+measured belief-to-knee ratio) as the second necessary ingredient. A cheap
+forward forecaster does not substitute: an EWMA at a calibrated quantile,
+through the same loop, misses the fast onsets or costs 1.09$\times$ static,
+so the calibrated band shape --- supplied zero-shot by the foundation
+models --- is load-bearing.
 \end{enumerate}
 
 \section{Scope and limitations}
