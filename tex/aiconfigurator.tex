@@ -234,8 +234,8 @@ $1.45$ there.
 \includegraphics[width=\linewidth]{figuras/aic/aic_fn}
 \caption{Left: the composed $f(N)$ against end-to-end
 \emph{HuggingFace-eager} measurement (log--log; ratio annotated per
-point): the ratio grows from $1.38\times$ to $1.62\times$ across the
-dispatch range. This is an execution-stack effect --- the HuggingFace
+point): the ratio rises to $1.62\times$ at $N{=}64$ (from ${\approx}1.37\times$
+at small $N$), easing to $1.43\times$ at the largest dispatch. This is an execution-stack effect --- the HuggingFace
 eager forward carries unfused per-image work that grows with $N$, whereas
 AIC composes the vLLM kernel path; a direct vLLM measurement
 (Section~\ref{sec:aic-model-vs-silicon}) matches the composition to
