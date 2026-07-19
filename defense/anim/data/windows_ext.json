@@ -234,5 +234,13 @@
   "span_s": 483659.8,
   "t0": "2024-10-16 21:39:00.118000",
   "note": "chronos FULL forecastable span: [2024-10-16 21:39:00.118000 .. trace end], 749601 requests (75.0% of 1M)"
+ },
+ "span_expctx": {
+  "offset": 401,
+  "max_requests": 999599,
+  "requests": 999599,
+  "span_s": 604620.0,
+  "t0": "2024-10-15 12:03:00.013000",
+  "note": "expanding-context span (all 3 models forecast from here): [2024-10-15 12:03:00.013000 .. end], 999599 req (99.96% of 1M)"
  }
 }

@@ -2,16 +2,37 @@
  "timesfm": {
   "enc_p99": 588.4,
   "enc_requests": 931628,
-  "provisioned_ws": 2803229.6
+  "provisioned_ws": 2803229.6,
+  "lang_requests": 931628,
+  "completed": 931628,
+  "ttft_p99": 651.1,
+  "itl_p99": 6.1,
+  "gpu_h": 704.98,
+  "max_requests": 931628,
+  "pct_of_1M": 93.2
  },
  "toto": {
   "enc_p99": 588.4,
   "enc_requests": 872980,
-  "provisioned_ws": 2535179.7
+  "provisioned_ws": 2535179.7,
+  "lang_requests": 872980,
+  "completed": 872980,
+  "ttft_p99": 651.1,
+  "itl_p99": 6.4,
+  "gpu_h": 751.43,
+  "max_requests": 872980,
+  "pct_of_1M": 87.3
  },
  "chronos": {
   "enc_p99": 588.4,
   "enc_requests": 749601,
-  "provisioned_ws": 2410754.7
+  "provisioned_ws": 2410754.7,
+  "lang_requests": 749601,
+  "completed": 749601,
+  "ttft_p99": 651.1,
+  "itl_p99": 6.2,
+  "gpu_h": 528.28,
+  "max_requests": 749601,
+  "pct_of_1M": 75.0
  }
 }

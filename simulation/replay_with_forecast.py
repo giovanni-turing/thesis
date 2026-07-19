@@ -56,9 +56,10 @@ def _load_series() -> dict[str, "pd.Series"]:
     res = os.environ.get("FORECAST_RESOLUTION", "1min")
     t0 = pd.Timestamp(os.environ["FORECAST_T0"])
     out: dict[str, pd.Series] = {}
-    for variate, fname in (("requests", f"{model}_requests.parquet"),
-                           ("ctx", f"{model}_ctx.parquet"),
-                           ("gen", f"{model}_gen.parquet")):
+    suf = os.environ.get("FORECAST_SUFFIX", "")
+    for variate, fname in (("requests", f"{model}_requests{suf}.parquet"),
+                           ("ctx", f"{model}_ctx{suf}.parquet"),
+                           ("gen", f"{model}_gen{suf}.parquet")):
         df = pd.read_parquet(os.path.join(d, fname))
         df = df[df.resolution == res]
         if "variate" in df.columns and df.variate.nunique() > 1:
