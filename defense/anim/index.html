@@ -49,7 +49,7 @@
 <body>
 <h1>Defense animations</h1>
 <div class="sub">Master's defense · <i>Predictive Per-Pool Provisioning for Modality-Disaggregated Multimodal Model Serving</i>
- — every pixel is ledger-verified simulator output · fully offline · press <kbd>1</kbd>–<kbd>5</kbd> to open</div>
+ — every pixel is ledger-verified simulator output · fully offline · press <kbd>1</kbd>–<kbd>6</kbd> to open</div>
 
 <div class="cards">
   <div class="card" data-href="a1_invisible_failure.html" id="k1">
@@ -148,6 +148,24 @@
       <a href="a9_dataset_kde.html#r=6,9">frames</a>
     </div>
     <div class="slide">Plotly surface (inlined, offline) · drag to orbit · buckets follow the k² structure.</div>
+
+  <div class="card" data-href="a10_language_pool.html" id="k6">
+    <span class="kbd-chip">6</span>
+    <h2><span>A10 · SLIDES "PER-POOL MECHANISM" / "ABLATION LEDGER"</span>The language pool</h2>
+    <p>Four linked panels for the H100 pool: <b>replica-lead sweep</b> (forecast flat at
+    736–757 ms vs reactive pinned ≈1.62 s at every planner target, statics anchoring),
+    the <b>two-ingredients triad</b>, the <b>burst3 quantile split with the LIVE-stack
+    anchor</b> (651→695 ms, 3.49→3.53 s), and <b>week economics</b> (cost × tail,
+    0.96× static). Build-time assertions pin every number to its ledgered report.</p>
+    <div class="nums">
+      <div class="num"><span class="dot" style="background:var(--blue)"></span>tail-aware conversion: <b>736 ms</b> at every lead</div>
+      <div class="num"><span class="dot" style="background:var(--violet)"></span>same forecast, mean conversion: <b>1.72 s FAIL</b></div>
+      <div class="num"><span class="dot" style="background:var(--orange)"></span>reactive week: half the spend, <b>1.20 s FAIL</b></div>
+    </div>
+    <div class="links" onclick="event.stopPropagation()">
+      <a href="a10_language_pool.html">open</a>
+    </div>
+    <div class="slide">Hover any mark for its artifact path (riders44, live51 twins + aiperf exports, llm_week).</div>
   </div>
 </div>
 
@@ -162,7 +180,7 @@
 for (const c of document.querySelectorAll(".card"))
   c.addEventListener("click", e => { if (e.target.tagName !== "A") location.href = c.dataset.href; });
 addEventListener("keydown", e => {
-  const m = { "1": "k1", "2": "k2", "3": "k3", "4": "k4", "5": "k5" }[e.key];
+  const m = { "1": "k1", "2": "k2", "3": "k3", "4": "k4", "5": "k5", "6": "k6" }[e.key];
   if (m) location.href = document.getElementById(m).dataset.href;
 });
 </script>

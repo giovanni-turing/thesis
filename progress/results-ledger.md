@@ -608,3 +608,11 @@ verify:     bucket counts sum to 1,000,000 (text-only exactly 500,000 = thesis 5
 view:       rotatable plotly surface, image-range selectors + presets (all/text-only/1img/tiled/frames), deep links #r=lo,hi; frames class renders as a near point mass at ctx~36k gen~50 (tail-deterministic image-context coupling)
 feeds:      dataset-characterization slide; launcher card 5
 commit:     see next commit
+
+## Defense animation A10 "the language pool" (four-panel LLM comparison board)
+date:       2026-07-19
+artifact:   defense/anim/a10_language_pool.html (17 KB, self-contained SVG); builder defense/anim/build/build_a10.py (reads + asserts every number from its report at build time)
+inputs:     riders44/fc_lead{60,90,120,300} (736.3/744.2/757.2/757.2), riders44/ladder_t* (1615.5-1619.6), riders44/fc_lead60_s1 (mean conversion 1716.6), live51 twins (p90 651.1 / p50 2164.2 / reactive 3494.7) + live aiperf exports (695.2 / 3531.5), llm_week (p90 651.1@518.6 GPU-h, p50 827.8@319.9, reactive 1196.6@281.8, toto 625.3, timesfm 641.1); statics from thesis Tab 7.2 (TP2x2 763 / TP1x4 1318)
+view:       (1) lead sweep - forecast lead-invariant vs reactive target-ladder band vs static lines; (2) conversion triad; (3) burst3 quantile split offline-vs-LIVE grouped bars; (4) week cost-vs-tail scatter with burst-static cost line (0.96x)
+feeds:      slides "Per-pool mechanism" + "What makes it work: the ablation ledger"; launcher card 6
+commit:     see next commit

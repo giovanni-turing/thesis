@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A10 — The language pool</title>
+<style>
+  :root { color-scheme:light;
+    --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+    --blue:#2a78d6; --orange:#eb6834; --violet:#4a3aa7; --good:#0ca30c; --critical:#d03b3b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { background:var(--page); color:var(--ink); overflow:hidden;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif; display:flex; flex-direction:column; }
+  header { padding:12px 24px 6px; }
+  header h1 { font-size:21px; font-weight:650; }
+  header .sub { font-size:12.5px; color:var(--ink-2); margin-top:2px; }
+  main { flex:1; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr;
+    gap:10px; padding:0 24px 6px; min-height:0; }
+  .panel { background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    position:relative; padding:10px 12px 6px; display:flex; flex-direction:column; min-height:0; }
+  .panel h2 { font-size:13.5px; font-weight:700; }
+  .panel .q { font-size:11px; color:var(--ink-2); margin:1px 0 2px; }
+  .panel svg { flex:1; min-height:0; width:100%; }
+  footer { display:flex; gap:14px; align-items:center; padding:2px 24px 8px; font-size:10.5px; color:var(--muted); }
+  footer .spacer { flex:1; }
+  a.back { color:var(--blue); text-decoration:none; font-size:12px; }
+  #tooltip { position:fixed; z-index:30; pointer-events:none; display:none;
+    background:var(--ink); color:#fff; border-radius:8px; padding:7px 10px;
+    font-size:11.5px; line-height:1.5; font-variant-numeric:tabular-nums;
+    box-shadow:0 4px 16px rgba(0,0,0,0.3); max-width:420px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>The language pool: the conversion is the fix, not the lead</h1>
+  <div class="sub">Qwen3-VL-8B on H100 (TP2 replicas) through Dynamo's planner · every number read from its ledgered report at build time · SLA: TTFT p99 &lt; 1 s, ITL p99 &lt; 100 ms</div>
+</header>
+<main>
+  <div class="panel"><h2>① Replica lead sweep — burst1 (220-min onset)</h2>
+    <div class="q">Does cold-start lead hurt? Forecast + tail-aware conversion is lead-invariant; reactive is pinned above the SLA at every planner target; statics anchor both ends.</div>
+    <svg id="p1"></svg></div>
+  <div class="panel"><h2>② The two ingredients — burst1, 60 s lead</h2>
+    <div class="q">Same forecast, different conversion: signal quality cannot compensate mean-based sizing.</div>
+    <svg id="p2"></svg></div>
+  <div class="panel"><h2>③ Quantile split on the fastest onset (burst3) — offline vs LIVE stack</h2>
+    <div class="q">p90 passes, p50 and reactive fail — and the verdict pair reproduces through Dynamo's real control plane (mocked engines): TTFT within 1.1–6.8%.</div>
+    <svg id="p3"></svg></div>
+  <div class="panel"><h2>④ Week economics — 5.60-day span</h2>
+    <div class="q">Cost vs tail: reactive spends half and fails the week; p90 passes at 0.96× the burst-sized static fleet. Spend is not the defect.</div>
+    <svg id="p4"></svg></div>
+</main>
+<footer>
+  <span>Artifacts: simulation/results/{riders44, live51, llm_week} · build asserts every thesis-quoted value · hover any mark for its artifact path</span>
+  <span class="spacer"></span>
+  <a class="back" href="index.html">← launcher</a>
+</footer>
+<div id="tooltip"></div>
+<script>
+const DATA = {"sla_ttft":1000,"sla_itl":100,"leads":[{"L":60,"ttft":736.3,"itl":6.3,"gpu_h":37.6,"src":"simulation/results/riders44/fc_lead60.report.json"},{"L":90,"ttft":744.2,"itl":6.5,"gpu_h":37.0,"src":"simulation/results/riders44/fc_lead90.report.json"},{"L":120,"ttft":757.2,"itl":6.6,"gpu_h":35.9,"src":"simulation/results/riders44/fc_lead120.report.json"},{"L":300,"ttft":757.2,"itl":6.6,"gpu_h":36.5,"src":"simulation/results/riders44/fc_lead300.report.json"}],"ladder":[{"t":"400/40","ttft":1619.6,"itl":127.1,"gpu_h":18.6,"src":"simulation/results/riders44/ladder_t400_40.report.json"},{"t":"300/30","ttft":1616.6,"itl":126.5,"gpu_h":19.2,"src":"simulation/results/riders44/ladder_t300_30.report.json"},{"t":"250/25","ttft":1616.0,"itl":126.2,"gpu_h":19.4,"src":"simulation/results/riders44/ladder_t250_25.report.json"},{"t":"200/20","ttft":1615.5,"itl":125.1,"gpu_h":20.4,"src":"simulation/results/riders44/ladder_t200_20.report.json"}],"statics":{"tp2x2":{"ttft":763,"note":"TP2\u00d72 \u00b7 4 H100s always on \u00b7 Tab 7.2","pass":true},"tp1x4":{"ttft":1318,"note":"TP1\u00d74 \u00b7 same 4 H100s \u00b7 prefill floor","pass":false}},"triad":[{"name":"reactive planner","sub":"best ladder point (200/20 ms targets)","ttft":1615.5,"itl":125.1,"hue":"#eb6834","src":"simulation/results/riders44/ladder_t200_20.report.json"},{"name":"forecast \u00b7 mean conversion","sub":"same p90 forecast, planner-native sizing","ttft":1716.6,"itl":126.8,"hue":"#4a3aa7","src":"simulation/results/riders44/fc_lead60_s1.report.json"},{"name":"forecast \u00b7 tail-aware conversion","sub":"belief-to-knee ratio (measured)","ttft":736.3,"itl":6.3,"hue":"#2a78d6","src":"simulation/results/riders44/fc_lead60.report.json"}],"b3":[{"name":"reactive","off":3494.7,"live":3531.5,"hue":"#eb6834","srcs":["simulation/results/live51/twin_re_cap4.report.json","simulation/results/live51/live_runs/live_re/profile_export_aiperf.json"]},{"name":"forecast p50","off":2164.2,"live":null,"hue":"#4a3aa7","srcs":["simulation/results/live51/twin_fc.report.json"]},{"name":"forecast p90","off":651.1,"live":695.2,"hue":"#2a78d6","srcs":["simulation/results/live51/twin_fc_p90_cap4.report.json","simulation/results/live51/live_runs/live_fc/profile_export_aiperf.json"]}],"week":[{"name":"reactive","gpu_h":281.8,"ttft":1196.6,"hue":"#eb6834","src":"simulation/results/llm_week/week_re.report.json"},{"name":"forecast p50","gpu_h":319.9,"ttft":827.8,"hue":"#4a3aa7","src":"simulation/results/llm_week/week_fc_p50.report.json"},{"name":"forecast p90 \u00b7 Chronos","gpu_h":518.6,"ttft":651.1,"hue":"#2a78d6","src":"simulation/results/llm_week/week_fc_p90.report.json"},{"name":"forecast p90 \u00b7 Toto","gpu_h":625.3,"ttft":651.1,"hue":"#1baf7a","src":"simulation/results/llm_week/week_fc_p90_toto.report.json","dy":22},{"name":"forecast p90 \u00b7 TimesFM","gpu_h":641.1,"ttft":651.1,"hue":"#008300","src":"simulation/results/llm_week/week_fc_p90_timesfm.report.json","dy":-14}],"static_week_gpuh":537.4};
+const NS = "http://www.w3.org/2000/svg";
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const tt = document.getElementById("tooltip");
+function el(p, n, at = {}) { const e = document.createElementNS(NS, n);
+  for (const [k, v] of Object.entries(at)) e.setAttribute(k, v); p.appendChild(e); return e; }
+function txt(p, x, y, s, at = {}) { const e = el(p, "text", { x, y, fill: css("--ink-2"),
+  "font-size": 11, "font-family": "system-ui", ...at }); e.textContent = s; return e; }
+function hover(e, html) {
+  e.addEventListener("mousemove", ev => { tt.innerHTML = html; tt.style.display = "block";
+    tt.style.left = Math.min(ev.clientX + 14, innerWidth - 440) + "px";
+    tt.style.top = Math.min(ev.clientY + 14, innerHeight - 120) + "px"; });
+  e.addEventListener("mouseleave", () => tt.style.display = "none");
+}
+const fmt = v => v >= 1000 ? (v / 1000).toFixed(2) + " s" : Math.round(v) + " ms";
+
+function panelBox(svg) { const r = svg.getBoundingClientRect(); return { W: r.width, H: r.height }; }
+function axisY(svg, x0, x1, y, lo, hi, ticks, fmtT) {
+  for (const t of ticks) {
+    const yy = y(t);
+    el(svg, "line", { x1: x0, y1: yy, x2: x1, y2: yy, stroke: css("--grid") });
+    txt(svg, x0 - 6, yy + 3, fmtT ? fmtT(t) : t, { "text-anchor": "end", fill: css("--muted"), "font-size": 10 });
+  }
+}
+function slaLine(svg, x0, x1, y, v, label) {
+  el(svg, "line", { x1: x0, y1: y(v), x2: x1, y2: y(v), stroke: css("--critical"),
+    "stroke-dasharray": "5 4", "stroke-width": 1.5 });
+  txt(svg, x1 - 2, y(v) - 4, label, { "text-anchor": "end", fill: css("--critical"), "font-size": 10, "font-weight": 600 });
+}
+
+/* ── P1: lead sweep ── */
+function p1() {
+  const svg = document.getElementById("p1"); svg.innerHTML = "";
+  const { W, H } = panelBox(svg);
+  const P = { l: 46, r: 12, t: 10, b: 26 };
+  const x = L => P.l + (Math.log10(L) - Math.log10(50)) / (Math.log10(360) - Math.log10(50)) * (W - P.l - P.r);
+  const y = v => H - P.b - (v / 2000) * (H - P.t - P.b);
+  axisY(svg, P.l, W - P.r, y, 0, 2000, [0, 500, 1000, 1500, 2000], v => v >= 1000 ? (v/1000) + "s" : v);
+  for (const L of [60, 90, 120, 300]) txt(svg, x(L), H - P.b + 14, L + "s", { "text-anchor": "middle", fill: css("--muted"), "font-size": 10 });
+  txt(svg, (P.l + W - P.r) / 2, H - 4, "replica cold-start lead (log)", { "text-anchor": "middle", "font-size": 10, fill: css("--muted") });
+  slaLine(svg, P.l, W - P.r, y, DATA.sla_ttft, "SLA 1 s");
+  // statics
+  for (const [k, s] of Object.entries(DATA.statics)) {
+    const ln = el(svg, "line", { x1: P.l, y1: y(s.ttft), x2: W - P.r, y2: y(s.ttft),
+      stroke: s.pass ? css("--good") : css("--critical"), "stroke-dasharray": "2 4", "stroke-width": 2, opacity: 0.75 });
+    txt(svg, P.l + 4, y(s.ttft) - 4, `static ${k === "tp2x2" ? "TP2×2 · " + fmt(s.ttft) : "TP1×4 · " + fmt(s.ttft)}`,
+        { "font-size": 10, fill: s.pass ? "#006300" : css("--critical"), "font-weight": 600 });
+    hover(ln, `<b>static ${k}</b> — ${s.note}`);
+  }
+  // reactive ladder band
+  const lo = Math.min(...DATA.ladder.map(d => d.ttft)), hi = Math.max(...DATA.ladder.map(d => d.ttft));
+  const band = el(svg, "rect", { x: P.l, y: y(hi) - 2, width: W - P.l - P.r, height: y(lo) - y(hi) + 4,
+    fill: css("--orange"), opacity: 0.28 });
+  const bandLbl = fmt(lo) === fmt(hi) ? "≈" + fmt(hi) : fmt(lo) + "–" + fmt(hi);
+  txt(svg, W - P.r - 4, y(hi) - 6, `reactive planner (all targets 400/40→200/20): ${bandLbl} · FAIL`,
+      { "text-anchor": "end", fill: "#b5431a", "font-size": 10.5, "font-weight": 700 });
+  hover(band, `<b>reactive SLA planner, burst1, 60 s lead</b><br>window-mean targets tightened 400/40→200/20 ms:<br>` +
+    DATA.ladder.map(d => `${d.t}: ${fmt(d.ttft)} · ${d.gpu_h} GPU-h`).join("<br>") +
+    `<br>+10% spend buys nothing — mean-based conversion<br>` + DATA.ladder[0].src.replace("400_40", "*"));
+  // forecast line
+  let path = "";
+  DATA.leads.forEach((d, i) => { path += (i ? "L" : "M") + x(d.L) + " " + y(d.ttft) + " "; });
+  el(svg, "path", { d: path, stroke: css("--blue"), "stroke-width": 2.5, fill: "none" });
+  for (const d of DATA.leads) {
+    const c = el(svg, "circle", { cx: x(d.L), cy: y(d.ttft), r: 5.5, fill: css("--blue"), stroke: "#fff", "stroke-width": 1.5 });
+    hover(c, `<b>forecast p90 + tail-aware conversion</b><br>lead ${d.L} s → TTFT p99 ${fmt(d.ttft)} · ITL p99 ${d.itl} ms · ${d.gpu_h} GPU-h<br>${d.src}`);
+  }
+  txt(svg, x(90), y(736) + 20, `forecast p90 + tail-aware: ${fmt(736.3)}–${fmt(757.2)} · PASS at every lead`,
+      { fill: "#1c5cab", "font-size": 10.5, "font-weight": 700 });
+}
+
+/* ── P2: triad bars ── */
+function p2() {
+  const svg = document.getElementById("p2"); svg.innerHTML = "";
+  const { W, H } = panelBox(svg);
+  const P = { l: 46, r: 12, t: 10, b: 40 };
+  const y = v => H - P.b - (v / 2000) * (H - P.t - P.b);
+  axisY(svg, P.l, W - P.r, y, 0, 2000, [0, 500, 1000, 1500, 2000], v => v >= 1000 ? (v/1000) + "s" : v);
+  slaLine(svg, P.l, W - P.r, y, DATA.sla_ttft, "SLA 1 s");
+  const bw = (W - P.l - P.r) / DATA.triad.length;
+  DATA.triad.forEach((d, i) => {
+    const cx = P.l + bw * (i + 0.5);
+    const bar = el(svg, "rect", { x: cx - bw * 0.27, y: y(d.ttft), width: bw * 0.54,
+      height: y(0) - y(d.ttft), fill: d.hue, rx: 4 });
+    hover(bar, `<b>${d.name}</b><br>${d.sub}<br>TTFT p99 ${fmt(d.ttft)} · ITL p99 ${d.itl} ms · ${d.ttft < 1000 && d.itl < 100 ? "PASS" : "FAIL"}<br>${d.src}`);
+    txt(svg, cx, y(d.ttft) - 6, fmt(d.ttft), { "text-anchor": "middle", "font-weight": 700, fill: css("--ink"), "font-size": 12 });
+    const pass = d.ttft < 1000 && d.itl < 100;
+    txt(svg, cx, H - P.b + 14, d.name, { "text-anchor": "middle", "font-size": 10.5, "font-weight": 600 });
+    txt(svg, cx, H - P.b + 27, pass ? "PASS" : "FAIL", { "text-anchor": "middle", "font-size": 10, "font-weight": 700,
+        fill: pass ? "#006300" : css("--critical") });
+  });
+}
+
+/* ── P3: burst3 offline vs live ── */
+function p3() {
+  const svg = document.getElementById("p3"); svg.innerHTML = "";
+  const { W, H } = panelBox(svg);
+  const P = { l: 46, r: 12, t: 10, b: 40 };
+  const y = v => H - P.b - (v / 4000) * (H - P.t - P.b);
+  axisY(svg, P.l, W - P.r, y, 0, 4000, [0, 1000, 2000, 3000, 4000], v => v >= 1000 ? (v/1000) + "s" : v);
+  slaLine(svg, P.l, W - P.r, y, DATA.sla_ttft, "SLA 1 s");
+  const gw = (W - P.l - P.r) / DATA.b3.length;
+  DATA.b3.forEach((d, i) => {
+    const cx = P.l + gw * (i + 0.5);
+    const bar = el(svg, "rect", { x: cx - gw * 0.3, y: y(d.off), width: gw * 0.27,
+      height: y(0) - y(d.off), fill: d.hue, rx: 4 });
+    hover(bar, `<b>${d.name} — offline twin</b><br>TTFT p99 ${fmt(d.off)}<br>${d.srcs[0]}`);
+    txt(svg, cx - gw * 0.165, y(d.off) - 5, fmt(d.off), { "text-anchor": "middle", "font-size": 10.5, "font-weight": 700 });
+    if (d.live !== null) {
+      const lb = el(svg, "rect", { x: cx + gw * 0.03, y: y(d.live), width: gw * 0.27,
+        height: y(0) - y(d.live), fill: d.hue, opacity: 0.5, rx: 4, stroke: d.hue, "stroke-dasharray": "4 3" });
+      hover(lb, `<b>${d.name} — LIVE Dynamo control plane</b><br>TTFT p99 ${fmt(d.live)} (Δ ${((d.live/d.off-1)*100).toFixed(1)}%)<br>${d.srcs[1]}`);
+      txt(svg, cx + gw * 0.165, y(d.live) - 5, fmt(d.live), { "text-anchor": "middle", "font-size": 10.5 });
+    } else {
+      txt(svg, cx + gw * 0.165, y(300), "live: not run", { "text-anchor": "middle", "font-size": 9.5, fill: css("--muted"),
+          transform: `rotate(-90 ${cx + gw * 0.165} ${y(300)})` });
+    }
+    txt(svg, cx, H - P.b + 14, d.name, { "text-anchor": "middle", "font-size": 10.5, "font-weight": 600 });
+  });
+  txt(svg, P.l + 6, P.t + 10, "solid = offline twin · dashed = live stack (60 s replica lead, tail-aware conversion)", { "font-size": 10 });
+}
+
+/* ── P4: week scatter ── */
+function p4() {
+  const svg = document.getElementById("p4"); svg.innerHTML = "";
+  const { W, H } = panelBox(svg);
+  const P = { l: 46, r: 12, t: 14, b: 40 };
+  const x = g => P.l + (g - 230) / (720 - 230) * (W - P.l - P.r);
+  const y = v => H - P.b - ((v - 550) / (1350 - 550)) * (H - P.t - P.b);
+  axisY(svg, P.l, W - P.r, y, 550, 1350, [600, 800, 1000, 1200], v => v >= 1000 ? (v/1000).toFixed(1) + "s" : v);
+  for (const g of [300, 400, 500, 600, 700]) {
+    el(svg, "line", { x1: x(g), y1: P.t, x2: x(g), y2: H - P.b, stroke: css("--grid") });
+    txt(svg, x(g), H - P.b + 14, g, { "text-anchor": "middle", "font-size": 10, fill: css("--muted") });
+  }
+  txt(svg, (P.l + W - P.r) / 2, H - 4, "H100 GPU-hours over the 5.60-day span", { "text-anchor": "middle", "font-size": 10, fill: css("--muted") });
+  slaLine(svg, P.l, W - P.r, y, DATA.sla_ttft, "SLA 1 s");
+  const sx = x(DATA.static_week_gpuh);
+  el(svg, "line", { x1: sx, y1: P.t, x2: sx, y2: H - P.b, stroke: css("--ink-2"), "stroke-dasharray": "6 4", "stroke-width": 1.5 });
+  txt(svg, sx + 4, P.t + 10, `burst-sized static TP2×2: ${DATA.static_week_gpuh} GPU-h`, { "font-size": 10, "font-weight": 600 });
+  for (const d of DATA.week) {
+    const pass = d.ttft < 1000;
+    const c = el(svg, "circle", { cx: x(d.gpu_h), cy: y(d.ttft), r: 8, fill: d.hue, stroke: "#fff", "stroke-width": 2 });
+    hover(c, `<b>${d.name}</b><br>TTFT p99 ${fmt(d.ttft)} · ${d.gpu_h} GPU-h (${(d.gpu_h/DATA.static_week_gpuh).toFixed(2)}× static) · ${pass ? "PASS" : "FAIL"}<br>${d.src}`);
+    const anchor = d.gpu_h > 600 ? "end" : "start";
+    const dy = d.dy || 0;
+    txt(svg, x(d.gpu_h) + (dy ? 0 : (anchor === "end" ? -12 : 12)), y(d.ttft) + 4 + dy,
+        d.name.replace("forecast ", ""),
+        { "text-anchor": dy ? "middle" : anchor, "font-size": 10.5, "font-weight": 600 });
+    if (!pass) { el(svg, "line", { x1: x(d.gpu_h) - 4, y1: y(d.ttft) - 4, x2: x(d.gpu_h) + 4, y2: y(d.ttft) + 4, stroke: "#fff", "stroke-width": 2 });
+      el(svg, "line", { x1: x(d.gpu_h) + 4, y1: y(d.ttft) - 4, x2: x(d.gpu_h) - 4, y2: y(d.ttft) + 4, stroke: "#fff", "stroke-width": 2 }); }
+  }
+}
+
+function drawAll() { p1(); p2(); p3(); p4(); }
+addEventListener("resize", drawAll);
+drawAll();
+</script>
+</body>
+</html>
