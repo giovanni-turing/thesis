@@ -573,3 +573,29 @@ ledgered Toto factorial rows exactly (588.37 on bursts, 548.363 calm; ws to the 
 pass at the floor with Toto; e13 fails byte-identically to Chronos (5312/6093/6787 by lead) --
 both models' p90 bands quantize to the same worker counts there: the miss is the signal's, not
 the model's. A6 already used Toto per the user's original instruction.
+
+## Forward-EWMA calibrated-p90 baseline through the encoder closed loop (the "cheap forward forecaster" ablation)
+date:       2026-07-19
+artifact:   predictors/results/ewma_cal_{add,mult,wsc}_images.parquet (calibrated p90 archives, consumed-schema); predictors/results/ewma_cal_manifest.json (coverage+params); verification/results/ewma_baseline_{burst1,burst3,burst4,burst5,steady24h,aggregate}.json
+command:    eda/.venv/bin/python predictors/ewma_calibrate_p90.py; eda/.venv/bin/python verification/scripts/run_ewma_baseline.py <window> 30   (window in {burst1,3,4,5,steady24h,aggregate})
+inputs:     predictors/results/ewma_images.parquet (forward EWMA point path, 15s images) -> p90 calibrated on the 1.4-day context window (every EWMA forecast ts<2024-10-16 21:39:00, n=6144) to nominal 0.90 by three standard schemes: add (per-h additive split-conformal), mult (per-h multiplicative conformal), wsc (single width-scale k=0.513 of EWMA's native Gaussian band). Eval coverage add 0.901 / mult 0.878 / wsc 0.877 / native 0.929 (TSFM ref 0.88-0.90). Fed through the IDENTICAL pipeline as the TSFM policy: forecast_schedule_issuetime.py (p90, rho15, issue-time, hyst3) -> trace_to_two_pool.py (--encoder-workers 2 --worker-schedule); denominator static C8 = 3,869,278 ws.
+verify:     chronos control reproduces the committed headline exactly: burst3 p99 589.3 ms; week aggregate 589.3 ms / 2,410,754.7 ws = 0.6231x. So the pipeline invocation is faithful.
+findings:   Under the thesis's aggregate-AND-per-episode grading the forward EWMA cannot match the TSFM, by a coverage-vs-cost bind:
+              - ewma-add  (agg 589/0.70x): FAILS burst3 (1284.8 ms) and burst5 (divergent). Cheap only because it misses the onsets; passes the aggregate purely by burst3/5 masking.
+              - ewma-wsc  (agg 589/0.56x): FAILS burst3 (2083.8 ms) and burst5 (divergent). Cheapest, worst onset coverage.
+              - ewma-mult (agg 589/1.09x): PASSES every episode (burst3 747.1 ms, lead-invariant) but at 1.09x the static fleet -- NO economic win.
+              - chronos   (agg 589/0.62x): PASSES every episode. The only forecaster that is simultaneously onset-covering AND cheaper than static.
+            Per-window p99/ws (L30 warm): burst1 chr589/540k add657/377k mult589/919k wsc611/433k; burst3 chr589/32k add1285(F) mult747/47k wsc2084(F); burst4 all~589 (chr238k add170k mult360k wsc208k); burst5 chr589/89k add679-DIV(F) mult589/152k wsc589-DIV(F); steady24h chr681/162k add418/356k mult418/302k wsc735/161k.
+implication: refines (does not contradict) "model choice is second-order" -- that holds for ACCURACY among forward forecasters (ARIMA ties Chronos), but the operative object is the calibrated p90 BAND SHAPE. A cheap forward forecaster's calibrated band is either onset-missing (add/wsc) or over-provisioning (mult); the TSFM's state-adaptive band is the one that covers fast onsets without calm-time waste, which is exactly what buys 0.62x. Answers the defense "did you ever price a forward classical forecaster at a calibrated quantile?" (defense-qa KS-1): yes, now measured -- the forecaster is load-bearing, not decorative.
+feeds:      defense/defense-qa.tex "Deep adversarial cuts" KS-1 (updated with measured result); candidate closedloop.tex ablation paragraph (proposed, pending approval)
+supersedes: nothing (new ablation; closes the open item flagged in the same KS-1 entry)
+commit:     see next commit
+
+## Defense animation A8 "the onset map" (18-episode phase diagram)
+date:       2026-07-19
+artifact:   defense/anim/a8_onset_map.html (15 KB, self-contained); builder defense/anim/build/build_a8.py
+inputs:     per-episode reactive+forecast p99 by lead from a2_runs/a2x_runs verifications; NEW cells this entry: e18 reactive x4 (795/1574/1627/4932 -- fails from L30), burst2 reactive x4 (588x3 matching thesis Tab 7.3 + L165 1065 new), burst6 reactive x4 (588/748.7/904.7 matching Tab 7.3 + L165 3282 new)
+verify:     burst2/6 L<=45 reproduce thesis Tab 7.3 (588/588/588; 588/749/905) -- independent re-derivation through the full pipeline
+view:       scatter onset-minutes(log) x peak img/s; fill=reactive verdict at selected lead {15,30,45,165}, ring=forecast verdict (dashed gray = no forecast, context days); e13 flagged; click-through to A2; summary line (L=30: reactive fails 9/18, forecast 1/18)
+feeds:      Q&A / generality defense ("how general is the reactive failure?"); launcher card 4
+commit:     see next commit

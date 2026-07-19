@@ -614,5 +614,89 @@
   "provisioned_ws": 20684.3,
   "queue_divergent": false,
   "ledger_expected": null
+ },
+ "e18_reactive_L15": {
+  "p99_ms": 795.204,
+  "max_ms": 8947.36,
+  "provisioned_ws": 21748.8,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e18_reactive_L30": {
+  "p99_ms": 1573.828,
+  "max_ms": 10845.573,
+  "provisioned_ws": 20593.8,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e18_reactive_L45": {
+  "p99_ms": 1626.567,
+  "max_ms": 10845.573,
+  "provisioned_ws": 19438.8,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "e18_reactive_L165": {
+  "p99_ms": 4931.732,
+  "max_ms": 28245.859,
+  "provisioned_ws": 10198.8,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "burst2_reactive_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 4281.664,
+  "provisioned_ws": 131434.6,
+  "queue_divergent": false,
+  "ledger_expected": 588
+ },
+ "burst2_reactive_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 4281.664,
+  "provisioned_ws": 128826.6,
+  "queue_divergent": false,
+  "ledger_expected": 588
+ },
+ "burst2_reactive_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 4281.664,
+  "provisioned_ws": 126306.6,
+  "queue_divergent": false,
+  "ledger_expected": 588
+ },
+ "burst2_reactive_L165": {
+  "p99_ms": 1065.045,
+  "max_ms": 5661.3,
+  "provisioned_ws": 106267.9,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "burst6_reactive_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 5836.866,
+  "provisioned_ws": 88693.2,
+  "queue_divergent": false,
+  "ledger_expected": 588
+ },
+ "burst6_reactive_L30": {
+  "p99_ms": 748.677,
+  "max_ms": 5836.866,
+  "provisioned_ws": 86338.2,
+  "queue_divergent": false,
+  "ledger_expected": 749
+ },
+ "burst6_reactive_L45": {
+  "p99_ms": 904.739,
+  "max_ms": 6655.36,
+  "provisioned_ws": 83983.2,
+  "queue_divergent": false,
+  "ledger_expected": 905
+ },
+ "burst6_reactive_L165": {
+  "p99_ms": 3281.929,
+  "max_ms": 15586.854,
+  "provisioned_ws": 65188.8,
+  "queue_divergent": false,
+  "ledger_expected": null
  }
 }

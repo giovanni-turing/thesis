@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A8 — The onset map</title>
+<style>
+  :root { color-scheme: light;
+    --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+    --blue:#2a78d6; --good:#0ca30c; --critical:#d03b3b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { background:var(--page); color:var(--ink); overflow:hidden;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif; display:flex; flex-direction:column; }
+  header { display:flex; align-items:center; gap:16px; padding:12px 24px 6px; }
+  header h1 { font-size:21px; font-weight:650; }
+  header .sub { font-size:12.5px; color:var(--ink-2); margin-top:2px; }
+  .ctl { display:flex; align-items:center; gap:6px; margin-left:auto; }
+  .ctl .lbl { font-size:10px; color:var(--muted); font-weight:600; letter-spacing:0.06em; text-align:right; line-height:1.2; }
+  .seg { display:flex; border:1px solid var(--border); border-radius:9px; overflow:hidden; background:var(--surface); }
+  .seg button { font:inherit; font-size:13px; font-weight:600; padding:6px 13px; border:0;
+    background:transparent; cursor:pointer; color:var(--ink-2); }
+  .seg button + button { border-left:1px solid var(--border); }
+  .seg button.on { background:var(--ink); color:#fff; }
+  #summary { padding:2px 24px 4px; font-size:13.5px; color:var(--ink-2); }
+  #summary b { color:var(--ink); }
+  #chartwrap { flex:1; margin:0 24px 6px; position:relative;
+    background:var(--surface); border:1px solid var(--border); border-radius:14px; }
+  canvas { position:absolute; inset:0; width:100%; height:100%; }
+  footer { display:flex; gap:14px; align-items:center; padding:2px 24px 8px; font-size:10.5px; color:var(--muted); }
+  footer .spacer { flex:1; }
+  .lg { display:inline-flex; align-items:center; gap:5px; margin-right:12px; }
+  .dotp { width:11px; height:11px; border-radius:50%; display:inline-block; }
+  #tooltip { position:fixed; z-index:30; pointer-events:none; display:none;
+    background:var(--ink); color:#fff; border-radius:8px; padding:8px 11px;
+    font-size:12px; line-height:1.55; font-variant-numeric:tabular-nums;
+    box-shadow:0 4px 16px rgba(0,0,0,0.3); }
+  #tooltip table { border-collapse:collapse; margin-top:3px; }
+  #tooltip td { padding:0 7px 0 0; }
+  a.back { color:var(--blue); text-decoration:none; font-size:12px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>The onset map — all 18 burst episodes</h1>
+    <div class="sub">Each dot = one episode of the trace (Ch. 3 definition) · fill = reactive verdict at the chosen lead · ring = forecast (Chronos p90) verdict · click a dot to replay it in A2</div>
+  </div>
+  <div class="ctl">
+    <span class="lbl">COLD-START<br>LEAD L</span>
+    <div class="seg" id="leadSeg">
+      <button data-l="15">15 s</button><button data-l="30" class="on">30 s</button>
+      <button data-l="45">45 s</button><button data-l="165">165 s</button>
+    </div>
+  </div>
+</header>
+<div id="summary"></div>
+<div id="chartwrap"><canvas id="cv"></canvas></div>
+<footer>
+  <span class="lg"><span class="dotp" style="background:var(--good)"></span>reactive passes</span>
+  <span class="lg"><span class="dotp" style="background:var(--critical)"></span>reactive fails (p99 ≥ 1 s)</span>
+  <span class="lg"><span class="dotp" style="border:2.5px solid var(--blue)"></span>forecast passes</span>
+  <span class="lg"><span class="dotp" style="border:2.5px dashed var(--critical)"></span>forecast fails</span>
+  <span class="lg"><span class="dotp" style="border:2px dashed var(--muted)"></span>no forecast (context days)</span>
+  <span class="spacer"></span>
+  <span>isolated ±10-min window replays, ρ=15 · ledgered cells reproduced exactly; others new runs, identical law</span>
+  <a class="back" href="index.html">← launcher</a>
+</footer>
+<div id="tooltip"></div>
+<script>
+const DATA = {"sla":1000.0,"leads":[15,30,45,165],"episodes":[{"key":"burst1","label":"b1","start":"2024-10-21 12:59","onset":220,"peak":370.2,"requests":64804,"coverage":true,"a2":true,"re":{"15":588.4,"30":588.4,"45":588.4,"165":609.7},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":588.4}},{"key":"burst2","label":"b2","start":"2024-10-15 21:16","onset":48,"peak":363.7,"requests":13870,"coverage":false,"a2":false,"re":{"15":588.4,"30":588.4,"45":588.4,"165":1065.0},"fc":{"15":null,"30":null,"45":null,"165":null}},{"key":"burst3","label":"b3","start":"2024-10-18 10:18","onset":1,"peak":355.5,"requests":3093,"coverage":true,"a2":true,"re":{"15":9481.3,"30":16078.7,"45":28342.2,"165":54169.5},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":588.4}},{"key":"burst4","label":"b4","start":"2024-10-18 15:37","onset":60,"peak":350.4,"requests":25639,"coverage":true,"a2":true,"re":{"15":588.4,"30":588.4,"45":588.4,"165":904.7},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":588.4}},{"key":"burst5","label":"b5","start":"2024-10-18 14:32","onset":35,"peak":343.4,"requests":8983,"coverage":true,"a2":true,"re":{"15":588.4,"30":588.4,"45":588.4,"165":3250.2},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":588.4}},{"key":"burst6","label":"b6","start":"2024-10-15 23:26","onset":1,"peak":337.2,"requests":9821,"coverage":false,"a2":false,"re":{"15":588.4,"30":748.7,"45":904.7,"165":3281.9},"fc":{"15":null,"30":null,"45":null,"165":null}},{"key":"e7","label":"e7","start":"2024-10-18 13:02","onset":26,"peak":291.1,"requests":10377,"coverage":true,"a2":false,"re":{"15":588.4,"30":588.4,"45":588.5,"165":3073.8},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":588.4}},{"key":"e8","label":"e8","start":"2024-10-21 12:18","onset":2,"peak":290.6,"requests":4107,"coverage":true,"a2":false,"re":{"15":2687.3,"30":4235.3,"45":7487.4,"165":8247.8},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":4235.3}},{"key":"e9","label":"e9","start":"2024-10-18 11:20","onset":2,"peak":274.6,"requests":6615,"coverage":true,"a2":false,"re":{"15":607.0,"30":881.6,"45":904.7,"165":6668.4},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":588.4}},{"key":"e10","label":"e10","start":"2024-10-18 10:36","onset":6,"peak":274.4,"requests":3375,"coverage":true,"a2":true,"re":{"15":9162.3,"30":15946.8,"45":28279.8,"165":53585.5},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":588.4}},{"key":"e11","label":"e11","start":"2024-10-18 10:08","onset":2,"peak":272.6,"requests":4205,"coverage":true,"a2":true,"re":{"15":7656.3,"30":15412.4,"45":27741.7,"165":50855.1},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":588.4}},{"key":"e12","label":"e12","start":"2024-10-21 12:38","onset":11,"peak":269.8,"requests":5114,"coverage":true,"a2":false,"re":{"15":699.6,"30":941.5,"45":1052.8,"165":2366.9},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":904.7}},{"key":"e13","label":"e13","start":"2024-10-20 18:22","onset":7,"peak":262.9,"requests":1652,"coverage":true,"a2":true,"re":{"15":1452.4,"30":2892.0,"45":4128.9,"165":6112.3},"fc":{"15":5312.1,"30":6093.2,"45":6093.2,"165":6786.6}},{"key":"e14","label":"e14","start":"2024-10-18 09:42","onset":2,"peak":253.9,"requests":2517,"coverage":true,"a2":false,"re":{"15":1557.8,"30":5323.2,"45":12133.5,"165":15569.1},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":588.4}},{"key":"e15","label":"e15","start":"2024-10-18 11:01","onset":2,"peak":253.2,"requests":2790,"coverage":true,"a2":false,"re":{"15":4702.2,"30":8801.7,"45":12393.3,"165":13494.4},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":588.4}},{"key":"e16","label":"e16","start":"2024-10-21 09:13","onset":13,"peak":243.0,"requests":3803,"coverage":true,"a2":false,"re":{"15":637.7,"30":655.7,"45":745.7,"165":1001.0},"fc":{"15":903.7,"30":904.7,"45":904.7,"165":904.7}},{"key":"e17","label":"e17","start":"2024-10-18 11:10","onset":6,"peak":234.8,"requests":2881,"coverage":true,"a2":true,"re":{"15":8270.3,"30":13310.9,"45":22564.4,"165":38729.7},"fc":{"15":588.4,"30":588.4,"45":588.4,"165":588.4}},{"key":"e18","label":"e18","start":"2024-10-15 17:12","onset":3,"peak":225.4,"requests":6230,"coverage":false,"a2":false,"re":{"15":795.2,"30":1573.8,"45":1626.6,"165":4931.7},"fc":{"15":null,"30":null,"45":null,"165":null}}],"provenance":"verified runs: defense/anim/data/{a2_runs,a2x_runs}/verification.json; burst1/3/4/5 + burst2/6 L<=45 reproduce ledgered cells (results_44.jsonl, factorial_issuetime, thesis Tab 7.3); all other cells are new runs, identical law"};
+let lead = "30";
+const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+const wrap = document.getElementById("chartwrap");
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const PAD = { l: 64, r: 30, t: 26, b: 44 };
+let W = 0, H = 0, pts = [];
+
+const XMIN = 0.85, XMAX = 300;
+const x = m => PAD.l + (Math.log10(m) - Math.log10(XMIN)) / (Math.log10(XMAX) - Math.log10(XMIN)) * (W - PAD.l - PAD.r);
+const YMIN = 215, YMAX = 385;
+const y = p => H - PAD.b - (p - YMIN) / (YMAX - YMIN) * (H - PAD.t - PAD.b);
+
+function draw() {
+  const dpr = devicePixelRatio || 1;
+  const r = wrap.getBoundingClientRect();
+  W = r.width; H = r.height;
+  cv.width = W * dpr; cv.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  // grid + axes
+  ctx.font = "11px system-ui"; ctx.fillStyle = css("--muted");
+  for (const t of [1, 2, 5, 10, 30, 60, 120, 220]) {
+    ctx.strokeStyle = css("--grid");
+    ctx.beginPath(); ctx.moveTo(x(t), PAD.t); ctx.lineTo(x(t), H - PAD.b); ctx.stroke();
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.fillText(t, x(t), H - PAD.b + 7);
+  }
+  for (let p = 225; p <= 375; p += 50) {
+    ctx.strokeStyle = css("--grid");
+    ctx.beginPath(); ctx.moveTo(PAD.l, y(p)); ctx.lineTo(W - PAD.r, y(p)); ctx.stroke();
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    ctx.fillText(p, PAD.l - 8, y(p));
+  }
+  ctx.strokeStyle = css("--axis");
+  ctx.strokeRect(PAD.l, PAD.t, W - PAD.l - PAD.r, H - PAD.t - PAD.b);
+  ctx.font = "600 12px system-ui"; ctx.fillStyle = css("--ink-2");
+  ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+  ctx.fillText("onset: baseline → peak (minutes, log)", (PAD.l + W - PAD.r) / 2, H - 6);
+  ctx.save(); ctx.translate(16, (PAD.t + H - PAD.b) / 2); ctx.rotate(-Math.PI / 2);
+  ctx.textBaseline = "top"; ctx.fillText("episode peak (img/s, 1-min)", 0, 0); ctx.restore();
+  // region hints
+  ctx.font = "600 11.5px system-ui"; ctx.fillStyle = css("--muted");
+  ctx.textAlign = "left"; ctx.textBaseline = "top";
+  ctx.fillText("← fast onsets: reactive-dead zone", PAD.l + 10, PAD.t + 6);
+  ctx.textAlign = "right";
+  ctx.fillText("slow onsets: observable in time →", W - PAD.r - 10, PAD.t + 6);
+  // dots
+  pts = [];
+  for (const [i, e] of DATA.episodes.entries()) {
+    const jit = 1 + ((i * 2654435761 % 100) / 100 - 0.5) * 0.22;   // disclosed deterministic de-overlap
+    const ex = x(Math.max(e.onset, 1) * jit), ey = y(e.peak);
+    const rp = e.re[lead], fp = e.fc[lead];
+    const reFail = rp !== null && rp >= DATA.sla;
+    // forecast ring
+    if (fp === null) { ctx.setLineDash([3, 3]); ctx.strokeStyle = css("--muted"); ctx.lineWidth = 2; }
+    else if (fp >= DATA.sla) { ctx.setLineDash([4, 3]); ctx.strokeStyle = css("--critical"); ctx.lineWidth = 3; }
+    else { ctx.setLineDash([]); ctx.strokeStyle = css("--blue"); ctx.lineWidth = 2.5; }
+    ctx.beginPath(); ctx.arc(ex, ey, 13, 0, 6.2832); ctx.stroke(); ctx.setLineDash([]);
+    // reactive fill
+    ctx.fillStyle = rp === null ? css("--muted") : (reFail ? css("--critical") : css("--good"));
+    ctx.beginPath(); ctx.arc(ex, ey, 8.5, 0, 6.2832); ctx.fill();
+    // glyph (CVD-safe secondary encoding)
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = 2;
+    if (reFail) { ctx.beginPath(); ctx.moveTo(ex-3.5,ey-3.5); ctx.lineTo(ex+3.5,ey+3.5);
+      ctx.moveTo(ex+3.5,ey-3.5); ctx.lineTo(ex-3.5,ey+3.5); ctx.stroke(); }
+    else { ctx.beginPath(); ctx.moveTo(ex-3.5,ey+0.5); ctx.lineTo(ex-1,ey+3.5); ctx.lineTo(ex+3.5,ey-3); ctx.stroke(); }
+    // label
+    ctx.font = "700 11px system-ui"; ctx.textBaseline = "middle";
+    ctx.strokeStyle = css("--surface"); ctx.lineWidth = 3;
+    const side = i % 2 ? -1 : 1;
+    ctx.textAlign = side > 0 ? "left" : "right";
+    const lbl = e.label + (e.key === "e13" ? " ⚠" : "");
+    ctx.strokeText(lbl, ex + 16 * side, ey);
+    ctx.fillStyle = css("--ink-2"); ctx.fillText(lbl, ex + 16 * side, ey);
+    pts.push({ ...e, ex, ey });
+  }
+  // summary
+  const inplay = DATA.episodes.filter(e => e.re[lead] !== null);
+  const rf = inplay.filter(e => e.re[lead] >= DATA.sla).length;
+  const ff = DATA.episodes.filter(e => e.fc[lead] !== null && e.fc[lead] >= DATA.sla).length;
+  document.getElementById("summary").innerHTML =
+    `At L = <b>${lead} s</b>: reactive fails <b>${rf} of ${inplay.length}</b> episodes · ` +
+    `forecast fails <b>${ff}</b> (${ff ? "e13 — the forecast-miss boundary case" : "none"}) · ` +
+    `the dead zone grows with lead — drag it.`;
+}
+document.querySelectorAll("#leadSeg button").forEach(b => b.onclick = () => {
+  lead = b.dataset.l;
+  document.querySelectorAll("#leadSeg button").forEach(o => o.classList.toggle("on", o === b));
+  draw();
+});
+const tt = document.getElementById("tooltip");
+cv.addEventListener("mousemove", e => {
+  const r = cv.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const hit = pts.find(p => (p.ex-mx)**2 + (p.ey-my)**2 < 170);
+  cv.style.cursor = hit && hit.a2 ? "pointer" : "default";
+  if (!hit) { tt.style.display = "none"; return; }
+  const fmt = v => v === null ? "—" : (v >= 10000 ? (v/1000).toFixed(1)+" s" : v >= 1000 ? (v/1000).toFixed(2)+" s" : Math.round(v)+" ms");
+  let rows = DATA.leads.map(L =>
+    `<tr><td>L=${L}s</td><td style="color:${hit.re[L]>=DATA.sla?'#ff9d9d':'#9fe6a0'}">${fmt(hit.re[L])}</td>` +
+    `<td style="color:${hit.fc[L]===null?'#bbb':hit.fc[L]>=DATA.sla?'#ff9d9d':'#9fe6a0'}">${fmt(hit.fc[L])}</td></tr>`).join("");
+  tt.innerHTML = `<b>${hit.label}</b> · ${hit.start} UTC · peak ${hit.peak} img/s · onset ${hit.onset} min · ${hit.requests.toLocaleString("en-US")} req` +
+    `<table><tr><td></td><td>reactive</td><td>forecast</td></tr>${rows}</table>` +
+    (hit.coverage ? "" : "<div style='color:#bbb'>forecast-context days: no archived forecast</div>") +
+    (hit.a2 ? "<div style='color:#9ec5f4'>click to replay in A2</div>" : "");
+  tt.style.display = "block";
+  tt.style.left = Math.min(e.clientX + 14, innerWidth - 300) + "px";
+  tt.style.top = Math.min(e.clientY + 14, innerHeight - 170) + "px";
+});
+cv.addEventListener("mouseleave", () => tt.style.display = "none");
+cv.addEventListener("click", e => {
+  const r = cv.getBoundingClientRect();
+  const hit = pts.find(p => (p.ex-(e.clientX-r.left))**2 + (p.ey-(e.clientY-r.top))**2 < 170);
+  if (hit && hit.a2) location.href = `a2_the_race.html#w=${hit.key}&L=${lead === "165" ? "165" : lead}`;
+});
+addEventListener("resize", draw);
+draw();
+</script>
+</body>
+</html>
