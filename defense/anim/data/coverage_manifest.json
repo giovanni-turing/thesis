@@ -1,0 +1,699 @@
+{
+ "trace_requests": 1000000,
+ "forecast_span_requests": 749601,
+ "per_model_maxspan": {
+  "timesfm": {
+   "requests": null,
+   "pct_of_1M": null,
+   "ttft_p99": null
+  },
+  "toto": {
+   "requests": null,
+   "pct_of_1M": null,
+   "ttft_p99": null
+  },
+  "chronos": {
+   "requests": null,
+   "pct_of_1M": null,
+   "ttft_p99": null
+  }
+ },
+ "context_days_requests": 250399,
+ "coverage": {
+  "encoder_full_trace": {
+   "policies": [
+    "static_C8",
+    "static_C2",
+    "reactive"
+   ],
+   "requests_each": 1000000,
+   "runs": [
+    "ft_static_C8",
+    "ft_static_C2",
+    "ft_reactive_L30"
+   ]
+  },
+  "language_full_trace": {
+   "policies": [
+    "static_TP2x2",
+    "reactive"
+   ],
+   "requests_each": 1000000,
+   "runs": [
+    "ft_llm_static",
+    "ft_llm_reactive"
+   ]
+  },
+  "forecast_policies": {
+   "note": "structurally undefined on the first 1.4 days (no archived forecast) \u2014 covered on the 749,601-req forecast span only",
+   "span_requests": 749601
+  }
+ },
+ "rows": [
+  {
+   "fleet": "A13",
+   "run": "ft_static_C8",
+   "pool": "encoder",
+   "requests": 1000000,
+   "expect": 1000000,
+   "full": true,
+   "ok": true
+  },
+  {
+   "fleet": "A13",
+   "run": "ft_static_C2",
+   "pool": "encoder",
+   "requests": 1000000,
+   "expect": 1000000,
+   "full": true,
+   "ok": true
+  },
+  {
+   "fleet": "A13",
+   "run": "ft_reactive_L30",
+   "pool": "encoder",
+   "requests": 1000000,
+   "expect": 1000000,
+   "full": true,
+   "ok": true
+  },
+  {
+   "fleet": "A13",
+   "run": "ft_llm_static",
+   "pool": "language",
+   "requests": 1000000,
+   "expect": 1000000,
+   "full": true,
+   "ok": true
+  },
+  {
+   "fleet": "A13",
+   "run": "ft_llm_reactive",
+   "pool": "language",
+   "requests": 1000000,
+   "expect": 1000000,
+   "full": true,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_fc_chronos_L60",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_reactive_L60",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_fc_chronos_L120",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_fc_chronos_L300",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_fc_toto_L60",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_fc_toto_L120",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_fc_toto_L300",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_reactive_L120",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_reactive_L300",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_fc_chronos_L60",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_fc_chronos_L120",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_fc_chronos_L300",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_fc_toto_L60",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_fc_toto_L120",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_fc_toto_L300",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_reactive_L60",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_reactive_L120",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_reactive_L300",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_fc_chronos_L60",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_fc_chronos_L120",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_fc_chronos_L300",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_fc_toto_L60",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_fc_toto_L120",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_fc_toto_L300",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_reactive_L60",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_reactive_L120",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_reactive_L300",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_fc_chronos_L60",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_fc_chronos_L120",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_fc_chronos_L300",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_fc_toto_L60",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_fc_toto_L120",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_fc_toto_L300",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_reactive_L60",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_reactive_L120",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_reactive_L300",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "week_fc_chronos_L60",
+   "pool": "language",
+   "requests": 749601,
+   "expect": 749601,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "week_fc_toto_L60",
+   "pool": "language",
+   "requests": 749601,
+   "expect": 749601,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "week_reactive_L60",
+   "pool": "language",
+   "requests": 749601,
+   "expect": 749601,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_fc_timesfm_L60",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_fc_timesfm_L120",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst3_fc_timesfm_L300",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_fc_timesfm_L60",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_fc_timesfm_L120",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst5_fc_timesfm_L300",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_fc_timesfm_L60",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_fc_timesfm_L120",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst4_fc_timesfm_L300",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_fc_timesfm_L60",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_fc_timesfm_L120",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A11",
+   "run": "burst1_fc_timesfm_L300",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst3_fc_toto",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst3_fc_chronos",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst3_reactive",
+   "pool": "language",
+   "requests": 3093,
+   "expect": 3093,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst5_fc_toto",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst5_fc_chronos",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst5_reactive",
+   "pool": "language",
+   "requests": 8983,
+   "expect": 8983,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst4_fc_toto",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst4_fc_chronos",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst4_reactive",
+   "pool": "language",
+   "requests": 25639,
+   "expect": 25639,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst1_fc_toto",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst1_fc_chronos",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "burst1_reactive",
+   "pool": "language",
+   "requests": 64804,
+   "expect": 64804,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "week_fc_toto",
+   "pool": "language",
+   "requests": 749601,
+   "expect": 749601,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "week_fc_chronos",
+   "pool": "language",
+   "requests": 749601,
+   "expect": 749601,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A12",
+   "run": "week_reactive",
+   "pool": "language",
+   "requests": 749601,
+   "expect": 749601,
+   "full": null,
+   "ok": true
+  }
+ ],
+ "guarantee": {
+  "encoder_all_1M_covered": true,
+  "language_all_1M_covered": true,
+  "per_model_maxspan_covered": true,
+  "complete": true
+ }
+}

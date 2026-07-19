@@ -686,3 +686,17 @@ numbers:    corrected AIC C* = 6,8,7,7,7,6 -> reproduces tab:base-grid (6,8,7,7,
 finding:    headline (real serving encoder needs same provisioning as AIC, ~1.03x) is robust to the gate; the fix makes the anchor's AIC C* reproduce the thesis's own tab:base-grid, strengthening the consistency story.
 supersedes: the pre-correction anchor_master.json / anchor_provisioning figure (burst5=16) -- corrected in place; burst_anchor_all.json (boost-clock) still kept as the exploratory record.
 commit:     (uncommitted)
+
+## Full-trace coverage GUARANTEE MET — every request, both pools (A13)
+date:       2026-07-19
+artifact:   defense/anim/data/coverage_manifest.json; defense/anim/data/a13_runs/{verification.json, ft_*.report.json}
+command:    python3 defense/anim/build/gen_a13_fulltrace.py && python3 defense/anim/build/build_coverage_manifest.py
+result:     ALL 1,000,000 trace requests simulated through BOTH pools:
+              encoder — ft_static_C8 / ft_static_C2 / ft_reactive_L30, each 1,000,000 req (AIC converter)
+              language — ft_llm_static (TP2x2 on C8-composed) / ft_llm_reactive (SLA planner on reactive-composed),
+                         each 1,000,000 req WITH per-request records (dynamo.replay, source-build patch)
+            coverage_manifest guarantee: encoder_all_1M True, language_all_1M True, complete True.
+            Forecast policies structurally undefined on the pre-forecast warm-up (fixed-context origin grid);
+            per-model max-span forecast coverage is A14 (timesfm 931,628 / toto 872,980 / chronos 749,601).
+speedup:    mocker virtual clock; 1M-req replay in ~30-45 min wall at EXACT validity; arrivals never compressed.
+commit:     see next commit
