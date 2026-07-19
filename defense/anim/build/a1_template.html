@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A1 — The invisible failure</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:      #f9f9f7;
+    --surface:   #fcfcfb;
+    --ink:       #0b0b0b;
+    --ink-2:     #52514e;
+    --muted:     #898781;
+    --grid:      #e1e0d9;
+    --axis:      #c3c2b7;
+    --border:    rgba(11,11,11,0.10);
+    --req:       #008300;   /* requests: green (matches thesis figures) */
+    --img:       #2a78d6;   /* images/queue: blue (matches thesis figures) */
+    --good:      #0ca30c;
+    --critical:  #d03b3b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--page); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  header {
+    display: flex; align-items: center; gap: 18px;
+    padding: 10px 20px 8px;
+  }
+  header h1 { font-size: 21px; font-weight: 650; letter-spacing: -0.01em; }
+  header .sub { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+  .clock {
+    font-variant-numeric: tabular-nums; font-size: 26px; font-weight: 650;
+    padding: 2px 12px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); min-width: 190px; text-align: center;
+  }
+  .clock small { display:block; font-size: 10px; font-weight: 500; color: var(--muted); letter-spacing: 0.08em; }
+  .transport { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .transport button, .transport select {
+    font: inherit; font-size: 14px; padding: 6px 14px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+    cursor: pointer; color: var(--ink);
+  }
+  .transport button.primary { background: var(--ink); color: #fff; border-color: var(--ink); min-width: 92px; }
+  #scrubwrap { padding: 0 20px 6px; }
+  #scrub { width: 100%; accent-color: var(--ink); height: 22px; cursor: pointer; }
+  main {
+    flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    padding: 0 20px 6px; min-height: 0;
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    display: flex; flex-direction: column; padding: 12px 16px 10px; min-height: 0;
+    position: relative;
+  }
+  .card h2 { font-size: 13px; font-weight: 700; letter-spacing: 0.10em; color: var(--ink-2); }
+  .card h2 .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+  .tiles { display: flex; gap: 10px; margin: 8px 0 4px; }
+  .tile {
+    flex: 1; border: 1px solid var(--border); border-radius: 10px; padding: 7px 10px 6px;
+    background: var(--surface);
+  }
+  .tile .k { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; white-space: nowrap; }
+  .tile .v { font-size: 24px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.15; }
+  .tile .u { font-size: 12px; color: var(--ink-2); font-weight: 500; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 650; padding: 4px 12px; border-radius: 999px;
+  }
+  .pill.ok   { background: rgba(12,163,12,0.12); color: #006300; }
+  .pill.bad  { background: rgba(208,59,59,0.12); color: var(--critical); }
+  .charts { flex: 1; display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+  .chart { flex: 1; min-height: 0; position: relative; }
+  .chart canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .verdict {
+    position: absolute; left: 16px; right: 16px; bottom: 12px; z-index: 5;
+    border-radius: 10px; padding: 10px 14px; font-size: 15px; font-weight: 650;
+    display: none; align-items: baseline; gap: 10px; border: 1px solid var(--border);
+    box-shadow: 0 6px 24px rgba(11,11,11,0.12); background: var(--surface);
+  }
+  .verdict.show { display: flex; }
+  .verdict .big { font-size: 22px; font-variant-numeric: tabular-nums; }
+  .verdict.ok  { border-left: 6px solid var(--good); }
+  .verdict.bad { border-left: 6px solid var(--critical); }
+  footer {
+    display: flex; gap: 16px; align-items: center;
+    padding: 4px 20px 8px; font-size: 11px; color: var(--muted);
+  }
+  footer .spacer { flex: 1; }
+  #infoBtn { cursor: pointer; border: 1px solid var(--border); background: var(--surface);
+    border-radius: 50%; width: 20px; height: 20px; font-size: 12px; color: var(--ink-2); }
+  #infoBox {
+    display: none; position: absolute; right: 20px; bottom: 34px; z-index: 20;
+    max-width: 560px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; font-size: 12px; color: var(--ink-2);
+    box-shadow: 0 8px 30px rgba(11,11,11,0.15); line-height: 1.5;
+  }
+  #infoBox.show { display: block; }
+  #tooltip {
+    position: fixed; z-index: 30; pointer-events: none; display: none;
+    background: var(--ink); color: #fff; border-radius: 8px; padding: 8px 11px;
+    font-size: 12px; line-height: 1.55; font-variant-numeric: tabular-nums;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25); max-width: 260px;
+  }
+  #tooltip .tt-t { font-weight: 700; margin-bottom: 2px; }
+  #tooltip .sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; }
+  kbd { background: var(--grid); border-radius: 4px; padding: 0 5px; font-size: 11px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>The invisible failure</h1>
+    <div class="sub">Encoder pool inside the largest burst — trace's own rate, locked 2-worker topology (open-loop replay)</div>
+  </div>
+  <div class="clock"><small>2024-10-21 · UTC</small><span id="clock">12:59:00</span></div>
+  <div class="transport">
+    <button id="playBtn" class="primary">▶ Play</button>
+    <select id="speedSel" title="playback speed">
+      <option value="250">250×</option>
+      <option value="500" selected>500×</option>
+      <option value="1000">1000×</option>
+      <option value="2000">2000×</option>
+    </select>
+    <button id="resetBtn">↺ Reset</button>
+  </div>
+</header>
+<div id="scrubwrap"><input id="scrub" type="range" min="0" max="29939" step="1" value="0"></div>
+
+<main>
+  <section class="card" id="cardDash">
+    <h2><span class="dot" style="background:var(--good)"></span>WHAT THE OPERATOR SEES</h2>
+    <div class="tiles">
+      <div class="tile"><div class="k">Request rate (1-min)</div>
+        <div class="v" id="tReq">–</div><div class="u">req/s · weekly p99 = 4.35</div></div>
+      <div class="tile"><div class="k">Utilization (1-min mean)</div>
+        <div class="v" id="tUtil">–</div><div class="u">of 2 encoder workers</div></div>
+      <div class="tile" style="display:flex;align-items:center;justify-content:center">
+        <span class="pill ok" id="healthPill">● ALL SYSTEMS HEALTHY</span></div>
+    </div>
+    <div class="charts">
+      <div class="chart" data-chart="req"><canvas></canvas></div>
+      <div class="chart" data-chart="util"><canvas></canvas></div>
+    </div>
+    <div class="verdict ok" id="verdictDash">
+      <span>Dashboard verdict after 8.3 h:</span><span class="big" style="color:#006300">HEALTHY all day</span>
+      <span style="font-weight:500;color:var(--ink-2)">mean util 28.9% · req/s never above 4.5</span>
+    </div>
+  </section>
+
+  <section class="card" id="cardReal">
+    <h2><span class="dot" style="background:var(--critical)"></span>WHAT IS ACTUALLY HAPPENING</h2>
+    <div class="tiles">
+      <div class="tile"><div class="k">Offered image load</div>
+        <div class="v" id="tImg" style="color:#1c5cab">–</div><div class="u">img/s (1-min) · weekly p99 = 224</div></div>
+      <div class="tile"><div class="k">Queued images (now)</div>
+        <div class="v" id="tQueue" style="color:#1c5cab">–</div><div class="u">backlog-implied wait <span id="tWait">0.0 s</span></div></div>
+      <div class="tile"><div class="k">Time in SLA-violating backlog</div>
+        <div class="v" id="tExc" style="color:var(--critical)">0 s</div><div class="u">backlog-implied wait &gt; 1 s</div></div>
+    </div>
+    <div class="charts">
+      <div class="chart" data-chart="img"><canvas></canvas></div>
+      <div class="chart" data-chart="queue"><canvas></canvas></div>
+    </div>
+    <div class="verdict bad" id="verdictReal">
+      <span>Encoder-delay p99 (window):</span><span class="big" style="color:var(--critical)">5,013 ms</span>
+      <span style="font-weight:500;color:var(--ink-2)">vs SLA 1,000 ms — 5× over, at 28.9% mean utilization</span>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>Real data · simulation/results/sweeps/{series/vision_burst1_s1.series.json, traces/vision_burst1_s1.jsonl, summary.json}</span>
+  <span><kbd>space</kbd> play/pause · <kbd>←</kbd><kbd>→</kbd> ±1 min · <kbd>R</kbd> reset</span>
+  <span class="spacer"></span>
+  <span>64,804 requests · 3,478,128 images · 83,376 encoder forwards</span>
+  <button id="infoBtn">i</button>
+  <div id="infoBox">
+    <b>Scope.</b> Open-loop replay of the Azure LMM trace window (2024-10-21
+    12:59–21:18 UTC) at its own recorded rate through the AIC-costed encoder FIFO
+    (2 RTX 5090-class workers, 64-image dispatch cap, f(64)=316.4 ms).
+    "Backlog-implied wait" = queued images ÷ full-drain rate (2·64/f(64) ≈ 405 img/s);
+    the verdict banner quotes the official ledgered per-request percentile
+    (encoder-delay p99 = 5,013.4 ms; max 12,587 ms). Utilization is the 1-min mean of
+    busy workers. The dashboard panel shows exactly the signals a reactive
+    autoscaler consumes; both panels replay the same simulation second-by-second.
+  </div>
+</footer>
+<div id="tooltip"></div>
+
+<script>
+const DATA = /*__DATA__*/;
+
+/* ---------- data prep ---------- */
+const N = DATA.meta.horizon_s;             // 29940 s
+const Q = DATA.sec.q, A = DATA.sec.a;
+const MIN = DATA.min;                       // req, util, img (per minute)
+const Q_SLA = DATA.meta.q_sla;              // ≈405 images = 1 s of backlog
+const DRAIN = DATA.meta.drain_img_per_s;
+const T0 = 12*3600 + 59*60;                 // 12:59:00 UTC
+const EVENTS = [
+  { t: DATA.meta.checks.worst_second_t, label: "worst second: 2,726 images arrive at once", chart: "queue" },
+  { t: DATA.meta.checks.peak_queue_t,   label: "peak backlog: 4,701 images (≈11.6 s wait)", chart: "queue" },
+  { t: DATA.meta.checks.peak_img_min_t, label: "peak: 370 img/s (requests < 4.5/s)", chart: "img" },
+];
+
+/* ---------- state ---------- */
+let playhead = 0;           // seconds
+let playing = false;
+let hoverT = null;
+let lastTs = null;
+
+/* ---------- chart infrastructure ---------- */
+const CHARTS = [];
+const fmtClock = s => {
+  const w = T0 + s;
+  const hh = String(Math.floor(w/3600)%24).padStart(2,"0");
+  const mm = String(Math.floor(w/60)%60).padStart(2,"0");
+  const ss = String(Math.floor(w%60)).padStart(2,"0");
+  return `${hh}:${mm}:${ss}`;
+};
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+class Chart {
+  constructor(el, spec) {
+    this.el = el; this.spec = spec;
+    this.canvas = el.querySelector("canvas");
+    this.ctx = this.canvas.getContext("2d");
+    this.pad = { l: 52, r: 12, t: 20, b: spec.xAxis ? 22 : 8 };
+    CHARTS.push(this);
+  }
+  resize() {
+    const dpr = devicePixelRatio || 1;
+    const r = this.el.getBoundingClientRect();
+    this.w = r.width; this.h = r.height;
+    this.canvas.width = r.width * dpr; this.canvas.height = r.height * dpr;
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  x(t) { return this.pad.l + (t / N) * (this.w - this.pad.l - this.pad.r); }
+  y(v) { const s = this.spec; return this.h - this.pad.b - (Math.min(v, s.yMax) / s.yMax) * (this.h - this.pad.t - this.pad.b); }
+  draw() {
+    const { ctx, spec: s } = this;
+    ctx.clearRect(0, 0, this.w, this.h);
+    // title
+    ctx.font = "600 12.5px system-ui"; ctx.fillStyle = css("--ink-2");
+    ctx.textAlign = "left"; ctx.textBaseline = "top";
+    ctx.fillText(s.title, this.pad.l, 1);
+    // gridlines + y labels
+    ctx.font = "11px system-ui"; ctx.fillStyle = css("--muted");
+    ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+    for (const gv of s.yTicks) {
+      const gy = this.y(gv);
+      ctx.beginPath(); ctx.moveTo(this.pad.l, gy); ctx.lineTo(this.w - this.pad.r, gy); ctx.stroke();
+      ctx.textAlign = "right"; ctx.textBaseline = "middle";
+      ctx.fillText(s.yFmt ? s.yFmt(gv) : gv, this.pad.l - 6, gy);
+    }
+    // x axis (hourly)
+    if (s.xAxis) {
+      ctx.textAlign = "center"; ctx.textBaseline = "top"; ctx.fillStyle = css("--muted");
+      for (let hr = 13; hr <= 21; hr++) {
+        const t = hr*3600 - T0;
+        if (t < 0 || t > N) continue;
+        ctx.fillText(`${hr}:00`, this.x(t), this.h - this.pad.b + 6);
+        ctx.strokeStyle = css("--grid");
+        ctx.beginPath(); ctx.moveTo(this.x(t), this.h - this.pad.b); ctx.lineTo(this.x(t), this.h - this.pad.b + 4); ctx.stroke();
+      }
+    }
+    // baseline
+    ctx.strokeStyle = css("--axis"); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(this.pad.l, this.y(0)); ctx.lineTo(this.w - this.pad.r, this.y(0)); ctx.stroke();
+    // reference line
+    if (s.ref) {
+      ctx.strokeStyle = s.refColor || css("--critical"); ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
+      const ry = this.y(s.ref);
+      ctx.beginPath(); ctx.moveTo(this.pad.l, ry); ctx.lineTo(this.w - this.pad.r, ry); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = "600 10.5px system-ui";
+      ctx.textAlign = "right"; ctx.textBaseline = "bottom";
+      ctx.strokeStyle = css("--surface"); ctx.lineWidth = 3;
+      ctx.strokeText(s.refLabel, this.w - this.pad.r - 2, ry - 2);
+      ctx.fillStyle = s.refColor || css("--critical");
+      ctx.fillText(s.refLabel, this.w - this.pad.r - 2, ry - 2);
+    }
+    s.render(this, Math.floor(playhead));
+    // event markers (only those already passed)
+    ctx.textAlign = "left";
+    for (const ev of EVENTS) {
+      if (ev.chart !== s.id || ev.t > playhead) continue;
+      const ex = this.x(ev.t);
+      ctx.strokeStyle = css("--ink-2"); ctx.lineWidth = 1; ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.moveTo(ex, this.pad.t); ctx.lineTo(ex, this.h - this.pad.b); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = "600 10.5px system-ui";
+      const tw = ctx.measureText(ev.label).width;
+      const tx = Math.min(ex + 5, this.w - this.pad.r - tw - 4);
+      ctx.textBaseline = "top";
+      ctx.strokeStyle = css("--surface"); ctx.lineWidth = 3;
+      ctx.strokeText(ev.label, tx, this.pad.t - 2);
+      ctx.fillStyle = css("--ink-2");
+      ctx.fillText(ev.label, tx, this.pad.t - 2);
+    }
+    // playhead + hover crosshair
+    if (playhead > 0 && playhead < N) {
+      ctx.strokeStyle = css("--ink"); ctx.lineWidth = 1; ctx.globalAlpha = 0.55;
+      ctx.beginPath(); ctx.moveTo(this.x(playhead), this.pad.t); ctx.lineTo(this.x(playhead), this.h - this.pad.b); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    if (hoverT !== null && hoverT <= playhead) {
+      ctx.strokeStyle = css("--muted"); ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(this.x(hoverT), this.pad.t); ctx.lineTo(this.x(hoverT), this.h - this.pad.b); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+}
+
+/* line over per-minute data, up to playhead */
+function minuteLine(ch, upto, data, color) {
+  const ctx = ch.ctx, mMax = Math.min(Math.floor(upto/60), data.length - 1);
+  if (mMax < 1) return;
+  ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = "round";
+  ctx.beginPath();
+  for (let m = 0; m <= mMax; m++) {
+    const px = ch.x(m*60 + 30), py = ch.y(data[m]);
+    m ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+  }
+  ctx.stroke();
+}
+
+/* per-second area with red overlay above a threshold.
+   Downsampled by PER-PIXEL MAX buckets — stride sampling would skip the very
+   excursion spikes this chart exists to show. */
+function queueArea(ch, upto) {
+  const ctx = ch.ctx, base = ch.y(0);
+  const plotW = Math.max(1, Math.floor(ch.w - ch.pad.l - ch.pad.r));
+  const perPx = N / plotW;
+  const cols = [];                          // [x, maxQ] one entry per pixel column
+  for (let px = 0; px < plotW; px++) {
+    const lo = Math.floor(px * perPx), hi = Math.min(Math.floor((px + 1) * perPx), upto + 1);
+    if (lo > upto) break;
+    let m = 0;
+    for (let t = lo; t < Math.max(hi, lo + 1); t++) m = Math.max(m, Q[t]);
+    cols.push([ch.pad.l + px, m]);
+  }
+  if (!cols.length) return;
+  // blue backlog area
+  ctx.fillStyle = "rgba(42,120,214,0.55)";
+  ctx.beginPath(); ctx.moveTo(cols[0][0], base);
+  for (const [px, v] of cols) ctx.lineTo(px, ch.y(v));
+  ctx.lineTo(cols[cols.length-1][0], base); ctx.closePath(); ctx.fill();
+  // red portion above the SLA-equivalent backlog
+  ctx.fillStyle = "rgba(208,59,59,0.85)";
+  let open = false;
+  ctx.beginPath();
+  for (const [px, v] of cols) {
+    if (v > Q_SLA) {
+      if (!open) { ctx.moveTo(px, ch.y(Q_SLA)); open = true; }
+      ctx.lineTo(px, ch.y(v));
+    } else if (open) {
+      ctx.lineTo(px, ch.y(Q_SLA)); ctx.closePath(); ctx.fill(); ctx.beginPath(); open = false;
+    }
+  }
+  if (open) { ctx.lineTo(cols[cols.length-1][0], ch.y(Q_SLA)); ctx.closePath(); ctx.fill(); }
+}
+
+/* ---------- chart instances ---------- */
+const charts = {
+  req: new Chart(document.querySelector('[data-chart="req"]'), {
+    id: "req", title: "Request rate — the autoscaler's signal (req/s, 1-min)",
+    yMax: 6, yTicks: [0, 2, 4, 6], xAxis: false,
+    ref: 4.35, refColor: "#898781", refLabel: "weekly p99 (4.35)",
+    render: (ch, t) => minuteLine(ch, t, MIN.req, css("--req")),
+  }),
+  util: new Chart(document.querySelector('[data-chart="util"]'), {
+    id: "util", title: "Worker utilization (%, 1-min mean of 2 workers)",
+    yMax: 100, yTicks: [0, 29, 50, 100], yFmt: v => v === 29 ? "29" : v, xAxis: true,
+    ref: null,
+    render: (ch, t) => minuteLine(ch, t, MIN.util, css("--good")),
+  }),
+  img: new Chart(document.querySelector('[data-chart="img"]'), {
+    id: "img", title: "Offered image load (img/s, 1-min) — what actually drives this pool",
+    yMax: 400, yTicks: [0, 100, 224, 400], xAxis: false,
+    ref: 224, refColor: "#898781", refLabel: "weekly p99 (224)",
+    render: (ch, t) => minuteLine(ch, t, MIN.img, css("--img")),
+  }),
+  queue: new Chart(document.querySelector('[data-chart="queue"]'), {
+    id: "queue", title: "Encoder FIFO backlog (queued images, per second)",
+    yMax: 5000, yTicks: [0, 1000, 2500, 5000], yFmt: v => v >= 1000 ? (v/1000)+"k" : v, xAxis: true,
+    ref: Q_SLA, refLabel: "≈ 1 s of backlog (SLA)",
+    render: (ch, t) => queueArea(ch, t),
+  }),
+};
+
+/* ---------- excursion counter (precomputed cumulative) ---------- */
+const cumExc = new Int32Array(N);
+{ let c = 0; for (let t = 0; t < N; t++) { if (Q[t] > Q_SLA) c++; cumExc[t] = c; } }
+
+/* ---------- tiles / badges ---------- */
+const $ = id => document.getElementById(id);
+function updateReadouts() {
+  const t = Math.min(Math.floor(playhead), N - 1);
+  const m = Math.min(Math.floor(t/60), MIN.req.length - 1);
+  $("clock").textContent = fmtClock(t);
+  $("tReq").textContent  = MIN.req[m].toFixed(2);
+  $("tUtil").textContent = MIN.util[m].toFixed(0) + "%";
+  $("tImg").textContent  = MIN.img[m].toFixed(0);
+  $("tQueue").textContent = Q[t].toLocaleString("en-US");
+  const wait = Q[t] / DRAIN;
+  const wEl = $("tWait");
+  wEl.textContent = wait.toFixed(1) + " s";
+  wEl.style.color = wait > 1 ? css("--critical") : "";
+  wEl.style.fontWeight = wait > 1 ? "700" : "";
+  $("tExc").textContent = cumExc[t].toLocaleString("en-US") + " s";
+  const done = playhead >= N - 1;
+  $("verdictDash").classList.toggle("show", done);
+  $("verdictReal").classList.toggle("show", done);
+  $("scrub").value = t;
+}
+
+/* ---------- main loop ---------- */
+function frame(ts) {
+  if (playing) {
+    if (lastTs !== null) {
+      playhead += (ts - lastTs) / 1000 * (+$("speedSel").value);
+      if (playhead >= N - 1) { playhead = N - 1; setPlaying(false); }
+    }
+    lastTs = ts;
+  } else lastTs = ts;
+  for (const c of CHARTS) c.draw();
+  updateReadouts();
+  requestAnimationFrame(frame);
+}
+function setPlaying(p) {
+  playing = p;
+  $("playBtn").textContent = p ? "❚❚ Pause" : "▶ Play";
+}
+
+/* ---------- controls ---------- */
+$("playBtn").onclick = () => { if (playhead >= N - 1) playhead = 0; setPlaying(!playing); };
+$("resetBtn").onclick = () => { playhead = 0; setPlaying(false); };
+$("scrub").oninput = e => { playhead = +e.target.value; };
+$("infoBtn").onclick = () => $("infoBox").classList.toggle("show");
+addEventListener("keydown", e => {
+  if (e.code === "Space") { e.preventDefault(); $("playBtn").onclick(); }
+  else if (e.key === "ArrowRight") playhead = Math.min(N - 1, playhead + 60);
+  else if (e.key === "ArrowLeft")  playhead = Math.max(0, playhead - 60);
+  else if (e.key.toLowerCase() === "r") $("resetBtn").onclick();
+});
+
+/* ---------- unified hover tooltip ---------- */
+const tt = $("tooltip");
+for (const c of CHARTS) {
+  c.el.addEventListener("mousemove", e => {
+    const r = c.el.getBoundingClientRect();
+    const t = Math.round(((e.clientX - r.left) - c.pad.l) / (r.width - c.pad.l - c.pad.r) * N);
+    if (t < 0 || t > Math.min(playhead, N - 1)) { hoverT = null; tt.style.display = "none"; return; }
+    hoverT = t;
+    const m = Math.min(Math.floor(t/60), MIN.req.length - 1);
+    tt.innerHTML =
+      `<div class="tt-t">${fmtClock(t)} UTC</div>` +
+      `<div><span class="sw" style="background:${css("--req")}"></span>requests ${MIN.req[m].toFixed(2)} /s</div>` +
+      `<div><span class="sw" style="background:${css("--good")}"></span>utilization ${MIN.util[m].toFixed(0)}%</div>` +
+      `<div><span class="sw" style="background:${css("--img")}"></span>images ${MIN.img[m].toFixed(0)} /s</div>` +
+      `<div><span class="sw" style="background:${css("--img")}"></span>queued ${Q[t].toLocaleString("en-US")} img` +
+      ` · wait ≈ ${(Q[t]/DRAIN).toFixed(1)} s</div>`;
+    tt.style.display = "block";
+    const tx = Math.min(e.clientX + 14, innerWidth - 280);
+    tt.style.left = tx + "px"; tt.style.top = (e.clientY + 14) + "px";
+  });
+  c.el.addEventListener("mouseleave", () => { hoverT = null; tt.style.display = "none"; });
+}
+
+/* ---------- boot ---------- */
+function resizeAll() { for (const c of CHARTS) c.resize(); }
+addEventListener("resize", resizeAll);
+resizeAll();
+// deep-link: open with #t=<seconds> to land on that moment (e.g. #t=29939 = end state)
+{
+  const m = location.hash.match(/t=(\d+)/);
+  if (m) playhead = Math.min(N - 1, +m[1]);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

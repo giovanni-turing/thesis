@@ -1,0 +1,282 @@
+{
+ "burst1_forecast_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 1262.345,
+  "provisioned_ws": 540412.9,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst1_forecast_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 1262.345,
+  "provisioned_ws": 540202.9,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst1_forecast_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 1262.345,
+  "provisioned_ws": 539992.9,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst1_forecast_L165": {
+  "p99_ms": 588.37,
+  "max_ms": 2892.042,
+  "provisioned_ws": 537778.5,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst1_reactive_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 2892.042,
+  "provisioned_ws": 567193.5,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst1_reactive_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 2892.042,
+  "provisioned_ws": 557458.5,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst1_reactive_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 2892.042,
+  "provisioned_ws": 547723.5,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst1_reactive_L165": {
+  "p99_ms": 609.707,
+  "max_ms": 3143.47,
+  "provisioned_ws": 469903.9,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "burst3_forecast_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 588.37,
+  "provisioned_ws": 32303.0,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst3_forecast_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 588.37,
+  "provisioned_ws": 32228.0,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst3_forecast_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 588.37,
+  "provisioned_ws": 32153.0,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst3_forecast_L165": {
+  "p99_ms": 588.37,
+  "max_ms": 588.37,
+  "provisioned_ws": 31553.0,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst3_reactive_L15": {
+  "p99_ms": 9481.285,
+  "max_ms": 12574.141,
+  "provisioned_ws": 29615.8,
+  "queue_divergent": false,
+  "ledger_expected": 9481.285
+ },
+ "burst3_reactive_L30": {
+  "p99_ms": 16078.706,
+  "max_ms": 20239.987,
+  "provisioned_ws": 28355.8,
+  "queue_divergent": false,
+  "ledger_expected": 16078.706
+ },
+ "burst3_reactive_L45": {
+  "p99_ms": 28342.19,
+  "max_ms": 31892.192,
+  "provisioned_ws": 27095.8,
+  "queue_divergent": false,
+  "ledger_expected": 28342.19
+ },
+ "burst3_reactive_L165": {
+  "p99_ms": 54169.533,
+  "max_ms": 63447.488,
+  "provisioned_ws": 17018.1,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "burst4_forecast_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 904.739,
+  "provisioned_ws": 238367.9,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst4_forecast_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 904.739,
+  "provisioned_ws": 238172.9,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst4_forecast_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 904.739,
+  "provisioned_ws": 237977.9,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst4_forecast_L165": {
+  "p99_ms": 588.37,
+  "max_ms": 6947.046,
+  "provisioned_ws": 234559.3,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst4_reactive_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 6947.046,
+  "provisioned_ws": 246498.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst4_reactive_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 6947.046,
+  "provisioned_ws": 242403.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst4_reactive_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 6947.046,
+  "provisioned_ws": 238308.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst4_reactive_L165": {
+  "p99_ms": 904.739,
+  "max_ms": 24217.99,
+  "provisioned_ws": 205548.6,
+  "queue_divergent": false,
+  "ledger_expected": null
+ },
+ "burst5_forecast_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 883.807,
+  "provisioned_ws": 88955.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst5_forecast_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 883.807,
+  "provisioned_ws": 88805.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst5_forecast_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 883.807,
+  "provisioned_ws": 88655.6,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst5_forecast_L165": {
+  "p99_ms": 588.37,
+  "max_ms": 11004.377,
+  "provisioned_ws": 86852.1,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst5_reactive_L15": {
+  "p99_ms": 588.37,
+  "max_ms": 4761.229,
+  "provisioned_ws": 100713.0,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst5_reactive_L30": {
+  "p99_ms": 588.37,
+  "max_ms": 11004.377,
+  "provisioned_ws": 98643.0,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst5_reactive_L45": {
+  "p99_ms": 588.37,
+  "max_ms": 15329.686,
+  "provisioned_ws": 96573.0,
+  "queue_divergent": false,
+  "ledger_expected": 588.37
+ },
+ "burst5_reactive_L165": {
+  "p99_ms": 3250.164,
+  "max_ms": 15510.1,
+  "provisioned_ws": 80910.6,
+  "queue_divergent": true,
+  "ledger_expected": null
+ },
+ "steady24h_forecast_L15": {
+  "p99_ms": 677.365,
+  "max_ms": 2083.97,
+  "provisioned_ws": 162355.8,
+  "queue_divergent": false,
+  "ledger_expected": 677.365
+ },
+ "steady24h_forecast_L30": {
+  "p99_ms": 677.365,
+  "max_ms": 2083.97,
+  "provisioned_ws": 162325.8,
+  "queue_divergent": false,
+  "ledger_expected": 677.365
+ },
+ "steady24h_forecast_L45": {
+  "p99_ms": 677.365,
+  "max_ms": 2083.97,
+  "provisioned_ws": 162295.8,
+  "queue_divergent": false,
+  "ledger_expected": 677.365
+ },
+ "steady24h_forecast_L165": {
+  "p99_ms": 685.323,
+  "max_ms": 2083.97,
+  "provisioned_ws": 162055.8,
+  "queue_divergent": false,
+  "ledger_expected": 685.323
+ },
+ "steady24h_reactive_L15": {
+  "p99_ms": 548.363,
+  "max_ms": 3691.632,
+  "provisioned_ws": 186956.7,
+  "queue_divergent": false,
+  "ledger_expected": 548.363
+ },
+ "steady24h_reactive_L30": {
+  "p99_ms": 682.109,
+  "max_ms": 3691.632,
+  "provisioned_ws": 182486.7,
+  "queue_divergent": false,
+  "ledger_expected": 682.109
+ },
+ "steady24h_reactive_L45": {
+  "p99_ms": 733.643,
+  "max_ms": 3691.632,
+  "provisioned_ws": 178016.7,
+  "queue_divergent": false,
+  "ledger_expected": 733.643
+ },
+ "steady24h_reactive_L165": {
+  "p99_ms": 733.643,
+  "max_ms": 3691.632,
+  "provisioned_ws": 142256.7,
+  "queue_divergent": false,
+  "ledger_expected": null
+ }
+}

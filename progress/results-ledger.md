@@ -488,3 +488,62 @@ feeds:      DEFENSE presentation, NOT the manuscript -- introduces NO new experi
 review:     2 external rounds folded in -- corrected over-claims (each verified vs artifacts): Fano "unbounded"->measured range; knees "invert"->both pools fail in-burst for different reasons; "serves the week"->5.6d/749,601-req eval span; live plane->language pool / one run per policy / mocked engines; "upstreamed"->draft PR #1312 (verified isDraft:true via gh); "identically-informed reactive"->same-signal reactive baseline (point rate, no p90 headroom); R^2 tied to request rate; request-rate + window-mean-utilization; rho=15 disclosed ex post; language cost 0.96-1.19x by model; "to our knowledge" on the novelty claim.
 supersedes: new
 commit:     4a7346e
+
+---
+date:       2026-07-19
+result:     All 18 manuscript figures re-rendered in plotly (from matplotlib) and swapped into figuras/ as vector PDF; thesis rebuilt and print-verified.
+artifact:   figuras_new/{_theme.py,_prep.py,eda.py,predictors.py,sim.py,aic.py,gallery.py} -> figuras/{eda,pred,sim,aic}/*.{pdf,png}; SVG copies in figuras_new/svg/; interactive HTML + index.html gallery in figuras_new/; originals backed up in figuras_backup_*/ (also in git).
+command:    gen: cd figuras_new && ../eda/.venv/bin/python {eda,predictors,sim,aic}.py (plotly 6.8 + kaleido 0.2.1; CPU-only, no GPU -- pandas/sklearn reproduce the 3 GPU-only derivations: ctx-by-NumImages band, inter-arrival deltas, k-means clusters; silhouette 0.389, shares reproduce exactly). swap: cp figuras_new/<name>.{pdf,png} figuras/<group>/. build: cd tex && latexmk -pdf -g tese.tex.
+feeds:      ALL figure-bearing chapters (tex/{trace-eda,predictors,closedloop,twopool,aiconfigurator,apendice}.tex). Same filenames/paths -> drop-in; \includegraphics extensionless so .pdf wins. Numbers verified identical to originals (WAPE cells, framework bars, TTFT 3495/2164/651/695, AIC ratios 1.38-1.62x, cluster shares 3.4%/85.7%). No new experimental numbers.
+verify:     build 135pp, 0 new overfull hbox (20=baseline), 0 vbox, no missing figs; every figure rendered from tese.pdf at print size -- legible, within \linewidth, no overflow. Design changes (representation, not just port): eda_d_scatter overplot->2D density; eda_i histogram->ECDF; eda_l 2nd scatter->req/img share bar; pred_horizon 6 lines->FM min-max envelope; pred_frame panel(a) 0.50-baseline->0 (was exaggerating "near-identical"); pred_heat 4-facet. Fonts: annotation text 10-11px->13-15px. High-res: scale-3 PNG, clusters 150k pts, interarrival 200k.
+supersedes: the matplotlib figuras/*.pdf|png (analysis/trace_eda/*.py, predictors/figures_tex.py, simulation/{sweep_fig,burst_queue_fig}.py, collector_artifacts ad-hoc) -- those source scripts remain but no longer feed the manuscript.
+commit:     (uncommitted)
+
+addendum (same date): defense deck updated too. slides/fig/_slidegen.py generates
+slide-optimized plotly versions of all 9 deck figures (reuses figuras_new builders +
+a font-scaler for the 6 reused manuscript figs; dedicated 2-panel horizon + cost
+frontier + faceted heatmap for the 3 slide-specific ones). slides.tex repointed all 9
+to fig/. Build: cd slides && latexmk -pdf slides.tex -> 32pp, 4 overfull vbox (< the
+5 pre-existing baseline, all 4 remaining match baseline exactly), no missing figs;
+every figure slide print-checked -- fills its box, readable from a room. Old matplotlib
+generators (make_pred_slidefigs.py, make_frontier.py) superseded but left in place.
+
+## Defense animation A1 "the invisible failure" (interactive, offline HTML)
+date:       2026-07-19
+artifact:   defense/anim/a1_invisible_failure.html (self-contained, 0.24 MB; data inlined)
+command:    python3 defense/anim/build/extract_a1.py && python3 defense/anim/build/build_a1.py
+inputs:     simulation/results/sweeps/{series/vision_burst1_s1.series.json, traces/vision_burst1_s1.jsonl, summary.json} (all ledgered; no new results)
+feeds:      defense presentation, slide "The mechanics of decoupling" (interactive replacement/augment of Fig sim_burst_queue: dashboard-vs-reality split-screen replay of the largest burst window)
+verify:     extraction cross-checks match thesis text exactly (queue>1000 imgs for 805 s; peak queue 4,701 @ t=24877; worst second 2,726 images @ t=1920); verdict banner quotes ledgered enc-delay p99 5,013.37 ms / util 28.9%; reviewed via headless-chromium screenshots at 1920x1080 and 1280x720 (defense/anim/build/shots/); per-pixel max-bucket downsampling verified against simulation/results/sweeps/burst_queue.png (same spike forest)
+supersedes: nothing (presentation-layer artifact; manuscript figures unchanged)
+commit:     (uncommitted; defense/ still untracked)
+
+## Defense animation A2 "the race" (interactive, offline HTML) + regenerated burst3 series
+date:       2026-07-19
+artifact:   defense/anim/a2_the_race.html (self-contained, 0.22 MB); regenerated runs under defense/anim/data/a2_runs/ (sched/series/stats/jsonl per policy x lead + verification.json)
+command:    python3 defense/anim/build/gen_a2_runs.py && eda/.venv/bin/python defense/anim/build/extract_a2.py && python3 defense/anim/build/build_a2.py
+inputs:     exact ledgered pipeline re-run with --series-out: forecast = verification/scripts/forecast_schedule_issuetime.py (chronos p90 rho15, warm) -> converter; reactive = simulation/forecast_schedule.py --policy reactive --resolution 15s rho15 -> converter; burst3 (offset 531966, 3093 req); converter wrapped by defense/anim/build/a2_conv_snapshot.py to restore the load-bearing snapshot encoder graph (current AIC branch adds guarded encoder_patch_embed_gemm, +0.931 ms at f(64) = the +0.3% appendix figure; without the shim every endpoint shifts ~+0.9 ms)
+verify:     endpoint p99 asserts pass — forecast 588.37 at L{15,30,45,165} (= factorial_issuetime_p90_rho15, warm); reactive 9481.285/16078.706/28342.19 at L{15,30,45} (= results_44.jsonl rho15 = thesis Tab 7.3); reactive L165 NEW CELL, same law: p99 54169.53 (= its L300 never-scaled limit). Per-request delays recovered from seam timestamps via FIFO (input,output)-key matching (converter re-sorts by shifted ts); recovered p99 matches stats for all 8 runs. Forecast peak queue = 0 at every lead; reactive peak queue 6378/11551/12673/12673. Screenshots reviewed 1080p+720p (defense/anim/build/shots/)
+feeds:      defense slide "Forecast holds the SLA where reactive breaks" (RQ4 as interactive lead-slider race)
+supersedes: nothing (presentation artifact; manuscript numbers unchanged — reactive L165 is supplementary, not cited in tex)
+commit:     (uncommitted; defense/ still untracked)
+
+## Defense animation A2 v2: episode selector + live tickers; 40-run fleet
+date:       2026-07-19
+artifact:   defense/anim/a2_the_race.html (2.18 MB, self-contained); defense/anim/data/a2_runs/ (40 runs: sched/series/stats/jsonl + verification.json)
+command:    python3 defense/anim/build/gen_a2_fleet.py && eda/.venv/bin/python defense/anim/build/extract_a2_fleet.py && python3 defense/anim/build/build_a2.py
+inputs:     5 windows (burst1/3/4/5, steady24h) x {forecast p90 issue-time chronos warm, reactive 15s} x L{15,30,45,165}, exact ledgered pipeline + snapshot-graph shim; burst2/6 excluded (forecast-context days, no archived forecast)
+verify:     35/40 endpoints reproduce ledgered cells exactly (factorial_issuetime_p90_rho15 + results_44.jsonl reactive rho15). 5 NEW L165-reactive cells (same law): burst1 609.7 / burst3 54,169.5 / burst4 904.7 / burst5 3,250.2 / steady 733.6 ms — i.e. at 165 s lead reactive newly fails burst4+burst5, completing the onset-speed gradient. Running tickers (cost integral, mean image-bearing delay, running p99 all-requests) computed from recovered per-request delays (FIFO key matching, both fields clamped >=1); running p99 converges to ledgered verdict per run. Screenshots reviewed (burst3 mid, burst5 L165 end, calm end; 1080p)
+feeds:      defense slide "Forecast holds the SLA where reactive breaks"; supersedes A2 v1 (burst3-only) entry above
+commit:     (uncommitted; defense/ still untracked)
+
+addendum (same date, A2 v2): dual cost accounting added. extract_a2_fleet.py now
+emits cost2 = bill-from-order (readiness-billed integral + each upward
+worker-increment paying its L-second warm-up; exact for reactive, upper bound for
+forecast warm-pool). Animation shows both (headline = ledgered readiness
+convention; "incl. cold-start warm-up" line + footer totals = order-billed).
+Full 40-cell table: defense/anim/data/a2_cost_accounting.csv (feeds a future
+thesis accounting update). Key facts: order-billing FLIPS the burst5 L165 cost
+order (reactive 101.4k ws > forecast 93.6k, and reactive fails); reactive burst3
+order-billed total is lead-INVARIANT (30,875.8 ws at L15/30/45) while its p99
+degrades 9.5->28 s — same spend, worse tail with lead.

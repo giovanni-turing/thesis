@@ -1,0 +1,6 @@
+# Regenerable intermediates (python3 build/gen_a2_fleet.py rebuilds all of
+# data/a2_runs/; build/shots/ are headless-chromium review screenshots).
+# Kept in-tree, out of git: the repo stays LFS-free (see results ledger).
+data/a2_runs/*.jsonl
+data/a2_runs/*.series.json
+build/shots/
