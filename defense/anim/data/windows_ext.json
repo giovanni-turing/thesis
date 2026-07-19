@@ -1,0 +1,206 @@
+{
+ "burst1": {
+  "offset": 843072,
+  "max_requests": 64804,
+  "note": "episode 1 of top6_by_peak +/-10min pad: [2024-10-21 12:59:00 .. 2024-10-21 21:18:00) UTC, peak 370.2 img/s @ 2024-10-21 19:53:00, onset 220 min",
+  "requests": 64804,
+  "span_s": 29939.3,
+  "mean_req_per_s": 2.165,
+  "mean_img_per_s": 116.173,
+  "peak_1min_img_per_s": 370.18,
+  "text_only_fraction": 0.325
+ },
+ "burst2": {
+  "offset": 78376,
+  "max_requests": 13870,
+  "note": "episode 2 of top6_by_peak +/-10min pad: [2024-10-15 21:16:00 .. 2024-10-15 23:10:00) UTC, peak 363.7 img/s @ 2024-10-15 22:14:00, onset 48 min",
+  "requests": 13870,
+  "span_s": 6836.8,
+  "mean_req_per_s": 2.029,
+  "mean_img_per_s": 124.063,
+  "peak_1min_img_per_s": 363.7,
+  "text_only_fraction": 0.348
+ },
+ "burst3": {
+  "offset": 531966,
+  "max_requests": 3093,
+  "note": "episode 3 of top6_by_peak +/-10min pad: [2024-10-18 10:18:00 .. 2024-10-18 10:45:00) UTC, peak 355.5 img/s @ 2024-10-18 10:29:00, onset 1 min",
+  "requests": 3093,
+  "span_s": 1619.7,
+  "mean_req_per_s": 1.91,
+  "mean_img_per_s": 88.437,
+  "peak_1min_img_per_s": 355.48,
+  "text_only_fraction": 0.599
+ },
+ "burst4": {
+  "offset": 565664,
+  "max_requests": 25639,
+  "note": "episode 4 of top6_by_peak +/-10min pad: [2024-10-18 15:37:00 .. 2024-10-18 18:46:00) UTC, peak 350.4 img/s @ 2024-10-18 16:47:00, onset 60 min",
+  "requests": 25639,
+  "span_s": 11339.2,
+  "mean_req_per_s": 2.261,
+  "mean_img_per_s": 135.028,
+  "peak_1min_img_per_s": 350.38,
+  "text_only_fraction": 0.43
+ },
+ "burst5": {
+  "offset": 558386,
+  "max_requests": 8983,
+  "note": "episode 5 of top6_by_peak +/-10min pad: [2024-10-18 14:32:00 .. 2024-10-18 15:53:00) UTC, peak 343.4 img/s @ 2024-10-18 15:17:00, onset 35 min",
+  "requests": 8983,
+  "span_s": 4857.9,
+  "mean_req_per_s": 1.849,
+  "mean_img_per_s": 114.205,
+  "peak_1min_img_per_s": 343.42,
+  "text_only_fraction": 0.503
+ },
+ "burst6": {
+  "offset": 93867,
+  "max_requests": 9821,
+  "note": "episode 6 of top6_by_peak +/-10min pad: [2024-10-15 23:26:00 .. 2024-10-16 00:48:00) UTC, peak 337.2 img/s @ 2024-10-16 00:29:00, onset 1 min",
+  "requests": 9821,
+  "span_s": 4919.3,
+  "mean_req_per_s": 1.996,
+  "mean_img_per_s": 88.858,
+  "peak_1min_img_per_s": 337.18,
+  "text_only_fraction": 0.465
+ },
+ "steady24h": {
+  "offset": 627019,
+  "max_requests": 88260,
+  "note": "calmest full UTC day (lowest peak 1-min img rate among [datetime.date(2024, 10, 16), datetime.date(2024, 10, 17), datetime.date(2024, 10, 18), datetime.date(2024, 10, 19), datetime.date(2024, 10, 20), datetime.date(2024, 10, 21)]): 2024-10-19",
+  "requests": 88260,
+  "span_s": 86396.7,
+  "mean_req_per_s": 1.022,
+  "mean_img_per_s": 5.443,
+  "peak_1min_img_per_s": 57.05,
+  "text_only_fraction": 0.573
+ },
+ "aggregate": {
+  "offset": 250399,
+  "max_requests": 749601,
+  "note": "4.4 weekly aggregate: full 15-s-forecast-covered span [2024-10-16 21:39:00 .. trace end], 749601 requests [2024-10-16 21:39:00.118000 .. 2024-10-22 11:59:59.964000]",
+  "requests": 749601,
+  "span_s": 483659.8
+ },
+ "e7": {
+  "offset": 548128,
+  "max_requests": 10377,
+  "note": "episode rank 7 by peak \u00b110min pad: [2024-10-18 13:02:00 .. 2024-10-18 14:23:00] peak 291.1 img/s @ 2024-10-18 13:28:00, onset 26 min",
+  "requests": 10377,
+  "span_s": 6059.2,
+  "peak_1min_img_per_s": 291.12,
+  "onset_min": 26,
+  "in_coverage": true
+ },
+ "e8": {
+  "offset": 836308,
+  "max_requests": 4107,
+  "note": "episode rank 8 by peak \u00b110min pad: [2024-10-21 12:18:00 .. 2024-10-21 12:29:00] peak 290.6 img/s @ 2024-10-21 12:20:00, onset 2 min",
+  "requests": 4107,
+  "span_s": 1858.8,
+  "peak_1min_img_per_s": 290.63,
+  "onset_min": 2,
+  "in_coverage": true
+ },
+ "e9": {
+  "offset": 537549,
+  "max_requests": 6615,
+  "note": "episode rank 9 by peak \u00b110min pad: [2024-10-18 11:20:00 .. 2024-10-18 12:01:00] peak 274.6 img/s @ 2024-10-18 11:22:00, onset 2 min",
+  "requests": 6615,
+  "span_s": 3657.9,
+  "peak_1min_img_per_s": 274.63,
+  "onset_min": 2,
+  "in_coverage": true
+ },
+ "e10": {
+  "offset": 532881,
+  "max_requests": 3375,
+  "note": "episode rank 10 by peak \u00b110min pad: [2024-10-18 10:36:00 .. 2024-10-18 10:47:00] peak 274.4 img/s @ 2024-10-18 10:42:00, onset 6 min",
+  "requests": 3375,
+  "span_s": 1856.7,
+  "peak_1min_img_per_s": 274.35,
+  "onset_min": 6,
+  "in_coverage": true
+ },
+ "e11": {
+  "offset": 529446,
+  "max_requests": 4205,
+  "note": "episode rank 11 by peak \u00b110min pad: [2024-10-18 10:08:00 .. 2024-10-18 10:23:00] peak 272.6 img/s @ 2024-10-18 10:10:00, onset 2 min",
+  "requests": 4205,
+  "span_s": 2099.5,
+  "peak_1min_img_per_s": 272.57,
+  "onset_min": 2,
+  "in_coverage": true
+ },
+ "e12": {
+  "offset": 839213,
+  "max_requests": 5114,
+  "note": "episode rank 12 by peak \u00b110min pad: [2024-10-21 12:38:00 .. 2024-10-21 13:00:00] peak 269.8 img/s @ 2024-10-21 12:49:00, onset 11 min",
+  "requests": 5114,
+  "span_s": 2519.3,
+  "peak_1min_img_per_s": 269.8,
+  "onset_min": 11,
+  "in_coverage": true
+ },
+ "e13": {
+  "offset": 766488,
+  "max_requests": 1652,
+  "note": "episode rank 13 by peak \u00b110min pad: [2024-10-20 18:22:00 .. 2024-10-20 18:32:00] peak 262.9 img/s @ 2024-10-20 18:29:00, onset 7 min",
+  "requests": 1652,
+  "span_s": 1792.1,
+  "peak_1min_img_per_s": 262.88,
+  "onset_min": 7,
+  "in_coverage": true
+ },
+ "e14": {
+  "offset": 526542,
+  "max_requests": 2517,
+  "note": "episode rank 14 by peak \u00b110min pad: [2024-10-18 09:42:00 .. 2024-10-18 09:45:00] peak 253.9 img/s @ 2024-10-18 09:44:00, onset 2 min",
+  "requests": 2517,
+  "span_s": 1379.2,
+  "peak_1min_img_per_s": 253.88,
+  "onset_min": 2,
+  "in_coverage": true
+ },
+ "e15": {
+  "offset": 535594,
+  "max_requests": 2790,
+  "note": "episode rank 15 by peak \u00b110min pad: [2024-10-18 11:01:00 .. 2024-10-18 11:09:00] peak 253.2 img/s @ 2024-10-18 11:03:00, onset 2 min",
+  "requests": 2790,
+  "span_s": 1679.1,
+  "peak_1min_img_per_s": 253.23,
+  "onset_min": 2,
+  "in_coverage": true
+ },
+ "e16": {
+  "offset": 820523,
+  "max_requests": 3803,
+  "note": "episode rank 16 by peak \u00b110min pad: [2024-10-21 09:13:00 .. 2024-10-21 09:29:00] peak 243.0 img/s @ 2024-10-21 09:26:00, onset 13 min",
+  "requests": 3803,
+  "span_s": 2158.7,
+  "peak_1min_img_per_s": 242.97,
+  "onset_min": 13,
+  "in_coverage": true
+ },
+ "e17": {
+  "offset": 536512,
+  "max_requests": 2881,
+  "note": "episode rank 17 by peak \u00b110min pad: [2024-10-18 11:10:00 .. 2024-10-18 11:17:00] peak 234.8 img/s @ 2024-10-18 11:16:00, onset 6 min",
+  "requests": 2881,
+  "span_s": 1619.8,
+  "peak_1min_img_per_s": 234.77,
+  "onset_min": 6,
+  "in_coverage": true
+ },
+ "e18": {
+  "offset": 41891,
+  "max_requests": 6230,
+  "note": "episode rank 18 by peak \u00b110min pad: [2024-10-15 17:12:00 .. 2024-10-15 17:32:00] peak 225.4 img/s @ 2024-10-15 17:15:00, onset 3 min [OUTSIDE forecast coverage]",
+  "requests": 6230,
+  "span_s": 2399.4,
+  "peak_1min_img_per_s": 225.45,
+  "onset_min": 3,
+  "in_coverage": false
+ }
+}

@@ -29,7 +29,7 @@
   .ctl { display: flex; align-items: center; gap: 6px; }
   .ctl .lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; font-weight: 600; text-align: right; line-height: 1.2; }
   .seg { display: flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; background: var(--surface); }
-  .seg button { font: inherit; font-size: 13px; font-weight: 600; padding: 6px 11px;
+  .seg button { font: inherit; font-size: 12px; font-weight: 600; padding: 5px 8px;
     border: 0; background: transparent; cursor: pointer; color: var(--ink-2); white-space: nowrap; }
   .seg button small { display: block; font-size: 9.5px; font-weight: 500; color: inherit; opacity: 0.75; }
   .seg button + button { border-left: 1px solid var(--border); }
@@ -166,8 +166,21 @@
     graph); endpoint p99s reproduce the ledgered values to the third decimal, and the
     running mean/p99 tickers are recovered from the per-request seam timestamps
     (cross-checked against each run's stats). L = 165 s reactive cells are new runs under
-    the same law. Episodes are the thesis's evaluation windows; burst2/6 are excluded
-    because they fall in the forecast-context days (no archived forecast exists there).
+    the same law. The first five episodes are the thesis's evaluation windows (burst2/6
+    excluded: they fall in the forecast-context days, so no archived forecast exists).
+    The <b>e-episodes</b> are additional in-coverage bursts from the trace's full
+    18-episode set (thesis Ch. 3 definition, re-derived exactly; ranks 10/11/13/17 by
+    peak) — <b>new cells, not in the thesis</b>, run under the identical ledgered law.
+    On e10/e11/e17 the reactive controller fails at every lead while the forecast holds
+    the 588 ms floor — three more burst3-class cases. <b>e13 is the honest boundary</b>:
+    an isolated moderate burst (263 img/s, 7-min onset) rising out of the quietest
+    stretch, where the p90 band — calibrated to ~90% coverage, riding a calm history —
+    never lifts, so <i>both</i> policies fail (and inside the ledgered week-aggregate
+    replays the same minutes read p90 4.55 s / reactive 2.89 s / p50 16.1 s / static C2
+    7.9 s — only static C8 passes at 882 ms; ρ=10 does not repair it, since no rating
+    multiplies a missed forecast). Isolated-window replays of e-episodes open cold
+    (no standing capacity from surrounding activity), matching the thesis's own
+    per-window factorial protocol.
     <br><br><b>Cost accounting.</b> Cold start is fully modeled in <i>timing</i> — ordered
     capacity becomes usable only after the lead L. Two billings are shown. The headline
     number bills from <i>readiness</i> (warm-up unbilled): the thesis's ledgered
@@ -423,10 +436,13 @@ function laneTicker(prefix, run) {
 }
 function noteFor(prefix, run, pass) {
   const p = run.stats.p99_ms;
-  if (prefix === "fc")
+  if (prefix === "fc") {
+    if (!pass) return `${(p/SLA).toFixed(1)}× the SLA — the p90 band never lifted (forecast miss): `
+      + "headroom cannot cover demand the forecast does not carry";
     return Math.abs(p - 588.37) < 1
       ? "= zero-queueing floor: f(64) 316.4 + p99 handoff 272 ms"
       : "meets the SLA at every archived issued lead";
+  }
   if (pass) return "this onset is slow enough to observe and react in time";
   return `${(p/SLA).toFixed(1)}× the SLA — same signal, read too late; worst request waits ${fmtMs(run.stats.max_ms)}`;
 }
