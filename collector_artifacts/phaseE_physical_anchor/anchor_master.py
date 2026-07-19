@@ -61,9 +61,12 @@ def main():
         for k, e in enc.items():
             p99_1, _, _ = M.eval_point(reqs, 1, e, total)
             p1[k] = round(p99_1, 1)
-            cs, row = M.feasible_cstar(reqs, e, SWEEP, total)
+            # feasibility gate = p99 < SLA ONLY, matching baselines.tex tab:base-grid
+            # ("minimizes all-request encoder-delay p99"); NOT the extra queue-
+            # divergence check (which only flagged burst5's boundary-draining queue).
+            cs = next((w for w in SWEEP if M.eval_point(reqs, w, e, total)[0] < M.SLA_MS), None)
             cstar[k] = cs
-            rec[k] = {"w1_p99_ms": p1[k], "cstar": cs,
+            rec[k] = {"w1_p99_ms": p1[k], "cstar": cs, "gate": "p99_only",
                       "p99_at_aic_cstar": None}
         ac = str(cstar["aic"]) if cstar["aic"] else None
         # p99 of each encoder at AIC's recommended worker count

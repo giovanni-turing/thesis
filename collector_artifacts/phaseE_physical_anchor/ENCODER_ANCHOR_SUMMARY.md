@@ -44,14 +44,25 @@ AIC to within the **±12.8% band across all N=1..64**.
 | b2 | 848k | 8 | 8 | 16 | 1.00 | 2.00 |
 | b3 | 143k | 7 | 7 | 13 | 1.00 | 1.86 |
 | b4 | 1.53M | 7 | 7 | 14 | 1.00 | 2.00 |
-| b5 | 555k | 16 | 16 | 16 | 1.00 | 1.00 |
+| b5 | 555k | 7 | 7 | 14 | 1.00 | 2.00 |
 | b6 | 437k | 6 | 6 | 12 | 1.00 | 2.00 |
-| **geomean** | | | | | **1.027** | **1.784** |
+| **geomean** | | | | | **1.027** | **2.003** |
 
 **The real serving encoder needs the same worker count AIC provisions (geomean
-1.03× inflation — identical in 5/6 windows). AIC's vision-pool provisioning is
-validated end-to-end.** HF-eager would demand ~1.78× the workers — a pure
-execution-stack artifact, not the serving path.
+1.03× inflation — identical in 5/6 windows, at most one worker more). AIC's
+vision-pool provisioning is validated end-to-end.** HF-eager would demand ~2.0×
+the workers — a pure execution-stack artifact, not the serving path.
+
+**Feasibility gate = p99 < SLA only**, matching `baselines.tex` Table
+`tab:base-grid` ("minimizes all-request encoder-delay p99"). NOT the extra
+queue-divergence check used in an earlier draft, which flagged only burst5's
+boundary-draining queue (p99 at 8 workers is 759 ms, comfortably feasible) and
+wrongly inflated its C\* to 16. With the correct gate the anchor's **AIC C\*
+reproduces `tab:base-grid` exactly for 5/6 windows** (6,8,7,7,·,6); burst5 is 7
+vs the table's 8 — a ≤1-worker, sub-percentile artifact (at W=7 the anchor's
+p99 = 925 ms sits just under the 1 s line where the table's post-infill AIC
+snapshot puts it just over). This does not affect the silicon-vs-AIC comparison,
+which is gate- and snapshot-consistent by construction.
 
 **1-worker saturated p99** (kept from the first run + recomputed clean): silicon
 p99 / AIC p99 geomean **1.22× (vLLM)**, 9.7× (eager). NOTE: at 1 worker every

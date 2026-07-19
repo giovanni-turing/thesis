@@ -677,3 +677,12 @@ speedup:    mocker virtual clock simulates 5.6 days in minutes at EXACT validity
             physics -- it is the knee-sweep instrument, not a fast-forward).
 launcher:   index.html -> 7 cards (A11=key6, A12=key7)
 commit:     see next commit
+
+---
+date:       2026-07-19
+result:     CORRECTION to the encoder anchor (consistency fix found during thesis-edit prep). The multi-worker C* used a stricter gate (p99<SLA AND queue-non-divergence) than the thesis; the divergence check flagged ONLY burst5 (boundary-draining queue; p99 at 8 workers = 759ms, feasible), wrongly inflating its C* 8->16. Fixed to p99<SLA only, matching baselines.tex tab:base-grid.
+artifact:   collector_artifacts/phaseE_physical_anchor/{anchor_master.py (gate fix), anchor_master.json, anchor_provisioning.pdf, ENCODER_ANCHOR_SUMMARY.md}
+numbers:    corrected AIC C* = 6,8,7,7,7,6 -> reproduces tab:base-grid (6,8,7,7,8,6) for 5/6 windows; burst5 7 vs 8 = <=1-worker sub-percentile artifact (anchor p99 at W=7=925ms just under 1s; thesis post-infill AIC just over). vLLM C* = 7,8,7,7,7,6. Worker inflation geomean vLLM 1.027x (UNCHANGED, robust), eager 2.003x (was 1.784x -- fix corrected b5 eager 16->14 vs AIC 7). Per-forward fidelity + reproduction + multires unaffected.
+finding:    headline (real serving encoder needs same provisioning as AIC, ~1.03x) is robust to the gate; the fix makes the anchor's AIC C* reproduce the thesis's own tab:base-grid, strengthening the consistency story.
+supersedes: the pre-correction anchor_master.json / anchor_provisioning figure (burst5=16) -- corrected in place; burst_anchor_all.json (boost-clock) still kept as the exploratory record.
+commit:     (uncommitted)
