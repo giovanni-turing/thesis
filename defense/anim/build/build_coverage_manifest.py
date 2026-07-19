@@ -46,8 +46,19 @@ for fleet, vf in (("A11", "a11_runs"), ("A12", "a12_runs")):
         rows.append({"fleet": fleet, "run": tag, "pool": "language",
                      "requests": n, "expect": n, "full": None, "ok": "error" not in r})
 
+# --- A14: per-model max-span forecast E2E ---
+a14 = load(D / "a14_runs/verification.json")
+for m, r in a14.items():
+    if "lang_requests" in r:
+        rows.append({"fleet": "A14", "run": f"{m} max-span E2E", "pool": "both (E2E)",
+                     "requests": r.get("lang_requests"), "expect": r.get("max_requests"),
+                     "full": None, "ok": "error" not in r})
+
 manifest = {
     "trace_requests": N_TRACE, "forecast_span_requests": N_SPAN,
+    "per_model_maxspan": {m: {"requests": a14[m].get("lang_requests"),
+                              "pct_of_1M": a14[m].get("pct_of_1M"),
+                              "ttft_p99": a14[m].get("ttft_p99")} for m in a14},
     "context_days_requests": N_TRACE - N_SPAN,
     "coverage": {
         "encoder_full_trace": {
@@ -76,9 +87,11 @@ enc_ok = ft_enc and all(r.get("requests") == N_TRACE and "error" not in r
                         for r in ft_enc.values())
 llm_ok = ft_llm and all(r.get("requests") == N_TRACE and r.get("completed") == N_TRACE
                         and "error" not in r for r in ft_llm.values())
+a14_ok = bool(a14) and all("error" not in a14[m] and a14[m].get("lang_requests") == a14[m].get("max_requests") for m in a14)
 manifest["guarantee"] = {
     "encoder_all_1M_covered": bool(enc_ok),
     "language_all_1M_covered": bool(llm_ok),
+    "per_model_maxspan_covered": a14_ok,
     "complete": bool(enc_ok and llm_ok),
 }
 
@@ -96,5 +109,11 @@ print("=" * 68)
 g = manifest["guarantee"]
 print(f"encoder pool — all 1,000,000 requests simulated: {g['encoder_all_1M_covered']}")
 print(f"language pool — all 1,000,000 requests simulated: {g['language_all_1M_covered']}")
+if a14:
+    print("--- per-model max-span forecast E2E (both pools) ---")
+    for m in a14:
+        r = a14[m]
+        print(f"  {m:8} {r.get('lang_requests',0):>9,} req ({r.get('pct_of_1M')}% of 1M) "
+              f"TTFT p99 {r.get('ttft_p99')} ms  {'ok' if 'error' not in r else 'ERR'}")
 print(f"FULL-COVERAGE GUARANTEE MET: {g['complete']}")
 print(f"wrote {D / 'coverage_manifest.json'}")
