@@ -11,7 +11,11 @@ network, no CDN) — open it in any browser, present alongside the Beamer PDF.
 |------|-----------|-----------------|
 | `a1_invisible_failure.html` | A1 "The invisible failure" — split-screen replay of the largest burst window: the operator's dashboard (request rate, utilization — green all day) vs reality (offered image load, encoder FIFO backlog, SLA-excess in red). Ends on the verdict pair: HEALTHY dashboard vs encoder-delay p99 = 5,013 ms (5× the SLA) at 28.9% mean utilization. | "The mechanics of decoupling" |
 | `a6_the_week.html` | A6 "The week" — five policies racing over the full 5.60-day evaluation span (749,601 requests): static C8, **Toto-2 p90** (issue-time, ρ=15, L=30 s), reactive, Toto p50, static C2. Per row: worker ribbon, cost odometer in both accountings with live ×-vs-static ratio, running p99, and per-episode verdict chips (b3/b5/b4/calm/b1 + week) that light as the playhead passes each episode. Reactive's aggregate p99 stays green while its burst3 chip goes red — the dashboard-masking phenomenon, annotated live. All 5 endpoints reproduce the ledgered week numbers (Toto p90: 588 ms at 0.6176× static). | "Headline economics" |
-| `a2_the_race.html` | A2 "The race" — forecast (Chronos p90, issue-time) vs reactive (trailing observed rate), identical law/ρ/hysteresis. **Episode selector** across the onset gradient (burst3 1-min · burst5 35-min · burst4 60-min · burst1 220-min · calm day) × **cold-start-lead slider** (15/30/45/165 s; keys 1–4) = 40 ledger-verified converter runs. Per lane: worker staircase + busy, per-bin worst-delay dots (log, SLA line), and **live tickers**: cost so far (worker-h), mean delay (image-bearing), running p99 (all requests — converges to the ledgered verdict), queue now/peak. On burst3 reactive climbs 9.5→54 s while forecast pins at 588 ms with peak queue 0; on slower onsets both pass (reactive even costs more on the calm day); at L165 reactive newly fails burst4/5. | "Forecast holds the SLA where reactive breaks" |
+| `a2_the_race.html` | A2 "The race" — forecast (Chronos↔Toto p90, issue-time) vs reactive (trailing observed rate), identical law/ρ/hysteresis. **Episode selector** across the onset gradient (burst3/5/4/1 + calm + e10/e11/e13/e17) × **cold-start-lead slider** (15/30/45/165 s) + model toggle. Per lane: worker staircase, per-bin worst-delay dots (log, SLA line), live tickers (dual-account cost, mean delay, running p99, queue), SLA-infraction counter. e13 = the p90 forecast-miss boundary case (both fail). | "Forecast holds the SLA where reactive breaks" |
+| `a8_onset_map.html` | A8 "The onset map" — all **18 burst episodes** as a phase diagram (onset speed × peak volume); fill = reactive verdict at a chosen lead, ring = forecast verdict; click a dot → replay in A2. Answers "how general is the reactive failure?" (9/18 reactive fails at L=30 s; 1 forecast miss). | Q&A / generality |
+| `a9_dataset_kde.html` | A9 "Request-anatomy KDE" — all **1M requests** as a rotatable 3D density over (context, generation) tokens (Plotly, inlined) with an image-count range selector (k×k buckets). Text-only mountain range collapses to a needle for the frames class. | "Dataset characterization" |
+| `a11_llm_race.html` | A11 "The race: language pool" — the A2 race for the **language pool** through Dynamo's real planner: forecast + tail-aware conversion vs reactive SLA planner. **5 windows** (incl. full week) × Chronos↔Toto × replica-lead 60/120/300 s = 39 planner replays. Live: TP2-replica staircase, running TTFT/ITL p99, GPU-h. Forecast 651 ms PASS vs reactive 3.49 s FAIL (window-mean law met, tail violated); week forecast 651 ms vs reactive 1.19 s at ½ the cost. Every L60 anchor reproduces the ledgered twin. | "Per-pool mechanism" (language) |
+| `a12_composed_e2e.html` | A12 "The composed system" — **true end-to-end, both pools**. Each policy's encoder schedule → seam → language planner, with a **request-linked** ingress→first-token join (own encoder delay + own replayed TTFT; alignment asserted < 1 ms). Forecast E2E p99 **1.24 s** (enc 588 + TTFT 651) == thesis Ch. 6 modelled reconstruction, now MEASURED; reactive E2E **21.9 s** (encoder queue compounds into language). | The composed system / RQ3 |
 
 ## Controls (all pages)
 
@@ -67,3 +71,47 @@ Data sources (all in the results ledger):
   the official per-request p99 from `summary.json`, not a recomputation);
   derived conveniences (backlog-implied wait = queue ÷ 404.6 img/s full-drain
   rate) are labeled as such in the `ⓘ` note.
+
+## Full-trace coverage (every request simulated, both pools)
+
+The `a13_runs/` batch simulates **all 1,000,000 trace requests** through both
+pools with per-request records, on the policies defined over the whole 7-day
+trace (statics + reactive; forecast policies are structurally undefined on the
+first 1.4 days — no archived forecast exists there, the thesis coverage
+boundary):
+
+- **encoder**: `ft_static_C8`, `ft_static_C2`, `ft_reactive_L30` — each priced
+  by the AIC converter, all reporting exactly 1,000,000 requests.
+- **language**: `ft_llm_static` (TP2×2 on the C8-composed trace),
+  `ft_llm_reactive` (SLA planner on the reactive-composed trace) — each a full
+  1,000,000-request dynamo.replay with per-request records.
+
+`build/build_coverage_manifest.py` reads every fleet's `verification.json` and
+hard-asserts the guarantee → `data/coverage_manifest.json`.
+
+Speedup: the mocker's virtual clock simulates 5.6 days in minutes at **exact**
+validity (event-ordered discrete-event sim). Arrival timestamps are never
+compressed — that would change the queueing physics (it is the knee-sweep
+instrument, not a fast-forward).
+
+## Build — A11 / A12 / A13 (need the source-build dynamo venv + patch)
+
+```
+# source-build dynamo carries the per-request planner-bridge patch (committed
+# in ai-dynamo/dynamo @ 70c965db26). Rebuild if the tree changes:
+#   cd ai-dynamo/dynamo/lib/bindings/python && maturin develop --uv --release --features aic-forward-pass
+
+# A11 language race (39 planner replays; ~hours)
+python3 defense/anim/build/gen_a11_runs.py            # + week cells; ledger-asserted at L60
+eda/.venv/bin/python defense/anim/build/extract_a11.py
+python3 defense/anim/build/build_a11.py
+
+# A12 composed E2E (15 arms on the ledger-verified composed traces)
+python3 defense/anim/build/gen_a12_e2e.py
+eda/.venv/bin/python defense/anim/build/extract_a12.py   # request-linked join, alignment asserted
+python3 defense/anim/build/build_a12.py
+
+# A13 full-trace coverage (throttled: converters 2-way, 1M-req replays sequential)
+python3 defense/anim/build/gen_a13_fulltrace.py
+python3 defense/anim/build/build_coverage_manifest.py
+```
