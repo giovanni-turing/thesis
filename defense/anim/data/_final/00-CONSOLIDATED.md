@@ -9,7 +9,7 @@ sibling cards; this file is the ingestion surface.
 cases the uncaveated version is factually wrong.
 
 Status: 8 of 9 tracks final (g4 added after a 4-lens round-3 audit that refuted its first
-headline). Only g2_conventions still computing.
+headline). g2_conventions was attempted and DROPPED — see item 10.
 
 ---
 
@@ -147,7 +147,27 @@ cost-vs-C* range. (d) One trace, one datacenter, one 7-day record.
 **Anchor:** enc p99 588.4 = 588.4, provisioned_ws 2,962,304.8 exact, ratio 0.612 vs 0.6124.
 Billing verified symmetric; the forecast arm's 30 s cold start IS paid.
 
-## 10. g2_conventions — PENDING
+## 10. Token-accounting conventions — TRACK DROPPED, claim nothing from it
+
+The both-conventions sensitivity run (tex/twopool.tex:432) was built and partially run, then
+DROPPED. Nothing from it may be cited.
+
+**Why.** The alternate convention rests on a SUPPOSITION that cannot be read off the trace: a
+fixed 196 post-merge tokens per image (448^2 at 32x32 px/token). The trace's own model
+demonstrably does NOT tokenize that way — its total vision tokens are sub-linear in image count
+(V(n) ~ 743 * n^0.627; the implied tile side falls from 532 px at n=1 to 214 px at n=1225), i.e.
+it downscales under a token budget. Imposing a fixed per-image count on top of that is a
+modelling fiction, not a measurement, and the resulting PASS->FAIL flips would be an artifact of
+the supposition rather than evidence about the target model.
+
+**Consequence.** tex/twopool.tex:432 — "a both-conventions sensitivity run remains future work" —
+STANDS AS WRITTEN. It cannot be closed without the target model's actual tokenization applied to
+the trace's actual image geometry, which this trace does not record.
+
+**Not affected.** The base-convention (ContextTokens verbatim) results are untouched, and so are
+every other track, the 588.4 ms floor, and the fabric requirement — all of which use
+post_merge_tokens = 196 * n as coded in trace_to_two_pool.py:188, which is correct under a
+per-image cap of 16,384 tokens (196 << 16,384, so the cap never binds).
 
 ---
 
