@@ -87,3 +87,27 @@ predictors/results/toto_covariates.parquet
 simulation/results/rerun_verify/week_static_C6.jsonl
 simulation/results/rerun_verify/week_static_C7.jsonl
 simulation/results/rerun_verify/week_static_C8.jsonl
+
+# ── Post-manuscript defence-generation families (ingested into the provenance
+#    DB at provenance/ and kept on disk; not tracked). Same convention as above:
+#    summaries tracked, heavy/reproducible bulk ignored. These families carry no
+#    tracked summaries, and a16_ft holds fine-tuning checkpoints, so ignore wholesale.
+/defense/anim/data/a16_ft/
+/defense/anim/data/a16_runs/
+/defense/anim/data/a16_decode/
+/defense/anim/data/a16_decode_spread/
+/defense/anim/data/a16_controller_cost/
+/defense/anim/data/g1_runs/
+/defense/anim/data/g2_runs/
+/defense/anim/data/g3_32b/
+/defense/anim/data/g4_folds/
+/defense/anim/data/g6_runs/
+/defense/anim/data/g7_coldstart/
+# heavy per-request / per-second / composed logs in the mixed a11..a15 run dirs
+# (report.json + *.jsonl.stats.json summaries stay tracked)
+defense/anim/data/**/*.requests.jsonl
+defense/anim/data/**/*.series.json
+defense/anim/data/**/*.jsonl
+defense/anim/data/**/*.log
+# timestamped figure backup (throwaway copy)
+/figuras_backup_1784438929/
