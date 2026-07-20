@@ -171,6 +171,44 @@ for pat in 'limit cycle' 'mean-field' 'period-2' 'retry fraction' \
   fi
 done
 [ $CONTAIN -eq 0 ] && ok "post-manuscript defence material contained (none added to results chapters)"
+
+# B4 methodological-overclaim gate -- REPORT, don't hide (false positives OK, misses are not).
+# Simulation / mocker / live-validation must never be written as real-H100-silicon execution.
+# The only physically-measured pool is the RTX-5090 encoder (its "on silicon" is legitimate);
+# the language pool is the discrete-event mocker on AIC timing and the live anchor runs mocked
+# engines. This audit already hand-fixed one defect (closedloop "real H100 silicon" -> mocker
+# control plane); B4a asserts that class can never reappear, B4b surfaces new near-misses.
+cd "$TESE"
+# B4a HARD -- the caught defect and its per-line siblings. Each must be 0 or the gate FAILS.
+for pat in \
+    'real H100 silicon' 'real H100 GPU' 'real H100s' 'on real H100' 'H100 silicon' \
+    'mocker[^.]*on[^.]*silicon' 'mock(ed|er)[^.]*on real[^.]*GPU' \
+    'live[- ]valid[a-z]*[^.]*on real[^.]*GPU' 'live[- ]valid[a-z]*[^.]*on silicon'; do
+  hits=$(grep -rniE "$pat" tex/*.tex 2>/dev/null)
+  n=$(printf '%s' "$hits" | grep -c .)
+  if [ "$n" -eq 0 ]; then ok "no methodological overclaim matching /$pat/"
+  else bad "METHODOLOGICAL OVERCLAIM (hard): /$pat/ -- $n line(s)"
+       printf '%s\n' "$hits" | sed 's/^/        /'; fi
+done
+# B4b MANUAL-REVIEW WARN -- any silicon/real-GPU phrasing sitting within 3 lines of a
+# language-pool / mocker / live-validation cue. Deliberately over-broad: a WARN here is an
+# instruction to a human to re-read the passage, not a failure. Legitimate encoder-silicon and
+# other-systems-on-real-GPU passages are expected to trip it; that is the point of a REPORT gate.
+SIL='on silicon|on real [A-Za-z0-9]* ?GPU|real GPU|silicon-(validated|measured|collected|calibrated)'
+CUE='mocker|mocked|language[ -]pool|live[- ]valid|live-runtime|control[- ]plane replay|discrete-event'
+NEAR=0
+while IFS= read -r line; do
+  [ -n "$line" ] && { warn "manual-review (silicon/GPU phrase <=3 lines from a sim/mocker/live cue): $line"; NEAR=$((NEAR+1)); }
+done < <(
+  for f in tex/*.tex; do
+    awk -v S="$SIL" -v C="$CUE" -v F="$f" '
+      { L[NR]=$0 }
+      END { for (i=1;i<=NR;i++) if (L[i] ~ S)
+              for (j=i-3;j<=i+3;j++)
+                if (j>=1 && j<=NR && L[j] ~ C) { printf "%s:%d: %s\n", F, i, substr(L[i],1,88); break } }' "$f"
+  done)
+[ $NEAR -eq 0 ] && ok "no silicon/real-GPU phrase within 3 lines of a sim/mocker/live cue" \
+                || printf "        (%d near-miss(es) above are for human re-read, not gate failures)\n" "$NEAR"
 fi
 
 # ─────────────────────────────────────────────────────── GATE C: delivery-ready

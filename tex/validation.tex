@@ -71,7 +71,7 @@ Forecast p90 & TTFT p99 (ms) & 695 & 651 & $+6.8\%$ \\
 \midrule
 Reactive & TTFT p99 (ms) & 3{,}531 & 3{,}495 & $+1.1\%$ \\
  & ITL p99 (ms) & 150.7 & 152.7 & $-1.3\%$ \\
- & replica-seconds & 1{,}799 & 1{,}948 & $-7.7\%$ \\
+ & replica-seconds & 1{,}799 & 1{,}948 & $-7.6\%$ \\
  & verdict & \textbf{FAIL} & \textbf{FAIL} & agree \\
 \bottomrule
 \end{tabular}
@@ -159,7 +159,7 @@ Chapter~\ref{cap:aiconfigurator} anchored physically on the encoder
 side. Within that scope the conclusion is direct: the platform's
 closed-loop behavior transfers to the real stack in both verdict
 directions --- TTFT differs by 1.1--6.8\% and provisioned replica-seconds
-by 5.3--7.7\%, and the ITL SLA verdicts agree (though the forecast policy's
+by 5.3--7.6\%, and the ITL SLA verdicts agree (though the forecast policy's
 ITL differs by \SI{1.8}{\milli\second}, 18.0\%, both far under the
 \SI{100}{\milli\second} bound) --- across one live run per policy (a point
 difference, not a repeated-trial noise band), and the divergences that

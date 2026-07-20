@@ -1,0 +1,88 @@
+{
+  "chapter": "twopool",
+  "verified_2026_07_20": true,
+  "sources": "corrected provenance store (is_current); defense/anim/data artifacts; collector_artifacts/phaseE_physical_anchor; simulation/*.py; g6_runs/*.stats.json",
+  "summary": {
+    "n_claims": 62,
+    "confirmed": 55,
+    "wrong": 2,
+    "overclaim": 1,
+    "unverifiable": 4
+  },
+  "findings": [
+    {
+      "line": 80,
+      "quote": "TTFT p99 of 398~ms at $1\\times$ the trace rate against the 8B's 307~ms",
+      "kind": "numeric",
+      "verdict": "WRONG",
+      "checked_against": "llm_run_summary g3_32b:235b_tp8_s1 (is_current) p99_ttft_ms = 387.37; point artifact defense/anim/data/g3_32b/points/235b_tp8_s1.json ttft_ms.p99 = 387.368; wheelcheck variant = 392.70. No artifact yields 398.",
+      "evidence": "235B-A22B TP8 at s=1 has TTFT p99 = 387 ms, not 398. The 8B's 307 ms is correct (307.36). 398 appears in no current or archived run.",
+      "proposed_fix": "TTFT p99 of 387~ms at $1\\times$ the trace rate against the 8B's 307~ms"
+    },
+    {
+      "line": 81,
+      "quote": "the flagship's ITL p99 is already \\SI{87.7}{\\milli\\second} at the trace's own rate",
+      "kind": "numeric",
+      "verdict": "WRONG",
+      "checked_against": "llm_run_summary g3_32b:235b_tp8_s1 (is_current) p99_itl_ms = 86.151; point artifact itl_ms.p99 = 86.151; wheelcheck = 88.85. None equal 87.7.",
+      "evidence": "235B ITL p99 at s=1 is 86.2 ms, not 87.7 ms. The load-bearing conclusion (just under the 100 ms bound, so the knee sits at s=1) is unaffected: 86.2 < 100.",
+      "proposed_fix": "the flagship's ITL p99 is already \\SI{86.2}{\\milli\\second} at the trace's own rate"
+    },
+    {
+      "line": 81,
+      "quote": "with $2\\times$ the decode latency throughout (TPOT 14.9 vs.\\ 7.9~ms; 87 vs.\\ 142 output tok/s per user)",
+      "kind": "numeric",
+      "verdict": "OVERCLAIM",
+      "checked_against": "llm_run_summary/point artifacts: 235B mean_tpot_ms = 14.704, 8B = 7.763; mean_output_token_throughput_per_user 235B = 87.2, 8B = 142.0.",
+      "evidence": "Per-user tok/s 87 vs 142 is exact. TPOT is 14.7 vs 7.8 ms (rounds), not 14.9 vs 7.9; the '~2x decode latency' ratio (14.70/7.76 = 1.89) still holds.",
+      "proposed_fix": "with roughly $2\\times$ the decode latency throughout (TPOT 14.7 vs.\\ 7.8~ms; 87 vs.\\ 142 output tok/s per user)"
+    },
+    {
+      "line": 230,
+      "quote": "the two tails are positively correlated ($r{=}0.53$ on image-bearing requests)",
+      "kind": "numeric",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "requires per-request join of encoder delay and prefill TTFT on the aggregate composed run (a12); the store keeps stage summaries and per-request token rows but not a joined encoder-delay+TTFT per-request table that is cheaply queryable. Prior extraction listed r=0.52; tex now 0.53 (edited).",
+      "evidence": "The sign/magnitude claim (positive, moderate correlation driving the near-sum composition) is consistent with e2e_p99 1240 coinciding with the naive marginal sum, but the exact r could not be recomputed within budget.",
+      "proposed_fix": ""
+    },
+    {
+      "line": 147,
+      "quote": "under the sequential alternative ... delay p99 plateaus at \\SI{2.9}{\\second} from 4 through 32 workers",
+      "kind": "methodological",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "encoder_run_summary.chunk_dispatch has only 'parallel' (1115) and NULL (2); no sequential/chained-dispatch sweep row in the store, and no matching report located in defense/anim/data or simulation/results within budget.",
+      "evidence": "The chunk-parallel-vs-sequential contrast is a stated converter-flag sensitivity; the parallel side is fully verified but the sequential 2.9 s plateau (4-32 workers, fastest-onset episode) has no located artifact.",
+      "proposed_fix": ""
+    },
+    {
+      "line": 406,
+      "quote": "requests beyond the \\texttt{h100\\_sxm} grid's \\num{16384}-token edge (${\\approx}3.1\\%$ of the trace, up to ${\\approx}149$k tokens ...) are priced by extrapolation",
+      "kind": "numeric",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "eda_metric holds ctx multi-resolution maxima (1s max 347807 tok/s aggregate, single-request max not exposed) but no stored fraction(ContextTokens>16384) or max-per-request = 149k; deferred to Section aic-composition.",
+      "evidence": "Large-context tail exists (burst-window max input_length = 121188 tokens per sweeps:vision_burst1_s1 metrics), consistent with the direction, but the exact 3.1% / 149k could not be reproduced from available tables.",
+      "proposed_fix": ""
+    },
+    {
+      "line": 182,
+      "quote": "and, at $896^2$, $1.14\\times$",
+      "kind": "numeric",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "collector_encoder_fn.ratio_meas_over_aic is NULL for image_px=896 (aic_pred_ms only populated to N=128 at 448); 896 rows exist only for engine='vllm' (vllm_multires.json, 8 rows). The 1.14x eager-vs-serving ratio at 896 was not located as a stored scalar.",
+      "evidence": "The 448 band 1.36-1.62x ('~1.4-1.6x') is CONFIRMED via ratio_meas_over_aic; the 896^2 1.14x figure (Appendix engine-sensitivity) has no readily queryable source.",
+      "proposed_fix": ""
+    }
+  ],
+  "confirmed_highlights": {
+    "tab_sim_poly_aic": "srcbuild:llm_head2k_poly_src / _aic_src: TTFT 67.3/248/2540 vs 68.2/307/4518; e2e 1413/6879 vs 1590/8163; ITL avg 6.79/7.67, max 181/348; tok/s-per-user 160.6/142.0 — all exact. Ratios 1.24x/1.8x/1.9x confirmed.",
+    "wheel_vs_source": "sweeps:llm_head2k_aic_s1 (wheel) max_ttft 7598=7.6s vs srcbuild source 4518=4.5s, identical p99 307; s16 divergence 40163 vs 49034 ttft (22%), 588.6 vs 228.8 itl (61%). s3 is source-built (max tail 4.5s) while s1/s2/s4/s16 are wheel (max tail ~7.6s), corroborating the provenance caveat; s3 itl p99 = 109.51 exact.",
+    "knee_table": "poly steady knee s=3 (itl-bound) 8.3req/s 248->374; AIC steady s=2 5.5req/s 307->418 (itl 109.51 crosses at s=3); poly burst s=1 910 (9% under); AIC burst 1868 (over); vision steady 199->787 censored, >=256 img/s at s=32; vision burst 5013 @116img/s. TTFT slack 1.8-2.1x (1000/554, 1000/473); itl 154@s4poly, 110@s3aic.",
+    "encoder": "f(1)=8.16, f(64)=316.37 (=>4.94/img, 1.65x, 3.2ms overhead); dispatch caps 5.2/5.0/6.7s @32/64/128; forwards 83376; util 0.289=29%; 6-worker C* (3x); handoff 25Gbps p50 0.714ms, 121-img 62ms.",
+    "composed_aggregate": "enc_p99 588.4, ttft_p99 651.1 (replayed), e2e_p99 1239.5=1240 (request-linked, v_joint_e2e); 706 modelled cross-confirmed in closedloop.tex (651-706 band); 8.5% = (706-651)/651; 21.9% overstatement cross-ref closedloop burst3/4.",
+    "burst_queue_series": "vision_burst1_s1.series.json: peak queue 4701, seconds>1000 = 805, worst second 2726 images; a1_data.json confirms all + peak_img_min 374.4 (tex 370, 2-sig-fig).",
+    "resolution_g6": "provisioned_worker_seconds 32228.0 invariant across 448/672 burst3; 672 burst3 g100 p99 938.7 (6.1% under); 24h 672 fc_L30 g25/g100 = 1972.5/1927.5. vLLM engine sensitivity 12.71% (=>12.8%) over N<=64, 69-point N=1-512 sweep.",
+    "trace_and_arch": "mean images/request 14.33 (~14); steady 2.9 img/req (8.0/2.77); --no-encoder-shift isolation flag present (simulation/sweep_load.py:12,138); 6 burst windows + steady24h (grid_window_effective).",
+    "family_transfer_conclusions_hold": "235B knee s=1 (s2 fails: itl 210.6), 8B knee s=2 (s3 fails: itl 108.5) => envelope halved; conclusions stand despite the 398/87.7/14.9 numeric slips."
+  }
+}

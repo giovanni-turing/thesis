@@ -1,0 +1,139 @@
+{
+  "chapter": "aiconfigurator",
+  "reverified": "2026-07-20",
+  "focus": "methodological (simulated/measured/mocker/real-GPU) + numeric re-check against corrected provenance store and collector_artifacts source",
+  "summary": {
+    "n_claims": 82,
+    "confirmed": 74,
+    "wrong": 0,
+    "overclaim": 0,
+    "unverifiable": 8,
+    "methodological_claims_checked": 14,
+    "note": "No methodological overclaim of the 'ran on real silicon' type found. The chapter is careful: the encoder cost model IS real RTX-5090 silicon (phaseE / phaseA/B collector artifacts); the validation measurements (tab:aic-validation, tab:aic-fn HF-eager, and the vLLM forward) ARE real RTX-5090 measurements on synthetic inputs (line 327 discloses 'forward compute on synthetic inputs, not the complete serving path'); the two-pool test and the winsched reprice ARE explicitly labeled simulation (dynamo.replay offline, FIFO queue). The h100_sxm language-pool timing is described as AIC engine timing / a real Azure trace, never as real-H100 inference. Prior pass's two flagged 'inconsistencies' both resolve as correct."
+  },
+  "methodology_axis": {
+    "encoder_cost_model": "REAL RTX-5090 silicon. Confirmed: collector_artifacts/phaseA_validation/result.txt, phaseB_batch_validation/*, systems/data/rtx_5090/vllm/0.22.0/{encoder_attention,gemm}_perf.parquet (kernel_source=vllm_vit_flash_attn).",
+    "validation_measurements": "REAL RTX-5090, HuggingFace-transformers eager (SDPA backend) forward, CUDA events, 5x50, locked clocks. Confirmed phaseA_validation/result.txt + collector_fn.measured/measured_5x50.",
+    "vllm_forward": "REAL RTX-5090, standalone eager forward through vLLM's own Qwen3-VL vision tower, synthetic inputs. Confirmed collector_encoder_fn engine='vllm' (attn=FLASH_ATTN), 69 batch sizes N=1..512, max CI95=0.0581ms.",
+    "two_pool_smoke": "SIMULATION. dynamo.replay --replay-mode offline --router-mode kv_router --num-workers 2; encoder = FIFO sim priced from AIC on rtx_5090 silicon. Confirmed collector_artifacts/phase9_two_pool/{run.sh,encoder_pool_sim.py,two_pool_report.json}.",
+    "winsched_reprice_606ms": "SIMULATION (schedule replay), encoder repriced with the REAL vLLM f(N). p99 606ms is a queued-sim result, not hardware. Confirmed collector_encoder_stats winsched_treatment_vllm=605.6 / ctrl_aic=589.3, queue_divergent=false."
+  },
+  "confirmed_highlights": [
+    {"line": 36, "quote": "SOL ... underestimating ... by a factor of ~5.9", "checked_against": "collector_artifacts/phaseB_fallback_trace/result.txt: SILICON->PerfDataNotAvailableError, HYBRID/EMPIRICAL->EmpiricalNotImplementedError, SOL=0.00605ms vs measured 0.03580ms => 5.917x", "evidence": "5.9x CONFIRMED; all four fallback-mode error behaviors CONFIRMED verbatim"},
+    {"line": 37, "quote": "0.0061 ms SOL vs 0.0358 ms measured at batch 1, 784 patches", "checked_against": "phaseB_fallback_trace/result.txt (b=1 s=784 n=16 d=72 bf16): SOL 0.00605, measured 0.03580", "evidence": "CONFIRMED"},
+    {"line": 44, "quote": "support-matrix green only because harness supplies no image dims; encoder phase skipped", "checked_against": "phaseB_fallback_trace/result.txt: num_images_per_request=0 -> _run_encoder_phase returns early", "evidence": "CONFIRMED"},
+    {"line": 54, "quote": "compute capability 12.0, 32607 MiB GDDR7, 600 W, driver 595.71.05, CUDA 13.2", "checked_against": "collector_artifacts/phase2_system_metadata/rtx_5090.yaml (sm_version 120, mem 34190917632=32607MiB, power 600, driver/CUDA in comment)", "evidence": "CONFIRMED"},
+    {"line": 60, "quote": "209.5 TFLOP/s dense bf16 (FP32 accumulate; FP16-accumulate is 2x this) at 2407 MHz", "checked_against": "rtx_5090.yaml bfloat16_tc_flops=418990000000000 (419 TFLOPS, 170 SM @ 2407 MHz)", "evidence": "CONFIRMED and internally consistent: the file stores 419 = 2x209.5, i.e. the FP16-accum rate; 209.5 is the stated FP32-accum equivalent. Model does not consume this (SOL-only)."},
+    {"line": 76, "quote": "cc 12.0 / vLLM 0.22.0 resolves to FlashAttention (kernel_source=vllm_vit_flash_attn)", "checked_against": "phase3_preflight/compat_notes.md: get_vit_attn_backend(72,bf16)->FLASH_ATTN; parquet kernel_source col = vllm_vit_flash_attn", "evidence": "CONFIRMED"},
+    {"line": 80, "quote": "collector gate vllm>=0.21.0", "checked_against": "compat_notes.md: __compat__ = 'vllm>=0.21.0'; local 0.20.0 rejected", "evidence": "CONFIRMED"},
+    {"line": 115, "quote": "7679 encoder-attention cases, batch 1-64, seq 1-65536, 35 head configs incl 16x72", "checked_against": "parquet at HEAD b55dd0b7: 35 distinct (num_heads,head_dim) combos, 16x72 present, isl 1-65536, kernel_source vllm_vit_flash_attn. Raw-slice count 7679 is at commit 1e8b9cac (batch cap 64).", "evidence": "35 head configs / 16x72 / seq range CONFIRMED at HEAD; 7679 raw count consistent with narrative arithmetic (see line 141)."},
+    {"line": 141, "quote": "infill 465 cases -> 7760 attention / 34710 GEMM rows", "checked_against": "arithmetic: 7679+81=7760, 34326+384=34710, 81+384=465; HEAD=7770/34775 (=7760+10, 34710+65)", "evidence": "CONFIRMED (internally consistent chain); HEAD row counts 7770/34775 CONFIRMED against live parquet."},
+    {"line": 152, "quote": "upstream HEAD b55dd0b7 carries 7770/34775 rows", "checked_against": "live parquet count at checked-out HEAD b55dd0b7: encoder_attention 7770, gemm 34775", "evidence": "CONFIRMED exactly"},
+    {"line": 271, "quote": "tab:aic-fn rows N=1..64 measured/composed/ratio", "checked_against": "collector_fn: measured_5x50 = 11.30/43.58/58.65/123.39/253.33/511.23; aic_postinfill = 8.16/31.79/43.13/82.22/160.20/316.37; ratios 1.38/1.37/1.36/1.50/1.58/1.62", "evidence": "ALL SIX ROWS CONFIRMED exactly (both columns and ratios)"},
+    {"line": 243, "quote": "ratio rises to 1.62x at N=64 (from ~1.37x), easing to 1.43x at the largest dispatch", "checked_against": "collector_fn measured_5x50/aic_postinfill: N=64 ratio 1.616, N=128 ratio 1.428", "evidence": "CONFIRMED. Prior pass's 'flag for review' RESOLVED: 'largest dispatch' = N=128 (the figure's largest plotted point), not the 64 dispatch cap; 1.43x is the N=128 ratio."},
+    {"line": 310, "quote": "vLLM vs composed at N=8,32,64 = -2.2%, +11.3%, +5.5% (42.2/178.3/333.7 vs 43.1/160.2/316.4)", "checked_against": "collector_encoder_fn vllm@448px vs collector_fn aic_postinfill: 42.2/43.1=-2.2%, 178.3/160.2=+11.3%, 333.7/316.4=+5.5%", "evidence": "CONFIRMED exactly (measured and composed both match)"},
+    {"line": 322, "quote": "every batch up to FIFO cap within 12.8% (max +12.7% at N=52)", "checked_against": "collector_encoder_fn vllm@448 vs aic_postinfill, N<=64 ordered by abs dev: N=52 = +12.71% (top)", "evidence": "CONFIRMED (N=52, +12.7%, inside 12.8% bound)"},
+    {"line": 319, "quote": "dense sweep N=1-512, 69 batch sizes, per-N 95% CI below 0.06 ms", "checked_against": "collector_encoder_fn engine='vllm': 69 distinct n_images, min 1 max 512, max ci95=0.0581ms", "evidence": "CONFIRMED"},
+    {"line": 334, "quote": "vLLM per-image bottoms at 5.12 ms at N~6-9, 1.57x below single-image", "checked_against": "collector_encoder_fn vllm@448: min per-img 5.117 at N=9; vllm N=1=8.031; 8.031/5.117=1.569", "evidence": "CONFIRMED"},
+    {"line": 336, "quote": "later batch sizes drift up to ~10% above floor, +9.9% at N=23", "checked_against": "collector_encoder_fn vllm@448 N=23: per-img 5.623 vs floor 5.117 = +9.9%", "evidence": "CONFIRMED"},
+    {"line": 331, "quote": "HF per-image bottoms at N=6 (7.26 ms, 1.56x below single) drifts to 7.99 by cap", "checked_against": "collector_fn measured_5x50: 43.58/6=7.263, 11.30/7.263=1.556, 511.23/64=7.988", "evidence": "CONFIRMED"},
+    {"line": 288, "quote": "attention linear: 1.300 ms N=1, 1.306 ms/img N=64", "checked_against": "collector_kernel_ledger: attention N=1=1.300, N=64=83.578/64=1.306", "evidence": "CONFIRMED"},
+    {"line": 289, "quote": "per-image GEMM falls 6.03 -> 3.69 ms", "checked_against": "collector_kernel_ledger gemm: N=1=6.029, N=64=236.304/64=3.692", "evidence": "CONFIRMED"},
+    {"line": 293, "quote": "elementwise 1.18->1.89/img; DeepStack gather 0.26->0.58/img", "checked_against": "kernel_ledger: elementwise N=1=1.179, N=64=120.816/64=1.888; gather_cat N=1=0.257, N=64=37.253/64=0.582", "evidence": "CONFIRMED"},
+    {"line": 296, "quote": "categories total 168.6 ms at N=64 = 92% of the 182 ms difference", "checked_against": "kernel_ledger N=64: elementwise 120.816 + gather_cat 37.253 + patch_embed_conv 10.520 = 168.589; HF kernel total 498.267 - composed 316.37 = 181.9; 168.6/181.9=92.7%", "evidence": "CONFIRMED"},
+    {"line": 291, "quote": "dispatch gaps 15.3% at N=1, amortize to 2.5%", "checked_against": "N=1: 1.736/11.360=15.28% (phaseA); N=64: (511.23-498.267)/511.23=2.54%", "evidence": "CONFIRMED"},
+    {"line": 350, "quote": "the eight batch sizes of this section's protocol are memoized in minutes", "checked_against": "collector_fn measured_5x50: 8 distinct n_images (1,6,8,16,32,64,96,128)", "evidence": "CONFIRMED. (Prior extraction had the old value 'twelve/12'; current text 'eight' is correct.)"},
+    {"line": 354, "quote": "reprice at measured vLLM cost leaves encoder-delay p99 606 ms (from 589), non-divergent, under 1000 SLA", "checked_against": "collector_encoder_stats: winsched ctrl_aic p99=589.3 (queue_divergent=f), winsched treatment_vllm p99=605.6 (queue_divergent=f)", "evidence": "CONFIRMED (589, 606, non-divergent)"},
+    {"line": 357, "quote": "all six windows size at 6-8 workers", "checked_against": "grid_window_effective c_star_effective: burst1=6,burst2=8,burst3=7,burst4=7,burst5=8,burst6=6 (steady24h=2 is not a burst window)", "evidence": "CONFIRMED (the six burst windows all in [6,8])"},
+    {"line": 363, "quote": "burst5's honest size is 8 workers, not the 16 an earlier divergence flag reported", "checked_against": "grid_window_effective burst5: c_star_as_ingested=16, c_star_effective=8, is_superseded=t, correction_source verification/rerun-stability-e2e.md", "evidence": "CONFIRMED (matches the corrected store; DB carries the supersession)"},
+    {"line": 366, "quote": "C=8 feasible at week scale (encoder-delay p99 644 ms)", "checked_against": "encoder_run_summary window_name='aggregate' (week), encoder_workers=8, static: p99=644.44 ms", "evidence": "CONFIRMED (644 = week-scale aggregate C=8 static)"},
+    {"line": 435, "quote": "11.360 ms = 9.624 kernel + 1.736 (15.3%) dispatch gaps", "checked_against": "phaseA_validation/result.txt reconciliation ledger @448: 9.624 + 1.736 = 11.360, 1.736/11.360=15.3%", "evidence": "CONFIRMED"},
+    {"line": 440, "quote": "attention 1.300 vs predicted 1.342: within ~3% (strictly 3.2%)", "checked_against": "phaseA result.txt: attention 1.300 vs AIC 1.342; (1.342-1.300)/1.300=3.23%", "evidence": "CONFIRMED (headline)"},
+    {"line": 442, "quote": "GEMM total ~6% above prediction", "checked_against": "phaseA result.txt: GEMM 6.03 vs AIC 5.69; (6.03-5.69)/5.69=5.98%", "evidence": "CONFIRMED"},
+    {"line": 454, "quote": "unfused elementwise + projector norms 1.04 measured vs 0.79 predicted (~0.25 of residual)", "checked_against": "phaseA result.txt: elementwise+norms 1.04 vs AIC 0.79; delta 0.25", "evidence": "CONFIRMED"},
+    {"line": 447, "quote": "patch-embedding convolution 0.459 ms, 4.8% of kernel time", "checked_against": "phaseA result.txt: patch_embed conv 0.459, 0.459/9.624=4.77%", "evidence": "CONFIRMED (phase-A profile; the DB kernel_ledger has the footnote's 'later run' value 0.495)"},
+    {"line": 450, "quote": "DeepStack gather/concatenation 0.248 ms", "checked_against": "phaseA result.txt: deepstack concat/glue 0.248 (2.6%)", "evidence": "CONFIRMED. No conflict with the 0.26 at line 294: that uses the phaseB N=1 kernel_ledger (gather_cat 0.257->0.26); the two profiles are footnoted as not mixed."},
+    {"line": 451, "quote": "removing the two unmodeled modules leaves 8.92 vs 7.82 predicted, within ~12%", "checked_against": "phaseA result.txt: 9.624-0.459-0.248=8.92 vs 7.82 predicted; (8.92-7.82)/8.92=12.3%", "evidence": "CONFIRMED"},
+    {"line": 428, "quote": "tab:aic-validation: 448^2 11.360+/-0.006 vs 7.822 (1.45); 896^2 36.421 vs 31.973 (1.14); 1344^2 103.824 vs 89.347 (1.16)", "checked_against": "phaseA_validation/result.txt comparison table (identical values and ratios)", "evidence": "CONFIRMED all three rows"},
+    {"line": 455, "quote": "forcing projector instance count 4->1 scales predicted projector cost by exactly 4.00x", "checked_against": "phaseA result.txt: 4 projector instances (main merger + 3 deepstack) modeled identically", "evidence": "CONFIRMED (structural: 4 identical instances => 4.00x exact)"},
+    {"line": 379, "quote": "27-block ViT, hidden 1152, 16 heads dim 72, GELU MLP width 4304, 4 projectors 4608->4608->4096", "checked_against": "phaseA result.txt AIC modeled-op inventory: 27x per block, qkv 1152->3456, attn 16h x 72d rotary 0.5, proj 1152->1152, ffn 1152->4304->1152, 4x projector 4608->4608->4096", "evidence": "CONFIRMED"},
+    {"line": 477, "quote": "196 post-merge vision tokens per 448^2 image", "checked_against": "phaseA result.txt 'Output: 196 vision tokens'; encoder_pool_sim.py VISION_TOKENS_448=196 (784/4)", "evidence": "CONFIRMED"},
+    {"line": 484, "quote": "50-request smoke: mean TTFT 32.4 ms, 27.6 rps; disjoint prefix hashes (no cache reuse)", "checked_against": "phase9_two_pool/two_pool_report.json: completed_requests=50, mean_ttft_ms=32.43, request_throughput_rps=27.63, prefix_cache_reused_ratio=0.0", "evidence": "CONFIRMED"},
+    {"line": 84, "quote": "unlocked-clock initial collection ran ~17% faster than final locked dataset", "checked_against": "phaseA_validation/result.txt line 19-20: 'locked absolute numbers ~17% higher (prior collection rode ~3GHz boost)'; ratios clock-invariant", "evidence": "CONFIRMED"},
+    {"line": 87, "quote": "locked clocks nvidia-smi -lgc 2400,2400 -lmc 14001, delivered SM 2377-2400, MEM 13801", "checked_against": "collector_fn measured/measured_5x50 sm_clock_mhz in {2377,2385,2392,2400}; phaseA result.txt 'SM locked 2407 (reads 2385-2392), mem locked 14001'", "evidence": "CONFIRMED"}
+  ],
+  "findings": [
+    {
+      "line": 360,
+      "quote": "rho=20 feasible in every per-window cell (120/120), rho=25 losing exactly the burst5 cells --- is an AIC-model result",
+      "kind": "numeric",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "provenance.factorial_cell grouped by rho: rho=20 -> 312 cells / 221 feasible over 6 windows; rho=25 -> 315 / 192. The specific 120-cell frontier (a fixed readiness/quantile/model slice) is not reconstructible from the aggregate factorial_cell here.",
+      "evidence": "Cannot confirm the exact 120/120 count from this chapter's scope; the claim is a Chapter-5 (twopool) capacity-rating result. Direction is consistent (feasibility falls rho=20->25 and burst5 is the tightest window). NOT wrong -- verify inside the twopool audit against the exact frontier slice.",
+      "proposed_fix": null
+    },
+    {
+      "line": 501,
+      "quote": "the ~3.1% of trace requests beyond it (up to ~149k tokens ...) are priced by stratum-three extrapolation",
+      "kind": "numeric",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "provenance.composed_request_aggregate44 (aggregate/week window, 4.5M replayed rows): 3.50% have input_length>16384, max input_length 127864.",
+      "evidence": "The aggregate window alone gives 3.5% and max ~128k, not 3.1%/149k -- but the sentence is about the full trace including burst windows (the '~149k frames-class prefills that decide burst-window TTFT tails'), a different denominator/window than aggregate. Cannot confirm or refute from the aggregate partition; belongs to the Chapter-5 trace-composition audit. NOT asserting wrong.",
+      "proposed_fix": null
+    },
+    {
+      "line": 157,
+      "quote": "re-derived under the corrected data: encoder-delay percentiles moved by at most ~1%, and no finding changed",
+      "kind": "numeric",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "Would require paired raw-slice vs infilled-slice encoder_run_summary runs differing only in AIC dataset version; the store retains the corrected (infilled) runs, and the pre-infill runs are not cleanly isolable by a single dimension.",
+      "evidence": "Stability claim; the reprice/infill deltas that ARE checkable (589->606 vLLM reprice = +2.9%, f(N) infill shifts +4.3%/-5.8%/<1% at line 143) are consistent with a small p99 movement, but the specific '<=~1% percentile move' cannot be reproduced here.",
+      "proposed_fix": null
+    },
+    {
+      "line": 159,
+      "quote": "one marginal optimum shifted by a single worker (an episode ... 3 ms inside the tail bound)",
+      "kind": "numeric",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "Requires the specific baseline-chapter episode's factorial_cell at config_c and config_c+1 across raw vs infilled dataset versions; not isolable from this chapter.",
+      "evidence": "Chapter-4/5 sizing episode; not reproducible from the aiconfigurator-chapter data. NOT asserting wrong.",
+      "proposed_fix": null
+    },
+    {
+      "line": 324,
+      "quote": "beyond the cap the composition progressively under-prices vLLM, reaching +21.8% at N=512",
+      "kind": "numeric",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "collector_encoder_fn vllm@448 N=512 mean_ms=3033.79; the composed reference at N=512 is by AIC stratum-3 extrapolation (aic_postinfill table only extends to N=128), so no stored composed@512 to divide against.",
+      "evidence": "vLLM value confirmed (3033.79). +21.8% implies composed~2490.8, consistent with extrapolating the composed per-image (5.65 at N=128) downward -- plausible but not directly checkable. NOT asserting wrong.",
+      "proposed_fix": null
+    },
+    {
+      "line": 76,
+      "quote": "this resolves to FlashAttention~\\cite{Dao2023FlashAttention2}",
+      "kind": "external",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "Citation to Dao 2023 FlashAttention-2 is an external reference; backend selection itself is CONFIRMED (compat_notes.md get_vit_attn_backend->FLASH_ATTN, parquet kernel_source=vllm_vit_flash_attn).",
+      "evidence": "The kernel-selection fact is confirmed; only the paper citation is external/unverifiable internally.",
+      "proposed_fix": null
+    },
+    {
+      "line": 384,
+      "quote": "The Qwen3-VL family shares this tower across its 8B, 32B, and 235B variants~\\cite{Qwen3VL2025}; ... 32B projects into its 5120-dimensional embedding space",
+      "kind": "external",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "Qwen3-VL model-family architecture facts (shared tower, 8B/32B/235B, 4096 vs 5120 embedding) are external model-release properties; no internal provenance source. The 8B tower config (27 blocks, 1152/16x72/4304) IS confirmed via phaseA result.txt.",
+      "evidence": "The 8B tower and projector dims used in the experiment are confirmed; the cross-variant transfer claim (32B 5/4 scaling, 235B shared projector) is an external analytic/model-family statement.",
+      "proposed_fix": null
+    },
+    {
+      "line": 200,
+      "quote": "probed on the H100 tables out to 147k-token contexts, this tracks the theoretical quadratic of attention within a few percent per octave",
+      "kind": "methodological",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "An AIC h100_sxm attention-table extrapolation probe; not a logged run in provenance. Reproducible only by re-querying AIC's shipped h100_sxm tables.",
+      "evidence": "No internal artifact captures this probe; consistent with the stratum-3 description but not stored. NOT asserting wrong.",
+      "proposed_fix": null
+    }
+  ]
+}

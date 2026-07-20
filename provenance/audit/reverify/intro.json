@@ -1,0 +1,89 @@
+{
+  "chapter": "intro",
+  "reviewed": "2026-07-20",
+  "method": "Every claim (numeric, methodological, structural, comparative, external) re-verified against the corrected provenance store, source code (defense/anim/build, simulation, collector_artifacts, tex body chapters), and the ratified ADJUDICATION.md. Methodological/simulation-vs-measurement axis given priority.",
+  "summary": {
+    "n_claims": 70,
+    "confirmed": 60,
+    "wrong": 0,
+    "overclaim": 1,
+    "unverifiable": 9,
+    "note_1_finding": "intro.tex:444 'dominant operator within 3%' mislabels the attention operator as dominant -- the same DEFINITIONAL error ADJUDICATION [E1] fixed in conclusion.tex:39 but did NOT mirror into intro. GEMM (63.2% of kernel time) is dominant; the operator that agrees within 3% is attention (13.6%). intro.tex:248 states it correctly ('encoder-attention operator agrees within 3%')."
+  },
+  "methodological_axis_findings": {
+    "language_pool_simulated_not_hardware": "CONFIRMED correct framing. Line 316-318 'The language pool is simulated by Dynamo's discrete-event engine (dynamo.replay with a KV-aware router) under AIC-calibrated H100 timing'. Verified: simulation/build_dynamo_src.sh runs `python -m dynamo.replay`; sweep_fig.py:134 labels 'Language pool (dynamo.replay, 2 workers)'. 'AIC-calibrated H100 timing' correctly avoids claiming real H100 hardware.",
+    "encoder_pool_real_silicon": "CONFIRMED. Line 305-306 / 444 'collected ... on an NVIDIA GeForce RTX 5090' / 'physical measurement of the same network on the same silicon' -- real phaseE RTX-5090 collection. collector_scalar/collector_encoder_fn confirm real measured data.",
+    "live_validation_mocked_engines": "CONFIRMED correct framing -- this is the sibling of the previously-caught closedloop 'real H100 silicon' error, and intro gets it RIGHT. Line 542-544 'replayed against the live Dynamo runtime (real control plane, mocked engines)'. validation.tex:156-157 confirms 'mocked engine execution. It validates the control loop, not GPU silicon.' No overclaim.",
+    "measured_behavior_line43": "CONFIRMED (not an overclaim). Line 43 'reproduces the decoupling as measured behavior' -- 'measured' = observed emergent behavior of the explicitly-named 'calibrated discrete-event simulation' in the same sentence, not a hardware-measurement claim."
+  },
+  "findings": [
+    {
+      "line": 444,
+      "anchor": "sec:intro-contrib (contribution 3)",
+      "quote": "the kernel-time ledger closed against a physical measurement of the same network on the same silicon (dominant operator within ${\\approx}3\\%$)",
+      "kind": "methodological",
+      "verdict": "OVERCLAIM",
+      "checked_against": "provenance.collector_kernel_ledger (n_images=1, entry_kind='category'): gemm 6.029 ms (63.2%), attention 1.300 ms (13.6%), total 9.542 ms; aiconfigurator.tex:450,525 ('agreement within 3% on the collected attention operator', predicted 1.342 vs measured 1.300); ADJUDICATION [E1]/R34 (conclusion.tex:39 'dominant operator' fixed for the same reason).",
+      "evidence": "The operator that agrees with physical measurement within 3% is the ATTENTION operator (1.300 ms measured / 1.342 ms predicted = 13.6% of kernel time). The DOMINANT operator is GEMM (6.029 ms = 63.2%), which is NOT within 3% (the full GEMM-dominated forward carries the ~0.7 ms remainder over ~10 ms). Calling the within-3% operator 'dominant' is the exact DEFINITIONAL mislabel ADJUDICATION [E1] corrected in conclusion.tex:39 ('validated to ~3% on its dominant operator') -- it was applied there but NOT mirrored to intro.tex:444. intro.tex:248 already states it correctly.",
+      "proposed_fix": "Replace '(dominant operator within ${\\approx}3\\%$)' with '(collected attention operator within ${\\approx}3\\%$)' -- aligning :444 to :248 and to aiconfigurator.tex:525."
+    },
+    {
+      "line": 430,
+      "anchor": "sec:intro-contrib (contribution 2)",
+      "quote": "its p90 edge empirically calibrated at provisioning cadence (coverage 0.88--0.90 across all models and signals)",
+      "kind": "numeric",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "provenance.ewma_cal_coverage (EWMA calibration only: add/mult/wsc p90 coverage 0.877-0.901 at nominal 0.9); forecast_metrics has no coverage column; no located foundation-model p90-coverage table in the store.",
+      "evidence": "The foundation-model p90-band empirical-coverage figure (0.88-0.90) is a predictors-chapter artifact I could not locate in the provenance store (only the EWMA-calibration coverage table exists, which brackets the same 0.88-0.90 range). Not contradicted; not directly verified against the DB. Consistent with the chapter per prior ADJUDICATION review of predictors.tex."
+    },
+    {
+      "line": 448,
+      "anchor": "sec:intro-contrib (contribution 3)",
+      "quote": "unlocked consumer-GPU clocks silently inflate collected data by ${\\approx}17\\%$ while leaving validation ratios unchanged",
+      "kind": "numeric",
+      "verdict": "CONFIRMED",
+      "checked_against": "ADJUDICATION §3 (intro.tex:448): unlocked dataset recollected/overwritten; surviving proxies give 11-19% via the encoder_fn proxy, 27.3% via one kernel shape; NO EDIT (honest floor 'well over 10%').",
+      "evidence": "17% sits inside the surviving 11-19% proxy band; ADJUDICATION explicitly upheld NO EDIT. Approximate but not wrong."
+    },
+    {
+      "line": 101,
+      "anchor": "sec:intro-context (footnote)",
+      "quote": "the 576M-parameter vision encoder reaches serving-ready in ${\\approx}$3--5\\,s of model-side work ... 1.15\\,GB checkpoint 0.11\\,s ... 0.13\\,s host-to-device",
+      "kind": "external",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "No readiness/checkpoint-IO microbenchmark table in provenance store (per prior extraction db_check); a startup-timing measurement on the benchmark node, not archived in the DB.",
+      "evidence": "Startup/readiness microbenchmark; verify against the readiness audit artifact on disk if required. Not contradicted."
+    },
+    {
+      "line": 306,
+      "anchor": "sec:intro-approach",
+      "quote": "576M-parameter tower ... 8B/32B/235B share one vision tower; 8B and 235B share its 4096-dimensional projector; 32B 5120-d, projector GEMM and handoff bytes scale by 5/4; 196x4096 bf16/img handoff",
+      "kind": "external",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "Qwen3-VL model-architecture facts; not experimental measurements in the provenance store. Handoff-payload size cross-checkable against cap:twopool derivation.",
+      "evidence": "Architecture-derived; no internal source. ADJUDICATION did not dispute."
+    },
+    {
+      "line": 442,
+      "anchor": "sec:intro-contrib",
+      "quote": "contributed upstream (draft PR ai-dynamo/aiconfigurator~\\#1312)",
+      "kind": "external",
+      "verdict": "UNVERIFIABLE",
+      "checked_against": "External GitHub artifact; not in provenance DB. ADJUDICATION citation-hygiene section tracks intro.tex:442 (PR #1312) as a known reference.",
+      "evidence": "Verify via `gh pr view ai-dynamo/aiconfigurator 1312` if required."
+    }
+  ],
+  "confirmed_highlights": {
+    "trace_facts": "1M requests (frames 27183/0.027183=1e6; coverage_meta=1000000), 7 days (f_fourier.duration_days=7), 50% text-only (b_marginals.numimages.share_text_only=0.5), max 9409=97^2 (b_marginals.numimages.max=9409), grids perfect squares (numimages.all_perfect_squares).",
+    "decoupling_R2": "image constant-fraction R2=0.12253911 -> 0.123 (eda_metric d_signals constant_fraction_fit.r2); decode R2=0.65350405 -> 0.654 (m_gen_and_global gen_signal.constant_fraction_vs_req.r2).",
+    "burstiness": "CV2 image 3.8308 vs req 0.3212 at 1min (c_temporal); Fano 1.7639->1.8 (s) to 938.12->938 (h) (e_comprehensive); Hurst images 0.9325->0.93, requests 0.8289->0.83 (f_fourier).",
+    "burst_geometry": "peak img 370.18->370 img/s (c_temporal top6[0]); peak-to-mean 15.62->~16x; req peak in burst 4.4833 (<4.5); req p99 4.35; Jaccard 0.02475->0.02; frames burst shares 0.927-0.964 -> 93-96%; onset p50=6 min, min=1; steepest jump p50=208.11->208 img/s; ACF halflife img=69, req=9.",
+    "encoder_invisible_failure": "encoder p99 5013.4 ms -> 5.0 s at util 0.2889 -> 29% (grid:grid_burst1_C2 / sweeps:vision_burst1_s1); image_px=448 for all encoder runs.",
+    "forecast": "foundation models win 20/20 (variate,resolution) cells under thesis protocol (h=-1, mode=uni, candidate=point) in BOTH spans (0 classical wins); v_forecast_best mixes candidates and is NOT the right check; 21,404,640 forecast rows -> 21.4M exact (ADJUDICATION Q1); 9 quantiles (candidate p10..p90).",
+    "aic_cost_model": "SOL 5.9174x optimistic (collector_scalar phaseB measured_over_sol_x); HF-eager 1.3613 (N=8) to 1.6170 (N=64) -> 1.4-1.6x (collector_encoder_fn anchor_dense_sdpa); vLLM matched-engine within +-12.8% across N=1..64 (ENCODER_ANCHOR_SUMMARY.md:44); 69 vllm batch sizes N=1..512.",
+    "timing_calibration": "steady TTFT p99 aic 307.36 / poly 248.46 = 1.237 -> +24% (srcbuild); burst calibrated TTFT p99 ~1868-1905 ms -> ~1.9x the 1000ms SLA.",
+    "closed_loop": "forecast burst floor 588.4/589.30 ms; calm steady24h 733.6 ms (<734); reactive burst3 (fastest onset) enc p99 9481.3 (L15) to 54169.5 ms (L165) -> 9.5-54s; 0.62x = chronos aggregate p90 rho15 warm 0.6220-0.6231 (lead-invariant), strict 0.5877-0.6202 -> 0.59-0.62x; 5.60d span = aggregate span_s 483659.8 = 5.598d; EWMA-mult p90 rho15 warm 1.0900 -> 1.09x; 14 configs = 7 windows x 2 planner variants (baselines.tex:177); 560 target-time cells (closedloop.tex:83, exploratory grid); operating rho=15 p90.",
+    "validation": "reactive offline twin p99_tpot 152.681->152.7 (live:twin_re); forecast offline p99_tpot 9.718 (live:twin_fc_p90_cap4)->9.7; live 11.469605->11.5 & 150.74->150.7 (aiperf exports, ADJUDICATION R1/R2/R16); TTFT reactive delta 1.05094%->1.1% (ADJUDICATION R1); within-8% replica-time upheld.",
+    "family_transfer": "235B at TP8 exists (g3_32b:235b_tp8_*, tp=8, Qwen3-VL-235B); ITL p99 crosses 100ms between s1p1351 (97.74) and s1p1496 (102.20); coarse octave knee s=1 (235B) vs s=2 (8B) = one swept octave (twopool.tex:84)."
+  }
+}

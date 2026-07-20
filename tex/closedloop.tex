@@ -114,7 +114,7 @@ per-window p99 unchanged across leads from $L{=}15$ to \SI{165}{\second}
 service floor on every burst window and feasible (below
 \SI{734}{\milli\second}) on the calm day, while the
 reactive twin degrades monotonically with
-lead toward its never-scaled limit (burst3: 16{,}079 to
+lead toward its never-scaled limit (burst3: 9{,}481 to
 54{,}170\,\si{\milli\second}). A policy that must \emph{observe} an
 onset pays for lead; a policy that provisions from an already-issued
 forecast band does not, up to the lead the archive supplies. (This is a
@@ -1002,9 +1002,11 @@ partitions inspected. The forecasts driving all of it are the
 \num{21400000}-row rolling-origin archive of
 Chapter~\ref{cap:predictors}. Finally, the layer none of this can
 simulate: the live validation of Chapter~\ref{cap:validation} runs the
-burst3 window on real H100 silicon, in real time, twice --- once per
-policy --- at \num{3093} requests each with per-request token counts and
-prefix structure taken from the trace.
+burst3 window through Dynamo's real control plane, in real time, twice
+--- once per policy --- at \num{3093} requests each, with per-request token
+counts and prefix structure taken from the trace. Those workers are mocker
+processes on the shared AIC timing model, not GPUs: the live anchor validates
+the control loop, not silicon.
 
 Two caveats keep that volume from being over-read. Scale is not
 independence: the runs replay a \emph{single} production trace, so a

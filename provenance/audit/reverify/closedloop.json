@@ -1,0 +1,100 @@
+{
+  "chapter": "closedloop",
+  "verified_by": "reverify pass (DB corrected store + source code)",
+  "date": "2026-07-20",
+  "summary": {
+    "n_claims": 96,
+    "confirmed": 90,
+    "wrong": 0,
+    "overclaim": 1,
+    "unverifiable": 5,
+    "methodological_claims_checked": 12
+  },
+  "confirmed_highlights": [
+    {"line": 77, "claim": "p90 rho=15 factorial 60/60 both readiness", "checked": "v_closedloop_frontier: p90 rho15 warm=60/60, strict=60/60"},
+    {"line": 79, "claim": "burst windows pinned 588 ms; calm 548-734", "checked": "worst_p99_ms burst=588.37; steady warm 548.363-685.323, strict 564.047-733.643"},
+    {"line": 101, "claim": "p50 clears 23-24/60 (24 warm, 23 strict)", "checked": "v_closedloop_frontier p50 rho15: warm feas=24, strict feas=23"},
+    {"line": 139, "claim": "rho{10,15,20} 60/60; rho=25 drops 9 all burst5", "checked": "rho10/15/20 feas=60 both; rho25 feas=51, 9 infeasible all window_name=burst5"},
+    {"line": 142, "claim": "rho=20 per-window p99 746/860 warm/strict", "checked": "max worst_p99 rho20 warm=746.356, strict=859.524"},
+    {"line": 234, "claim": "foundation band 0.62x; EWMA table burst1/3/4/5/steady/agg", "checked": "v_ewma_ablation_ratio: chronos 589x4/681/0.623; add 658/1285/589/div/418/0.696; mult 589/747/589/589/418/1.089; wsc 611/2084/589/div/736/0.558"},
+    {"line": 335, "claim": "knee validation flips at formula boundary (b1 4.64 fail/6.22 pass -16%; b4 6.22 fail/7.0 pass)", "checked": "v_capacity_knee: fc_scale4.64 f, fc_scale6.22 t (gpu 31.45 vs 37.60 = -16.4%); burst4 6.22 f, 7.0 t"},
+    {"line": 331, "claim": "tail knee 1.62 req/s burst1; [1.26,1.44] burst4; belief 10.07 req/s", "checked": "implied_r_tail burst1 boundary 1.62 (scale6.22); burst4 passing r_tail 1.44(scale7.0)/1.26(scale8.0); 10.07/1.62=6.22 and 10.07/1.44=7.0 confirm r_hat=10.07"},
+    {"line": 371, "claim": "language week p90 651ms/6.4 itl/518.6 GPUh; reactive 1197/281.8; p50 828/319.9; Toto 625 TimesFM 641", "checked": "llm_run_summary planner aggregate: forecast p90 651.1/6.4/518.6; reactive 1196.6/281.8; p50 827.8/319.9; toto 651.1/625.3; timesfm 651.1/641.1"},
+    {"line": 393, "claim": "encoder p50 fails all 48 week cells", "checked": "v_closedloop_frontier aggregate p50: all 48 cells all_feasible=false"},
+    {"line": 522, "claim": "week rho frontier 0.89/0.62/0.48/0.40 at rho 10/15/20/25", "checked": "v_closedloop_frontier aggregate Chronos: 0.888/0.623/0.482/~0.40; p99 588 at rho<=15 to 748 at rho25"},
+    {"line": 619, "claim": "encoder ledger table (cost_accounting) all 40 cells", "checked": "cost_accounting: burst1/3/4/5 x forecast/reactive prov+warmup+% all match to published precision"},
+    {"line": 693, "claim": "L=165 reactive warm-up 73.7/34.6/25.3/22.7/21.9%; forecast max 9.4%", "checked": "cost_accounting warmup_frac: b3 0.7369, steady 0.3456, b5 0.2529, b1 0.2272, b4 0.2191; forecast max 0.0941 (b3 L165)"},
+    {"line": 818, "claim": "joint E2E table all 20 arms", "checked": "v_joint_e2e: forecast e2e_p99=1240 (13/15 exact), reactive 1696/2069/21868/3064/2714, errors 1.050/1.089/1.219/1.108/1.021"},
+    {"line": 660, "claim": "burst3 reactive overage 15.1 (1508%), worst excursion 19.2x", "checked": "v_infraction burst3 reactive L30: overage_ratio 15.08, worst_excursion_ratio 19.24"},
+    {"line": 318, "claim": "triad: reactive 1615.5/125.1 FAIL; mean-conv 1716.6/126.8 FAIL; tail-aware 736.3/6.3 PASS", "checked": "v_capacity_knee/v_infraction burst1: reactive 1615.5, fc mean 1716.6, fc_lead60 736.3/6.345"},
+    {"line": 201, "claim": "reactive-with-headroom burst3 fails 1973-11568 ms", "checked": "rerun_verify burst3 reactive(headroom) p99 1973 (L30) to 11568 (L300)"},
+    {"line": 993, "claim": "749601 req span; per-model maxspan Chronos 749601/Toto 872980/TimesFM 931628", "checked": "coverage_meta: forecast_span_requests 749601; per_model_maxspan matches exactly"},
+    {"line": 550, "claim": "burst3 ~3100 req, <0.5% of span", "checked": "v_joint_e2e burst3 n_requests=3093; 3093/749601=0.41%"}
+  ],
+  "methodological_confirmed": [
+    {"line": 30, "claim": "encoder controller C(t)=ceil(y_q/rho), lead L issued early, 3-min hysteresis; reactive = same law on trailing observed point rate", "checked_against": "simulation/forecast_schedule.py:11-17,89-104 (desired=clamp(ceil(q/rho)), rolling-max hysteresis default 3min, min-trailing-L cold start; reactive branch reads trailing-bin observed image rate, quantile ignored)"},
+    {"line": 56, "claim": "issue time = target - (h-1)*15s; h=1 zero lead; archive supplies <=165s", "checked_against": "verification/scripts/forecast_schedule_issuetime.py:14-31 (O_i=ts_i-(h-1)*15; max lead (h-1)*15 in [0,165]; asserts issue<=decision; 300s impossible)"},
+    {"line": 123, "claim": "warm-pool vs strict re-warm readiness models", "checked_against": "forecast_schedule_issuetime.py:124-152,175 (warm=monotone envelope of matured levels forever; strict-rewarm=matured level warm only warm-hold-s then re-orders/re-pays lead)"},
+    {"line": 42, "claim": "language forecast replaces planner predictor via forecast_file predictor in registry; replica lead = simulator native worker-startup delay", "checked_against": "simulation/replay_with_forecast.py:12-22 (factory variate bindings, predictor returns held archived bin, not future-horizon)"},
+    {"line": 293, "claim": "language hook reads single 15s bin per tick at index 4t, pre-scaled to 60s, steps 4 bins/tick, samples not aggregates; = conversion test not anticipation", "checked_against": "simulation/replay_with_forecast.py:14-22,106-129 (SAMPLES single bin at index 4*ticks; NOT aggregate the minute's four bins; series starts T0-1min; explicitly 'conversion test')"},
+    {"line": 1008, "claim": "live validation workers are mocker processes on AIC timing, not GPUs; validates control loop not silicon", "checked_against": "consistent with ground-truth (validation.tex live51 cap:validation); prior closedloop error ('real H100 silicon') already corrected here"},
+    {"line": 616, "claim": "vLLM Qwen3-VL vision tower is a REAL measured standalone eager forward (not simulated)", "checked_against": "v_vllm_vision_cost_by_n run_id='measured:vllm_h100_trace' (real H100 vLLM measurement); AIC=calibrated. Framing correct"},
+    {"line": 606, "claim": "5090h derived as worker-seconds/3600 (not stored); H100 GPU-hours stored", "checked_against": "SCHEMA_GUIDE 2.2: encoder rows carry provisioned_worker_seconds (no stored 5090h); language rows carry stored gpu_hours"}
+  ],
+  "findings": [
+    {
+      "line": 118,
+      "kind": "numeric",
+      "verdict": "OVERCLAIM",
+      "quote": "the reactive twin degrades monotonically with lead toward its never-scaled limit (burst3: 16,079 to 54,170 ms)",
+      "checked_against": "tab:base-react-enc (tex/baselines.tex:245) and v_infraction a2 burst3 reactive: L=15 -> 9,481 ms, L=30 -> 16,079, L=45 -> 28,342, L=165/300 -> 54,170",
+      "evidence": "The low end of the reactive burst3 degradation range over the leads compared for the p90 policy (L=15..165) is 9,481 ms (at L=15), not 16,079 ms (which is the L=30 value). The sentence frames the p90 policy over 'L=15 to 165 s' but quotes the reactive range starting at L=30.",
+      "proposed_fix": "Change '(burst3: 16,079 to 54,170 ms)' to '(burst3: 9,481 to 54,170 ms)' to match the L=15 floor of the compared range, or state the lead explicitly ('16,079 ms at L=30 up to 54,170 ms').",
+      "severity": "low"
+    },
+    {
+      "line": 154,
+      "kind": "external",
+      "verdict": "UNVERIFIABLE",
+      "quote": "the p90 band crosses ahead of the observed rate on burst4 (by 225 s at the 224 img/s one-minute-p99 threshold, a 345 s usable issue-lead ... 286 img/s ... burst5 by 105 s)",
+      "checked_against": "detector-crossing rider artifact (simulation/detect_onsets_44.py, riders44/); no corresponding column in the provenance summary schema",
+      "evidence": "Detection-lead values (225/345/105 s, thresholds 224/286 img/s) are derived from an onset-detector rider script, not stored as gradeable facts; not independently reproduced in this pass.",
+      "proposed_fix": "none (values are internally sourced from the detector rider; flagged only as not re-derived here)"
+    },
+    {
+      "line": 175,
+      "kind": "external",
+      "verdict": "UNVERIFIABLE",
+      "quote": "the p90 path crosses on 70-102 bins per day where the observed rate does not, while point and p50 cross essentially never (<=1 per day) ... zero false alarms across the calm day",
+      "checked_against": "simulation/detect_fullweek_falsealarms.py rider artifact; no provenance summary column",
+      "evidence": "False-crossing counts are a rider-script output, not re-derived in this pass.",
+      "proposed_fix": "none"
+    },
+    {
+      "line": 421,
+      "kind": "external",
+      "verdict": "UNVERIFIABLE",
+      "quote": "both policies' online TTFT tails track their offline twins directionally, within 1.1-6.8% (Chapter cap:validation; a single live run per policy)",
+      "checked_against": "belongs to the validation chapter (v_live_anchor / live51); v_corroboration in this store is a verification-vs-summary reproducibility check (deltas ~0.006%), not the live-vs-offline delta",
+      "evidence": "The 1.1-6.8% live/offline delta is a cross-chapter (validation) quantity; not resolvable from the closedloop-scope tables. Framing ('live Dynamo runtime', mocker workers) is consistent with ground truth.",
+      "proposed_fix": "none (cross-reference)"
+    },
+    {
+      "line": 509,
+      "kind": "external",
+      "verdict": "UNVERIFIABLE",
+      "quote": "at 120M parameters it is the smallest of the three (Toto-2.0 is 20x larger)",
+      "checked_against": "published model-card facts; no internal artifact",
+      "evidence": "Model parameter counts are external architecture facts with no provenance-store source.",
+      "proposed_fix": "none (external citation)"
+    },
+    {
+      "line": 585,
+      "kind": "external",
+      "verdict": "UNVERIFIABLE",
+      "quote": "inter-pool handoff priced single-stream (~1.6 MB per image); 4x payload on 25 Gbps raises p99 handoff 272 -> 1,087 ms (encoder-delay p99 1,404 ms)",
+      "checked_against": "v_fabric_sensitivity (sensitivity replay); payload size 1.6 MB is a platform-model parameter (Qwen3-VL DeepStack), not a stored measurement",
+      "evidence": "Fabric-sensitivity numbers derive from a modelled transfer parameter (25 Gbps link, 1.6 MB payload); the payload figure is an external model-architecture input, not re-derived here. The 272 ms p99 handoff component of the 588 ms floor is consistent with the service-floor decomposition (316.4 + 272 = 588.4)."
+    }
+  ]
+}
