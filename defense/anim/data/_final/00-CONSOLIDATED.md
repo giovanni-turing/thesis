@@ -8,7 +8,8 @@ sibling cards; this file is the ingestion surface.
 **Nothing here may be quoted without its caveat line.** The caveats are not hedging — in four
 cases the uncaveated version is factually wrong.
 
-Status: 7 of 9 tracks final. g2_conventions and g4_folds still computing.
+Status: 8 of 9 tracks final (g4 added after a 4-lens round-3 audit that refuted its first
+headline). Only g2_conventions still computing.
 
 ---
 
@@ -120,8 +121,33 @@ under every model and both capacity ratings."
 mechanism boundary. (c) Fine-tuning is OUT OF SCOPE — one future-work sentence only; the
 exploratory pass was a failed recipe, not a proven ceiling.
 
-## 9. g2_conventions — PENDING
-## 10. g4_folds — PENDING
+## 9. Within-trace temporal fold generalization  [G4_folds_FINAL.md]
+
+**Quotable:** "Split into seven disjoint 24-hour folds, the headline quantities are not
+fold-invariant. The encoder cost ratio against the deployed C=8 fleet ranges from 0.47x to 1.10x
+across burst-bearing folds around its 0.62x whole-span value, and the forecast policy misses the
+bound on the fold containing the e13 onset. The rho frontier retains its shape in every fold, but
+rho=15 is nowhere the cheapest feasible setting; on the language pool the forecast is dearer than
+static in six of seven folds. The single-span averages are representative of the span, not of an
+arbitrary day within it."
+
+**On the deployed fleet size (state it, do not overstate it):** a static ladder shows C=4 clears
+the AGGREGATE bound (993.8 ms), but C=4 fails 3 of 5 burst-bearing folds, so under the thesis's
+own aggregate-AND-per-episode grading it is not deployable. The fold-robust optimum is C*=5,
+against which the schedule still costs **0.980x**. The unjustified headroom in the deployed fleet
+is 8 vs 5 = **1.6x**. Do NOT write "the baseline is 2x oversized" — the data does not license it.
+
+**Mandatory caveats:** (a) this is the A15 expanding-context span (999,599 req, 6.998 d), NOT the
+5.60-day span the 0.62x headline is priced on — the ratios coincide, the absolute worker-seconds
+do not. (b) Fold conditioning history is NESTED (expanding context), so folds are disjoint TEST
+windows but not training-independent. (c) F3's static rungs are flagged FAIL by a hair-trigger
+queue-divergence criterion (q_end 17 vs median <=1) and F3 is silently dropped from the
+cost-vs-C* range. (d) One trace, one datacenter, one 7-day record.
+
+**Anchor:** enc p99 588.4 = 588.4, provisioned_ws 2,962,304.8 exact, ratio 0.612 vs 0.6124.
+Billing verified symmetric; the forecast arm's 30 s cold start IS paid.
+
+## 10. g2_conventions — PENDING
 
 ---
 
