@@ -1,0 +1,132 @@
+{
+ "what": "fix1 decisive check: MoE arms re-run under the WHEEL runtime (ai-dynamo 1.2.1 in the aiconfigurator venv, AIC_VER=0.22.0 via the Python SDK) vs the driver's SOURCE build (dynamo 1.3.0, in-core Rust, AIC_VER=0.19.0). Same trace, same 2-worker kv_router topology, same --arrival-speedup-ratio.",
+ "rows": [
+  {
+   "arm": "235b_tp8",
+   "speedup": 1,
+   "wheel_ttft_p99_ms": 392.7,
+   "source_ttft_p99_ms": 388.1,
+   "ttft_ratio_source_over_wheel": 0.988,
+   "wheel_itl_p99_ms": 88.85,
+   "source_itl_p99_ms": 86.151,
+   "itl_ratio_source_over_wheel": 0.9696,
+   "wheel_completed": 2000,
+   "source_completed": 2000,
+   "source_itl_p99_ms_superseded": 87.86
+  },
+  {
+   "arm": "235b_tp8",
+   "speedup": 2,
+   "wheel_ttft_p99_ms": 731.7,
+   "source_ttft_p99_ms": 530.6,
+   "ttft_ratio_source_over_wheel": 0.725,
+   "wheel_itl_p99_ms": 215.96,
+   "source_itl_p99_ms": 210.5879,
+   "itl_ratio_source_over_wheel": 0.9751,
+   "wheel_completed": 2000,
+   "source_completed": 2000,
+   "source_itl_p99_ms_superseded": 213.04
+  },
+  {
+   "arm": "235b_tp8",
+   "speedup": 4,
+   "wheel_ttft_p99_ms": 1401.7,
+   "source_ttft_p99_ms": 20530.9,
+   "ttft_ratio_source_over_wheel": 14.647,
+   "wheel_itl_p99_ms": 318.5,
+   "source_itl_p99_ms": 275.0703,
+   "itl_ratio_source_over_wheel": 0.8636,
+   "wheel_completed": 2000,
+   "source_completed": 2000,
+   "source_itl_p99_ms_superseded": 275.4
+  },
+  {
+   "arm": "30ba3b_tp2",
+   "speedup": 1,
+   "wheel_ttft_p99_ms": 152.4,
+   "source_ttft_p99_ms": 152.4,
+   "ttft_ratio_source_over_wheel": 1.0,
+   "wheel_itl_p99_ms": 6.92,
+   "source_itl_p99_ms": 6.9178,
+   "itl_ratio_source_over_wheel": 0.9997,
+   "wheel_completed": 2000,
+   "source_completed": 2000,
+   "source_itl_p99_ms_superseded": 6.92,
+   "scope": "OUT OF SCOPE \u2014 MoE arms dropped; thesis treats the dense family"
+  },
+  {
+   "arm": "30ba3b_tp2",
+   "speedup": 2,
+   "wheel_ttft_p99_ms": 163.0,
+   "source_ttft_p99_ms": 163.2,
+   "ttft_ratio_source_over_wheel": 1.001,
+   "wheel_itl_p99_ms": 32.06,
+   "source_itl_p99_ms": 31.932,
+   "itl_ratio_source_over_wheel": 0.996,
+   "wheel_completed": 2000,
+   "source_completed": 2000,
+   "scope": "OUT OF SCOPE \u2014 MoE arms dropped; thesis treats the dense family"
+  },
+  {
+   "arm": "30ba3b_tp2",
+   "speedup": 4,
+   "wheel_ttft_p99_ms": 254.8,
+   "source_ttft_p99_ms": 211.0,
+   "ttft_ratio_source_over_wheel": 0.828,
+   "wheel_itl_p99_ms": 73.21,
+   "source_itl_p99_ms": 69.1187,
+   "itl_ratio_source_over_wheel": 0.9441,
+   "wheel_completed": 2000,
+   "source_completed": 2000,
+   "scope": "OUT OF SCOPE \u2014 MoE arms dropped; thesis treats the dense family"
+  }
+ ],
+ "conclusion": [
+  "The MoE pricing path is NOT generically divergent: 30B-A3B-TP2 agrees across runtimes at s=1 (1.000), s=2 (1.001) and s=4 (0.828 -- source OPTIMISTIC by 17%), and its ITL agrees to within 6%.",
+  "The divergence is SPECIFIC to 235B-TP8 and appears only ABOVE that arm's knee: s=1 agrees to 1% (388.1 vs 392.7), s=2 diverges 0.73x, s=4 diverges 14.65x (20,530.9 source vs 1,401.7 wheel = the ledgered simulation/results/235b value, reproduced exactly here).",
+  "The wheel run reproduces the ledgered 1,401.7 ms exactly, so the cross-check apparatus is faithful and the ledgered number stands.",
+  "EVERY arm's knee in this sweep is ITL-BOUND (binding='itl'), and ITL agrees across runtimes within 6-14% at every point measured, including 235B-TP8 s=4 (275.4 vs 318.5). The knee locations are therefore governed by the quantity the two runtimes agree on.",
+  "CONSEQUENCE: the MoE-arm knees stand. The caveat that must be written is narrower than feared -- the 235B-TP8 SATURATED-SIDE TTFT curve above its knee (s>=2) is runtime-dependent and must not be quoted as a measurement; its knee (s=1.12) and its s=1 row are runtime-robust."
+ ],
+ "kv_budgets_source_build": {
+  "235b_tp8": "total_kv_blocks=4436 (283,904 tokens)",
+  "30ba3b_tp2": "total_kv_blocks=13528 (865,792 tokens)",
+  "note": "the wheel runtime (1.2.1) does not emit total_kv_blocks at RUST_LOG=warn, so a direct KV-budget diff was not obtainable; the behavioural evidence above localises the divergence to prefill admission on the one arm whose KV budget is smallest."
+ },
+ "correction": {
+  "what": "source_itl_p99_ms refreshed from the current post---force reports",
+  "why": "the recorded values predated the --force re-run; R13 cited the stale 213.044",
+  "rows_changed": [
+   {
+    "arm": "235b_tp8",
+    "s": 1,
+    "from": 87.86,
+    "to": 86.151,
+    "drift_pct": -1.945
+   },
+   {
+    "arm": "235b_tp8",
+    "s": 2,
+    "from": 213.04,
+    "to": 210.5879,
+    "drift_pct": -1.151
+   },
+   {
+    "arm": "235b_tp8",
+    "s": 4,
+    "from": 275.4,
+    "to": 275.0703,
+    "drift_pct": -0.12
+   },
+   {
+    "arm": "30ba3b_tp2",
+    "s": 1,
+    "from": 6.92,
+    "to": 6.9178,
+    "drift_pct": -0.032
+   }
+  ],
+  "conclusion": "INTACT \u2014 drift <=1.95%, confined to the 235B-TP8 arm; every ITL remains far above the 100 ms bound and the knee ordering is unchanged. Not re-opened.",
+  "superseded_values_retained": "source_itl_p99_ms_superseded on each changed row"
+ }
+}

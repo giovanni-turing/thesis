@@ -120,9 +120,23 @@ per-request records.
 
 **New (A2, `a2_cost_accounting.csv`, 40 cells):** each policy costed both ways
 (bill-from-readiness = ledgered; bill-from-order = each up-step pays its warm-up).
-Order-billing *widens* the forecast's advantage (reactive churns 2–5× the
-worker-increments); on burst5 L165 it **flips** the cost order (reactive dearer
-AND failing). Confirms the 0.62× is conservative.
+This is legitimate on the **encoder** pool only: its controller applies cold start
+by delaying availability (`forecast_schedule.py:146-149`), so `provisioned_ws`
+integrates *ready* capacity and warm-up is genuinely unbilled. All 40 `warmup_ws`
+values re-derive exactly from the shipped `a2_runs/*.sched.json`
+(`gen_g7_coldstart.py`). Order-billing *widens* the forecast's advantage (reactive
+churns 2–5× the worker-increments) and **flips** the cost order at the L165
+cold-pool lead on **burst1** (1.144× → 0.970×) and **steady24h** (1.139× → 0.917×),
+both with *both* arms inside the SLA. Confirms the 0.62× is conservative.
+
+**Retracted:** the burst5-L165 flip — its reactive comparator misses the SLA at
+p99 = 3,250 ms, and an infeasible arm cannot carry a cost comparison.
+
+**Does NOT extend to the language pool.** The mocker's `gpu_hours` is the integral
+of the *provisioned* worker count — active + starting-up + draining
+(`lib/mocker/src/replay/collector.rs:44-52`) — so every language GPU-hour in this
+thesis is **already billed from order**. No cold-start surcharge may be added there;
+see `defense/anim/data/g7_coldstart/REPORT.md`.
 
 ---
 

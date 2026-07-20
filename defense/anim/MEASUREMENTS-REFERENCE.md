@@ -59,7 +59,15 @@ queue, replica decisions, SLA verdicts) is computed by the discrete-event mocker
 from silicon-calibrated timings per (config, policy, lead). The archive is
 rolling-origin, so replaying it is online-equivalent for the exogenous signal;
 the one endogenous piece (language capacity conversion) is already in-loop.
-Endogenous demand (abandonment/retry) remains the honest future-work frontier.
+Endogenous demand (abandonment/retry) is **narrowed, not closed**. A16
+(`defense/anim/data/a16_runs/verification.json`, report recomputed by
+`defense/anim/build/a16_endogenous_report.py`) bounds it under a *stated
+mean-field client model*: abandonment is resolved **offline**, by iterating the
+client model around the unmodified replay, **not in-clock** — the mocker has no
+Abandon event kind. Under that model both arms settle into a **period-2 limit
+cycle**, not a fixed point, so only cycle envelopes are quotable and no single
+iterate or envelope midpoint is a point estimate. In-clock abandonment remains
+the honest future-work frontier.
 Confirmed sound — **no methodology change this session.**
 
 ---

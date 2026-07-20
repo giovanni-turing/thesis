@@ -751,6 +751,78 @@ pending:    A15 language E2E, A12 TimesFM language arms, A11 week_fc_timesfm_L60
 feeds:      NOTHING into the manuscript — DB inclusion/verification only. [[provenance-db]]
 commit:     (uncommitted)
 
+## Provenance DB — post-pipeline ingest + validation vs MEASUREMENTS-REFERENCE.md (2026-07-19)
+date:       2026-07-19
+artifact:   defense/anim/MEASUREMENTS-REFERENCE.md (source); provenance/ (+table composed_e2e,
+            +table analysis_artifact, forecast_metrics gains `h` column + new PK).
+command:    psql ... -f provenance/schema/01_schema.sql && python3 provenance/loader/main.py
+            && psql ... -c 'REFRESH MATERIALIZED VIEW provenance.mv_llm_p99_check'
+result:     Ingested post-finisher state (finisher bd03gp6h1 exit 0, 20:09:37) and validated every
+            checkable number in the reference doc — ALL reproduce exactly:
+              A15 3x n=999,599 (99.96%), enc 588.4, TTFT 651.1, ITL 6.03/6.09/6.17,
+                  GPU-h 776.85/757.17/704.68 (chronos/toto/timesfm).
+              A14 3x TTFT 651.1; n 749,601/872,980/931,628; GPU-h 528.28/751.43/704.98.
+              A11 week_fc_timesfm_L60 651.1 / 556.88 GPU-h (52 tags). A12 week_fc_timesfm 651.1 / 610.65 (20 arms).
+              A2 reactive fails 9/18 @L30 = burst3,e8,e10,e11,e13,e14,e15,e17,e18 (exact list match).
+              burst1 fc tails chronos 680.1 / toto 670.5 / timesfm 651.1, all PASS.
+              coverage guarantee complete=true, encoder+language all-1M true.
+              New: forecast_metrics horizon-resolved (h=1..12, 3200/horizon) + h=-1 aggregate;
+                   additive_structural_ablation -> analysis_artifact.
+finding:    CORRECTION — composed E2E is a request-linked join, NOT the sum of per-pool p99s.
+            Stored it as first-class `composed_e2e` (20 arms, from extract_a12's join). Sum-of-p99s
+            is exact for forecast (flat encoder delay, 1239.5) but overstates reactive by 21.9%
+            (burst3: naive 26,652 vs measured 21,868) and 5.0% (week: 1,780 vs 1,695.9).
+lineage:    mv_llm_p99_check refreshed over the enlarged raw set: 80 runs, worst TTFT drift 0.3902%,
+            all rowcounts match. Store: 76.0M rows / 13 GB, 1,983 files (18 GB), 102 tables, 11 views.
+excluded:   predictors/results/parts/** (138 files) — intermediate per-context chunk outputs
+            (cov_<res>_<ctxlen>.parquet, no model/mode metadata) already consolidated into the 12
+            documented *_expctx.parquet finals; loading them would duplicate + mis-attribute model.
+feeds:      NOTHING into the manuscript — DB inclusion/validation only. [[provenance-db]]
+commit:     (uncommitted)
+
+## Full-thesis verification against the provenance DB + DB repair (2026-07-19/20)
+date:       2026-07-20
+artifact:   provenance/audit/{ADJUDICATION.md, DB_STRUCTURE_PLAN.md, POST_EDIT_XREF.md,
+            crosschapter_report.md, internal_defects.json, claims/*.json, verified/*.json,
+            adversarial/*.json, purged_run_ids.txt}; provenance/schema/{05..10,20_semantic,
+            21_checks,99_readonly_optimization}.sql; provenance/SCHEMA_GUIDE.md;
+            provenance/loader/{ingest_common,runid,loaders,main,selftest}.py
+command:    orchestrated sub-agent workflows (extraction -> internal arithmetic -> DB verification ->
+            adversarial review -> edit -> cross-chapter) + DB gap-fill/audit/repair workflows
+result:     DB COVERAGE: filled the 5 missing families (static grid, collector/AIC silicon, trace EDA,
+            measured vLLM ETL, dynamo predictors + EWMA). Store now ~84M rows / 168 tables / 31 views,
+            2,060 runs; 60.3M encoder-pool and 24.7M language-pool requests simulated; 1.35M measured
+            per-token ITL rows (real H100).
+            THESIS: extracted 917 quantitative claims across 13 chapters. 678 CONFIRMED first pass.
+            Adversarial review of all 112 mismatches OVERTURNED 67 (60%) — an unreviewed defect list
+            would have introduced more errors than it removed. 32 edits survived and were applied,
+            plus 7 cross-chapter desync fixes found by tracing quantities BETWEEN chapters. Build
+            clean throughout (exit 0, 137 pages, 0 errors, one FEWER overfull box than baseline).
+            Only 13 wrong digits survived scrutiny out of 917 claims (~1.4%).
+finding:    (a) The loader was SILENTLY DESTROYING DATA: run_id collisions under the 'misc' fallback
+            + delete-then-insert overwrote prior loads (29,311 llm_request + 16,939 composed_request +
+            1,793 encoder_series + 76,776 forecast rows). Per-run shortfalls summed EXACTLY to the
+            global shortfalls. Root cause fixed (guard_run_collision raises instead of deleting;
+            0 'misc' directories remain; run_id injective — selftest.py enforces all three).
+            (b) forecast rows RESTORED (+76,776) with a new source_tag identity; the three EWMA
+            calibration arms are again distinguishable. worker_schedule orphans 118,861 -> 0 by
+            backfilling 112 missing week_matrix spine rows (not by deleting orphans).
+            (c) The 29,311/16,939/1,793 destroyed rows are PERMANENTLY UNRECOVERABLE — source corpus
+            no longer on disk. Stated as such, not glossed.
+            (d) Cold-start omission is ~4x on burst3 reactive L=165 (warmup_fraction 0.7369), so
+            provisioned_worker_seconds materially understates the true bill.
+            (e) EWMA add/mult/wsc calibration arms are POINT-IDENTICAL (only p90 differs; p50==point),
+            so point-error metrics cannot distinguish them — checked, and the thesis's four
+            discriminating lines all use p90-derived quantities, so NO thesis defect.
+supersedes: nothing in the manuscript's results; corrects 13 published digits and narrows 19 claims
+            whose wording exceeded what the data supports.
+feeds:      tex/{predictors,twopool,aiconfigurator,apendice,apendice_ecosystem,closedloop,conclusion,
+            intro,related,trace-eda,validation}.tex. tese.tex and baselines.tex needed NO edits.
+open:       aiconfigurator.tex:444 (0.25 ms vs 1.18 ms) blocked pending author decision; 12 DB
+            corrections (grid static_encoder_workers 16->8, overprovision_vision_x 8->4) pending;
+            a16/g2/g3_32b/g6 still generating — loader prepared + SKIP_DIRS-guarded.
+commit:     (uncommitted)
+
 ## A15 expanding-context E2E + week TimesFM arms -> A11/A12 three-model boards (2026-07-19)
 date:       2026-07-19
 artifact:   defense/anim/data/a15_runs/ (3 runs), defense/anim/data/a12_runs/week_fc_timesfm.*,
@@ -781,3 +853,64 @@ feeds:      defense animations A11/A12 (three-model); NEW-MEASUREMENTS.md §3 an
             and tex/twopool.tex (composed reconstruction -> measured, all models).
 supersedes: the "[running]" placeholder in NEW-MEASUREMENTS.md §3; the 2-model A11/A12 boards.
 commit:     (this commit)
+
+---
+
+## 2026-07-20 — provenance DB: ADJUDICATION §2.1 corrections + window-name normalisation
+
+artifact:   provenance/schema/22_corrections.sql (new, idempotent, re-runnable)
+            provenance/SCHEMA_GUIDE.md (§2.4, "Window-name drift" rewritten to the applied state)
+            provenance/audit/WINDOW_ALIAS.md (REMEDIATED banner)
+            provenance/audit/ADJUDICATION.md (§2.1 APPLIED banner; Q8 answered)
+command:    export PGPASSWORD=$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' postgres \
+              | sed -n 's/^POSTGRES_PASSWORD=//p')
+            psql -h localhost -p 5433 -U goku -d postgres -v ON_ERROR_STOP=1 \
+              --single-transaction -f provenance/schema/22_corrections.sql
+            psql ... -c "SELECT * FROM provenance.check_all() ORDER BY check_id;"
+result:     ADJUDICATION §2.1 (thesis right, DB stale) fully applied as VISIBLE supersessions —
+              sibling _corrected columns + provenance.grid_correction rows + _effective views;
+              no archived value overwritten anywhere (grid_summary.json ingest, including
+              grid_run_summary.raw, is byte-identical to before).
+              * grid_run_summary.static_encoder_workers 16 -> 8 (max over the corrected
+                per-window C* {6,8,7,7,8,6,2}, attained at burst2 AND burst5).
+                New view provenance.grid_run_summary_effective.
+              * grid_window.overprovision_vision_x superseded on ALL SEVEN windows (it was
+                fleet-count/C*, computed with the stale 16): steady24h 8.0 -> 4.0 (the calm-day
+                overprovisioning HEADLINE); bursts 2.67/2.0/2.29/2.29/1.0/2.67 ->
+                1.33/1.0/1.14/1.14/1.0/1.33. overprovision_llm_x unchanged (2.0 / 1.0).
+                grid_window_effective extended with the *_as_ingested / *_effective pair.
+              * Q8 ANSWERED (rerun-stability-e2e.md:116-129): silicon_multiworker.json's burst5
+                C*=16 is the SAME endpoint artifact, not an independent confirmation.
+                collector_multiworker_window burst5: aic_feasible_cstar 16 -> 8,
+                silicon_feasible_cstar 16 -> 15, worker_inflation_x 1.0 -> 1.88 (so burst5 stops
+                being the lone "no inflation" outlier), silicon_p99_at_aic_cstar 783.6 -> 1257.1.
+                FLEET silicon C* = 16 UNCHANGED — provenance moves burst5 -> burst2's genuine knee.
+                New view provenance.collector_multiworker_window_effective.
+            WINDOW_ALIAS.md §3.2 normalisation applied at the BASE TABLES:
+              runs 129 + composed_e2e 4 'week' -> 'aggregate'; rerun_b1_window 1 +
+              rerun_b1_curve_point 20 'steady' -> 'steady24h'. Each table gained
+              window_name_as_ingested (backfilled for every row), so the pre-normalisation
+              spelling is preserved and the rename is reconstructable by
+              WHERE window_name <> window_name_as_ingested.
+              head2k registered in provenance.windows (offset 0, 2000 req, span 721.072 s,
+              2.774 req/s, 7.985 img/s, text_only 0.3685 — from
+              simulation/results/sweeps/traces/llm_head2k.jsonl.stats.json), so sweep_* /
+              cost_model_variant cost ratios are computable for the first time.
+              v_window_alias extended: span_chronos -> aggregate (CONFIRMED, turns C211 green),
+              steady upgraded PROBABLE -> CONFIRMED, fulltrace registered as DO-NOT-FOLD.
+            Defect query that previously showed the bug:
+              SELECT count(*) FROM provenance.runs WHERE window_name='aggregate';
+              -> was 6 of 135, now 135. composed_e2e 'aggregate': was 0, now 4.
+            check_all(): 46 checks, 40 pass / 6 fail — C209, C210, C211 all flipped RED -> GREEN;
+              zero regressions; every remaining failure is severity 'warn' and pre-existing
+              (C107, C207, C302, C306, C404, C601). No 'error'-severity check fails.
+feeds:      any future query of fleet sizing / overprovisioning (read the *_effective views);
+            the §2.1-dependent sites baselines.tex:81/94/115/118/120/252, conclusion.tex:24/25,
+            apendice.tex:301, aiconfigurator.tex:336-348/363 — all already publish the CORRECTED
+            values, so this is DB-side only: NO THESIS EDIT.
+supersedes: the stale derived columns above; WINDOW_ALIAS.md §3.2 "NOT APPLIED" remediation block.
+outstanding: ADJUDICATION §2.2-§2.12 are INGESTS of artifacts not yet in the store (srcbuild
+            runtime rows, reprice harness stats, riders knee/belief, riders ladder config,
+            stage-conditional vision grid, sweep manifests, EWMA calibration coverage, the 5.3M
+            missing cov-mode forecast rows, live-arm artifacts, three answer-artifacts, and the
+            missing configuration columns). None applied here.
