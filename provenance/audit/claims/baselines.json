@@ -1,0 +1,2029 @@
+{
+ "chapter": "baselines",
+ "claims": [
+  {
+   "line": 15,
+   "anchor": "cap:baselines",
+   "quote": "per window: language TTFT p99 $<$ \\SI{1}{\\second} and ITL p99 $<$ \\SI{100}{\\milli\\second}",
+   "numbers": [
+    "1",
+    "100"
+   ],
+   "metric": "sla_threshold_ttft_p99_ms_itl_p99_ms",
+   "subject": "evaluation SLA, language pool",
+   "assertion": "The language-pool evaluation SLA is TTFT p99 below 1000 ms and ITL p99 below 100 ms per window.",
+   "db_check": "provenance.factorial_cell: check the feasibility predicate used (p99_ms thresholds) against llm_run_summary.p99_ttft_ms/p99_itl_ms; confirm SLA constants in coverage_meta.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 16,
+   "anchor": "cap:baselines",
+   "quote": "encoder delay p99 $<$ \\SI{1}{\\second}",
+   "numbers": [
+    "1"
+   ],
+   "metric": "sla_threshold_encoder_delay_p99_ms",
+   "subject": "evaluation SLA, encoder pool",
+   "assertion": "The encoder-pool evaluation SLA is encoder delay p99 below 1000 ms per window.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms vs the 1000 ms gate recorded in factorial_cell.feasible / coverage_meta.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 30,
+   "anchor": "sec:base-protocol",
+   "quote": "the six largest burst episodes of Chapter~\\ref{cap:trace-eda} (peak 1-minute image rates 337--370 \\si{img/s}, onsets 1--220 minutes)",
+   "numbers": [
+    "6",
+    "337",
+    "370",
+    "1",
+    "220"
+   ],
+   "metric": "burst_peak_img_per_s_and_onset_min",
+   "subject": "six burst windows from the trace EDA",
+   "assertion": "The six largest burst episodes have 1-minute peak image rates of 337-370 img/s and onsets ranging from 1 to 220 minutes.",
+   "db_check": "provenance.windows: SELECT window_name, peak_img_per_s, onset_minutes WHERE window_name LIKE 'burst%'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 31,
+   "anchor": "sec:base-protocol",
+   "quote": "plus the calmest full day of the trace (2024-10-19; peak \\SI{57}{img/s}) as the steady reference",
+   "numbers": [
+    "57"
+   ],
+   "metric": "steady_peak_img_per_s",
+   "subject": "steady (calm-day) window 2024-10-19",
+   "assertion": "The calm-day steady reference window (2024-10-19) has a peak image rate of 57 img/s.",
+   "db_check": "provenance.windows WHERE window_name='steady' -- check peak_img_per_s and date range.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 33,
+   "anchor": "sec:base-protocol",
+   "quote": "Each burst window brackets its episode with a $\\pm$10-minute calm margin",
+   "numbers": [
+    "10"
+   ],
+   "metric": "window_margin_minutes",
+   "subject": "burst window definition",
+   "assertion": "Each burst window is padded with a plus/minus 10-minute calm margin around the episode.",
+   "db_check": "provenance.windows: compare (t_end - t_start) against the episode span for each burst window.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 37,
+   "anchor": "sec:base-protocol",
+   "quote": "Two episodes (burst2/6) fall in the trace's first 1.4 days, reserved as forecast context",
+   "numbers": [
+    "2",
+    "6",
+    "1.4"
+   ],
+   "metric": "forecast_context_days",
+   "subject": "temporal split / burst2 and burst6",
+   "assertion": "Burst2 and burst6 lie within the first 1.4 days of the trace, which is reserved as forecast context.",
+   "db_check": "provenance.windows: t_start of burst2/burst6 vs trace start; cross-check the split boundary in coverage_meta.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 49,
+   "anchor": "sec:base-protocol",
+   "quote": "encoder $L \\in \\{15,30,45,300\\}$\\,\\si{\\second}",
+   "numbers": [
+    "15",
+    "30",
+    "45",
+    "300"
+   ],
+   "metric": "cold_start_lead_s_encoder",
+   "subject": "encoder pool lead sweep",
+   "assertion": "The encoder cold-start lead is swept over 15, 30, 45 and 300 seconds.",
+   "db_check": "provenance.runs: SELECT DISTINCT lead_s WHERE pool='encoder'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 51,
+   "anchor": "sec:base-protocol",
+   "quote": "brackets spanning orchestration regimes above the measured 3--5\\,\\si{\\second} model-side floor",
+   "numbers": [
+    "3",
+    "5"
+   ],
+   "metric": "model_side_cold_start_floor_s",
+   "subject": "encoder model load time",
+   "assertion": "The measured model-side cold-start floor for the encoder is 3-5 seconds.",
+   "db_check": "UNVERIFIABLE: model-load timing measurement is not in the listed provenance tables; would need collector_fn or an external measurement artifact.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 52,
+   "anchor": "sec:base-protocol",
+   "quote": "language $L \\in \\{60,\\ldots,300\\}$\\,\\si{\\second}, the weight-loading regime",
+   "numbers": [
+    "60",
+    "300"
+   ],
+   "metric": "cold_start_lead_s_language",
+   "subject": "language pool lead sweep",
+   "assertion": "The language-pool cold-start lead is swept from 60 to 300 seconds.",
+   "db_check": "provenance.runs: SELECT DISTINCT lead_s WHERE pool='language'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 53,
+   "anchor": "sec:base-protocol",
+   "quote": "Scale-downs take effect immediately, guarded by a 3-minute hysteresis.",
+   "numbers": [
+    "3"
+   ],
+   "metric": "hysteresis_minutes",
+   "subject": "actuation mechanics, both pools",
+   "assertion": "Scale-downs are immediate but guarded by a 3-minute hysteresis.",
+   "db_check": "provenance.runs.actuation -- inspect the recorded actuation parameters for hysteresis=180 s.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 60,
+   "anchor": "sec:base-static",
+   "quote": "refined around the feasibility frontier; 101 evaluated points, all archived",
+   "numbers": [
+    "101"
+   ],
+   "metric": "grid_points_evaluated",
+   "subject": "static grid search",
+   "assertion": "The static grid search evaluated 101 configuration points.",
+   "db_check": "provenance.factorial_cell: SELECT count(*) WHERE experiment='static_grid' AND is_current (join runs).",
+   "criticality": "headline"
+  },
+  {
+   "line": 77,
+   "anchor": "tab:base-grid",
+   "quote": "burst1 & 8.32 & 6 & TP2$\\times$2 & 49.9 & 33.3 \\\\",
+   "numbers": [
+    "8.32",
+    "6",
+    "49.9",
+    "33.3"
+   ],
+   "metric": "window_span_h",
+   "subject": "burst1",
+   "assertion": "Window burst1 has a padded span of 8.32 hours.",
+   "db_check": "provenance.windows: span_hours WHERE window_name='burst1'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 77,
+   "anchor": "tab:base-grid",
+   "quote": "burst1 & 8.32 & 6 & TP2$\\times$2 & 49.9 & 33.3 \\\\",
+   "numbers": [
+    "6"
+   ],
+   "metric": "cstar_min_feasible_encoder_workers",
+   "subject": "burst1",
+   "assertion": "The minimum grid-feasible encoder-worker count C* for burst1 is 6.",
+   "db_check": "provenance.factorial_cell: SELECT min(config_c) WHERE window_name='burst1' AND feasible AND experiment='static_grid'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 77,
+   "anchor": "tab:base-grid",
+   "quote": "burst1 & 8.32 & 6 & TP2$\\times$2 & 49.9 & 33.3 \\\\",
+   "numbers": [],
+   "metric": "optimal_llm_shape",
+   "subject": "burst1",
+   "assertion": "The cheapest feasible language shape for burst1 is TP2x2.",
+   "db_check": "provenance.factorial_cell join runs: cheapest (tp, n_replicas) with feasible=true WHERE window_name='burst1'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 77,
+   "anchor": "tab:base-grid",
+   "quote": "burst1 & 8.32 & 6 & TP2$\\times$2 & 49.9 & 33.3 \\\\",
+   "numbers": [
+    "49.9"
+   ],
+   "metric": "provisioned_5090_gpu_hours",
+   "subject": "burst1",
+   "assertion": "The static optimum for burst1 costs 49.9 RTX 5090 GPU-hours over the window span.",
+   "db_check": "provenance.encoder_run_summary.provisioned_worker_seconds / 3600 (or cost_accounting.provisioned_ws) for the C* run on window 'burst1'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 77,
+   "anchor": "tab:base-grid",
+   "quote": "burst1 & 8.32 & 6 & TP2$\\times$2 & 49.9 & 33.3 \\\\",
+   "numbers": [
+    "33.3"
+   ],
+   "metric": "provisioned_h100_gpu_hours",
+   "subject": "burst1",
+   "assertion": "The static optimum for burst1 costs 33.3 H100 GPU-hours over the window span.",
+   "db_check": "provenance.llm_run_summary.gpu_hours for the optimal-shape static run on window 'burst1'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 78,
+   "anchor": "tab:base-grid",
+   "quote": "burst2 & 1.90 & 8 & TP2$\\times$2 & 15.2 & 7.6 \\\\",
+   "numbers": [
+    "1.90",
+    "8",
+    "15.2",
+    "7.6"
+   ],
+   "metric": "window_span_h",
+   "subject": "burst2",
+   "assertion": "Window burst2 has a padded span of 1.90 hours.",
+   "db_check": "provenance.windows: span_hours WHERE window_name='burst2'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 78,
+   "anchor": "tab:base-grid",
+   "quote": "burst2 & 1.90 & 8 & TP2$\\times$2 & 15.2 & 7.6 \\\\",
+   "numbers": [
+    "8"
+   ],
+   "metric": "cstar_min_feasible_encoder_workers",
+   "subject": "burst2",
+   "assertion": "The minimum grid-feasible encoder-worker count C* for burst2 is 8.",
+   "db_check": "provenance.factorial_cell: SELECT min(config_c) WHERE window_name='burst2' AND feasible AND experiment='static_grid'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 78,
+   "anchor": "tab:base-grid",
+   "quote": "burst2 & 1.90 & 8 & TP2$\\times$2 & 15.2 & 7.6 \\\\",
+   "numbers": [],
+   "metric": "optimal_llm_shape",
+   "subject": "burst2",
+   "assertion": "The cheapest feasible language shape for burst2 is TP2x2.",
+   "db_check": "provenance.factorial_cell join runs: cheapest (tp, n_replicas) with feasible=true WHERE window_name='burst2'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 78,
+   "anchor": "tab:base-grid",
+   "quote": "burst2 & 1.90 & 8 & TP2$\\times$2 & 15.2 & 7.6 \\\\",
+   "numbers": [
+    "15.2"
+   ],
+   "metric": "provisioned_5090_gpu_hours",
+   "subject": "burst2",
+   "assertion": "The static optimum for burst2 costs 15.2 RTX 5090 GPU-hours over the window span.",
+   "db_check": "provenance.encoder_run_summary.provisioned_worker_seconds / 3600 (or cost_accounting.provisioned_ws) for the C* run on window 'burst2'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 78,
+   "anchor": "tab:base-grid",
+   "quote": "burst2 & 1.90 & 8 & TP2$\\times$2 & 15.2 & 7.6 \\\\",
+   "numbers": [
+    "7.6"
+   ],
+   "metric": "provisioned_h100_gpu_hours",
+   "subject": "burst2",
+   "assertion": "The static optimum for burst2 costs 7.6 H100 GPU-hours over the window span.",
+   "db_check": "provenance.llm_run_summary.gpu_hours for the optimal-shape static run on window 'burst2'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 79,
+   "anchor": "tab:base-grid",
+   "quote": "burst3 & 0.45 & 7 & TP2$\\times$2 & 3.2 & 1.8 \\\\",
+   "numbers": [
+    "0.45",
+    "7",
+    "3.2",
+    "1.8"
+   ],
+   "metric": "window_span_h",
+   "subject": "burst3",
+   "assertion": "Window burst3 has a padded span of 0.45 hours.",
+   "db_check": "provenance.windows: span_hours WHERE window_name='burst3'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 79,
+   "anchor": "tab:base-grid",
+   "quote": "burst3 & 0.45 & 7 & TP2$\\times$2 & 3.2 & 1.8 \\\\",
+   "numbers": [
+    "7"
+   ],
+   "metric": "cstar_min_feasible_encoder_workers",
+   "subject": "burst3",
+   "assertion": "The minimum grid-feasible encoder-worker count C* for burst3 is 7.",
+   "db_check": "provenance.factorial_cell: SELECT min(config_c) WHERE window_name='burst3' AND feasible AND experiment='static_grid'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 79,
+   "anchor": "tab:base-grid",
+   "quote": "burst3 & 0.45 & 7 & TP2$\\times$2 & 3.2 & 1.8 \\\\",
+   "numbers": [],
+   "metric": "optimal_llm_shape",
+   "subject": "burst3",
+   "assertion": "The cheapest feasible language shape for burst3 is TP2x2.",
+   "db_check": "provenance.factorial_cell join runs: cheapest (tp, n_replicas) with feasible=true WHERE window_name='burst3'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 79,
+   "anchor": "tab:base-grid",
+   "quote": "burst3 & 0.45 & 7 & TP2$\\times$2 & 3.2 & 1.8 \\\\",
+   "numbers": [
+    "3.2"
+   ],
+   "metric": "provisioned_5090_gpu_hours",
+   "subject": "burst3",
+   "assertion": "The static optimum for burst3 costs 3.2 RTX 5090 GPU-hours over the window span.",
+   "db_check": "provenance.encoder_run_summary.provisioned_worker_seconds / 3600 (or cost_accounting.provisioned_ws) for the C* run on window 'burst3'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 79,
+   "anchor": "tab:base-grid",
+   "quote": "burst3 & 0.45 & 7 & TP2$\\times$2 & 3.2 & 1.8 \\\\",
+   "numbers": [
+    "1.8"
+   ],
+   "metric": "provisioned_h100_gpu_hours",
+   "subject": "burst3",
+   "assertion": "The static optimum for burst3 costs 1.8 H100 GPU-hours over the window span.",
+   "db_check": "provenance.llm_run_summary.gpu_hours for the optimal-shape static run on window 'burst3'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 80,
+   "anchor": "tab:base-grid",
+   "quote": "burst4 & 3.15 & 7 & TP2$\\times$2 & 22.1 & 12.6 \\\\",
+   "numbers": [
+    "3.15",
+    "7",
+    "22.1",
+    "12.6"
+   ],
+   "metric": "window_span_h",
+   "subject": "burst4",
+   "assertion": "Window burst4 has a padded span of 3.15 hours.",
+   "db_check": "provenance.windows: span_hours WHERE window_name='burst4'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 80,
+   "anchor": "tab:base-grid",
+   "quote": "burst4 & 3.15 & 7 & TP2$\\times$2 & 22.1 & 12.6 \\\\",
+   "numbers": [
+    "7"
+   ],
+   "metric": "cstar_min_feasible_encoder_workers",
+   "subject": "burst4",
+   "assertion": "The minimum grid-feasible encoder-worker count C* for burst4 is 7.",
+   "db_check": "provenance.factorial_cell: SELECT min(config_c) WHERE window_name='burst4' AND feasible AND experiment='static_grid'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 80,
+   "anchor": "tab:base-grid",
+   "quote": "burst4 & 3.15 & 7 & TP2$\\times$2 & 22.1 & 12.6 \\\\",
+   "numbers": [],
+   "metric": "optimal_llm_shape",
+   "subject": "burst4",
+   "assertion": "The cheapest feasible language shape for burst4 is TP2x2.",
+   "db_check": "provenance.factorial_cell join runs: cheapest (tp, n_replicas) with feasible=true WHERE window_name='burst4'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 80,
+   "anchor": "tab:base-grid",
+   "quote": "burst4 & 3.15 & 7 & TP2$\\times$2 & 22.1 & 12.6 \\\\",
+   "numbers": [
+    "22.1"
+   ],
+   "metric": "provisioned_5090_gpu_hours",
+   "subject": "burst4",
+   "assertion": "The static optimum for burst4 costs 22.1 RTX 5090 GPU-hours over the window span.",
+   "db_check": "provenance.encoder_run_summary.provisioned_worker_seconds / 3600 (or cost_accounting.provisioned_ws) for the C* run on window 'burst4'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 80,
+   "anchor": "tab:base-grid",
+   "quote": "burst4 & 3.15 & 7 & TP2$\\times$2 & 22.1 & 12.6 \\\\",
+   "numbers": [
+    "12.6"
+   ],
+   "metric": "provisioned_h100_gpu_hours",
+   "subject": "burst4",
+   "assertion": "The static optimum for burst4 costs 12.6 H100 GPU-hours over the window span.",
+   "db_check": "provenance.llm_run_summary.gpu_hours for the optimal-shape static run on window 'burst4'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 81,
+   "anchor": "tab:base-grid",
+   "quote": "burst5 & 1.35 & 8 & TP2$\\times$2 & 10.8 & 5.4 \\\\",
+   "numbers": [
+    "1.35",
+    "8",
+    "10.8",
+    "5.4"
+   ],
+   "metric": "window_span_h",
+   "subject": "burst5",
+   "assertion": "Window burst5 has a padded span of 1.35 hours.",
+   "db_check": "provenance.windows: span_hours WHERE window_name='burst5'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 81,
+   "anchor": "tab:base-grid",
+   "quote": "burst5 & 1.35 & 8 & TP2$\\times$2 & 10.8 & 5.4 \\\\",
+   "numbers": [
+    "8"
+   ],
+   "metric": "cstar_min_feasible_encoder_workers",
+   "subject": "burst5",
+   "assertion": "The minimum grid-feasible encoder-worker count C* for burst5 is 8.",
+   "db_check": "provenance.factorial_cell: SELECT min(config_c) WHERE window_name='burst5' AND feasible AND experiment='static_grid'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 81,
+   "anchor": "tab:base-grid",
+   "quote": "burst5 & 1.35 & 8 & TP2$\\times$2 & 10.8 & 5.4 \\\\",
+   "numbers": [],
+   "metric": "optimal_llm_shape",
+   "subject": "burst5",
+   "assertion": "The cheapest feasible language shape for burst5 is TP2x2.",
+   "db_check": "provenance.factorial_cell join runs: cheapest (tp, n_replicas) with feasible=true WHERE window_name='burst5'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 81,
+   "anchor": "tab:base-grid",
+   "quote": "burst5 & 1.35 & 8 & TP2$\\times$2 & 10.8 & 5.4 \\\\",
+   "numbers": [
+    "10.8"
+   ],
+   "metric": "provisioned_5090_gpu_hours",
+   "subject": "burst5",
+   "assertion": "The static optimum for burst5 costs 10.8 RTX 5090 GPU-hours over the window span.",
+   "db_check": "provenance.encoder_run_summary.provisioned_worker_seconds / 3600 (or cost_accounting.provisioned_ws) for the C* run on window 'burst5'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 81,
+   "anchor": "tab:base-grid",
+   "quote": "burst5 & 1.35 & 8 & TP2$\\times$2 & 10.8 & 5.4 \\\\",
+   "numbers": [
+    "5.4"
+   ],
+   "metric": "provisioned_h100_gpu_hours",
+   "subject": "burst5",
+   "assertion": "The static optimum for burst5 costs 5.4 H100 GPU-hours over the window span.",
+   "db_check": "provenance.llm_run_summary.gpu_hours for the optimal-shape static run on window 'burst5'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 82,
+   "anchor": "tab:base-grid",
+   "quote": "burst6 & 1.37 & 6 & TP2$\\times$2 & 8.2 & 5.5 \\\\",
+   "numbers": [
+    "1.37",
+    "6",
+    "8.2",
+    "5.5"
+   ],
+   "metric": "window_span_h",
+   "subject": "burst6",
+   "assertion": "Window burst6 has a padded span of 1.37 hours.",
+   "db_check": "provenance.windows: span_hours WHERE window_name='burst6'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 82,
+   "anchor": "tab:base-grid",
+   "quote": "burst6 & 1.37 & 6 & TP2$\\times$2 & 8.2 & 5.5 \\\\",
+   "numbers": [
+    "6"
+   ],
+   "metric": "cstar_min_feasible_encoder_workers",
+   "subject": "burst6",
+   "assertion": "The minimum grid-feasible encoder-worker count C* for burst6 is 6.",
+   "db_check": "provenance.factorial_cell: SELECT min(config_c) WHERE window_name='burst6' AND feasible AND experiment='static_grid'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 82,
+   "anchor": "tab:base-grid",
+   "quote": "burst6 & 1.37 & 6 & TP2$\\times$2 & 8.2 & 5.5 \\\\",
+   "numbers": [],
+   "metric": "optimal_llm_shape",
+   "subject": "burst6",
+   "assertion": "The cheapest feasible language shape for burst6 is TP2x2.",
+   "db_check": "provenance.factorial_cell join runs: cheapest (tp, n_replicas) with feasible=true WHERE window_name='burst6'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 82,
+   "anchor": "tab:base-grid",
+   "quote": "burst6 & 1.37 & 6 & TP2$\\times$2 & 8.2 & 5.5 \\\\",
+   "numbers": [
+    "8.2"
+   ],
+   "metric": "provisioned_5090_gpu_hours",
+   "subject": "burst6",
+   "assertion": "The static optimum for burst6 costs 8.2 RTX 5090 GPU-hours over the window span.",
+   "db_check": "provenance.encoder_run_summary.provisioned_worker_seconds / 3600 (or cost_accounting.provisioned_ws) for the C* run on window 'burst6'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 82,
+   "anchor": "tab:base-grid",
+   "quote": "burst6 & 1.37 & 6 & TP2$\\times$2 & 8.2 & 5.5 \\\\",
+   "numbers": [
+    "5.5"
+   ],
+   "metric": "provisioned_h100_gpu_hours",
+   "subject": "burst6",
+   "assertion": "The static optimum for burst6 costs 5.5 H100 GPU-hours over the window span.",
+   "db_check": "provenance.llm_run_summary.gpu_hours for the optimal-shape static run on window 'burst6'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 83,
+   "anchor": "tab:base-grid",
+   "quote": "steady (24 h) & 24.0 & 2 & TP1$\\times$2 & 48.0 & 48.0 \\\\",
+   "numbers": [
+    "24.0",
+    "2",
+    "48.0",
+    "48.0"
+   ],
+   "metric": "window_span_h",
+   "subject": "steady (24 h)",
+   "assertion": "Window steady (24 h) has a padded span of 24.0 hours.",
+   "db_check": "provenance.windows: span_hours WHERE window_name='steady'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 83,
+   "anchor": "tab:base-grid",
+   "quote": "steady (24 h) & 24.0 & 2 & TP1$\\times$2 & 48.0 & 48.0 \\\\",
+   "numbers": [
+    "2"
+   ],
+   "metric": "cstar_min_feasible_encoder_workers",
+   "subject": "steady (24 h)",
+   "assertion": "The minimum grid-feasible encoder-worker count C* for steady (24 h) is 2.",
+   "db_check": "provenance.factorial_cell: SELECT min(config_c) WHERE window_name='steady' AND feasible AND experiment='static_grid'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 83,
+   "anchor": "tab:base-grid",
+   "quote": "steady (24 h) & 24.0 & 2 & TP1$\\times$2 & 48.0 & 48.0 \\\\",
+   "numbers": [],
+   "metric": "optimal_llm_shape",
+   "subject": "steady (24 h)",
+   "assertion": "The cheapest feasible language shape for steady (24 h) is TP1x2.",
+   "db_check": "provenance.factorial_cell join runs: cheapest (tp, n_replicas) with feasible=true WHERE window_name='steady'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 83,
+   "anchor": "tab:base-grid",
+   "quote": "steady (24 h) & 24.0 & 2 & TP1$\\times$2 & 48.0 & 48.0 \\\\",
+   "numbers": [
+    "48.0"
+   ],
+   "metric": "provisioned_5090_gpu_hours",
+   "subject": "steady (24 h)",
+   "assertion": "The static optimum for steady (24 h) costs 48.0 RTX 5090 GPU-hours over the window span.",
+   "db_check": "provenance.encoder_run_summary.provisioned_worker_seconds / 3600 (or cost_accounting.provisioned_ws) for the C* run on window 'steady'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 83,
+   "anchor": "tab:base-grid",
+   "quote": "steady (24 h) & 24.0 & 2 & TP1$\\times$2 & 48.0 & 48.0 \\\\",
+   "numbers": [
+    "48.0"
+   ],
+   "metric": "provisioned_h100_gpu_hours",
+   "subject": "steady (24 h)",
+   "assertion": "The static optimum for steady (24 h) costs 48.0 H100 GPU-hours over the window span.",
+   "db_check": "provenance.llm_run_summary.gpu_hours for the optimal-shape static run on window 'steady'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 90,
+   "anchor": "sec:base-static",
+   "quote": "excluding the ${\\approx}50\\%$ text-only requests that never enter the encoder",
+   "numbers": [
+    "50"
+   ],
+   "metric": "text_only_request_share_pct",
+   "subject": "trace request mix",
+   "assertion": "About 50% of requests in the trace are text-only and never enter the encoder pool.",
+   "db_check": "provenance.measured_request: share of rows with no image payload over the full trace.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 92,
+   "anchor": "sec:base-static",
+   "quote": "the burst optima rise by one to two workers --- burst1 to 7, burst3/burst4 to 8, burst6 to 8",
+   "numbers": [
+    "1",
+    "2",
+    "7",
+    "8",
+    "8"
+   ],
+   "metric": "cstar_stage_conditional_encoder_workers",
+   "subject": "burst windows under the stage-conditional encoder metric",
+   "assertion": "Under the stage-conditional (image-bearing-only) encoder-delay metric, C* rises to 7 for burst1 and to 8 for burst3, burst4 and burst6.",
+   "db_check": "provenance.factorial_cell WHERE readiness/metric='stage_conditional': min(config_c) with feasible=true per window_name.",
+   "criticality": "headline"
+  },
+  {
+   "line": 93,
+   "anchor": "sec:base-static",
+   "quote": "(58.2/3.6/25.2/10.9 5090-hours)",
+   "numbers": [
+    "58.2",
+    "3.6",
+    "25.2",
+    "10.9"
+   ],
+   "metric": "provisioned_5090_gpu_hours_stage_conditional",
+   "subject": "burst1/burst3/burst4/burst6 stage-conditional optima",
+   "assertion": "The stage-conditional encoder optima cost 58.2, 3.6, 25.2 and 10.9 RTX 5090 GPU-hours for burst1, burst3, burst4 and burst6 respectively.",
+   "db_check": "provenance.cost_accounting.provisioned_ws/3600 for the stage-conditional C* runs; note burst6 = 1.37 h x 8 = 10.96 which rounds to 11.0, not 10.9.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 93,
+   "anchor": "sec:base-static",
+   "quote": "burst2/burst5/steady unchanged",
+   "numbers": [],
+   "metric": "cstar_stage_conditional_unchanged",
+   "subject": "burst2, burst5, steady",
+   "assertion": "The stage-conditional metric leaves C* unchanged for burst2, burst5 and steady.",
+   "db_check": "provenance.factorial_cell: compare min feasible config_c across the two metrics for those three windows.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 94,
+   "anchor": "sec:base-static",
+   "quote": "The deployable static $C{=}8$ is the same under either metric",
+   "numbers": [
+    "8"
+   ],
+   "metric": "deployable_static_encoder_workers",
+   "subject": "deployable static fleet, encoder pool",
+   "assertion": "The deployable static encoder fleet is 8 workers under both the all-request and stage-conditional metrics.",
+   "db_check": "provenance.factorial_cell: max over windows of min feasible config_c, under each metric.",
+   "criticality": "headline"
+  },
+  {
+   "line": 98,
+   "anchor": "sec:base-static",
+   "quote": "carries the cost headline of Chapter~\\ref{cap:closedloop} (0.62$\\times$ static)",
+   "numbers": [
+    "0.62"
+   ],
+   "metric": "cost_ratio_predictive_vs_static",
+   "subject": "closed-loop predictive policy vs deployable static",
+   "assertion": "The predictive policy costs 0.62x the deployable static fleet.",
+   "db_check": "provenance.v_cost_frontier_dual or cost_accounting: ratio of provisioned_ws (predictive) to provisioned_ws (static C=8) aggregated over windows.",
+   "criticality": "headline"
+  },
+  {
+   "line": 104,
+   "anchor": "sec:base-static",
+   "quote": "the burst's ${\\approx}36$k-token frames-class prefills pin TTFT p99 at ${\\approx}$\\SI{1285}{\\milli\\second} even at $N{=}16$",
+   "numbers": [
+    "36",
+    "1285",
+    "16"
+   ],
+   "metric": "ttft_p99_ms_tp1_n16",
+   "subject": "language pool at TP1, N=16, burst windows",
+   "assertion": "At TP1 with 16 replicas the ~36k-token frames-class prefills still pin TTFT p99 at about 1285 ms, so no replica count is feasible.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms join runs WHERE tp=1 AND n_replicas=16 AND experiment='static_grid'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 107,
+   "anchor": "sec:base-static",
+   "quote": "Four TP1 replicas and one TP2$\\times$2 group are both four H100s",
+   "numbers": [
+    "4",
+    "2",
+    "2",
+    "4"
+   ],
+   "metric": "h100_count_iso_cost",
+   "subject": "TP1x4 vs TP2x2",
+   "assertion": "TP1x4 and TP2x2 both consume four H100s.",
+   "db_check": "provenance.runs: tp * n_replicas = 4 for both shapes.",
+   "criticality": "incidental"
+  },
+  {
+   "line": 108,
+   "anchor": "sec:base-static",
+   "quote": "TP1$\\times$4 fails every burst window (TTFT p99 1{,}314--1{,}331\\,\\si{\\milli\\second})",
+   "numbers": [
+    "1314",
+    "1331"
+   ],
+   "metric": "ttft_p99_ms_tp1x4_range",
+   "subject": "TP1x4 across burst windows",
+   "assertion": "TP1x4 fails every burst window with TTFT p99 between 1314 and 1331 ms.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms WHERE tp=1 AND n_replicas=4, min/max over burst windows; NOTE tab:base-tp min is 1315 (burst3), not 1314.",
+   "criticality": "headline"
+  },
+  {
+   "line": 109,
+   "anchor": "sec:base-static",
+   "quote": "while TP2$\\times$2 passes every one (763--846\\,\\si{\\milli\\second})",
+   "numbers": [
+    "763",
+    "846"
+   ],
+   "metric": "ttft_p99_ms_tp2x2_range",
+   "subject": "TP2x2 across burst windows",
+   "assertion": "TP2x2 passes every burst window with TTFT p99 between 763 and 846 ms.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms WHERE tp=2 AND n_replicas=2, min/max over burst windows.",
+   "criticality": "headline"
+  },
+  {
+   "line": 110,
+   "anchor": "sec:base-static",
+   "quote": "a 1.55--1.74$\\times$ tail reduction from the layout alone",
+   "numbers": [
+    "1.55",
+    "1.74"
+   ],
+   "metric": "tail_cut_ratio_range",
+   "subject": "TP2x2 vs TP1x4",
+   "assertion": "Switching from TP1x4 to TP2x2 at equal GPU cost cuts the TTFT tail by 1.55-1.74x.",
+   "db_check": "provenance.llm_run_summary: per-window ratio p99_ttft_ms(tp=1,n=4)/p99_ttft_ms(tp=2,n=2).",
+   "criticality": "headline"
+  },
+  {
+   "line": 113,
+   "anchor": "sec:base-static",
+   "quote": "Chapter~\\ref{cap:twopool} quotes \\SI{748.4}{\\milli\\second} for the same shape on its isolation trace",
+   "numbers": [
+    "748.4"
+   ],
+   "metric": "ttft_p99_ms_isolation_tp2x2",
+   "subject": "TP2x2 on the two-pool isolation trace",
+   "assertion": "The same TP2x2 shape measures 748.4 ms TTFT p99 on the Chapter two-pool isolation trace.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms WHERE experiment='isolation' AND tp=2 AND n_replicas=2.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 115,
+   "anchor": "sec:base-static",
+   "quote": "the encoder requirement swings from 2 workers on the calm day to 8 on burst5",
+   "numbers": [
+    "2",
+    "8"
+   ],
+   "metric": "cstar_range_encoder_workers",
+   "subject": "calm day vs burst5",
+   "assertion": "The minimum feasible encoder-worker count ranges from 2 on the calm day to 8 on burst5.",
+   "db_check": "provenance.factorial_cell: min feasible config_c for window_name in ('steady','burst5').",
+   "criticality": "headline"
+  },
+  {
+   "line": 118,
+   "anchor": "sec:base-static",
+   "quote": "$C{=}8$ encoders plus TP2$\\times$2 (4 H100s), hereafter the \\emph{deployable static}",
+   "numbers": [
+    "8",
+    "2",
+    "2",
+    "4"
+   ],
+   "metric": "deployable_static_fleet",
+   "subject": "deployable static fleet",
+   "assertion": "The single static fleet surviving all windows is 8 encoder workers plus TP2x2 (4 H100s).",
+   "db_check": "provenance.factorial_cell: smallest (config_c, tp, n_replicas) feasible in every window.",
+   "criticality": "headline"
+  },
+  {
+   "line": 120,
+   "anchor": "sec:base-static",
+   "quote": "overprovisions the calm day by $4\\times$ on the vision side and $2\\times$ on the language side",
+   "numbers": [
+    "4",
+    "2"
+   ],
+   "metric": "calm_day_overprovision_ratio",
+   "subject": "deployable static vs calm-day optimum",
+   "assertion": "The deployable static fleet overprovisions the calm day 4x on the encoder pool and 2x on the language pool.",
+   "db_check": "provenance.factorial_cell: 8/min_feasible_config_c(steady)=8/2=4 and 4/(tp*n_replicas for steady optimum)=4/2=2.",
+   "criticality": "headline"
+  },
+  {
+   "line": 123,
+   "anchor": "sec:base-static",
+   "quote": "Close-out checks confirm the optima are robust to the router's tuning knobs (35 corner re-runs; no frontier movement).",
+   "numbers": [
+    "35"
+   ],
+   "metric": "corner_reruns",
+   "subject": "router tuning-knob close-out checks",
+   "assertion": "Thirty-five corner re-runs of the router tuning knobs produced no movement of the feasibility frontier.",
+   "db_check": "provenance.runs WHERE experiment='closeout_corner' AND is_current: count(*); compare factorial_cell.feasible against the baseline grid.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 129,
+   "anchor": "tab:base-tp",
+   "quote": "TP1$\\times$4 and TP2$\\times$2 both cost four H100s; only the parallelism layout differs.",
+   "numbers": [
+    "1",
+    "4",
+    "2",
+    "2"
+   ],
+   "metric": "h100_count_iso_cost",
+   "subject": "iso-cost TP comparison",
+   "assertion": "TP1x4 and TP2x2 are iso-cost at four H100s.",
+   "db_check": "provenance.runs: tp*n_replicas=4 for both rows of the tab:base-tp comparison.",
+   "criticality": "incidental"
+  },
+  {
+   "line": 131,
+   "anchor": "tab:base-tp",
+   "quote": "TTFT p99 per burst window under the \\SI{1000}{\\milli\\second} SLO (ITL p99 within bound in both columns)",
+   "numbers": [
+    "1000"
+   ],
+   "metric": "sla_threshold_ttft_p99_ms",
+   "subject": "iso-cost TP comparison",
+   "assertion": "The TP comparison is graded against a 1000 ms TTFT p99 SLO, with ITL p99 within bound in both columns.",
+   "db_check": "provenance.llm_run_summary.p99_itl_ms < 100 for all rows of the tab:base-tp runs.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 139,
+   "anchor": "tab:base-tp",
+   "quote": "burst1 & 1318 \\emph{(fail)} & 763 \\emph{(pass)} & 1.73$\\times$ \\\\",
+   "numbers": [
+    "1318"
+   ],
+   "metric": "ttft_p99_ms_tp1x4",
+   "subject": "burst1",
+   "assertion": "TP1x4 yields TTFT p99 of 1318 ms on burst1, failing the 1000 ms SLO.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms join runs WHERE window_name='burst1' AND tp=1 AND n_replicas=4 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 139,
+   "anchor": "tab:base-tp",
+   "quote": "burst1 & 1318 \\emph{(fail)} & 763 \\emph{(pass)} & 1.73$\\times$ \\\\",
+   "numbers": [
+    "763"
+   ],
+   "metric": "ttft_p99_ms_tp2x2",
+   "subject": "burst1",
+   "assertion": "TP2x2 yields TTFT p99 of 763 ms on burst1, passing the 1000 ms SLO.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms join runs WHERE window_name='burst1' AND tp=2 AND n_replicas=2 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 139,
+   "anchor": "tab:base-tp",
+   "quote": "burst1 & 1318 \\emph{(fail)} & 763 \\emph{(pass)} & 1.73$\\times$ \\\\",
+   "numbers": [
+    "1.73"
+   ],
+   "metric": "tail_cut_ratio",
+   "subject": "burst1",
+   "assertion": "The TP2x2 layout cuts the TTFT tail by 1.73x versus TP1x4 on burst1.",
+   "db_check": "provenance.llm_run_summary: 1318/763 computed per window 'burst1'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 140,
+   "anchor": "tab:base-tp",
+   "quote": "burst2 & 1331 \\emph{(fail)} & 766 \\emph{(pass)} & 1.74$\\times$ \\\\",
+   "numbers": [
+    "1331"
+   ],
+   "metric": "ttft_p99_ms_tp1x4",
+   "subject": "burst2",
+   "assertion": "TP1x4 yields TTFT p99 of 1331 ms on burst2, failing the 1000 ms SLO.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms join runs WHERE window_name='burst2' AND tp=1 AND n_replicas=4 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 140,
+   "anchor": "tab:base-tp",
+   "quote": "burst2 & 1331 \\emph{(fail)} & 766 \\emph{(pass)} & 1.74$\\times$ \\\\",
+   "numbers": [
+    "766"
+   ],
+   "metric": "ttft_p99_ms_tp2x2",
+   "subject": "burst2",
+   "assertion": "TP2x2 yields TTFT p99 of 766 ms on burst2, passing the 1000 ms SLO.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms join runs WHERE window_name='burst2' AND tp=2 AND n_replicas=2 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 140,
+   "anchor": "tab:base-tp",
+   "quote": "burst2 & 1331 \\emph{(fail)} & 766 \\emph{(pass)} & 1.74$\\times$ \\\\",
+   "numbers": [
+    "1.74"
+   ],
+   "metric": "tail_cut_ratio",
+   "subject": "burst2",
+   "assertion": "The TP2x2 layout cuts the TTFT tail by 1.74x versus TP1x4 on burst2.",
+   "db_check": "provenance.llm_run_summary: 1331/766 computed per window 'burst2'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 141,
+   "anchor": "tab:base-tp",
+   "quote": "burst3 & 1315 \\emph{(fail)} & 846 \\emph{(pass)} & 1.55$\\times$ \\\\",
+   "numbers": [
+    "1315"
+   ],
+   "metric": "ttft_p99_ms_tp1x4",
+   "subject": "burst3",
+   "assertion": "TP1x4 yields TTFT p99 of 1315 ms on burst3, failing the 1000 ms SLO.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms join runs WHERE window_name='burst3' AND tp=1 AND n_replicas=4 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 141,
+   "anchor": "tab:base-tp",
+   "quote": "burst3 & 1315 \\emph{(fail)} & 846 \\emph{(pass)} & 1.55$\\times$ \\\\",
+   "numbers": [
+    "846"
+   ],
+   "metric": "ttft_p99_ms_tp2x2",
+   "subject": "burst3",
+   "assertion": "TP2x2 yields TTFT p99 of 846 ms on burst3, passing the 1000 ms SLO.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms join runs WHERE window_name='burst3' AND tp=2 AND n_replicas=2 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 141,
+   "anchor": "tab:base-tp",
+   "quote": "burst3 & 1315 \\emph{(fail)} & 846 \\emph{(pass)} & 1.55$\\times$ \\\\",
+   "numbers": [
+    "1.55"
+   ],
+   "metric": "tail_cut_ratio",
+   "subject": "burst3",
+   "assertion": "The TP2x2 layout cuts the TTFT tail by 1.55x versus TP1x4 on burst3.",
+   "db_check": "provenance.llm_run_summary: 1315/846 computed per window 'burst3'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 142,
+   "anchor": "tab:base-tp",
+   "quote": "burst4 & 1317 \\emph{(fail)} & 792 \\emph{(pass)} & 1.66$\\times$ \\\\",
+   "numbers": [
+    "1317"
+   ],
+   "metric": "ttft_p99_ms_tp1x4",
+   "subject": "burst4",
+   "assertion": "TP1x4 yields TTFT p99 of 1317 ms on burst4, failing the 1000 ms SLO.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms join runs WHERE window_name='burst4' AND tp=1 AND n_replicas=4 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 142,
+   "anchor": "tab:base-tp",
+   "quote": "burst4 & 1317 \\emph{(fail)} & 792 \\emph{(pass)} & 1.66$\\times$ \\\\",
+   "numbers": [
+    "792"
+   ],
+   "metric": "ttft_p99_ms_tp2x2",
+   "subject": "burst4",
+   "assertion": "TP2x2 yields TTFT p99 of 792 ms on burst4, passing the 1000 ms SLO.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms join runs WHERE window_name='burst4' AND tp=2 AND n_replicas=2 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 142,
+   "anchor": "tab:base-tp",
+   "quote": "burst4 & 1317 \\emph{(fail)} & 792 \\emph{(pass)} & 1.66$\\times$ \\\\",
+   "numbers": [
+    "1.66"
+   ],
+   "metric": "tail_cut_ratio",
+   "subject": "burst4",
+   "assertion": "The TP2x2 layout cuts the TTFT tail by 1.66x versus TP1x4 on burst4.",
+   "db_check": "provenance.llm_run_summary: 1317/792 computed per window 'burst4'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 143,
+   "anchor": "tab:base-tp",
+   "quote": "burst5 & 1316 \\emph{(fail)} & 781 \\emph{(pass)} & 1.68$\\times$ \\\\",
+   "numbers": [
+    "1316"
+   ],
+   "metric": "ttft_p99_ms_tp1x4",
+   "subject": "burst5",
+   "assertion": "TP1x4 yields TTFT p99 of 1316 ms on burst5, failing the 1000 ms SLO.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms join runs WHERE window_name='burst5' AND tp=1 AND n_replicas=4 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 143,
+   "anchor": "tab:base-tp",
+   "quote": "burst5 & 1316 \\emph{(fail)} & 781 \\emph{(pass)} & 1.68$\\times$ \\\\",
+   "numbers": [
+    "781"
+   ],
+   "metric": "ttft_p99_ms_tp2x2",
+   "subject": "burst5",
+   "assertion": "TP2x2 yields TTFT p99 of 781 ms on burst5, passing the 1000 ms SLO.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms join runs WHERE window_name='burst5' AND tp=2 AND n_replicas=2 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 143,
+   "anchor": "tab:base-tp",
+   "quote": "burst5 & 1316 \\emph{(fail)} & 781 \\emph{(pass)} & 1.68$\\times$ \\\\",
+   "numbers": [
+    "1.68"
+   ],
+   "metric": "tail_cut_ratio",
+   "subject": "burst5",
+   "assertion": "The TP2x2 layout cuts the TTFT tail by 1.68x versus TP1x4 on burst5.",
+   "db_check": "provenance.llm_run_summary: 1316/781 computed per window 'burst5'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 155,
+   "anchor": "sec:base-reactive-llm",
+   "quote": "Across the seven windows this yields 14 configurations, each at its window's optimal TP shape.",
+   "numbers": [
+    "7",
+    "14"
+   ],
+   "metric": "reactive_llm_config_count",
+   "subject": "Dynamo SLA planner variants A and B",
+   "assertion": "The reactive language-pool baseline comprises 14 configurations: two planner variants across seven windows.",
+   "db_check": "provenance.runs: count(*) WHERE experiment='reactive_llm' AND is_current -- expect 14 (7 windows x 2 policies).",
+   "criticality": "headline"
+  },
+  {
+   "line": 159,
+   "anchor": "sec:base-reactive-llm",
+   "quote": "window-mean TTFT/ITL under its 500/50\\,ms targets, with 2--4$\\times$ margin",
+   "numbers": [
+    "500",
+    "50",
+    "2",
+    "4"
+   ],
+   "metric": "planner_target_ms_and_margin",
+   "subject": "Dynamo SLA planner control law",
+   "assertion": "All fourteen configurations meet the planner's own 500/50 ms window-mean TTFT/ITL targets with 2-4x margin.",
+   "db_check": "provenance.llm_run_summary (mean TTFT/ITL columns, or aggregate measured_request) for the 14 reactive runs; compare to 500/50 ms.",
+   "criticality": "headline"
+  },
+  {
+   "line": 160,
+   "anchor": "sec:base-reactive-llm",
+   "quote": "while violating the tail SLA} (TTFT p99 1{,}079--3{,}495\\,\\si{\\milli\\second}",
+   "numbers": [
+    "1079",
+    "3495"
+   ],
+   "metric": "ttft_p99_ms_reactive_range",
+   "subject": "14 reactive language-pool configurations",
+   "assertion": "All fourteen reactive configurations violate the tail SLA with TTFT p99 between 1079 and 3495 ms.",
+   "db_check": "provenance.llm_run_summary: min/max p99_ttft_ms over runs WHERE experiment='reactive_llm' AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 161,
+   "anchor": "sec:base-reactive-llm",
+   "quote": "burst windows additionally fail ITL p99 at 121--162\\,\\si{\\milli\\second}",
+   "numbers": [
+    "121",
+    "162"
+   ],
+   "metric": "itl_p99_ms_reactive_range",
+   "subject": "reactive language-pool configurations on burst windows",
+   "assertion": "On burst windows the reactive configurations additionally fail ITL p99, at 121-162 ms.",
+   "db_check": "provenance.llm_run_summary: min/max p99_itl_ms over reactive_llm runs on burst windows.",
+   "criticality": "headline"
+  },
+  {
+   "line": 168,
+   "anchor": "sec:base-reactive-llm",
+   "quote": "Holding a 60-second replica lead and tightening the planner's window-mean targets from 400/40 to 200/20\\,\\si{\\milli\\second} on burst1",
+   "numbers": [
+    "60",
+    "400",
+    "40",
+    "200",
+    "20"
+   ],
+   "metric": "reactive_ladder_setup",
+   "subject": "burst1 reactive target ladder",
+   "assertion": "The reactive target ladder on burst1 holds a 60-second replica lead and sweeps planner window-mean targets from 400/40 to 200/20 ms.",
+   "db_check": "provenance.runs WHERE experiment='reactive_ladder' AND window_name='burst1' AND lead_s=60: distinct planner targets.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 170,
+   "anchor": "sec:base-reactive-llm",
+   "quote": "raises GPU-hours monotonically (18.6\\,$\\to$\\,20.4)",
+   "numbers": [
+    "18.6",
+    "20.4"
+   ],
+   "metric": "gpu_hours_ladder_range",
+   "subject": "burst1 reactive target ladder",
+   "assertion": "Tightening the planner targets raises H100 GPU-hours monotonically from 18.6 to 20.4.",
+   "db_check": "provenance.llm_run_summary.gpu_hours for the four reactive_ladder runs on burst1, ordered by target.",
+   "criticality": "headline"
+  },
+  {
+   "line": 171,
+   "anchor": "sec:base-reactive-llm",
+   "quote": "while TTFT p99 stays pinned at 1{,}616--1{,}620\\,\\si{\\milli\\second}",
+   "numbers": [
+    "1616",
+    "1620"
+   ],
+   "metric": "ttft_p99_ms_ladder_range",
+   "subject": "burst1 reactive target ladder",
+   "assertion": "Across the ladder TTFT p99 stays pinned between 1616 and 1620 ms.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms over the four reactive_ladder burst1 runs (table values 1615.5-1619.6).",
+   "criticality": "headline"
+  },
+  {
+   "line": 172,
+   "anchor": "sec:base-reactive-llm",
+   "quote": "a 10\\% spend increase buying nothing",
+   "numbers": [
+    "10"
+   ],
+   "metric": "spend_increase_pct",
+   "subject": "burst1 reactive target ladder",
+   "assertion": "The ladder represents a 10% spend increase that buys no tail improvement.",
+   "db_check": "provenance.llm_run_summary: (20.4-18.6)/18.6 = 9.7% for the burst1 ladder runs.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 172,
+   "anchor": "sec:base-reactive-llm",
+   "quote": "Burst1's onset is 220 minutes, so a trailing window sees it in ample time",
+   "numbers": [
+    "220"
+   ],
+   "metric": "onset_minutes",
+   "subject": "burst1",
+   "assertion": "Burst1's onset spans 220 minutes.",
+   "db_check": "provenance.windows.onset_minutes WHERE window_name='burst1'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 181,
+   "anchor": "tab:base-ladder",
+   "quote": "Reactive target ladder on burst1 under a 60-second replica lead",
+   "numbers": [
+    "60"
+   ],
+   "metric": "cold_start_lead_s_language",
+   "subject": "burst1 reactive ladder",
+   "assertion": "The burst1 reactive ladder is run under a 60-second replica cold-start lead.",
+   "db_check": "provenance.runs.lead_s=60 WHERE experiment='reactive_ladder' AND window_name='burst1'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 190,
+   "anchor": "tab:base-ladder",
+   "quote": "400 / 40 & 18.6 & 1{,}619.6 & 127.1 \\\\",
+   "numbers": [
+    "18.6"
+   ],
+   "metric": "gpu_hours",
+   "subject": "burst1 reactive ladder at planner target 400 / 40",
+   "assertion": "At planner target 400 / 40 ms the burst1 reactive run costs 18.6 H100 GPU-hours.",
+   "db_check": "provenance.llm_run_summary.gpu_hours WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='400/40'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 190,
+   "anchor": "tab:base-ladder",
+   "quote": "400 / 40 & 18.6 & 1{,}619.6 & 127.1 \\\\",
+   "numbers": [
+    "1619.6"
+   ],
+   "metric": "p99_ttft_ms",
+   "subject": "burst1 reactive ladder at planner target 400 / 40",
+   "assertion": "At planner target 400 / 40 ms the burst1 reactive run has TTFT p99 of 1619.6 ms.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='400/40'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 190,
+   "anchor": "tab:base-ladder",
+   "quote": "400 / 40 & 18.6 & 1{,}619.6 & 127.1 \\\\",
+   "numbers": [
+    "127.1"
+   ],
+   "metric": "p99_itl_ms",
+   "subject": "burst1 reactive ladder at planner target 400 / 40",
+   "assertion": "At planner target 400 / 40 ms the burst1 reactive run has ITL p99 of 127.1 ms, above the 100 ms bound.",
+   "db_check": "provenance.llm_run_summary.p99_itl_ms WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='400/40'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 191,
+   "anchor": "tab:base-ladder",
+   "quote": "300 / 30 & 19.2 & 1{,}616.6 & 126.5 \\\\",
+   "numbers": [
+    "19.2"
+   ],
+   "metric": "gpu_hours",
+   "subject": "burst1 reactive ladder at planner target 300 / 30",
+   "assertion": "At planner target 300 / 30 ms the burst1 reactive run costs 19.2 H100 GPU-hours.",
+   "db_check": "provenance.llm_run_summary.gpu_hours WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='300/30'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 191,
+   "anchor": "tab:base-ladder",
+   "quote": "300 / 30 & 19.2 & 1{,}616.6 & 126.5 \\\\",
+   "numbers": [
+    "1616.6"
+   ],
+   "metric": "p99_ttft_ms",
+   "subject": "burst1 reactive ladder at planner target 300 / 30",
+   "assertion": "At planner target 300 / 30 ms the burst1 reactive run has TTFT p99 of 1616.6 ms.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='300/30'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 191,
+   "anchor": "tab:base-ladder",
+   "quote": "300 / 30 & 19.2 & 1{,}616.6 & 126.5 \\\\",
+   "numbers": [
+    "126.5"
+   ],
+   "metric": "p99_itl_ms",
+   "subject": "burst1 reactive ladder at planner target 300 / 30",
+   "assertion": "At planner target 300 / 30 ms the burst1 reactive run has ITL p99 of 126.5 ms, above the 100 ms bound.",
+   "db_check": "provenance.llm_run_summary.p99_itl_ms WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='300/30'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 192,
+   "anchor": "tab:base-ladder",
+   "quote": "250 / 25 & 19.4 & 1{,}616.0 & 126.2 \\\\",
+   "numbers": [
+    "19.4"
+   ],
+   "metric": "gpu_hours",
+   "subject": "burst1 reactive ladder at planner target 250 / 25",
+   "assertion": "At planner target 250 / 25 ms the burst1 reactive run costs 19.4 H100 GPU-hours.",
+   "db_check": "provenance.llm_run_summary.gpu_hours WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='250/25'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 192,
+   "anchor": "tab:base-ladder",
+   "quote": "250 / 25 & 19.4 & 1{,}616.0 & 126.2 \\\\",
+   "numbers": [
+    "1616.0"
+   ],
+   "metric": "p99_ttft_ms",
+   "subject": "burst1 reactive ladder at planner target 250 / 25",
+   "assertion": "At planner target 250 / 25 ms the burst1 reactive run has TTFT p99 of 1616.0 ms.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='250/25'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 192,
+   "anchor": "tab:base-ladder",
+   "quote": "250 / 25 & 19.4 & 1{,}616.0 & 126.2 \\\\",
+   "numbers": [
+    "126.2"
+   ],
+   "metric": "p99_itl_ms",
+   "subject": "burst1 reactive ladder at planner target 250 / 25",
+   "assertion": "At planner target 250 / 25 ms the burst1 reactive run has ITL p99 of 126.2 ms, above the 100 ms bound.",
+   "db_check": "provenance.llm_run_summary.p99_itl_ms WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='250/25'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 193,
+   "anchor": "tab:base-ladder",
+   "quote": "200 / 20 & 20.4 & 1{,}615.5 & 125.1 \\\\",
+   "numbers": [
+    "20.4"
+   ],
+   "metric": "gpu_hours",
+   "subject": "burst1 reactive ladder at planner target 200 / 20",
+   "assertion": "At planner target 200 / 20 ms the burst1 reactive run costs 20.4 H100 GPU-hours.",
+   "db_check": "provenance.llm_run_summary.gpu_hours WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='200/20'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 193,
+   "anchor": "tab:base-ladder",
+   "quote": "200 / 20 & 20.4 & 1{,}615.5 & 125.1 \\\\",
+   "numbers": [
+    "1615.5"
+   ],
+   "metric": "p99_ttft_ms",
+   "subject": "burst1 reactive ladder at planner target 200 / 20",
+   "assertion": "At planner target 200 / 20 ms the burst1 reactive run has TTFT p99 of 1615.5 ms.",
+   "db_check": "provenance.llm_run_summary.p99_ttft_ms WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='200/20'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 193,
+   "anchor": "tab:base-ladder",
+   "quote": "200 / 20 & 20.4 & 1{,}615.5 & 125.1 \\\\",
+   "numbers": [
+    "125.1"
+   ],
+   "metric": "p99_itl_ms",
+   "subject": "burst1 reactive ladder at planner target 200 / 20",
+   "assertion": "At planner target 200 / 20 ms the burst1 reactive run has ITL p99 of 125.1 ms, above the 100 ms bound.",
+   "db_check": "provenance.llm_run_summary.p99_itl_ms WHERE experiment='reactive_ladder' AND window_name='burst1' AND target='200/20'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 204,
+   "anchor": "sec:base-reactive-enc",
+   "quote": "workers $= \\lceil \\text{demand} / \\rho \\rceil$ at per-worker capacity rating $\\rho$ \\si{img/s}, hysteresis 3 minutes, lead $L$",
+   "numbers": [
+    "3"
+   ],
+   "metric": "hysteresis_minutes",
+   "subject": "reactive encoder worker-mapping law",
+   "assertion": "The reactive encoder controller uses ceil(demand/rho) workers with a 3-minute hysteresis and lead L.",
+   "db_check": "provenance.runs.actuation for experiment='reactive_encoder': hysteresis parameter.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 208,
+   "anchor": "sec:base-reactive-enc",
+   "quote": "grades it at the chapter's operating rating ($\\rho{=}15$) across cold-start leads",
+   "numbers": [
+    "15"
+   ],
+   "metric": "rho_img_per_s_per_worker",
+   "subject": "encoder per-worker capacity rating",
+   "assertion": "The reactive encoder baseline is graded at a per-worker capacity rating of rho = 15 img/s.",
+   "db_check": "provenance.runs.rho=15 WHERE experiment='reactive_encoder' AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 213,
+   "anchor": "tab:base-react-enc",
+   "quote": "Reactive encoder scaling on the observed image signal ($\\rho{=}15$): encoder-delay p99 in ms by cold-start lead $L$",
+   "numbers": [
+    "15"
+   ],
+   "metric": "rho_img_per_s_per_worker",
+   "subject": "tab:base-react-enc",
+   "assertion": "Table tab:base-react-enc reports encoder-delay p99 in ms at rho=15 across cold-start leads.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND rho=15.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 221,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst1 (onset 220) & 588 & 588 & 588 & 638 & 300 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst1 under reactive encoder control at L=15 s (rho=15)",
+   "assertion": "Reactive encoder control on burst1 at cold-start lead 15 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst1' AND lead_s=15 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 221,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst1 (onset 220) & 588 & 588 & 588 & 638 & 300 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst1 under reactive encoder control at L=30 s (rho=15)",
+   "assertion": "Reactive encoder control on burst1 at cold-start lead 30 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst1' AND lead_s=30 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 221,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst1 (onset 220) & 588 & 588 & 588 & 638 & 300 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst1 under reactive encoder control at L=45 s (rho=15)",
+   "assertion": "Reactive encoder control on burst1 at cold-start lead 45 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst1' AND lead_s=45 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 221,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst1 (onset 220) & 588 & 588 & 588 & 638 & 300 \\\\",
+   "numbers": [
+    "638"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst1 under reactive encoder control at L=300 s (rho=15)",
+   "assertion": "Reactive encoder control on burst1 at cold-start lead 300 s gives encoder-delay p99 of 638 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst1' AND lead_s=300 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 221,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst1 (onset 220) & 588 & 588 & 588 & 638 & 300 \\\\",
+   "numbers": [
+    "300"
+   ],
+   "metric": "largest_feasible_lead_s",
+   "subject": "burst1",
+   "assertion": "The largest cold-start lead at which reactive encoder control still meets the SLA on burst1 is 300.",
+   "db_check": "provenance.encoder_run_summary: max(lead_s) WHERE encoder_delay_p99_ms < 1000 AND window_name='burst1' AND experiment='reactive_encoder'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 221,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst1 (onset 220) & 588 & 588 & 588 & 638 & 300 \\\\",
+   "numbers": [
+    "220"
+   ],
+   "metric": "onset_minutes",
+   "subject": "burst1",
+   "assertion": "burst1 has an onset of 220 minutes.",
+   "db_check": "provenance.windows.onset_minutes WHERE window_name='burst1'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 222,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst2 (onset 48) & 588 & 588 & 588 & 4282 & 45 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst2 under reactive encoder control at L=15 s (rho=15)",
+   "assertion": "Reactive encoder control on burst2 at cold-start lead 15 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst2' AND lead_s=15 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 222,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst2 (onset 48) & 588 & 588 & 588 & 4282 & 45 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst2 under reactive encoder control at L=30 s (rho=15)",
+   "assertion": "Reactive encoder control on burst2 at cold-start lead 30 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst2' AND lead_s=30 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 222,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst2 (onset 48) & 588 & 588 & 588 & 4282 & 45 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst2 under reactive encoder control at L=45 s (rho=15)",
+   "assertion": "Reactive encoder control on burst2 at cold-start lead 45 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst2' AND lead_s=45 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 222,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst2 (onset 48) & 588 & 588 & 588 & 4282 & 45 \\\\",
+   "numbers": [
+    "4282"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst2 under reactive encoder control at L=300 s (rho=15)",
+   "assertion": "Reactive encoder control on burst2 at cold-start lead 300 s gives encoder-delay p99 of 4282 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst2' AND lead_s=300 AND rho=15 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 222,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst2 (onset 48) & 588 & 588 & 588 & 4282 & 45 \\\\",
+   "numbers": [
+    "45"
+   ],
+   "metric": "largest_feasible_lead_s",
+   "subject": "burst2",
+   "assertion": "The largest cold-start lead at which reactive encoder control still meets the SLA on burst2 is 45.",
+   "db_check": "provenance.encoder_run_summary: max(lead_s) WHERE encoder_delay_p99_ms < 1000 AND window_name='burst2' AND experiment='reactive_encoder'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 222,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst2 (onset 48) & 588 & 588 & 588 & 4282 & 45 \\\\",
+   "numbers": [
+    "48"
+   ],
+   "metric": "onset_minutes",
+   "subject": "burst2",
+   "assertion": "burst2 has an onset of 48 minutes.",
+   "db_check": "provenance.windows.onset_minutes WHERE window_name='burst2'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 223,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst3 (onset 1) & 9481 & 16079 & 28342 & 54170 & none \\\\",
+   "numbers": [
+    "9481"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst3 under reactive encoder control at L=15 s (rho=15)",
+   "assertion": "Reactive encoder control on burst3 at cold-start lead 15 s gives encoder-delay p99 of 9481 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst3' AND lead_s=15 AND rho=15 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 223,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst3 (onset 1) & 9481 & 16079 & 28342 & 54170 & none \\\\",
+   "numbers": [
+    "16079"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst3 under reactive encoder control at L=30 s (rho=15)",
+   "assertion": "Reactive encoder control on burst3 at cold-start lead 30 s gives encoder-delay p99 of 16079 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst3' AND lead_s=30 AND rho=15 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 223,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst3 (onset 1) & 9481 & 16079 & 28342 & 54170 & none \\\\",
+   "numbers": [
+    "28342"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst3 under reactive encoder control at L=45 s (rho=15)",
+   "assertion": "Reactive encoder control on burst3 at cold-start lead 45 s gives encoder-delay p99 of 28342 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst3' AND lead_s=45 AND rho=15 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 223,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst3 (onset 1) & 9481 & 16079 & 28342 & 54170 & none \\\\",
+   "numbers": [
+    "54170"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst3 under reactive encoder control at L=300 s (rho=15)",
+   "assertion": "Reactive encoder control on burst3 at cold-start lead 300 s gives encoder-delay p99 of 54170 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst3' AND lead_s=300 AND rho=15 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 223,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst3 (onset 1) & 9481 & 16079 & 28342 & 54170 & none \\\\",
+   "numbers": [
+    "none"
+   ],
+   "metric": "largest_feasible_lead_s",
+   "subject": "burst3",
+   "assertion": "The largest cold-start lead at which reactive encoder control still meets the SLA on burst3 is none.",
+   "db_check": "provenance.encoder_run_summary: max(lead_s) WHERE encoder_delay_p99_ms < 1000 AND window_name='burst3' AND experiment='reactive_encoder'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 223,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst3 (onset 1) & 9481 & 16079 & 28342 & 54170 & none \\\\",
+   "numbers": [
+    "1"
+   ],
+   "metric": "onset_minutes",
+   "subject": "burst3",
+   "assertion": "burst3 has an onset of 1 minutes.",
+   "db_check": "provenance.windows.onset_minutes WHERE window_name='burst3'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 225,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst4 (onset 60) & 588 & 588 & 588 & 3063 & 45 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst4 under reactive encoder control at L=15 s (rho=15)",
+   "assertion": "Reactive encoder control on burst4 at cold-start lead 15 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst4' AND lead_s=15 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 225,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst4 (onset 60) & 588 & 588 & 588 & 3063 & 45 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst4 under reactive encoder control at L=30 s (rho=15)",
+   "assertion": "Reactive encoder control on burst4 at cold-start lead 30 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst4' AND lead_s=30 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 225,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst4 (onset 60) & 588 & 588 & 588 & 3063 & 45 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst4 under reactive encoder control at L=45 s (rho=15)",
+   "assertion": "Reactive encoder control on burst4 at cold-start lead 45 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst4' AND lead_s=45 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 225,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst4 (onset 60) & 588 & 588 & 588 & 3063 & 45 \\\\",
+   "numbers": [
+    "3063"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst4 under reactive encoder control at L=300 s (rho=15)",
+   "assertion": "Reactive encoder control on burst4 at cold-start lead 300 s gives encoder-delay p99 of 3063 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst4' AND lead_s=300 AND rho=15 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 225,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst4 (onset 60) & 588 & 588 & 588 & 3063 & 45 \\\\",
+   "numbers": [
+    "45"
+   ],
+   "metric": "largest_feasible_lead_s",
+   "subject": "burst4",
+   "assertion": "The largest cold-start lead at which reactive encoder control still meets the SLA on burst4 is 45.",
+   "db_check": "provenance.encoder_run_summary: max(lead_s) WHERE encoder_delay_p99_ms < 1000 AND window_name='burst4' AND experiment='reactive_encoder'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 225,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst4 (onset 60) & 588 & 588 & 588 & 3063 & 45 \\\\",
+   "numbers": [
+    "60"
+   ],
+   "metric": "onset_minutes",
+   "subject": "burst4",
+   "assertion": "burst4 has an onset of 60 minutes.",
+   "db_check": "provenance.windows.onset_minutes WHERE window_name='burst4'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 226,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst5 (onset 35) & 588 & 588 & 588 & 6729 & 45 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst5 under reactive encoder control at L=15 s (rho=15)",
+   "assertion": "Reactive encoder control on burst5 at cold-start lead 15 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst5' AND lead_s=15 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 226,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst5 (onset 35) & 588 & 588 & 588 & 6729 & 45 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst5 under reactive encoder control at L=30 s (rho=15)",
+   "assertion": "Reactive encoder control on burst5 at cold-start lead 30 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst5' AND lead_s=30 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 226,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst5 (onset 35) & 588 & 588 & 588 & 6729 & 45 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst5 under reactive encoder control at L=45 s (rho=15)",
+   "assertion": "Reactive encoder control on burst5 at cold-start lead 45 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst5' AND lead_s=45 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 226,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst5 (onset 35) & 588 & 588 & 588 & 6729 & 45 \\\\",
+   "numbers": [
+    "6729"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst5 under reactive encoder control at L=300 s (rho=15)",
+   "assertion": "Reactive encoder control on burst5 at cold-start lead 300 s gives encoder-delay p99 of 6729 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst5' AND lead_s=300 AND rho=15 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 226,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst5 (onset 35) & 588 & 588 & 588 & 6729 & 45 \\\\",
+   "numbers": [
+    "45"
+   ],
+   "metric": "largest_feasible_lead_s",
+   "subject": "burst5",
+   "assertion": "The largest cold-start lead at which reactive encoder control still meets the SLA on burst5 is 45.",
+   "db_check": "provenance.encoder_run_summary: max(lead_s) WHERE encoder_delay_p99_ms < 1000 AND window_name='burst5' AND experiment='reactive_encoder'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 226,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst5 (onset 35) & 588 & 588 & 588 & 6729 & 45 \\\\",
+   "numbers": [
+    "35"
+   ],
+   "metric": "onset_minutes",
+   "subject": "burst5",
+   "assertion": "burst5 has an onset of 35 minutes.",
+   "db_check": "provenance.windows.onset_minutes WHERE window_name='burst5'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 227,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst6 (onset 1) & 588 & 749 & 905 & 4606 & 45 \\\\",
+   "numbers": [
+    "588"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst6 under reactive encoder control at L=15 s (rho=15)",
+   "assertion": "Reactive encoder control on burst6 at cold-start lead 15 s gives encoder-delay p99 of 588 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst6' AND lead_s=15 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 227,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst6 (onset 1) & 588 & 749 & 905 & 4606 & 45 \\\\",
+   "numbers": [
+    "749"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst6 under reactive encoder control at L=30 s (rho=15)",
+   "assertion": "Reactive encoder control on burst6 at cold-start lead 30 s gives encoder-delay p99 of 749 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst6' AND lead_s=30 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 227,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst6 (onset 1) & 588 & 749 & 905 & 4606 & 45 \\\\",
+   "numbers": [
+    "905"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst6 under reactive encoder control at L=45 s (rho=15)",
+   "assertion": "Reactive encoder control on burst6 at cold-start lead 45 s gives encoder-delay p99 of 905 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst6' AND lead_s=45 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 227,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst6 (onset 1) & 588 & 749 & 905 & 4606 & 45 \\\\",
+   "numbers": [
+    "4606"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "burst6 under reactive encoder control at L=300 s (rho=15)",
+   "assertion": "Reactive encoder control on burst6 at cold-start lead 300 s gives encoder-delay p99 of 4606 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='burst6' AND lead_s=300 AND rho=15 AND is_current.",
+   "criticality": "headline"
+  },
+  {
+   "line": 227,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst6 (onset 1) & 588 & 749 & 905 & 4606 & 45 \\\\",
+   "numbers": [
+    "45"
+   ],
+   "metric": "largest_feasible_lead_s",
+   "subject": "burst6",
+   "assertion": "The largest cold-start lead at which reactive encoder control still meets the SLA on burst6 is 45.",
+   "db_check": "provenance.encoder_run_summary: max(lead_s) WHERE encoder_delay_p99_ms < 1000 AND window_name='burst6' AND experiment='reactive_encoder'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 227,
+   "anchor": "tab:base-react-enc",
+   "quote": "burst6 (onset 1) & 588 & 749 & 905 & 4606 & 45 \\\\",
+   "numbers": [
+    "1"
+   ],
+   "metric": "onset_minutes",
+   "subject": "burst6",
+   "assertion": "burst6 has an onset of 1 minutes.",
+   "db_check": "provenance.windows.onset_minutes WHERE window_name='burst6'.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 228,
+   "anchor": "tab:base-react-enc",
+   "quote": "steady (onset 24h) & 548 & 682 & 734 & 884 & 300 \\\\",
+   "numbers": [
+    "548"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "steady under reactive encoder control at L=15 s (rho=15)",
+   "assertion": "Reactive encoder control on steady at cold-start lead 15 s gives encoder-delay p99 of 548 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='steady' AND lead_s=15 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 228,
+   "anchor": "tab:base-react-enc",
+   "quote": "steady (onset 24h) & 548 & 682 & 734 & 884 & 300 \\\\",
+   "numbers": [
+    "682"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "steady under reactive encoder control at L=30 s (rho=15)",
+   "assertion": "Reactive encoder control on steady at cold-start lead 30 s gives encoder-delay p99 of 682 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='steady' AND lead_s=30 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 228,
+   "anchor": "tab:base-react-enc",
+   "quote": "steady (onset 24h) & 548 & 682 & 734 & 884 & 300 \\\\",
+   "numbers": [
+    "734"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "steady under reactive encoder control at L=45 s (rho=15)",
+   "assertion": "Reactive encoder control on steady at cold-start lead 45 s gives encoder-delay p99 of 734 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='steady' AND lead_s=45 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 228,
+   "anchor": "tab:base-react-enc",
+   "quote": "steady (onset 24h) & 548 & 682 & 734 & 884 & 300 \\\\",
+   "numbers": [
+    "884"
+   ],
+   "metric": "encoder_delay_p99_ms",
+   "subject": "steady under reactive encoder control at L=300 s (rho=15)",
+   "assertion": "Reactive encoder control on steady at cold-start lead 300 s gives encoder-delay p99 of 884 ms.",
+   "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms join runs WHERE experiment='reactive_encoder' AND window_name='steady' AND lead_s=300 AND rho=15 AND is_current.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 228,
+   "anchor": "tab:base-react-enc",
+   "quote": "steady (onset 24h) & 548 & 682 & 734 & 884 & 300 \\\\",
+   "numbers": [
+    "300"
+   ],
+   "metric": "largest_feasible_lead_s",
+   "subject": "steady",
+   "assertion": "The largest cold-start lead at which reactive encoder control still meets the SLA on steady is 300.",
+   "db_check": "provenance.encoder_run_summary: max(lead_s) WHERE encoder_delay_p99_ms < 1000 AND window_name='steady' AND experiment='reactive_encoder'.",
+   "criticality": "headline"
+  },
+  {
+   "line": 228,
+   "anchor": "tab:base-react-enc",
+   "quote": "steady (onset 24h) & 548 & 682 & 734 & 884 & 300 \\\\",
+   "numbers": [
+    "24"
+   ],
+   "metric": "window_span_h",
+   "subject": "steady",
+   "assertion": "The steady window spans 24 hours.",
+   "db_check": "provenance.windows.span_hours WHERE window_name='steady'.",
+   "criticality": "incidental"
+  },
+  {
+   "line": 236,
+   "anchor": "sec:base-reactive-enc",
+   "quote": "medium onsets survive only sub-minute leads ($L^{*}{=}$\\SI{45}{\\second}, below the lead times realistically available to pod-scheduled GPU workers)",
+   "numbers": [
+    "45"
+   ],
+   "metric": "largest_feasible_lead_s",
+   "subject": "medium-onset burst windows (burst2/4/5/6)",
+   "assertion": "Medium-onset windows only remain SLA-feasible under reactive control at leads of 45 s or less.",
+   "db_check": "provenance.encoder_run_summary: max feasible lead_s per window over burst2/burst4/burst5/burst6.",
+   "criticality": "headline"
+  },
+  {
+   "line": 239,
+   "anchor": "sec:base-reactive-enc",
+   "quote": "burst6's one-minute onset is caught at short leads ($L^{*}{=}$\\SI{45}{\\second}) because its peak (\\SI{337}{img/s}) drains within a batch",
+   "numbers": [
+    "1",
+    "45",
+    "337"
+   ],
+   "metric": "peak_img_per_s",
+   "subject": "burst6",
+   "assertion": "Burst6 has a one-minute onset and a peak of 337 img/s, and is still caught at leads up to 45 s.",
+   "db_check": "provenance.windows.peak_img_per_s WHERE window_name='burst6'; encoder_run_summary feasibility by lead_s.",
+   "criticality": "supporting"
+  },
+  {
+   "line": 241,
+   "anchor": "sec:base-reactive-enc",
+   "quote": "burst3's one-minute onset defeats the controller at \\emph{every} lead, including \\SI{15}{\\second} (p99 encoder delay 9.5--54\\,\\si{\\second}",
+   "numbers": [
+    "1",
+    "15",
+    "9.5",
+    "54"
+   ],
+   "metric": "encoder_delay_p99_s_range",
+   "subject": "burst3 under reactive encoder control",
+   "assertion": "Burst3 defeats the reactive controller at every tested lead, with encoder-delay p99 of 9.5 to 54 seconds.",
+   "db_check": "provenance.encoder_run_summary: min/max encoder_delay_p99_ms WHERE window_name='burst3' AND experiment='reactive_encoder' (9481-54170 ms).",
+   "criticality": "headline"
+  },
+  {
+   "line": 252,
+   "anchor": "sec:base-summary",
+   "quote": "deployable only as 8 encoders + TP2$\\times$2, i.e.\\ $4\\times$/$2\\times$ calm-day overprovisioning",
+   "numbers": [
+    "8",
+    "2",
+    "2",
+    "4",
+    "2"
+   ],
+   "metric": "deployable_static_fleet_and_overprovision",
+   "subject": "deployable static fleet",
+   "assertion": "The deployable static optimum is 8 encoders plus TP2x2, implying 4x/2x calm-day overprovisioning.",
+   "db_check": "provenance.factorial_cell: min feasible fleet covering all windows vs the steady-window optimum.",
+   "criticality": "headline"
+  },
+  {
+   "line": 257,
+   "anchor": "sec:base-summary",
+   "quote": "all fourteen language-pool configurations meet their own window-mean law while violating the tail SLA",
+   "numbers": [
+    "14"
+   ],
+   "metric": "reactive_llm_config_count",
+   "subject": "14 reactive language-pool configurations",
+   "assertion": "All fourteen reactive language-pool configurations satisfy their own window-mean control law yet violate the tail SLA.",
+   "db_check": "provenance.v_infeasible / llm_run_summary: count runs WHERE experiment='reactive_llm' AND (p99_ttft_ms>1000 OR p99_itl_ms>100) -- expect 14 of 14.",
+   "criticality": "headline"
+  }
+ ]
+}

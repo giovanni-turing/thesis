@@ -1,0 +1,93 @@
+{
+  "chapter": "conclusion",
+  "db": "postgresql://goku@localhost:5433/postgres schema provenance",
+  "adjudicated_utc": "2026-07-19",
+  "n_reviewed": 6,
+  "n_upheld": 2,
+  "n_overturned": 4,
+  "rulings": [
+    {
+      "line": 24,
+      "quote": "burst-feasible fleets need 6--8 encoder workers and a TP2 language shape against 2 workers and TP1 on the calm day",
+      "criticality": "headline",
+      "original_verdict": "ARTIFACT_SUPERSEDED",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "SELECT window_name,c_star,c_star_corrected,is_superseded,tp_star FROM provenance.grid_window ORDER BY 1; -> burst1 6, burst2 8, burst3 7, burst4 7, burst5 16 (c_star_corrected=8, is_superseded=t), burst6 6, steady24h 2. tp_star=2 on every burst, 1 on steady24h. SELECT * FROM provenance.grid_window_effective ORDER BY 1; -> c_star_effective = 6,8,7,7,8,6 on the bursts and 2 on steady24h, with correction_source=/home/gio/tese/verification/rerun-stability-e2e.md on the burst5 row. Corroborated by grid_vision_point burst5: C=8 gives delay_p99 759.524 ms, under the 1000 ms vision bound (the stale feasible=false flag came from the pre-correction gate that also tested max, not p99 only). Effective burst range = 6--8 exactly as published.",
+      "final_fix": "NO EDIT. The thesis is right and the DATABASE IS NO LONGER STALE: grid_window.c_star_corrected and the grid_window_effective view already carry the corrected burst5 C*=8 with its correction_source. The first-pass ARTIFACT_SUPERSEDED verdict described the raw grid_window row only; the authoritative view agrees with the thesis, so there is nothing left to do on either side. (Residual DB hygiene, not a thesis matter: grid_window.overprovision_vision_x for steady24h still reads 8, computed off the pre-correction static C=16 -- see line 25.)"
+    },
+    {
+      "line": 25,
+      "quote": "a $4\\times$/$2\\times$ overprovisioning plus a fleet-shape change no replica scaler can perform",
+      "criticality": "headline",
+      "original_verdict": "ARTIFACT_SUPERSEDED",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "Vision: deployable static fleet = max over windows of the CORRECTED C* = 8 (grid_window_effective: 6,8,7,7,8,6); calm day steady24h C*=2. 8/2 = 4.0x exactly. Language: SELECT window_name,overprovision_llm_x FROM provenance.grid_window; -> steady24h = 2, and directly from tp_star/n_star: TP2 x 2 replicas = 4 GPUs on bursts vs TP1 x 2 = 2 GPUs on the calm day = 2.0x. The DB's overprovision_vision_x(steady24h)=8 is arithmetic off the superseded static C=16 (16/2), not an independent measurement.",
+      "final_fix": "NO EDIT to the thesis. DB action only: recompute provenance.grid_window.overprovision_vision_x for steady24h from the corrected deployable fleet, 8/2 = 4 (currently 8). The published 4x/2x is correct."
+    },
+    {
+      "line": 39,
+      "quote": "validated to ${\\approx}3\\%$ on its dominant operator with a fully attributed residual ledger",
+      "criticality": "headline",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "upheld",
+      "final_verdict": "DEFINITIONAL",
+      "evidence": "SELECT n_images,entry_kind,entry_name,ms,total_kernel_ms FROM provenance.collector_kernel_ledger WHERE n_images=1 AND entry_kind='category' ORDER BY ms DESC; -> gemm 6.029 ms, attention 1.300 ms, elementwise 1.179, patch_embed 0.495, norm 0.262, gather_cat 0.257, other 0.020; total_kernel_ms 9.542. Attention is 13.6% of kernel time; GEMM is 63.2%. SELECT n_images,op_name,share FROM provenance.collector_vit_op_breakdown ORDER BY n_images,share DESC; -> matmul share 0.789 / 0.675 / 0.661 at N=8/32/64, the largest stratum at every N. The ~3% figure is NOT the residual on the dominant operator: aiconfigurator.tex:441-442 states it is '(strictly 3.2%) on the collected operator' (attention, measured 1.300 ms) and that 'the GEMM total runs ~6%'. The chapter's own summary at :513 says 'within ${\\approx}3\\%$ on the collected attention operator'. The NUMBER 3% is correct and the measured side (1.300 ms) is confirmed exactly by the DB; only the word 'dominant' mislabels which operator it attaches to.",
+      "final_fix": "Replace 'validated to ${\\approx}3\\%$ on its dominant operator' with 'validated to ${\\approx}3\\%$ on its collected attention operator (the GEMM stratum ${\\approx}6\\%$)'. Justification: collector_kernel_ledger N=1 (attention 1.300 ms of 9.542 ms total, gemm 6.029 ms) plus the source chapter's own wording at aiconfigurator.tex:441-442 and :513. No number changes; this is a one-word correction of an operator name. If a minimal edit is preferred, 'dominant' -> 'collected attention' alone is sufficient."
+    },
+    {
+      "line": 53,
+      "quote": "with TTFT p99 within 1.1--6.8\\%",
+      "criticality": "headline",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "SELECT run_id,(metrics->>'p99_ttft_ms')::float FROM provenance.llm_run_summary WHERE run_id LIKE 'live:%'; -> live:twin_re = 3494.725887000095, live:twin_fc_p90 = 651.1395370000973. These are the OFFLINE TWIN halves only; the live halves are not in the provenance DB, but the archived unrounded live values are recorded at /home/gio/tese/verification/verify-glm.md:68 and :358 (live_re 3531.45, live_fc 695.16) and pinned to five significant figures in progress/results-ledger.md:472 as 3531.4532 / 3494.7259. (3531.4532-3494.7259)/3494.7259 = 36.7273/3494.7259 = 1.05094% -> 1.1% at one decimal under both half-up and half-even. (695.16-651.1395)/651.1395 = 6.760% -> 6.8%. The first-pass 1.03% came from dividing the already-ROUNDED table cells 3,531 and 3,495 -- exactly the failure mode barred by the established precedent.",
+      "final_fix": "NO EDIT. Published 1.1--6.8% is correct. This fix was already REJECTED in ADJUDICATION.md section 0.4 and the first pass re-derived it from rounded cells; do not apply it at conclusion.tex:53, validation.tex 72/83/97/159, or intro.tex 536--538."
+    },
+    {
+      "line": 85,
+      "quote": "the language fleet passes the same span at 0.96$\\times$ its burst-sized static shape",
+      "criticality": "headline",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "upheld",
+      "final_verdict": "THESIS_WRONG",
+      "evidence": "Numerator, unrounded from the DB: SELECT run_id,p99_ttft_ms,p99_itl_ms,gpu_hours,completed_requests FROM provenance.llm_run_summary WHERE run_id='planner:week_fc_p90'; -> gpu_hours = 518.6063450234815, p99_ttft 651.1395 (-> '651'), p99_itl 6.4056 (-> '6.4'), 749,601 requests. Denominator derived WITHOUT touching a rounded cell: the static shape is TP2 x 2 replicas = 4 constant GPUs (grid_window: tp_star=2, n_star=2), and the replay span is duration_ms = 483,668,382.4763285 from simulation/results/llm_week/week_fc_p90.report.json, the same artifact runs.source_path points at. 4 x 483668382.4763285 / 3.6e6 = 537.4093138625872 GPU-hours. Cross-check that the static fleet really is 4 constant GPUs: SELECT gpu_hours FROM provenance.llm_run_summary WHERE run_id='a13:ft_llm_static'; -> 672.0093014234247 over the full trace, and 672.0093014234247*3600/4 = 604,808.37 s = the 7.0-day trace span, so the 4-GPU model reproduces the archived full-trace figure exactly. Ratio = 518.6063450234815 / 537.4093138625872 = 0.9650118292443411. At two decimals that is 0.97 under half-up AND under half-even (the value sits 1.2e-5 ABOVE the 0.965 tie point). 0.96 is reachable only by truncation. Rejected alternative denominators: request-scaling the static run (672.0093 x 749601/1e6 = 503.739) gives 1.030x, which contradicts the chapter's own 'slightly below', so the time-matched denominator is the intended one.",
+      "final_fix": "Replace '0.96$\\times$' with '0.97$\\times$' at conclusion.tex:85, closedloop.tex:375, and the abstract/resumo sites (tese.tex '0.96' / '0,96'). Justification: 518.6063450234815 GPU-h (llm_run_summary, planner:week_fc_p90) / 537.4093138625872 GPU-h (4 GPUs x 483,668,382.48 ms span) = 0.96501. CAVEAT FOR THE EDITOR: this is a knife-edge rounding -- the ratio exceeds the 0.965 tie point by 1.2e-5, so the fifth significant digit decides it. If robustness is preferred over the last digit, the honest alternative is to WEAKEN rather than restate: write 'at 0.965$\\times$ its burst-sized static shape (essentially break-even)' or 'at essentially break-even against its burst-sized static shape (518.6 versus 537.4 H100 GPU-hours)'. Either is defensible; leaving '0.96' is not, since no convention other than truncation produces it."
+    },
+    {
+      "line": 95,
+      "quote": "at roughly two-thirds of the best static encoder fleet's GPU-time (RQ4)",
+      "criticality": "headline",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "SELECT ws,ratio_vs_static,denom_static_c8_ws,p99_ms,feasible FROM provenance.ewma_ablation_cell WHERE model='chronos' AND window_name='aggregate' AND quantile='p90' AND rho=15 AND readiness='warm' AND lead_s=30; -> ws=2,410,754.7, denom=3,869,278.4, ratio_vs_static=0.6231, p99=589.301 ms, feasible=t. Lead-invariance across the realizable archive range: L=15 0.6231, L=45 0.6229, L=165 0.6220 (warm); strict readiness 0.6202 / 0.6171 / 0.6140 / 0.5877 -> the published 0.59--0.62. So the underlying quantity, 0.62x, is exactly as published at line 81 and in tab:cl-aggregate. TWO first-pass objections both fail on inspection. (a) 'best static' does NOT name the cheapest fleet: the cheapest static fleet (C=2, verification.ft_static_C2 provisioned_ws=1,209,599.4, enc_p99=2,904.6 ms) FAILS the tail bound, so it is not a candidate for 'best' under any reading a reader would apply to a passing-fleet comparison; 'best static encoder fleet' reads naturally as the best deployable one, C=8, which IS the denominator used. (b) 'GPU-time' vs 'provisioned worker-time' is not a unit mismatch: 1 encoder worker = 1 GPU throughout, confirmed by grid_window_effective, where gpu_hours_rtx5090_effective = span_h x c_star exactly (burst1 8.316 x 6 = 49.896 -> 49.9; steady24h 23.999 x 2 = 48.0). What remains is only that 'roughly two-thirds' (0.6667) sits 7.0% relatively above the measured 0.6231, and coincides numerically with the reactive controller's published 0.67x row in the same table.",
+      "final_fix": "NO EDIT is required -- the quantity is confirmed and the denominator is correctly named. OPTIONAL wording tightening, to avoid the collision with the reactive row's 0.67x three pages earlier: replace 'at roughly two-thirds of the best static encoder fleet's GPU-time (RQ4)' with 'at 0.62$\\times$ the deployable static encoder fleet's provisioned worker-time (RQ4)' (2,410,754.7 versus 3,869,278.4 worker-seconds, ewma_ablation_cell chronos/aggregate/p90/rho=15/warm/L=30). Do NOT adopt any rewrite premised on the denominator being wrong or ambiguous -- it is neither."
+    }
+  ],
+  "rejected_fixes": [
+    {
+      "site": "conclusion.tex:53 (and validation.tex 72, 83, 97, 159; intro.tex 536--538)",
+      "proposed": "'1.1--6.8\\%' -> '1.0--6.8\\%' (and the tab:val-anchor cell '+1.1%' -> '+1.0%')",
+      "why_rejected": "Derived from the already-rounded table cells 3,531 and 3,495. The archived unrounded values are 3531.4532 and 3494.7259 (results-ledger.md:472; verify-glm.md:68), giving 1.05094% -> 1.1% at one decimal. Applying this would replace a correct number with a wrong one at five sites. Already on the ADJUDICATION section 0.4 reject list; re-proposed by the first pass and re-rejected here."
+    },
+    {
+      "site": "conclusion.tex:24 / grid_window",
+      "proposed": "Treat the published 6--8 burst range as resting on a stale artifact needing re-ingest.",
+      "why_rejected": "Stale as of the first pass, no longer. provenance.grid_window now carries c_star_corrected=8 / is_superseded=t on burst5 and the grid_window_effective view resolves it with correction_source. No DB re-ingest is outstanding for this claim; only the derived grid_window.overprovision_vision_x(steady24h) column still needs recomputing to 4."
+    },
+    {
+      "site": "conclusion.tex:95",
+      "proposed": "Rewrite on the premise that 'best static encoder fleet' names the wrong (cheapest, C=2) denominator and that 'GPU-time' is a unit mismatch against 'provisioned worker-time'.",
+      "why_rejected": "Both premises are false. C=2 fails the tail bound (enc_p99 2,904.6 ms, verification.ft_static_C2) so it is not 'best' under any reading; and 1 worker = 1 GPU is exact in this thesis (grid_window_effective.gpu_hours_rtx5090_effective = span_h x c_star). Only the loose paraphrase 'roughly two-thirds' for the measured 0.6231 is worth touching, and that is optional prose, not a numeric defect."
+    },
+    {
+      "site": "conclusion.tex:39",
+      "proposed": "Change the ${\\approx}3\\%$ figure itself.",
+      "why_rejected": "The 3% is correct and confirmed on its measured side (collector_kernel_ledger, attention category = 1.300 ms at N=1, matching aiconfigurator.tex:287). Only the operator NAME ('dominant' -> 'collected attention') is at fault. Do not touch the number."
+    }
+  ],
+  "notes": "Six claims re-checked, all against live SQL. Two upheld (line 39 DEFINITIONAL operator-naming, line 85 THESIS_WRONG rounding), four overturned to CONFIRMED (lines 24, 25, 53, 95). Net thesis edits recommended: exactly two, and only one of them changes a digit. (1) line 39, one word: 'dominant operator' -> 'collected attention operator' -- forced, because the DB shows GEMM is 63% of kernel time against attention's 13.6%, and the source chapter never calls attention dominant. (2) line 85, one digit: 0.96x -> 0.97x, or the weaker-but-safer 'essentially break-even (518.6 versus 537.4 H100 GPU-hours)'. This one is a knife-edge: the unrounded ratio is 0.9650118, only 1.2e-5 above the 0.965 tie point, so the fix is technically forced but its magnitude is negligible and the editor should be told so before propagating it to the abstract and resumo. The two ARTIFACT_SUPERSEDED verdicts are now moot: the burst5 C* correction is already recorded in the DB (c_star_corrected + grid_window_effective + correction_source), so nothing is outstanding on the thesis side and only one derived column (grid_window.overprovision_vision_x for steady24h, 8 -> 4) needs fixing on the DB side. The 1.1--6.8% 'defect' is the ADJUDICATION section 0.4 rejected fix resurfacing; it is barred again here. Separately noted but out of scope for this file (they are text-internal wording items, not DB mismatches): line 41's unqualified 12.8% wants the 'across the $N\\le64$ serving regime' scope that lines 104 and 121 already carry, and line 60's 'every cold-start lead from 15 to 165 seconds' describes a four-point discrete ladder {15,30,45,165} s as a continuum."
+}

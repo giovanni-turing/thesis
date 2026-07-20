@@ -15,7 +15,8 @@ its silicon under locked clocks. Second, the analytical
 prediction of the full vision-encoder forward pass was validated against
 direct measurement of the same network, GPU, and clocks:
 the collected attention operator agrees within ${\approx}3\%$, and the end-to-end
-kernel-time ledger closes with no unexplained residual. Third, the
+kernel-time ledger is attributed term by term except for a
+${\approx}0.7$\,ms remainder. Third, the
 calibrated encoder model was composed with Dynamo's discrete-event
 LLM-pool simulator in a first end-to-end two-pool simulation,
 establishing the pipeline for the autoscaling experiments that follow.
@@ -83,10 +84,10 @@ out the older framework versions AIC's manifest still lists.
 isolated microbenchmark kernels ride higher clocks than sustained serving
 load: an initial collection at unlocked clocks ran ${\approx}17\%$
 faster than the final dataset. All data reported here was recollected
-at locked clocks: SM \SI{2407}{\mega\hertz}, memory
-\SI{14001}{\mega\hertz}
-(\texttt{nvidia-smi -lgc/-lmc}, persistence mode enabled), the
-clock at which the system file's throughput figures are stated. The
+at locked clocks (\texttt{nvidia-smi -lgc 2400,2400 -lmc 14001}, persistence
+mode enabled; delivered SM 2377--2400\,\si{\mega\hertz}, MEM
+\SI{13801}{\mega\hertz}), at the \SI{2407}{\mega\hertz} boost reference the
+system file's throughput figures are stated against. The
 measured-to-predicted \emph{ratios} of Section~\ref{sec:aic-validation}
 are identical between the unlocked and locked datasets (clock state
 scales both sides equally and cancels), but only the locked dataset
@@ -193,8 +194,9 @@ multilinear interpolation between the bracketing collected points on each
 axis (batch, sequence length, GEMM dimensions), with a clamp refusing
 locally non-monotone segments. Query time has no tunable resolution:
 the collected grid \emph{is} the discretization. The pre-infill
-448-pixel path shows this stratum's cost here: $+4.3\%$ to $-5.8\%$ from
-the exact measurements.
+448-pixel path shows this stratum's cost here: $-4.2\%$ to $+6.2\%$ from
+the exact measurements (equivalently, the infill shifted the prediction by
+$+4.3\%$ at one image and $-5.8\%$ at six).
 \item \textbf{Modeled (analytic bounds).} Beyond the grid edge the query
 extrapolates the outermost segment; probed on the H100 tables out to
 147k-token contexts, this tracks the theoretical quadratic of attention
@@ -347,8 +349,8 @@ encoder-worker count is set by a
 single queue-feasibility search, identical in every window and differing
 only in the per-batch cost $f(N)$ (encoder-delay p99 within the SLA,
 backlog non-divergent). The cost $f(N)$ itself is a cheap, deterministic
-per-accelerator benchmark: the twelve batch sizes here are memoized in
-minutes. Because the vLLM per-forward cost matches the AIC composition to
+per-accelerator benchmark: the eight batch sizes of this section's
+protocol are memoized in minutes. Because the vLLM per-forward cost matches the AIC composition to
 within $12.8\%$ across the whole $N\le64$ serving regime, and replaying the
 AIC-sized week schedule with the encoder repriced at the measured vLLM cost
 leaves the encoder-delay p99 at \SI{606}{\milli\second} (from
@@ -413,7 +415,8 @@ $t$-intervals across the five replications.
 \begin{table}[htbp]
 \centering
 \caption{Vision-encoder forward latency: measurement vs.\ AIC prediction
-(RTX~5090, bf16, batch 1, SM clock locked to \SI{2407}{\mega\hertz}).
+(RTX~5090, bf16, batch 1, SM clock locked via \texttt{nvidia-smi -lgc 2400,2400},
+delivered 2377--2400\,\si{\mega\hertz}).
 Predictions from the \emph{raw slice}, the pre-infill validation
 baseline (Section~\ref{sec:aic-collection}); every simulation consumes
 the infilled slice.}
@@ -431,9 +434,15 @@ $1344^2$ & 7056  & $103.824 \pm 0.022$ & 89.347 & 1.16 \\
 
 \textbf{The analytical model matched the
 empirical test}: a kernel-level profile of the measured forward pass
-accounts for the entire gap, term by term, with no unexplained residual.
+accounts for the gap term by term, except for a ${\approx}0.7$\,ms remainder.
 At $448^2$, the \SI{11.360}{\milli\second} wall time decomposes into
-\SI{9.624}{\milli\second} of pure CUDA kernel time plus
+\SI{9.624}{\milli\second} of pure CUDA kernel time\footnote{Every kernel
+figure in this section is taken from the phase-A profile. A later
+\texttt{kernel\_ledger} run over the same shape reports slightly different
+values for the same quantities (total kernel time \SI{9.542}{\milli\second},
+patch-embedding convolution \SI{0.495}{\milli\second}, unfused elementwise
+\SI{1.179}{\milli\second} and layer norms \SI{0.262}{\milli\second}); the two
+profiles are not interchangeable and are not mixed here.} plus
 \SI{1.736}{\milli\second} (15.3\%) of inter-kernel dispatch gaps, a
 property of the HuggingFace eager execution stack used for measurement,
 deliberately outside AIC's scope. Within the kernel time, the attention
@@ -441,16 +450,19 @@ kernels sum to \SI{1.300}{\milli\second} against a predicted
 \SI{1.342}{\milli\second}: \textbf{agreement within ${\approx}3\%$}
 (strictly 3.2\%) on the collected operator. The GEMM total runs ${\approx}6\%$
 above prediction (HuggingFace selects different cutlass variants than
-vLLM's GEMM path), and unfused elementwise operations and the projectors'
-layer norms account for a further ${\approx}0.25$ ms. Two modules sit
+vLLM's GEMM path), and unfused elementwise operations together with the
+projectors' layer norms contribute a further ${\approx}0.25$ ms \emph{of the
+residual} (\SI{1.04}{\milli\second} measured against AIC's
+\SI{0.79}{\milli\second} predicted). Two modules sit
 outside AIC's operator graph altogether: the patch-embedding convolution
 (\SI{0.459}{\milli\second}, 4.8\% of kernel time; an inefficient
 convolution shape, far costlier than its FLOP count
 suggests) and the DeepStack gather/concatenation
 (\SI{0.248}{\milli\second}). Removing the two unmodeled modules leaves
 \SI{8.92}{\milli\second} of AIC-comparable work against
-\SI{7.82}{\milli\second} predicted, within ${\approx}12\%$, fully
-attributed to the kernel-variant and fusion differences above. The
+\SI{7.82}{\milli\second} predicted, within ${\approx}12\%$, with the
+residual attributed term by term to the kernel-variant and fusion
+differences above except for a ${\approx}0.7$\,ms remainder. The
 DeepStack merger MLPs themselves \emph{are} modeled: AIC instantiates the
 projector four times, and forcing the instance count from four to one
 scales the predicted projector cost by exactly $4.00\times$.

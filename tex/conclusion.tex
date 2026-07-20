@@ -36,8 +36,8 @@ which is what later converts forecasts into provisionable headroom.
 
 \paragraph{RQ3 --- Platform validity: yes, with measured fidelity.} The
 encoder cost model was collected on silicon for this thesis
-(and contributed upstream), validated to ${\approx}3\%$ on its dominant
-operator with a fully attributed residual ledger, and a composed
+(and contributed upstream), validated to ${\approx}3\%$ on its collected attention
+operator (the GEMM stratum ${\approx}6\%$) with an attributed residual ledger, and a composed
 forward that matches vLLM's own vision tower to within $12.8\%$
 (the earlier ${\approx}1.4\text{--}1.6\times$ gap was HuggingFace
 execution overhead, an execution-stack difference;
@@ -52,7 +52,7 @@ reproduce their simulated verdicts through the real control plane with
 mocked engines,
 with TTFT p99 within 1.1--6.8\% (ITL p99 verdicts agreeing too: forecast
 sub-bound, reactive above bound in both) and
-replica-time within 5.3--7.6\%.
+replica-time within 5.3--7.7\%.
 
 \paragraph{RQ4 --- Closed-loop payoff: yes, with the mechanism
 identified.} On the encoder pool, the p90-forecast schedule meets the
@@ -102,7 +102,8 @@ inter-pool handoff is an analytic single-stream bound, so the
 handoff or a ${\geq}100$\,Gbps fabric; the encoder cost model is
 silicon-validated against a standalone eager forward through vLLM's
 own vision-tower implementation to within $12.8\%$ (a matched-engine check over
-a dense $N{=}1$--$64$ sweep on a standalone vision-tower forward; the
+a dense $N{=}1$--$512$ sweep on a standalone vision-tower forward, holding across
+the 64 batch sizes of the $N\le64$ serving regime; the
 ${\approx}1.4\text{--}1.6\times$ HuggingFace-eager gap was a slower
 execution stack, not the serving path; Appendix~\ref{app:engine-sensitivity});
 and the vision-pool control loop is exercised in simulation and

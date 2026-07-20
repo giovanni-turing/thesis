@@ -1,0 +1,6 @@
+# Loader dependencies.
+# DB transport is the host `psql` client (PostgreSQL 16) — NO psycopg needed
+# (psycopg has no wheel for the Python 3.14rc2 interpreter on this box; the loader
+# streams CSV into `psql \copy` instead). Only parquet reading needs a library:
+pyarrow>=15
+# pandas is present in the env but not required by the loader.

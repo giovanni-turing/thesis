@@ -1,0 +1,39 @@
+{
+  "chapter": "validation",
+  "n_reviewed": 3,
+  "n_upheld": 0,
+  "n_overturned": 3,
+  "rulings": [
+    {
+      "line": 43,
+      "quote": "(59\\,s + a measured 1.0\\,s spawn-to-registered latency)",
+      "criticality": "supporting",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "The first pass looked only at manager.jsonl (which logs the fork) and concluded no registration timestamp exists. It does exist, in the planner log: the MDC/ZMQ 'Discovery Added event received' line is the registration event. Pairing every post-initial spawn in manager.jsonl with its Discovery Added line in planner.log.gz across BOTH anchor live runs gives 5 measurements: live_fc spawn3 17:34:09.801430 -> 17:34:10.797294 = 0.9959 s; live_fc spawn4 17:34:09.802520 -> 17:34:10.797333 = 0.9948 s; live_fc spawn5 17:52:20.080436 -> 17:52:21.034621 = 0.9542 s; live_re spawn3 18:44:56.809380 -> 18:44:57.797152 = 0.9878 s; live_re spawn4 18:57:26.895263 -> 18:57:27.891577 = 0.9963 s. Mean 0.9858 s, range 0.954-0.996 s -> 1.0 s at the published one-decimal precision. The 59 s half is also directly logged: manager.jsonl 'start' event carries spawn_delay=59.0 and every subsequent spawn carries reason='lead+59s'. Command: zcat /home/gio/tese/simulation/results/live51/live_runs/{live_fc,live_re}/planner.log.gz | grep 'Discovery Added event received', paired against manager.jsonl t_wall.",
+      "final_fix": "NO EDIT. The 1.0 s is a genuine measurement, reproducible from the archived anchor artifacts (mean 0.986 s over 5 spawns), and rounds to the published 1.0 s. Dropping the parenthetical would delete a correct, evidence-backed number."
+    },
+    {
+      "line": 122,
+      "quote": "Mixed prefill+decode passes, the only samples that inform aggregated capacity, are rare at calm load: zero arrived in five minutes at 2\\,req/s, leaving the capacity model unready.",
+      "criticality": "headline",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "revised",
+      "final_verdict": "THESIS_WRONG",
+      "evidence": "The first pass was right that the pre-fix probe run is not archived, but wrong that the question is undecidable. The tracking-mode sampler itself IS archived: the upstream 'base._log_fpm' line logs the latest forward pass per worker per load tick, and it is unaffected by the parity patch (which adds a SEPARATE drain-all subscriber, 'planner_live_patch._collect_fpm'). Classifying every base._log_fpm record by sched(prefill_tok>0 AND decode_kv>0) over the first 300 s of each archived run gives: live_fc n=184 samples, mixed=2 (first at +24.9 s), pure_prefill=3, pure_decode=138, idle=41; live_re n=24, mixed=2; verify_flag n=207, mixed=3 (first at +209.9 s). So mixed passes are indeed RARE (~1% of tracking-mode samples) but NOT zero in any archived run. Calm-load rate is corroborated: provenance.windows burst3 requests=3093 / span_s=1619.7 = 1.910 rps, and live_fc profile_export_aiperf.json request_throughput.avg = 1.8968 rps, so '2 req/s' is a fair round description. The 'unready' consequence survives (planner diag shows correction_ready_buckets=0), only the literal 'zero' does not. Command: zcat .../live_runs/*/planner.log.gz | grep 'base._log_fpm' and count records with prefill_tok>0 and decode_kv>0 in the first 300 s.",
+      "final_fix": "WEAKEN, do not restate a new headline number. Replace 'zero arrived in five minutes at 2\\,req/s, leaving the capacity model unready' with: 'only a handful arrive at calm load --- across the archived runs 2--3 of the first ${\\approx}200$ tracking-mode samples over five minutes at ${\\approx}2$\\,req/s were mixed (${\\approx}1\\%$) --- too few to make the capacity model ready'. Justified by the counts above (live_fc 2/184, live_re 2/24, verify_flag 3/207 in the first 300 s) and by burst3 mean rate 1.910 rps (SELECT requests, span_s FROM provenance.windows WHERE window_name='burst3';)."
+    },
+    {
+      "line": 140,
+      "quote": "the tail-aware forecast requests up to 24 language replicas and \\texttt{max\\_gpu\\_budget}${=}8$ clamps it to 8",
+      "criticality": "headline",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "The sentence is scoped by its own clause 'in these episode replays', and the episode replays are an EXISTING artifact set distinct from the anchor. Grepping every planner log in simulation/results for the largest clamp finds exactly one 24-replica request, in the offline episode replay: /home/gio/tese/simulation/results/episode_twins/burst4_fc.log -> 'GPU budget band [min=-1, max=8] clamped 24 replicas (= 24 GPUs) -> 8 replicas (= 8 GPUs)'. Note '= 24 GPUs' for 24 replicas: in the OFFLINE path max_gpu_budget is in replica units, so 8 means 8 replicas. Both numbers in the sentence, 24 and 8, are therefore literally exact for the object being described. The anchor is separately and correctly capped: the anchor twin is twin_fc_p90_cap4 (max=4, 'clamped 6/7/8/9 replicas -> 4 replicas', 13 clamp events) with decode_worker_seconds=6399.81 -> the table's 6,400 replica-seconds; the anchor live run is 'max=8 GPUs' -> 'clamped 8 replicas (= 16 GPUs) -> 4 replicas (= 8 GPUs)'. Both anchor paths land on 4 applied replicas, exactly as the caption (line 57) and the immediately preceding sentence ('The anchor comparison equalizes the caps') state. There is no numeric mismatch, only a reader who might carry the anchor scope into the following clause.",
+      "final_fix": "NO EDIT required: 24 and 8 are exact for the offline episode replays the clause names, and the anchor's equalized cap of 4 is already stated in the preceding sentence and the table caption. OPTIONAL clarity only (changes no number): insert 'offline' -> 'The cap \\emph{does} bind in these offline episode replays --- the tail-aware forecast requests up to 24 language replicas and \\texttt{max\\_gpu\\_budget}${=}8$ clamps it to 8 replicas ---'. Source: episode_twins/burst4_fc.log."
+    }
+  ],
+  "rejected_fixes": "1) verified/validation.json line 43 proposed 'drop the parenthetical precision' on the 1.0 s spawn-to-registered latency. REJECT - the value is measured and archived: 5 spawn->Discovery-Added pairs across both anchor live runs give 0.954-0.996 s, mean 0.986 s, which rounds to the published 1.0 s. Applying this fix would delete a correct measurement. 2) internal_defects.json line 140 proposed replacing 'clamps it to 8' with 'clamps it to 4 replicas (max_gpu_budget=8 GPUs at 2 GPUs per TP2 replica)'. REJECT - this would INTRODUCE an error: the 24-replica request being described comes from episode_twins/burst4_fc.log, an OFFLINE episode replay where max_gpu_budget is in REPLICA units ('clamped 24 replicas (= 24 GPUs) -> 8 replicas (= 8 GPUs)'), not from the anchor. The proposed text would attach the anchor's 4-replica cap to an episode whose logged clamp is 8, and would assert a GPUs-per-replica conversion that the offline path does not perform. 3) internal_defects.json line 72 proposed changing '+1.1%' to '+1.0%' and rewriting the band to '1.0--6.8%'. REJECT under the established precedent against recomputing a percentage from rounded table cells: the unrounded values are live 3531.4532 and offline twin_re_cap4 p99_ttft_ms=3494.725887 (SELECT run_id, p99_ttft_ms FROM provenance.llm_run_summary WHERE run_id='live:twin_re_cap4';), giving (3531.4532-3494.725887)/3494.725887 = 1.0507% -> +1.1%. This fix was already rejected in an earlier chapter and must not be reapplied here. 4) internal_defects.json line 140's premise that 'offline forecast twin 6400 replica-s / 1620 = 3.95 mean replicas ... impossible under a cap of 8' is sound about the ANCHOR but irrelevant to the sentence, which is about the episode replays; do not use it to justify editing line 140."
+}

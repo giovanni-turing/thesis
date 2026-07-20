@@ -52,17 +52,40 @@ F7 = 1.098x — the forecast is DEARER than the deployed static fleet on that fo
 Cost vs each fold's own refit optimum C*: **0.971x .. 1.757x**.
 => `cost_ratio_below_1_in_every_burst_fold` = **False**.
 
-## FINDING 3 — rho=15 is feasible everywhere but cost-optimal NOWHERE
+## FINDING 3 — rho=15 is feasible everywhere but cost-optimal NOWHERE **among the four values swept**
 `rho15_is_cheapest_feasible_in_every_burst_fold` = **False**, contradicted in ALL SEVEN folds and
 in FULL. Cheapest feasible rho is 25 in FULL and F1-F4/F7, 20 in F5, 10 in F6. At FULL, rho=25
 costs 0.39x vs rho=15's 0.61x at an encoder p99 of 784 ms — still inside the bound.
 The frontier SHAPE is stable (`rho_frontier_shape_stable` = True); it is the CHOICE of 15 that is
 conservative rather than optimal. Reported, not suppressed.
 
+**GRID CAVEAT (mandatory).** The sweep is only {10, 15, 20, 25}, and the reported optimum sits at
+a **grid ENDPOINT in 7 of 8 folds** (rho=25 in six, rho=10 in F6). The true cost-optimal rho
+therefore lies outside the swept range in most folds and is **unmeasured**. Write "rho=15 is
+nowhere the cheapest feasible setting **among the four values swept**" — that is safe. "rho=25 is
+optimal" is **not** supported and must not be written.
+
 ## FINDING 4 — the forecast policy fails one fold
 `forecast_passes_every_burst_fold` = **False**. F6 (containing e13 and e16) fails at encoder p99
 1262.3 ms and fails E2E. Consistent with e13 being the known mechanism boundary.
 Reactive fails four folds (F1, F4, F6, F7) — `reactive_fails_at_least_one_burst_fold` = True.
+
+### FINDING 4b (NEW, AND THIS TRACK'S STRONGEST FACT — it was omitted)
+**On F6 — the one fold where the forecast arm FAILS — a forecast-free static C=5 fleet PASSES.**
+Re-derived from g4_folds/results.json:
+
+| F6 arm | encoder p99 | provisioned ws | verdict |
+|---|---:|---:|:--|
+| forecast rho=15 | 1262.3 ms | 419,391.2 | **FAIL** |
+| static C=5 | **904.7 ms** | 431,967.3 | **PASS** |
+
+The forecast arm is **2.9% cheaper and infeasible**; the static fleet costs **3.0% more and
+works**. On the fold that decides the generality question, buying the forecast machinery purchases
+a 3% cost reduction in exchange for missing the SLA.
+This is the **encoder-pool counterpart of Finding 5's language-pool inversion**, and the two
+together are the delivery's central convergent result: **the forecast-free static fleet is the arm
+to beat on both pools**, and on the encoder pool it is beaten on the covered span but not
+fold-by-fold. Materially strengthens the fold caveat and must travel with it.
 
 ## FINDING 5 — on the LANGUAGE pool the forecast is DEARER than static in 6 of 7 folds
 forecast/static GPU-h: F1 1.276, F2 1.101, F3 0.931, F4 1.709, F5 3.808, F6 1.022, F7 2.144.
@@ -79,11 +102,27 @@ cannot decide it). This supersedes the earlier single-quiet-fold verdict, which 
 "Split into seven disjoint 24-hour folds, the headline quantities are not fold-invariant. The
 encoder cost ratio against the deployed C=8 fleet ranges from 0.47x to 1.10x across burst-bearing
 folds around its 0.62x whole-span value, and the forecast policy misses the bound on the fold
-containing the e13 onset. A whole-span static ladder further shows that C=4 clears the bound
-(by a 0.6% margin), so the 0.62x denominator is the deployable fleet rather than the static
-optimum — against a refit optimum the schedule is dearer. The rho frontier retains its shape in
-every fold, but rho=15 is nowhere the cheapest feasible setting. The single-span averages are
-therefore representative of the span, not of an arbitrary day within it."
+containing the e13 onset — a fold on which a **static C=5 fleet passes at 904.7 ms for only 3%
+more worker-time**. The rho frontier retains its shape in every fold, but rho=15 is nowhere the
+cheapest feasible setting **among the four values swept**. On the language pool the forecast is
+dearer than a feasible static fleet in six of seven folds. The single-span averages are therefore
+representative of the span, not of an arbitrary day within it."
+
+(One DELETION from the earlier draft: the sentence "A whole-span static ladder further shows that
+C=4 clears the bound (by a 0.6% margin), so the 0.62x denominator is the deployable fleet rather
+than the static optimum — against a refit optimum the schedule is dearer." C=4 fails 3 of 5
+burst-bearing folds and is not deployable under the thesis's own aggregate-AND-per-episode
+grading, so leading with it invites the unlicensed "the baseline is 2x oversized" reading.
+One ADDITION: the F6 static-C=5 fact, per Finding 4b.)
+
+## DO NOT WRITE (from this card)
+- **"The baseline is 2x oversized."** Not licensed. The fold-robust static optimum is C*=5, giving
+  8 vs 5 = **1.6x**, and that is measured on the **A15 7.0-day span**, not the 5.60-day headline
+  span.
+- "rho=25 is optimal" — the optimum sits at a grid endpoint in 7 of 8 folds and is untested beyond.
+- Any restatement of 0.62x against a span other than the one it is priced on. G4 is priced on the
+  **6.998-day A15 span** — a third span again — and must be labelled as such.
+- Any generality claim beyond **temporal** variability within **one** trace.
 
 ## Honest scope
 One trace, one datacenter, one model family, one 7-day record. Folds share tenant mix, request-size

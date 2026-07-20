@@ -1,0 +1,70 @@
+{
+  "chapter": "trace-eda",
+  "n_reviewed": 6,
+  "n_upheld": 1,
+  "n_overturned": 5,
+  "rulings": [
+    {
+      "line": 38,
+      "quote": "a non-constant per-image increment (${\\approx}277$ tokens per image at one image, falling to ${\\approx}66$ at 529)",
+      "criticality": "supporting",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "psql -h localhost -p 5433 -U goku -d postgres -c \"select metric_path,value_num from provenance.eda_metric where script='a_quality' and metric_path in ('context_tokens_by_numimages.0.median','context_tokens_by_numimages.1.median','context_tokens_by_numimages.529.median');\" -> 0.median=792, 1.median=1069, 529.median=35932 (529.count=7377, so the k=529 bin is well populated; the identical 35932 at k=1104 is a coincidence of a single-request bin, not a mislabel). (1069-792)/1 = 277.000 exactly; (35932-792)/529 = 66.427 -> 66. Both published values reproduce EXACTLY under one consistent definition: mean per-image context in excess of the text-only median. Corroborated independently: provenance.eda_metric regimes.large_img.ContextTokens.p50 = 35932 at NumImages.p50 = 529.",
+      "final_fix": "NO EDIT. Both numbers are exact under the single consistent reading 'context per image above the text-only baseline', which is the natural reading of 'tokens per image'. An OPTIONAL, non-numeric clarification (not a correction) would be to write '...(${\\approx}277$ tokens per image above the \\num{792}-token text-only median at one image, falling to ${\\approx}66$ at 529)'; 792 is provenance.eda_metric a_quality context_tokens_by_numimages.0.median."
+    },
+    {
+      "line": 47,
+      "quote": "increment decays, from ${\\approx}277$ tokens at one image to ${\\approx}66$ at 529",
+      "criticality": "incidental",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "Caption restatement of line 38; same query, same exact reproduction (277.000 and 66.427).",
+      "final_fix": "NO EDIT."
+    },
+    {
+      "line": 136,
+      "quote": "a diurnal harmonic family (\\SI{24}{\\hour} fundamental with weaker 12/8/\\SI{6}{\\hour} overtones) sits on a strong $1/f^{\\beta}$ long-range-dependent background.",
+      "criticality": "supporting",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "The first pass was limited by eda_metric storing only the top-8 peaks. I recomputed the full periodogram from the source trace (/home/gio/tese/data/AzureLMMInferenceTrace_multimodal.csv.gz) with the exact pipeline of analysis/trace_eda/f_fourier.py (1 Hz zero-filled per-second counts, N=604800, mean-removed rfft, 400-bin log binning). The recompute reproduces the archived betas (requests 0.6764 vs DB 0.65789; images 0.8594 vs DB 0.86497 - cuFFT/precision difference only), so it is faithful. Harmonic power vs local background (median power over [f0/2, 2*f0]) for the REQUEST-rate signal, which is the signal this paragraph ('the arrival process') is about: 24 h power 3.89e3 (ratio 2.94), 12 h 1.82e3 (3.05), 8 h 2.20e3 (5.25), 6 h 2.28e3 (9.25). All four family members are present and elevated above background, and the 24 h fundamental is the largest in absolute power of the four, i.e. the overtones are 'weaker' exactly as stated. The 12 h line the first pass could not see is real (rank 9 among all period>10 min bins, just outside the stored top-8).",
+      "final_fix": "NO EDIT. Confirmed by direct recomputation for the request-arrival signal. Note for the record (does not require a text change): the IMAGE-rate signal shows the 24 h line (rank 2) but NO 12 h or 8 h overtone (power/background ratios 0.19 and 0.23, i.e. below background); the paragraph is about the arrival process and its neighbouring sentences (84 h / 168 h record-length artifacts) match the request signal's peak list, so the scope is already correct."
+    },
+    {
+      "line": 244,
+      "quote": "decode load is largely carried by request rate ($R^2 = \\num{0.654}$; Pearson $r$ against request rate is $0.36$ for images versus $0.81$ for decode)",
+      "criticality": "headline",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "upheld",
+      "final_verdict": "THESIS_WRONG",
+      "evidence": "psql -c \"select script,metric_path,value_num from provenance.eda_metric where metric_path in ('gen_signal.constant_fraction_vs_req.r2','pearson_1min.gen_vs_req','pearson_1min.img_vs_req');\" -> m_gen_and_global gen_signal.constant_fraction_vs_req.r2 = 0.6535040521227362 -> 0.654 (OK); d_signals pearson_1min.gen_vs_req = 0.8121338734126078 -> 0.81 (OK); d_signals pearson_1min.img_vs_req = 0.3546002012649865 -> 0.35, NOT 0.36. Adversarial checks that FAILED to rescue 0.36: (a) rounding - 0.3546 cannot reach 0.36 under any ordinary convention; the published 0.36 is reachable only by re-rounding the already-3dp-rounded 0.355 stored in e_comprehensive window_level_pearson_1min.images.requests, which is exactly the forbidden round-twice pattern (ADJUDICATION 0.4 precedent). (b) wrong-row - no alternative Pearson exists in provenance: the only correlation rows are d_signals pearson_1min.{ctx,gen,img}_vs_req/img_vs_ctx and e_comprehensive's request-level and 1-min window-level matrices; the two SIBLING numbers in the same parenthesis (0.654, 0.81) both come from this same 1-min set, so the thesis is quoting this set. (c) definitional - the figure caption fixes the scope as 'one-minute windows', matching window_bin='1min'. (d) superseded - d_signals and e_comprehensive agree (0.3546 and 0.355), so there is no stale row.",
+      "final_fix": "At tex/trace-eda.tex line 246, replace \"$0.36$ for images versus $0.81$ for decode\" with \"$0.35$ for images versus $0.81$ for decode\". Justification: provenance.eda_metric (script='d_signals', metric_path='pearson_1min.img_vs_req') = 0.3546002012649865. Note this makes the sentence MORE consistent with its own surrounding numbers, since 0.35^2 = 0.1225 now matches the quoted image-side $R^2 = 0.123$ at line 241 to three digits (0.36^2 = 0.1296 did not)."
+    },
+    {
+      "line": 317,
+      "quote": "The latter is fit as the $1/f^{\\beta}$ slope over the sub-diurnal band (10 minutes to 12 hours, clear of the diurnal fundamental)",
+      "criticality": "supporting",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "The fit band IS archived - in the generating code, which the first pass did not consult. /home/gio/tese/analysis/trace_eda/f_fourier.py lines 72-75: '# slope over the LRD band: periods 10 min .. 12 h (clear of diurnal lines & HF floor)' / 'band = (fb > 1 / (12 * 3600)) & (fb < 1 / 600)' / 'beta, logc = np.polyfit(np.log10(fb[band]), np.log10(pb[band]), 1)'. The band endpoints are literally 10 minutes and 12 hours, exactly as published, and the 24 h fundamental (f = 1/86400 < 1/43200) is excluded by construction. My independent recompute over that band returns beta = 0.8594, H = 0.9297 for images, reproducing the archived images.hurst_from_beta = 0.93249 and the published H ~ 0.93. Additionally REFUTING the recorded internal defect at line 317 (which claimed the 12/8/6 h overtones contaminate the band): the sentence is about the IMAGE signal's H ~ 0.93, and in the image periodogram the 12 h and 8 h lines are BELOW local background (power/background 0.19 and 0.23) and 6 h is marginal (1.47). There is no overtone contamination to notch out for this fit, and the text asserts only that the band is clear of the FUNDAMENTAL, which is exactly true.",
+      "final_fix": "NO EDIT. Band endpoints confirmed verbatim against f_fourier.py:73; the 'clear of the diurnal fundamental' justification confirmed empirically for the image signal. Optional provenance hygiene only (no text change): persist f_lo=1/43200 Hz and f_hi=1/600 Hz as eda_metric rows from f_fourier.py."
+    },
+    {
+      "line": 411,
+      "quote": "the busiest 1\\% of request-rate minutes carry ordinary-composition traffic: median 1 image and median context and generation within a few percent of the global medians.",
+      "criticality": "supporting",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "revised",
+      "final_verdict": "CONFIRMED",
+      "evidence": "psql -c \"select metric_path,value_num from provenance.eda_metric where script='q_multires_tails' and metric_path like 'regimes.high_req_rate.%';\" -> NumImages.p50 = 1 (p50_global 0.5), ContextTokens.p50 = 1210 (p50_global 1124), GeneratedTokens.p50 = 105 (p50_global 98), multimodal_share = 0.7770324485669352, requests = 31157, share = 0.031157. Unrounded deltas computed from these DB values, never from table cells: 1210/1124 = 1.0765 (+7.65%); 105/98 = 1.0714 (+7.14%). Every NUMBER the thesis states in this clause is exactly right - 'median 1 image' is precisely regimes.high_req_rate.NumImages.p50 = 1. The defect is therefore not numeric but rhetorical, in two places: (a) '+7.1-7.7%' is a stretch for 'within a few percent'; (b) 'ordinary-composition' is undercut by multimodal_share = 0.777 in hot minutes against a global 0.500 (line 31), a genuine compositional difference. Scope check on the code (analysis/trace_eda/q_multires_tails.py:106-131): svals = sub[var] over ALL requests in the hot minutes and gvals over ALL requests, so both p50 and p50_global are all-request statistics - there is NO image-bearing/all-request denominator mismatch inside this metric.",
+      "final_fix": "The honest outcome here is to WEAKEN the characterisation, not to restate a number - no published number is wrong. Suggested replacement for tex/trace-eda.tex lines 411-413: \"By contrast the busiest 1\\% of request-rate minutes carry near-ordinary per-request work: median 1 image, and median context and generation about 8\\% above the global medians (\\num{1210} vs.\\ \\num{1124} tokens; \\num{105} vs.\\ \\num{98} tokens). They are somewhat more multimodal than the trace as a whole (77.7\\% image-bearing against 50.0\\%), but high request rate still does not imply heavy per-request work.\" Every figure from provenance.eda_metric script='q_multires_tails', regimes.high_req_rate.*. If a minimal edit is preferred, changing only 'within a few percent' to 'about 8\\% above' is sufficient and safe."
+    }
+  ],
+  "rejected_fixes": "1) INTERNAL DEFECT line 38 proposed replacing 'per-image increment' with 'per-image token rate' and describing 277/66 as 'median-context/image-count ratios, not marginal differences'. REJECT: that definition is arithmetically false at k=1 - the plain ratio is 1069/1 = 1069, not 277. Only the excess-over-text-baseline definition, (median_ctx(k) - 792)/k, reproduces BOTH 277.000 and 66.427. Applying this fix would attach a wrong definition to two correct numbers. 2) INTERNAL DEFECT line 411 proposed 'median 1 image among their image-bearing requests (the global image-bearing median)'. REJECT: q_multires_tails.py:106-131 computes regimes.high_req_rate.NumImages.p50 over ALL requests in the hot minutes (sub[var]), not over image-bearing requests only; the fix would state a false provenance for the value 1. 3) INTERNAL DEFECT line 317 proposed 'excluding the \\SI{24}{\\hour} fundamental, though the 12/8/\\SI{6}{\\hour} overtones fall inside the band and are not notched out'. REJECT for the image signal, which is the signal the sentence is about: recomputation shows the image periodogram has NO 12 h or 8 h overtone (power/local-background 0.19 and 0.23, i.e. below background), so the added caveat would assert contamination that does not exist. 4) FIRST-PASS line 136 and line 317 verdicts of INSUFFICIENT_DATA were premised on the stored top-8 peak list and on the fit band being unarchived; both premises are false (full periodogram recomputable from the source trace; fit band hard-coded at f_fourier.py:73). Do not weaken or hedge either sentence on those grounds. 5) FIRST-PASS line 244 gave the correct direction; note only that the supporting rationale must be the UNROUNDED 0.3546002012649865, not the 3-dp 0.355 stored in e_comprehensive - rounding 0.355 upward is precisely how the erroneous 0.36 arose.",
+  "notes": "Only one genuine numeric error survives adversarial re-check in this chapter: 0.36 -> 0.35 at tex/trace-eda.tex:246. The other five non-CONFIRMED first-pass verdicts all fall: two DEFINITIONAL calls (lines 38/47) are exact under a single consistent and natural definition; two INSUFFICIENT_DATA calls (lines 136/317) are decidable and confirmed once the source trace and the generating script are consulted rather than only the truncated eda_metric peak list; and line 411's numbers are all exactly right, with only the qualitative wording ('within a few percent', 'ordinary-composition') warranting a weakening. Recomputation methodology: analysis/trace_eda/f_fourier.py replicated on CPU/numpy over the source trace; archived betas reproduced to within cuFFT precision (images 0.8594 vs 0.86497; requests 0.6764 vs 0.65789), establishing the recompute as faithful before any harmonic conclusion was drawn from it."
+}

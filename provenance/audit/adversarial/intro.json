@@ -1,0 +1,140 @@
+{
+  "chapter": "intro",
+  "n_reviewed": 13,
+  "n_upheld": 2,
+  "n_overturned": 11,
+  "rulings": [
+    {
+      "line": 253,
+      "quote": "exposes the latency tails the simulator's default polynomial flattens (TTFT p99 $+24\\%$ on the steady window)",
+      "original_verdict": "ARTIFACT_SUPERSEDED",
+      "ruling": "overturned",
+      "final_verdict": "THESIS_WRONG",
+      "criticality": "headline",
+      "evidence": "I identified BOTH columns of tab:sim-poly-aic (twopool.tex:97-110) to the exact artifact. POLY column = provenance run sweeps:llm_head2k_poly_s1 (= simulation/results/sweeps/reports/llm_head2k_poly_s1.report.json). Query: select mean_ttft_ms,p99_ttft_ms,max_ttft_ms,mean_e2e_latency_ms,p99_e2e_latency_ms,mean_itl_ms,max_itl_ms,mean_output_token_throughput_per_user from provenance.llm_run_summary where run_id='sweeps:llm_head2k_poly_s1' -> 67.390 / 249.441 / 2539.914 / 1412.351 / 6878.768 / 6.782 / 180.699 / 160.655. Table prints 67.3 / 248 / 2,540 | 1,413 / 6,879 | 6.79 / 181 | 160.6. Five of the seven non-TTFT cells match to the digit (2,540; 6,879; 6.79; 181; 160.6) so the poly column IS this run; there is no other 2,000-request report anywhere on disk with p99_ttft in [247.5,248.5) (exhaustive scan of **/*.report.json). AIC column = defense/anim/data/g3_32b/reports/8b_tp1_s1.report.json: mean 68.212 -> 68.2, p99 307.364 -> 307, max 4517.568 -> 4,518, e2e 1589.464/8163.498 -> 1,590/8,163, itl 7.6705/347.732 -> 7.67/348, tok/s 141.955 -> 142.0. All eight cells match; this is the source-built runtime run the caption names, and it is NOT ingested in provenance. UNROUNDED RATIO: 307.364/249.441 = 1.23221 -> 1.23x -> +23.2%. Cross-check on the same-batch pair (both from simulation/results/sweeps, i.e. the DB rows): 306.729/249.441 = 1.22966 -> +23.0%. Both routes give +23%, never +24%. The +24% / 1.24x in the thesis is derived from the table's misprinted poly cell 248 (true 249.441); 249.441 is not obtainable as 248 under any rounding or truncation convention.",
+      "final_fix": "intro.tex:253 replace '$+24\\%$' with '$+23\\%$'. twopool.tex:61 replace 'TTFT p99 grows $1.24\\times$' with 'TTFT p99 grows $1.23\\times$'. twopool.tex:103 (tab:sim-poly-aic) replace the polynomial TTFT cell '67.3 / 248 / 2{,}540' with '67.4 / 249 / 2{,}540'. Justification: p99 307.364 (defense/anim/data/g3_32b/reports/8b_tp1_s1.report.json) / 249.441 (provenance.llm_run_summary, run_id='sweeps:llm_head2k_poly_s1') = 1.2322. The neighbouring claims in the same sentence are UNAFFECTED and correct: max TTFT 4517.568/2539.914 = 1.779 -> 1.8x, max ITL 347.732/180.699 = 1.924 -> 1.9x. DB action: ingest defense/anim/data/g3_32b/reports/8b_tp1_s1.report.json as the current source-built AIC steady run and mark sweeps:llm_head2k_aic_s1 superseded (its max_ttft 7598.1 is the wheel-based instrumentation artifact the thesis itself disowns)."
+    },
+    {
+      "line": 311,
+      "quote": "AIC has no usable fallback (its speed-of-light bound is ${\\approx}5.9\\times$ optimistic)",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "supporting",
+      "evidence": "The artifact exists on disk and was simply not ingested: collector_artifacts/phaseB_fallback_trace/result.txt records, for rtx_pro_6000_server vllm 0.22.0 at b=1 s=784 n=16 d=72 bf16: 'SOL -> 0.00605 ms (speed-of-light bound)' and 'rtx_5090 measured silicon, same shape: 0.03580 ms'. 0.03580/0.00605 = 5.917 -> ~5.9. aiconfigurator.tex:37-39 quotes 0.0061 (= 0.00605 rounded) and 0.0358 (exact). The SILICON/HYBRID/EMPIRICAL hard-failure half of the claim is recorded verbatim in the same artifact.",
+      "final_fix": "NO EDIT. The claim is reproduced exactly from collector_artifacts/phaseB_fallback_trace/result.txt. DB action: ingest that artifact into provenance.collector_scalar. Advisory (do NOT act on it as an edit): the later locked-clock recollection in provenance.collector_kernel_perf (select latency_ms from provenance.collector_kernel_perf where op_name='encoder_attention' and batch_size=1 and isl=784 -> 0.045568) gives 0.045568/0.00605 = 7.53x at that shape, i.e. the thesis's 5.9x is the CONSERVATIVE figure. Weakening 'approximately 5.9x' to 'roughly 6x' would be defensible prose but is not required."
+    },
+    {
+      "line": 380,
+      "quote": "A spot-check pricing the 235B flagship at tensor-parallel~8 on the same shipped H100 data finds its saturation knee one swept octave below the 8B's",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "supporting",
+      "evidence": "The first pass queried provenance.runs.model, which holds FORECAST model names (timesfm/chronos/toto/naive/ewma/holt_winters/arima/kalman/prophet) -- not LLM names. The 235B sweep IS in the DB: 26 rows matching run_id 'misc:235b_tp8_%', with provenance.runs.tp = 8. Query: select run_id,p99_itl_ms from provenance.llm_run_summary where run_id like 'misc:235b_tp8_s1' or run_id like 'misc:235b_tp8_s2' -> s1 = 87.8634 ms (< 100 ms bound, FEASIBLE), s2 = 213.0439 ms (> 100, INFEASIBLE) => knee at s=1. 8B: select run_id,p99_itl_ms from provenance.llm_run_summary where run_id like 'sweeps:llm_head2k_aic_s%' -> s2 = 67.3340 (feasible), s3 = 109.5126 (infeasible) => knee at s=2. s=1 is exactly one swept octave below s=2. Claim holds.",
+      "final_fix": "NO EDIT at intro.tex:380. FLAG FOR THE twopool CHAPTER REVIEW (out of scope here, do not edit blind): twopool.tex:76-82 quotes the 235B spot-check as 'TTFT p99 of 398 / 1,402 ms at 1x/4x the trace rate' and 'ITL p99 already 87.7 ms'. Neither reproduces: provenance misc:235b_tp8_s1 gives TTFT p99 388.056 / ITL p99 87.863, and the on-disk defense/anim/data/g3_32b/reports/235b_tp8_s1.report.json gives 387.372 / 86.153; misc:235b_tp8_s4 gives TTFT p99 20530.9, not 1,402. The 8B halves of the same sentence DO reproduce (307 = 307.364, 882 = 882.077 at sweeps:llm_head2k_aic_s4). The intro's octave claim is robust to all three candidate 235B values (every one is < 100 ms at s=1 and the s=2 value is 213 ms), so the intro sentence stands regardless of how twopool is reconciled."
+    },
+    {
+      "line": 431,
+      "quote": "The full set (21.4 million rows, each a point, nine quantiles, and the realized value) is archived with the metric tables",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "upheld",
+      "final_verdict": "INSUFFICIENT_DATA",
+      "criticality": "supporting",
+      "evidence": "select count(*) from provenance.forecast -> 16,657,524. This is an INGEST GAP, confirmed: select coalesce(mode,'cov'),resolution,model,count(*) from provenance.forecast group by 1,2,3 shows covariate-mode point rows present ONLY at 15s (chronos/timesfm/toto 161,232 each + ewma 38,388 = 522,084), whereas provenance.forecast_metrics carries cov-mode metrics at ALL FIVE resolutions (2,080 rows x 5). I counted the ON-DISK archive instead: pyarrow row counts over predictors/results/*.parquet = 16,734,300, plus the reassembled covariate parquets (cat chronos_covariates.parquet.gz.part0* | gunzip) chronos 2,593,680 + toto 2,675,520 = 5,269,200. Grand total 22,003,500. Excluding the three ewma_cal_* calibration ablations (3 x 38,388): 21,888,336. Further excluding the eight *_expctx extended-context ablations (8 x 40,308): 21,565,872. Every plausible inclusion rule lands in 21.5-22.0M, i.e. the thesis's 21.4M is of the right magnitude and leading digits, but I cannot reproduce 21.4 exactly without the author's inclusion manifest.",
+      "final_fix": "NO EDIT. Critically: the DB's 16,657,524 must NOT be substituted for 21.4 million -- it is 5.3M short purely because the covariate-mode point partitions at 1s/30s/45s/1min were never ingested, and the on-disk archive the sentence actually refers to holds 21.5-22.0M rows. DB action: ingest the remaining cov-mode partitions of provenance.forecast, then re-adjudicate the exact digit. If a precise figure is wanted before that, the author should state the inclusion rule; 'over 21 million rows' would be a safe weakening."
+    },
+    {
+      "line": 448,
+      "quote": "unlocked consumer-GPU clocks silently inflate collected data by ${\\approx}17\\%$ while leaving validation ratios unchanged",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "upheld",
+      "final_verdict": "INSUFFICIENT_DATA",
+      "criticality": "supporting",
+      "evidence": "aiconfigurator.tex:84 states the ~17% dataset was RECOLLECTED at locked clocks, i.e. the unlocked collection was replaced, not archived. I tested the only genuinely controlled pair in the DB: select source_path,n_images,mean_ms,sm_clock_mhz from provenance.collector_encoder_fn where source_path like '%anchor_sdpa%' -> anchor_sdpa_5x50.json and anchor_sdpa_locked2400.json agree to within 0.2% at every n_images (e.g. n=1: 11.2170 vs 11.3238; n=64: 511.2617 vs 511.6829) and BOTH sit at 2377-2400 MHz -- this is a locked-vs-locked repeatability pair, not the locked-vs-unlocked pair. The first pass's proxy (burst_anchor_all at 2887 MHz vs fn_multires at ~2392 MHz) crosses engine and probe as well as clock, so its 11-19% spread is not a clean measurement of the clock effect. The one shape where an unlocked and a locked measurement of the SAME kernel both survive (encoder_attention b=1 s=784: 0.03580 ms in phaseB_fallback_trace vs 0.045568 ms in provenance.collector_kernel_perf phaseC) implies the unlocked run was 27.3% faster, not 17% -- but that is a single microbenchmark shape across two different collection phases, far too thin to overturn a dataset-level average.",
+      "final_fix": "NO EDIT. There is no archived unlocked dataset to check the ~17% against, and the fragmentary proxies disagree with each other (11-19% via the encoder_fn proxy, 27% via the one surviving kernel shape), so none of them justifies replacing the number. If the pre-relock collection cannot be recovered, the honest remedy is to WEAKEN rather than restate: 'inflate collected data by well over 10%' would be defensible. DB action: locate and ingest the pre-relock collection if it still exists in any backup."
+    },
+    {
+      "line": 476,
+      "quote": "a broader 560-cell target-time grid located the operating point",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "supporting",
+      "evidence": "The target-time grid is deliberately absent from provenance (select actuation,count(*) from provenance.factorial_cell group by 1 -> issue-time 1,172 only; closedloop.tex:83 declares the target-time grid superseded by the issue-time rebuild) but it is intact on disk. wc -l simulation/results/cells_44.jsonl = 560 and wc -l simulation/results/results_44.jsonl = 560, exactly. Sample cell: {\"window\":\"burst4\",\"resolution\":\"15s\",\"rho\":20,\"cold_start_s\":45,\"hysteresis_min\":3,\"policy\":\"forecast\",\"quantile\":\"p90\",\"model\":\"toto\"} -- matching the closedloop.tex:81-83 description (p50 + reactive + four capacity ratings + a 300 s target-time lead).",
+      "final_fix": "NO EDIT. 560 is exact. DB action (optional): ingest simulation/results/{cells_44,results_44}.jsonl into provenance.factorial_cell with actuation='target-time' and is_current=false so the superseded grid is auditable rather than invisible."
+    },
+    {
+      "line": 514,
+      "quote": "at Qwen3-VL's full DeepStack payload the \\SI{588}{\\milli\\second} floor and the 0.62$\\times$ result assume an embedding-only handoff or a ${\\geq}100$\\,Gbps fabric",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "headline",
+      "evidence": "The sensitivity replay exists: simulation/results/aggregate44/fc_p90_L30_ds4.jsonl.stats.json, logged in progress/results-ledger.md (2026-07-09, commit 337211e) with command trace_to_two_pool.py --handoff-gbps 6.25, i.e. the 4x DeepStack payload at 25 Gbps expressed by linearity as the 1x payload at 6.25 Gbps. Its contents: handoff_gbps 6.25, handoff_ms.p99 = 1087.406, encoder_delay_ms.p99 = 1403.774. Against the baseline embedding-only run (provenance.composed_e2e, week/fc_chronos: enc_p99_ms = 588.4) this is the 588 -> 1,404 ms degradation closedloop.tex:586-594 describes. The '>=100 Gbps restores the quoted numbers exactly' half is an exact linearity identity, not an empirical claim: 4x payload / 100 Gbps = 1x payload / 25 Gbps, so the 588 ms floor and hence the 0.62x ratio are recovered unchanged. The DB's own confirmation of the two headline numbers stands: composed_e2e enc_p99_ms 588.4, and 2.41M/3.87M worker-seconds = 0.6228 -> 0.62x.",
+      "final_fix": "NO EDIT. Verified against simulation/results/aggregate44/fc_p90_L30_ds4.jsonl.stats.json. DB action: add a bandwidth/payload dimension (or an arm label such as 'ds4_25gbps') to provenance.composed_e2e and ingest this stats file, so the conditional is queryable rather than only ledger-documented."
+    },
+    {
+      "line": 516,
+      "quote": "since on the default 25\\,Gbps link transfer alone violates the bound for every policy",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "headline",
+      "evidence": "Same artifact, simulation/results/aggregate44/fc_p90_L30_ds4.jsonl.stats.json: encoder_delay_ms.p99 = 1403.774 ms against the thesis's 1,000 ms encoder-delay p99 bound -- a violation by the WINNING policy (fc_p90_L30, the best schedule in the thesis). handoff_ms.p99 = 1087.406 ms already exceeds 1,000 ms on its own, which is what makes 'transfer alone' literally true. The 'for every policy' universal is sound without needing a run per policy: the handoff term is RTT + bytes/bandwidth, a per-request function of payload and link speed that is independent of the worker schedule, so the 1,087 ms p99 handoff floor is common to every policy including the deployable static fleet -- exactly the argument closedloop.tex:590-594 makes.",
+      "final_fix": "NO EDIT. encoder_delay p99 1,403.774 ms > 1,000 ms bound and handoff p99 1,087.406 ms > 1,000 ms, both read from simulation/results/aggregate44/fc_p90_L30_ds4.jsonl.stats.json. Same DB ingest action as line 514."
+    },
+    {
+      "line": 526,
+      "quote": "language-pool results characterize the 8B model at TP1 but deploy it at TP2$\\times$2 (the burst-feasible shape), with a 235B-TP8 spot-check",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "supporting",
+      "evidence": "Same first-pass error as line 380 (runs.model queried instead of run_id/tp). select run_id,tp from provenance.runs where run_id like 'misc:235b_tp8_%' returns 26 rows, all with tp = 8, sourced from defense/anim/data/g3_32b/reports/235b_tp8_*.report.json. The first pass already accepted the TP1-characterisation and TP2x2-deployment halves, and the only reason it withheld CONFIRMED was the supposedly missing 235B-TP8 run, which is present.",
+      "final_fix": "NO EDIT. All three components of the sentence are represented in provenance: TP1 characterisation (sweeps:llm_head2k_aic_*), TP2x2 deployment shape (runs with tp=2,n_replicas=2), and the 235B-TP8 spot-check (misc:235b_tp8_*, 26 runs, tp=8)."
+    },
+    {
+      "line": 536,
+      "quote": "reproduce the simulated verdicts in both directions with TTFT p99 within 1.1--6.8\\%",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "headline",
+      "evidence": "The live arm is recoverable: simulation/results/live51/live_runs/{live_fc,live_re}/profile_export_aiperf.json. live_fc time_to_first_token.p99 = 695.16032053 ms (3,092 requests); live_re time_to_first_token.p99 = 3531.453221559999 ms (3,089 requests). Offline twins from the DB: select run_id,p99_ttft_ms from provenance.llm_run_summary where run_id like 'live:twin%' -> live:twin_fc_p90_cap4 = 651.1395370000973, live:twin_re = 3494.725887000095. UNROUNDED deltas, taken from the raw values and NOT from the table's rounded cells: forecast (695.16032 - 651.13954)/651.13954 = +6.7607% -> +6.8%; reactive (3531.45322 - 3494.72589)/3494.72589 = +1.05094% -> +1.1% at one decimal place under round-half-up. The band 1.1--6.8% is exactly right.",
+      "final_fix": "NO EDIT. This also independently re-confirms the standing precedent: the internal-defects entry proposing 'within 1.1--6.8\\%' -> 'within 1.0--6.8\\%' (intro.tex:536, plus validation.tex:72/83/97/159) is WRONG and must not be applied. It was derived by recomputing 36/3495 from the table's already-rounded cells; the unrounded live value is 3531.4532, giving 1.0509% which rounds to 1.1%, not 1.0%."
+    },
+    {
+      "line": 537,
+      "quote": "sub-bound for the forecast policy, 11.5 versus 9.7\\,ms",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "supporting",
+      "evidence": "The first pass read the WRONG COLUMN. tab:val-anchor's caption defines ITL p99 as (RequestLatency - TTFT)/(OSL - 1), which is aiperf's TPOT definition -- and provenance.llm_run_summary stores exactly that in p99_tpot_ms, a column the first pass did not use (it used p99_itl_ms, the per-token-gap metric, hence its spurious 5.13/5.29 ms). Query: select run_id,p99_tpot_ms,p99_itl_ms from provenance.llm_run_summary where run_id in ('live:twin_fc_p90_cap4','live:twin_re') -> live:twin_fc_p90_cap4 p99_tpot_ms = 9.718327791667738 -> 9.7 ms, matching the thesis exactly (its p99_itl_ms is 5.2875, the wrong metric). Live side: simulation/results/live51/live_runs/live_fc/profile_export_aiperf.json inter_token_latency.p99 = 11.469605181217391 -> 11.5 ms. The table's stated delta also checks: 11.4696 - 9.7183 = 1.7513 -> +1.8 ms. Both values are below the 100 ms bound, so the 'sub-bound' verdict is correct in both columns.",
+      "final_fix": "NO EDIT. Both numbers reproduce to the published precision from provenance.llm_run_summary.p99_tpot_ms (9.7183) and the archived aiperf export (11.4696). DB action: none required, but the ingest documentation should note that tab:val-anchor's 'ITL p99' maps to p99_tpot_ms, not p99_itl_ms, to stop this recurring."
+    },
+    {
+      "line": 538,
+      "quote": "\\emph{above} the \\SI{100}{\\milli\\second} bound for the reactive policy, 150.7 versus 152.7\\,ms",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "supporting",
+      "evidence": "Same column correction as line 537. select run_id,p99_tpot_ms from provenance.llm_run_summary where run_id='live:twin_re' -> 152.68107776924109 -> 152.7 ms, matching the thesis exactly (its p99_itl_ms is 160.2596, the wrong metric, which is what produced the first pass's phantom 8 ms discrepancy). Live: simulation/results/live51/live_runs/live_re/profile_export_aiperf.json inter_token_latency.p99 = 150.74457055235087 -> 150.7 ms. The table's delta also checks: (150.74457 - 152.68108)/152.68108 = -1.2683% -> -1.3%. Both values exceed 100 ms, so the 'above the bound in both directions' verdict is correct.",
+      "final_fix": "NO EDIT. Both numbers reproduce exactly: 152.7 = provenance.llm_run_summary.p99_tpot_ms for live:twin_re (152.68108); 150.7 = the archived aiperf inter_token_latency.p99 (150.74457)."
+    },
+    {
+      "line": 539,
+      "quote": "and provisioned replica-time within 8\\% (Chapter~\\ref{cap:validation})",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "headline",
+      "evidence": "The live replica-seconds are recoverable by integrating the live worker count over the manager event log. From simulation/results/live51/live_runs/{live_fc,live_re}/manager.jsonl, integrating n_live piecewise over t_wall between the first spawn and shutdown: live_fc = 6062.954568 replica-seconds (span 1643.6 s), live_re = 1798.852786 (span 1644.5 s). These reproduce tab:val-anchor's live cells 6,063 and 1,799 to the unit. Offline side from the DB: select run_id,decode_worker_seconds from provenance.llm_run_summary where run_id like 'live:twin%' -> live:twin_fc_p90_cap4 = 6399.81122840004 -> 6,400, live:twin_re = 1948.1905283120368 -> 1,948. UNROUNDED deltas: forecast (6062.95457 - 6399.81123)/6399.81123 = -5.2635%; reactive (1798.85279 - 1948.19053)/1948.19053 = -7.6654%. Both magnitudes are strictly under 8%, so the intro's claim is correct.",
+      "final_fix": "NO EDIT at intro.tex:539. FLAG FOR THE validation CHAPTER REVIEW (out of scope here): validation.tex:72 prints the reactive replica-seconds delta as $-7.6\\%$, but the unrounded value is -7.6654%, which rounds to -7.7%. That is a validation.tex rounding nit only; it does not touch the intro's 'within 8%' claim, which holds under either printing. DB action: ingest the two manager.jsonl replica-time integrals and the two aiperf profile exports as a 'live' arm so the whole of tab:val-anchor becomes DB-checkable instead of half-checkable."
+    }
+  ],
+  "rejected_fixes": "1) REJECTED -- intro.tex:536 'within 1.1--6.8\\%' -> 'within 1.0--6.8\\%' (and the propagated edits to validation.tex:72, 83, 97, 159 changing the +1.1% cell to +1.0%). This is the internal-defects entry for intro.tex:536 and it would REPLACE A CORRECT NUMBER WITH A WRONG ONE. It was computed as 36/3495 from the table's already-rounded cells. The unrounded live value, read from simulation/results/live51/live_runs/live_re/profile_export_aiperf.json, is 3531.453222 ms; against the DB's unrounded offline twin 3494.725887 ms the delta is +1.05094%, which rounds to +1.1%. Applying this 'fix' is forbidden. 2) REJECTED -- editing intro.tex:431's '21.4 million rows' toward provenance.forecast's count of 16,657,524. That count is 5.3M short only because the covariate-mode point partitions at 1s/30s/45s/1min were never ingested; the on-disk archive the sentence refers to totals 21,565,872-22,003,500 rows depending on whether the ewma_cal and expctx ablations are included. 3) REJECTED -- editing intro.tex:537 or :538 toward provenance.llm_run_summary.p99_itl_ms (5.29 ms forecast / 160.26 ms reactive). Those are a DIFFERENT METRIC. tab:val-anchor explicitly defines its ITL p99 as (RequestLatency-TTFT)/(OSL-1), which is stored in the p99_tpot_ms column (9.7183 and 152.6811) and matches the thesis exactly. 4) REJECTED -- treating intro.tex:380 / :526 as unsupported and softening or deleting the 235B-TP8 spot-check. The runs are in the DB under run_id 'misc:235b_tp8_%' with tp=8; the first pass missed them by filtering on runs.model, which stores forecast-model names. 5) REJECTED -- the first pass's line-253 conclusion that 'the thesis number is computed from its own current table and should stand'. Both columns of that table are traceable to specific artifacts and their unrounded ratio is 1.2322, not 1.24; the table's polynomial p99 cell (248) is itself a transcription error for 249.441 and must not be used to defend the +24%.",
+  "notes": "Method: every claim was re-queried against the live DB at localhost:5433 (schema provenance), and where the DB lacked a table I went to the archived artifact on disk rather than declaring the claim unverifiable. That single change of method flipped 9 of the 12 INSUFFICIENT_DATA verdicts to CONFIRMED. Three systematic first-pass errors account for almost all of them: (a) filtering provenance.runs.model, which holds FORECAST model names, when looking for LLM models -- this hid the entire 26-run 235B-TP8 sweep (lines 380, 526); (b) reading llm_run_summary.p99_itl_ms where tab:val-anchor's definition maps to p99_tpot_ms -- this manufactured an 8 ms 'discrepancy' that does not exist (lines 537, 538); (c) treating 'not in the DB' as 'not verifiable', when the live aiperf exports, the manager.jsonl replica-time logs, the 560-cell target-time grid, the 4x-payload sensitivity replay, and the SOL fallback trace are all archived on disk (lines 311, 476, 514, 516, 536, 539). Only ONE genuine thesis defect survived adversarial scrutiny: line 253's +24%, which traces to a misprinted polynomial p99 cell in tab:sim-poly-aic (248 for the archived 249.441). I proved this by identifying both table columns to their exact artifacts and matching 5 and 8 independent cells respectively, and by checking that the same-batch pair in the DB gives +23.0% while the cross-batch pair gives +23.2% -- neither route can produce +24%. Two claims remain genuinely undecidable and I upheld them as INSUFFICIENT_DATA with explicit NO-EDIT instructions: the 21.4M forecast-row count (bracketed by the on-disk archive at 21.6-22.0M but not exactly reproducible without the author's inclusion rule) and the ~17% unlocked-clock inflation (the unlocked dataset was recollected and overwritten; the surviving proxies disagree with each other, 11-19% versus 27%, so none of them justifies a number change -- if it must be addressed, weaken the prose rather than restate the figure). Three follow-on defects OUTSIDE this chapter were uncovered and are flagged for their own chapter reviews, not acted on here: twopool.tex:76-82's 235B TTFT/ITL figures (398/1,402/87.7) reproduce from no artifact I could find; twopool.tex tab:sim-poly-aic's polynomial cells 248 and 67.3 should be 249 and 67.4; and validation.tex:72's -7.6% should be -7.7% (unrounded -7.6654%)."
+}

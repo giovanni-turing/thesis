@@ -1,0 +1,1266 @@
+{
+  "chapter": "twopool",
+  "claims": [
+    {
+      "line": 61,
+      "anchor": "sec:sim-timing",
+      "quote": "TTFT p99 grows $1.24\\times$ and the maximum TTFT and inter-token latency roughly double ($1.8\\times$ and $1.9\\times$)",
+      "numbers": [
+        "1.24",
+        "1.8",
+        "1.9"
+      ],
+      "metric": "ttft_p99_ratio_aic_over_poly",
+      "subject": "language pool, steady 2000-request window, AIC h100_sxm vs mocker polynomial timing",
+      "assertion": "Switching from polynomial to AIC-calibrated timing multiplies TTFT p99 by 1.24x and roughly doubles max TTFT (1.8x) and max ITL (1.9x).",
+      "db_check": "provenance.llm_run_summary JOIN runs ON runs.id: compare p99_ttft_ms for experiment='twopool' window_name='steady' model in ('poly','aic_h100_sxm'), is_current; ratio must equal 307/248=1.238.",
+      "criticality": "headline"
+    },
+    {
+      "line": 58,
+      "anchor": "tab:sim-poly-aic",
+      "quote": "compares the two timing models on the same 2{,}000-request steady window (raw arrivals, identical topology)",
+      "numbers": [
+        "2000"
+      ],
+      "metric": "requests",
+      "subject": "steady window used for the polynomial-vs-AIC timing comparison",
+      "assertion": "The timing comparison window contains 2,000 requests.",
+      "db_check": "provenance.runs WHERE experiment='twopool' AND window_name='steady' -> llm_run_summary.completed_requests = 2000.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 70,
+      "anchor": "sec:sim-timing",
+      "quote": "identical p99, maximum TTFT 7.6 vs.\\ 4.5~s on identical perf data",
+      "numbers": [
+        "7.6",
+        "4.5"
+      ],
+      "metric": "max_ttft_s",
+      "subject": "language pool, wheel-based AIC runtime vs source-built in-core runtime, same perf data",
+      "assertion": "The wheel-based Python-callback runtime inflated max TTFT to 7.6 s versus 4.5 s for the in-core source-built runtime, with identical p99.",
+      "db_check": "provenance.runs filtered on actuation/engine build variant (wheel vs source-built) joined to llm_run_summary; max TTFT is not a listed column -- UNVERIFIABLE unless measured_request holds per-request TTFT to take max().",
+      "criticality": "supporting"
+    },
+    {
+      "line": 103,
+      "anchor": "tab:sim-poly-aic",
+      "quote": "TTFT avg / p99 / max (ms) & 67.3 / 248 / 2{,}540 & 68.2 / 307 / 4{,}518",
+      "numbers": [
+        "67.3",
+        "248",
+        "2540",
+        "68.2",
+        "307",
+        "4518"
+      ],
+      "metric": "ttft_avg_p99_max_ms",
+      "subject": "language pool, steady 2000-request window, 2 workers, offline KV router; polynomial vs AIC h100",
+      "assertion": "TTFT avg/p99/max is 67.3/248/2,540 ms under polynomial timing and 68.2/307/4,518 ms under AIC h100 timing.",
+      "db_check": "provenance.llm_run_summary.p99_ttft_ms JOIN runs WHERE experiment='twopool' AND window_name='steady' AND model IN ('poly','aic_h100_sxm'); avg/max via measured_request aggregation.",
+      "criticality": "headline"
+    },
+    {
+      "line": 104,
+      "anchor": "tab:sim-poly-aic",
+      "quote": "Request latency avg / p99 (ms) & 1{,}413 / 6{,}879 & 1{,}590 / 8{,}163",
+      "numbers": [
+        "1413",
+        "6879",
+        "1590",
+        "8163"
+      ],
+      "metric": "request_latency_avg_p99_ms",
+      "subject": "language pool, steady window, polynomial vs AIC h100 timing",
+      "assertion": "End-to-end request latency avg/p99 is 1,413/6,879 ms (polynomial) versus 1,590/8,163 ms (AIC).",
+      "db_check": "provenance.measured_request aggregated per run_id for the two steady-window runs; no dedicated column in llm_run_summary.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 105,
+      "anchor": "tab:sim-poly-aic",
+      "quote": "Inter-token latency avg / max (ms) & 6.79 / 181 & 7.67 / 348",
+      "numbers": [
+        "6.79",
+        "181",
+        "7.67",
+        "348"
+      ],
+      "metric": "itl_avg_max_ms",
+      "subject": "language pool, steady window, polynomial vs AIC h100 timing",
+      "assertion": "Inter-token latency avg/max is 6.79/181 ms (polynomial) versus 7.67/348 ms (AIC).",
+      "db_check": "provenance.llm_run_summary.p99_itl_ms for the same runs (avg/max need measured_request); check max ratio 348/181=1.92 against the claimed 1.9x.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 106,
+      "anchor": "tab:sim-poly-aic",
+      "quote": "Output tok/s per user (avg) & 160.6 & 142.0",
+      "numbers": [
+        "160.6",
+        "142.0"
+      ],
+      "metric": "output_tok_per_s_per_user",
+      "subject": "language pool, steady window, polynomial vs AIC h100 timing",
+      "assertion": "Average per-user output token rate is 160.6 tok/s under polynomial and 142.0 tok/s under AIC timing.",
+      "db_check": "Derived quantity; recompute from provenance.measured_request (output tokens / decode span) for the two steady runs. Cross-check against ITL avg 6.79/7.67 ms (implies 147/130 tok/s) -- consistency check.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 77,
+      "anchor": "sec:sim-timing",
+      "quote": "TTFT p99 of 398 / 1{,}402~ms at $1\\times$/$4\\times$ the trace rate against the 8B's 307 / 882",
+      "numbers": [
+        "398",
+        "1402",
+        "307",
+        "882"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "Qwen3-VL-235B-A22B at TP8 (MoE-TP 8) vs Qwen3-VL-8B at TP1, same H100 data/window/topology, speedups s=1 and s=4",
+      "assertion": "The 235B flagship reaches TTFT p99 of 398 ms at 1x and 1,402 ms at 4x the trace rate, versus 307 ms and 882 ms for the 8B.",
+      "db_check": "provenance.llm_run_summary.p99_ttft_ms JOIN runs WHERE experiment='twopool' AND model IN ('qwen3vl-235b-a22b','qwen3vl-8b') AND tp IN (8,1) AND window_name='steady' AND rho/speedup IN (1,4).",
+      "criticality": "headline"
+    },
+    {
+      "line": 79,
+      "anchor": "sec:sim-timing",
+      "quote": "with $2\\times$ the decode latency throughout (TPOT 14.9 vs.\\ 7.9~ms; 87 vs.\\ 142 output tok/s per user)",
+      "numbers": [
+        "2",
+        "14.9",
+        "7.9",
+        "87",
+        "142"
+      ],
+      "metric": "tpot_ms",
+      "subject": "Qwen3-VL-235B TP8 vs Qwen3-VL-8B TP1, steady window",
+      "assertion": "The 235B has roughly 2x the decode latency of the 8B: TPOT 14.9 vs 7.9 ms and 87 vs 142 output tok/s per user.",
+      "db_check": "provenance.llm_run_summary.p99_itl_ms plus measured_request-derived TPOT for the two model runs. NOTE consistency: 142/87=1.63 not 2x, and 1000/7.9=127 tok/s != 142 -- verify the tok/s convention.",
+      "criticality": "headline"
+    },
+    {
+      "line": 81,
+      "anchor": "sec:sim-timing",
+      "quote": "the flagship's ITL p99 is already \\SI{87.7}{\\milli\\second} at the trace's own rate",
+      "numbers": [
+        "87.7"
+      ],
+      "metric": "p99_itl_ms",
+      "subject": "Qwen3-VL-235B-A22B TP8, steady window at s=1",
+      "assertion": "The 235B flagship's ITL p99 is 87.7 ms at the trace's own recorded rate, just under the 100 ms bound.",
+      "db_check": "provenance.llm_run_summary.p99_itl_ms JOIN runs WHERE model='qwen3vl-235b-a22b' AND tp=8 AND window_name='steady' AND speedup=1.",
+      "criticality": "headline"
+    },
+    {
+      "line": 82,
+      "anchor": "sec:sim-timing",
+      "quote": "its knee sits at $s{=}1$ ($2.8$~req/s) against the 8B's $s{=}2$: decoder scale halves the language pool's operating envelope",
+      "numbers": [
+        "1",
+        "2.8",
+        "2"
+      ],
+      "metric": "saturation_knee_speedup",
+      "subject": "Qwen3-VL-235B TP8 vs 8B TP1 language pool, steady window, evaluation SLA",
+      "assertion": "Under the evaluation SLA the 235B's saturation knee is s=1 (2.8 req/s) versus s=2 for the 8B, halving the operating envelope.",
+      "db_check": "provenance.factorial_cell (feasible) or llm_run_summary sweep over speedup for each model; largest speedup with p99_ttft_ms<1000 AND p99_itl_ms<100. Offered load 2.8 req/s must equal the steady window's 2.77 req/s.",
+      "criticality": "headline"
+    },
+    {
+      "line": 84,
+      "anchor": "sec:sim-timing",
+      "quote": "the ViT \\emph{and} its 4096-dimensional projector output are identical between the 8B and the 235B",
+      "numbers": [
+        "4096"
+      ],
+      "metric": "projector_dim",
+      "subject": "Qwen3-VL vision tower/projector, 8B vs 235B",
+      "assertion": "The vision tower and its 4096-dimensional projector output are identical across the 8B and 235B family members.",
+      "db_check": "UNVERIFIABLE: architectural property of the model family, not an experimental artifact in provenance; check against the AIC encoder graph config in collector artifacts.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 118,
+      "anchor": "sec:sim-encoder",
+      "quote": "every factoring of $N$ images into (batch, images-per-request) --- $(1,64)$, $(2,32)$, $(64,1)$ --- returns the same latency to the microsecond",
+      "numbers": [
+        "1",
+        "64",
+        "2",
+        "32",
+        "64",
+        "1"
+      ],
+      "metric": "encoder_forward_latency_invariance",
+      "subject": "AIC encoder graph probe on rtx_5090, N=64 images factored across batch dimensions",
+      "assertion": "AIC's encoder graph prices a forward purely by total image count: all factorings of 64 images give identical latency to the microsecond.",
+      "db_check": "provenance.collector_fn / encoder cost-model probe artifacts: query priced latency for (batch,images) pairs summing to 64 and assert equality.",
+      "criticality": "headline"
+    },
+    {
+      "line": 122,
+      "anchor": "sec:sim-encoder",
+      "quote": "$f(1) = \\SI{8.16}{\\milli\\second}$ per image alone versus $f(64) = \\SI{316.4}{\\milli\\second}$",
+      "numbers": [
+        "1",
+        "8.16",
+        "64",
+        "316.4"
+      ],
+      "metric": "encoder_forward_ms",
+      "subject": "AIC encoder cost model on rtx_5090, Qwen3-VL ViT at 448^2",
+      "assertion": "A single-image encoder forward costs 8.16 ms and a 64-image forward costs 316.4 ms.",
+      "db_check": "provenance.collector_fn WHERE gpu='rtx_5090' AND op='vit_forward' AND batch IN (1,64) -> latency_ms.",
+      "criticality": "headline"
+    },
+    {
+      "line": 124,
+      "anchor": "sec:sim-encoder",
+      "quote": "\\SI{4.94}{\\milli\\second} per image amortized, a $1.65\\times$ throughput gain that amounts to a ${\\sim}\\SI{3.2}{\\milli\\second}$ fixed per-forward overhead",
+      "numbers": [
+        "4.94",
+        "1.65",
+        "3.2"
+      ],
+      "metric": "encoder_amortized_ms_per_image",
+      "subject": "AIC encoder cost model, batch 64 vs batch 1",
+      "assertion": "Batching to 64 images amortizes to 4.94 ms/image, a 1.65x throughput gain implying a ~3.2 ms fixed per-forward overhead.",
+      "db_check": "Derived from collector_fn latencies: 316.4/64=4.944; 8.16/4.944=1.651; intercept (316.4-8.16)/63 slope -> a=3.27. Arithmetically self-consistent.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 127,
+      "anchor": "sec:sim-encoder",
+      "quote": "the realized gain is smaller and saturates by $N{\\approx}6$--$8$",
+      "numbers": [
+        "6",
+        "8"
+      ],
+      "metric": "batching_saturation_N",
+      "subject": "measured end-to-end encoder batching on HuggingFace-transformers and vLLM stacks, RTX 5090",
+      "assertion": "Measured end-to-end batching gain saturates at batch sizes of roughly 6 to 8 images.",
+      "db_check": "Physical-anchor collector artifacts (collector_artifacts/phaseE_physical_anchor) / provenance.collector_fn measured curve; find N where marginal throughput gain flattens.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 132,
+      "anchor": "sec:sim-encoder",
+      "quote": "up to a 64-image cap (the collected batch range, so no extrapolation)",
+      "numbers": [
+        "64"
+      ],
+      "metric": "dispatch_batch_cap",
+      "subject": "encoder pool dispatch policy in the workload converter",
+      "assertion": "Greedy FIFO dispatch batches up to a 64-image cap, matching the collected batch range.",
+      "db_check": "provenance.runs config for encoder experiments (dispatch cap parameter) and collector_fn max batch = 64.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 133,
+      "anchor": "sec:sim-encoder",
+      "quote": "a request exceeding the cap alone (the trace reaches $97^2 = \\num{9409}$ images)",
+      "numbers": [
+        "97",
+        "9409"
+      ],
+      "metric": "max_images_per_request",
+      "subject": "Azure trace, largest single request image count",
+      "assertion": "The largest single trace request carries 9,409 images (97 squared).",
+      "db_check": "provenance.measured_request or trace EDA table: max(images_per_request) over the full trace = 9409.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 144,
+      "anchor": "sec:sim-encoder",
+      "quote": "under the sequential alternative ... delay p99 plateaus at \\SI{2.9}{\\second} from 4 through 32 workers",
+      "numbers": [
+        "2.9",
+        "4",
+        "32"
+      ],
+      "metric": "encoder_delay_p99_s",
+      "subject": "encoder pool, sequential (non-chunk-parallel) dispatch, fastest-onset burst episode, worker counts 4-32",
+      "assertion": "Under sequential chunk dispatch, encoder delay p99 plateaus at 2.9 s from 4 through 32 workers, an irreducible service floor.",
+      "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms JOIN runs WHERE actuation='sequential_chunks' AND window_name = fastest-onset episode AND config_c BETWEEN 4 AND 32.",
+      "criticality": "headline"
+    },
+    {
+      "line": 147,
+      "anchor": "sec:sim-encoder",
+      "quote": "The largest request still costs ${\\approx}\\SI{46}{\\second}$ of kernel time (148 forwards: $147 \\times f(64) + f(1)$)",
+      "numbers": [
+        "46",
+        "148",
+        "147",
+        "64",
+        "1"
+      ],
+      "metric": "encoder_kernel_time_s",
+      "subject": "largest trace request (9,409 images) under the 64-image chunking policy",
+      "assertion": "The largest request costs about 46 s of encoder kernel time, split into 148 forwards (147 full 64-image forwards plus one single-image forward).",
+      "db_check": "Derived: 147*316.4+8.16 = 46,519 ms = 46.5 s; check 147*64+1 = 9409 against the trace max. Arithmetically consistent.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 151,
+      "anchor": "sec:sim-encoder",
+      "quote": "the policy changes nothing at the steady head (delay percentiles identical to three decimals)",
+      "numbers": [
+        "3"
+      ],
+      "metric": "encoder_delay_percentile_agreement",
+      "subject": "encoder pool, steady window, chunk-parallel vs sequential dispatch",
+      "assertion": "On the steady head the chunk-parallel and sequential dispatch policies give encoder delay percentiles identical to three decimals.",
+      "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms for the two dispatch policies on window_name='steady'; assert equality to 3 decimals.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 156,
+      "anchor": "sec:sim-encoder",
+      "quote": "post-merge vision embeddings of $196 \\times 4096$ bf16 values per image, ${\\approx}\\SI{1.6}{\\mega\\byte}$ per image, \\SI{194}{\\mega\\byte} for a 121-image request",
+      "numbers": [
+        "196",
+        "4096",
+        "1.6",
+        "194",
+        "121"
+      ],
+      "metric": "handoff_payload_mb",
+      "subject": "inter-pool handoff, main projector stream, Qwen3-VL",
+      "assertion": "The main projector stream is 196x4096 bf16 values (~1.6 MB) per image, i.e. 194 MB for a 121-image request.",
+      "db_check": "Derived: 196*4096*2 B = 1.606 MB; 121*1.606 = 194.3 MB. Arithmetically consistent; no DB row needed.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 159,
+      "anchor": "sec:sim-encoder",
+      "quote": "on a parameterized link (default \\SI{25}{Gbps}): \\SI{0.71}{\\milli\\second} at the median request of the steady window, \\SI{62}{\\milli\\second} at its 121-image maximum",
+      "numbers": [
+        "25",
+        "0.71",
+        "62",
+        "121"
+      ],
+      "metric": "handoff_transfer_ms",
+      "subject": "inter-pool handoff bound, steady window, 25 Gbps link",
+      "assertion": "The analytic handoff bound gives 0.71 ms at the median steady-window request and 62 ms at its 121-image maximum on a 25 Gbps link.",
+      "db_check": "Derived: 194 MB*8/25 Gbps = 62.2 ms. Median value implies ~1 image + RTT; verify median images/request for window_name='steady' in provenance.measured_request.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 165,
+      "anchor": "sec:sim-encoder",
+      "quote": "quadrupling the payload to ${\\approx}\\SI{6.4}{\\mega\\byte}$ per image (${\\approx}\\SI{250}{\\milli\\second}$ at the 121-image maximum on the default link)",
+      "numbers": [
+        "6.4",
+        "250",
+        "121"
+      ],
+      "metric": "deepstack_payload_mb",
+      "subject": "inter-pool handoff with three additional DeepStack projections, Qwen3-VL",
+      "assertion": "Including the three DeepStack projections quadruples the handoff payload to ~6.4 MB per image and ~250 ms at the 121-image maximum.",
+      "db_check": "Derived: 4*1.606 = 6.42 MB; 121*6.42*8/25 Gbps = 249 ms. Arithmetically consistent.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 171,
+      "anchor": "sec:sim-encoder",
+      "quote": "Chapter~\\ref{cap:closedloop}'s limitations quantify the $4\\times$-payload sensitivity on the week-scale aggregate",
+      "numbers": [
+        "4"
+      ],
+      "metric": "payload_sensitivity_factor",
+      "subject": "handoff payload sensitivity, week-scale aggregate run",
+      "assertion": "A 4x handoff payload sensitivity analysis is reported on the week-scale aggregate.",
+      "db_check": "provenance.composed_e2e for the week-scale aggregate run with a 4x-payload variant; compare e2e_p99_ms against the 1x-payload run.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 178,
+      "anchor": "sec:sim-encoder",
+      "quote": "the uniform 448\\textsuperscript{2} assumption of Chapter~\\ref{cap:aiconfigurator} stands",
+      "numbers": [
+        "448"
+      ],
+      "metric": "image_resolution_px",
+      "subject": "encoder cost model image-size assumption",
+      "assertion": "All encoder costing assumes uniform 448x448 images because the trace records no image sizes.",
+      "db_check": "provenance.runs.resolution = '448' for encoder experiments.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 180,
+      "anchor": "sec:sim-encoder",
+      "quote": "The ${\\sim}1.4$--$1.6\\times$ offset (and, at $896^2$, $1.14\\times$) earlier read as an AIC-versus-silicon gap",
+      "numbers": [
+        "1.4",
+        "1.6",
+        "896",
+        "1.14"
+      ],
+      "metric": "aic_vs_silicon_ratio",
+      "subject": "AIC encoder cost model vs measured RTX 5090 silicon, HuggingFace-transformers eager path",
+      "assertion": "AIC under-models the ViT by 1.4-1.6x at 448^2 and 1.14x at 896^2 relative to the HF-transformers eager path.",
+      "db_check": "provenance.collector_fn / v_corroboration comparing modelled vs measured encoder latency by resolution on gpu='rtx_5090'.",
+      "criticality": "headline"
+    },
+    {
+      "line": 185,
+      "anchor": "app:engine-sensitivity",
+      "quote": "the cost model matches to within $12.8\\%$ across the whole $N\\le64$ serving regime (a dense sweep of 69 batch sizes)",
+      "numbers": [
+        "12.8",
+        "64",
+        "69"
+      ],
+      "metric": "aic_vs_vllm_max_error_pct",
+      "subject": "AIC encoder cost model vs vLLM's own vision-tower implementation at 448^2, batch sizes 1..64",
+      "assertion": "Against vLLM's own vision tower at 448^2 the AIC cost model matches within 12.8% across a dense sweep of 69 batch sizes up to N=64.",
+      "db_check": "provenance.collector_fn WHERE engine='vllm' AND resolution='448' joined to modelled cost; max relative error over the 69 swept batch sizes; count rows = 69.",
+      "criticality": "headline"
+    },
+    {
+      "line": 200,
+      "anchor": "sec:sim-knees",
+      "quote": "the language pool must hold TTFT p99 $<\\SI{1}{\\second}$ \\emph{and} inter-token latency ... p99 $<\\SI{100}{\\milli\\second}$",
+      "numbers": [
+        "1",
+        "100"
+      ],
+      "metric": "sla_bounds",
+      "subject": "evaluation SLA for the language pool",
+      "assertion": "The evaluation SLA requires language-pool TTFT p99 below 1 s and ITL p99 below 100 ms.",
+      "db_check": "Definition, not a measurement; encoded as the feasibility predicate in provenance.factorial_cell.feasible -- verify the gate uses p99<1000 ms and p99 ITL<100 ms.",
+      "criticality": "headline"
+    },
+    {
+      "line": 203,
+      "anchor": "sec:sim-knees",
+      "quote": "first token within a second and at least 10~tokens/s for the worst percentile user); the vision pool must hold encoder delay p99 $<\\SI{1}{\\second}$",
+      "numbers": [
+        "10",
+        "1"
+      ],
+      "metric": "sla_bounds_vision",
+      "subject": "evaluation SLA for the vision pool and the ITL restatement",
+      "assertion": "The 100 ms ITL bound equals at least 10 tokens/s for the worst-percentile user, and the vision pool must hold encoder delay p99 below 1 s.",
+      "db_check": "Definition; verify provenance.factorial_cell.feasible gate for pool='encoder' uses encoder_delay_p99_ms<1000.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 211,
+      "anchor": "sec:sim-knees",
+      "quote": "Summing the two stage budgets gives ${\\approx}\\SI{2}{\\second}$ to first token at roughly the p98 level",
+      "numbers": [
+        "2",
+        "98"
+      ],
+      "metric": "union_budget_s",
+      "subject": "composed two-stage first-token budget",
+      "assertion": "Summing the two 1 s stage budgets yields a ~2 s first-token budget holding at roughly the p98 level (union bound over two p99s).",
+      "db_check": "Definition/union-bound arithmetic; cross-check against provenance.composed_e2e.e2e_p99_ms for the aggregate composed run.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 215,
+      "anchor": "sec:sim-knees",
+      "quote": "adding its replay-recorded encoder delay (recovered exactly, p99 \\SI{588}{\\milli\\second})",
+      "numbers": [
+        "588"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "aggregate composed run, encoder pool",
+      "assertion": "The aggregate composed run's replay-recorded encoder delay p99 is 588 ms.",
+      "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms JOIN runs WHERE experiment='composed_aggregate' AND is_current; or composed_e2e.enc_p99_ms.",
+      "criticality": "headline"
+    },
+    {
+      "line": 217,
+      "anchor": "sec:sim-knees",
+      "quote": "validated against the week replay to within 8\\% at p99: \\SI{706}{} modelled versus \\SI{651}{\\milli\\second} replayed",
+      "numbers": [
+        "8",
+        "706",
+        "651"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool, week replay, AIC-modelled prefill TTFT vs replay-measured TTFT",
+      "assertion": "AIC-modelled prefill TTFT p99 (706 ms) matches the week replay's measured TTFT p99 (651 ms) to within 8%.",
+      "db_check": "provenance.composed_e2e.ttft_p99_ms vs modelled value in llm_run_summary for the week replay. NOTE: (706-651)/651 = 8.45% > 8% -- verify the denominator convention.",
+      "criticality": "headline"
+    },
+    {
+      "line": 220,
+      "anchor": "sec:sim-knees",
+      "quote": "the ingress-to-first-token p99 is ${\\approx}\\SI{1.30}{\\second}$: the per-request joint reconstruction",
+      "numbers": [
+        "1.30"
+      ],
+      "metric": "e2e_p99_s",
+      "subject": "aggregate composed run, ingress-to-first-token per-request joint reconstruction",
+      "assertion": "The reconstructed ingress-to-first-token p99 is approximately 1.30 s.",
+      "db_check": "provenance.composed_e2e.e2e_p99_ms for the aggregate composed run WHERE is_current; expect ~1300 ms.",
+      "criticality": "headline"
+    },
+    {
+      "line": 222,
+      "anchor": "sec:sim-knees",
+      "quote": "A lower estimate of ${\\approx}\\SI{1.24}{\\second}$ follows from summing the replay's own \\emph{aggregate} TTFT tail, \\SI{651}{} rather than the modelled \\SI{706}{\\milli\\second}",
+      "numbers": [
+        "1.24",
+        "651",
+        "706"
+      ],
+      "metric": "e2e_p99_s_alt",
+      "subject": "aggregate composed run, marginal-sum sensitivity variant",
+      "assertion": "Using the replay's own aggregate TTFT tail (651 ms) instead of the modelled 706 ms gives a lower ingress-to-first-token p99 estimate of ~1.24 s.",
+      "db_check": "Derived: 588+651 = 1239 ms; 588+706 = 1294 ms. Check both against provenance.composed_e2e.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 227,
+      "anchor": "sec:sim-knees",
+      "quote": "close to the naive sum of the two marginals (${\\approx}\\SI{0.59}{}$ plus ${\\approx}\\SI{0.65}{}$--$\\SI{0.71}{\\second}$) rather than their max",
+      "numbers": [
+        "0.59",
+        "0.65",
+        "0.71"
+      ],
+      "metric": "marginal_p99_s",
+      "subject": "aggregate composed run, encoder and TTFT marginal p99s",
+      "assertion": "The composed first-token p99 is close to the naive sum of the marginals (0.59 s encoder plus 0.65-0.71 s TTFT), not their max.",
+      "db_check": "provenance.composed_e2e.enc_p99_ms (588) and ttft_p99_ms (651) plus modelled 706; verify sum consistency with the 1.24-1.30 s claims.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 230,
+      "anchor": "sec:sim-knees",
+      "quote": "because the two tails are positively correlated ($r{=}0.52$ on image-bearing requests)",
+      "numbers": [
+        "0.52"
+      ],
+      "metric": "pearson_r",
+      "subject": "per-request encoder delay vs prefill TTFT, image-bearing requests, aggregate composed run",
+      "assertion": "Encoder delay and prefill TTFT are positively correlated with r=0.52 across image-bearing requests.",
+      "db_check": "Recompute from provenance.measured_request (encoder_delay, ttft) for the composed aggregate run, filtered to images>0; Pearson r should be 0.52.",
+      "criticality": "headline"
+    },
+    {
+      "line": 232,
+      "anchor": "sec:sim-knees",
+      "quote": "It sits within the \\SI{2}{\\second} union budget but is roughly twice either per-stage marginal",
+      "numbers": [
+        "2",
+        "2"
+      ],
+      "metric": "e2e_vs_budget",
+      "subject": "aggregate composed run, ingress-to-first-token p99 vs 2 s union budget",
+      "assertion": "The reconstructed first-token p99 sits inside the 2 s union budget but is roughly twice either per-stage marginal.",
+      "db_check": "provenance.composed_e2e.e2e_p99_ms < 2000 AND ~2x max(enc_p99_ms, ttft_p99_ms).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 236,
+      "anchor": "sec:sim-knees",
+      "quote": "double Dynamo's default planner targets ($500/\\SI{50}{\\milli\\second}$, window-mean) applied as tail bounds",
+      "numbers": [
+        "500",
+        "50"
+      ],
+      "metric": "planner_default_targets_ms",
+      "subject": "Dynamo default SLA planner targets (TTFT/ITL, window-mean)",
+      "assertion": "Dynamo's default planner targets are 500 ms TTFT and 50 ms ITL on a window-mean basis; the thesis SLA doubles them as tail bounds.",
+      "db_check": "UNVERIFIABLE from provenance: a property of Dynamo's planner defaults; verify against ai-dynamo/dynamo planner config source.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 246,
+      "anchor": "sec:sim-knees",
+      "quote": "Two windows are swept at the locked 2-encoder $\\times$ 2-LLM topology",
+      "numbers": [
+        "2",
+        "2"
+      ],
+      "metric": "topology_workers",
+      "subject": "locked simulation topology for the knee sweeps",
+      "assertion": "Both sweep windows use a locked topology of 2 encoder workers and 2 LLM workers.",
+      "db_check": "provenance.runs WHERE experiment='twopool' AND config_c=2 AND n_replicas=2.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 247,
+      "anchor": "sec:sim-knees",
+      "quote": "the steady 2{,}000-request head (\\SI{2.77}{req/s}, \\SI{8.0}{img/s})",
+      "numbers": [
+        "2000",
+        "2.77",
+        "8.0"
+      ],
+      "metric": "offered_load",
+      "subject": "steady 2,000-request head window",
+      "assertion": "The steady head window holds 2,000 requests at 2.77 req/s and 8.0 img/s.",
+      "db_check": "provenance.windows WHERE window_name='steady' -> n_requests, req_per_s, img_per_s. Cross-check 8.0/2.77 = 2.89 images/request against the 2.9 stated at line 458.",
+      "criticality": "headline"
+    },
+    {
+      "line": 250,
+      "anchor": "sec:sim-knees",
+      "quote": "padded $\\pm$10 minutes: 64{,}804 requests over \\SI{8.3}{\\hour}, mean \\SI{2.17}{req/s} but \\SI{116}{img/s}, peaking at \\SI{370}{img/s}",
+      "numbers": [
+        "10",
+        "64804",
+        "8.3",
+        "2.17",
+        "116",
+        "370"
+      ],
+      "metric": "offered_load_burst",
+      "subject": "burst window enveloping the week's largest burst episode, padded +/-10 min",
+      "assertion": "The burst window has 64,804 requests over 8.3 h, mean 2.17 req/s and 116 img/s, peaking at 370 img/s.",
+      "db_check": "provenance.windows WHERE window_name LIKE 'burst%' AND is largest episode -> n_requests, duration_s, req_per_s, img_per_s, peak_img_per_s. Check 64804/(8.3*3600)=2.169.",
+      "criticality": "headline"
+    },
+    {
+      "line": 261,
+      "anchor": "tab:sim-knees",
+      "quote": "The vision pool's steady-window knee is censored (the bound was never crossed within the swept range, $s \\leq 32$)",
+      "numbers": [
+        "32"
+      ],
+      "metric": "saturation_knee_speedup",
+      "subject": "vision pool, steady window, arrival-speedup sweep",
+      "assertion": "The vision pool never crosses its 1 s encoder-delay bound within the swept range up to s=32 on the steady window.",
+      "db_check": "provenance.encoder_run_summary JOIN runs WHERE window_name='steady' AND pool='encoder': max speedup swept = 32 and all encoder_delay_p99_ms < 1000.",
+      "criticality": "headline"
+    },
+    {
+      "line": 265,
+      "anchor": "tab:sim-knees",
+      "quote": "a TP2$\\times$2 shape passes the same window at \\SI{748}{\\milli\\second}",
+      "numbers": [
+        "2",
+        "2",
+        "748"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool, burst window, TP2 x 2 workers",
+      "assertion": "A TP2 x 2-worker language topology passes the burst window with TTFT p99 of 748 ms.",
+      "db_check": "provenance.llm_run_summary.p99_ttft_ms JOIN runs WHERE window_name = burst AND tp=2 AND n_replicas=2 AND model='aic_h100_sxm'.",
+      "criticality": "headline"
+    },
+    {
+      "line": 276,
+      "anchor": "tab:sim-knees",
+      "quote": "LLM / poly & steady & $s{=}3$ (ITL-bound) & 8.3 req/s & $249 \\to 374$",
+      "numbers": [
+        "3",
+        "8.3",
+        "249",
+        "374"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool, polynomial timing, steady window",
+      "assertion": "Under polynomial timing the steady-window language knee is s=3 (ITL-bound) at 8.3 req/s, with TTFT p99 going 249 -> 374 ms at the successor point.",
+      "db_check": "provenance.llm_run_summary JOIN runs WHERE model='poly' AND window_name='steady'; largest speedup satisfying both bounds = 3; check 2.77*3=8.31 req/s. Note table lists 249 while tab:sim-poly-aic lists 248 for the same run.",
+      "criticality": "headline"
+    },
+    {
+      "line": 277,
+      "anchor": "tab:sim-knees",
+      "quote": "LLM / AIC  & steady & $s{=}2$ (ITL-bound) & 5.5 req/s & $307 \\to 418$",
+      "numbers": [
+        "2",
+        "5.5",
+        "307",
+        "418"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool, AIC h100 timing, steady window",
+      "assertion": "Under AIC timing the steady-window language knee is s=2 (ITL-bound) at 5.5 req/s, TTFT p99 307 -> 418 ms.",
+      "db_check": "provenance.llm_run_summary JOIN runs WHERE model='aic_h100_sxm' AND window_name='steady'; check 2.77*2=5.54 req/s.",
+      "criticality": "headline"
+    },
+    {
+      "line": 278,
+      "anchor": "tab:sim-knees",
+      "quote": "LLM / poly & burst & $s{=}1$ & 2.2 req/s & $910$ at $s{=}1$",
+      "numbers": [
+        "1",
+        "2.2",
+        "910"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool, polynomial timing, burst window at s=1",
+      "assertion": "Under polynomial timing the burst-window language pool has TTFT p99 of 910 ms at s=1, its knee.",
+      "db_check": "provenance.llm_run_summary.p99_ttft_ms JOIN runs WHERE model='poly' AND window_name = burst AND speedup=1 -> 910.",
+      "criticality": "headline"
+    },
+    {
+      "line": 279,
+      "anchor": "tab:sim-knees",
+      "quote": "LLM / AIC  & burst & \\textbf{none: over at $s{=}1$} & 2.2 req/s & $1{,}868$ at $s{=}1$",
+      "numbers": [
+        "1",
+        "2.2",
+        "1868"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool, AIC h100 timing, burst window at s=1",
+      "assertion": "Under AIC timing the burst-window language pool is already over its bound at s=1, with TTFT p99 of 1,868 ms.",
+      "db_check": "provenance.llm_run_summary.p99_ttft_ms JOIN runs WHERE model='aic_h100_sxm' AND window_name = burst AND speedup=1 -> 1868; also v_infeasible should list this cell.",
+      "criticality": "headline"
+    },
+    {
+      "line": 280,
+      "anchor": "tab:sim-knees",
+      "quote": "Vision / AIC & steady & $\\geq s{=}32$ (cens.) & $\\geq$ 256 img/s & $199 \\to 787$",
+      "numbers": [
+        "32",
+        "256",
+        "199",
+        "787"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "vision pool, AIC timing, steady window",
+      "assertion": "The vision pool's steady-window knee is censored at s>=32 (>=256 img/s), with encoder delay p99 going 199 -> 787 ms.",
+      "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms JOIN runs WHERE pool='encoder' AND window_name='steady' AND speedup IN (16,32); check 8.0*32=256 img/s.",
+      "criticality": "headline"
+    },
+    {
+      "line": 281,
+      "anchor": "tab:sim-knees",
+      "quote": "Vision / AIC & burst & \\textbf{none: over at $s{=}1$} & 116 img/s & $5{,}013$ at $s{=}1$",
+      "numbers": [
+        "1",
+        "116",
+        "5013"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "vision pool, AIC timing, burst window at s=1",
+      "assertion": "The vision pool is over its 1 s bound at s=1 on the burst window, with encoder delay p99 of 5,013 ms at 116 img/s.",
+      "db_check": "provenance.encoder_run_summary.encoder_delay_p99_ms JOIN runs WHERE pool='encoder' AND window_name = burst AND speedup=1 -> 5013.",
+      "criticality": "headline"
+    },
+    {
+      "line": 294,
+      "anchor": "fig:sim-knees",
+      "quote": "On the steady window (blue) the language knee sits at $s{=}3$ (polynomial) and $s{=}2$ (calibrated) while the vision pool remains under its bound through $s{=}32$",
+      "numbers": [
+        "3",
+        "2",
+        "32"
+      ],
+      "metric": "saturation_knee_speedup",
+      "subject": "both pools, steady window, arrival-speedup sweep",
+      "assertion": "On the steady window the language knees are s=3 (polynomial) and s=2 (calibrated) while the vision pool stays under its bound through s=32.",
+      "db_check": "provenance.factorial_cell / v_closedloop_frontier feasibility by speedup for both pools on window_name='steady'.",
+      "criticality": "headline"
+    },
+    {
+      "line": 297,
+      "anchor": "fig:sim-knees",
+      "quote": "at the calibrated language knee the encoder idles at 4.5\\% utilization",
+      "numbers": [
+        "4.5"
+      ],
+      "metric": "encoder_utilization_pct",
+      "subject": "vision pool at the calibrated language-pool knee (s=2, steady window)",
+      "assertion": "At the calibrated language knee the encoder pool is only 4.5% utilized.",
+      "db_check": "provenance.encoder_run_summary: busy_worker_seconds / provisioned_worker_seconds for pool='encoder' AND window_name='steady' AND speedup=2 -> 0.045.",
+      "criticality": "headline"
+    },
+    {
+      "line": 299,
+      "anchor": "fig:sim-knees",
+      "quote": "the language pool at 1.9$\\times$ its TTFT bound (the TP1 prefill floor; the polynomial model, 9\\% under the bound at the same point, misses this failure entirely), the vision pool at 5$\\times$ its delay bound",
+      "numbers": [
+        "1.9",
+        "1",
+        "9",
+        "5"
+      ],
+      "metric": "sla_violation_ratio",
+      "subject": "burst window at s=1, calibrated language pool and vision pool vs their bounds",
+      "assertion": "At the burst episode's own rate the calibrated language pool sits at 1.9x its TTFT bound while the polynomial reads 9% under it, and the vision pool sits at 5x its delay bound.",
+      "db_check": "Derived: 1868/1000=1.87; 910/1000 = 9% under; 5013/1000=5.01. Check against llm_run_summary/encoder_run_summary rows for the burst window at speedup=1.",
+      "criticality": "headline"
+    },
+    {
+      "line": 307,
+      "anchor": "sec:sim-knees",
+      "quote": "the vision pool is uncrossed at $32\\times$ the trace rate while the language pool's knee sits at $s{=}3$ (polynomial) or $s{=}2$ (calibrated, failing at $s{=}3$)",
+      "numbers": [
+        "32",
+        "3",
+        "2",
+        "3"
+      ],
+      "metric": "saturation_knee_speedup",
+      "subject": "steady head, both pools",
+      "assertion": "On the steady head the vision pool is uncrossed at 32x trace rate while the language knee is s=3 (poly) / s=2 (calibrated, failing at s=3).",
+      "db_check": "provenance.factorial_cell.feasible by speedup per pool, window_name='steady'.",
+      "criticality": "headline"
+    },
+    {
+      "line": 309,
+      "anchor": "sec:sim-knees",
+      "quote": "Since the sweep is octave-spaced above $s{=}4$, the demonstrated separation is a factor ${>}10$ under calibrated timing",
+      "numbers": [
+        "4",
+        "10"
+      ],
+      "metric": "pool_separation_factor",
+      "subject": "steady head, vision vs language saturation separation",
+      "assertion": "The demonstrated saturation separation between the pools exceeds a factor of 10 under calibrated timing (32/2 = 16, bounded below by sweep granularity).",
+      "db_check": "provenance.runs distinct speedup values for window_name='steady' should be octave-spaced above 4 (4,8,16,32); ratio of vision censoring point to language knee = 32/2 = 16 > 10.",
+      "criticality": "headline"
+    },
+    {
+      "line": 311,
+      "anchor": "sec:sim-knees",
+      "quote": "sizing both pools off one signal would overprovision the encoder fleet by that factor in calm traffic",
+      "numbers": [
+        "10"
+      ],
+      "metric": "overprovision_factor",
+      "subject": "encoder fleet sizing under a single shared scaling signal, calm traffic",
+      "assertion": "Sizing both pools from one signal would overprovision the encoder fleet by more than 10x in calm traffic.",
+      "db_check": "provenance.cost_accounting.provisioned_ws comparison between single-signal and per-pool sizing on the steady window.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 315,
+      "anchor": "sec:sim-knees",
+      "quote": "At the knee's successor point the TTFT budget still has $1.8$--$2.1\\times$ slack while ITL p99 has crossed ($154$ at $s{=}4$ polynomial; $110$ at $s{=}3$ calibrated, both in \\si{\\milli\\second})",
+      "numbers": [
+        "1.8",
+        "2.1",
+        "154",
+        "4",
+        "110",
+        "3"
+      ],
+      "metric": "p99_itl_ms",
+      "subject": "language pool, steady window, knee successor points (s=4 polynomial, s=3 calibrated)",
+      "assertion": "At the knee successor points ITL p99 has crossed 100 ms (154 ms at s=4 polynomial, 110 ms at s=3 calibrated) while the TTFT budget still has 1.8-2.1x slack.",
+      "db_check": "provenance.llm_run_summary.p99_itl_ms and p99_ttft_ms for window_name='steady' at speedup 4 (poly) and 3 (aic). NOTE inconsistency: table successor TTFT p99 are 374 and 418 ms, giving slack 2.67x and 2.39x, not 1.8-2.1x.",
+      "criticality": "headline"
+    },
+    {
+      "line": 324,
+      "anchor": "sec:sim-knees",
+      "quote": "under the polynomial the pool skirts its bound at the episode's own rate (\\SI{910}{\\milli\\second}, 9\\% under)",
+      "numbers": [
+        "910",
+        "9"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool, polynomial timing, burst window at s=1",
+      "assertion": "Polynomial timing puts burst-window TTFT p99 at 910 ms, 9% under the 1 s bound.",
+      "db_check": "provenance.llm_run_summary.p99_ttft_ms WHERE model='poly' AND window_name = burst AND speedup=1 -> 910.",
+      "criticality": "headline"
+    },
+    {
+      "line": 326,
+      "anchor": "sec:sim-knees",
+      "quote": "Under AIC timing the same run reads \\SI{1868}{\\milli\\second}",
+      "numbers": [
+        "1868"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool, AIC timing, burst window at s=1",
+      "assertion": "The same burst-window run reads 1,868 ms TTFT p99 under AIC timing.",
+      "db_check": "provenance.llm_run_summary.p99_ttft_ms WHERE model='aic_h100_sxm' AND window_name = burst AND speedup=1; also v_llm_drift poly-vs-aic delta.",
+      "criticality": "headline"
+    },
+    {
+      "line": 327,
+      "anchor": "sec:sim-knees",
+      "quote": "the frames-class requests' ${\\approx}36$k-token prefills alone exceed the TTFT budget at TP1",
+      "numbers": [
+        "36"
+      ],
+      "metric": "prefill_tokens_k",
+      "subject": "frames-class requests, trace ContextTokens, TP1 language pool",
+      "assertion": "Frames-class requests carry roughly 36k-token prefills, which alone exceed the 1 s TTFT budget at TP1.",
+      "db_check": "provenance.measured_request: median ContextTokens for frames-class (images>64) requests in the burst window ~36,000.",
+      "criticality": "headline"
+    },
+    {
+      "line": 329,
+      "anchor": "sec:sim-knees",
+      "quote": "the baseline chapter's grid finds TTFT p99 pinned near \\SI{1.3}{\\second} from 4 through 16 TP1 workers on this window",
+      "numbers": [
+        "1.3",
+        "4",
+        "16",
+        "1"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool, burst window, TP1, worker counts 4-16",
+      "assertion": "TTFT p99 stays pinned near 1.3 s from 4 through 16 TP1 workers on the burst window, showing an irreducible prefill floor.",
+      "db_check": "provenance.factorial_cell WHERE window = burst AND tp=1 AND n_replicas BETWEEN 4 AND 16 -> p99_ms clustered near 1300.",
+      "criticality": "headline"
+    },
+    {
+      "line": 334,
+      "anchor": "sec:sim-knees",
+      "quote": "TP2 at the same worker count (doubling the GPUs per worker, four in total) passes the window with \\SI{748}{\\milli\\second} TTFT p99 and \\SI{6.6}{\\milli\\second} ITL p99",
+      "numbers": [
+        "2",
+        "4",
+        "748",
+        "6.6"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool, burst window, TP2 x 2 workers (4 GPUs total)",
+      "assertion": "TP2 at 2 workers (4 GPUs) passes the burst window with 748 ms TTFT p99 and 6.6 ms ITL p99, meeting the full SLA.",
+      "db_check": "provenance.llm_run_summary WHERE window = burst AND tp=2 AND n_replicas=2 -> p99_ttft_ms=748, p99_itl_ms=6.6; factorial_cell.feasible = true.",
+      "criticality": "headline"
+    },
+    {
+      "line": 339,
+      "anchor": "sec:sim-knees",
+      "quote": "its p99 encoder delay of \\SI{5.0}{\\second} ($5\\times$ the bound) arises from episodic queueing while mean utilization sits at 29\\%",
+      "numbers": [
+        "5.0",
+        "5",
+        "29"
+      ],
+      "metric": "encoder_delay_p99_s",
+      "subject": "vision pool, burst window at s=1, 2 encoder workers",
+      "assertion": "The vision pool's encoder delay p99 is 5.0 s (5x the bound) despite mean utilization of only 29%.",
+      "db_check": "provenance.encoder_run_summary WHERE pool='encoder' AND window = burst AND config_c=2 -> encoder_delay_p99_ms ~5013 and busy_worker_seconds/provisioned_worker_seconds ~0.29.",
+      "criticality": "headline"
+    },
+    {
+      "line": 342,
+      "anchor": "sec:sim-knees",
+      "quote": "the minute-mean stays low even as the 1-minute peak busy fraction reaches 0.90",
+      "numbers": [
+        "1",
+        "0.90"
+      ],
+      "metric": "peak_busy_fraction",
+      "subject": "vision pool, burst window, 1-minute peak busy fraction",
+      "assertion": "The 1-minute peak busy fraction reaches 0.90 while the minute-mean utilization stays low.",
+      "db_check": "Recompute per-minute busy fraction from encoder run event log / measured_request for the burst window; max over minutes = 0.90.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 343,
+      "anchor": "sec:sim-knees",
+      "quote": "yields only to capacity (the grid, AIC-costed: six encoder workers, $3\\times$ this topology, are needed at the trace's own rate)",
+      "numbers": [
+        "6",
+        "3"
+      ],
+      "metric": "feasible_worker_count",
+      "subject": "vision pool, burst window at s=1, minimum feasible encoder worker count",
+      "assertion": "Six encoder workers (3x the locked 2-worker topology) are needed to meet the vision SLA at the trace's own rate on the burst window.",
+      "db_check": "provenance.factorial_cell WHERE pool='encoder' AND window = burst AND feasible = true -> min(config_c) = 6.",
+      "criticality": "headline"
+    },
+    {
+      "line": 351,
+      "anchor": "fig:sim-burst-queue",
+      "quote": "The window's 7{,}716 frames-class requests (${>}64$ images each) decompose into 56{,}510 chunk units of at most 64 images",
+      "numbers": [
+        "7716",
+        "64",
+        "56510",
+        "64"
+      ],
+      "metric": "frames_class_requests",
+      "subject": "burst window, frames-class requests and their chunk decomposition",
+      "assertion": "The burst window contains 7,716 frames-class requests (>64 images) that decompose into 56,510 chunk units of at most 64 images.",
+      "db_check": "provenance.measured_request WHERE window = burst AND images > 64 -> count = 7716; sum(ceil(images/64)) = 56510.",
+      "criticality": "headline"
+    },
+    {
+      "line": 353,
+      "anchor": "fig:sim-burst-queue",
+      "quote": "the pool executes 83{,}376 forwards over the window (every forward at most \\SI{316.4}{\\milli\\second})",
+      "numbers": [
+        "83376",
+        "316.4"
+      ],
+      "metric": "encoder_forwards",
+      "subject": "vision pool, burst window",
+      "assertion": "The encoder pool executes 83,376 forwards over the burst window, none costing more than 316.4 ms.",
+      "db_check": "Encoder run event log / encoder_run_summary forward count for window = burst; max forward cost = f(64) = 316.4 ms.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 355,
+      "anchor": "fig:sim-burst-queue",
+      "quote": "the worst second lands 2{,}726 images at once",
+      "numbers": [
+        "2726"
+      ],
+      "metric": "peak_images_per_second",
+      "subject": "burst window, per-second image arrivals",
+      "assertion": "The worst single second of the burst window delivers 2,726 images.",
+      "db_check": "provenance.windows or per-second aggregation of measured_request images for window = burst -> max = 2726. Cross-check against the stated 370 img/s peak (which is a 1-minute mean).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 357,
+      "anchor": "fig:sim-burst-queue",
+      "quote": "the backlog exceeds 1{,}000 queued images for 805 seconds spread across the eight-hour window, peaking at 4{,}701",
+      "numbers": [
+        "1000",
+        "805",
+        "4701"
+      ],
+      "metric": "queue_depth_images",
+      "subject": "vision pool queue depth, burst window, 2 workers",
+      "assertion": "The encoder queue exceeds 1,000 images for a cumulative 805 s of the ~8 h window and peaks at 4,701 queued images.",
+      "db_check": "Per-second queue-depth series from the encoder run for window = burst: count(depth>1000) = 805 s, max(depth) = 4701.",
+      "criticality": "headline"
+    },
+    {
+      "line": 361,
+      "anchor": "sec:sim-knees",
+      "quote": "request rate (\\SI{2.2}{req/s}, unremarkable), mean utilization (29\\%), and every minute-averaged signal read healthy",
+      "numbers": [
+        "2.2",
+        "29"
+      ],
+      "metric": "offered_load_req_per_s",
+      "subject": "burst window, monitoring signals vs tail SLA violation",
+      "assertion": "Request rate (2.2 req/s) and mean utilization (29%) both read healthy while the tail SLA is violated episodically.",
+      "db_check": "provenance.windows.req_per_s for window = burst = 2.17; encoder_run_summary busy/provisioned = 0.29.",
+      "criticality": "headline"
+    },
+    {
+      "line": 374,
+      "anchor": "fig:sim-burst-queue",
+      "quote": "The queue repeatedly spikes past 1{,}000 images (peaking at 4{,}701) and fully drains between spikes, so the window's \\emph{mean} utilization stays at 29\\% while p99 encoder delay reaches \\SI{5.0}{\\second}",
+      "numbers": [
+        "1000",
+        "4701",
+        "29",
+        "5.0"
+      ],
+      "metric": "queue_depth_images",
+      "subject": "vision pool, burst window at trace rate, figure caption",
+      "assertion": "The queue spikes past 1,000 images (peak 4,701) and drains fully between spikes, leaving mean utilization at 29% while encoder delay p99 reaches 5.0 s.",
+      "db_check": "Same as line 357/339 checks: encoder_run_summary + per-second queue series for window = burst.",
+      "criticality": "headline"
+    },
+    {
+      "line": 384,
+      "anchor": "sec:sim-limitations",
+      "quote": "The evaluation SLA's specific bounds (\\SI{1}{\\second}/\\SI{100}{\\milli\\second}/\\SI{1}{\\second}) are a design choice",
+      "numbers": [
+        "1",
+        "100",
+        "1"
+      ],
+      "metric": "sla_bounds",
+      "subject": "evaluation SLA triple (TTFT p99 / ITL p99 / encoder delay p99)",
+      "assertion": "The evaluation SLA is 1 s TTFT p99, 100 ms ITL p99, and 1 s encoder-delay p99.",
+      "db_check": "Definition; verify the feasibility gate in provenance.factorial_cell matches this triple.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 386,
+      "anchor": "sec:sim-limitations",
+      "quote": "under a lax TTFT-only \\SI{2}{\\second} bound the language knees sit one to two octaves higher",
+      "numbers": [
+        "2",
+        "1",
+        "2"
+      ],
+      "metric": "knee_shift_octaves",
+      "subject": "language pool knees under an alternative TTFT-only 2 s bound",
+      "assertion": "Relaxing to a TTFT-only 2 s bound moves the language knees one to two octaves higher.",
+      "db_check": "Re-derive knees from provenance.llm_run_summary sweeps with the alternative predicate p99_ttft_ms<2000 only; compare to the SLA knees s=3/s=2.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 389,
+      "anchor": "sec:sim-limitations",
+      "quote": "The topology is locked at 2$\\times$2 workers here",
+      "numbers": [
+        "2",
+        "2"
+      ],
+      "metric": "topology_workers",
+      "subject": "chapter-wide locked topology",
+      "assertion": "This chapter locks the topology at 2 encoder x 2 LLM workers.",
+      "db_check": "provenance.runs WHERE experiment='twopool' -> config_c=2 AND n_replicas=2.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 391,
+      "anchor": "sec:sim-limitations",
+      "quote": "Language-pool results are reported for the 8B at TP1 with a 235B-TP8 spot-check ...; intermediate family members (32B) were not priced",
+      "numbers": [
+        "1",
+        "8",
+        "32"
+      ],
+      "metric": "model_config_coverage",
+      "subject": "language-pool model coverage: 8B TP1, 235B TP8, 32B unpriced",
+      "assertion": "Language-pool results cover the 8B at TP1 and a 235B-TP8 spot-check; the intermediate 32B was not priced.",
+      "db_check": "provenance.runs DISTINCT model, tp for experiment='twopool' -> only 8B/TP1 and 235B/TP8 present.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 403,
+      "anchor": "sec:sim-limitations",
+      "quote": "the steady-window knee moves by one octave between the two models (Table~\\ref{tab:sim-knees}) and the burst verdict changes outright",
+      "numbers": [
+        "1"
+      ],
+      "metric": "knee_shift_octaves",
+      "subject": "steady-window language knee sensitivity to timing model (poly vs AIC)",
+      "assertion": "The steady-window language knee moves by one octave (s=3 to s=2) between polynomial and AIC timing.",
+      "db_check": "provenance.llm_run_summary knees per model on window_name='steady'; log2(3/2) is not exactly one octave -- verify the octave-spacing convention below s=4.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 406,
+      "anchor": "sec:sim-limitations",
+      "quote": "requests beyond the \\texttt{h100\\_sxm} grid's \\num{16384}-token edge (${\\approx}3.1\\%$ of the trace, up to ${\\approx}149$k tokens ...) are priced by extrapolation",
+      "numbers": [
+        "16384",
+        "3.1",
+        "149"
+      ],
+      "metric": "extrapolated_request_pct",
+      "subject": "AIC h100_sxm perf grid coverage vs trace ContextTokens distribution",
+      "assertion": "About 3.1% of trace requests exceed the h100_sxm grid's 16,384-token edge (up to ~149k tokens) and are priced by extrapolation.",
+      "db_check": "provenance.measured_request: fraction with ContextTokens>16384 = 3.1%, max ~149,000; compare grid edge in collector_fn.",
+      "criticality": "headline"
+    },
+    {
+      "line": 413,
+      "anchor": "sec:sim-limitations",
+      "quote": "costs encoder work as a full $448^2$ forward per image, ships $196 \\times 4096$ post-merge tokens per image",
+      "numbers": [
+        "448",
+        "196",
+        "4096"
+      ],
+      "metric": "token_accounting_convention",
+      "subject": "simulation token/compute accounting conventions",
+      "assertion": "The simulation costs a full 448^2 forward per image and ships 196x4096 post-merge tokens per image across the seam.",
+      "db_check": "provenance.runs.resolution='448' and handoff payload parameter = 196*4096 bf16.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 415,
+      "anchor": "sec:sim-limitations",
+      "quote": "embeds the \\emph{traced} model's vision tokenization at ${\\approx}277 \\to 66$ tokens per image at scale",
+      "numbers": [
+        "277",
+        "66"
+      ],
+      "metric": "tokens_per_image",
+      "subject": "traced production model's vision tokenization, small vs large image counts",
+      "assertion": "The trace's ContextTokens embed the traced model's vision tokenization of about 277 tokens per image falling to 66 at scale.",
+      "db_check": "Trace EDA artifact: regression of ContextTokens on image count per request bucket; provenance.measured_request derived ratio.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 418,
+      "anchor": "sec:sim-limitations",
+      "quote": "a Qwen3-VL-consistent prefill for the median top-1\\% frames request would be ${\\geq}529 \\times 196 \\approx 104$k tokens, roughly $3\\times$ the recorded ${\\approx}36$k",
+      "numbers": [
+        "1",
+        "529",
+        "196",
+        "104",
+        "3",
+        "36"
+      ],
+      "metric": "prefill_tokens_k",
+      "subject": "median top-1% frames-class request, Qwen3-VL tokenization convention vs recorded ContextTokens",
+      "assertion": "Under Qwen3-VL's own tokenization the median top-1% frames request would need >=104k prefill tokens, about 3x the recorded ~36k.",
+      "db_check": "Derived: 529*196 = 103,684 tokens; verify median images for the top-1% frames class = 529 in provenance.measured_request and recorded ContextTokens ~36k.",
+      "criticality": "headline"
+    },
+    {
+      "line": 426,
+      "anchor": "sec:sim-limitations",
+      "quote": "the TP1 prefill floor is robust to them (at $3\\times$ the tokens it worsens), but the TP2 margin is not",
+      "numbers": [
+        "3",
+        "1",
+        "2"
+      ],
+      "metric": "token_convention_sensitivity",
+      "subject": "burst-window language verdict sensitivity to the token-accounting convention",
+      "assertion": "At 3x the recorded tokens the TP1 prefill floor only worsens, but the TP2 margin would not survive.",
+      "db_check": "Sensitivity run not present; UNVERIFIABLE: the text states a both-conventions run remains future work.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 436,
+      "anchor": "sec:sim-limitations",
+      "quote": "per-image cost scales roughly with patch count, so a $224^2$-dominated workload would run ${\\approx}4\\times$ cheaper per image and a $672^2$-dominated one ${\\approx}2.25\\times$ dearer",
+      "numbers": [
+        "224",
+        "4",
+        "672",
+        "2.25"
+      ],
+      "metric": "resolution_cost_scaling",
+      "subject": "encoder per-image cost scaling with image resolution",
+      "assertion": "Per-image encoder cost scales with patch count: 224^2 is ~4x cheaper and 672^2 ~2.25x dearer than 448^2.",
+      "db_check": "Derived from (448/224)^2=4 and (672/448)^2=2.25; cross-check provenance.collector_fn latencies by resolution on gpu='rtx_5090'.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 442,
+      "anchor": "sec:sim-limitations",
+      "quote": "The dispatch cap is not the source of the burst verdict (p99 encoder delay 5.2/5.0/\\SI{6.7}{\\second} at caps of 32/64/128 ...)",
+      "numbers": [
+        "5.2",
+        "5.0",
+        "6.7",
+        "32",
+        "64",
+        "128"
+      ],
+      "metric": "encoder_delay_p99_s",
+      "subject": "vision pool, burst window, dispatch cap sensitivity 32/64/128 images",
+      "assertion": "Encoder delay p99 is 5.2, 5.0 and 6.7 s at dispatch caps of 32, 64 and 128 images, so the cap does not drive the burst verdict.",
+      "db_check": "provenance.encoder_run_summary JOIN runs WHERE window = burst AND actuation/dispatch_cap IN (32,64,128) -> encoder_delay_p99_ms 5200/5013/6700.",
+      "criticality": "headline"
+    },
+    {
+      "line": 456,
+      "anchor": "sec:sim-limitations",
+      "quote": "the baseline chapter's grid, which re-derives the per-window optima on encoder-delay-shifted traces across all six burst windows and a 24-hour steady window",
+      "numbers": [
+        "6",
+        "24"
+      ],
+      "metric": "window_count",
+      "subject": "baseline chapter grid coverage: six burst windows plus a 24-hour steady window",
+      "assertion": "The composed baseline grid covers all six burst windows and a 24-hour steady window.",
+      "db_check": "provenance.windows COUNT(*) WHERE kind='burst' = 6 plus one 24 h steady window; factorial_cell rows exist for each.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 458,
+      "anchor": "sec:sim-limitations",
+      "quote": "the steady head used here is vision-lean (2.9 images per request against the trace's ${\\approx}14$)",
+      "numbers": [
+        "2.9",
+        "14"
+      ],
+      "metric": "images_per_request",
+      "subject": "steady head window vs full trace, mean images per request",
+      "assertion": "The steady head averages 2.9 images per request versus about 14 for the whole trace, making it vision-lean.",
+      "db_check": "provenance.windows / measured_request: avg(images) for window_name='steady' = 2.9 vs full-trace avg = 14. Cross-check 8.0 img/s / 2.77 req/s = 2.89.",
+      "criticality": "headline"
+    }
+  ]
+}

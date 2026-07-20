@@ -1,0 +1,69 @@
+{
+  "chapter": "intro",
+  "n_relations_checked": 47,
+  "n_errors": 6,
+  "errors": [
+    {
+      "line": 536,
+      "quote": "reproduce the simulated verdicts in both directions with TTFT p99 within 1.1--6.8\\%",
+      "stated": "live-vs-simulated TTFT p99 agreement band = 1.1--6.8%",
+      "computed": "Lower bound recomputed from tab:val-anchor (tex/validation.tex:72), reactive TTFT p99: live 3,531 ms vs offline twin 3,495 ms. (3531-3495)/3495 = 36/3495 = 0.0103004... = 1.0300% -> rounds to +1.0%, not +1.1%. (Even on the alternative denominator: 36/3531 = 1.0195% -> 1.0%.) Upper bound checks out: (695-651)/651 = 44/651 = 6.759% -> +6.8%.",
+      "relation": "text vs table (tab:val-anchor); rounding of (new-old)/old",
+      "severity": "rounding",
+      "propagates_to": "tex/validation.tex:72 (the table cell itself prints +1.1%), tex/validation.tex:83 ('its p99 within 1.1% of the simulation'), tex/validation.tex:97 ('within 1.1--6.8%'), tex/validation.tex:159 ('TTFT differs by 1.1--6.8%'), and any conclusion restatement of the live-anchor band",
+      "proposed_fix": "Replace 'within 1.1--6.8\\%' with 'within 1.0--6.8\\%' at intro.tex:536, and correspondingly fix the table cell to $+1.0\\%$ and the three restatements in validation.tex (72, 83, 97, 159)."
+    },
+    {
+      "line": 211,
+      "quote": "at a fraction of the best static \\emph{encoder} fleet's GPU-hours",
+      "stated": "the headline cost denominator in the thesis statement is 'the best static encoder fleet'",
+      "computed": "Every other statement of the same ratio in this chapter and in the source chapter names a DIFFERENT denominator: line 50 'the deployable static encoder fleet's provisioned GPU-time', line 271 '0.62 times the deployable static encoder fleet's provisioned worker-time', line 481 '0.62$\\times$ the deployable static encoder fleet's worker-time', line 514 'the 0.62$\\times$ result'. The source is closedloop.tex:253/432/482 = the 'deployable static $C{=}8$ fleet', i.e. the single fleet that clears every window (3.87M worker-seconds; 2.41/3.87 = 0.6228 -> 0.62x). The 'best static configuration' is a per-window quantity (baselines: 6--8 encoder workers on bursts, 2 on the calm day; intro.tex:467), which is strictly smaller than C=8 on five of the windows, so the same policy measured against it would give a LARGER, not smaller, ratio. The two phrasings are not interchangeable and the 0.62 figure is only defined for the deployable one.",
+      "relation": "denominator/definition consistency of the headline cost ratio across lines 50 / 211 / 260 / 271 / 481 / 514",
+      "severity": "ambiguous",
+      "propagates_to": "intro.tex:260 ('the best static configuration'); conclusion.tex:81 ('deployable static') vs conclusion.tex:95 ('roughly two-thirds of the best static'); tese.tex:67 abstract ('deployable static') vs tese.tex:112 Resumo ('a menor frota estatica viavel' = smallest feasible)",
+      "proposed_fix": "At intro.tex:211 replace 'the best static \\emph{encoder} fleet's GPU-hours' with 'the deployable static \\emph{encoder} fleet's GPU-hours', matching lines 50/271/481/514 and closedloop.tex:432. Use 'deployable static' as the single canonical wording thesis-wide."
+    },
+    {
+      "line": 260,
+      "quote": "over the\ntwo reference policies (the best static configuration and a reactive\nplanner)",
+      "stated": "RQ4 grades the contribution against 'the best static configuration'",
+      "computed": "The answer given to RQ4 seven lines later (line 271) prices the policy at 0.62x 'the deployable static encoder fleet'. Deployable static = C=8 (closedloop.tex:253), the max over windows; best static per window = 6--8 on bursts and 2 on the calm day (intro.tex:467, baselines tab:base-grid). 0.62 = 2.41M/3.87M worker-seconds is computed only against the C=8 fleet; against the per-window static optima the denominator is smaller, so the quoted 0.62 does not answer the question as posed.",
+      "relation": "internal cross-reference: RQ4 statement vs RQ4 answer (denominator)",
+      "severity": "ambiguous",
+      "propagates_to": "intro.tex:211, intro.tex:271, conclusion.tex:95",
+      "proposed_fix": "At intro.tex:260 replace 'the best static configuration' with 'the deployable static configuration (the single fleet that clears every window)'."
+    },
+    {
+      "line": 50,
+      "quote": "at a fraction of the\ndeployable static\nencoder fleet's provisioned GPU-time over the covered week",
+      "stated": "the cost result is priced 'over the covered week'",
+      "computed": "The covered span is 5.60 days (intro.tex:270; closedloop.tex:50/430/437: 5.60 continuous days, 749,601 requests). 5.60/7 = 0.800, i.e. 80% of the week; 1.40 days (20%) are ungraded. 'the covered week' overstates the span by 25% relative to what is actually priced (7/5.60 = 1.25x).",
+      "relation": "internal cross-reference intro.tex:50 vs intro.tex:270; span consistency with the 7-day trace claim at line 128",
+      "severity": "loose",
+      "propagates_to": "conclusion.tex:79 vs conclusion.tex:98 ('one seven-day production trace'); tese.tex abstract",
+      "proposed_fix": "Replace 'over the covered week' with 'over the 5.60-day covered span' at intro.tex:50."
+    },
+    {
+      "line": 274,
+      "quote": "lead-invariant across the archive's realizable\nrange under a warm-pool readiness model, 0.59--0.62$\\times$ under a\nstrict re-warm one",
+      "stated": "the strict re-warm readiness model yields a cost ratio of 0.59--0.62x, i.e. cheaper than or equal to the warm-pool 0.62x",
+      "computed": "Direction check: a strict re-warm model requires a scaled-down replica to be re-created before it can serve, which is the more conservative readiness assumption, so a reader expects it to provision MORE, not less. The source (closedloop.tex:493--499) does state 0.59x at L=165 under strict re-warm, so the numbers themselves reproduce; but as written in the intro, with no accounting note, the sign is unexplained and reads as an inverted label. It also changes the claim's character: under warm-pool the result is lead-invariant, under re-warm it is lead-dependent (0.59x only at the maximum lead).",
+      "relation": "unit/definition consistency of the provisioned-worker-time accounting between the two readiness models",
+      "severity": "ambiguous",
+      "propagates_to": "conclusion.tex:84; closedloop.tex:122--124, 444--447, 493--499, 669--670",
+      "proposed_fix": "Replace with: 'lead-invariant across the archive's realizable range under a warm-pool readiness model; under a strict re-warm model it becomes lead-dependent, falling to 0.59$\\times$ at the maximum lead because down replicas are not billed while re-warming (Chapter~\\ref{cap:closedloop})'."
+    },
+    {
+      "line": 536,
+      "quote": "with TTFT p99 within 1.1--6.8\\% (the ITL p99 verdicts also agree\nin both directions: sub-bound for the forecast policy, 11.5 versus\n9.7\\,ms",
+      "stated": "the quoted agreement band characterises the live-vs-simulated anchor; ITL agreement is asserted only as verdict-level",
+      "computed": "The forecast policy's ITL pair implies a relative difference of (11.5-9.7)/9.7 = 1.8/9.7 = 18.557% -> 18.6%, roughly 2.7x the top of the quoted 1.1--6.8% band. The reactive pair is (150.7-152.7)/152.7 = -1.310%. So the chapter publishes both numbers but never states that one metric's agreement is an order of magnitude looser than the headline band, inviting the reader to carry 1.1--6.8% over to ITL. Note also that validation.tex:161 prints this same delta as '18.0\\%', which does not reproduce: 1.8/9.7 = 18.6% (18.0% would require a base of 10.0 ms).",
+      "relation": "unit/metric-scope consistency: TTFT-only band presented adjacent to ITL figures; propagated rounding error in the source chapter",
+      "severity": "loose",
+      "propagates_to": "tex/validation.tex:161 (states 18.0%, should be 18.6%); conclusion.tex:54",
+      "proposed_fix": "Append the scope explicitly: '... with TTFT p99 within 1.1--6.8\\% (the band is TTFT-only; the forecast policy's ITL p99 differs by \\SI{1.8}{\\milli\\second}, 18.6\\%, both far under the \\SI{100}{\\milli\\second} bound) ...', and correct validation.tex:161 from 18.0\\% to 18.6\\%."
+    }
+  ],
+  "passed_checks": "TRACE / EDA (all match tex/trace-eda.tex exactly): 97^2 = 9409 (L83); 2.7% of requests / 81.2% of image volume (L133-134 = trace-eda:88); R^2 0.123 image-rate and 0.654 decode (L147-148 = trace-eda:241); CV^2 3.83 vs 0.32 (L150 = trace-eda:195/232) and 3.83/0.32 = 11.97, so 'an order of magnitude burstier' holds; peak 370 img/s (L153 = trace-eda:443 max cell); 370/23.7 = 15.61 so 'nearly sixteen times its weekly mean' holds (L154); request p99 4.35 req/s (L155 = trace-eda:442 p99 cell) and 4.5/4.35 = 1.034 so 'barely above' is defensible; Jaccard 0.02 (L156; trace-eda 5/202 = 0.0248 -> 0.02 correct); Fano 1.8 -> 938 from 1 s to 1 h (L170 = trace-eda:131/151); ACF half-life 69 vs 9 min and Hurst 0.93 vs 0.83 (L186-188 = trace-eda:227/232). TWO-POOL: encoder p99 5.0 s at 29% mean utilization (L178 and restated L461 = twopool:339-340, both sites agree); TTFT p99 +24% calibrated vs polynomial (L253; 307/248 = 1.2379 -> +23.8% -> +24%); 1.9x SLA violation on the burst window (L254; 1868/1000 = 1.87 and 348/181 = 1.92, both round to 1.9); 235B-TP8 knee one swept octave below the 8B (L380 = twopool:403). PREDICTORS: 4 signals x 5 resolutions = 20 cells, and the '20 cells' figure at L233 and L427 agrees with the 4x5 grid at L426 and with predictors:151; 21.4 million archived rows (L431) = 21,404,640 exactly (predictors:27/92); nine quantiles (L431 = predictors:27); p90 coverage 0.88--0.90 (L430 = predictors:250). AIC / VALIDATION: 12.8% composed-forward bound stated identically at L249 and L510; ~3% dominant-operator agreement identically at L248 and L443; 1.4--1.6x engine figure identically at L249 and L510; 5120/4096 = 1.25 = 5/4 projector scaling (L379); 196x4096 bf16 handoff = 1.606 MB, consistent with twopool's 194 MB/121-image and 62 ms at 25 Gbps (fig L357). CLOSED LOOP: 0.62x = 2.41M/3.87M worker-seconds = 0.6228 (L271, L481, L514 all agree); leads 15 to 165 s = (12-1) x 15 (L265, L479 agree); 588 ms floor stated identically at L265, L479, L514 and matches closedloop tab:cl-aggregate; 734 ms calm-day bound at L266 and L480, consistent with closedloop:80 range 548--734 ms; reactive p99 9.5--54 s (L268) from 9,481 ms and 54,170 ms; EWMA 1.09x static (L493 = closedloop tab:cl-ewma); 560 target-time cells (L476 = closedloop:83); 14 reactive configurations (L276). ROUNDING: R^2 0.123 (L147) restated as 0.12 (L406) - correct rounding. UNITS: evaluation SLA (TTFT and encoder-delay p99 < 1 s, ITL p99 < 100 ms) stated identically in fig:intro-arch (L343/348/349) and in Scope (L521-522). LIVE ANCHOR: replica-time 'within 8%' (L539) holds - max |delta| in tab:val-anchor is 7.649%; ITL pairs 11.5/9.7 and 150.7/152.7 (L537-538) match tab:val-anchor cells in the same live-versus-offline order. TRACE SIZE: 1M requests / 7 days stated consistently at L128, L337 (figure) and L501; 50% text-only at L131, L415, L501.",
+  "notes": "No tables in this chapter, so 'text vs table' checks were run against the tables in the source chapters (trace-eda, twopool, predictors, closedloop, validation, baselines) that the intro restates. The only numeric recomputation that outright fails is the 1.1% live-anchor lower bound (finding 1), which is a rounding defect inherited from validation.tex rather than originated here. The remaining findings are definitional: the chapter uses two different denominators for its single headline cost ratio ('deployable static' at L50/271/481/514 vs 'best static' at L211 and 'best static configuration' at L260) and two different spans for the same pricing ('the covered week' at L50 vs '5.60-day covered span' at L270). Both are cheap to fix and both propagate to the conclusion and the abstract. Two derived observations that are NOT defects but a reviewer may raise: (a) 2.7% of requests carrying 81.2% of image volume implies a per-request image-count ratio of (81.2/2.7)/(18.8/97.3) = 155.6x between the frames and non-frames classes, not the ~140x an approximate reading suggests; (b) the intro consistently writes the zero-queueing service floor as 588 ms, which matches closedloop's tab:cl-aggregate, while closedloop's tab:cl-ewma writes 589 ms for what reads as the same floor - the intro picked one side of a discrepancy internal to closedloop, so the fix belongs there. Footnote microbenchmarks (3--5 s readiness, 1.15 GB / 0.11 s / 0.13 s checkpoint load) and the model-architecture facts (576M tower, 4096-d and 5120-d projectors) contain no internal relation to recompute against; the only checkable one, 5120/4096 = 5/4, passes."
+}

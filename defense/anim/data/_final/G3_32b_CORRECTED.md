@@ -1,10 +1,26 @@
 # G3 — dense 32B intermediate pricing: CORRECTED
 
+## STATUS — POST-MANUSCRIPT DEFENCE MATERIAL, R26 CLASS
+Defence Q&A / appendix ONLY. This may **never** be retro-fitted into a results chapter, and
+`tex/twopool.tex:391` ("32B were not priced") **STANDS AS WRITTEN** and may not be edited.
+
+## PROVENANCE — THESE ARE SIMULATIONS, NOT MEASUREMENTS (state this before any number)
+Every figure in this card is an **AIC / vLLM perf-DB prediction replayed through the
+`dynamo.replay` offline discrete-event mocker** on a virtual clock (summary.json: `engine` =
+"dynamo.replay offline mocker, discrete-event virtual clock"; `timing_model` = "AIC h100_sxm /
+vLLM, perf-DB 0.19.0"). No 32B model was ever run on silicon for this thesis: **the 32B family has
+no silicon anchor anywhere in the work.** The collected RTX 5090 operator database underwrites the
+encoder/8B path only; what ties this harness to the ledger is the **8B-TP1 control** reproducing
+tab:sim-poly-aic, not any 32B row. Additionally, 7 requests fall beyond the 16,384-token context
+grid edge and are extrapolated. Any sentence that presents these knees as measured throughput is
+false.
+
 Scope note: MoE arms (30B-A3B) were REMOVED — the thesis treats the dense family. The
 235B-A22B-TP8 control is retained because it is the thesis's own flagship spot-check.
 
 ## Defect 1 — the numbers I first reported were STALE (pre-`--force` run)
-Correct knee values from the current artifact (knees.md:22-28):
+Correct knee values from the current artifact (knees.md:22-28). **These are the raw artifact
+records; nothing below 2 significant figures is quotable** — see Defect 4.
 | arm | knee s | offered req/s | achieved req/s |
 |---|---:|---:|---:|
 | 8B TP1 (control) | 2.8158 | — | — |
@@ -26,8 +42,14 @@ The driver's cross_check.json:79 asserts "the divergence is SPECIFIC to 235B-TP8
 vs simulation/results/sweeps/reports/llm_head2k_aic_s{2,4,16}:
   TTFT p99 418.2/882.1/40163.5 (wheel) vs 394.3/782.7/49034.5 (source) = -5.7% / -11.3% / +22.1%
   ITL  p99 67.33/210.63/588.58 (wheel) vs 59.43/206.47/228.78 (source) = -11.7% / -2.0% / -61.1%
-The 882 ms figure is quoted verbatim in tex/twopool.tex. This must be fixed in the artifact
-before any cross-runtime claim is made.
+**RULING NOTE — do NOT act on this against tex/twopool.tex.** The proposed "882 -> 783" requote is
+**REFUTED and forbidden** (ruling §3 Defect 1; guardrail against ADJUDICATION §0.4). The
+`llm_head2k_aic*` reports that back the published paragraph are all old-schema WHEEL runs, so that
+paragraph is wheel on **both** arms — internally consistent, not runtime-mixed. Substituting a
+source-build value into it would CREATE the mixing defect it claims to fix. The finding above is
+sound as a statement about the artifact's own cross_check.json; it licenses no edit to the thesis
+text. (What the ruling does approve at twopool.tex is narrowing ":69" and deleting the 4x column —
+neither is this card's business, and neither is in scope here.)
 
 ## Defect 4 — the knee is not a point estimate
 8B-TP2: s=6.0 FAILS (ITL p99 102.19), s=6.0542 PASSES (99.96), s=6.1089 FAILS (102.29).
@@ -45,6 +67,16 @@ is FINER than the demonstrated wobble. Quote knees to 2 significant figures, not
   burst-feasible by parallelism within a sane budget, which REINFORCES the deployed 8B-TP2x2
   choice.
 
+## What may be written (DEFENCE Q&A ONLY)
+"On the head2k isolation window under the evaluation SLA, the dense 32B at TP2 knees near 2.3
+offered req/s against the 8B-TP2's 16 — roughly a 7x gap at equal GPU count — and even at TP8,
+four times the silicon, reaches only about 10, still below 8B-TP2. Every knee is ITL-bound."
+
 ## Required caveats in the same paragraph
-head2k isolation window only (2,000 requests, 721 s, raw arrivals, no encoder shift), uniform
-arrival-rate scaling, source-built runtime, knees to 2 s.f.
+**Simulation provenance first** (AIC/vLLM perf-DB predictions replayed through the mocker; the 32B
+family has no silicon anchor in this thesis), then: head2k isolation window only (2,000 requests,
+721 s, raw arrivals, no encoder shift), uniform arrival-rate scaling, source-built runtime, knees
+to **2 s.f.** (the SLA boundary is non-monotone and the reported `bracket_rel_width` = 0.0127 is
+finer than the demonstrated wobble), offered **or** achieved units stated consistently and never
+mixed, and the runtime divergence characterised as a function of distance from the knee rather
+than of arm. The **ordering** (32B-TP2 << 8B-TP2) is robust; the knee **locations** are not.

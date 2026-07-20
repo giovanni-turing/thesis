@@ -71,7 +71,7 @@ Forecast p90 & TTFT p99 (ms) & 695 & 651 & $+6.8\%$ \\
 \midrule
 Reactive & TTFT p99 (ms) & 3{,}531 & 3{,}495 & $+1.1\%$ \\
  & ITL p99 (ms) & 150.7 & 152.7 & $-1.3\%$ \\
- & replica-seconds & 1{,}799 & 1{,}948 & $-7.6\%$ \\
+ & replica-seconds & 1{,}799 & 1{,}948 & $-7.7\%$ \\
  & verdict & \textbf{FAIL} & \textbf{FAIL} & agree \\
 \bottomrule
 \end{tabular}
@@ -119,9 +119,11 @@ preferentially fills; hence the delayed-spawn modeling of the Setup.
 planner samples worker metrics in tracking mode (the \emph{latest}
 forward pass per worker, once per load tick), while the offline
 replay feeds \emph{every} pass. Mixed prefill+decode passes, the only
-samples that inform aggregated capacity, are rare at calm load: zero
-arrived in five minutes at 2\,req/s, leaving the capacity model
-unready. It would warm only once the workload was already busy,
+samples that inform aggregated capacity, are rare at calm load: only a
+handful arrive --- across the archived runs 2--3 of the first
+${\approx}200$ tracking-mode samples over five minutes at
+${\approx}2$\,req/s were mixed (${\approx}1\%$) --- too few to make the
+capacity model ready. It would warm only once the workload was already busy,
 too late for scale-ahead decisions. The fix (contributed to the Dynamo
 tree as an opt-in \texttt{fpm\_observation\_mode}) drains every
 published pass into the same regression feed the replay uses;
@@ -157,7 +159,7 @@ Chapter~\ref{cap:aiconfigurator} anchored physically on the encoder
 side. Within that scope the conclusion is direct: the platform's
 closed-loop behavior transfers to the real stack in both verdict
 directions --- TTFT differs by 1.1--6.8\% and provisioned replica-seconds
-by 5.3--7.6\%, and the ITL SLA verdicts agree (though the forecast policy's
+by 5.3--7.7\%, and the ITL SLA verdicts agree (though the forecast policy's
 ITL differs by \SI{1.8}{\milli\second}, 18.0\%, both far under the
 \SI{100}{\milli\second} bound) --- across one live run per policy (a point
 difference, not a repeated-trial noise band), and the divergences that

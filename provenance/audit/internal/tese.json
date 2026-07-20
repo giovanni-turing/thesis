@@ -1,0 +1,79 @@
+{
+  "chapter": "tese",
+  "n_relations_checked": 34,
+  "n_errors": 7,
+  "errors": [
+    {
+      "line": 68,
+      "quote": "(the\nlanguage fleet near-break-even, 0.96$\\times$)",
+      "stated": "language-pool forecast schedule costs 0.96x the deployable static language fleet's GPU-time",
+      "computed": "The source values (closedloop.tex:371-375) are 518.6 H100 GPU-h (forecast) vs 537.4 (burst-sized static TP2x2). 518.6 / 537.4 = 0.9650167 -> 0.97 at two decimals, not 0.96. The same paragraph rounds its companion ratios by round-half-up (625/537.4 = 1.16300 -> 1.16; 641/537.4 = 1.19278 -> 1.19), so 0.96 is a truncation inconsistent with the file's own convention.",
+      "relation": "ratio recomputation from published values; rounding convention consistency",
+      "severity": "rounding",
+      "propagates_to": "tese.tex:114 (Resumo, 0,96x); closedloop.tex:375; conclusion.tex:85",
+      "proposed_fix": "Replace \"0.96$\\times$\" with \"0.97$\\times$\" at tese.tex:68, tese.tex:114, closedloop.tex:375 and conclusion.tex:85; or, if 0.96 is the unrounded truth, publish the unrounded GPU-hours that produce it (the currently published 518.6/537.4 do not)."
+    },
+    {
+      "line": 68,
+      "quote": "(the\nlanguage fleet near-break-even, 0.96$\\times$)",
+      "stated": "the language fleet is near break-even at 0.96x, presented as a property of the forecast-driven policy",
+      "computed": "closedloop.tex:376-383 states explicitly that this is Chronos-specific: substituting Toto or TimesFM holds the identical tail (651 ms, both pass) but costs 625 and 641 GPU-h = 1.16x and 1.19x the static fleet. The abstract quotes only the single most favourable of three forecasters (mean of the three = (518.6+625+641)/3 = 594.9 GPU-h = 1.107x static) without the qualification the body itself insists on (\"the language pool's near-break-even cost is Chronos-specific; the pass/fail verdict is model-independent, the cost is not\").",
+      "relation": "abstract vs results-section scope of the same quantity",
+      "severity": "loose",
+      "propagates_to": "tese.tex:114 (Resumo); conclusion.tex:85",
+      "proposed_fix": "Replace with: \"(the language fleet near-break-even under Chronos, 0.97$\\times$; 1.16--1.19$\\times$ under the other two forecasters, which pass the same tail)\"."
+    },
+    {
+      "line": 71,
+      "quote": "and the week-scale economics\nare simulated.",
+      "stated": "the cost headline (0.62x / 0.96x) is a week-scale, i.e. seven-day, economic result, following an abstract that has already framed the trace as \"seven days\"",
+      "computed": "closedloop.tex:369 defines the aggregate as \"the full 5.60-day evaluation span\"; trace-eda.tex:176 explains the missing 1.4 days are consumed as zero-shot forecast context and never graded. 5.60/7.00 = 0.800, i.e. the \"week-scale\" figure covers 80% of the trace. Worker-time arithmetic confirms the span: 3.87M encoder worker-seconds / 8 workers / 3600 = 134.375 h = 5.599 d, and 537.4 H100 GPU-h / 4 GPUs = 134.35 h = 5.598 d.",
+      "relation": "unit/definition consistency: \"week-scale\" vs the 5.60-day graded span, against the abstract's own \"seven days\"",
+      "severity": "loose",
+      "propagates_to": "tese.tex:117-118 (Resumo, \"a economia em escala semanal\"); closedloop.tex:369, 481; conclusion.tex:81-85",
+      "proposed_fix": "Replace with: \"and the multi-day economics (the 5.60-day graded span, the remaining 1.4 days being consumed as forecast context) are simulated.\""
+    },
+    {
+      "line": 67,
+      "quote": "at\n0.62$\\times$ the deployable static encoder fleet's GPU-time",
+      "stated": "the 0.62x denominator is \"the deployable static encoder fleet\" (English), while the Resumo (line 112) says \"a menor frota est\\'atica vi\\'avel\" -- the smallest feasible static fleet",
+      "computed": "REFUTED as a numerical error, CONFIRMED as an abstract-level ambiguity. baselines.tex:117-120 defines the deployable static as \"the single static fleet that survives all windows, $C=8$ encoders plus TP2$\\times$2\", and tab:base-grid shows max over windows of $C^{*}$ = 8 (burst2, burst5), so \"deployable\" IS the smallest all-window-feasible fleet and the two phrasings denote the same denominator. The ratio itself recomputes exactly: 2.41M / 3.87M provisioned worker-seconds = 0.62274 -> 0.62 (closedloop tab:cl-aggregate). The defect is that \"deployable\" is never defined inside the abstract, so a standalone reader cannot tell it from \"the cheapest static fleet\" ($C=2$, 0.25x, which fails), and the two abstracts disagree in wording.",
+      "relation": "denominator definition consistency, English abstract vs Portuguese resumo vs baselines.tex definition",
+      "severity": "ambiguous",
+      "propagates_to": "tese.tex:112 (Resumo); tese.tex:133 (draft note); intro.tex:481; conclusion.tex:81; related.tex:361; closedloop.tex:482",
+      "proposed_fix": "Make the English self-contained and match the Resumo: \"at 0.62$\\times$ the GPU-time of the smallest static encoder fleet feasible on every window ($C{=}8$)\"."
+    },
+    {
+      "line": 60,
+      "quote": "episodic encoder queueing at 29\\% mean\nutilization, invisible to rate- and utilization-based monitors",
+      "stated": "the vision pool queues episodically at 29% mean utilization, with no configuration attached",
+      "computed": "The 29% is measured at one specific locked configuration -- the naive 2-encoder x 2-LLM topology at the trace's own recorded rate over the largest-burst window (twopool.tex:246-251, 337-341, 375). It is not a property of the deployed or SLA-shaped fleet: twopool.tex:344-347 says six encoder workers (3x this topology) are needed at the same rate, at which utilization would necessarily be lower still. Independent upper-bound check that the 29% is at least self-consistent: 83{,}376 forwards x 316.4 ms (the published per-forward maximum) / (2 workers x 8.3 h x 3600) = 44.1%, so 29% is admissible as a mean over sub-full batches; and 64{,}804 requests / (8.3 x 3600) = 2.169 req/s reproduces the quoted 2.2 req/s.",
+      "relation": "definitional scope of a headline utilization figure (which topology, which window)",
+      "severity": "ambiguous",
+      "propagates_to": "tese.tex:104 (Resumo); intro.tex:179, 460; twopool.tex:340, 362, 375; conclusion.tex:21",
+      "proposed_fix": "Replace with: \"episodic encoder queueing at 29\\% mean utilization on the two-worker topology at the trace's own rate, invisible to rate- and utilization-based monitors\"."
+    },
+    {
+      "line": 56,
+      "quote": "its encoder costs\ncollected on RTX 5090 silicon (submitted upstream to NVIDIA's aiconfigurator as a draft PR) and\nvalidated physically",
+      "stated": "English: the encoder cost data were SUBMITTED UPSTREAM AS A DRAFT PR. Portuguese (line 98-99): \"contribu\\'idos ao aiconfigurator da NVIDIA\" -- contributed to NVIDIA's aiconfigurator.",
+      "computed": "Not arithmetic: the two abstracts assert different degrees of upstream acceptance for the same artifact. \"Draft PR submitted\" is an open, unmerged contribution; \"contribu\\'idos ao\" reads as an accepted/landed contribution. The Portuguese is the strictly stronger claim and drops the qualifier the English author deliberately added.",
+      "relation": "cross-language consistency of claim strength (English abstract vs Resumo)",
+      "severity": "loose",
+      "propagates_to": "tese.tex:98-99 (Resumo)",
+      "proposed_fix": "Align the Resumo to the English: \"com custos do codificador medidos em sil\\'icio RTX 5090 (submetidos ao aiconfigurator da NVIDIA como \\emph{draft PR}) e validados fisicamente\"."
+    },
+    {
+      "line": 192,
+      "quote": "\\appendix\n\\include{apendice}",
+      "stated": "the document's appendix material is apendice.tex only",
+      "computed": "apendice_ecosystem.tex (168 lines, labels app:ecosystem and tab:app-ecosystem) exists in tex/ but is \\include'd nowhere: grep over all *.tex finds no \\include/\\input of it, and apendice.tex contains no \\include either. No surviving \\ref points into it (the only references to tab:app-ecosystem are inside the orphan file itself), so the build does not break -- the content simply never renders. Its 19 numeric tokens, including the two dynamo release dates and four version pins, are therefore unreviewed and unpublished.",
+      "relation": "document-structure integrity: source file present but not compiled",
+      "severity": "loose",
+      "propagates_to": "apendice_ecosystem.tex (entire file, never rendered)",
+      "proposed_fix": "Either add \"\\include{apendice_ecosystem}\" after line 192, or delete apendice_ecosystem.tex from tex/ so the source tree does not carry dead, unaudited content into the defense version."
+    }
+  ],
+  "passed_checks": "ENCODER COST HEADLINE (exact): tab:cl-aggregate 2.41M / 3.87M provisioned worker-seconds = 0.62274 -> 0.62x, matching tese.tex:67, tese.tex:112, tese.tex:133, intro.tex:481, conclusion.tex:81, related.tex:361 and closedloop.tex:482 with no drift. Sibling rows in the same table also recompute: static C=2 0.97/3.87 = 0.2506 -> 0.25x; reactive L=30 2.61/3.87 = 0.6744 -> 0.67x; reactive L=300 1.67/3.87 = 0.4315 -> 0.43x. UNIT IDENTITY \"GPU-time\" = \"worker-time\": one encoder worker is one RTX 5090, confirmed independently from tab:base-grid (burst2, C*=8, span 1.90 h -> 15.2 5090-GPU-h = 8x1.90) and from the span arithmetic 8 workers x 134.4 h x 3600 = 3.871M worker-s, matching the published 3.87M exactly -- so the abstract's \"GPU-time\" and closedloop's \"provisioned worker-time\" are the same quantity and the ratio is unaffected. LANGUAGE SPAN: 537.4 H100 GPU-h / 4 GPUs = 134.35 h and 3.87M/8/3600 = 134.375 h -- the two pools' denominators are measured over the same span to within rounding. DENOMINATOR IDENTITY: \"deployable static\" (baselines.tex:117-120) = max over windows of C* = 8 from tab:base-grid = the smallest all-window-feasible fleet, so the Resumo's \"menor frota est\\'atica vi\\'avel\" is not a different denominator (extractor flag refuted). ORDER-OF-MAGNITUDE CLAIMS BOTH VERIFIED AS >=10x: burstiness CV^2 3.83 / 0.32 = 11.97 (trace-eda.tex:194-196); saturation knees, vision uncrossed at s=32 vs language knee at s=3 -> 10.7x (twopool.tex:307-309). Neither is a 6x dressed up as an order of magnitude. JACCARD: 5 shared minutes / (106 + 101 - 5) = 5/202 = 0.02475 -> 0.02, matching tese.tex:52 and tese.tex:93 and trace-eda.tex:418. R^2: abstract 0.12 is the correct two-decimal rounding of the 0.123 published in trace-eda.tex:241 and intro.tex:146 (and trace-eda.tex:257 itself writes 0.12) -- no drift. TRACE SIZE/SPAN: \"one million requests over seven days\" agrees with trace-eda.tex:22-23 (\"exactly seven days, 2024-10-15 to 2024-10-22\") and intro.tex:128, and is corroborated by the duplicate-row fraction 151/1e6 = 1.51e-4 matching the stated 1.5e-4. UTILIZATION 29%: identical in tese.tex:60, tese.tex:104, intro.tex:179, intro.tex:460, twopool.tex:340/362/375 and conclusion.tex:21, and admissible against the independent upper bound 83,376 x 316.4 ms / (2 x 8.3 h) = 44.1%. BURST-WINDOW RATE: 64,804 requests / 8.3 h = 2.169 req/s, consistent with both the 2.17 of twopool.tex:251 and the 2.2 of twopool.tex:379. p90 QUANTILE: tese.tex:69 and tese.tex:115 agree with validation.tex:35/67/100 (archived Chronos p90 path on burst3); the validation delta recomputes, (695-651)/651 = +6.759% -> +6.8% as printed at validation.tex:67. \"HARDEST\" vs \"LARGEST\" BURST: the abstract uses two different superlatives for two different windows, and both match the body (validation.tex:28-29 calls burst3 the hardest case; twopool.tex:25/248 calls the burst-enveloping window the largest) -- not a contradiction. CROSS-LANGUAGE NUMERICS: every numeral in the Resumo matches its English counterpart exactly (0.12/0,12; 0.02/0,02; 29%/29%; 0.62/0,62; 0.96/0,96; p90; one million/um milh\\~ao; seven/sete) -- confirming the extractor's finding of no translation drift. FORECASTING CLAIM SCOPE: \"beat classical baselines on every signal\" at provisioning horizons is exactly what predictors.tex:410-412 claims (all four signals, every cell of the 5x4 grid), correctly scoped away from the sub-minute no-skill regime.",
+  "notes": "SCOPE. tese.tex is the root/front-matter file: title page, Abstract, Resumo, draft note, abbreviations table, \\include list, and a manual thebibliography. It contains no tables, no figures and no results sections, so there is no text-vs-table relation internal to this file. Every number in it is a restatement of a body-chapter result, which makes the only meaningful audit an abstract-vs-body recomputation; I therefore recomputed each of the nine distinct quantities against the chapter that produces it (trace-eda, twopool, baselines, predictors, closedloop, validation) rather than only checking abstract-vs-resumo.\n\nEXTRACTOR FLAGS ADJUDICATED. (1) The claimed \"deployable\" vs \"menor frota vi\\'avel\" denominator discrepancy is REFUTED as a numeric error -- baselines.tex:117-120 defines them to be the same fleet (C=8 = max over windows of C*) -- but I retain it at severity \"ambiguous\" because the abstract never defines \"deployable\" and the two language versions still read differently. (2) The extractor's demand that the two \"order of magnitude\" phrases be confirmed as >=10x and not ~6x is CONFIRMED: 11.97x (burstiness) and 10.7x (knees). (3) The verifiability gap the extractor raises for the four trace-EDA descriptors is real but out of scope for an internal-arithmetic pass; internally they are all mutually consistent, and the Jaccard one is fully reconstructible from the published set sizes.\n\nOUT-OF-CHAPTER OBSERVATION worth routing to the twopool auditor: twopool.tex:79 states \"TPOT 14.9 vs.\\ 7.9~ms; 87 vs.\\ 142 output tok/s per user\". The identity tok/s = 1000/TPOT_ms gives 1000/14.9 = 67.1 and 1000/7.9 = 126.6, not 87 and 142, and the two discrepancy factors are not even equal (1.30x and 1.12x), so this is not a single consistent unit convention. It does not propagate into tese.tex, so I do not record it as a finding here, but it should be recomputed against the source data in the twopool pass.\n\nSEVERITY CALIBRATION. Only one finding is arithmetic (the 0.96 -> 0.97 rounding), and it sits 0.0002 above the rounding boundary, so it is recorded as \"rounding\" not \"wrong\". The remaining six are scope, denominator-definition, cross-language-strength and document-structure defects; none of the thesis's headline numbers is numerically false."
+}

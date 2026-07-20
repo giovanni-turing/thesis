@@ -1,0 +1,71 @@
+{
+  "chapter": "related",
+  "n_reviewed": 3,
+  "n_upheld": 2,
+  "n_overturned": 0,
+  "n_revised": 1,
+  "db": "postgresql://goku@localhost:5433/postgres schema provenance",
+  "rulings": [
+    {
+      "line": 168,
+      "quote": "the source tree at the commit used for this thesis's simulations (v1.3.0 source build; accessed 2026-07-07)",
+      "criticality": "low",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "upheld",
+      "final_verdict": "INSUFFICIENT_DATA",
+      "evidence": "Re-ran: SELECT DISTINCT engine, commit_sha FROM provenance.runs WHERE is_current; -> only (NULL,NULL) and ('vLLM',NULL). No commit_sha is populated on any run. SELECT table_name,column_name FROM information_schema.columns WHERE table_schema='provenance' AND column_name ILIKE '%version%' OR ILIKE '%engine%' OR ILIKE '%commit%' OR ILIKE '%runtime%' -> the only runtime-ish fields are collector_* engine labels (aic, vllm, eager, sdpa, flash_attention_2, compiled, measured, measured_5x50, aic_postinfill), collector_bench_run.{cuda_version,torch_version,python_version}, and cost_model_variant.runtime. SELECT DISTINCT runtime FROM provenance.cost_model_variant -> {NULL,'srcbuild'}; the three is_published=t rows (head2k_src:poly, head2k_src:aic) carry runtime='srcbuild' with source_path under simulation/results/srcbuild/, while the superseded is_published=f variants (two_pool:*, llm_only:*) carry runtime=NULL. SELECT count(*) FROM provenance.ledger_entry WHERE row_to_json(ledger_entry)::text ILIKE '%1.3.0%' OR '%1.2.1%' -> 0. So the DB records a TWO-BUILD archive in which only the source build is published, but stores no version string anywhere and cannot adjudicate '1.3.0' vs '1.2.1'.",
+      "final_fix": "NO NUMERIC EDIT. The DB neither confirms nor refutes the version string. The residual issue is textual scope, and on an ordinary reading the footnote is defensible: it dates the planner SOURCE TREE inspected to describe planner behavior, and the planner-in-the-loop baseline (cap:baselines) is a load-sweep-onward run, which apendice.tex:51-55 assigns to the 1.3.0 source build. Only the phrase 'this thesis's simulations' (unqualified, i.e. all of them) overreaches, since apendice.tex:42 records the 1.2.1 wheel as the Phase-2 baseline runtime. If edited at all, make it a narrowing, not a new claim: '... inspection of the source tree at the v1.3.0 source build used for the calibrated runs from the load sweeps onward (see Appendix~\\ref{ap:artifacts} for the two dynamo.replay runtimes; accessed 2026-07-07).' This is a WEAKENING of an over-broad scope, not a correction of a wrong value.",
+      "notes": "The first-pass's secondary recommendation (backfill a runtime-version column into provenance.runs) is a sound DB hygiene action and touches no thesis text; recorded as optional, not required for the chapter."
+    },
+    {
+      "line": 206,
+      "quote": "Chapter~\\ref{cap:trace-eda} finds the same signatures (Fano factor growing by nearly three orders of magnitude with window size, Hurst exponents up to ${\\approx}0.93$) in a multimodal inference workload's demand signals, strongest in the vision signal.",
+      "criticality": "low",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "upheld",
+      "final_verdict": "DEFINITIONAL",
+      "evidence": "SELECT script, metric_path, signal, value_num FROM provenance.eda_metric WHERE metric_path ILIKE '%fano%' OR metric_path ILIKE '%hurst%' ORDER BY metric_path; -> 5 Fano rows, ALL from script e_comprehensive with signal IS NULL (fano_factor_by_window: s 1.763887763041937, 10s 7.990738587608922, min 31.86402190693521, 10min 186.43410640714995, h 938.1234256287424), versus 7 Hurst rows each carrying a signal (images 0.9324861626791896 = argmax, gen 0.9058882969135582, ctx_multimodal 0.867543571824298, ctx/ctx_total 0.8591774257917434, requests 0.8289469695744109, ctx_text_only 0.7569443297639995). Unrounded growth ratio = 938.1234256287424 / 1.763887763041937 = 531.85, log10 = 2.7258 decades.",
+      "final_fix": "NO NUMERIC EDIT: 'nearly three orders of magnitude' (10^2.726) and '~0.93' (0.9325, images) are both correct, and the Fano factor IS computed on one of the four demand signals (requests), so 'in a multimodal inference workload's demand signals' is literally true. The single unsupported attachment is 'strongest in the vision signal' applied to Fano, for which no per-signal Fano exists. Apply the wording split only: '... finds the same signatures (a request-arrival Fano factor growing by nearly three orders of magnitude with counting-window size, from 1.8 at \\SI{1}{\\second} to 938 at \\SI{1}{\\hour}) and, across the per-pool demand signals, Hurst exponents up to ${\\approx}0.93$, highest in the vision signal.' Both quoted endpoints check out (1.7639 -> 1.8, 938.12 -> 938).",
+      "notes": "Adversarial test applied: is the sentence rescuable by attaching 'strongest in the vision signal' to the nearest antecedent (Hurst) alone? Grammatically yes, which is why this is DEFINITIONAL/ambiguous and not THESIS_WRONG. No number in the chapter changes."
+    },
+    {
+      "line": 312,
+      "quote": "the vision pool's image rate: the burstiest of the four ... and ramping to peak within replica cold-start times in the fast half of its bursts",
+      "criticality": "medium",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "revised",
+      "final_verdict": "THESIS_WRONG",
+      "evidence": "Sub-claim (a) 'burstiest of the four' CONFIRMED: SELECT metric_path, signal, value_num FROM provenance.eda_metric WHERE metric_path LIKE 'multi_resolution.%.cv2' -> images is the maximum at every resolution (1s 25.71 > ctx 4.83 > gen 4.59 > requests 1.07; 60s 3.83 > 0.85 > 0.40 > 0.32; 3600s 2.33 > 0.43 > 0.18 > 0.16). Sub-claim (b) NOT SUPPORTED. Onset distribution, re-run: SELECT metric_path, value_num FROM provenance.eda_metric WHERE metric_path ILIKE '%onset%' -> onset_minutes.min=1, p10=1.7, p50=6, p90=51.6 over the 18 published episodes[i].onset_min rows (sorted: 1,2,2,2,2,2,3,6,6,7,11,13,26,35,48,53,60,404). Independent check on the merged-episode table: SELECT count(*) FILTER (WHERE onset_min<=2.75), count(*) FILTER (WHERE onset_min<=2), count(*) FROM provenance.eda_burst_episode WHERE onset_min IS NOT NULL -> 8 / 8 / 24. Longest cold-start lead the archive ever exercises: SELECT DISTINCT lead_s FROM provenance.ewma_ablation_cell -> max 165 s (2.75 min). So the fraction of episodes whose onset fits inside the longest realizable lead is 8/24 = 33.3% (6/18 = 33.3% on the published set), NOT half. The thesis contradicts itself elsewhere in the same direction: trace-eda.tex:293 claims only 'the fastest onsets (1--2 minutes) are comparable to or faster than replica cold-starts', and closedloop.tex:168 states the exposure is 'at most the cold-start lead of placement, not the several minutes an onset takes'.",
+      "final_fix": "Replace 'in the fast half of its bursts' with 'in its fastest bursts (a third of the episodes reach peak within two minutes, the fastest within one, against replica cold starts of tens of seconds to minutes)'. Justification: 8/24 merged episodes and 6/18 published episodes have onset_min <= 2, and 165 s is max(ewma_ablation_cell.lead_s). Apply the identical change at tex/intro.tex:167 ('the fast half of the bursts arrive too fast' -> 'a third of the bursts arrive too fast'). This WEAKENS the claim from 'half' to 'a third'; the claim survives, its magnitude does not.",
+      "notes": "Revision vs first pass: the verdict THESIS_WRONG stands, but the first pass's replacement magnitude ('only the fastest decile, ~10% of bursts') is itself wrong -- it reads the p10 statistic as the qualifying fraction. The DB gives 33%."
+    }
+  ],
+  "rejected_fixes": [
+    {
+      "source": "verified/related.json line 312 proposed_fix and its reasoning/delta",
+      "text": "'in its fastest bursts (10th-percentile onset 1.7 minutes, fastest 1 minute ...)' / 'only the fastest decile (p10 = 102 s < 165 s) satisfies the claim, i.e. ~10% of bursts'",
+      "why_rejected": "Two errors. (1) The ~10% figure confuses a percentile LABEL with the qualifying FRACTION: 8 of 24 merged episodes (and 6 of 18 published) have onset_min <= 2 min <= the 165 s max lead, i.e. ~33%. Writing '~10%' would replace an overstatement with an understatement. (2) '1.7 minutes' contradicts the published precision in trace-eda.tex:289-291, which prints the same statistic as '10th percentile \\SI{2}{\\minute}' (DB 1.7 rounds to 2 at whole-minute precision); importing 1.7 into related.tex manufactures a new intra-thesis inconsistency."
+    },
+    {
+      "source": "internal_defects.json line 313 proposed_fix",
+      "text": "'... (10th-percentile onset 2 minutes, fastest 1 minute, against replica cold-start leads of 15--165 s)'",
+      "why_rejected": "Numbers are fine, but stating the range as 'replica cold-start LEADS of 15--165 s' in a positioning sentence swaps the physical quantity (replica cold-start time, which the thesis characterizes as 'tens of seconds to minutes') for a simulation knob (the lead values the ablation sweeps). Only partially rejected: keep the percentiles, drop the 15--165 s framing from the prose."
+    },
+    {
+      "source": "internal_defects.json line 56 proposed_fix",
+      "text": "'... and separately up to 3.3--5.5$\\times$ higher IMAGE-ENCODING throughput~\\cite{Qiu2025ModServe}'",
+      "why_rejected": "Attributes the throughput gain to a specific stage that was NOT read from the cited paper (the fix text itself ends 'Confirm against the ModServe paper which stage the throughput gain is measured on'). Applying it as written would introduce a fabricated attribution into a citation. The safe form is to decouple the two figures WITHOUT naming a stage: 'reporting 25--41.3\\% serving-cost savings via modality-aware placement and scaling, and up to 3.3--5.5$\\times$ higher throughput~\\cite{Qiu2025ModServe}'."
+    },
+    {
+      "source": "verified/related.json line 225 proposed_fix",
+      "text": "Print $R^2{=}\\num{0.123}$ instead of 0.12",
+      "why_rejected": "Not an error correction -- 0.12 is the correct two-digit rounding of the archived 0.12253911262014872 (eda_metric.constant_fraction_fit.r2). Purely cosmetic precision harmonization; must not be recorded in any errata as a wrong value."
+    },
+    {
+      "source": "verified/related.json line 361 proposed_fix",
+      "text": "rewording the 0.62 denominator",
+      "why_rejected": "Not rejected as harmful, but flagged: 0.62 is exact (ewma_ablation_cell chronos/p90/rho=15/warm: ws 2410754.7 / denom_static_c8_ws 3869278.4 = 0.6231). Any rewording must not touch the number; the claim was CONFIRMED and is out of adversarial scope."
+    }
+  ],
+  "notes": "Only 3 of the 24 first-pass claims were non-CONFIRMED/non-UNVERIFIABLE. Net effect on the chapter: ZERO numbers change. Line 206 and line 168 are scope/wording narrowings; line 312 is the one substantive defect, and the honest remedy is to WEAKEN 'the fast half' to 'a third' (and mirror it at intro.tex:167), not to substitute a different headline statistic. Every value cited above was read from the live DB in this session."
+}

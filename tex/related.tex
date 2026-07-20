@@ -203,9 +203,11 @@ Floyd (whose title, \emph{the failure of Poisson modeling}, names the
 phenomenon~\cite{Paxson1995}), and, with the heavy-tailed object sizes
 that produce them, for Web traffic by Crovella and
 Bestavros~\cite{Crovella1997}. Chapter~\ref{cap:trace-eda} finds the
-same signatures (Fano factor growing by nearly three orders of magnitude
-with window size, Hurst exponents up to ${\approx}0.93$) in a multimodal
-inference workload's demand signals, strongest in the vision signal.
+same signatures (a request-arrival Fano factor growing by nearly three
+orders of magnitude with counting-window size, from 1.8 at
+\SI{1}{\second} to 938 at \SI{1}{\hour}) and, across the per-pool demand
+signals, Hurst exponents up to ${\approx}0.93$, highest in the vision
+signal.
 
 For LLM serving, public traces anchor the field's empirical work: the
 Azure LLM inference traces released with
@@ -309,8 +311,10 @@ What separates this thesis from the landscape above is not an ingredient
 but a finding. The demand signal most dangerous to reactive scaling is
 the vision pool's image rate: the burstiest of the four, nearly
 invisible in the request \emph{rate} a conventional autoscaler watches,
-and ramping to peak within replica cold-start times in the fast half of
-its bursts. That same signal is also the most persistent, hence the most
+and ramping to peak within replica cold-start times in its fastest
+bursts (a third of the episodes reach peak within two minutes, the
+fastest within one, against replica cold starts of tens of seconds to
+minutes). That same signal is also the most persistent, hence the most
 forecastable, at exactly the horizons provisioning requires
 (Chapters~\ref{cap:trace-eda} and~\ref{cap:predictors}). That inversion
 makes per-pool predictive provisioning both necessary and feasible in

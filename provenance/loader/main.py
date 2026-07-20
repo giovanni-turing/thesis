@@ -13,7 +13,7 @@ Per-kind runs are independent and touch different tables, so several
 import argparse, sys, time
 import loaders as L
 import load_grid, load_collector_silicon, load_trace_eda, load_vllm_etl, load_pred_ewma
-import load_sweeps, load_costmodel, load_residual, load_a16
+import load_sweeps, load_costmodel, load_residual, load_a16, load_group_c, load_live, load_runtime_build, load_config_backfill
 from ingest_common import load_ingest_index
 
 PROJ = [("K9", "windows", L.load_windows), ("K1", "llm_reports", L.load_llm_reports),
@@ -40,7 +40,31 @@ RAW = [("K4", "worker_schedule", L.load_worker_schedule),
        ("K11", "measured", L.load_measured),
        ("K29", "eda_rates", load_residual.load_eda_rates)]
 PROJ.append(("K30", "a16_analysis", load_a16.load_a16))
-ALL = PROJ + RAW
+# K31 -- ADJUDICATION §2.4/§2.5/§2.11. Must run AFTER K1 (llm_reports): it reads the
+# riders reports that K1 owns in ingest_log and derives from provenance.runs rows K1
+# created. PROJ order already puts K1 first.
+PROJ.append(("K31", "group_c", load_group_c.load_group_c))
+# ADJUDICATION §2.2 / §2.7. Registered at K40+ deliberately: K31-K36 are contended by
+# the sibling §2.10 (live arm) and §2.12 (config backfill) passes landing in the same
+# round, and BYKIND is a dict, so a duplicated code silently makes `--only <code>` reach
+# only the LAST registration. K40/K42 are projection loaders; K41 is a POST pass.
+PROJ.append(("K40", "srcbuild", load_runtime_build.load_srcbuild))
+PROJ.append(("K42", "sweep_manifests", load_runtime_build.load_sweep_manifests))
+# ADJUDICATION §2.10 -- the live arm (tex/validation.tex tab:val-anchor).
+# K50 is unique across PROJ + RAW + POST, and K50 is what live_arm's nine ingest_log
+# rows carry -- keep the two in step if this is ever renumbered, since `--only` and the
+# ingest_log kind census are the two places the code is read back.
+PROJ.append(("K50", "live_arm", load_live.load_live))
+# POST-PASSES annotate rows the ingests have already created, so they run LAST and
+# are appended after RAW rather than folded into PROJ.
+POST = [("K34", "config_backfill", load_config_backfill.load_config_backfill),
+        # K41 runs AFTER config_backfill. Both read the SAME "(Tick)" Lineage marker and
+        # write the same vocabulary, and both COALESCE, so they cannot disagree; they
+        # differ only in reach. K34 maps log -> run via runs.source_path (605 runs); K41
+        # re-derives a run_id from the log filename and catches whatever that resolves
+        # and source_path did not. Neither overwrites the other.
+        ("K41", "runtime_build", load_runtime_build.load_runtime_build)]
+ALL = PROJ + RAW + POST
 BYKIND = {k: (k, name, fn) for k, name, fn in ALL}
 
 

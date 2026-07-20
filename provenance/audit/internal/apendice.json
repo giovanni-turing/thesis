@@ -1,0 +1,99 @@
+{
+  "chapter": "apendice",
+  "n_relations_checked": 34,
+  "n_errors": 9,
+  "errors": [
+    {
+      "line": 198,
+      "quote": "growing to $+21.8\\%$ only past the FIFO cap at $N{=}512$",
+      "stated": "The encoder FIFO cap is at N=512, and the +21.8% residual appears past it.",
+      "computed": "fig:app-engines caption (line 168) states 'the dotted line the FIFO cap ($N{=}64$)'; lines 116 and 196 define the serving regime as N<=64; line 205 gives N=1--512 as the sweep span, so N=512 is the sweep endpoint, not the cap. Independent recomputation from the archived curves (vllm_eager_dense.json vs aic_fn_engines_aiccurve.csv): ratio at N=512 = 1.2177 (+21.8%), and max residual for N<=64 = +12.71% at N=52. So +21.8% is the value AT N=512, which is past a cap of 64.",
+      "relation": "internal cross-reference: FIFO cap value in figure caption vs body text",
+      "severity": "wrong",
+      "propagates_to": "line 168 (fig:app-engines caption); line 116 and line 196 ('N<=64 serving regime'); the exculpatory argument that the +21.8% drift lies outside the pool's batching regime",
+      "proposed_fix": "Replace with: 'growing to $+21.8\\%$ only past the FIFO cap at $N{=}64$, reaching that value at the $N{=}512$ sweep endpoint'."
+    },
+    {
+      "line": 180,
+      "quote": "runs $1.36$--$1.61\\times$ above the composition, rising with $N$",
+      "stated": "HF-SDPA/AIC ratio range 1.36--1.61x.",
+      "computed": "From tab:app-engine as published: 11.3/8.2=1.3780, 58.7/43.1=1.3619, 253.8/160.2=1.5843, 511.6/316.4=1.6169 -> upper bound rounds to 1.62, not 1.61. From the unrounded archive (merged_sdpa.csv): 511.573/316.369=1.6170, and the max over all N<=64 is 1.6208. Both roundings give 1.62.",
+      "relation": "text vs table recomputation (max of column ratio)",
+      "severity": "rounding",
+      "propagates_to": "line 194 ('The earlier $1.4$--$1.6\\times$ gap'); fig:app-engines caption line 172",
+      "proposed_fix": "Replace '$1.36$--$1.61\\times$' with '$1.36$--$1.62\\times$'."
+    },
+    {
+      "line": 186,
+      "quote": "matches the composition to within $11.4\\%$\n($-2.2\\%,+11.3\\%,+5.5\\%$ at $N{=}8/32/64$)",
+      "stated": "vLLM residual of -2.2% at N=8.",
+      "computed": "From the published table: 42.2/43.1 - 1 = -2.088% -> -2.1%, not -2.2%. From the unrounded archive: 42.1787/43.126 - 1 = -2.197% -> -2.2%. The claim holds ONLY against unrounded data the reader cannot see; the same three-value tuple then quotes +11.3% at N=32, which is the ROUNDED-table value (178.3/160.2-1 = +11.30%) while the unrounded value is +11.37% -> +11.4%. The tuple therefore mixes rounded and unrounded bases.",
+      "relation": "recomputation of residual from table cells; rounded vs unrounded consistency",
+      "severity": "rounding",
+      "propagates_to": "same sentence's 'within $11.4\\%$' bound; line 196 'within $12.8\\%$'",
+      "proposed_fix": "Make the tuple internally consistent with the table: '($-2.1\\%,+11.3\\%,+5.5\\%$ at $N{=}8/32/64$)', or state all three from the unrounded archive as '($-2.2\\%,+11.4\\%,+5.5\\%$)' and add a footnote that residuals are computed pre-rounding."
+    },
+    {
+      "line": 186,
+      "quote": "matches the composition to within $11.4\\%$",
+      "stated": "Agreement bound of 11.4% for the matched-engine anchor.",
+      "computed": "The largest residual derivable from the four published anchor rows is +11.30% (178.3/160.2). 11.4% is not reachable from any table cell; it equals the unrounded N=32 residual (178.4062/160.196 = +11.37%). Meanwhile lines 196/214 use a different bound, 12.8%, for the same 'N<=64 serving regime' (dense-sweep max = +12.71% at N=52). Two different agreement bounds (11.4% and 12.8%) are quoted in the same appendix for what reads as the same claim, without stating that one is over 4 anchor shapes and the other over 69.",
+      "relation": "definitional consistency of the scope/denominator of the agreement bound",
+      "severity": "ambiguous",
+      "propagates_to": "lines 116, 168, 196, 214 (all uses of 12.8% / 12.7%)",
+      "proposed_fix": "Rewrite as: 'matches the composition to within $11.4\\%$ at the four anchor shapes (and within $12.8\\%$ across all 69 batch sizes of the dense sweep)'."
+    },
+    {
+      "line": 182,
+      "quote": "($1.25\\times$ at $N{=}8$, $1.47\\times$ at $N{=}64$)",
+      "stated": "HF-FA2/AIC = 1.25x at N=8.",
+      "computed": "From the published table: 54.1/43.1 = 1.2552 -> 1.26. From the unrounded archive (merged_fa2.csv): 54.236/43.126 = 1.2576 -> 1.26. Neither basis yields 1.25; the value appears truncated rather than rounded. The companion value checks out: 465.7/316.4 = 1.4719 -> 1.47 (unrounded 465.589/316.369 = 1.4717).",
+      "relation": "text vs table recomputation",
+      "severity": "rounding",
+      "propagates_to": "none found in this chapter",
+      "proposed_fix": "Replace '$1.25\\times$ at $N{=}8$' with '$1.26\\times$ at $N{=}8$'."
+    },
+    {
+      "line": 149,
+      "quote": "8  & 43.1  & 58.7  & 54.1  & 42.2  & 48.8  & 0.98 \\\\",
+      "stated": "HF-FA2 latency 54.1 ms at N=8 (and 465.7 ms at N=64, line 151).",
+      "computed": "The archived source (collector_artifacts/phaseE_physical_anchor/merged_fa2.csv) gives 54.236 ms at N=8 (-> 54.2) and 465.589 ms at N=64 (-> 465.6). Every other cell I could trace rounds correctly (HF-SDPA 511.573 -> 511.6; AIC 8.162 -> 8.2, 43.126 -> 43.1, 160.196 -> 160.2, 316.369 -> 316.4; vLLM 8.0305 -> 8.0, 42.1787 -> 42.2, 178.4062 -> 178.3 [178.41 -> 178.4], 333.6107 -> 333.7 [333.61 -> 333.6]), so the FA2 column and two vLLM cells look mis-transcribed by one in the last digit.",
+      "relation": "table cell vs generating artifact (rounding of published cells)",
+      "severity": "rounding",
+      "propagates_to": "the derived ratios on lines 182 and 186 and the vLLM/AIC column of tab:app-engine",
+      "proposed_fix": "Regenerate tab:app-engine cells from the archived means: HF-FA2 54.2 (N=8) and 465.6 (N=64); vLLM 178.4 (N=32) and 333.6 (N=64), recomputing the vLLM/AIC column (0.98, 0.98, 1.11, 1.05 are unchanged)."
+    },
+    {
+      "line": 192,
+      "quote": "\\texttt{torch.compile}\n(max-autotune) accelerates the HuggingFace forward by $1.2$--$1.4\\times$",
+      "stated": "torch.compile speedup over HuggingFace of 1.2--1.4x.",
+      "computed": "HF-SDPA/compile from the published table: 11.3/10.1 = 1.1188 at N=1, 58.7/48.8 = 1.2029 at N=8, 253.8/186.0 = 1.3645 at N=32, 511.6/370.6 = 1.3805 at N=64. Over the 13 compiled sizes in the archive the range is 1.06 (N=2) to 1.40 (N=128); inside the N<=64 serving regime it is 1.06--1.38. The stated lower bound 1.2 is violated at N=1,2,4,6 and the upper bound 1.4 is only reached at N=128, outside the serving regime.",
+      "relation": "recomputation of a stated speedup range from published table cells",
+      "severity": "loose",
+      "propagates_to": "line 193 'landing near vLLM's numbers'",
+      "proposed_fix": "Replace with: 'accelerates the HuggingFace forward by $1.2$--$1.4\\times$ in the batched regime ($N{\\ge}8$; only $1.06$--$1.15\\times$ at $N{\\le}6$)'."
+    },
+    {
+      "line": 180,
+      "quote": "runs $1.36$--$1.61\\times$ above the composition, rising with $N$",
+      "stated": "The HF-SDPA/AIC ratio rises monotonically with N.",
+      "computed": "Table ratios by N: 1.378 (N=1), 1.362 (N=8), 1.584 (N=32), 1.617 (N=64). The ratio FALLS from N=1 to N=8 before rising; the archived dense curve confirms a dip (N=2 ratio 1.321). 'Rising with N' is false at the small-N end where the quoted minimum 1.36 actually lives.",
+      "relation": "monotonicity claim vs table column",
+      "severity": "loose",
+      "propagates_to": "fig:app-engines caption line 172 ('sits near $1.3$--$1.4\\times$ at small $N$ and climbs')",
+      "proposed_fix": "Replace 'rising with $N$' with 'rising with $N$ above $N{=}8$ (the ratio is flat near $1.36$--$1.38$ for $N{\\le}8$)'."
+    },
+    {
+      "line": 124,
+      "quote": "RTX~5090 under an external \\texttt{nvidia-smi} clock lock,\ntarget SM~2400\\,/\\,mem~14001\\,\\si{\\mega\\hertz}",
+      "stated": "The engine-sensitivity table was collected under an external hard clock lock, distinct from the Phase-E persistence-mode run.",
+      "computed": "The delivered band reported for this 'locked' recollection (line 130: 2377--2400 MHz, median 2400) is IDENTICAL to the band reported at line 30 for the run explicitly described as persistence-mode and 'not a hard lock'. Lines 130--131 further concede 'no memory-clock reading and no lock-command log were captured'. The evidence offered therefore does not distinguish the locked from the unlocked case, so the qualitative distinction drawn at lines 125--128 is unsupported by any published number. (Spot check: the archived per-N SM readings do include 2377, e.g. vllm_eager_dense.json N=1.) Separately, tab:ap-env pins the AIC collection runs at SM 2407 MHz while this recollection targets 2400 MHz -- two different pinned SM targets in the same appendix, unexplained.",
+      "relation": "unit/definition consistency: 'external hard lock' vs 'persistence mode', and 2407 vs 2400 MHz targets",
+      "severity": "ambiguous",
+      "propagates_to": "lines 28--31 (tab:ap-env caption); line 165 (fig:app-engines caption)",
+      "proposed_fix": "Replace with: 'RTX~5090 with clocks requested at SM~2400\\,/\\,mem~14001\\,\\si{\\mega\\hertz}; as in the Phase-E anchor the delivered SM band was 2377--2400\\,\\si{\\mega\\hertz} (median 2400) and no lock-command log was captured, so this is treated as the same soft-pinned regime rather than a verified hard lock.' Also state why AIC collection used SM 2407 and this recollection 2400."
+    }
+  ],
+  "passed_checks": "vLLM/AIC ratio column of tab:app-engine fully reproduces from the latency cells: 8.0/8.2=0.976->0.98, 42.2/43.1=0.979->0.98, 178.3/160.2=1.1130->1.11, 333.7/316.4=1.0547->1.05 (all four correct). +5.5% at N=64 reproduces (1.0547 rounded, 1.0545 unrounded). +11.3% at N=32 reproduces from the published cells. HF-FA2 1.47x at N=64 reproduces (465.7/316.4=1.4719). HF-SDPA lower bound 1.36 reproduces (58.7/43.1=1.3619). Grid-extrapolation threshold: 32768/784 = 41.80, so 'past N~=42 the model extrapolated beyond the grid' is CORRECT and correctly binds before the attention-grid limit -- I REFUTE the extractor's item 5. ViT max token count 784*512 = 401,408 matches \\num{401408} exactly. Residual bounds: max |ratio-1| for N<=64 over the archived dense sweep = 12.71% at N=52, matching both '+12.7%' (line 116, line 197) and the +-12.8% band (lines 168, 196, 214); the beyond-cap value 1.2177 at N=512 matches '+21.8%' (lines 171, 198) exactly. Design/counts are self-consistent: '69 batch sizes' for vLLM and HuggingFace and '13' for torch.compile agree between line 158 and the caption at line 166 (and 13 compiled sizes are present in vit_compile_dense.json); 'five replications of fifty timed forwards' (line 205) matches the artifact name measured_f_n_5x50.csv (line 284); the 95% Student-t CI bound 'below 0.06 ms' is stated identically at lines 166 and 206. The clock band 2377--2400 MHz is quoted consistently at lines 30, 130 and 165. Encoder-delay reprice 606 ms vs 589 ms (line 210) is a +2.9% shift and is correctly described as non-divergent; the 0.62x cost ratio is quoted consistently at lines 11 and 333, both attributed to the ISSUE-TIME aggregate (denominators agree within this chapter). Multires claim is self-consistent: mean ratio 0.99--1.05 at <=448^2 with a 12.8% bound, and 1.09--1.11 at 640^2/896^2 with a 15.5% bound, direction ('AIC under-pricing') matches ratios >1. The three named fix commits (656ac8ca infill, 12306db5 collector fix, 492a3444 large-batch coverage) at lines 70--72 are the same three enumerated in apendice_ecosystem. Column/row structure of tab:app-engine (4 N values x 6 numeric columns) is complete with no missing cells.",
+  "notes": "Method: read all 383 lines of tex/apendice.tex; recomputed every ratio derivable from tab:app-engine both from the PUBLISHED (rounded) cells and, as a cross-check, from the archived generating artifacts (vllm_eager_dense.json, merged_sdpa.csv, merged_fa2.csv, vit_compile_dense.json, figuras/aic/aic_fn_engines_aiccurve.csv) in order to separate 'wrong number' from 'wrong rounding'. This appendix's numeric content is concentrated in lines 110-242; the manifest longtable (244-373) is paths and design constants with no arithmetic to check. Extractor adjudication: item 1 (FIFO cap) CONFIRMED and raised to severity 'wrong'; item 2 (1.61 vs 1.62) CONFIRMED; item 3 (-2.2% and 'within 11.4%') CONFIRMED, and I additionally show the tuple mixes rounded and unrounded bases; item 4 (torch.compile 1.2-1.4x) CONFIRMED, with the low end actually 1.06x not 1.12x once the full 13-size set is used; item 5 (N~=42 attributed to the wrong grid) REFUTED -- 32768/784=41.8 is the FIRST grid boundary hit, so attributing the threshold to the GEMM m-grid is correct and the sentence names both grids before concluding. Two defects the extractor did not report: the HF-FA2 1.25x rounding (line 182) and the mis-rounded HF-FA2/vLLM table cells (line 149/151). Lower-severity items recorded only here: line 116's '+12.7%' is introduced before any figure or table in the appendix publishes a number from which it can be derived (the four anchor rows top out at +11.3%), which briefly leaves the reader unable to source it until fig:app-engines at line 168; and line 194's 'earlier $1.4$--$1.6\\times$ gap' loosely restates the $1.36$--$1.62\\times$ range given fourteen lines earlier."
+}

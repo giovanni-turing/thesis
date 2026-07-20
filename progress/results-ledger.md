@@ -23,6 +23,40 @@ defect. Run a ledger-vs-tex sweep before any submission build.
 
 ---
 
+### provenance GROUP C — riders knee/belief derivation + 3 answer-artifacts  (2026-07-20)
+artifact:   provenance/schema/25_group_c.sql, provenance/schema/26_group_c_checks.sql,
+            provenance/loader/load_group_c.py (kind K31);
+            new tables provenance.{capacity_belief_sample, capacity_knee_probe,
+            capacity_derivation, runs_config_backfill, encoder_factoring_probe};
+            new views provenance.{v_capacity_knee, v_fabric_sensitivity};
+            new columns encoder_run_summary.{handoff_gbps, handoff_rtt_ms},
+            capacity_derivation.{belief_p10_disc_rps, belief_p90_disc_rps, r_tail_basis}
+command:    psql -f provenance/schema/25_group_c.sql && psql -f provenance/schema/26_group_c_checks.sql
+            && cd provenance/loader && python3 load_group_c.py
+            (idempotence verified: 3 consecutive passes, 2nd and 3rd load 0 files / 0 rows)
+feeds:      closedloop.tex:328,331,337 (belief 10.07 rps/TP2-replica over n=86 ticks; burst1 tail
+            knee 1.6233 -> 1.62; burst4 bracket [1.2588,1.4386] -> [1.26,1.44]; scale = belief/r_tail
+            = 8.0 with 1.1429 margin -> "~14%"); baselines.tex:168,181 tab:base-ladder (lead_s=60,
+            window_name=burst1, tp=2 backfilled onto the four riders:ladder_* runs);
+            intro.tex:311 (AIC SOL 5.9174x optimistic); intro.tex:514,516 (fabric conditional now
+            queryable via v_fabric_sensitivity); twopool.tex:118 (factoring invariance, delta 0.000000)
+supersedes: ADJUDICATION §2.4/§2.5/§2.11 OUTSTANDING -> APPLIED. Nothing measured was overwritten:
+            the two pre-bugfix burst4 probes are kept is_superseded=true with their reason, and the
+            §2.5 backfill writes only over NULL (aborts on any non-NULL) with every change recorded
+            in runs_config_backfill + asserted by check C405.
+result:     new checks C401-C407 all PASS; full check_all() shows no new failures (the 7 reds are
+            pre-existing and out of scope). TWO honest findings recorded rather than smoothed:
+            (1) the published belief band "p10-p90 8.5-12.8" reproduces only under the
+            order-statistic percentile convention (8.45/12.83), not linear interpolation
+            (8.46/12.66 -> 12.7); both stored, no thesis edit, since the derivation uses only the
+            median (10.07 under every convention). (2) NEW DEFECT: encoder_run_summary.image_px
+            reads 448 on all 12 g6:u896* rows although that mixture is 896^2 (784 post-merge
+            tokens/image); the true payload lives in the un-ingested <stem>.jsonl.g6mix.json
+            sidecar. Those 12 are the reason C404 is scoped to thesis runs and C407 pins the
+            excluded set. image_px MUST NOT be used to reason about g6 payload; ingesting the
+            g6mix sidecars would let C404 become one physical law with no exclusion.
+commit:     (pending)
+
 ### Vision knee sweeps, post-infill  (2026-07-08)
 artifact:   simulation/results/sweeps/summary.json, vision_*_aic_s*.json
 command:    python3 simulation/sweep_load.py --pool vision --window {head2k,burst1} --speedups 1 2 4 8 16 32 --force  (grid-exact DB, parallel-chunk dispatch)
@@ -914,3 +948,808 @@ outstanding: ADJUDICATION §2.2-§2.12 are INGESTS of artifacts not yet in the s
             stage-conditional vision grid, sweep manifests, EWMA calibration coverage, the 5.3M
             missing cov-mode forecast rows, live-arm artifacts, three answer-artifacts, and the
             missing configuration columns). None applied here.
+
+--------------------------------------------------------------------------------
+date:       2026-07-20
+what:       ADJUDICATION §2.9 APPLIED (covariate-mode forecast ingest) and §2.8 CLOSED
+            (no ingest needed). Q1 answered; intro.tex:431 verified in-store.
+command:    cd /home/gio/tese/predictors/results && python3 -c "reassemble
+              {chronos,toto}_covariates.parquet.gz.part{00,01} via gzip.decompress"
+            cd /home/gio/tese/provenance/loader && python3 main.py --only K10
+            psql -f /home/gio/tese/provenance/schema/23_forecast_covariate.sql
+artifacts:  predictors/results/{chronos,toto}_covariates.parquet (reassembled, gitignored)
+            provenance/schema/23_forecast_covariate.sql (new)
+            provenance.v_forecast_thesis_corpus (new view); checks C009, C010 (new)
+result:     provenance.forecast  before 16,734,300 -> added 5,269,200 -> after 22,003,500.
+            Second --only K10 run loaded 0 rows / 0 files (idempotent, sha256 in ingest_log).
+            Per (model,mode,resolution), all mode='cov':
+              chronos 1s 2,386,896 | 15s 128,976 | 30s 48,336 | 45s 21,456 | 1min 8,016
+                      = 2,593,680
+              toto    1s 2,403,264 | 15s 145,344 | 30s 64,704 | 45s 37,824 | 1min 24,384
+                      = 2,675,520
+            RECONCILIATION EXACT: 41 forecast parquets on disk, 41 source_tag groups in DB,
+              zero count mismatches, both sides 22,003,500. NO FILE IS ABSENT.
+root cause: NOT a loader bug. {chronos,toto}_covariates.parquet are the only forecast
+            artifacts stored split+gzipped (.parquet.gz.part00/01, commit 925b399 "keep the
+            repo LFS-free"); load_forecast globs '*.parquet', which cannot match
+            '*.parquet.gz.part00'. The archive was always complete -- only the reassembly
+            step was missing. Reassembled paths are gitignored (.gitignore:85-86), i.e.
+            reassembly on demand is the intended workflow (cf. _ensure_covariates(),
+            figuras_new/predictors.py:78-85). No loader change was required or made.
+            The ledger's framing ("only the 1s/30s/45s/1min point partitions are missing")
+            was stale: mode='cov' count was 0 at EVERY resolution. The rows it mistook for
+            cov-mode 15s data are the NULL-mode post-manuscript families -- 12 *_expctx
+            reforecasts (40,308 ea) + 3 ewma_cal_* variants (38,388 ea).
+Q1 ANSWERED: intro.tex:431 "21.4 million archived rows" is EXACT, not approximate.
+              all files                            22,003,500
+              excl ewma_cal_*                      21,888,336
+              excl ewma_cal_* and *_expctx         21,404,640
+              mode IN ('uni','cov')  [corpus]      21,404,640   <-- 21.4 M, no rounding slack
+            The two natural exclusion rules COINCIDE. R29's proposed weakening to "over 21
+            million" is NO LONGER NEEDED. This refutes ADJUDICATION's own 21,565,872 figure.
+not cosmetic: C006 recomputes forecast_metrics WAPE/MAE/RMSE from raw rows and joins on
+            rc.md = coalesce(m.mode,'~') -- it is mode-aware. With cov rows absent, all 360
+            cov-mode metric cells (span='full', h in 1,4,12) failed to join and were SILENTLY
+            DROPPED: C006 verified 1,080 cells while reporting as a full check. It now
+            verifies all 1,440, all passing -- a vacuous check made honest with NO change to
+            its tolerance or population predicate.
+§2.8:       NO INGEST NEEDED -- the ledger entry was stale. provenance.ewma_cal_coverage
+            already carries all 4 schemes x 2 splits, matching ewma_cal_manifest.json to full
+            precision (eval: add 0.9012529, mult 0.8783340, wsc 0.8765972, native 0.9288860;
+            nominal 0.9, n_calib 6144), and was already fully COMMENTed. closedloop.tex:218's
+            0.88-0.90 band is therefore DB-verifiable as it stands = the add/mult/wsc eval
+            spread at published precision. NO THESIS EDIT.
+            What WAS missing is why coverage is load-bearing, now check C010: the three arms
+            are POINT-IDENTICAL. Over the 38,388 aligned (origin,h,variate) rows: 0 differ in
+            point; 38,388 differ in p90 (both add-vs-mult and add-vs-wsc). By construction --
+            conformal calibration rescales the interval, never the point forecast -- so NO
+            point-error metric can rank these arms, and ewma_cal_coverage is the ONLY
+            evidence in the store that separates them.
+check_all(): 56 enabled checks (C009, C010 added, both GREEN). 8 fail, ALL pre-existing:
+              error: C002 (1 of 178 backed runs exceed 1e-3 rel on median_ttft_ms),
+                     C603 (a16, a16_ft, g2, g4 have raw rows but no composed_request partition)
+              warn:  C107, C207, C302, C306, C404, C601
+            Zero regressions attributable to this pass: this work wrote ONLY to
+            provenance.forecast (+ check_definition, one view, three COMMENTs). None of the
+            8 failing checks reads provenance.forecast, so none can have been caused here.
+            NOTE: the 2026-07-19 entry above recorded "no 'error'-severity check fails" over
+            46 checks. C002 and C603 have gone red since, from OTHER work (C603 from the
+            a16/g2/g4 ingest). Flagged here, NOT adopted -- both are outstanding.
+feeds:      intro.tex:431 (now CONFIRMED in-store, first time); closedloop.tex:218 (§2.8);
+            any archived-row claim -> use provenance.v_forecast_thesis_corpus, NOT count(*)
+            over provenance.forecast (22,003,500 over-counts by post-manuscript artifacts).
+supersedes: ADJUDICATION §2.9's "5.3M short / only point partitions missing" diagnosis and its
+            21,565,872 figure; R29's proposed weakening of intro.tex:431; §2.8's "the coverage
+            artifact does not [exist]"; Q1 as an open question.
+outstanding: ADJUDICATION §2.2-§2.7, §2.10-§2.12 remain UNAPPLIED (srcbuild runtime rows,
+            reprice harness stats, riders knee/belief, riders ladder config, stage-conditional
+            vision grid, sweep manifests, live-arm artifacts, three answer-artifacts, missing
+            configuration columns). None touched here.
+
+---
+
+## 2026-07-20 — ADJUDICATION GROUP B: §2.3, §2.6, §2.10
+
+artifacts:  provenance/schema/23_stage_conditional.sql   (§2.6 residual: burst5 supersession,
+                                                          rerun_b1_window_effective, 3 grid_correction rows)
+            provenance/schema/24_live_arm.sql            (§2.10 DDL: live_arm, live_arm_metric,
+                                                          live_worker_event, live_spawn_latency,
+                                                          live_fpm_pass, v_live_anchor)
+            provenance/schema/25_reprice_harness.sql     (§2.3 checks + v_reprice_harness; NO ingest)
+            provenance/loader/load_live.py               (kind K50, registered in main.py)
+commands:   psql -f schema/23_stage_conditional.sql ; -f 24_live_arm.sql ; -f 25_reprice_harness.sql
+            cd provenance/loader && python3 main.py --only K50
+date:       2026-07-20
+
+FINDING — TWO OF THE THREE WERE ALREADY DONE. The OUTSTANDING status on §2.3 and §2.6 was
+stale, and the honest result of this pass is that only §2.10 was a real gap.
+
+§2.3 reprice harness — ALREADY INGESTED by K21 (load_collector_silicon, via its
+     glob(phaseE_physical_anchor/*.stats.json) registry line) into collector_encoder_stats.
+     Verified exact: encoder_delay_p99 605.612 / 589.301 / 692.008 / 646.943 ms (thesis
+     606/589/692/647, closedloop.tex:606,621,635,638); provisioned_worker_seconds 2,410,754.7
+     both winsched arms and 3,869,278.8 both static-C8 arms; encoder_batch_images = 64
+     ([E18]); collector_kernel_ledger loaded. NOT re-ingested — re-ingesting correct rows is
+     pure downside. Added instead what §2.3 actually lacked: C230 (four published p99s under
+     rounding), C231 (the reprice-pair invariant — same schedule, so identical
+     provisioned_worker_seconds within a scenario), C232 (harness 646.943 vs simulator
+     misc:week_static_C8 644.44 = 0.388 %, against the thesis's own 0.5 % bound), and the 2x2
+     view v_reprice_harness.
+
+§2.6 stage-conditional vision grid — ALREADY INGESTED by K28 (load_residual.load_rerun_b1 ->
+     rerun_b1_run / rerun_b1_window / rerun_b1_curve_point; 7 windows, 140 curve points).
+     All four deltas reproduce exactly: burst1 6->7, burst3 7->8, burst4 7->8, burst6 6->8,
+     GPU-hours 49.9->58.2 / 3.1->3.6 / 22.1->25.2 / 8.2->10.9. TWO REAL RESIDUALS, now applied:
+       (a) burst5's row was computed against the pre-§2.1 C*=16, so its "0 delta" was right
+           for the wrong reason. Superseded visibly (sibling _corrected columns +
+           grid_correction row 'burst5:stage_conditional_baseline:supersession' +
+           rerun_b1_window_effective): against the corrected C*=8 the smallest C clearing
+           1,000 ms on image-bearing requests is C=8 at 852.4 ms (C=7 = 1037.5 ms). Delta is
+           genuinely 0 — but 0 against 8. Value DERIVED in SQL from the ingested curve, not typed.
+       (b) only burst1 had a grid_correction row; burst3/4/6 added as 'alternative_metric'.
+     grid_window.c_star UNTOUCHED. Per standing instruction the stage-conditional grid is kept
+     SEPARATE from grid_window.c_star, and every COMMENT says it is a DIFFERENT METRIC, not a
+     correction. C211 pins the one-way relation (stage-conditional >= published, always).
+
+§2.10 live arm — THE ONLY GENUINE INGEST. Nothing under simulation/results/live51/live_runs/
+     was in the store. 3 arms x 3 files = 9 files, 2,905 rows. Every §2.10 quantity reproduces
+     to full precision: TTFT p99 695.16032053 (live_fc) / 3531.453221559999 (live_re); ITL p99
+     11.469605181217391 / 150.74457055235087; replica-seconds 6062.954568 (span 1643.6 s) /
+     1798.852786 (span 1644.5 s); spawn->registered 0.954-0.996 s mean 0.9858 s n=5;
+     mixed-pass 2/184, 2/24, 3/207.
+     TWO DEFINITIONS the audit gave only in prose are now pinned in code + COMMENT:
+       mixed pass       = FPM scheduler pass with prefill_tok > 0 AND decode_kv > 0,
+                          censused over the first 300 s of FPM logging.
+       spawn->registered = a NON-INITIAL spawn paired to the first following "Discovery Added".
+                          Initial spawns are excluded: they fire before the planner is
+                          subscribed and measure ~3.3 s of planner startup, not registration.
+     THE ITL MAPPING (the §2.10 note that drove R16) is now enforced, not just documented:
+     live_arm.itl_p99_ms is aiperf inter_token_latency = TPOT; the true per-chunk ITL is a
+     separate column chunk_latency_p99_ms; the view column is named tpot_p99_ms; C222/C223 go
+     red if the two are ever wired to the same aiperf field.
+     runs.tp = 2 backfilled on all 10 experiment='live' rows from live51/engine_args.json (C224).
+     verify_flag ingested but is_thesis_arm = false — a planner feature-flag control, NOT a
+     tab:val-anchor row, flagged so no future pass mistakes it for a third policy arm.
+
+idempotency: K50 run twice -> second run files=0 rows=0. --reload reloads 9 files to identical
+            values. Verified via both load_live.py and main.py --only K50.
+
+check_all(): 13 new checks, ALL GREEN — C210-C213 (§2.6), C220-C225 (§2.10), C230-C232 (§2.3).
+            C212 is deliberately an INEQUALITY, not an equality: the published grid samples
+            C in {1,2,4,8,16} while the rerun curve is dense over 1..20, so burst5's dense
+            mixed knee (7, 925.2 ms) sits below its published 8. That is grid resolution, not
+            a defect. Asserting equality would fail honestly on burst5 for the wrong reason,
+            so the invariant is written at the strength that is actually true, and C213 is an
+            info-severity census that keeps the one difference VISIBLE rather than tolerated
+            silently. No tolerance was weakened and no population narrowed anywhere.
+            Suite total: 8 pre-existing failures (error C002, C603; warn C107, C207, C302,
+            C306, C601) plus C401/C403/C404 PROBE ERROR ("unrecognized format() type
+            specifier") — ALL pre-existing, none attributable to this pass, which wrote only
+            to the new live_* tables, rerun_b1_window's new columns, grid_correction,
+            check_definition and runs.tp. FLAGGED, NOT ADOPTED.
+
+feeds:      tex/validation.tex tab:val-anchor (live half now fully DB-checkable, first time);
+            closedloop.tex:606, 621, 635, 638 (now check-backed via C230-C232);
+            baselines.tex:92, 93 (stage-conditional prose; use rerun_b1_window_effective).
+supersedes: ADJUDICATION §2.3's and §2.6's "not ingested" premise (both were); §2.6's burst5
+            "0 delta" as stated against C*=16.
+outstanding: ADJUDICATION §2.4, §2.5, §2.8, §2.11, §2.12 remain UNAPPLIED (riders knee/belief,
+            riders ladder config, EWMA calibration coverage, three answer-artifacts, missing
+            configuration columns). §2.2/§2.7/§2.9 were handled by sibling passes, not here.
+            NOT DONE HERE, deliberately: the 306 ingest_log rows with run_ids absent from runs
+            (C207) — pre-existing and out of Group B's scope.
+
+### ADJUDICATION Group A — §2.2 runtime/build discriminator + §2.7 sweep manifests  (2026-07-20)
+artifact:   provenance/schema/23_runtime_build_and_actuation.sql (structure),
+            provenance/schema/24_actuation_correction.sql (the §2.7 relabel + C507-C509),
+            provenance/loader/load_runtime_build.py (K40 srcbuild / K41 runtime_build / K42
+            sweep manifests), loaders.actuation_of() + ingest_common.RUN_COLS,
+            21_checks.sql C505 widened.
+command:    psql -f schema/23_runtime_build_and_actuation.sql; psql -f schema/24_actuation_correction.sql;
+            python3 loader/main.py --only K40,K41,K42; python3 loader/main.py --only K7 --reload
+verify:     idempotent (digest over runs.{runtime_build,runtime_build_evidence,actuation,
+            is_current} identical across two full passes); K7 --reload reproduces the
+            corrected state exactly (572 target-time run_ids, all is_current=false, 600
+            issue-time, 0 orphans); selftest 3/3 GREEN; C503/C504/C505/C507/C508/C509 pass;
+            no new suite failure (the 9 remaining are all pre-existing).
+
+§2.2 — THE THESIS IS RIGHT, THE STORE COULD NOT EXPRESS THE QUESTION.
+  * srcbuild rows ingested (K40). simulation/results/srcbuild/llm_head2k_{poly,aic}_src.json
+    were invisible to K1 because its glob is *.report.json and these are *_src.json. Now
+    'srcbuild:llm_head2k_{poly,aic}_src'. Every published tab:sim-poly-aic cell reproduces
+    EXACTLY: poly 67.30122/248.46453/2539.91366/6.78509/1412.95029/6878.76756; aic
+    68.23318/307.36448/4517.56828/7.67120/1589.62103/8163.49788.
+  * Supersession is METRIC-scoped (new provenance.metric_supersession, 12 rows), not
+    run-scoped: the wheel sweeps:*_s1 rows stay is_current because they are still the s=1
+    anchor of the Phase-2 speedup knee sweep. Nothing on them was rewritten;
+    provenance.llm_head2k_poly_aic_effective shows both sides + the published value.
+  * The discriminator: runs.runtime_build was ALREADY created by the sibling §2.12 pass
+    (23_config_columns.sql, vocabulary 'source'|'wheel'). Adopted its column and vocabulary
+    rather than minting a second one; added only runs.runtime_build_evidence (which log
+    attests the row) + the vocabulary constraint + the index.
+  * NEW EVIDENCE, and the substantive contribution: §2.12 states "NO run log in the archive
+    carries a wheel marker, so 'wheel' is currently unattested". There is one. The KVBM
+    builder logs "Using Lineage inactive backend (Tick)" on dynamo 1.3.0 and the same line
+    WITHOUT "(Tick)" on the 1.2.1 wheel — a line every replay emits regardless of timing
+    model, whereas §2.12's "RustAicCallback" probe is emitted only by the source build's AIC
+    path and so cannot distinguish wheel from no-AIC-at-all. Cross-checked over all 1,219
+    archived logs: 498 agree, 1 (Tick)-only (srcbuild/run_poly.log — a POLY run runs no AIC
+    callback, so the §2.12 probe is blind to it by construction), 119 wheel-only, 601 neither,
+    ZERO disagreements. runtime_build now: 495 source / 110 wheel / 2,446 NULL (was 493/0).
+    sweeps:llm_head2k_{poly,aic}_s1 = wheel 1.2.1; srcbuild:* = source 1.3.0 — R4/R12/[E14]
+    are now a one-line query.
+  * The 2,446 NULLs are left NULL deliberately: encoder-pool / pure-Python / converter-only
+    runs never load a dynamo runtime, so the question is not meaningful, and runs with no
+    archived log have no evidence. Never guessed. C509 fails if a build is ever asserted
+    without evidence.
+
+§2.7 — THE AUDIT'S PREMISE WAS WRONG, IN THE DIRECTION THAT MATTERS.
+  * §2.7 records factorial_cell as "issue-time only (1,172 cells) — the expected state, since
+    the target-time grid is declared superseded", and asks for the target-time grid to be
+    ingested. It was ALREADY ingested — MISLABELLED. Of the 1,172, only 600 are issue-time;
+    572 are the target-time harness wearing an issue-time label (results_44.jsonl 560 +
+    pilot_results.jsonl 12). The two actuations were being SILENTLY POOLED in
+    current_factorial and every view built on it — precisely the failure §2.7 exists to
+    prevent. Root cause: loaders.load_factorial inferred actuation from the substring
+    "target" in the PATH, which neither file contains.
+  * Corroborated independently, before any document was consulted, by check C504's own note
+    ("factorial_cell readiness: strict=300 warm=300 NULL=572") — readiness is an
+    issue-time-only axis — and by the lead sets ({15,30,45,300} vs {15,30,45,165}).
+  * Applied as a visible supersession, no measurement touched: actuation relabelled,
+    is_current=false, run_id renamed factorial:issue-time:* -> factorial:target-time:* (the
+    wrong label was baked into the primary key), with all 572 old identifiers preserved in
+    the new provenance.run_id_alias and the reasoning in provenance.ingest_correction
+    (IC001/IC002). p99/max/feasible/provisioned_ws/busy_ws/schedule carried across verbatim.
+  * loaders.actuation_of() now classifies by explicit artifact identity, so --reload
+    reproduces the corrected state instead of re-minting the mislabelled rows.
+  * Sweep manifests ingested (K42): provenance.sweep_manifest + sweep_manifest_cell, 5
+    manifests / 747 cells, each carrying its actuation so a manifest can never be attributed
+    to the other controller. provenance.sweep_manifest_coverage turns "requested but never
+    returned" into a fact: cells_44 560/560, cells_44_wave1 60/60, pilot_cells 12/12,
+    cells_week_canary 0/3 (all three errored in the converter), cells_week 0/112.
+  * C505 widened from {issue-time} to {issue-time, target-time}. An EXTENSION, not a
+    relaxation — the check's own note anticipated it ("If a second actuation mode is ever
+    simulated this check fires and the domain must be widened") and a third value still
+    fires. Kept in sync in 21_checks.sql so re-running it cannot revert the correction.
+
+FLAGGED, NOT HIDDEN: the target-time reactive rho=15 cells at leads 15/30/45 are superseded
+AS A GRID but are still the source of thesis Tab. 7.3 and the A2 defense animation
+(gen_a2_runs.py:9, extract_a2.py:47). Setting is_current=false removes them from
+current_factorial, which is what §2.7 asks for but does mean a Tab-7.3 query must now filter
+actuation='target-time' explicitly. Those 16 runs therefore carry runs.feeds naming the table
+they still back, so "superseded" can never be misread as "unused". (16, not 15: the pilot's
+burst3/rho15/cs30 cell is the bit-exact parity twin of the grid's and backs it equally.) (16, not 15: the
+pilot's burst3/rho15/cs30 cell is the bit-exact parity twin of the grid's, and backs the
+published number equally.)
+
+CONTENTION NOTE: three sibling passes (§2.10 live arm, §2.12 config columns, and others)
+landed in the same round and contended for kind codes K31-K36; this pass sits at K40/K41/K42.
+main.py's BYKIND is a dict, so a duplicated code silently makes `--only <code>` reach only the
+LAST registration — K31 and K34 are each still registered twice as of this writing.
+
+feeds:      tex/twopool.tex tab:sim-poly-aic (:61, :103-106) now srcbuild-backed and
+            queryable; apendice.tex tab:ap-env (wheel/source split now attested both ways);
+            closedloop.tex:83, 393, 515 + intro.tex:476 (the 560-cell grid is now auditable
+            AND non-pooling).
+supersedes: ADJUDICATION §2.7's premise that the target-time grid was not ingested (it was,
+            mislabelled, and pooled); §2.12's "runtime_build='wheel' is currently unattested"
+            (110 wheel runs are now attested from the KVBM marker).
+outstanding: ADJUDICATION §2.4, §2.5, §2.8, §2.11 remain UNAPPLIED. NOT DONE HERE: the 96-cell
+            issue-time week surface and the p50 half named in §2.7's later bullets — the
+            week_matrix results are not in factorial_cell at all, which cells_week's 0/112
+            coverage row now makes visible, but ingesting them is a separate pass.
+
+### DB §2.12 — run-level configuration columns, backfilled from the artifacts  (2026-07-20)
+artifact:   provenance/schema/23_config_columns.sql; provenance/schema/24_config_column_checks.sql;
+            provenance/loader/load_config_backfill.py (registered K34, a POST pass)
+command:    psql -f provenance/schema/23_config_columns.sql; psql -f provenance/schema/24_config_column_checks.sql;
+            python3 provenance/loader/main.py --only K34   (idempotent; verified by md5 digest over
+            all 12 config columns across 3 consecutive runs — identical)
+result:     11 new columns on provenance.runs + provenance.v_config_coverage. Coverage of
+            3,051 runs: tp 81.06% (1,372 of them the by-construction encoder TP=1 of §2.12/§5.1),
+            window_name 86.17%, artifact_commit_sha 54.87%, runtime_build/runtime_version 19.83%
+            (source 495 / wheel 110), kv_block_size + kv_eviction 19.27%, aic_system 15.01%,
+            model_checkpoint 14.98% (4 distinct Qwen3-VL checkpoints), aic_perf_db_version 12.68%,
+            arrival_speedup 7.60%, aic_backend 7.41%, moe_tp 2.33%.
+            Every backfilled value carries per-column evidence in runs.config_provenance
+            (log:/point:/git:/by-construction:), so a measurement is distinguishable from a
+            mapping by query, not by trust. UNRECOVERABLE and left NULL, not defaulted:
+            runs.commit_sha (0%, the code commit that PRODUCED a run — no artifact records it;
+            artifact_commit_sha is a DIFFERENT fact and C413 guards the two from being conflated)
+            and runs.engine (0.23%).
+            The load-bearing source is the archived per-run .log sidecar, which carries
+            "AIC session initialized: backend=/system=/model=/tp=", "Loading database for
+            system=/backend=/version=", and the KVBM block_size/eviction banner verbatim.
+feeds:      related.tex:168, tese.tex:256, apendice_ecosystem.tex:125 (the v1.3.0 source build) —
+            §2.12 named these as unadjudicable purely for want of a runtime-version column; they
+            are now a one-line query. Any future audit conditioning on the served checkpoint,
+            the MoE TP degree, the AIC system/perf-DB version, or the offered-rate multiplier.
+supersedes: §2.12's framing that a runtime version had to be documentary — it is attested from a
+            log marker (shared with the §2.2 pass), not from tab:ap-env.
+checks:     C410 (no orphan provenance tags — 7,948 tags, all naming a populated column),
+            C411 (the two runtime_build writers cannot disagree — source 495 / wheel 110 / null 2,446),
+            C412 (model_checkpoint never holds a forecast model name), C413 (commit_sha stays
+            empty; the archival sha never impersonates it), C414 (arrival_speedup agreement —
+            CURRENTLY VACUOUS, 0 overlapping rows, and its detail says so; a forward guard).
+            Full suite after this pass: 55 error-pass / 2 error-fail, both pre-existing
+            (C002 ttft reconciliation, C603 missing composed_request partitions) and untouched here.
+outstanding: §2.12's three NON-column items are NOT done here and remain OUTSTANDING — AIC f(N) at
+            320²/640²/896², the spectral fit band (f_lo=1/43200, f_hi=1/600) plus the untruncated
+            periodogram peak list, and the R26 "post-manuscript defence material" tagging (the
+            g3_32b reports ARE ingested as 232 runs, but nothing in the schema distinguishes
+            defence-only runs from thesis runs — see the audit note below).
+audit:      run-level dimensions the store could not express, BEYOND §2.12's list:
+            (1) served LLM checkpoint — runs.model names the FORECAST model only, so the 32B/235B
+                arms were unselectable; fixed here as model_checkpoint (C412 keeps them apart).
+            (2) MoE tensor-parallel degree — fixed here as moe_tp (NULL, not 1, for dense models).
+            (3) runs.window_name was NULL on 232 g3_32b runs although every point file records
+                "head2k", so the whole 32B arm silently vanished from every window-conditioned
+                query; backfilled here. STILL NULL on exactly 422 runs, led by g4 165, a16 51,
+                a16_ft 48, misc 47, predictors 41, sweeps 19, riders 11, live 10 — flagged, not
+                guessed: those tracks have no artifact field naming a window.
+            (4) offered-rate multiplier had no run-level home (sweep_point.speedup is keyed by
+                sweep_run_id and covers the sweeps track only); added as runs.arrival_speedup.
+            (5) aic_perf_db_version (0.19.0) vs the aiconfigurator PACKAGE version (0.10.0 in
+                tab:ap-env) are different numbers that have been mistaken for each other; now
+                separately named and COMMENTed.
+            (6) NO defence-vs-thesis provenance flag anywhere — R26's requirement is unmet.
+
+## 2026-07-20 — provenance DB: READ-ONLY OPTIMIZATION (post-ingest, generation complete)
+date:       2026-07-20
+artifact:   provenance/schema/99_readonly_optimization_applied.sql (as-executed record;
+            supersedes the PLAN in 99_readonly_optimization.sql, which was written at
+            ~84M rows / 2,060 runs and is now stale in six places — see below)
+            progress/readonly_optimization_bench/{bench.sql, runbench.sh,
+            results_baseline.txt, results_after.txt} (the 9-query workload + before/after
+            EXPLAIN (ANALYZE, BUFFERS) for every query)
+command:    export PGPASSWORD=$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' postgres \
+              | sed -n 's/^POSTGRES_PASSWORD=//p')
+            psql -h localhost -p 5433 -U goku -d postgres -f provenance/schema/99_readonly_optimization_applied.sql
+            # benchmark: progress/readonly_optimization_bench/runbench.sh {baseline,after}
+            # NOTE: VACUUM must run with max_parallel_maintenance_workers=0 — the postgres
+            # container's default 64 MB /dev/shm cannot size the parallel vacuum segment
+            # ("could not resize shared memory segment ... No space left on device").
+
+state:      store at 3,051 runs / ~94M rows / 19 GB / 4,148 ingest_log files. No loader running.
+            Gates all passed: 0 orphans on all four raw fact tables, 0 window-vocabulary
+            violations (DEF-12/DEC-7 now RESOLVED), 0 runs at experiment='misc' (DEC-3 RESOLVED).
+
+MEASURED RESULT — materialization is the entire win; nothing else moved:
+            per-run p99 recompute from raw (18.9M rows)   7.56 s -> 0.027 s   (280x)
+            infraction view (LATERAL per run)             2.18 s -> 0.028 s    (78x)
+            worker-seconds integral (C005)                0.47 s -> 0.026 s    (18x)
+            single-run percentile lookup (check_run path) 0.045 s -> 0.027 s  (1.7x)
+            unchanged (already at the ~26 ms psql floor): runs-to-projection join filtered by
+            window/policy/model 25 ms, per-window cost ratio 27 ms, forecast leaderboard 74 ms,
+            eda_metric path lookup 25 ms, vllm_token_itl aggregation 370 ms.
+
+new:        mv_llm_percentiles (178 rows, 104 kB), mv_worker_seconds (234, 96 kB),
+            mv_infraction (2,337, 648 kB), mv_check_results — each with a unique index so
+            REFRESH ... CONCURRENTLY works; plus v_mv_freshness_all and v_mv_stale, the
+            freshness guard modelled on mv_llm_p99_check's. v_mv_stale returns ZERO ROWS when
+            every matview matches its live population — all four fresh at time of writing.
+            All matviews and both guard views COMMENTed.
+
+integrity:  all 161 NOT VALID constraints VALIDATEd (~10 s total, not the "several hours" the
+            plan budgeted) — zero violations, so nothing broke during the a16/a16_ft/g2/g3_32b/g6
+            ingests. FKs added on run_id for llm_request / composed_request / encoder_series /
+            worker_schedule; runs_window_fk and verification_resolved_run_fk ENABLED (the plan had
+            both commented out; their preconditions are now met). Zero NOT VALID constraints remain.
+
+INDEX INVENTORY: NET ZERO INDEXES ADDED. 255 total / 1,924 MB, of which the only new ones are the
+            three tiny matview primary keys. Every index the plan proposed was measured and rejected:
+            (4.1) (run_id, time) on the raw facts — built on llm_request_a11 in both shapes; 13% on
+                  the LATERAL, 10% on the ordered scan, for 245 MB PER PARTITION (>1.5 GB across
+                  llm_request). Total buffer touches ROSE 125k->271k. The ordered-scan variant was
+                  not even used — the planner still sorted, because sibling partitions lack the index
+                  so no MergeAppend ordered path exists. Both DROPPED.
+            (4.2) forecast_eval_key_idx — redundant; forecast_key_idx already exists per partition.
+            (4.3) runs_family_dims_idx / runs_window_policy_idx — runs is 3,051 rows / 5.7 MB and
+                  the query they targeted already runs in 25 ms. runs_dims_idx already covers the shape.
+            (4.4) ingest_log_* / runs_source_path_idx — ingest_log is 4,148 rows / 1 MB.
+            (4.5) all three ALREADY EXIST (vllm_token_itl_req_idx is a strictly better
+                  (request_id, token_idx); vllm_stat_path_idx; eda_metric_signal_idx).
+
+REJECTED ON MEASUREMENT (recorded so this is not relitigated):
+            CLUSTER (plan §7) — predicted "an order of magnitude fewer pages", measured ZERO.
+              llm_request_a11 correlation 0.80->1.00: 0.97 s -> 0.99 s, buffers 123,651 -> 123,916.
+              llm_request_a12, the WORST-correlated large partition, 0.49->1.00: 0.805 s -> 0.831 s,
+              buffers 95,041 -> 95,268. Planner cost estimate HALVED (390k->181k) while actual time
+              and actual I/O did not move. Premise false: the loaders wrote each run contiguously, so
+              the heap is already ~1.0 correlated on run_id nearly everywhere. a11/a12 left clustered
+              (harmless side effect); no other partition touched.
+            FILLFACTOR (plan §6) — no-op. 100 is already the heap default; reloptions is NULL on
+              every fact table.
+            enable_partitionwise_aggregate/join (plan §10) — claimed "pure wins"; measured WORSE.
+              Forecast leaderboard recompute 1.394 s off -> 1.721 s on (23% worse), reproduced on
+              alternating runs. Premise doubly false: the fact tables partition on `experiment` while
+              forecast partitions on `model` (they do NOT share a key), and no analytical query groups
+              on experiment. NOT set.
+            raised statistics targets + extended statistics (plan §9) — estimates are already right:
+              single run_id filter est 64,132 vs actual 64,804 (1.0%); full grouped scan est 18,868,933
+              vs actual 18,869,922 (0.005%). The plan's multivariate rationale does not arise because a
+              filter on `experiment` is consumed by PARTITION PRUNING before it can multiply
+              selectivity. Plain schema-wide ANALYZE (6 s) applied instead.
+            raising work_mem — tested, NOT applied. At 256 MB the forecast recompute went
+              1.399 s -> 3.462 s (2.5x WORSE; planner switches to a thrashing HashAggregate) while the
+              p99 recompute gained only 5%. Left at the 4 MB default.
+            splitting the default partitions (plan §8) — not needed; DEC-3 resolved, misc is 0 rows.
+
+NOT MATERIALIZED, deliberately:
+            v_run_status — built, measured, DROPPED. Live view already answers in 0.15 s, so the
+              matview saves 130 ms, and it is an AUDIT view ("is this run auditable/orphaned").
+              Caching an audit is exactly how mv_llm_p99_check came to silently check 79% of runs
+              (DEF-10). 130 ms does not justify reintroducing that failure mode.
+            the forecast-accuracy recompute (C006/C007, 1.4 s / 22M rows) — left LIVE on purpose.
+              Its whole value is being an INDEPENDENT recomputation of forecast_metrics; a cached copy
+              could go stale against the very table it cross-checks and the check would then compare
+              stale to stale and pass vacuously.
+
+checks:     full suite after this pass: 56 error-pass / 1 error-fail, 6 warn-pass / 3 warn-fail,
+            2 info-pass. All four failures are pre-existing and documented KNOWN FAILING / ACCEPTED in
+            check_definition.note (C002 ttft percentile-convention on 1 of 178 runs; C107 vLLM client
+            logprob edge; C207 aggregate-artifact ingest_log labels + 5 legacy K35 rows; C302 the two
+            deliberate hand-assigned "measured:" run_ids). None was caused by this pass — no
+            measurement was touched, and no tolerance was loosened. Verdict frozen in mv_check_results.
+            NOTE C603 (missing composed_request partitions), red in the previous ledger entry, is no
+            longer failing.
+
+outstanding: DEC-5 (prefix the bare verification.run_id labels) remains genuinely outstanding — that
+            is why the new FK is on resolved_run_id, not run_id; v_orphan_audit still shows
+            verification 314 / ingest_log 306, both characterised in C207/C302 notes.
+            The three m235b report files flagged in C207's note are still un-ingested (clean gap).
+            ADJUDICATION §2.2-§2.12 are unaffected by this pass and remain as recorded there.
+
+feeds:      every future query of the store — read mv_llm_percentiles instead of recomputing
+            percentiles from llm_request, mv_infraction instead of v_infraction, and
+            mv_worker_seconds instead of the C005 integral; check provenance.v_mv_stale (must be
+            0 rows) before citing any of them.
+
+## 2026-07-20 — provenance DB: FINAL CERTIFICATION of the settled store
+
+date:       2026-07-20
+artifact:   provenance/schema/28_verification_resolution.sql (the only schema change this pass;
+            as-executed record, re-runnable, gated)
+            provenance/SCHEMA_GUIDE.md (rewritten §3 census, §5 preflight, §6 limitations; every
+            example query re-executed and every pasted output refreshed)
+command:    export PGPASSWORD=$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' postgres \
+              | sed -n 's/^POSTGRES_PASSWORD=//p')
+            psql -h localhost -p 5433 -U goku -d postgres -c "select * from provenance.check_all(NULL,NULL,NULL);"
+            python3 provenance/loader/selftest.py
+            python3 provenance/loader/main.py --projections && ... --raw && ... --only K34 && ... --only K41
+            psql -f provenance/schema/28_verification_resolution.sql
+
+WHAT THIS PASS WAS: independent verification of the store at its settled, read-only state. Nothing
+was taken on trust from prior reports; every claim below was re-derived against the live DB.
+
+TOTALS (2026-07-20): 3,051 runs · 99,019,063 rows · 21 GB · 211 tables (incl. partitions) ·
+            55 views + 5 matviews · 4,148 ingest_log rows over 4,148 distinct files (1:1).
+            Raw facts: composed_request 41,106,599 / llm_request 18,869,922 /
+            encoder_series 10,342,685 / forecast 22,003,500 / worker_schedule 235,827.
+
+VERIFIED SOUND:
+  checks    70 defined, 69 enabled, 64 pass, 5 fail. Every failing check's sql_text was read against
+            its title: none had been weakened — no narrowed population, no exemption list, no loosened
+            tolerance. C002 (error) 1 of 178 backed runs, percentile-interpolation convention, 1e-3
+            NOT loosened. C107/C207/C302 (warn) pre-existing and documented. C214 (warn) is NEW and
+            deliberately failing (see below).
+  C007      the one DISABLED check. Its note claimed 14,400/14,400 against a 16.7M-row forecast table
+            — STALE evidence predating the covariate ingest. Re-ran it: 0 of 19,200 cells disagree,
+            15.4 s. It is disabled for cost, not to hide a failure. Note refreshed with the new figure.
+  conservation  partition-migration conservation re-proved against the durable
+            partition_migration_baseline snapshot: delta 0 on all three partitioned facts
+            (composed 41,106,599 / llm 18,869,922 / encoder_series 10,342,685). Nothing was lost.
+  orphans   full sweep over EVERY run_id-bearing base table (generated from information_schema, not a
+            hand list). Orphans in exactly two tables, both characterised: verification 314 (the bare
+            run_id column, not the join key) and ingest_log 306 (C207). Every fact, summary and cell
+            table is clean; worker_schedule is 0 of 235,827 (was 118,861 at the 2026-07-19 audit).
+  identities  the 12 Lens-C projection-vs-raw identities all hold except the known C002:
+            C001 C003 C004 C005 C006 C008 C010 C101 C102 C103 C104 C105 all pass. No regression from
+            the repairs or the read-only optimization.
+  idempotency  main.py end to end changes NOTHING: ingest_log 4,148, runs 3,051 and all raw counts
+            identical, and md5(string_agg(...)) content hashes over runs, llm_run_summary and
+            metric_supersession are BYTE-IDENTICAL before and after. NOTE the literal "0 files/0 rows
+            for everything" criterion is NOT met and should not be expected: K40/K34/K41 are not
+            ingest_log-gated (K40's two files are owned by K26; K34/K41 are COALESCE annotation
+            passes) so they print nonzero counters every run while changing no state. Recorded as
+            SCHEMA_GUIDE §6.14 so this is not re-investigated as a defect.
+  drift     v_llm_drift fresh (mv 178 / live 178, is_fresh=t), v_mv_stale empty, all four matviews
+            fresh. Worst p99 drift 1.2375% (a16:burst3_reactive_P2000.0_...:iter1); all rowcount_matches true.
+  selftest  ALL GREEN 3/3 (collision guard, 66 dirs / 3,134 files / 0 'misc', run_id injective).
+
+DEFECT FOUND AND REPAIRED THIS PASS (the only data change):
+  C205 proved that non-NULL verification.resolved_run_id pointers resolve, but its predicate is
+  `WHERE resolved_run_id IS NOT NULL`, so it never counted rows carrying NO pointer — 75 of 380.
+  C206 is an info census that always returns true. The NULL population was covered by no check in
+  either direction. 66 of the 75 were an EXACT verbatim match to an existing runs.run_id that the
+  original resolver had skipped (it rewrote only BARE simulator ids, leaving already-namespaced ones
+  NULL). Backfilled, gated inside the transaction on row count / no-dangling / exactly-9-remaining,
+  every fill recorded in the new table verification_resolution_backfill (NULL -> value, mirrors
+  runs_config_backfill / C405). No pre-existing pointer could be overwritten (UPDATE gated on IS NULL).
+  ALSO: v_verification_resolved was SHADOWING the stored column — it recomputed its own pointer via
+  split_part(runs.run_id,':',2) = verification.run_id, which can never match an already-namespaced id,
+  so all 66 still read as unresolvable THROUGH THE VIEW that SCHEMA_GUIDE tells agents to join.
+  Rewritten to prefer the stored column, falling back to the old heuristic; strictly more resolving,
+  never less; adds resolution_source ∈ {stored, unique_suffix, unresolved}. 305 -> 371 of 380 resolve.
+  New check C214 (warn) makes the remainder visible. It FAILS at exactly 9 and is deliberately NOT
+  exempted: exempting would narrow the population and would mask any future unresolved row.
+
+STILL BROKEN / PERMANENTLY UNRECOVERABLE (honest list, nothing inflated):
+  permanent 432 of 610 llm_run_summary rows (11,536,096 requests) have NO raw backing — the request
+            logs were never archived. Their percentiles cannot be audited. Not repairable in-store.
+  permanent 9 verification rows will never resolve: 3 structural markers (a16:cells, g1:_preflight,
+            _preflight) and 6 model-level AGGREGATE rows (chronos/timesfm/toto x a14/a15) that carry
+            real numbers but summarise a whole forecast family — no single backing run exists.
+  permanent 9,177 worker_schedule rows across 6 rerun_verify:react_p90_* runs hold the AGGREGATE run's
+            schedule (byte-identical sha256; span 483,660 s vs sim_horizon 29,939 s). The true burst1
+            schedules were never generated and are not on disk. Their stored provisioned_worker_seconds
+            is CORRECT (from *.jsonl.stats.json); only the time series is foreign. Flagged is_valid=false.
+  clean gap simulation/results/235b/llm_head2k_aic235btp8_s{1,4,16}.json still un-ingested — zero
+            ingest_log rows, zero spine runs, experiment m235b declared in runid.py but unloaded. Only
+            the .log siblings were ever read. Needs a loader for that report shape. Nothing is wrong;
+            something is absent.
+  known     C002 / C107 / C207 / C302 remain failing by design, each with an adjudicated note.
+
+COVERAGE (files on disk vs ingest_log, excl. worktrees/parts/venv, .json/.jsonl/.csv/.parquet/.log):
+            5,634 result-like files on disk; 4,148 ingested; 0 ingest_log paths dangling.
+            1,497 not ingested (26.6%) = ~1,202 SECONDARY artifacts of runs that ARE in the store
+            (.log consoles, points/ + logs/ siblings of an ingested reports/*.report.json — all 232
+            g3_32b runs load from reports/, its points/+logs/ alone are 465 of the "missing" —
+            sched_*.json, .conv.log, .ledger.json) + 295 with no representation, of which the
+            vllm_trace_analysis/model/* entries are TRAINED MODEL WEIGHTS, not measurements.
+            By area: simulation/results 96.9%, predictors/results_dynamo + verification/results 100%,
+            analysis/trace_eda 95.2%, predictors/results 88.7%, defense/anim/data 62.4%,
+            vllm_trace_analysis 57.4%, collector_artifacts 54.9%.
+
+SCHEMA_GUIDE.md brought to the final state: §1 totals, §2.12 verification guidance (join
+            resolution_source, NOT n_candidates), §3 dimension census re-derived over 3,051 runs
+            (actuation now has TWO values — target-time 572 — a new pooling trap), §4.0 new trap
+            index, §5 preflight (the documented query was BROKEN — check_failures() has no `passed`
+            column — and 'cheap' silently skips the only error-severity failure), §6 rewritten:
+            6.1/6.4/6.6/6.7/6.9/6.10 are now RESOLVED and recorded as such, 6.13 coverage census,
+            6.14 the idempotency-counter explanation. Added an experiment-family index (the a1x/gx
+            families were undocumented). All 34 SQL blocks re-executed: 0 errors (was 1).
+
+outstanding: ADJUDICATION §2.2-§2.12 are unaffected by this pass and remain as recorded there.
+
+feeds:      any future audit of this store — start from SCHEMA_GUIDE §4.0 and §6, run
+            check_failures('expensive') NOT ('cheap'), and judge loader idempotency by row counts and
+            content hashes rather than by the printed file/row counters.
+
+---
+
+## 2026-07-20 — DELIVERY_RULING §4(b) + §5.1 applied to the manuscript
+
+scope:      the four claims APPROVED to strengthen an existing result, plus the §5.1
+            qualification of the generality claim. Nothing from §4(c) (post-manuscript defence
+            material: G3_32b, G1_burst26, A16_endogenous, A16_decode's new statistics, G4's
+            C*/fleet-sizing/rho-optimality) entered any results chapter. §0.4's 44 rejected
+            fixes untouched (no 882->783; tab:sim-poly-aic untouched; twopool.tex:391 stands;
+            0.96x stands at all four sites; 1.1--6.8% and 18.0% stand).
+
+(1) G7 language-pool billing convention  ->  tex/baselines.tex, new paragraph after the
+    per-hardware-class scoring definition ("From order or from readiness").
+    artifact:  ai-dynamo/dynamo/lib/mocker/src/replay/collector.rs:44-52 (read: the provisioned
+               integral is "active + starting-up + draining"; gpu_hours "already including the
+               startup ramp and drain tail")
+    command:   python over defense/anim/data/g7_coldstart/coldstart.csv — n=52 runs;
+               max |order_integral_rel_err| = 0.01000 (1.00%); reactive arms (n=13)
+               readiness_lagged_rel_vs_reported in [-0.3802, -0.0348] -> "3.5--38.0% short"
+    effect:    correctness-critical — stops a reader adding a cold-start surcharge already billed.
+
+(2) G6 size sensitivity  ->  tex/twopool.tex, appended to the stated uniform-448^2 scope
+    limitation (the site that already said "sizes not recorded").
+    command:   python over defense/anim/data/g6_runs/u*__{burst3,steady24h}__*.stats.json
+    re-derived: 448@25G fc p99 = 588.370 ms = f(64) 316.369 + handoff 272.001, queueing 0;
+               burst3 fc provisioned_worker_seconds INVARIANT at 32,228.0 across 224/336/448/
+               672/896 px and both fabrics (the size-blindness finding, led with);
+               672@100G = 938.734 ms (6.1% margin); 672@25G = 1397.4 FAIL;
+               steady24h 672 = 1972.454 @25G / 1927.455 @100G — BOTH FAIL (window-scope caveat);
+               448 graded cells (not 456) and 690--705 px crossing from G6_sizesens_FINAL.md.
+    all four caveats carried, including the window-scope one.
+
+(3) G4 fold variance  ->  tex/closedloop.tex sec:cl-limits, replacing the "single Azure trace
+    over one 5.60-day span" sentence. QUALIFICATION only; 0.62x unchanged, no numeric edit.
+    command:   python over defense/anim/data/g4_folds/{results.json,windows_folds.json}
+    re-derived (all reproduce the ruling's §1.8 table exactly):
+               FULL fc 2,962,304.8 ws / C8 4,836,959.7 ws = 0.6124 at p99 588.4 (anchor exact)
+               span 999,599 req / 6.998 d; burst-bearing folds = F1,F3,F4,F6,F7 (F6 holds e13)
+               ratio range 0.465--1.098 burst-bearing, 0.187--1.098 over all seven
+               F6: fc rho15 FAILS at 1262.3 ms / 419,391.2 ws; static C5 PASSES at 904.7 ms /
+                   431,967.3 ws = +3.0% worker-time
+               cheapest feasible rho: 25 in FULL/F1/F2/F3/F4/F7, 20 in F5, 10 in F6 —
+                   rho=15 cheapest NOWHERE among the four swept; endpoint in 7 of 8
+               ratio strictly monotone in fold mean img/s (4.2 -> 50.6, spread 12.1x)
+               language: forecast/static = 1.276/1.101/0.931/1.709/3.808/1.022/2.144,
+                   static PASSES in all seven folds
+    DEVIATION from the ruling's §5.1 wording, deliberate: the ruling says "rho=15 is feasible in
+    every fold"; the data say it FAILS F6 (that is the same fold the same sentence says the policy
+    misses). Written as "feasible in six of the seven folds" — the re-derived truth. Flagged.
+    NOT written: "the baseline is 2x oversized", C*, 0.980x, any rho-optimality claim.
+
+(4) A16_ctrlcost, static-anchored only  ->  tex/closedloop.tex, new paragraph closing the cost
+    account ("The controller is not free, and charging it changes nothing").
+    artifact:  defense/anim/data/a16_controller_cost/accounting.csv (+ REPORT.md)
+    query:     psql provenance.ewma_ablation_cell where model='chronos' and rho=15 and
+               quantile='p90' and lead_s=30 -> warm: ws 2,410,754.7 / denom 3,869,278.4 /
+               ratio 0.6231 / feasible=t  (numerator DB-confirmed)
+    re-derived: GPU model A @15s: ratio 0.6232 -> 0.6240 (worst = toto 4-signal), max duty
+               0.00782 (<0.8%); CPU model C @15s: chronos 0.6537/0.6593, timesfm 0.6572/0.6561
+               -> "0.65--0.66x"; toto CPU @15s sustainable=False (duty 1.95/2.14, per-tick
+               29.2/32.1 s) -> fails on FEASIBILITY not cost; tiled_180s CPU all
+               0.6256--0.6338 -> "0.626--0.634x"
+    price basis STATED explicitly ($0.04/vCPU-h vs $2.00/GPU-h over 24 threads,
+               gen_a16_controller_cost.py:85,542,963) and flagged as measured-then-PRICED.
+    NOT written: the 0.675x reactive comparator — §1.2 permits it only with the infeasibility
+               disclosure, and §5.3 warns it re-creates the "roughly two-thirds" collision.
+               Static-anchored form only.
+
+(5) §5.2 convergent finding (static dominates forecast on LANGUAGE-pool cost)  ->  NO EDIT.
+    Searched all 13 tex files (grep: 0.96 / break-even / cheaper / saving / cost advantage /
+    economical). The thesis nowhere claims a language-pool cost advantage for forecasting:
+      closedloop.tex:789-793  "on the encoder pool forecasting buys savings; on the language
+                              pool it buys compliance" + an explicit ban on quoting reactive's
+                              cheapness as a language-pool win
+      closedloop.tex:927-940  "genuinely at break-even, and which side of unity it falls on is
+                              decided by the denominator, not by the policy" (1.03x under
+                              request-count scaling)
+      closedloop.tex:376,383 / conclusion.tex:85 / tese.tex:68 / intro.tex:214 — all hedged as
+                              "near-break-even, 0.96x" (and R18 bars touching 0.96x anyway)
+    The one contrast of forecast vs reactive on the language pool (closedloop.tex:780-793)
+    already names the static shape as the defensible comparator. Nothing to correct or scope.
+
+consistency: closedloop.tex:582 and :1011 declared a16/g2/g3_32b/g6 "contribute no number here".
+             Item (4) admits an a16 number and item (2) a g6 number, so both sentences were
+             scoped to tables with the controller-inference sensitivity disclosed by name.
+
+build:      latexmk -g -pdf -interaction=nonstopmode -> tese.pdf, 149 pages, 0 errors,
+             0 undefined references, 0 undefined citations.
+
+feeds:      tex/baselines.tex (cost-accounting definition), tex/twopool.tex (uniform-448 scope),
+            tex/closedloop.tex (cost account + sec:cl-limits generality qualification).
+supersedes: nothing — all four are additive strengthenings; no existing number was edited.
+
+---
+
+## 2026-07-20 — ADJUDICATION §2.8 + §2.11 applied-state VERIFICATION (no new ingest)
+
+artifact:   provenance/schema/26a_group_c_comment_gaps.sql  (new; idempotent, applied twice)
+command:    psql -f schema/26a_group_c_comment_gaps.sql ; python loader/load_group_c.py (x2)
+date:       2026-07-20
+
+Both sections were already APPLIED earlier the same day (Group C: schema/25_group_c.sql +
+26_group_c_checks.sql, loader kind K31). This pass re-derived their claims against the live DB
+rather than trusting the audit notes. Everything reproduces:
+
+  §2.8  provenance.ewma_cal_coverage — 4 methods x 2 splits = 8 rows.
+        eval: add 0.9012529 / mult 0.8783340 / wsc 0.8765972 / native 0.9288860; nominal 0.9.
+        The add/mult/wsc EVAL spread is exactly closedloop.tex:218's published 0.88-0.90 band.
+        C010 re-run GREEN: over the 38,388 aligned (origin,h,variate) rows the three arms show
+        0 point disagreements and 0 p90 ties (add~mult and add~wsc alike). The arms are
+        POINT-IDENTICAL by construction — conformal calibration rescales the interval and never
+        moves the point forecast — so no point-error metric (WAPE/MAE/RMSE) can rank them, and
+        ewma_cal_coverage is the ONLY evidence in the store that discriminates them. That is
+        what makes the coverage numbers load-bearing rather than decorative.
+
+  §2.11 (1) collector_scalar, phaseB_fallback_trace: sol_pred_ms 0.00605 vs measured_silicon_ms
+            0.03580 on rtx_5090 -> measured_over_sol_x 5.917355 -> published "~5.9x"
+            (intro.tex:311). Confirmed.
+        (2) encoder_run_summary.handoff_gbps / handoff_rtt_ms first-class on all 1,117 rows;
+            v_fabric_sensitivity present. aggregate44:fc_p90_L30_ds4 carries handoff_gbps 6.25,
+            handoff p99 1087.406, encoder_delay p99 1403.774 — digit-exact to intro.tex:514,516.
+        (3) encoder_factoring_probe, 8 rows: every (batch, images_per_request) factoring of 64
+            images predicts 316.369 ms, delta_vs_ref_ms 0.000000 throughout; f(1)=8.162.
+            Matches twopool.tex:121-122.
+        C401-C407 all re-run GREEN. C404/C407 still correctly scope the 12 g6:u896 defence runs.
+
+  idempotency: load_group_c.py run twice -> files=0 rows=0 on both passes.
+
+DEFECT FIXED THIS PASS (standing rule "COMMENT every new table/column"): the Group C ingest left
+5 columns uncommented, including encoder_factoring_probe.probe_id, which §2.11 itself created.
+Most consequential was encoder_run_summary.image_px: the §2.11 warning that it reads 448 on all
+12 g6:u896 rows despite an 896^2 payload — i.e. that it MUST NOT be used to reason about g6
+bytes-on-the-wire — existed only in audit markdown, invisible to any SQL-only reader. It is now
+a COMMENT on the column itself.
+
+NOT DONE, reported honestly:
+  - encoder_run_summary still has 20 uncommented columns, all pre-existing and outside
+    §2.8/§2.11 scope. Not silently expanded into.
+  - The g6mix sidecars (<stem>.jsonl.g6mix.json) remain un-ingested, so C404 keeps its
+    thesis-run scoping and C407 keeps its 12-row exclusion pin. Ingesting them would let C404
+    be restated as one physical law with no exclusion at all. Left as §2.11 explicitly did.
+
+feeds:      nothing new — this pass CONFIRMS closedloop.tex:218, intro.tex:311, intro.tex:514,516
+            and twopool.tex:121-122 as already-correct. No thesis edit.
+supersedes: nothing. No measurement altered; the only writes were COMMENTs.
+
+---
+
+### provenance ADJUDICATION §2.7 — WEEK-SURFACE cells loaded into factorial_cell  (2026-07-20)
+artifact:   provenance/schema/30_week_surface_coverage.sql;
+            provenance/loader/load_week_matrix_cells.py (kind K7w);
+            provenance/loader/loaders.py (actuation_of + _norm_cell + load_factorial changes);
+            sources: simulation/results/week_matrix/*.jsonl.stats.json (112 cells),
+            simulation/results/week_surface_issuetime/week_surface_issuetime_results.json (96 cells)
+command:    python3 provenance/loader/load_week_matrix_cells.py ;
+            python3 -c "import loaders as L; from ingest_common import load_ingest_index; L.load_factorial(load_ingest_index(), True)" ;
+            psql ... -f provenance/schema/30_week_surface_coverage.sql
+result:     factorial_cell 1172 -> 1380 rows (+112 week_matrix target-time, +96 week_surface
+            issue-time). current_factorial 600 -> 696 (only the issue-time surface enters;
+            the 112 week_matrix runs demoted is_current=false). sweep_manifest_coverage:
+            cells_week now 112/112 returned (was 0/112); new manifest
+            cells_week_surface_issuetime 96/96. Both quantile halves (p50 AND p90) present.
+            ACTUATION assigned by loaders.actuation_of() explicit identity table (never a
+            path substring): week_matrix=target-time (run_week_matrix.sh:5 ->
+            forecast_schedule.py, leads {15,30,45,300}), week_surface_issuetime=issue-time
+            (forecast_schedule_issuetime.py, leads {15,30,45,165}).
+checks:     C507 PASS (current_factorial holds exactly one actuation = issue-time);
+            new C510 PASS (no factorial RESULTS file ingested with 0 cells). Loader
+            idempotent (run twice: identical md5, identical counts). selftest.py 3/3 GREEN.
+            The 6 pre-existing check failures (C002,C305,C107,C207,C214,C302) are unchanged
+            and unrelated (grid/sweeps/vllm) — verified 0 of them touch week_* run_ids.
+feeds:      DATA layer only — makes the §2.7-deferred cells queryable. No thesis number
+            changed. The issue-time week surface backs the "quantile is the decisive dial,
+            rating is a cost knob" week-scale conclusion (twopool/closedloop).
+supersedes: week_matrix (cells_week, target-time) is SUPERSEDED by week_surface_issuetime
+            per run_44_week_surface_issuetime.py:6-7; both retained, actuation-separated.
+commit:     uncommitted (working tree)
+
+---
+
+### FINAL CERTIFICATION — independent re-verification of the whole store + thesis  (2026-07-20)
+artifact:   provenance/verify_all.sh (idempotency gate re-implemented — digest, not stdout counter);
+            provenance/SCHEMA_GUIDE.md (totals/census/dimension-table/§6.13/§6.14 refreshed to the
+            3,147-run state); provenance/audit/FINAL_STATE.md (new one-page standing summary)
+command:    ./provenance/verify_all.sh ;
+            psql ... "select * from provenance.check_all()" ;
+            (cd provenance/loader && python3 selftest.py && python3 main.py) ;
+            cd tex && latexmk -pdf -g -interaction=nonstopmode tese.tex
+result:     The store is SOUND and the thesis AGREES with it. Independently verified, not taken on trust:
+            - check_all(): 73 definitions, exactly 5 failing, every one carrying an adjudicated
+              KNOWN-FAILING note re-verified today, none weakened: C002 (error, ACCEPTED — 1 of 178
+              runs at 0.18% median_ttft, percentile-interpolation convention, tolerance deliberately
+              NOT loosened); C107/C207/C214/C302 (warn — logprob edge / aggregate-kind ingest_log
+              labels / 9 non-run verification rows / the 2 hand-assigned measured:* ids). C305 now
+              PASSES (an earlier ledger entry's "6 failures incl. C305" is superseded — current set is 5).
+            - selftest.py 3/3 GREEN (collision guard, 66-dir coverage 0 misc, run_id injective 1844/3134).
+            - Orphan sweep: 0 orphan run_ids across every run_id-bearing analytic table (independent
+              re-run of the information_schema-driven query, per-table max 0).
+            - 12 semantic identities (Lens C) intact: C001-C010 + C101-C106 all reproduce, only the
+              accepted C002 off, none regressed.
+            - IDEMPOTENCY: the store is byte-stable. A md5 content digest over ingest_log(path,sha,
+              n_rows,run_id) + the annotated runs columns + the six raw/summary tables is IDENTICAL
+              across consecutive settled `main.py` runs. (The digest value itself only moves when a
+              genuinely-changed file is re-ingested — e.g. editing this ledger updates its own
+              ingest_log row via K13 — so idempotency is asserted as "a SETTLED re-run changes
+              nothing", not against a pinned hash.) The three POST-passes (K34 944/2204,
+              K40 2/2, K41 1219/618) and the one-shot K13 ledger reload PRINT nonzero counters but
+              change nothing — exactly SCHEMA_GUIDE §6.14. verify_all.sh's idempotency gate was
+              re-implemented to judge by that digest (the §6.14-mandated criterion) rather than the
+              stdout "files=0" proxy §6.14 explicitly says not to use; this is strictly STRONGER (it
+              also catches a value overwrite that leaves the file count unchanged). No loader logic and
+              no data were touched.
+            - Lineage: mv_llm_p99_check FRESH (178 materialised = 178 live, no refresh needed); worst
+              raw-vs-summary TTFT drift 1.2375% < 2% (a16:burst3_reactive_P2000_...); every summary
+              rowcount matches its raw rows.
+            - Totals at certification: 3,147 runs / 99,019,523 rows (exact) / 21 GB / 211 base tables /
+              56 views / 5 matviews / 4,149 ingest_log files (1:1, 0 dangling). Raw partitions unchanged
+              (composed_request 41,106,599; llm_request 18,869,922; encoder_series 10,342,685; forecast
+              22,003,500; worker_schedule 235,827). The +96 runs vs the last recorded 3,051 are the
+              week_surface_issuetime load (previous ledger entry, K7w) — all factorial (1,284->1,380).
+            - THESIS: latexmk -g exits 0, 0 errors, 0 undefined refs, 149 pages. Every ADJUDICATION
+              §0.4 rejected fix still correctly ABSENT/PRESENT: 882 and 783 absent (0 each); 67.3/248
+              present (twopool.tex:105); "were not priced" present (twopool.tex:410); 1.1--6.8% at 5
+              sites; 18.0% present (validation.tex:163), 18.6 absent; 0.96x at 5 sites; twopool ITL p99
+              reads 87.7 ms with NO 86.2 anywhere (the 86.2 that was applied is confirmed REVERTED).
+corrected-in-thesis: NOTHING. The manuscript was already correct; this pass confirms it and changes no number.
+corrected-in-DB:     NO data change. Only (i) verify_all.sh idempotency gate strengthened to a digest,
+            (ii) SCHEMA_GUIDE.md numeric state refreshed (totals, §3 dimension census, §4.0 traps
+            short-list +window-alias/+absence-is-not-refutation rows, §4.3 retraction example now 4
+            superseded_by rows incl. the two wheel->srcbuild pointers, §6.13 coverage census, §6.14
+            counters). Example queries re-run where their output moved (canon_aggregate 135->234, still
+            a no-op fold; grid_window_effective byte-identical; v_llm_summary_backing still 610/432).
+permanent (carried forward, nothing inflated):
+            - 29,311 llm_request + 16,939 composed_request + 1,793 encoder_series rows destroyed by the
+              historical misc-collision are UNRECOVERABLE — source corpus no longer on disk.
+            - 432 of 610 llm_run_summary rows (11,536,096 requests) have NO raw backing (logs never
+              archived); their percentiles cannot be audited in-store.
+            - 9 verification rows never resolve (3 structural markers + 6 model-level aggregates); left
+              failing as C214 rather than exempted.
+            - 9,177 worker_schedule rows on 6 rerun_verify:react_p90_* runs carry the AGGREGATE run's
+              schedule (is_valid=false); their provisioned_worker_seconds is still correct.
+outstanding:
+            - CLEAN GAP: simulation/results/235b/llm_head2k_aic235btp8_s{1,4,16}.json (3 files) still
+              un-ingested; experiment m235b declared in runid.py but unloaded; only .log siblings read.
+              Nothing wrong, something absent; needs a loader for that report shape.
+            - K35 (legacy) labelled 5 replay-log ingest_log rows with the log's own id instead of the
+              run they describe — the labelling half of C207. No measurement missing.
+            - COVERAGE re-censused: 5,673 result-like files on disk, 4,149 ingested, 0 dangling, 1,536
+              not ingested (27.1%) — dominated by secondary artifacts (logs/points/sched siblings) and
+              post-manuscript defence data; collector_artifacts fell to 35.5% purely from +39 new
+              secondary files (phase9_two_pool CSVs, phaseE logs), not a lost measurement.
+feeds:      nothing new in the manuscript. This is the standing certification of record; the
+            examiner-facing summary is provenance/audit/FINAL_STATE.md.
+supersedes: the prior "STILL BROKEN / PERMANENTLY UNRECOVERABLE" list (which named 4 by-design
+            failures + the 5,634/26.6% census) — updated here to 5 by-design failures (adds C214)
+            and the 5,673/27.1% census. No measurement altered.
+commit:     uncommitted (working tree)

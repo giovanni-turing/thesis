@@ -1,0 +1,31 @@
+{
+  "chapter": "apendice_ecosystem",
+  "n_reviewed": 1,
+  "n_upheld": 0,
+  "n_overturned": 1,
+  "rulings": [
+    {
+      "line": 125,
+      "quote": "\\texttt{ai-dynamo} 1.2.1 (wheel) / 1.3.0 (source, both post-1.0),",
+      "criticality": "low",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "provenance DB genuinely carries no ai-dynamo runtime version (checked: information_schema.columns WHERE table_schema='provenance' AND column_name ILIKE '%version%' -> only collector_bench_run.{torch,cuda,python}_version and collector_kernel_perf.version; provenance.collector_scalar WHERE metric='version' -> two rows, both value_text='0.22.0' = the vLLM container, not dynamo; provenance.runs commit_sha is NULL for all 2206 rows; ledger_entry.command records only AIC_VER=0.19.0, a data-branch tag, never a dynamo version). But the pin IS decidable from the environment provenance the sentence actually describes. WHEEL: two independent site-packages carry ai_dynamo-1.2.1.dist-info with METADATA Version: 1.2.1, no direct_url.json (i.e. installed from the index as a built wheel, Tag py3-none-any) at /home/gio/tese/collector_artifacts/phase9_two_pool/dynamo-venv/lib/python3.12/site-packages/ and /home/gio/tese/ai-dynamo/aiconfigurator/.venv/lib/python3.13/site-packages/. SOURCE: /home/gio/tese/ai-dynamo/dynamo/.venv/lib/python3.12/site-packages/ai_dynamo-1.3.0.dist-info with direct_url.json = {\"url\":\"file:///home/gio/tese/ai-dynamo/dynamo\",\"dir_info\":{\"editable\":true}}, and that checkout's pyproject.toml:6 declares version = \"1.3.0\". BOTH POST-1.0: v1.0.0 is tagged 2026-03-13; v1.2.1 is tagged 2026-06-12; the source tree is at HEAD 70c965db26a31deb7d6e2637ce487031fccae690 (2026-07-19), later still. Every element of the sentence is therefore literally true as written.",
+      "final_fix": "NO EDIT. The thesis already discriminates the two pins exactly as the artifacts do: 1.2.1 is a released wheel, 1.3.0 is qualified '(source)' — which is precisely what an editable install of a source tree declaring version = \"1.3.0\" is. The internal-defects objection ('1.3.0 is not a released tag') is answered by the word 'source' that is already in the sentence."
+    }
+  ],
+  "rejected_fixes": [
+    {
+      "source": "internal_defects.json line 125",
+      "rejected_text": "\\texttt{ai-dynamo} 1.2.1 (released wheel) / 1.3.0 pre-release source build (\\texttt{v1.3.0-rc1}, 2026-06-30; both post-1.0)",
+      "why_rejected": "WOULD INTRODUCE AN ERROR. It names v1.3.0-rc1 (2026-06-30) as the source build, but the editable install points at /home/gio/tese/ai-dynamo/dynamo whose HEAD is 70c965db26a31deb7d6e2637ce487031fccae690 dated 2026-07-19 — after rc1, and not that tag. Applying the fix would replace a correct, deliberately hedged statement ('(source)') with a specific and false tag attribution. If any change were desired at all, the only honest one is to cite the actual commit 70c965db, not a tag."
+    },
+    {
+      "source": "internal_defects.json line 121 (adjacent, flagged during this pass)",
+      "rejected_text": "Replace 'only -rc release-candidate tags ahead of some minors' with '... ahead of a few patch releases'",
+      "why_rejected": "NOT rejected on substance — the tag record does support it (v0.8.1-rc0, v0.9.1-rc0/rc1 all precede PATCH releases). Recorded here only so a downstream editor does not confuse it with the line-125 fix, which must NOT be applied."
+    }
+  ],
+  "notes": "Scope: verified/apendice_ecosystem.json holds 19 claims — 6 CONFIRMED, 12 UNVERIFIABLE, 1 INSUFFICIENT_DATA, and zero THESIS_WRONG / DEFINITIONAL / ARTIFACT_SUPERSEDED. Only the single INSUFFICIENT_DATA claim (line 125) was in scope for adversarial re-check, and it overturns to CONFIRMED. No thesis edit is warranted anywhere in this appendix on DB grounds. Two DB gaps are reaffirmed as ingest tasks, not thesis defects: (a) the live closed-loop runs live_fc / live_re / verify_flag are absent from provenance.runs (only the offline twins live:twin_* exist), so lines 108 and 163 are corroborated from archived artifacts; (b) no table records a per-run ai-dynamo runtime version. Incidental corroboration found while adjudicating: aiconfigurator 0.10.0 (thesis line 126, first-pass CONFIRMED only against tab:ap-env) is now directly evidenced by /home/gio/tese/ai-dynamo/dynamo/.venv/lib/python3.12/site-packages/aiconfigurator-0.10.0.dist-info with direct_url.json editable=true pointing at /home/gio/tese/ai-dynamo/aiconfigurator — i.e. '0.10.0 (editable, data branch)' is exact. The separate ledger string AIC_VER=0.19.0 is a data-branch/collection tag, not the package version, and must not be mistaken for a contradiction."
+}

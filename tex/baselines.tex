@@ -17,6 +17,28 @@ p99 $<$ \SI{100}{\milli\second}; encoder delay p99 $<$
 \SI{1}{\second}), and scored together with provisioned GPU-time
 \emph{per hardware class} (RTX~5090-class worker-seconds for the encoder
 pool, H100 GPU-hours for the language pool; never summed across classes).
+
+\paragraph{From order or from readiness: the pools bill differently.}
+The two classes are also billed from different instants, and the
+difference must be stated rather than assumed away. The language-pool
+GPU-hour figures reported throughout this thesis bill from instance
+\emph{order} rather than readiness: the discrete-event mocker integrates
+the \emph{provisioned} worker count --- active, starting-up and draining
+alike --- so the startup ramp and the scale-down drain tail are already
+inside every reported language GPU-hour, and \emph{no cold-start
+surcharge may be added to it}. The encoder pool applies cold start by
+delaying availability instead, and therefore bills from
+\emph{readiness}; its cold-start component is reported separately as a
+warm-up column (Section~\ref{sec:cl-ledger-enc}). A composed two-pool
+total consequently mixes the two conventions and must state which
+applies to which pool --- a second reason, beyond hardware class, that
+the two are never summed. The language convention is read directly off
+the mocker's collector and corroborated numerically over the 52 language
+runs of this thesis: the order-time staircase integral reproduces every
+reported GPU-hour to within $1.0\%$, whereas a readiness-lagged
+counterfactual --- each run charged from its own startup time --- falls
+$3.5$--$38.0\%$ short on the reactive arms, which up-step most often.
+
 Both baselines get every structural advantage the predictive policy
 of Chapter~\ref{cap:closedloop} will have: the same windows,
 actuation mechanics, and cold-start leads. Whatever
@@ -257,5 +279,16 @@ information arriving too late and converted through means: all fourteen
 language-pool configurations meet their own window-mean law while
 violating the tail SLA; spend cannot buy the tail back under lead; and
 even the correct encoder signal read reactively loses every window whose
-onset is faster than the lead time. Whether \emph{forecasting} those
+onset is faster than the lead time. Both baselines are also exercised at
+full-trace scale, on all \num{1000000} requests of the seven-day trace
+and on both pools: there the deployable $C{=}8$ encoder fleet passes at
+encoder-delay p99 \SI{677}{\milli\second} while the calm-day $C{=}2$
+fleet fails at \SI{2905}{\milli\second}, and reactive encoder control
+holds the bound at \SI{588}{\milli\second} for 0.687$\times$ the
+deployable fleet's provisioned worker-time. That last figure is a real
+aggregate-scale saving and is reported as such; it does not overturn the
+per-window verdicts above, because the full trace is graded in aggregate
+only --- the same masking this chapter and
+Section~\ref{sec:cl-ledger} document --- and reactive control still loses
+burst3 whenever burst3 is graded on its own. Whether \emph{forecasting} those
 same per-pool signals closes the gap is the subject of the next chapter.

@@ -1,0 +1,150 @@
+{
+  "chapter": "closedloop",
+  "source": "/home/gio/tese/tex/closedloop.tex",
+  "n_relations_checked": 74,
+  "n_errors": 14,
+  "errors": [
+    {
+      "line": 265,
+      "quote": "Foundation (Chronos)  & 589 & 589             & 589 & 589            & 681 & 0.62 & \\textbf{pass all}",
+      "stated": "The zero-queueing encoder service floor is 589 ms (tab:cl-ewma rows and its caption, lines 254, 265-268; restated at lines 224, 241, 606, 621).",
+      "computed": "The chapter defines the floor as f(64) + p99 handoff = 316.4 + 272 = 588.4 ms (lines 92-95, 452-457). 588.4 rounds to 588, which is the value used everywhere else in the chapter (lines 79, 91, 114, 121, 468, 469, 483, 499, 531, 543, 593, 627). 589 is neither the round nor the truncation of 588.4.",
+      "relation": "text vs table; internal cross-reference of a single defined quantity; rounding of 316.4+272",
+      "severity": "rounding",
+      "propagates_to": "lines 224, 241-243 ('burst3 589 ms'), 254 (tab:cl-ewma caption), 265-268 (all four table rows), 606 ('606 vs. 589 ms'), 621-622 ('versus 589 ms under AIC'); and to conclusion.tex, which quotes the 588 ms floor",
+      "proposed_fix": "Use 588 ms uniformly (588.4 -> 588). Replace every '589' in tab:cl-ewma, its caption, and lines 224, 241, 606, 621 with '588'. If the EWMA harness genuinely produces 589 ms because it is a different run harness, add an explicit sentence: 'the EWMA harness reports the same floor as 589 ms, a <0.2% harness difference from the 588 ms of Table~\\ref{tab:cl-aggregate}.'"
+    },
+    {
+      "line": 240,
+      "quote": "The Chronos control reproduces the committed figures to the digit throughout (burst3 \\SI{589}{\\milli\\second}; week 0.62$\\times$; $\\rho$-frontier 0.89/0.62/0.48/0.40$\\times$; the p50 arm fails at \\SI{2759}{\\milli\\second}/0.25$\\times$",
+      "stated": "The Chronos control in the EWMA harness reproduces the chapter's committed figures 'to the digit'.",
+      "computed": "Two of the four quoted figures differ from the committed values. (a) burst3: quoted 589 ms; committed floor is 588 ms (= 316.4+272 = 588.4). (b) p50: quoted 2759 ms; the committed p50 week value in Table~\\ref{tab:cl-aggregate} line 470 is 2,735 ms. (2759-2735)/2735 = +0.88%. Only 'week 0.62x' and the rho-frontier 0.89/0.62/0.48/0.40 (lines 522-529) actually agree to the digit.",
+      "relation": "internal cross-reference: EWMA-harness control vs tab:cl-aggregate and the defined service floor",
+      "severity": "wrong",
+      "propagates_to": "line 265 (table row 589), line 470 (table p50 row 2,735), lines 606 and 621 (589 restated)",
+      "proposed_fix": "Replace 'reproduces the committed figures to the digit throughout' with 'reproduces the committed figures to within run noise (<1%) throughout (burst3 \\SI{588}{\\milli\\second}; week 0.62$\\times$; $\\rho$-frontier 0.89/0.62/0.48/0.40$\\times$; the p50 arm fails at \\SI{2735}{\\milli\\second}/0.25$\\times$)'. If 2759 and 589 are the harness's true outputs, keep them but drop 'to the digit' and state the deltas explicitly."
+    },
+    {
+      "line": 230,
+      "quote": "costs 1.09$\\times$ static, with no rating below $\\rho{=}25$ bringing it under the static fleet ($\\rho$-frontier 1.32/1.09/0.94/0.83$\\times$ at $\\rho\\in\\{10,15,20,25\\}$)",
+      "stated": "No capacity rating below rho=25 brings the multiplicative-conformal EWMA policy under the static fleet's cost.",
+      "computed": "The frontier quoted in the same parenthesis is 1.32 (rho=10), 1.09 (rho=15), 0.94 (rho=20), 0.83 (rho=25). 'Under the static fleet' means <1.00x. 0.94 < 1.00, and rho=20 < rho=25. So rho=20 already brings it under the static fleet, contradicting the sentence it appears in.",
+      "relation": "recomputation / internal contradiction: claim vs the frontier quoted in the same sentence",
+      "severity": "wrong",
+      "propagates_to": "the surrounding argument at lines 228-234 that the mult-conformal EWMA is priced out; and the 'Only the zero-shot foundation-model band clears every episode and beats static' claim at line 234 (still true, since 0.94x at rho=20 is not shown to be per-episode-clean)",
+      "proposed_fix": "Replace with: 'costs 1.09$\\times$ static, and only at $\\rho{\\geq}20$ does it come under the static fleet at all (\\rho-frontier 1.32/1.09/0.94/0.83$\\times$ at $\\rho\\in\\{10,15,20,25\\}$) --- never approaching the foundation policy's 0.62$\\times$, and $\\rho{=}25$ is where even the foundation policy loses burst5.' Also state whether the 0.94x cell at rho=20 was per-episode-graded."
+    },
+    {
+      "line": 337,
+      "quote": "A ${\\approx}14\\%$ margin above the binding knee is retained as policy",
+      "stated": "The retained policy scale carries a ~14% margin above the binding knee.",
+      "computed": "From the chapter's own numbers: r_hat = 10.07 req/s; burst1 knee 1.62 -> scale 10.07/1.62 = 6.216 (matches the quoted 6.22); burst4 (the stated binding mix) knee bracketed [1.26, 1.44] -> scale 10.07/1.44 = 6.993 and 10.07/1.26 = 7.992. The retained policy is 7.0 (line 336: 'burst4: 6.22 fails, 7.0 passes'). Margin above the BINDING knee = 7.0/6.993 = 1.001, i.e. ~0.1%, not 14%. Margin above burst1's knee = 7.0/6.22 = 1.1254, i.e. +12.5%. Neither is 14%. (The only 14% derivable is the width of the burst4 knee bracket itself, 1.44/1.26 = 1.143, which is not a margin above a knee.) Relative to the conservative end of the bracket (scale 7.99) the policy 7.0 is 12.4% BELOW, not above.",
+      "relation": "recomputation: retained scale vs measured knee; ceil(d_hat/r_hat) scaling by r_hat/r_tail",
+      "severity": "wrong",
+      "propagates_to": "the 'derived, not tuned' claim at line 324 and the summary's 'derived here as a measured belief-to-knee ratio' (line 664)",
+      "proposed_fix": "Replace with: 'A ${\\approx}12.5\\%$ margin above burst1's measured knee (scale 7.0 versus 6.22) is retained as policy --- which is only ${\\approx}0.1\\%$ above the binding burst4 knee scale of 6.99 (from $r_{\\text{tail}}{=}1.44$) --- since $r_{\\text{tail}}$ is mix-dependent and planner-in-loop replays show ${\\approx}4\\%$ p99 run noise.' If the intended margin is over the conservative bracket end (1.26 -> scale 7.99), the sentence must say the policy sits BELOW that end, not above it."
+    },
+    {
+      "line": 529,
+      "quote": "$\\rho\\in\\{10,15,20\\}$ is per-episode-clean, spanning 0.48--0.89$\\times$.",
+      "stated": "The per-episode-clean rating band costs 0.48-0.89x static.",
+      "computed": "Line 534 states the rho=20 aggregate cost as '0.46--0.48$\\times$ across readiness models and realizable leads'. The minimum of the band is therefore 0.46, not 0.48, so the quoted span understates its own cheap end by 0.02x (4%). Same span is restated at line 184 ('0.48--0.89$\\times$ static').",
+      "relation": "internal cross-reference: line 529 / line 184 span vs the rho=20 range at line 534",
+      "severity": "loose",
+      "propagates_to": "line 184 (same 0.48--0.89 span), line 536 ('the extra ${\\sim}0.14\\times$ saving', which is 0.62-0.48; using 0.46 gives 0.16)",
+      "proposed_fix": "At lines 184 and 529 write 'spanning 0.46--0.89$\\times$ across readiness models and realizable leads', or add at line 534 that 0.48 is the warm-pool figure and the span quoted elsewhere is warm-pool only."
+    },
+    {
+      "line": 587,
+      "quote": "raises p99 handoff from 272 to 1{,}087\\,\\si{\\milli\\second} (encoder-delay p99 1{,}404\\,\\si{\\milli\\second}",
+      "stated": "4x payload gives handoff p99 1,087 ms and encoder-delay p99 1,404 ms.",
+      "computed": "The chapter's own composition is encoder delay = f(64) + handoff = 316.4 + handoff. With handoff 1,087: 316.4 + 1087 = 1403.4 -> 1,403 ms, not 1,404. 1,404 requires handoff = 1,088, which is exactly 4 x 272 = 1,088. So the two numbers are rounded inconsistently: the handoff is rounded down (1,087) while the sum is computed from the unrounded/exact 1,088.",
+      "relation": "recomputation: 4x272 = 1088; 316.4 + handoff = encoder-delay p99; consistency with the 588 = 316.4+272 convention",
+      "severity": "rounding",
+      "propagates_to": "line 592 ('the 1{,}087\\,\\si{\\milli\\second} handoff floor is common to all')",
+      "proposed_fix": "Use 1,088 ms consistently: 'raises p99 handoff from 272 to 1{,}088\\,\\si{\\milli\\second} (encoder-delay p99 1{,}404\\,\\si{\\milli\\second})', and update line 592 to '1{,}088\\,\\si{\\milli\\second} handoff floor'."
+    },
+    {
+      "line": 83,
+      "quote": "The broader exploratory grid that located this operating point (adding p50, the reactive baseline, four capacity ratings, and a non-realizable \\SI{300}{\\second} target-time lead; 560 target-time cells)",
+      "stated": "The exploratory target-time grid has 560 cells and consists of the 60-cell factorial plus p50, the reactive baseline, four capacity ratings, and a fifth (300 s) lead.",
+      "computed": "The forecast arms alone under the stated factors give 5 windows x 3 models x 2 quantiles x 4 ratings x 5 leads = 600 cells, already larger than 560, before adding the reactive baseline (which line 146 says is graded over 20 cells per rating, i.e. 5 windows x 4 leads, so 80 more at four ratings). 560 is exactly reproducible only with FOUR leads: 5 windows x 4 ratings x 7 policy arms (6 forecast + 1 reactive) x 4 leads = 560. The stated inclusion of the 300 s lead is therefore inconsistent with the stated cell count.",
+      "relation": "design-size recomputation: product of the stated grid factors",
+      "severity": "ambiguous",
+      "propagates_to": "line 86-88 (the claim that the 300 s cell reached the floor only by target-time indexing, which presupposes that cell is in the grid)",
+      "proposed_fix": "State the grid composition explicitly and consistently, e.g. 'adding p50, the reactive baseline, four capacity ratings, and a non-realizable \\SI{300}{\\second} target-time lead; 560 target-time cells (the grid is not a full factorial: <state which combinations were run>)'. If the grid is full-factorial over five leads the count should be 600 forecast cells plus the reactive arm."
+    },
+    {
+      "line": 335,
+      "quote": "burst1: scale 4.64 fails, 6.22 passes at $-16\\%$ GPU-hours versus the conservative setting",
+      "stated": "Scale 6.22 passes at -16% GPU-hours versus 'the conservative setting'.",
+      "computed": "'The conservative setting' is never defined. If it is the retained policy scale 7.0, then 6.22/7.0 = 0.8886, i.e. -11.1%, not -16%. If it is some other scale s, -16% would require 6.22/s = 0.84 -> s = 7.40, a value the chapter never quotes. (Replica counts are ceil()'d, so the mapping is not exactly linear, but no quoted pair reproduces -16%.)",
+      "relation": "recomputation of a percentage delta with an unstated base; GPU-hours proportional to replica-scale",
+      "severity": "ambiguous",
+      "propagates_to": "line 337 (the ~14% margin claim, which depends on which scale is 'the conservative setting')",
+      "proposed_fix": "Name the base explicitly, e.g. 'burst1: scale 4.64 fails, 6.22 passes at $-16\\%$ GPU-hours versus the retained scale-7.0 setting' -- and reconcile the percentage: 6.22 vs 7.0 is $-11\\%$ in scale; if the measured GPU-hour delta really is -16% because of ceil() effects, say so."
+    },
+    {
+      "line": 114,
+      "quote": "at the \\SI{588}{\\milli\\second} service floor on every burst window and feasible (below \\SI{734}{\\milli\\second}) on the calm day",
+      "stated": "734 ms is the calm-day feasibility threshold.",
+      "computed": "At line 80 the same number is the MAXIMUM of the observed calm-day range ('the calm day 548--\\SI{734}{\\milli\\second}'). Using the observed maximum as the feasibility criterion at line 114 makes the feasibility statement circular (every observed value is below its own maximum by construction). The chapter's stated SLA bound elsewhere is \\SI{1000}{\\milli\\second} (line 623).",
+      "relation": "unit/definition consistency: observed range max vs SLA bound",
+      "severity": "ambiguous",
+      "propagates_to": "line 80 (calm day 548--734), and intro.tex which restates the 734 ms calm-day figure",
+      "proposed_fix": "At line 114 write 'and feasible on the calm day (per-window p99 548--\\SI{734}{\\milli\\second}, under the \\SI{1000}{\\milli\\second} bound)', so that 734 is reported as an observed maximum rather than as the threshold."
+    },
+    {
+      "line": 627,
+      "quote": "also stays feasible on every in-span burst window (encoder-delay p99 784 versus \\SI{588}{\\milli\\second} under AIC)",
+      "stated": "Under the HuggingFace-eager f(N) -- an upper bound on the engine gap characterised at line 618 as a '${\\approx}1.4$--$1.6\\times$ HuggingFace$\\to$vLLM overhead' -- burst-window p99 is 784 ms.",
+      "computed": "Decomposing with the chapter's own composition, encoder delay = f(64) + 272 handoff. Implied HF forward = 784 - 272 = 512 ms, so the implied overhead factor over the AIC f(64) = 316.4 ms is 512/316.4 = 1.618x, marginally ABOVE the stated 1.4--1.6x band (and the text argues no queueing is added, so the residual cannot be attributed to queueing).",
+      "relation": "recomputation: encoder-delay p99 minus handoff, divided by f(64), against the stated engine-overhead band",
+      "severity": "loose",
+      "propagates_to": "line 618 ('${\\approx}1.4$--$1.6\\times$ HuggingFace$\\to$vLLM overhead'), restated in conclusion.tex",
+      "proposed_fix": "Either widen the band to '${\\approx}1.4$--$1.65\\times$', or note at line 627 that the 784 ms figure includes residual queueing on top of the 1.6x forward, e.g. '(encoder-delay p99 784 versus \\SI{588}{\\milli\\second} under AIC --- a $1.6\\times$ forward plus a small residual queue)'."
+    },
+    {
+      "line": 166,
+      "quote": "lifting provisioned capacity to ${\\approx}21$ workers, so capacity is standing when the one-minute spike lands",
+      "stated": "The p90 band lifts provisioned capacity to ~21 workers before the burst3 spike.",
+      "computed": "Line 628 states that 'the $\\rho{=}15$/p90 headroom provisions 24--32 workers at the burst peaks'. 21 lies outside 24--32. Both are p90/rho=15 encoder worker counts on in-span burst windows, so the reader cannot tell whether 21 is a pre-spike (ambient) value excluded from the 24--32 peak range, or an inconsistency.",
+      "relation": "internal cross-reference: provisioned worker counts for the same policy",
+      "severity": "ambiguous",
+      "propagates_to": "line 628 ('24--32 workers at the burst peaks', which underwrites the engine-sensitivity absorption argument)",
+      "proposed_fix": "At line 166 write 'lifting provisioned capacity to ${\\approx}21$ workers in the minutes \\emph{before} the spike (rising to 24--32 at the peak, line \\ref{...})' so the two counts are explicitly the ambient and peak values of the same schedule."
+    },
+    {
+      "line": 498,
+      "quote": "the cost is mildly lead-dependent (0.62$\\times$ at $L{=}15$ falling to 0.59$\\times$ at $L{=}165$)",
+      "stated": "Under the STRICT re-warm readiness model the cost falls with lead, and the whole strict-re-warm range (0.59-0.62x) sits at or below the warm-pool value (flat 0.62x).",
+      "computed": "No arithmetic contradiction, but the direction is physically counterintuitive and unexplained: strict re-warm makes a retired replica re-order and re-pay lead, which should discourage scale-down and so provision MORE worker-time, not less; and a longer lead should order capacity earlier and hence cost more, not less. Every arithmetic relation on these figures checks out (2.41/3.87 = 0.6227 -> 0.62), so this is a definitional/semantic flag, not a computational one.",
+      "relation": "definitional consistency of the readiness-model column; direction of a monotonicity claim",
+      "severity": "ambiguous",
+      "propagates_to": "lines 123-125, line 447 (tab:cl-aggregate caption), line 669 (summary), and conclusion.tex line 84, where the same 0.59--0.62x strict-re-warm range is restated",
+      "proposed_fix": "Add one clause explaining the mechanism, e.g. 'Under a strict re-warm model the controller retires replicas less eagerly but re-orders them less often, so provisioned worker-time falls slightly with lead (0.62$\\times$ at $L{=}15$ to 0.59$\\times$ at $L{=}165$)' -- or, if the columns are transposed, swap them so the strict model is the more expensive one."
+    },
+    {
+      "line": 208,
+      "quote": "genuine anticipatory lead is measured only on the gradual onset (burst4, ${+}\\SI{345}{\\second}$)",
+      "stated": "Anticipatory lead is measured only on burst4.",
+      "computed": "Lines 156-158 report that the p90 band also crosses ahead on burst5 by \\SI{105}{\\second} at the one-minute threshold (lagging only under the tighter 15-second threshold). So positive measured lead exists on two windows, not one; the 'only' is stronger than the data supports in one direction and drops a measured 105 s result in the other.",
+      "relation": "internal cross-reference: detector-crossing leads (lines 153-158) vs the summary sentence at line 208",
+      "severity": "loose",
+      "propagates_to": "line 657-659 (summary, 'anticipating the clearly-gradual onset and covering the faster ones through standing headroom')",
+      "proposed_fix": "Write: 'genuine anticipatory lead is measured cleanly only on the gradual onset (burst4, ${+}\\SI{345}{\\second}$; burst5 leads by \\SI{105}{\\second} at the one-minute threshold but lags at the tighter one)'."
+    },
+    {
+      "line": 283,
+      "quote": "ITL p99 ${\\approx}$\\SI{6.5}{\\milli\\second}",
+      "stated": "Language-pool burst ITL p99 is ~6.5 ms across leads 60-300 s.",
+      "computed": "The only ITL values the chapter publishes for this policy are 6.3 ms (tab:cl-triad, burst1 at L=60 s, line 320) and 6.4 ms (week-scale, line 372). Neither is 6.5; the rounded-up 'approximately' value exceeds every published instance. If 6.5 is the max over the lead sweep, that maximum is never tabulated.",
+      "relation": "text vs table: prose approximation vs the published ITL cells",
+      "severity": "loose",
+      "propagates_to": "line 320 (tab:cl-triad ITL 6.3), line 372 (week ITL 6.4)",
+      "proposed_fix": "Write 'ITL p99 6.3--\\SI{6.5}{\\milli\\second} across leads' and tabulate the 6.5 ms endpoint, or reduce to 'ITL p99 ${\\approx}$\\SI{6.4}{\\milli\\second}' to match the published cells."
+    }
+  ],
+  "passed_checks": "SPAN AND WORKER-TIME ARITHMETIC (all exact): 5.60 d = 483,840 s; static C=8 -> 8 x 483,840 = 3.871M worker-s = the table's 3.87M; static C=2 -> 0.968M = 0.97M. Cost ratios all recompute from the published Mworker-s: 2.41/3.87 = 0.6227 -> 0.62x (headline, lines 468/469/481/530/666); 2.61/3.87 = 0.6744 -> 0.67x (reactive L=30); 1.67/3.87 = 0.4315 -> 0.43x (reactive L=300); 0.97/3.87 = 0.2506 -> 0.25x (static C=2); 0.98/3.87 = 0.2532 -> 0.25x (forecast p50). SERVICE-FLOOR COMPOSITION: 316.4 + 272 = 588.4 -> 588 ms, consistent everywhere the value 588 is used. LANGUAGE GPU-HOURS: 518.6/537.4 = 0.9650 -> 0.96x; 625/537.4 = 1.1630 -> 1.16x; 641/537.4 = 1.1928 -> 1.19x; 1 - 319.9/518.6 = 38.3% -> '38% cheaper than p90'; 281.8/518.6 = 0.543 -> 'half the budget'. Static TP2x2 = 4 GPUs x 5.60 d x 24 h = 537.6 GPU-h vs the stated 537.4 (0.04% -- consistent with a span marginally under 5.60 d). ARCHIVE-LEAD ARITHMETIC: (12-1) x 15 = 165 s (line 85) and the 180-second tile = 12 x 15 s (lines 111, 443) both hold; the realizable lead set {15,30,45,165} is consistent with both. DESIGN SIZES: headline factorial 5 windows x 3 TSFMs x 4 leads = 60 (lines 74-76, 127, 140, 532); reactive 5 x 4 = 20, matching '13--14 of 20 cells' (line 146) and the stated failure pattern (burst3 at all 4 leads + burst4 and burst5 at L=165 = 6 failures -> 14/20); encoder p50 week-scale 48 cells = half of the 3 x 2 x 4 x 4 = 96 week sweep (lines 393, 515-517); rho=25 dropping 9 of 60 all on burst5 is consistent with burst5 owning 3 x 4 = 12 cells. BELIEF-TO-KNEE CONVERSION: r_hat/r_tail = 10.07/1.62 = 6.216 -> the quoted burst1 scale 6.22 (exact); burst4 bracket [1.26,1.44] -> scales [6.99, 7.99], consistent with 'burst4: 6.22 fails, 7.0 passes'. DASHBOARD-MASKING: 3,100/749,601 = 0.41% -> 'under half a percent of the span' (line 550). RHO FRONTIER: 0.89/0.62/0.48/0.40 agrees between line 242 (Chronos control), lines 522-524, and line 529; it is also internally consistent with cost ~ 1/rho (0.62 x 15/20 = 0.465 ~ 0.48; 0.62 x 15/25 = 0.372 ~ 0.40, with ceil() effects); 0.62 - 0.48 = 0.14 -> 'the extra ~0.14x saving' (line 536). REPRICE HARNESS: (647-644)/644 = 0.47% -> '<0.5% harness difference' (line 638); (606-589)/589 = 2.9% and (606-588)/588 = 3.1%, both under the stated ~4% replay noise (line 603-607); vLLM implied forward overhead (606-272)/316.4 = 1.056, i.e. +5.6%, inside the stated 12.8% AIC-vs-vLLM band and consistent with the canonical residuals -2.2/+11.3/+5.5% (max 11.3% < 12.8%). CROSS-SECTION AGREEMENT: burst3 language triad 3,495 (reactive) / 2,164 (p50) / 651 (p90) agrees between lines 350-356 and fig:cl-framework-diff (lines 415-417); tab:cl-triad 736.3 ms sits inside the 736--757 ms range at line 282, and the 751 ms instant-worker value sits inside that range, supporting the lead-invariance claim; 'reactive fails all four (1,615--3,495)' (line 366) agrees with tab:cl-triad's 1,615.5; week p90 TTFT p99 651 ms (line 372) equals the burst3 and per-episode floor 651 (lines 356, 364). EWMA TABLE vs PROSE: 'burst3 p99 1,285 and 2,084' (line 225) matches the add-conformal and width-scaled rows in the stated order (0.70x, 0.56x); 'multiplicative, burst3 747 ms ... 1.09x' matches row 3; foundation 0.62x agrees with tab:cl-aggregate. HEADROOM ABLATION: 'headroom cuts its p99 up to 8x below the point reactive' checks at matched lead: 16,079/1,973 = 8.15 -> 8x (the cross-lead extreme, 54,170/1,973 = 27x, is correctly not claimed). TEMPORAL SPLIT: 1.4 d context + 5.60 d evaluation = 7.0 d, consistent with the seven-day trace. QUANTILE-CELL COUNTS: p50 '23--24 of 60' agrees between line 101 and line 541 including the warm/strict attribution (24 warm, 23 strict). DENOMINATOR CONSISTENCY: the cost denominator is called 'the deployable static fleet' / 'the deployable static C=8 fleet' consistently at lines 20, 252, 433, 465, 482, 667 -- this chapter does NOT exhibit the 'best static' vs 'deployable static' denominator drift flagged in conclusion.tex; the C=2 'calm-day optimum' row is explicitly marked fail, so the deployable denominator is the correct one.",
+  "notes": "No database was consulted; every finding is derived from numbers the chapter itself publishes. The single most consequential defect is the 589-vs-588 service-floor split (finding 1), because it is the chapter's most-repeated literal and it also falsifies the explicit 'reproduces the committed figures to the digit' claim (finding 2). The second most consequential is finding 3, a self-contradiction inside one sentence that weakens the EWMA argument as written. Findings 3 and 4 CONFIRM the extractor's flag #2 (the ~14% margin) with the correction that neither 12.5% nor 0.1% is 14%, and CONFIRM flag #1 (588/589) with the arithmetic 316.4+272=588.4. The extractor's list of passing checks was independently reverified and all of them hold. The mechanism/detector paragraph (lines 150-190) and the language-hook implementation detail (lines 289-299) contain no internally recomputable relations and were not gradeable in this pass."
+}

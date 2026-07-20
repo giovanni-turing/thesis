@@ -227,8 +227,8 @@ p99 1{,}285 and 2{,}084\,\si{\milli\second}) and the high-volume onset
 dashboard-masking the reactive baseline shows (Section~\ref{sec:cl-aggregate}),
 now on a forward forecaster. The one calibration that clears every episode
 (multiplicative, burst3 \SI{747}{\milli\second}) over-provisions moderate
-activity and costs 1.09$\times$ static, with no rating below $\rho{=}25$
-bringing it under the static fleet ($\rho$-frontier 1.32/1.09/0.94/0.83$\times$
+activity and costs 1.09$\times$ static, and only at $\rho{\geq}20$ does it
+come under the static fleet at all ($\rho$-frontier 1.32/1.09/0.94/0.83$\times$
 at $\rho\in\{10,15,20,25\}$) --- and $\rho{=}25$ is where even the foundation
 policy loses burst5. Only the zero-shot foundation-model band clears every
 episode \emph{and} beats static (0.62$\times$). The refinement of ``model
@@ -238,9 +238,10 @@ calibrated p90 band \emph{shape} is not --- a state-adaptive band that lifts
 at onsets without inflating in calm is what simultaneously holds the tail and
 stays cheap, and it is what the foundation models supply zero-shot while
 standard forward-EWMA calibrations do not. The Chronos control reproduces the
-committed figures to the digit throughout (burst3 \SI{589}{\milli\second};
-week 0.62$\times$; $\rho$-frontier 0.89/0.62/0.48/0.40$\times$; the p50 arm
-fails at \SI{2759}{\milli\second}/0.25$\times$; archive
+committed figures to within run noise ($<1\%$) throughout (burst3
+\SI{588}{\milli\second}; week 0.62$\times$; $\rho$-frontier
+0.89/0.62/0.48/0.40$\times$; the p50 arm
+fails at \SI{2735}{\milli\second}/0.25$\times$; archive
 \texttt{verification/results/ewma\_sweep.json}).
 
 \begin{table}[htbp]
@@ -555,6 +556,465 @@ compliance jointly. The p50 row completes the symmetry: an excellent
 \emph{cost} policy (0.25$\times$) that fails the SLA outright ---
 cheaper than useful.
 
+\section{The complete improvement ledger}
+\label{sec:cl-ledger}
+
+The preceding sections priced the policy one dial at a time. This
+section assembles the whole picture on a single, fixed arm set, so that
+each pool's improvement --- and the composed improvement a user actually
+experiences --- can be read against \emph{every} metric that was
+measured, including the ones on which forecasting wins nothing.
+
+\paragraph{Scope, and how an ``arm'' is defined.} The ledger is built on
+the five windows for which a request-linked composed replay exists
+(aggregate, burst1, burst3, burst4, burst5), each with four policy arms
+(reactive and the three foundation-model forecasts), anchored on the
+composed replay artifact and joined back to its run by exact artifact
+path --- a one-to-one match with no ambiguity, 20 arms in total. Where a
+static row appears it is the deployable $C{=}8$ fleet of
+Chapter~\ref{cap:baselines} over the same span. Two structural gaps are
+stated once and never worked around: there is \textbf{no request-linked
+composed replay for steady24h, burst2, burst6 or the full trace, and
+none for any static arm}, so no composed number is reported for those
+cells; and the full-trace family carries static and reactive arms only,
+so it has no forecast comparator. All tables in this section cover the
+current committed result set; of the experiment families still being
+generated at the time of writing (a16, g2, g3\_32b, g6), none
+contributes a number to any table here. One quantity from outside that
+set is admitted in prose below --- the controller's own inference charge,
+from the a16 controller-cost measurements --- and it is reported as a
+sensitivity on the cost ratio, never as a table entry or a headline.
+
+\subsection{Encoder pool}
+\label{sec:cl-ledger-enc}
+
+Table~\ref{tab:cl-ledger-enc} carries the encoder pool's full
+distribution, its margin against the \SI{1000}{\milli\second} bound, its
+provisioned worker-time in both units, and its cold-start bill.
+
+\begin{table}[htbp]
+\centering
+\caption{Encoder-pool ledger on the request-linked arm set (forecast =
+Chronos p90, $\rho{=}15$, $L{=}30$\,\si{\second}, issue-time,
+warm-pool; reactive = the identically informed strawman at the same
+lead). ``Margin'' is bound $-$ p99 against the
+\SI{1000}{\milli\second} encoder-delay bound: positive is slack,
+negative is overage. Worker-time is provisioned worker-seconds
+(thousands); \emph{5090\,h is derived as worker-seconds/3600 under the
+one-worker-one-RTX-5090 convention of Chapter~\ref{cap:baselines}, not
+stored}. ``Warm-up'' is the cold-start component billed from order
+rather than from readiness. The full-trace block is graded in aggregate
+only (it has no per-episode grading and no forecast arm).}
+\label{tab:cl-ledger-enc}
+\footnotesize
+\setlength{\tabcolsep}{2.2pt}
+\begin{tabular}{@{}llrrrrrrrrr@{}}
+\toprule
+& & \multicolumn{4}{c}{encoder delay (\si{\milli\second})} & &
+\multicolumn{2}{c}{provisioned} & \multicolumn{2}{c}{warm-up} \\
+\cmidrule(lr){3-6}\cmidrule(lr){8-9}\cmidrule(lr){10-11}
+Window & Policy & p50 & p90 & p99 & max & Margin & k\,ws & 5090\,h &
+k\,ws & \% \\
+\midrule
+aggregate & static $C{=}8$ & --- & --- & 644 & --- & $+356$ & 3{,}869.3 & 1{,}074.8 & --- & --- \\
+          & reactive       & 0.0 & 52.3 & 588 & 35{,}807 & $+412$ & 2{,}611.3 & 725.4 & n/m & n/m \\
+          & forecast       & 0.0 & 52.3 & 588 & 35{,}807 & $+412$ & 2{,}410.8 & 669.7 & n/m & n/m \\
+\midrule
+burst1 & reactive & 8.9 & 448.1 & 588 & 2{,}892 & $+412$ & 557.5 & 154.9 & 19.5 & 3.5 \\
+       & forecast & 8.9 & 448.1 & 588 & 1{,}262 & $+412$ & 540.2 & 150.1 & 3.8 & 0.7 \\
+burst3 & reactive & 0.0 & 565.2 & \textbf{16{,}079} & 20{,}240 & $\mathbf{-15{,}079}$ & 28.4 & 7.9 & 2.5 & 8.9 \\
+       & forecast & 0.0 & 268.3 & 588 & 588 & $+412$ & 32.2 & 9.0 & 0.5 & 1.7 \\
+burst4 & reactive & 8.9 & 502.1 & 588 & 6{,}947 & $+412$ & 242.4 & 67.3 & 8.2 & 3.4 \\
+       & forecast & 8.9 & 502.1 & 588 & 905 & $+412$ & 238.2 & 66.2 & 3.1 & 1.3 \\
+burst5 & reactive & 0.0 & 522.1 & 588 & 11{,}004 & $+412$ & 98.6 & 27.4 & 4.1 & 4.2 \\
+       & forecast & 0.0 & 522.1 & 588 & 884 & $+412$ & 88.8 & 24.7 & 1.2 & 1.3 \\
+\midrule
+full trace & static $C{=}2$ & 8.9 & 119.8 & \textbf{2{,}905} & 28{,}246 & $\mathbf{-1{,}905}$ & 1{,}209.6 & 336.0 & n/m & n/m \\
+(7\,d, 1\,M req) & static $C{=}8$ & 8.9 & 52.3 & 677 & 10{,}846 & $+323$ & 4{,}838.4 & 1{,}344.0 & n/m & n/m \\
+           & reactive & 8.9 & 52.3 & 588 & 35{,}807 & $+412$ & 3{,}323.2 & 923.1 & n/m & n/m \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\footnotesize ``n/m'' = not measured. Cold-start accounting covers 40
+(window, policy, lead) cells and does not include the aggregate window
+or the full trace: the warm-up component there is \emph{unmeasured, not
+zero}. It also carries no forecast-model dimension, so the warm-up
+columns are trustworthy for the Chronos and reactive arms only.}
+\end{table}
+
+\paragraph{The improvement is not where a bar chart would put it.} Read
+the first four columns across each window: within a window, the
+reactive and forecast arms share \emph{identical} p50, p90 and p99 on
+aggregate, burst1, burst4 and burst5. This is not a duplication
+artifact --- the arms are distinct runs with distinct worker-time and
+distinct worst cases --- it is the physics already stated in
+Section~\ref{sec:cl-aggregate}: at 2.2--3.2\% encoder utilisation the
+queue is empty for essentially every request, so the delay collapses
+onto the deterministic \SI{588}{\milli\second} service floor that every
+adequately provisioned policy reaches, because all arms share the same
+encoder. Stated plainly and without softening: \textbf{on the graded
+encoder statistic, forecasting does not beat reactive control on four of
+the five composed windows --- they tie exactly, at the floor. The whole
+encoder-latency advantage on this arm set lives in burst3}, where the
+reactive p99 of 16{,}079 against a \SI{1000}{\milli\second} bound is an
+overage ratio of 15.1 (1{,}508\% over) and a worst excursion of
+19.2$\times$ the bound, while forecast holds the floor. The two
+out-of-span windows add two more separations that the composed arm set
+cannot show, because they have no forecast-covered composed replay:
+at $L{=}300$\,\si{\second} the reactive controller reaches
+\SI{4282}{\milli\second} on burst2 and \SI{4606}{\milli\second} on
+burst6 while the forecast arms hold \SI{588}{\milli\second}
+(Table~\ref{tab:base-react-enc}).
+
+Where the arms \emph{do} separate on every window is the worst case,
+which the p99 does not see: reactive's worst excursion above the bound
+runs $1.9\times$ (burst1), $19.2\times$ (burst3), $5.9\times$ (burst4)
+and $10.0\times$ (burst5), against $0.3\times$, $0\times$, $0\times$ and
+$0\times$ for the Chronos forecast. On the aggregate window even this
+separation vanishes: all four arms share the same \SI{35807}{\milli\second}
+worst request, a single trace-wide outlier no policy in this set avoids.
+
+\paragraph{Infraction intensity is reportable; infraction duration is
+not.} Only one canonical encoder arm violates (burst3 reactive), and its
+magnitude is reported above. \emph{How long} the encoder was in
+violation is structurally uncomputable from these runs: no per-request
+encoder delay is retained --- the encoder time series stores per-second
+occupancy, not latency --- so time-in-violation and
+fraction-of-requests-over-bound are unavailable for every encoder arm,
+of every policy, on every window. Queue depth is not a substitute, and
+this is an absence of instrumentation, not a missing ingest. The
+language pool below does have per-request backing, and its durations are
+reported there. No encoder p99 in this table is backlog-divergent, so
+none of them is a lower bound on an unbounded quantity.
+
+\paragraph{Cold start, and the denominator it hides.} The warm-up
+columns separate what an operator is billed from \emph{readiness} from
+what it is billed from \emph{order}. At the chapter's $L{=}30$\,\si{\second}
+operating point the difference is small for both policies, but it grows
+with lead and it grows asymmetrically: at
+$L{=}165$\,\si{\second} the reactive controller spends 73.7\% of its
+burst3 bill, 34.6\% of its calm-day bill, 25.3\% (burst5), 22.7\%
+(burst1) and 21.9\% (burst4) on workers that were not yet serving, while
+the forecast arm's warm-up fraction never exceeds 9.4\% on any window or
+lead. Anticipation converts cold start from a dominant cost term into a
+rounding error, and this holds independently of the p99 argument. It also
+changes a comparison: read from readiness alone, reactive at
+$L{=}165$\,\si{\second} looks \emph{cheaper} than forecast on burst3
+(17{,}018 against 31{,}553 worker-seconds); read from order, the gap
+narrows to 29{,}558 against 34{,}523, and reactive is buying that
+remaining 14\% discount at an encoder-delay p99 of
+\SI{54170}{\milli\second} against the forecast's \SI{588}{\milli\second}.
+Under bill-from-order at that lead the forecast arm is outright cheaper
+on burst1 (559{,}268 versus 576{,}659\,ws), burst5 (93{,}560 versus
+101{,}371) and the calm day (175{,}586 versus 191{,}427), and marginally
+more expensive on burst4 (253{,}503 versus 250{,}594).
+
+\subsection{Language pool}
+\label{sec:cl-ledger-llm}
+
+Table~\ref{tab:cl-ledger-llm} is the language-pool counterpart. Unlike
+the encoder, TTFT is retained per request, so infraction
+\emph{duration} is real here and is reported.
+
+\begin{table}[htbp]
+\centering
+\caption{Language-pool ledger on the same request-linked arm set
+(forecast = Chronos p90 under the tail-aware conversion). ``Over'' is the
+fraction of requests exceeding the \SI{1000}{\milli\second} TTFT bound
+and ``in viol.'' the fraction of wall-clock time the bound was breached;
+the SLA is graded on p99, so a sub-1\% over-fraction is compatible with a
+pass and is reported to show the margin honestly. ITL p99 is the
+token-pooled statistic against a \SI{100}{\milli\second} bound; the
+per-request TPOT variant used by
+Table~\ref{tab:val-anchor} is materially larger on the reactive arms
+(aggregate 36.5 versus \SI{21.1}{\milli\second}) and the two must not be
+interchanged. H100 GPU-hours are stored, not derived.}
+\label{tab:cl-ledger-llm}
+\footnotesize
+\setlength{\tabcolsep}{3.4pt}
+\begin{tabular}{@{}llrrrrrrrr@{}}
+\toprule
+& & \multicolumn{4}{c}{TTFT (\si{\milli\second})} & ITL &
+\multicolumn{2}{c}{infraction} & H100 \\
+\cmidrule(lr){3-6}\cmidrule(lr){8-9}
+Window & Policy & p50 & p90 & p99 & max & p99 & over & in viol. & GPU-h \\
+\midrule
+aggregate & reactive & 25.1 & 157.9 & \textbf{1{,}192} & 15{,}903 & 21.1 & 1.44\% & 0.99\% & 281.5 \\
+          & forecast & 22.6 & 96.2 & 651 & 4{,}366 & 6.3 & 0.26\% & 0.32\% & 550.2 \\
+burst1 & reactive & 35.1 & 710.3 & \textbf{1{,}665} & 4{,}329 & \textbf{124.1} & 4.69\% & 4.43\% & 20.5 \\
+       & forecast & 22.1 & 471.7 & 651 & 2{,}503 & 5.2 & 0.31\% & 0.67\% & 114.3 \\
+burst3 & reactive & 30.5 & 996.3 & \textbf{10{,}574} & 15{,}903 & \textbf{160.8} & 9.96\% & 5.37\% & 1.0 \\
+       & forecast & 21.7 & 267.3 & 651 & 2{,}186 & 5.1 & 0.10\% & 0.19\% & 6.3 \\
+burst4 & reactive & 60.4 & 821.8 & \textbf{2{,}807} & 6{,}396 & \textbf{151.1} & 7.75\% & 6.24\% & 8.1 \\
+       & forecast & 24.7 & 538.6 & 651 & 2{,}573 & 5.1 & 0.14\% & 0.32\% & 49.4 \\
+burst5 & reactive & 55.3 & 764.4 & \textbf{2{,}182} & 3{,}471 & \textbf{145.9} & 6.77\% & 5.00\% & 3.4 \\
+       & forecast & 25.5 & 558.9 & 651 & 2{,}573 & 5.1 & 0.12\% & 0.23\% & 21.0 \\
+\midrule
+full trace & reactive & 25.7 & 155.6 & \textbf{1{,}145} & 15{,}903 & 22.2 & 1.33\% & 0.98\% & 352.9 \\
+(1\,M req) & static & 22.8 & 93.0 & 655 & 4{,}366 & 6.0 & 0.21\% & 0.33\% & 672.0 \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\footnotesize These aggregate-window rows are the composed-replay arm
+set, a different run family from the planner week replay quoted in
+Section~\ref{sec:cl-llm}; the two agree on verdict and on the
+\SI{651}{\milli\second} tail but not on cost to better than
+${\approx}6\%$ (550.2 here against 518.6 there). ITL time-in-violation
+is not computable --- ITL has no per-request backing --- so the duration
+columns grade TTFT only.}
+\end{table}
+
+\paragraph{This pool separates on every window, and the separation is
+compliance, not thrift.} Forecast holds TTFT p99 at
+\SI{651}{\milli\second} and ITL p99 at ${\approx}\SI{5.1}{\milli\second}$
+on all five windows; reactive violates TTFT on \emph{all five} and ITL on
+four of the five. The one reactive ITL pass is the aggregate window, at
+\SI{21.1}{\milli\second} --- and it passes only because week-scale
+aggregation masks the burst excursions it fails on individually, the
+same dashboard-masking effect Section~\ref{sec:cl-aggregate} documents
+for the encoder. The duration columns are what a boolean feasibility flag
+cannot say: reactive control leaves burst3's TTFT bound breached for
+87 seconds of a 1{,}620-second window (5.37\% of wall-clock) affecting
+9.96\% of requests, and burst4's for 708 seconds (6.24\%) affecting
+7.75\%.
+
+\paragraph{And it costs more, not less.} The GPU-hour column must be read
+in the opposite direction to the encoder's. Against reactive control the
+forecast policy is 2--6$\times$ \emph{more} expensive on the language
+pool (aggregate $+95\%$, burst1 $+457\%$, burst3 $+510\%$). That is not
+a defect of the forecast: reactive is cheap precisely because it
+under-provisions decode capacity, which is why it fails the tail on every
+window, so the apparent saving \emph{is} the violation and must never be
+quoted as a language-pool win. The defensible language-pool cost
+statement is the one already made in Section~\ref{sec:cl-llm}, against
+the burst-sized static shape, and it is a break-even, not a saving. The
+division of labour between the pools is therefore asymmetric and worth
+stating outright: \textbf{on the encoder pool forecasting buys savings;
+on the language pool it buys compliance.} Conflating the two would
+overstate the result in both directions.
+
+\subsection{The joint result, and why it is not a sum}
+\label{sec:cl-ledger-joint}
+
+\begin{table}[htbp]
+\centering
+\caption{Composed end-to-end tail on the request-linked join. ``E2E p99''
+is the 99th percentile of \emph{per-request} composed latency: the stages
+are joined on request identity first, and the percentile is taken
+afterwards. ``Naive sum'' is the arithmetic sum of the two per-pool p99s
+--- a different quantity with no operational meaning, since the two
+percentiles are attained by different requests --- shown here only to
+quantify the error it would introduce.}
+\label{tab:cl-ledger-joint}
+\footnotesize
+\setlength{\tabcolsep}{2.2pt}
+\begin{tabular}{@{}llrrrrrrr@{}}
+\toprule
+Window & Policy & Requests & enc p99 & TTFT p99 & E2E p99 & E2E max &
+Naive sum & Error \\
+\midrule
+aggregate & reactive & 749{,}601 & 588 & 1{,}192 & 1{,}696 & 38{,}050 & 1{,}780 & $1.050\times$ \\
+          & forecast & 749{,}601 & 588 & 651 & 1{,}240 & 38{,}188 & 1{,}240 & $1.000\times$ \\
+burst1 & reactive & 64{,}804 & 588 & 1{,}665 & 2{,}069 & 4{,}650 & 2{,}253 & $1.089\times$ \\
+       & forecast & 64{,}804 & 588 & 651 & 1{,}240 & 2{,}503 & 1{,}240 & $1.000\times$ \\
+burst3 & reactive & 3{,}093 & 16{,}079 & 10{,}574 & \textbf{21{,}868} & 24{,}877 & 26{,}652 & $\mathbf{1.219\times}$ \\
+       & forecast & 3{,}093 & 588 & 651 & 1{,}240 & 2{,}186 & 1{,}240 & $1.000\times$ \\
+burst4 & reactive & 25{,}639 & 588 & 2{,}807 & 3{,}064 & 7{,}847 & 3{,}395 & $1.108\times$ \\
+       & forecast & 25{,}639 & 588 & 651 & 1{,}240 & 2{,}573 & 1{,}240 & $1.000\times$ \\
+burst5 & reactive & 8{,}983 & 588 & 2{,}182 & 2{,}714 & 11{,}634 & 2{,}770 & $1.021\times$ \\
+       & forecast & 8{,}983 & 588 & 651 & 1{,}240 & 2{,}573 & 1{,}240 & $1.000\times$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\footnotesize All latencies in \si{\milli\second}. Forecast rows are
+Chronos; the Toto and TimesFM arms coincide with them on every window
+except burst1, where they read 1{,}259 and 1{,}258\,\si{\milli\second}
+respectively (errors $1.0006\times$ and $1.0010\times$).}
+\end{table}
+
+Table~\ref{tab:cl-ledger-joint} carries the composed result, and the
+last two columns carry a methodological point the thesis should not
+leave implicit. \textbf{The composed p99 is a per-request join, not a sum
+of per-pool percentiles.} Adding the two marginal p99s is a different
+quantity, because the encoder's 99th-percentile request and the language
+pool's 99th-percentile request are generally not the same request. The
+error this introduces is not uniform: it is negligible on the forecast
+arms (exactly zero on thirteen of the fifteen, at most $0.13\%$ on the
+two burst1 outliers) and material on every reactive arm, which
+\emph{strictly} differ --- from $+56$\,\si{\milli\second} ($2.1\%$) on
+burst5, through $+84$ ($5.0\%$) on the aggregate, $+184$ ($8.9\%$) on
+burst1 and $+331$ ($11.1\%$) on burst4, to
+$\mathbf{+4{,}784}$\,\si{\milli\second} ($\mathbf{21.9\%}$) on burst3.
+The naive sum always \emph{overstates} the measured tail.
+
+The asymmetry has a physical cause rather than a data-quality one. On
+the forecast arms the encoder is never saturated, so both stage
+distributions sit pinned near-deterministic at their service floors, and
+when both stages are near-deterministic the p99 of the sum
+\emph{happens} to coincide with the sum of the p99s. That coincidence is
+arithmetic, not construction: the composed \emph{worst case} varies by
+window (2{,}186 / 2{,}573 / 4{,}650 / 38{,}188\,\si{\milli\second}) off
+stage distributions that are otherwise identical, which an additive
+placeholder could not produce, and the reactive rows sit strictly below
+their sums, which a stored sum could not do. The practical rule is
+simple: an end-to-end tail must come from the join, and for the four
+windows and the full trace that have no composed replay, it does not
+exist and is not reported. This also settles the reconstruction of
+Section~\ref{sec:sim-knees}: the measured request-linked composed p99 on
+the aggregate window is \SI{1240}{\milli\second}, in line with the
+${\approx}\SI{1.24}{\second}$ estimate built there from the replayed
+TTFT tail and above it only under the modelled prefill.
+
+Read jointly, the improvement is then stated once and completely:
+forecast holds the composed tail flat at \SI{1240}{\milli\second} on
+thirteen of fifteen arms and within \SI{20}{\milli\second} of it on the
+other two, independently of window, while reactive control ranges from
+\SI{1696}{} to \SI{21868}{\milli\second} --- $1.4\times$ to
+$17.6\times$ worse on the same window, with the worst case on the
+one-minute onset.
+
+\subsection{Cost, with every denominator named}
+\label{sec:cl-ledger-cost}
+
+A cost ratio is meaningless without its denominator, and more than one
+denominator is defensible here. Three are used in this thesis, and they
+are not interchangeable. \emph{Deployable static} is $C{=}8$ encoders
+held for the span --- the fleet an operator could actually provision with
+no foreknowledge of the trace. \emph{Grid-SLA-minimal static} is the
+maximum over the per-window optima $C^{*}$, the smallest single static
+fleet meeting the SLA everywhere; it requires the whole trace known in
+advance, and on this trace it evaluates to $C{=}8$ as well. \emph{The
+per-window optimum} is that window's own $C^{*}$ (6/7/7/8 on
+burst1/3/4/5), an oracle denominator: it is the strictest of the three
+and flatters autoscaling least. Because the first two coincide at
+$C{=}8$ here, their agreement is \emph{one} argument and must not be
+presented as two independent corroborations.
+
+Under those denominators the picture is the following, and it includes
+the cell where the thesis's own headline does not generalise:
+
+\begin{itemize}
+\item \textbf{Encoder, week scale.} 2{,}410{,}754.7 provisioned
+worker-seconds for the Chronos p90 policy ($\rho{=}15$,
+$L{=}30$\,\si{\second}, warm-pool readiness, issue-time actuation) over
+the 5.60-day covered span, against
+$8 \times 483{,}659.8 = 3{,}869{,}278.4$ worker-seconds for the
+deployable static $C{=}8$ fleet over the \emph{same} span: the
+0.62$\times$ of Table~\ref{tab:cl-aggregate}. The grid-SLA-minimal
+denominator gives the identical figure because it is the same fleet.
+There is no per-window-optimum denominator for the aggregate window,
+since $C^{*}$ is defined per window.
+\item \textbf{Encoder, per burst window --- the boundary condition on
+that headline.} Against the deployable static fleet over each burst
+window's own span, \emph{every} autoscaling arm costs \emph{more} than
+static: forecast 1.80--2.90$\times$ and reactive 2.19--2.67$\times$.
+Against the per-window oracle optimum the same arms cost
+2.06--3.32$\times$ and 2.50--3.10$\times$. This is not an artifact to be
+filtered away: a short bursty window gives an autoscaler no runway over
+which to amortise spin-up, so the encoder saving is a \emph{week-scale}
+phenomenon that materialises only once calm periods are in the span. The
+0.62$\times$ is a claim about the week, not about a burst.
+\item \textbf{Encoder, full trace.} Over the 7-day trace the reactive
+controller reaches 0.687$\times$ the deployable $C{=}8$ fleet
+(3{,}323{,}189.5 against 4{,}838{,}397.6 worker-seconds) while holding
+the encoder bound at \SI{588}{\milli\second}. Against $C{=}2$
+(1{,}209{,}599.4\,ws) the same arm reads 2.75$\times$, but $C{=}2$ is not
+a defensible denominator on this trace: it fails at
+\SI{2905}{\milli\second}. The full trace is graded in aggregate only and
+has no forecast arm, so it neither confirms nor contradicts the
+per-episode result --- reactive control still loses burst3 wherever
+burst3 is graded on its own.
+\item \textbf{Language pool.} The 0.96$\times$ of
+Section~\ref{sec:cl-llm} is 518.6 H100 GPU-hours against a static
+TP2$\times$2 shape \emph{time-scaled} to the same 5.60-day span,
+537.4\,GPU-hours. Pricing the same static shape as four constant GPUs
+over the artifact's own span gives 537.4 and the same ratio. But scaling
+the static reference by \emph{request count} rather than time
+(749{,}601 of 1{,}000{,}000) gives 503.7\,GPU-hours and a ratio of
+1.03$\times$ --- the forecast policy slightly \emph{more} expensive. The
+comparison is therefore genuinely at break-even, and which side of unity
+it falls on is decided by the denominator, not by the policy. The
+time-matched denominator is the one quoted, and it must be quoted
+\emph{with} the ratio.
+\end{itemize}
+
+Two further honesty points close the cost account. Forecasting is
+\emph{more expensive than reactive control} on two encoder cells: burst3
+(32{,}228 against 28{,}356 worker-seconds, $+13.7\%$) and the calm day at
+$L{=}165$\,\si{\second} (162{,}056 against 142{,}257, $+13.9\%$) --- and
+on the calm day it buys only \SI{685}{} against
+\SI{734}{\milli\second}, a difference of no practical consequence
+against a \SI{1000}{\milli\second} bound. Anticipation earns least
+exactly where there is nothing to anticipate. And the encoder's
+GPU-hours throughout this section are derived from provisioned
+worker-seconds under the one-worker-one-GPU convention, not measured;
+the language pool's H100 GPU-hours are stored quantities. The two are
+never summed.
+
+\paragraph{The controller is not free, and charging it changes nothing.}
+One cost term the ratio above omits is the forecaster's own inference.
+Charging each controller its measured per-tick forward cost over the
+covered span does not disturb the provisioning result against the static
+baseline. On GPU the forecast arm moves from 0.623$\times$ to
+0.624$\times$ of the deployable static fleet --- a controller duty cycle
+under $0.8\%$ at a \SI{15}{\second} tick for every model tested, the
+worst cell being Toto driving four signals. On CPU-class hardware the
+charge must be \emph{priced} rather than merely measured: at
+\$0.04/vCPU-h against \$2.00/GPU-h, over the 24 threads the forward
+occupies, the deployable configurations (Chronos and TimesFM) land at
+0.65--0.66$\times$, still far inside the 1.00$\times$ static baseline.
+Among the models measured only Toto on CPU at a \SI{15}{\second} tick
+fails, and it fails on \emph{feasibility} --- a per-tick forward of
+29--\SI{32}{\second} cannot hold a \SI{15}{\second} period --- rather
+than on cost. Two qualifications attach. The CPU band is a measurement
+multiplied by an assumed price ratio (0.02), and the ordering it
+supports is sensitive to that assumption; the \SI{15}{\second} tick is
+an upper bound rather than the controller actually replayed, whose
+\SI{180}{\second} stride-12 tiling makes every CPU cell feasible and
+puts all ratios within 0.626--0.634$\times$. The CPU latencies are
+medians of five repetitions with intra-cell spread up to $17\%$, so two
+significant figures is the honest resolution throughout.
+
+\subsection{The volume of evidence}
+\label{sec:cl-ledger-scale}
+
+The results of this chapter are not a handful of runs. The provenance
+store from which every number above is drawn held \num{2060} simulation
+runs across the committed families at the time this ledger was compiled,
+recorded through \num{3594} ingest records and validated by 44 automated
+consistency checks over the schema. Against that spine the composed arm
+set resolves to exactly 20 request-linked arms, each matched one-to-one
+to its run by artifact path.
+
+The per-run volumes are correspondingly large. The aggregate window
+replays \num{749601} requests \emph{per pool} over the 5.60-day covered
+span; the full-trace runs replay \num{1000000} requests per pool over
+7 days, on both the encoder and the language side; and the
+maximum-forecastable-span runs cover \num{749601}, \num{872980} and
+\num{931628} requests for Chronos, Toto and TimesFM respectively. Below
+those summaries sit the per-request records themselves:
+\num{21395430} composed per-request rows, \num{3348130} language-pool
+per-request rows, and \num{121060} encoder occupancy samples in the
+partitions inspected. The forecasts driving all of it are the
+\num{21400000}-row rolling-origin archive of
+Chapter~\ref{cap:predictors}. Finally, the layer none of this can
+simulate: the live validation of Chapter~\ref{cap:validation} runs the
+burst3 window on real H100 silicon, in real time, twice --- once per
+policy --- at \num{3093} requests each with per-request token counts and
+prefix structure taken from the trace.
+
+Two caveats keep that volume from being over-read. Scale is not
+independence: the runs replay a \emph{single} production trace, so a
+million requests is a million requests from one week of one service, and
+the generalisation limits of Section~\ref{sec:cl-limits} apply
+undiminished. And the families still generating at the time of writing
+(a16, g2, g3\_32b, g6) are excluded from every table above; apart from
+the controller-inference sensitivity noted there, no result in this
+chapter depends on them.
+
 \section{Limitations}
 \label{sec:cl-limits}
 
@@ -642,8 +1102,35 @@ the full serving path (the check reprices a standalone eager vision-tower
 forward on synthetic inputs) remains future work. Second,
 every quantity here (the $4\times$/$2\times$ over-provisioning, the
 $\rho$ frontier, the 0.62$\times$) derives from a single Azure
-production trace over one 5.60-day span; generalization to other workloads,
-models, and datacenters is unaddressed.
+production trace over one 5.60-day span. Within that trace the
+\emph{temporal} scope can now be probed, and the honest reading is that
+the single-span averages are representative of the span, not of an
+arbitrary day inside it. Splitting the expanding-context span
+(\num{999599} requests over 6.998 days --- a third span, longer than the
+5.60-day one the headline is priced on, and reproducing its aggregate
+ratio at 0.612$\times$) into seven disjoint 24-hour folds leaves the
+headline quantities not fold-invariant. The encoder cost ratio against
+the deployed $C{=}8$ fleet ranges 0.47--1.10$\times$ over the five
+burst-bearing folds (0.19--1.10$\times$ over all seven); $\rho{=}15$ is
+feasible in six of the seven folds but cheapest in none \emph{among the
+four values swept}; and the policy misses the bound on the fold
+containing the e13 onset (encoder-delay p99
+\SI{1262}{\milli\second}), a fold on which a static $C{=}5$ fleet passes
+at \SI{905}{\milli\second} for only $3\%$ more worker-time. Three limits
+travel with that qualification. The ratio is monotone in each fold's
+offered image load across all seven folds, so a fixed-$C$ denominator
+under a $12\times$ spread in fold demand (4.2 to
+\SI{50.6}{img\per\second} mean) produces part of the spread by
+construction. The folds are disjoint \emph{test} windows but not
+training-independent, since each fold's forecast is conditioned on its
+predecessors. And they share one trace's tenant mix, size distribution
+and hardware calibration, differing only in time --- so this is evidence
+about temporal variability within one trace and about nothing else. The
+$\rho$ frontier retains its shape in every fold, but its cheapest
+feasible setting sits at a \emph{grid endpoint} in seven of the eight
+windows swept, so no interior optimum is licensed by it either.
+Generalization to other workloads, models, and datacenters remains
+unaddressed.
 
 \section{Summary}
 \label{sec:cl-summary}

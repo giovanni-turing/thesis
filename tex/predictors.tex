@@ -93,9 +93,10 @@ full benchmark, \num{21404640} forecast rows across eight model/mode
 configurations, runs in about \SI{2.5}{\hour} wall-clock on one
 RTX~5090 (the baselines take about a minute each on CPU; Chronos-2 and
 Toto-2 dominate at roughly one hour and 80 minutes). Per decision the
-cost is small: averaged over a configuration's ${\approx}54$k
-origins, one 12-step forecast costs ${\approx}65$ (Chronos-2) to
-${\approx}90$ (Toto-2) milliseconds of GPU time, comfortably inside any
+cost is small: averaged over a configuration's \num{54000}--\num{56600}
+origins, one 12-step forecast of all four signals costs
+\SI{4}{\milli\second} (TimesFM) to \SI{51}{\milli\second} (Chronos-2
+with covariates) of GPU time, comfortably inside any
 15--60-second decision cadence. The operationally honest cost comparison
 is deployment footprint, not benchmark wall-clock: a foundation-model
 forecaster is a GPU-resident 120M--2.5B-parameter service, EWMA a few
@@ -249,7 +250,7 @@ trails the direct context forecast (WAPE within 1.3 points), and at the
 onsets themselves there is no robust edge; the sharpest onset
 detector even flips sign by resolution. The mechanism is diagnostic:
 \emph{at} the onsets the image forecast is the \emph{worst} component
-(75--100\% WAPE, against 58--72\% for the direct context forecast and
+(73--100\% WAPE, against 57--72\% for the direct context forecast and
 33--38\% for requests) --- the image spike least forecastable exactly
 where the structural bet needed it most. The direct forecast
 already absorbs the image-driven component as well as a decomposition
@@ -280,8 +281,9 @@ is treated as a candidate point forecast. Across the 160 (model,
 mode, resolution, signal) cells, some quantile beats the point forecast
 in 51. But the wins concentrate entirely in the models whose point
 forecast is \emph{not} the median: TimesFM's mean head is beaten in 18 of
-its 20 cells (median improvement $-1.7\%$, always by a below-median
-quantile, modally p40), and the Gaussian-band baselines account for 31
+its 20 cells (median improvement $-1.7\%$, always by the median or a
+lower quantile --- the p50 head in 17 of the 18, p10 in the last,
+1-second images), and the Gaussian-band baselines account for 31
 more (up to $-45\%$ for Holt--Winters on 1-second images, where a p10
 path simply undoes the model's burst overshoot). For Chronos-2 and
 Toto-2, whose point \emph{is} the median, quantiles improve essentially
@@ -303,7 +305,7 @@ essentially calibrated for every model and signal: p90 coverage
 images: 0.888). Median coverage sits at 0.43--0.48, and the lower edge
 is distorted by zero-inflation: on bursty signals the p10 frequently
 touches zero, and realized zeros tie with it, reading as 0.14--0.21
-coverage on images against 0.07--0.13 on the other signals. As a result
+coverage on images against 0.07--0.14 on the other signals. As a result
 the nominal-80\% p10--p90 band covers 69\% of
 1-minute image bins and degrades to 29\% at 1-second bins, where ties at
 zero dominate. The practical summary: \emph{upper-quantile headroom is
@@ -410,7 +412,8 @@ cluster, with its by-construction 50/50 modality split.
 Zero-shot time-series foundation models beat the fixed-parameter
 classical baselines on all four demand signals in every cell of the
 $5{\times}4$ resolution--signal grid: a modest 2--9\% relative edge
-at provisioning cadence, one-third relative at sub-minute bins where
+at provisioning cadence, widening to 8--32\% at 1-second bins --- one-third
+on the image signal, where
 WAPE${\approx}100\%$ marks the no-skill floor. Their accuracy
 decays only marginally across the 12-step horizon: the persistence
 identified in Chapter~\ref{cap:trace-eda} is exploitable at lead times

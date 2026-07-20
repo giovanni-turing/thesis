@@ -145,7 +145,8 @@ Chapter~\ref{cap:trace-eda} establishes that these signals are not
 interchangeable. A constant-fraction model (vision work as a fixed
 multiple of request rate) explains only $R^2=\num{0.123}$ of the
 image-rate series but $R^2=\num{0.654}$ of decode demand (measured as
-offered work stamped at arrival, an upper bound on decode load;
+offered work stamped at arrival; faithful in total volume but
+temporally displaced, not a pointwise upper bound ---
 Chapter~\ref{cap:trace-eda}). The image signal is also an order of
 magnitude burstier (CV$^2$ 3.83 versus 0.32 at one-minute resolution),
 and its extremes do not co-occur with the request signal's: the week's
@@ -164,7 +165,7 @@ request stream already contains.
 Nor would watching the right signal reactively suffice. Onsets ramp from baseline
 to peak in a median of six minutes (the fastest in one), with a
 median steepest single-minute jump of \SI{208}{img/s}. Against replica
-cold starts of tens of seconds to minutes, the fast half of the bursts
+cold starts of tens of seconds to minutes, a third of the bursts
 arrive too fast for a policy that waits to observe them. Aggregation
 does not rescue the reactive loop: the arrival process is overdispersed
 at every operational scale (the Fano factor of the counting process
@@ -243,8 +244,8 @@ validated on silicon, language-pool timing calibrated, and per-pool
 saturation attributable by construction?
 Chapters~\ref{cap:aiconfigurator} and~\ref{cap:twopool} build that
 platform: the collected encoder-attention operator agrees with physical
-measurement within ${\approx}3\%$, the end-to-end kernel ledger closes
-with no unexplained residual, and a matched-engine silicon measurement of
+measurement within ${\approx}3\%$, the end-to-end kernel ledger is attributed
+term by term except for a ${\approx}0.7$\,ms remainder, and a matched-engine silicon measurement of
 the serving engine's own vision tower (vLLM) validates the composed forward
 to within $12.8\%$ across the $N\le64$ batch axis --- the earlier ${\approx}1.4$--$1.6\times$
 figure is an execution-engine difference (HuggingFace eager vs.\ vLLM's
@@ -500,8 +501,18 @@ models --- is load-bearing.
 The claims are scoped by their evidence. The workload is one seven-day
 production trace with a by-construction 50/50 modality split and
 arrival-side information only: the rate signals stamp each request's full
-token volume at its arrival minute, which is faithful for encoder and
-prefill work but makes the decode series an offered-work upper bound. The
+token volume at its arrival minute. For encoder and prefill work this is
+faithful; for decode it is \emph{not} a pointwise upper bound. The stamped
+decode series is exact in total volume (within \num{7.8e-7} of the replayed
+token count over \num{1000000} requests) but displaces mass in time: on the
+busiest one percent of \SI{15}{\second} bins selected by the stamp itself it
+exceeds the realised decode rate by $54$--$56\%$, while on the busiest one
+percent selected by the realised series it falls short, in $55$--$58\%$ of
+those bins. Both figures shrink with bin width --- at the planner's
+\SI{60}{\second} interval the conservative figure is $2.9$--$3.2\%$ --- and
+the sign of the bias over the population the controller actually samples
+spans zero, so the series licenses no provisioning claim in either
+direction. The
 trace records image counts, not sizes, so the encoder pool assumes a
 uniform $448^2$ image, and its cost model is validated against the serving
 engine's own vision tower --- a

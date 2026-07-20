@@ -1,0 +1,151 @@
+{
+  "chapter": "apendice",
+  "n_reviewed": 14,
+  "n_upheld": 6,
+  "n_overturned": 7,
+  "n_revised": 1,
+  "notes": "Decisive finding: tab:app-engine's vLLM column is generated from collector_artifacts/phaseE_physical_anchor/vllm_eager_vit.json (the standalone eager vLLM vision tower named in the body text at line 187), NOT from vllm_eager_dense.json (the 69-point dense sweep). vllm_eager_vit gives 42.177 / 178.343 / 333.732 ms at N=8/32/64, which round EXACTLY to the published 42.2 / 178.3 / 333.7. The first pass and the internal-defects pass both compared the dense-sweep artifact and concluded four table cells were 'truncated'. They were comparing the wrong rows. The same error voids the proposed residual-tuple 'fix' at line 185. Second decisive finding: the HF-FA2 cells come from anchor_flash_attention_2_5x50.json (54.0604 / 465.7424 -> 54.1 / 465.7), not merged_fa2.csv, so the FA2 'fixes' are also wrong. Third: provenance.grid_window already carries c_star_corrected=8 and is_superseded=t for burst5, so no DB action is outstanding. Genuine defects surviving: the SDPA upper bound 1.61 (should be 1.62), the FIFO cap N=512 (should be 64), the SM 2407 MHz clock pin (actual lock command was -lgc 2400,2400 -lmc 14001), and two scope overstatements in the heatmap caption.",
+  "rulings": [
+    {
+      "line": 28,
+      "quote": "the AIC data-collection and GEMM-validation runs pin the GPU clocks (SM \\SI{2407}{\\mega\\hertz}, memory \\SI{14001}{\\mega\\hertz})",
+      "criticality": "supporting",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "revised",
+      "final_verdict": "THESIS_WRONG",
+      "evidence": "The question IS decidable now. collector_artifacts/phaseE_physical_anchor/ENCODER_ANCHOR_SUMMARY.md:92 records the actual intervention: 'The user locked the clock (nvidia-smi -lgc 2400,2400 -lmc 14001) -> settled at SM 2392 / MEM 13801'. So the requested SM was 2400, not 2407, and the delivered memory clock was 13801, not 14001. 2407 MHz is the RTX 5090 boost-spec figure used as the AIC cost-model clock assumption (verify-fabel.md:26 quotes the AIC yaml comment '170 SM x 2407 MHz'); phaseB_batch_validation/bench_vit_batches.py:13 calls it 'the 2407 MHz lock reference', i.e. a reference, not an achieved pin. DB: `select distinct sm_clock_mhz from provenance.collector_encoder_fn order by 1;` -> 2377, 2385, 2392, 2400, 2887. No archived reading is 2407, and phaseB's own measured_f_n.csv sm_clock_mhz column reads 2377-2400. The memory clock 14001 IS the value passed to -lmc, so that half is the requested (not delivered) figure.",
+      "final_fix": "Replace 'pin the GPU clocks (SM \\SI{2407}{\\mega\\hertz}, memory \\SI{14001}{\\mega\\hertz})' with: 'pin the GPU clocks via \\texttt{nvidia-smi -lgc 2400,2400 -lmc 14001} (delivered SM 2377--2400\\,\\si{\\mega\\hertz}, MEM \\SI{13801}{\\mega\\hertz}; the AIC cost model itself is parameterised at the \\SI{2407}{\\mega\\hertz} boost reference)'. Justification: ENCODER_ANCHOR_SUMMARY.md:92; collector_encoder_fn.sm_clock_mhz distinct values."
+    },
+    {
+      "line": 89,
+      "quote": "The foundation-model rows are uniformly near-white --- within a few percent of the per-cell optimum everywhere --- while the baseline rows darken as bins shrink.",
+      "criticality": "supporting",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "upheld",
+      "final_verdict": "THESIS_WRONG",
+      "evidence": "Query: `with c as (select variate,resolution,model,mode,wape from provenance.forecast_metrics where candidate='point' and h=-1 and span='common'), b as (select variate,resolution,min(wape) bw from c group by 1,2) select c.resolution,c.model,max(round((c.wape/b.bw)::numeric,3)) from c join b using(variate,resolution) group by 1,2;` Per-model MAX rel-to-column-best: toto <=1.006 everywhere; chronos <=1.030 everywhere; timesfm 1.010 (1min), 1.030 (30s), 1.032 (45s), 1.056 (15s) but **1.220 (1s)** -- driven by (images,1s) 1.2198, (ctx,1s) 1.1139, (gen,1s) 1.0965. Baselines for contrast at 1s: ewma up to 1.479, naive 1.588, holt_winters 2.198. So the 'baseline rows darken' half is right and Chronos/Toto are genuinely within 3%; the blanket 'everywhere' fails only for TimesFM in the 1 s column. Adversarial defence considered and rejected: on a shading scale reaching 2.20 a cell at 1.22 is not white, and 22% is not 'a few percent' on any reading.",
+      "final_fix": "Replace with: 'The Chronos-2 and Toto-2 rows are uniformly near-white --- within $3\\%$ of the per-cell optimum in every cell --- and TimesFM within $6\\%$ outside the \\SI{1}{\\second} column, where it reaches $22\\%$ above best on images; the baseline rows darken as bins shrink.' (DB: max rel-to-best toto 1.006, chronos 1.030, timesfm 1.056 excluding 1s / 1.220 at (images,1s).)"
+    },
+    {
+      "line": 90,
+      "quote": "Toto-2 with covariates carries most column wins at \\SI{15}{\\second} and \\SI{1}{\\second}; Chronos-2 and TimesFM take the coarse-bin columns.",
+      "criticality": "supporting",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "upheld",
+      "final_verdict": "DEFINITIONAL",
+      "evidence": "Query: `with c as (select variate,resolution,model,mode,wape from provenance.forecast_metrics where candidate='point' and h=-1 and span='common') select resolution,variate,(array_agg(model||'-'||mode order by wape))[1] from c group by 1,2;` Argmin per column: 15s -> toto-cov x4; 1s -> toto-cov (ctx,gen,requests), toto-uni (images); 30s -> toto-cov (ctx,gen), toto-uni (images,requests); 45s -> chronos-uni (ctx,requests), toto-cov (gen), toto-uni (images); 1min -> timesfm-uni (ctx), toto-cov (gen), chronos-cov (images), chronos-uni (requests). First clause is exactly right. Second clause overstates: Toto sweeps 30 s 4/4 and splits 45 s 2-2, so only the 1 min block goes mostly to Chronos/TimesFM. No number is wrong -- this is a scope/qualitative overstatement, hence DEFINITIONAL rather than THESIS_WRONG. All margins concerned are within 1.7% of the column best (chronos max rel 1.017 at 1min, timesfm 1.010).",
+      "final_fix": "Replace with: 'Toto-2 carries every column win at \\SI{15}{\\second} and \\SI{30}{\\second} and three of four at \\SI{1}{\\second} (with covariates except on images); Chronos-2 and TimesFM take three of four at \\SI{1}{\\minute} and two of four at \\SI{45}{\\second}. Every one of these margins is within $2\\%$ of the column best.'"
+    },
+    {
+      "line": 124,
+      "quote": "the same Qwen3-VL vision-tower forward (bf16, $448^2$, RTX~5090 under an external \\texttt{nvidia-smi} clock lock, target SM~2400\\,/\\,mem~14001\\,\\si{\\mega\\hertz}) under four execution paths",
+      "criticality": "supporting",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "The first pass and the internal-defect note both assert 'no lock-command log was captured', so the external lock is indistinguishable from persistence mode. That is refuted by the archive: collector_artifacts/phaseE_physical_anchor/ENCODER_ANCHOR_SUMMARY.md:92 logs the exact external command -- 'The user **locked the clock** (`nvidia-smi -lgc 2400,2400 -lmc 14001`) -> settled at SM 2392 / MEM 13801 (within the 2377-2400 reference range; <0.5%)'. The stated target SM 2400 / mem 14001 matches that command literally, and the four execution paths are all present in the DB (`select distinct engine,attn from provenance.collector_encoder_fn where image_px=448;` -> sdpa, flash_attention_2, vllm/AttentionBackendEnum.FLASH_ATTN, compiled, against the aic composition). The delivered band 2377-2400 quoted at line 130 is also correct. The residual tension (anchor_sdpa_locked2400.json carries clocks_locked=false) is already disclosed by the thesis itself at lines 128-131, which under-claims rather than over-claims.",
+      "final_fix": "NO EDIT. The lock command is archived at ENCODER_ANCHOR_SUMMARY.md:92 and matches the stated target exactly. Optional provenance improvement only: lines 130-131 say 'no lock-command log were captured', which is now too weak -- it could cite ENCODER_ANCHOR_SUMMARY.md:92. Do not weaken line 124."
+    },
+    {
+      "line": 150,
+      "quote": "32 & 160.2 & 253.8 & 232.0 & 178.3 & 186.0 & 1.11 \\\\",
+      "criticality": "supporting",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "The first pass read the vLLM cell off vllm_eager_dense.json (178.4062). Wrong artifact. Query: `select n_images,mean_ms,source_path from provenance.collector_encoder_fn where engine='vllm' and image_px=448 and n_images=32;` -> vllm_eager_dense 178.4062, vllm_multires 178.3996, **vllm_eager_vit 178.343**. The body text at line 187 names the source as 'the standalone eager vLLM vision-tower implementation' = vllm_eager_vit.json, and that artifact gives 178.343 -> 178.3, exactly as published. Ratio: 178.343/160.196 = 1.1133 -> 1.11 (published) -- the dense artifact would have given 1.1136 -> 1.11 too, so the ratio does not discriminate, but the mean does. HF-FA2 cell 232.0 has no 5x50 anchor point at N=32 (confirmed: `select n_images from provenance.collector_encoder_fn where source_path like '%flash_attention_2_5x50%';` returns 1, 8, 64 only), so that one cell does come from the dense FA2 merge -- a documentation nit, not a wrong number.",
+      "final_fix": "NO EDIT to any number. 178.3 is the correctly rounded value of vllm_eager_vit.json's 178.343 ms. Optional: footnote that the HF-FA2 column at $N{=}32$ is taken from the dense FA2 merge, since the 5x50 anchor has no $N{=}32$ point."
+    },
+    {
+      "line": 151,
+      "quote": "64 & 316.4 & 511.6 & 465.7 & 333.7 & 370.6 & 1.05 \\\\",
+      "criticality": "headline",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "Same wrong-artifact error. `select n_images,mean_ms,source_path from provenance.collector_encoder_fn where engine='vllm' and image_px=448 and n_images=64;` -> vllm_eager_dense 333.6107, vllm_multires 333.6633, **vllm_eager_vit 333.732**. 333.732 -> 333.7 as published. Every other cell verifies against its own archive: AIC 316.369 -> 316.4; HF-SDPA anchor_dense_sdpa_2400 511.573 -> 511.6; HF-FA2 anchor_flash_attention_2_5x50 465.7424 -> 465.7 (NOT merged_fa2.csv's 465.589); compiled vit_compile_dense 370.645 -> 370.6. Ratio 333.732/316.369 = 1.0549 -> 1.05 as published.",
+      "final_fix": "NO EDIT. 333.7 is the correctly rounded value of vllm_eager_vit.json's 333.732 ms; 465.7 is the correctly rounded value of the 5x50 FA2 anchor's 465.7424 ms."
+    },
+    {
+      "line": 179,
+      "quote": "The HuggingFace-transformers eager forward (SDPA attention) runs $1.36$--$1.61\\times$ above the composition, rising with $N$;",
+      "criticality": "headline",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "upheld",
+      "final_verdict": "THESIS_WRONG",
+      "evidence": "Query: `select n_images, ratio_meas_over_aic from provenance.collector_encoder_fn where source_path like '%anchor_dense_sdpa_2400%' and n_images in (1,8,32,64);` -> 1.3885, 1.3613, 1.5843, **1.6170**. The published table's SDPA cells (11.3/58.7/253.8/511.6) match this artifact and no other (anchor_sdpa_locked2400 would give 58.6 at N=8, not 58.7). Every candidate basis exceeds 1.615: unrounded 511.573/316.369 = 1.61701; table cells 511.6/316.4 = 1.61694; the 5x50 anchor 511.2617/316.369 = 1.6160; the oneworker burst5 row 511.601/316.369 = 1.6171. Dense-sweep max over N<=64 = **1.6208** (`select max(ratio_meas_over_aic) ... where source_path like '%anchor_dense_sdpa_2400%' and n_images<=64;`). A range upper bound must CONTAIN the measured maximum (bracketing precedent: ceil the high end), and 1.61 excludes 1.617 on every basis. This is truncation, not an ordinary rounding convention. Secondary: 'rising with $N$' is false from N=1 to N=8 (1.3885 -> 1.3613), so the published lower bound 1.36 is not the small-$N$ end of a monotone curve.",
+      "final_fix": "Replace '$1.36$--$1.61\\times$ above the composition, rising with $N$' with '$1.36$--$1.62\\times$ above the composition, rising with $N$ above $N{=}8$'. Justification: anchor_dense_sdpa_2400 ratios 1.3885 / 1.3613 / 1.5843 / 1.6170 at N=1/8/32/64; 1.6170 -> 1.62 at two decimals on the unrounded and the published-cell basis alike."
+    },
+    {
+      "line": 185,
+      "quote": "matches the composition to within $11.4\\%$ ($-2.2\\%,+11.3\\%,+5.5\\%$ at $N{=}8/32/64$)",
+      "criticality": "headline",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "The 'mixed bases' charge collapses once the right artifact is used. vllm_eager_vit.json (the standalone eager vLLM vision tower this sentence is explicitly about) vs aic_pred_ms: N=8 42.177/43.126-1 = **-2.2009%** -> -2.2%; N=32 178.343/160.196-1 = **+11.328%** -> +11.3%; N=64 333.732/316.369-1 = **+5.488%** -> +5.5%. All three published figures are the correctly rounded UNROUNDED residuals from one single artifact -- no mixing of rounded and unrounded bases occurs. The bound 'to within $11.4\\%$' is a true upper bound on this basis (max 11.33%) and also on the dense-sweep basis (11.367%), so it is safe either way. Query: `select n_images,mean_ms,source_path from provenance.collector_encoder_fn where engine='vllm' and image_px=448 and source_path like '%vllm_eager_vit%';`",
+      "final_fix": "NO EDIT. The tuple $(-2.2\\%,+11.3\\%,+5.5\\%)$ is the correctly rounded unrounded-residual tuple against vllm_eager_vit.json. Optional clarity-only footnote: state that the four anchor shapes bound the residual at $11.4\\%$ while the 69-point dense sweep bounds it at $12.8\\%$ (line 196), so the reader does not read two bounds for one claim."
+    },
+    {
+      "line": 191,
+      "quote": "\\texttt{torch.compile} (max-autotune) accelerates the HuggingFace forward by $1.2$--$1.4\\times$",
+      "criticality": "supporting",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "upheld",
+      "final_verdict": "DEFINITIONAL",
+      "evidence": "Query: `with s as (select n_images,mean_ms from provenance.collector_encoder_fn where source_path like '%anchor_dense_sdpa_2400%'), c as (select n_images,mean_ms from provenance.collector_encoder_fn where source_path like '%vit_compile_dense%') select s.n_images, s.mean_ms/c.mean_ms from s join c using(n_images) order by 1;` -> N=1 1.1213, 2 1.0627, 4 1.1514, 6 1.1708, 8 1.2035, 12 1.3210, 16 1.3411, 24 1.3986, 32 1.3646, 48 1.3751, 64 1.3802, 96 1.3897, 128 1.4022. In the batched regime $N\\ge8$ the range is 1.2035-1.4022, which brackets to exactly the published 1.2--1.4 -- the number is right where the chapter's whole argument lives. It is violated only at N=1,2,4,6 (1.06-1.17), which the sentence does not exclude. No number needs changing; only scope. Hence DEFINITIONAL, and the correct remedy is to scope, not to restate.",
+      "final_fix": "Add scope only: 'accelerates the HuggingFace forward by $1.2$--$1.4\\times$ in the batched regime ($N{\\ge}8$; only $1.06$--$1.17\\times$ at $N{\\le}6$)'. Justification: SDPA/compiled dense ratios above -- min at N>=8 is 1.2035 (N=8), max 1.4022 (N=128); at N<=6 the range is 1.0627 (N=2) to 1.1708 (N=6). NOTE the first pass wrote '1.06--1.15' for the small-N end; the measured max there is 1.1708, so use 1.17."
+    },
+    {
+      "line": 196,
+      "quote": "the composition stays within $12.8\\%$ across the whole $N\\le64$ serving regime (residual up to $+12.7\\%$ inside the regime, growing to $+21.8\\%$ only past the FIFO cap at $N{=}512$).",
+      "criticality": "headline",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "upheld",
+      "final_verdict": "THESIS_WRONG",
+      "evidence": "All three percentages verify and must be kept. Recomputed from vllm_eager_dense.json (69 points) against figuras/aic/aic_fn_engines_aiccurve.csv: 64 points have N<=64, max residual **+12.7094% at N=52** -> +12.7, inside the +12.8 band; at N=512 the residual is **+21.767%** -> +21.8. Only the cap value is wrong: collector_artifacts/phaseE_physical_anchor/winsched_ctrl_aic.stats.json gives `encoder_batch_images` = **64** (with images_per_batch p90=p99=64), and the figure caption at line 168 and the regime definitions at lines 116/196 all put the cap at 64. N=512 is the sweep endpoint, not the cap.",
+      "final_fix": "Replace 'growing to $+21.8\\%$ only past the FIFO cap at $N{=}512$' with 'growing to $+21.8\\%$ only past the FIFO cap at $N{=}64$, reaching that value at the $N{=}512$ sweep endpoint'. Justification: winsched_ctrl_aic.stats.json encoder_batch_images=64; residual +21.767% at N=512, max +12.709% at N=52 for N<=64."
+    },
+    {
+      "line": 215,
+      "quote": "and within $15.5\\%$ at the two largest resolutions (mean $1.09$--$1.11$ at $640^2$/$896^2$, AIC slightly under-pricing the largest forwards",
+      "criticality": "supporting",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "upheld",
+      "final_verdict": "INSUFFICIENT_DATA",
+      "evidence": "Re-checked against the whole table, not just the multires sources: `select distinct image_px, engine from provenance.collector_encoder_fn order by 1,2;` -> aic exists at 224, 336, 448, 672 only; vllm exists at 224, 320, 448, 640, 896. aic_multires.json contains exactly the keys {224, 336, 448, 672}. The AIC denominator at $320^2$, $640^2$ and $896^2$ therefore does not exist in any archive, so neither the 1.09--1.11 means nor the 15.5% bound can be reconstructed or refuted. The AIC EncoderCostModel is a callable, so these were almost certainly evaluated live and not persisted -- absence of the artifact is NOT evidence the numbers are wrong.",
+      "final_fix": "NO EDIT to the thesis. The numbers are unverifiable, not shown wrong, and changing them would be inventing. Provenance action instead: persist the AIC $f(N)$ curve at $320^2$, $640^2$ and $896^2$ alongside vllm_multires.json (same form as figuras/aic/aic_fn_engines_aiccurve.csv) and re-ingest into collector_encoder_fn, then re-verify. If that is not done before submission, weaken the sentence to cite only the resolutions with an archived AIC curve ($224^2$, $448^2$)."
+    },
+    {
+      "line": 275,
+      "quote": "\\texttt{results/*.parquet} (26 files)",
+      "criticality": "incidental",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "The first pass said 'no subsetting rule lands on 26'. There is one, and it is exact. `ls /home/gio/tese/predictors/results/*.parquet | wc -l` = 39, decomposing as: 6 models x 4 signals = 24 point-forecast files (chronos, timesfm, toto, ewma, naive, holt_winters over ctx/gen/images/requests), PLUS chronos_covariates and toto_covariates = **26** -- which is precisely the set that feeds tab:pred-wape and figs pred-heatmap/pred-horizon/pred-band/pred-models (6 models, with the two covariate variants, over 4 signals). The remaining 13 are 12 `*_expctx` files (the expanded-context ablation, a different section) and 3 `ewma_cal_*` files (the EWMA calibration, another section). The row this count sits on names exactly the WAPE table and those four figures, so 26 is the right count for that row.",
+      "final_fix": "NO EDIT. 26 = 6 models x 4 signals + 2 covariate variants, exactly the files feeding tab:pred-wape and figs:pred-heatmap/horizon/band/models. The 39-file total includes 12 expctx-ablation and 3 ewma-calibration files belonging to other rows."
+    },
+    {
+      "line": 301,
+      "quote": "Tab.~\\ref{tab:base-grid} (burst5 $C^{*}$ corrected to 8)",
+      "criticality": "headline",
+      "original_verdict": "ARTIFACT_SUPERSEDED",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "The DB is no longer stale -- the correction is already ingested. `select window_name, c_star, c_star_corrected, is_superseded from provenance.grid_window where window_name='burst5';` -> c_star=16, **c_star_corrected=8, is_superseded=t**. The schema deliberately keeps the raw pre-correction c_star beside the corrected value and the flag (and exposes grid_window_effective for consumers), so nothing is superseded and no DB action is outstanding. Independent confirmation of 8 under the p99-only gate: `select encoder_workers, delay_p99_ms, feasible from provenance.grid_vision_point where window_name='burst5' order by 1;` -> C=4 gives 1548.410 ms (infeasible vs the 1000 ms SLA), C=8 gives **759.524 ms** (feasible), so 8 is the smallest feasible grid point. grid_vision_point.feasible still reflects the raw pre-correction gate (first t at C=16) by design, as the untouched ingest of grid_summary.json.",
+      "final_fix": "NO EDIT to the thesis, and NO DB action. The archived correction is already recorded in grid_window.c_star_corrected=8 / is_superseded=t, and the p99-only gate independently yields 8 (delay_p99 759.524 ms < 1000 ms; C=4 is 1548.410 ms). Do not 're-ingest' or overwrite grid_window.c_star -- that column is intentionally the raw pre-correction value."
+    },
+    {
+      "line": 348,
+      "quote": "\\texttt{simulation/live51/ worker\\_manager.py} (live control plane: etcd/NATS, KV router, per-process TP2 mockers, Prometheus, planner)",
+      "criticality": "supporting",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "evidence": "The first pass only looked at provenance.runs.tp (NULL for all 7 live runs) and at llm_run_summary.metrics, and stopped. The launch configuration is archived in the repo next to the harness: /home/gio/tese/simulation/live51/engine_args.json contains `\"aic_tp_size\": 2` (alongside aic_backend vllm, aic_system h100_sxm, Qwen/Qwen3-VL-8B-Instruct, block_size 64). worker_manager.py spawns `PY, \"-m\", \"dynamo.mocker\"` per worker process (lines 60-74), which is the 'per-process mockers' half of the claim. Both halves of 'per-process TP2 mockers' are therefore corroborated by archived configuration.",
+      "final_fix": "NO EDIT. TP=2 is archived at simulation/live51/engine_args.json (`\"aic_tp_size\": 2`) and the per-process mocker spawn is at simulation/live51/worker_manager.py:60-74. Optional provenance hygiene (not a thesis change): backfill provenance.runs.tp = 2 for the 7 experiment='live' rows from that file."
+    }
+  ],
+  "rejected_fixes": "DO NOT APPLY ANY OF THE FOLLOWING -- each would replace a correct thesis number with a wrong one. (1) apendice.tex:150 '178.3 -> 178.4' [first pass; ADJUDICATION E25]: the table's vLLM column is vllm_eager_vit.json = 178.343, not vllm_eager_dense.json = 178.4062. 178.3 is correct. (2) apendice.tex:151 '333.7 -> 333.6' [first pass; ADJUDICATION E25]: vllm_eager_vit.json = 333.732. 333.7 is correct. (3) apendice.tex:149/151 HF-FA2 '54.1 -> 54.2' and '465.7 -> 465.6' [internal_defects line 149; ADJUDICATION E25]: those cells come from anchor_flash_attention_2_5x50.json (54.0604 and 465.7424), not merged_fa2.csv. 54.1 and 465.7 are correct. (4) apendice.tex:182 '$1.25\\times$ at $N{=}8$ -> $1.26\\times$' [internal_defects line 182]: 54.0604/43.126 = 1.2535 -> 1.25 from the 5x50 anchor. 1.25 is correct; the 1.26 came from the wrong FA2 artifact. (5) apendice.tex:185 tuple '-> ($-2.2\\%,+11.4\\%,+5.5\\%$)' [first pass; ADJUDICATION E24] AND the competing '-> ($-2.1\\%,+11.3\\%,+5.5\\%$)' [internal_defects line 186]: against vllm_eager_vit.json the residuals are -2.2009 / +11.328 / +5.488 %, so the published $(-2.2,+11.3,+5.5)$ is already the single-basis unrounded tuple. Both proposed replacements are wrong. (6) apendice.tex:275 '26 -> 39' [first pass]: 26 is the exact count of the files feeding tab:pred-wape and the four pred-* figures (6 models x 4 signals + 2 covariate variants); 39 is the whole directory including the expctx-ablation and ewma-calibration rows. (7) apendice.tex:301 'flag grid_window.c_star / grid_vision_point.feasible for burst5 as pre-correction and re-ingest' [first pass]: already done -- c_star_corrected=8 and is_superseded=t are present; overwriting c_star would destroy the raw pre-correction record. (8) apendice.tex:124 'replace the external hard lock with soft-pinned / no lock-command log' [first pass; internal_defects line 124]: the lock command `nvidia-smi -lgc 2400,2400 -lmc 14001` IS archived at ENCODER_ANCHOR_SUMMARY.md:92; weakening line 124 would understate a documented intervention. (9) apendice.tex:191 small-N band '1.06--1.15' [first pass]: the measured N<=6 maximum is 1.1708 (N=6), so the band is 1.06--1.17. (10) apendice.tex:89 'TimesFM ... up to 22% above best' phrased as if TimesFM were within 2% elsewhere alongside Chronos/Toto at 2%: Chronos reaches 1.030, so the correct blanket for Chronos+Toto is 3%, not 2%."
+}

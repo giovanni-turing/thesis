@@ -1,0 +1,214 @@
+{
+  "chapter": "apendice_ecosystem",
+  "claims": [
+    {
+      "line": 13,
+      "anchor": "app:ecosystem",
+      "quote": "NVIDIA's \\texttt{ai-dynamo} project is a family of five\nfirst-party repositories that together implement datacenter-scale\n\\emph{disaggregated} large-language-model inference, one repository per layer of\nthe deployment lifecycle.",
+      "numbers": ["five"],
+      "metric": "component_count",
+      "subject": "ai-dynamo ecosystem (repository family)",
+      "assertion": "The ai-dynamo project consists of exactly five first-party repositories, one per lifecycle layer.",
+      "db_check": "UNVERIFIABLE: software-inventory claim, not an experimental artifact; check by enumerating /home/gio/tese/ai-dynamo/ subrepos (dynamo, nixl, grove, aiconfigurator, aiperf) rather than provenance DB. Internally consistent with the 5 data rows of tab:app-ecosystem (lines 95-109).",
+      "criticality": "incidental"
+    },
+    {
+      "line": 22,
+      "anchor": "paragraph: aiconfigurator (offline planner)",
+      "quote": "at what parallelism (tensor, pipeline, data and expert; TP/PP/DP/EP) to maximise\nthroughput subject to TTFT and TPOT service-level objectives",
+      "numbers": ["four"],
+      "metric": "parallelism_dimension_count",
+      "subject": "aiconfigurator search space (TP/PP/DP/EP)",
+      "assertion": "aiconfigurator searches over four parallelism dimensions: tensor, pipeline, data and expert.",
+      "db_check": "UNVERIFIABLE: descriptive property of upstream aiconfigurator search space, no experimental artifact; the thesis runs table only records tp (provenance.runs.tp), not pp/dp/ep.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 26,
+      "anchor": "paragraph: aiconfigurator (offline planner)",
+      "quote": "(per-GPU CSVs, consumed in \\texttt{SILICON}, \\texttt{HYBRID}, \\texttt{EMPIRICAL}\nor \\texttt{SOL} modes) and interpolated between measured shapes",
+      "numbers": ["four"],
+      "metric": "aic_mode_count",
+      "subject": "aiconfigurator perf-database consumption modes",
+      "assertion": "The aiconfigurator performance database is consumed in four modes: SILICON, HYBRID, EMPIRICAL and SOL.",
+      "db_check": "UNVERIFIABLE: upstream API surface claim; no provenance table enumerates AIC modes. Cross-check against Appendix app:engine-sensitivity / collector_fn if the thesis records which mode each cost estimate used.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 47,
+      "anchor": "paragraph: dynamo (serving hub)",
+      "quote": "a tiered KV block manager\n(KVBM: GPU\\,$\\rightarrow$\\,CPU\\,$\\rightarrow$\\,SSD\\,$\\rightarrow$\\,remote)",
+      "numbers": ["four"],
+      "metric": "kvbm_tier_count",
+      "subject": "dynamo KVBM memory hierarchy",
+      "assertion": "Dynamo's KV block manager spans four tiers: GPU, CPU, SSD and remote.",
+      "db_check": "UNVERIFIABLE: architectural description of upstream dynamo KVBM; no experimental artifact in the provenance schema (this thesis does not exercise KVBM).",
+      "criticality": "incidental"
+    },
+    {
+      "line": 70,
+      "anchor": "paragraph: How they compose",
+      "quote": "\\paragraph{How they compose.} The five form one loop.",
+      "numbers": ["five", "one"],
+      "metric": "component_count",
+      "subject": "ai-dynamo lifecycle loop",
+      "assertion": "The five ai-dynamo components compose into a single closed plan-orchestrate-serve-move-measure loop.",
+      "db_check": "UNVERIFIABLE: qualitative architectural composition claim with no measurable quantity; restates the count on line 13.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 85,
+      "anchor": "tab:app-ecosystem",
+      "quote": "\\caption{The five \\texttt{ai-dynamo} components, their layer in the disaggregated\nserving lifecycle, and how this thesis uses each.}",
+      "numbers": ["five"],
+      "metric": "component_count",
+      "subject": "Table tab:app-ecosystem row count",
+      "assertion": "The table enumerates five ai-dynamo components (plus a separate engines row).",
+      "db_check": "UNVERIFIABLE: table-structure claim. Verify by counting body rows of tab:app-ecosystem: aiconfigurator, grove, dynamo, nixl, aiperf = 5, with 'engines' below a \\midrule as a sixth non-ai-dynamo row (consistent).",
+      "criticality": "incidental"
+    },
+    {
+      "line": 108,
+      "anchor": "tab:app-ecosystem",
+      "quote": "aiperf & Async benchmark client (TTFT, ITL, goodput) &\n  Client load generator for the Phase-4.3 live closed-loop validation\n  (\\texttt{live\\_fc} / \\texttt{live\\_re})",
+      "numbers": ["4.3"],
+      "metric": "phase_id",
+      "subject": "aiperf role in the Phase-4.3 live closed-loop validation",
+      "assertion": "aiperf served as the client load generator for the Phase-4.3 live closed-loop validation runs live_fc and live_re.",
+      "db_check": "provenance.runs WHERE experiment LIKE '%closedloop%' AND policy IN ('live_fc','live_re') AND is_current -- confirm both run families exist and that their client artifacts are aiperf exports (profile_export_aiperf.json); cross-check llm_run_summary for those run ids.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 112,
+      "anchor": "tab:app-ecosystem",
+      "quote": "vLLM's Qwen3-VL vision tower measured directly for the encoder anchor\n  (Appendix~\\ref{app:engine-sensitivity}); mocked in the live loop",
+      "numbers": ["3"],
+      "metric": "model_id",
+      "subject": "encoder anchor model (Qwen3-VL vision tower under vLLM)",
+      "assertion": "The encoder anchor was obtained by direct measurement of vLLM's Qwen3-VL vision tower.",
+      "db_check": "provenance.runs WHERE model LIKE 'Qwen3-VL%' AND engine LIKE '%vllm%' AND is_current; join encoder_run_summary for the anchor measurements. Also collector_fn for the ViT operator coverage used in the anchor.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 119,
+      "anchor": "paragraph: Maturity and pinning",
+      "quote": "The first\ntagged \\texttt{dynamo} release, \\texttt{v0.1.0}, is dated 2025-03-17",
+      "numbers": ["0.1.0", "2025-03-17"],
+      "metric": "release_date",
+      "subject": "ai-dynamo/dynamo first tagged release",
+      "assertion": "The first tagged dynamo release v0.1.0 is dated 2025-03-17.",
+      "db_check": "UNVERIFIABLE from provenance DB (no release-history table). Verify with: git -C /home/gio/tese/ai-dynamo/dynamo log -1 --format=%ci v0.1.0 (or `git tag -l --sort=creatordate --format='%(refname:short) %(creatordate:short)'`).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 120,
+      "anchor": "paragraph: Maturity and pinning",
+      "quote": "a roughly\ntwelve-month \\texttt{0.x} line followed",
+      "numbers": ["twelve"],
+      "metric": "prestable_line_duration_months",
+      "subject": "dynamo 0.x pre-stable release line",
+      "assertion": "The dynamo 0.x pre-stable line lasted roughly twelve months.",
+      "db_check": "UNVERIFIABLE from provenance DB. Arithmetic self-check: 2025-03-17 to 2026-03-13 = 11 months 27 days, so 'roughly twelve-month' is consistent with the two stated dates.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 123,
+      "anchor": "paragraph: Maturity and pinning",
+      "quote": "before the first \\emph{stable}\n\\texttt{v1.0.0} on 2026-03-13",
+      "numbers": ["1.0.0", "2026-03-13"],
+      "metric": "release_date",
+      "subject": "ai-dynamo/dynamo first stable release",
+      "assertion": "Dynamo's first stable release v1.0.0 is dated 2026-03-13.",
+      "db_check": "UNVERIFIABLE from provenance DB (no release-history table). Verify with: git -C /home/gio/tese/ai-dynamo/dynamo log -1 --format=%ci v1.0.0. NOTE: date is ~8 months after the thesis current date (2026-07-19) minus... i.e. in the past relative to 2026-07-19, so plausible; must still be checked against the actual tag.",
+      "criticality": "headline"
+    },
+    {
+      "line": 123,
+      "anchor": "paragraph: Maturity and pinning",
+      "quote": "Because minor versions land at roughly monthly\ncadence, every result here targets a deliberately pinned snapshot",
+      "numbers": ["monthly"],
+      "metric": "release_cadence_months",
+      "subject": "dynamo minor-version release cadence",
+      "assertion": "Dynamo minor versions are released at roughly a one-per-month cadence.",
+      "db_check": "UNVERIFIABLE from provenance DB. Verify by listing minor tags with dates: git -C /home/gio/tese/ai-dynamo/dynamo tag -l 'v*.*.0' --sort=creatordate --format='%(refname:short) %(creatordate:short)' and checking mean inter-minor interval ~30 days.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 125,
+      "anchor": "paragraph: Maturity and pinning / tab:ap-env",
+      "quote": "\\texttt{ai-dynamo} 1.2.1 (wheel) / 1.3.0 (source, both post-1.0),",
+      "numbers": ["1.2.1", "1.3.0", "1.0"],
+      "metric": "pinned_version",
+      "subject": "ai-dynamo runtime pin used for all results",
+      "assertion": "All results target ai-dynamo pinned to the 1.2.1 wheel and the 1.3.0 source build, both post-1.0.0.",
+      "db_check": "CONSISTENT with tex/apendice.tex:42 (tab:ap-env row 'ai-dynamo & 1.2.1 wheel / 1.3.0 source'). In DB: provenance.runs.actuation / run metadata should record which dynamo.replay runtime each run used; cross-check that Phase-2 baseline runs map to 1.2.1 and calibrated load-sweep-onward runs to 1.3.0 (apendice.tex:51-56).",
+      "criticality": "headline"
+    },
+    {
+      "line": 126,
+      "anchor": "paragraph: Maturity and pinning / tab:ap-env",
+      "quote": "\\texttt{aiconfigurator} 0.10.0 (editable, data branch) and \\texttt{aiperf}\n0.11.0 (Table~\\ref{tab:ap-env}).",
+      "numbers": ["0.10.0", "0.11.0"],
+      "metric": "pinned_version",
+      "subject": "aiconfigurator and aiperf version pins",
+      "assertion": "aiconfigurator is pinned at 0.10.0 (editable, data branch) and aiperf at 0.11.0, as recorded in Table tab:ap-env.",
+      "db_check": "PARTIAL MISMATCH: aiconfigurator 0.10.0 (editable, data branch) matches tex/apendice.tex:41 verbatim, but tab:ap-env (apendice.tex:35-48) has NO aiperf row at all -- the parenthetical cross-reference to Table~\\ref{tab:ap-env} does not support the aiperf 0.11.0 pin. Verify the version against the aiperf checkout / the profile_export_aiperf.json exports of the live_fc/live_re runs in provenance.runs, and either add an aiperf row to tab:ap-env or drop the cross-reference.",
+      "criticality": "headline"
+    },
+    {
+      "line": 146,
+      "anchor": "paragraph: What it contributes back",
+      "quote": "\\paragraph{What it contributes back.} Two things return upstream to\n\\textbf{aiconfigurator}: a draft coverage pull request (...), and a silicon validation of\nits encoder cost model",
+      "numbers": ["Two"],
+      "metric": "contribution_count",
+      "subject": "upstream contributions to aiconfigurator",
+      "assertion": "This thesis returns exactly two contributions upstream to aiconfigurator: a draft coverage PR and a silicon validation of the encoder cost model.",
+      "db_check": "UNVERIFIABLE in provenance DB as a count. The PR itself is corroborated at tex/apendice.tex:68-73 (draft PR #1312, commits b55dd0b7 / 656ac8ca / 12306db5 / 492a3444); the silicon validation maps to provenance.collector_fn + encoder_run_summary for the RTX 5090 anchor runs.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 148,
+      "anchor": "paragraph: What it contributes back",
+      "quote": "a draft coverage pull request (the missing\npatch-embedding operator, large-batch GEMM and attention coverage for vision\ntransformers, and a collector out-of-memory fix)",
+      "numbers": ["three"],
+      "metric": "pr_item_count",
+      "subject": "contents of the aiconfigurator draft coverage PR",
+      "assertion": "The draft coverage PR comprises three items: the missing patch-embedding operator, large-batch GEMM/attention coverage for ViTs, and a collector OOM fix.",
+      "db_check": "provenance.collector_fn -- expect rows for the patch-embedding operator and large-batch ViT GEMM/attention coverage; cross-check against the commit list in tex/apendice.tex:70-72 (infill 656ac8ca, collector fix 12306db5, large-batch ViT coverage 492a3444), which names exactly three fix commits (consistent).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 150,
+      "anchor": "paragraph: What it contributes back",
+      "quote": "a silicon validation of\nits encoder cost model against direct RTX~5090 measurements of vLLM's own vision\ntower",
+      "numbers": ["5090"],
+      "metric": "gpu_model",
+      "subject": "silicon-validation hardware for the encoder cost model",
+      "assertion": "The encoder cost model was validated against direct RTX 5090 measurements of vLLM's vision tower.",
+      "db_check": "provenance.runs WHERE gpu LIKE '%5090%' AND is_current; join encoder_run_summary. Cross-check tab:ap-env (apendice.tex:39) which names the benchmark node as RTX 5090 with driver 595.71.05 / CUDA 13.2 (consistent).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 155,
+      "anchor": "paragraph: How the contribution is positioned",
+      "quote": "same architectural slot as Dynamo's own SLA planner, but differs in two ways: it\nis \\emph{forecast-driven} ... and \\emph{modality-decoupled}",
+      "numbers": ["two"],
+      "metric": "differentiator_count",
+      "subject": "positioning of the proposed provisioning layer vs Dynamo's SLA planner",
+      "assertion": "The proposed provisioning layer differs from Dynamo's SLA planner in exactly two ways: forecast-driven and modality-decoupled.",
+      "db_check": "UNVERIFIABLE: positioning/claim-of-novelty with no numeric experimental content; the two properties themselves are evidenced by provenance.runs.policy (fc vs re) and by the separate encoder_run_summary / llm_run_summary pool tables.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 163,
+      "anchor": "paragraph: Scope",
+      "quote": "although the live closed loop exercises the real Dynamo control\nplane (planner, worker manager, discovery, metrics), its engines are\n\\emph{mocked}",
+      "numbers": ["four"],
+      "metric": "control_plane_component_count",
+      "subject": "live closed-loop scope (real control plane, mocked engines)",
+      "assertion": "The live closed loop exercises four real Dynamo control-plane components (planner, worker manager, discovery, metrics) while the engines are mocked.",
+      "db_check": "provenance.runs WHERE experiment LIKE '%closedloop%' AND engine LIKE '%mock%' AND is_current -- confirm every live_fc/live_re run is recorded with a mocked engine, so no live-loop number is claimed as real-GPU serving.",
+      "criticality": "supporting"
+    }
+  ]
+}

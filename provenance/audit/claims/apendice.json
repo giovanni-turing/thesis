@@ -1,0 +1,884 @@
+{
+  "chapter": "apendice",
+  "claims": [
+    {
+      "line": 11,
+      "anchor": "ap:artifacts",
+      "quote": "the issue-time week-scale aggregate that backs the\n0.62$\\times$ figure",
+      "numbers": [
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "issue-time week-scale aggregate schedule (forecast-driven vs static baseline), encoder pool",
+      "assertion": "The headline provisioned-cost ratio of the forecast-driven week-scale schedule to its baseline is 0.62x.",
+      "db_check": "provenance.cost_accounting joined to runs where experiment='week_aggregate_issuetime' and is_current; compute provisioned_ws(forecast)/provisioned_ws(static baseline); cross-check v_cost_frontier_dual.",
+      "criticality": "headline"
+    },
+    {
+      "line": 28,
+      "anchor": "tab:ap-env",
+      "quote": "the AIC data-collection and\nGEMM-validation runs pin the GPU clocks (SM \\SI{2407}{\\mega\\hertz}, memory\n\\SI{14001}{\\mega\\hertz})",
+      "numbers": [
+        "2407",
+        "14001"
+      ],
+      "metric": "gpu_clock_mhz",
+      "subject": "RTX 5090 benchmark node during AIC data-collection and GEMM-validation runs",
+      "assertion": "AIC collection and GEMM-validation runs were executed with GPU clocks pinned at SM 2407 MHz and memory 14001 MHz.",
+      "db_check": "provenance.runs (gpu, engine) has no clock column; verify against collector_artifacts/phaseA_validation/ and phaseB_batch_validation/ clock-lock logs. UNVERIFIABLE in DB: clock pinning is not a modelled provenance column.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 30,
+      "anchor": "tab:ap-env",
+      "quote": "the phase-E physical encoder anchor ran\nsingle-tenant persistence-mode (delivered SM 2377--2400\\,\\si{\\mega\\hertz},\nnot a hard lock)",
+      "numbers": [
+        "2377",
+        "2400"
+      ],
+      "metric": "gpu_clock_mhz_delivered",
+      "subject": "phase-E physical encoder anchor run on RTX 5090, persistence mode",
+      "assertion": "The phase-E physical encoder anchor delivered SM clocks in the 2377-2400 MHz band rather than a hard lock.",
+      "db_check": "No clock column in provenance.runs; check collector_artifacts/phaseE_physical_anchor/ per-N SM readings in anchor_sdpa_*.json. UNVERIFIABLE in DB.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 39,
+      "anchor": "tab:ap-env",
+      "quote": "NVIDIA driver / CUDA & 595.71.05 / 13.2 & benchmark node (RTX 5090) \\\\",
+      "numbers": [
+        "595.71.05",
+        "13.2"
+      ],
+      "metric": "software_version",
+      "subject": "benchmark node (RTX 5090) driver and CUDA toolkit",
+      "assertion": "Experiments ran on NVIDIA driver 595.71.05 with CUDA 13.2 on the RTX 5090 benchmark node.",
+      "db_check": "UNVERIFIABLE: provenance.runs records gpu/engine but no driver/CUDA version column; environment versions are not captured as experimental artifacts.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 40,
+      "anchor": "tab:ap-env",
+      "quote": "vLLM (container) & \\texttt{vllm/vllm-openai:v0.22.0} & collection + kernel profiling \\\\",
+      "numbers": [
+        "0.22.0"
+      ],
+      "metric": "software_version",
+      "subject": "vLLM container used for AIC kernel collection and profiling",
+      "assertion": "Kernel collection and profiling used the vllm/vllm-openai:v0.22.0 container.",
+      "db_check": "provenance.runs.engine may record 'vllm'; version string not modelled. UNVERIFIABLE: no engine-version column.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 41,
+      "anchor": "tab:ap-env",
+      "quote": "aiconfigurator & 0.10.0 (editable, data branch) & encoder + LLM cost model \\\\",
+      "numbers": [
+        "0.10.0"
+      ],
+      "metric": "software_version",
+      "subject": "aiconfigurator used as encoder and LLM cost model",
+      "assertion": "The cost model came from aiconfigurator 0.10.0 installed editable on the data branch.",
+      "db_check": "UNVERIFIABLE: no tooling-version column in provenance schema.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 42,
+      "anchor": "tab:ap-env",
+      "quote": "ai-dynamo & 1.2.1 wheel / 1.3.0 source & \\texttt{dynamo.replay} runtime \\\\",
+      "numbers": [
+        "1.2.1",
+        "1.3.0"
+      ],
+      "metric": "software_version",
+      "subject": "ai-dynamo replay runtime, two builds",
+      "assertion": "Two ai-dynamo replay runtimes were used: the 1.2.1 wheel and a 1.3.0 source build.",
+      "db_check": "UNVERIFIABLE: provenance.runs has no runtime-version column; distinguish via results/srcbuild/ artifact paths referenced in tab:ap-manifest.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 43,
+      "anchor": "tab:ap-env",
+      "quote": "cuDF / cuML / CuPy & 26.06 / 26.06 / 14.1.1 & trace EDA (GPU) \\\\",
+      "numbers": [
+        "26.06",
+        "26.06",
+        "14.1.1"
+      ],
+      "metric": "software_version",
+      "subject": "GPU EDA stack (RAPIDS cu13)",
+      "assertion": "Trace EDA ran on cuDF 26.06, cuML 26.06 and CuPy 14.1.1.",
+      "db_check": "UNVERIFIABLE: no library-version column; check eda/uv.lock.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 44,
+      "anchor": "tab:ap-env",
+      "quote": "PyTorch / transformers & 2.12.1 / 5.13.0 & TSFM benchmark + encoder bench \\\\",
+      "numbers": [
+        "2.12.1",
+        "5.13.0"
+      ],
+      "metric": "software_version",
+      "subject": "TSFM forecasting benchmark and encoder benchmark",
+      "assertion": "The TSFM benchmark and encoder bench ran on PyTorch 2.12.1 and transformers 5.13.0.",
+      "db_check": "UNVERIFIABLE: no library-version column in provenance schema.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 45,
+      "anchor": "tab:ap-env",
+      "quote": "chronos-forecasting & 2.3.1 & Chronos-2 \\\\",
+      "numbers": [
+        "2.3.1"
+      ],
+      "metric": "software_version",
+      "subject": "Chronos-2 forecasting model implementation",
+      "assertion": "Chronos-2 results were produced with chronos-forecasting 2.3.1.",
+      "db_check": "provenance.forecast_metrics.model='chronos2' identifies the model but not its library version. UNVERIFIABLE for the version literal.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 46,
+      "anchor": "tab:ap-env",
+      "quote": "matplotlib & 3.11.0 & all figures \\\\",
+      "numbers": [
+        "3.11.0"
+      ],
+      "metric": "software_version",
+      "subject": "figure rendering",
+      "assertion": "All figures were rendered with matplotlib 3.11.0.",
+      "db_check": "UNVERIFIABLE: no plotting-library version in provenance schema.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 52,
+      "anchor": "tab:ap-env / Environment section",
+      "quote": "the\npinned 1.2.1 wheel is the Phase-2 baseline; the 1.3.0 source build runs\nAIC timing predictions in-core (Rust) and is used for every calibrated\nrun from the load sweeps onward",
+      "numbers": [
+        "1.2.1",
+        "1.3.0"
+      ],
+      "metric": "runtime_version_assignment",
+      "subject": "Phase-2 baseline runs vs all calibrated runs from the load sweeps onward",
+      "assertion": "Phase-2 baseline used the 1.2.1 wheel while every calibrated run from the load sweeps onward used the 1.3.0 in-core source build.",
+      "db_check": "provenance.runs where experiment in ('phase2_baseline','load_sweep',...) and is_current; confirm srcbuild artifacts back all post-sweep runs (results/srcbuild/llm_head2k_*_src.json). Version itself UNVERIFIABLE in DB.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 89,
+      "anchor": "fig:pred-heatmap",
+      "quote": "The\nfoundation-model rows are uniformly near-white --- within a few percent of\nthe per-cell optimum everywhere --- while the baseline rows darken as bins\nshrink.",
+      "numbers": [],
+      "metric": "wape_relative_to_best",
+      "subject": "foundation models vs classical baselines across all (signal, resolution) cells",
+      "assertion": "Foundation-model rows stay within a few percent of the per-cell best WAPE in every cell while baseline rows degrade as bin width shrinks.",
+      "db_check": "provenance.forecast_metrics: per (variate, resolution) compute wape/min(wape); check foundation models <= ~1.05 in all cells.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 90,
+      "anchor": "fig:pred-heatmap",
+      "quote": "Toto-2 with covariates carries most column wins at \\SI{15}{\\second}\nand \\SI{1}{\\second}; Chronos-2 and TimesFM take the coarse-bin columns.",
+      "numbers": [
+        "15",
+        "1"
+      ],
+      "metric": "wape_column_wins",
+      "subject": "WAPE heatmap over all (signal, resolution) cells; Toto-2 with covariates vs Chronos-2/TimesFM",
+      "assertion": "Toto-2 with covariates wins most WAPE columns at the 15 s and 1 s resolutions, while Chronos-2 and TimesFM win the coarse-bin columns.",
+      "db_check": "provenance.forecast_metrics: group by (variate, resolution) and take argmin(wape) per column; check model='toto2' with covariates dominates resolution in ('15s','1s'); compare v_forecast_best.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 93,
+      "anchor": "fig:pred-heatmap",
+      "quote": "Holt--Winters is the worst model in every column --- worse than naive\npersistence --- because extrapolating a fitted trend across a 12-step\nhorizon is precisely wrong for bursty, mean-reverting rates.",
+      "numbers": [
+        "12"
+      ],
+      "metric": "forecast_horizon_steps",
+      "subject": "Holt-Winters baseline vs naive persistence across all heatmap columns",
+      "assertion": "Holt-Winters has the worst WAPE in every column, worse than naive persistence, over a 12-step forecast horizon.",
+      "db_check": "provenance.forecast_metrics where h=12: per (variate, resolution) check model='holtwinters' has max(wape) and wape > wape of model='naive'.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 103,
+      "anchor": "fig:pred-models",
+      "quote": "All three foundation models over the same burst (univariate\npoint paths, \\SI{1}{\\minute} bins): the paths are nearly coincident",
+      "numbers": [
+        "1",
+        "3"
+      ],
+      "metric": "forecast_path_agreement",
+      "subject": "Chronos-2, TimesFM and Toto-2 univariate point paths on a single burst at 1-minute bins",
+      "assertion": "The three foundation models produce nearly coincident univariate point forecast paths over the same burst at 1-minute resolution.",
+      "db_check": "provenance.forecast_metrics where resolution='1min' and variate='univariate' and mode='point'; compare wape across the three models on the burst span (expect noise-level spread).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 104,
+      "anchor": "fig:pred-models",
+      "quote": "releasing the regime\nwithin about one tile of its collapse --- the visual form of the\nnoise-level inter-model spreads in Table~\\ref{tab:pred-wape}",
+      "numbers": [
+        "1"
+      ],
+      "metric": "regime_release_lag_bins",
+      "subject": "foundation-model forecast paths at burst collapse, 1-minute bins",
+      "assertion": "All three foundation models release the burst regime within about one 1-minute bin of its collapse.",
+      "db_check": "Recompute from predictors/results/*.parquet forecast paths on the burst window; no direct provenance table column. UNVERIFIABLE in DB: qualitative path-timing claim, not a stored metric.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 116,
+      "anchor": "app:engine-sensitivity",
+      "quote": "predominantly execution-stack-specific across the $N\\le64$ serving regime\n(residual up to $+12.7\\%$)",
+      "numbers": [
+        "64",
+        "12.7"
+      ],
+      "metric": "aic_vs_measured_residual_pct",
+      "subject": "AIC composed encoder forward vs vLLM measurement, batch regime N<=64",
+      "assertion": "Within the N<=64 serving regime the AIC composition's residual against measurement reaches at most +12.7%.",
+      "db_check": "provenance.collector_fn (or measured_request) for the vLLM dense sweep: max over N<=64 of (measured_ms/aic_ms - 1); cross-check collector_artifacts/phaseE_physical_anchor/vllm_eager_dense.json.",
+      "criticality": "headline"
+    },
+    {
+      "line": 124,
+      "anchor": "tab:app-engine",
+      "quote": "the same Qwen3-VL vision-tower forward\n(bf16, $448^2$, RTX~5090 under an external \\texttt{nvidia-smi} clock lock,\ntarget SM~2400\\,/\\,mem~14001\\,\\si{\\mega\\hertz}) under four\nexecution paths",
+      "numbers": [
+        "448",
+        "2400",
+        "14001",
+        "4"
+      ],
+      "metric": "bench_config",
+      "subject": "Qwen3-VL vision tower forward benchmark configuration on RTX 5090",
+      "assertion": "The engine comparison timed the same Qwen3-VL vision-tower bf16 forward at 448x448 on an RTX 5090 with an external clock lock targeting SM 2400 / mem 14001 MHz, across four execution paths.",
+      "db_check": "provenance.runs where experiment='engine_sensitivity' and gpu='rtx5090'; count distinct engine = 4. Clock target UNVERIFIABLE in DB.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 129,
+      "anchor": "app:engine-sensitivity",
+      "quote": "the archive holds per-$N$ SM readings spanning\n2377--2400\\,\\si{\\mega\\hertz} (median 2400); no memory-clock reading and no\nlock-command log were captured.",
+      "numbers": [
+        "2377",
+        "2400",
+        "2400"
+      ],
+      "metric": "gpu_clock_mhz_delivered",
+      "subject": "external clock-lock recollection for the engine-sensitivity sweep",
+      "assertion": "Per-N SM clock readings for the engine-sensitivity recollection span 2377-2400 MHz with a median of 2400 MHz, with no memory-clock or lock-command log captured.",
+      "db_check": "UNVERIFIABLE in DB: clock telemetry is not a provenance column; check collector_artifacts/phaseE_physical_anchor/vllm_eager_dense.json per-N sm_clock fields.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 148,
+      "anchor": "tab:app-engine",
+      "quote": "1  & 8.2   & 11.3  & 11.2  & 8.0   & 10.1  & 0.98 \\\\",
+      "numbers": [
+        "1",
+        "8.2",
+        "11.3",
+        "11.2",
+        "8.0",
+        "10.1",
+        "0.98"
+      ],
+      "metric": "encoder_forward_ms",
+      "subject": "N=1 batch, 448^2 Qwen3-VL vision tower: AIC / HF-SDPA / HF-FA2 / vLLM-FA / torch.compile and vLLM/AIC ratio",
+      "assertion": "At N=1 the forward takes 8.2 ms (AIC), 11.3 ms (HF-SDPA), 11.2 ms (HF-FA2), 8.0 ms (vLLM-FA) and 10.1 ms (torch.compile), giving a vLLM/AIC ratio of 0.98.",
+      "db_check": "provenance.collector_fn where n_images=1 and resolution=448 grouped by engine; verify ratio 8.0/8.2=0.976 rounds to 0.98. Source: vllm_eager_dense.json, merged_sdpa.csv, merged_fa2.csv, vit_compile_dense.json.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 149,
+      "anchor": "tab:app-engine",
+      "quote": "8  & 43.1  & 58.7  & 54.1  & 42.2  & 48.8  & 0.98 \\\\",
+      "numbers": [
+        "8",
+        "43.1",
+        "58.7",
+        "54.1",
+        "42.2",
+        "48.8",
+        "0.98"
+      ],
+      "metric": "encoder_forward_ms",
+      "subject": "N=8 batch, 448^2 Qwen3-VL vision tower, five execution paths",
+      "assertion": "At N=8 the forward takes 43.1 ms (AIC), 58.7 ms (HF-SDPA), 54.1 ms (HF-FA2), 42.2 ms (vLLM-FA) and 48.8 ms (torch.compile), a vLLM/AIC ratio of 0.98.",
+      "db_check": "provenance.collector_fn where n_images=8 and resolution=448 grouped by engine; 42.2/43.1=0.979 -> 0.98; HF-FA2/AIC=1.255 must match the 1.25x quoted at line 182.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 150,
+      "anchor": "tab:app-engine",
+      "quote": "32 & 160.2 & 253.8 & 232.0 & 178.3 & 186.0 & 1.11 \\\\",
+      "numbers": [
+        "32",
+        "160.2",
+        "253.8",
+        "232.0",
+        "178.3",
+        "186.0",
+        "1.11"
+      ],
+      "metric": "encoder_forward_ms",
+      "subject": "N=32 batch, 448^2 Qwen3-VL vision tower, five execution paths",
+      "assertion": "At N=32 the forward takes 160.2 ms (AIC), 253.8 ms (HF-SDPA), 232.0 ms (HF-FA2), 178.3 ms (vLLM-FA) and 186.0 ms (torch.compile), a vLLM/AIC ratio of 1.11.",
+      "db_check": "provenance.collector_fn where n_images=32 and resolution=448 grouped by engine; 178.3/160.2=1.113 -> 1.11, and this is the +11.3% quoted at line 187.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 151,
+      "anchor": "tab:app-engine",
+      "quote": "64 & 316.4 & 511.6 & 465.7 & 333.7 & 370.6 & 1.05 \\\\",
+      "numbers": [
+        "64",
+        "316.4",
+        "511.6",
+        "465.7",
+        "333.7",
+        "370.6",
+        "1.05"
+      ],
+      "metric": "encoder_forward_ms",
+      "subject": "N=64 batch (FIFO cap), 448^2 Qwen3-VL vision tower, five execution paths",
+      "assertion": "At N=64 the forward takes 316.4 ms (AIC), 511.6 ms (HF-SDPA), 465.7 ms (HF-FA2), 333.7 ms (vLLM-FA) and 370.6 ms (torch.compile), a vLLM/AIC ratio of 1.05.",
+      "db_check": "provenance.collector_fn where n_images=64 and resolution=448 grouped by engine; 333.7/316.4=1.0547 -> 1.05; HF-SDPA/AIC=1.617 which rounds to 1.62 and EXCEEDS the '1.36--1.61x' range asserted at line 180 -- flag.",
+      "criticality": "headline"
+    },
+    {
+      "line": 158,
+      "anchor": "fig:app-engines",
+      "quote": "Figure~\\ref{fig:app-engines} plots the engines across the batch axis (vLLM\nand both HuggingFace backends at all 69 sizes, \\texttt{torch.compile} at\n13).",
+      "numbers": [
+        "69",
+        "13"
+      ],
+      "metric": "sweep_batch_sizes",
+      "subject": "dense batch-axis sweep coverage per engine",
+      "assertion": "vLLM and both HuggingFace backends were swept at 69 batch sizes; torch.compile at 13.",
+      "db_check": "provenance.collector_fn: count(distinct n_images) grouped by engine for experiment='engine_sensitivity'; expect 69/69/69 and 13. Source files vllm_eager_dense.json, merged_sdpa.csv, merged_fa2.csv, vit_compile_dense.json.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 165,
+      "anchor": "fig:app-engines",
+      "quote": "($448^2$, RTX~5090 external lock target SM~2400\\,/\\,mem~14001\\,\\si{\\mega\\hertz}, delivered SM 2377--2400\\,\\si{\\mega\\hertz};",
+      "numbers": [
+        "448",
+        "2400",
+        "14001",
+        "2377",
+        "2400"
+      ],
+      "metric": "gpu_clock_mhz",
+      "subject": "figure caption restatement of the engine-sweep clock configuration",
+      "assertion": "The dense f(N) figure was collected at 448^2 on an RTX 5090 with lock target SM 2400 / mem 14001 MHz and delivered SM 2377-2400 MHz.",
+      "db_check": "UNVERIFIABLE in DB: no clock columns; must agree with lines 124 and 129 (it does).",
+      "criticality": "incidental"
+    },
+    {
+      "line": 166,
+      "anchor": "fig:app-engines",
+      "quote": "vLLM: 69 batch sizes, per-$N$ Student-$t$ $95\\%$ CI below \\SI{0.06}{\\milli\\second}; HuggingFace swept at 69 batch sizes and \\texttt{torch.compile} at 13, both with wider CIs)",
+      "numbers": [
+        "69",
+        "95",
+        "0.06",
+        "69",
+        "13"
+      ],
+      "metric": "measurement_ci_ms",
+      "subject": "vLLM dense sweep timing precision across 69 batch sizes",
+      "assertion": "The vLLM dense sweep covers 69 batch sizes with per-N Student-t 95% confidence intervals below 0.06 ms; HuggingFace also at 69 sizes and torch.compile at 13, both with wider CIs.",
+      "db_check": "provenance.collector_fn: per (engine, n_images) compute Student-t 95% CI half-width from the 5x50 replication samples; check max < 0.06 ms for engine='vllm'. Source: vllm_eager_dense.json.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 168,
+      "anchor": "fig:app-engines",
+      "quote": "the shaded band marks $\\pm12.8\\%$ and the dotted line\nthe FIFO cap ($N{=}64$)",
+      "numbers": [
+        "12.8",
+        "64"
+      ],
+      "metric": "agreement_band_pct",
+      "subject": "figure annotation: agreement band and encoder FIFO batch cap",
+      "assertion": "The figure's shaded agreement band is +/-12.8% and the encoder FIFO batch cap is at N=64.",
+      "db_check": "provenance.runs / encoder_run_summary config for the encoder FIFO: confirm max batch = 64. NOTE: line 198 instead states the FIFO cap is at N=512 -- the two statements are mutually inconsistent.",
+      "criticality": "headline"
+    },
+    {
+      "line": 170,
+      "anchor": "fig:app-engines",
+      "quote": "vLLM --- the engine AIC's kernels are drawn from\n--- stays inside the band across the entire serving regime and drifts to\n$+21.8\\%$ only past the cap",
+      "numbers": [
+        "21.8"
+      ],
+      "metric": "aic_vs_vllm_residual_pct",
+      "subject": "vLLM vs AIC composition beyond the FIFO batch cap",
+      "assertion": "vLLM stays within the +/-12.8% band across the whole serving regime and drifts to +21.8% only beyond the batch cap.",
+      "db_check": "provenance.collector_fn: max over N>64 of (vllm_ms/aic_ms - 1) should equal 0.218; and max over N<=64 should be <= 0.128. Source vllm_eager_dense.json + aic_fn_engines_aiccurve.csv.",
+      "criticality": "headline"
+    },
+    {
+      "line": 172,
+      "anchor": "fig:app-engines",
+      "quote": "HuggingFace-SDPA sits near $1.3$--$1.4\\times$ at small $N$ and climbs to $1.69\\times$ by $N{=}512$;",
+      "numbers": [
+        "1.3",
+        "1.4",
+        "1.69",
+        "512"
+      ],
+      "metric": "hf_sdpa_over_aic_ratio",
+      "subject": "HuggingFace-SDPA eager forward relative to the AIC composition across the batch axis",
+      "assertion": "HF-SDPA runs 1.3-1.4x above the AIC composition at small N and rises to 1.69x at N=512.",
+      "db_check": "provenance.collector_fn: ratio engine='hf_sdpa' to AIC curve per N; check ~1.36-1.38 at N in (1,8) and 1.69 at N=512. Source merged_sdpa.csv + aic_fn_engines_aiccurve.csv.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 174,
+      "anchor": "fig:app-engines",
+      "quote": "The AIC curve is the load-bearing\npostinfill snapshot for $N\\le128$ and the current composed model beyond,\npersisted as \\texttt{aic\\_fn\\_engines\\_aiccurve.csv}.",
+      "numbers": [
+        "128"
+      ],
+      "metric": "aic_curve_provenance_split_n",
+      "subject": "AIC f(N) reference curve construction",
+      "assertion": "The plotted AIC curve uses the load-bearing postinfill snapshot up to N=128 and the current composed model for larger N.",
+      "db_check": "Inspect figuras/aic/aic_fn_engines_aiccurve.csv for a provenance/source column switching at N=128; compare with collector_artifacts/phaseB_batch_validation/aic_f_n_postinfill.csv. Not represented in provenance tables.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 179,
+      "anchor": "app:engine-sensitivity",
+      "quote": "The HuggingFace-transformers eager forward\n(SDPA attention) runs $1.36$--$1.61\\times$ above the composition, rising\nwith $N$;",
+      "numbers": [
+        "1.36",
+        "1.61"
+      ],
+      "metric": "hf_sdpa_over_aic_ratio",
+      "subject": "HF-SDPA eager forward vs AIC composition over the four anchor shapes",
+      "assertion": "HuggingFace SDPA eager forward runs 1.36x to 1.61x above the AIC composition, rising with N.",
+      "db_check": "Recompute from tab:app-engine: 11.3/8.2=1.378, 58.7/43.1=1.362, 253.8/160.2=1.584, 511.6/316.4=1.617. The upper end rounds to 1.62, not 1.61 -- flag as an off-by-one-in-last-digit inconsistency with the table.",
+      "criticality": "headline"
+    },
+    {
+      "line": 181,
+      "anchor": "app:engine-sensitivity",
+      "quote": "switching its attention backend to FlashAttention-2 recovers\npart of it ($1.25\\times$ at $N{=}8$, $1.47\\times$ at $N{=}64$) but leaves\nthe unfused elementwise, DeepStack, and patch-embed overhead intact.",
+      "numbers": [
+        "2",
+        "1.25",
+        "8",
+        "1.47",
+        "64"
+      ],
+      "metric": "hf_fa2_over_aic_ratio",
+      "subject": "HuggingFace with FlashAttention-2 backend vs AIC composition at N=8 and N=64",
+      "assertion": "HF-FA2 runs 1.25x above the composition at N=8 and 1.47x at N=64.",
+      "db_check": "Recompute from tab:app-engine: 54.1/43.1=1.255 -> 1.25 (rounds to 1.26 on half-up); 465.7/316.4=1.472 -> 1.47. Consistent with merged_fa2.csv in provenance.collector_fn where engine='hf_fa2'.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 185,
+      "anchor": "app:engine-sensitivity",
+      "quote": "matches the composition to within $11.4\\%$\n($-2.2\\%,+11.3\\%,+5.5\\%$ at $N{=}8/32/64$)",
+      "numbers": [
+        "11.4",
+        "-2.2",
+        "11.3",
+        "5.5",
+        "8",
+        "32",
+        "64"
+      ],
+      "metric": "vllm_vs_aic_residual_pct",
+      "subject": "vLLM own vision tower with FlashAttention backend vs AIC composition at N=8/32/64",
+      "assertion": "vLLM's own vision tower matches the AIC composition to within 11.4%, with residuals of -2.2%, +11.3% and +5.5% at N=8, 32 and 64.",
+      "db_check": "provenance.collector_fn where engine='vllm' and resolution=448: 42.2/43.1-1=-2.09%, 178.3/160.2-1=+11.30%, 333.7/316.4-1=+5.47%. The stated -2.2% does not match the table's -2.1%, and the 'within 11.4%' bound exceeds the largest listed residual (11.3%) -- flag both.",
+      "criticality": "headline"
+    },
+    {
+      "line": 188,
+      "anchor": "app:engine-sensitivity",
+      "quote": "AIC's collected operators \\emph{are} vLLM's kernels\n(the attention rows carry\n\\texttt{kernel\\_source=vllm\\_vit\\_flash\\_attn}; the GEMMs are vLLM\n\\texttt{RowParallelLinear}).",
+      "numbers": [],
+      "metric": "kernel_provenance",
+      "subject": "AIC collected operator provenance for the ViT attention and GEMM rows",
+      "assertion": "AIC's collected attention operators carry kernel_source=vllm_vit_flash_attn and its GEMMs are vLLM RowParallelLinear, making the vLLM comparison like-for-like.",
+      "db_check": "provenance.collector_fn (or the AIC perf tables) filter kernel_source='vllm_vit_flash_attn' for attention rows; non-numeric provenance claim.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 191,
+      "anchor": "app:engine-sensitivity",
+      "quote": "\\texttt{torch.compile}\n(max-autotune) accelerates the HuggingFace forward by $1.2$--$1.4\\times$,\nlanding near vLLM's numbers, but is the default execution of neither\nengine.",
+      "numbers": [
+        "1.2",
+        "1.4"
+      ],
+      "metric": "torch_compile_speedup",
+      "subject": "torch.compile max-autotune vs HuggingFace eager forward",
+      "assertion": "torch.compile with max-autotune speeds the HuggingFace forward up by 1.2x to 1.4x.",
+      "db_check": "Recompute from tab:app-engine (HF-SDPA/compile): 11.3/10.1=1.12, 58.7/48.8=1.20, 253.8/186.0=1.36, 511.6/370.6=1.38. The N=1 value 1.12 falls below the stated 1.2x lower bound -- flag unless the range is scoped to N>=8.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 194,
+      "anchor": "app:engine-sensitivity",
+      "quote": "The earlier $1.4$--$1.6\\times$ ``gap'' is thus the\nHuggingFace$\\to$vLLM execution-stack difference;",
+      "numbers": [
+        "1.4",
+        "1.6"
+      ],
+      "metric": "aic_vs_silicon_gap_ratio",
+      "subject": "the previously reported AIC-vs-silicon encoder gap reframed as an execution-stack difference",
+      "assertion": "The previously reported 1.4-1.6x AIC-vs-measurement gap is attributable to the HuggingFace-to-vLLM execution-stack difference rather than to the cost model.",
+      "db_check": "Cross-check against the corresponding claim in the AIC validation chapter (sec:aic-model-vs-silicon) and provenance.collector_fn ratios by engine; must be consistent with the 1.36-1.62x range implied by tab:app-engine.",
+      "criticality": "headline"
+    },
+    {
+      "line": 196,
+      "anchor": "app:engine-sensitivity",
+      "quote": "the composition stays within $12.8\\%$ across the whole $N\\le64$\nserving regime (residual up to $+12.7\\%$ inside the regime, growing to\n$+21.8\\%$ only past the FIFO cap at $N{=}512$).",
+      "numbers": [
+        "12.8",
+        "64",
+        "12.7",
+        "21.8",
+        "512"
+      ],
+      "metric": "aic_vs_vllm_residual_pct",
+      "subject": "AIC composition vs vLLM across the serving regime and beyond the batch cap",
+      "assertion": "Against vLLM the AIC composition stays within 12.8% over the whole N<=64 serving regime (max +12.7%), growing to +21.8% only past the cap.",
+      "db_check": "provenance.collector_fn: max residual for N<=64 = 12.7% and max beyond = 21.8%. NOTE: this sentence places the FIFO cap at N=512, contradicting line 168 which places it at N=64 (512 is the sweep end, not the cap) -- flag as a likely text error.",
+      "criticality": "headline"
+    },
+    {
+      "line": 205,
+      "anchor": "app:engine-sensitivity (Scope)",
+      "quote": "It is\na dense $N{=}1$--$512$ sweep --- 69 batch sizes, five replications of fifty\ntimed forwards each, per-$N$ Student-$t$ $95\\%$ CI below \\SI{0.06}{\\milli\\second} ---\nrather than a three-shape anchor.",
+      "numbers": [
+        "1",
+        "512",
+        "69",
+        "5",
+        "50",
+        "95",
+        "0.06",
+        "3"
+      ],
+      "metric": "sweep_design",
+      "subject": "matched-engine vLLM dense sweep design",
+      "assertion": "The matched-engine check is a dense N=1-512 sweep over 69 batch sizes with five replications of fifty timed forwards each and per-N Student-t 95% CIs below 0.06 ms.",
+      "db_check": "provenance.collector_fn for experiment='engine_sensitivity', engine='vllm': count(distinct n_images)=69, min(n_images)=1, max(n_images)=512, replications=5, iterations=50. Source vllm_eager_dense.json.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 209,
+      "anchor": "app:engine-sensitivity (Scope)",
+      "quote": "it leaves the week-scale encoder-delay p99 at \\SI{606}{\\milli\\second}\n(from \\SI{589}{\\milli\\second} under AIC), non-divergent, so the AIC-priced\ncost ratio carries no separate silicon penalty.",
+      "numbers": [
+        "606",
+        "589"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "week-scale winning encoder schedule replayed with measured vLLM f(N) vs AIC f(N)",
+      "assertion": "Repricing the winning week schedule's f(N) at the measured vLLM curve moves the week-scale encoder-delay p99 from 589 ms (AIC) to 606 ms, with a non-divergent queue.",
+      "db_check": "provenance.encoder_run_summary joined to runs for the winning week-scale schedule: compare encoder_delay_p99_ms for the AIC-priced control (expect 589) vs the vLLM-repriced treatment (expect 606) and queue_divergent=false for both. Source: {winsched}_{ctrl_aic,treatment_vllm}.stats.json.",
+      "criticality": "headline"
+    },
+    {
+      "line": 213,
+      "anchor": "app:engine-sensitivity (Scope)",
+      "quote": "repeating the sweep at $224^2$, $320^2$, $448^2$,\n$640^2$ and $896^2$ (batched regime $N{\\ge}8$) holds vLLM within $12.8\\%$ of\nthe composition at $448^2$ and below (mean ratio $0.99$--$1.05$)",
+      "numbers": [
+        "224",
+        "320",
+        "448",
+        "640",
+        "896",
+        "8",
+        "12.8",
+        "0.99",
+        "1.05"
+      ],
+      "metric": "vllm_over_aic_ratio_by_resolution",
+      "subject": "multi-resolution vLLM vs AIC composition sweep, batched regime N>=8",
+      "assertion": "Across 224^2, 320^2 and 448^2 in the batched regime, vLLM stays within 12.8% of the composition with mean ratios of 0.99-1.05.",
+      "db_check": "provenance.collector_fn where engine='vllm' and n_images>=8 grouped by resolution in (224,320,448): mean(vllm_ms/aic_ms) in [0.99,1.05] and max deviation <=12.8%. Source vllm_multires.json.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 215,
+      "anchor": "app:engine-sensitivity (Scope)",
+      "quote": "and within\n$15.5\\%$ at the two largest resolutions (mean $1.09$--$1.11$ at\n$640^2$/$896^2$, AIC slightly under-pricing the largest forwards",
+      "numbers": [
+        "15.5",
+        "1.09",
+        "1.11",
+        "640",
+        "896"
+      ],
+      "metric": "vllm_over_aic_ratio_by_resolution",
+      "subject": "multi-resolution sweep at 640^2 and 896^2",
+      "assertion": "At 640^2 and 896^2 vLLM stays within 15.5% of the composition with mean ratios of 1.09-1.11, i.e. AIC slightly under-prices the largest forwards.",
+      "db_check": "provenance.collector_fn where engine='vllm' and n_images>=8 and resolution in (640,896): mean ratio 1.09/1.11 and max deviation <=15.5%. Source vllm_multires.json.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 228,
+      "anchor": "Encoder-coverage contributions (upstream)",
+      "quote": "a \\emph{subsequent} branch added a guarded\n\\texttt{encoder\\_patch\\_embed\\_gemm} ($\\approx0.3\\%$ of the forward at\n$N{=}64$; the DeepStack mergers were already modelled).",
+      "numbers": [
+        "0.3",
+        "64"
+      ],
+      "metric": "operator_share_pct",
+      "subject": "patch-embedding GEMM operator added to the AIC encoder graph",
+      "assertion": "The previously missing patch-embedding GEMM accounts for about 0.3% of the encoder forward at N=64.",
+      "db_check": "provenance.collector_fn / AIC kernel ledger (kernel_ledger_N{1,64}.json): patch_embed_gemm latency / total forward latency at N=64 ~= 0.003.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 233,
+      "anchor": "Encoder-coverage contributions (upstream)",
+      "quote": "the \\textsc{gemm} token-count grid stopped at\n$m{=}\\num{32768}$ (the ViT needs $m{=}784N$ up to \\num{401408})",
+      "numbers": [
+        "32768",
+        "784",
+        "401408"
+      ],
+      "metric": "gemm_grid_coverage",
+      "subject": "AIC GEMM perf-table token-count grid vs ViT shape requirements",
+      "assertion": "The AIC GEMM grid stopped at m=32768 while the ViT requires m=784N up to m=401408.",
+      "db_check": "Check 784*512=401408 arithmetic; verify grid extent in the aiconfigurator perf tables / collector parquet from phaseC_vit_shape_infill. Not in provenance tables. Arithmetic is self-consistent.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 235,
+      "anchor": "Encoder-coverage contributions (upstream)",
+      "quote": "and the\nattention grid at batch~$64$ (the ViT is queried at batch~$=N$,\n$\\text{isl}{=}784$) --- so past $N{\\approx}42$ the model extrapolated beyond\nthe grid;",
+      "numbers": [
+        "64",
+        "784",
+        "42"
+      ],
+      "metric": "grid_extrapolation_threshold_n",
+      "subject": "AIC attention perf-table grid coverage for ViT queries",
+      "assertion": "The attention grid stopped at batch 64 with isl=784, so beyond about N=42 the model extrapolated outside the collected grid.",
+      "db_check": "Verify 32768/784 = 41.8 -> N~42 (the GEMM grid, not the attention grid, sets this threshold); confirm against phaseC_vit_shape_infill merged parquets. Arithmetic checks out; note the threshold derives from the m-grid limit.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 238,
+      "anchor": "Encoder-coverage contributions (upstream)",
+      "quote": "ViT-shape rows at large $m$ and attention rows to batch~$512$\nwere collected on the 5090 (a collector out-of-memory fix, releasing the\ncache and adapting the timing-copy count, made the ViT's large-$m$ shapes\ncollectable on a 32\\,GB card).",
+      "numbers": [
+        "512",
+        "5090",
+        "32"
+      ],
+      "metric": "collection_coverage",
+      "subject": "upstream AIC collection of large-m ViT GEMM rows and attention rows to batch 512 on a 32 GB RTX 5090",
+      "assertion": "Large-m ViT GEMM rows and attention rows up to batch 512 were collected on a 32 GB RTX 5090 after an out-of-memory collector fix.",
+      "db_check": "provenance.collector_fn / AIC perf parquets from the large-batch ViT coverage commit (492a3444): confirm max attention batch = 512 and max GEMM m = 401408. GPU memory size UNVERIFIABLE in DB.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 267,
+      "anchor": "tab:ap-manifest",
+      "quote": "Figs.~\\ref{fig:eda-ctx-vs-img}--\\ref{fig:eda-multires};\nTabs.~\\ref{tab:eda-archetypes},~\\ref{tab:eda-persistence},~\\ref{tab:eda-multires},~\\ref{tab:eda-percentiles}",
+      "numbers": [],
+      "metric": "artifact_mapping",
+      "subject": "trace EDA figures and tables provenance",
+      "assertion": "All trace-EDA figures and tables are generated by analysis/trace_eda/*.py with *_stats.json artifacts.",
+      "db_check": "Provenance mapping only; check that every EDA statistic (hurst, fano, hill index, silhouette) in provenance has a matching *_stats.json artifact. No numeric claim.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 275,
+      "anchor": "tab:ap-manifest",
+      "quote": "\\texttt{results/*.parquet} (26 files) \\\\",
+      "numbers": [
+        "26"
+      ],
+      "metric": "artifact_file_count",
+      "subject": "predictor benchmark result archive",
+      "assertion": "The predictor benchmark archive comprises 26 parquet result files.",
+      "db_check": "Filesystem count of predictors/results/*.parquet; in DB, count distinct source artifacts feeding provenance.forecast_metrics. Weak DB coverage.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 301,
+      "anchor": "tab:ap-manifest / tab:base-grid",
+      "quote": "Tab.~\\ref{tab:base-grid} (burst5 $C^{*}$ corrected to 8) &",
+      "numbers": [
+        "5",
+        "8"
+      ],
+      "metric": "config_c_star",
+      "subject": "burst5 window, base grid minimal feasible configuration",
+      "assertion": "The minimal feasible configuration C* for the burst5 window was corrected to 8.",
+      "db_check": "provenance.factorial_cell joined to runs where window_name='burst5' and is_current: smallest config_c with feasible=true should be 8; cross-check verification/rerun-stability-e2e.md superseding grid_summary.json.",
+      "criticality": "headline"
+    },
+    {
+      "line": 302,
+      "anchor": "tab:ap-manifest / tab:base-grid",
+      "quote": "\\texttt{simulation/sweep\\_grid.py} (+35 close-out corner runs);",
+      "numbers": [
+        "35"
+      ],
+      "metric": "runs",
+      "subject": "base-grid sweep close-out corner runs",
+      "assertion": "The base grid was completed with 35 additional close-out corner runs.",
+      "db_check": "provenance.runs where experiment='base_grid' and a close-out/corner tag: count = 35 beyond the main sweep; or count rows added to factorial_cell in the close-out batch.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 306,
+      "anchor": "tab:ap-manifest / sec:base-reactive-llm",
+      "quote": "\\texttt{simulation/ run\\_32\\_reactive.sh} &\n  \\texttt{results/reactive32/ r32\\{A,B\\}\\_*.report.json} \\\\",
+      "numbers": [
+        "32",
+        "32"
+      ],
+      "metric": "run_identifier",
+      "subject": "reactive planner baseline runs (phase 3.2), pools A and B",
+      "assertion": "The reactive-planner results derive from the phase-3.2 reactive runs r32A/r32B.",
+      "db_check": "provenance.runs where experiment='reactive32' and policy='reactive' and pool in ('A','B') and is_current; join llm_run_summary for p99_ttft_ms.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 315,
+      "anchor": "tab:ap-manifest / sec:cl-matrix",
+      "quote": "Per-window factorial (60-cell p90 headline + p50; $\\rho$-rating\n  surface, \\S\\ref{sec:cl-matrix}); Tab.~\\ref{tab:base-react-enc} &",
+      "numbers": [
+        "60",
+        "90",
+        "50"
+      ],
+      "metric": "cells",
+      "subject": "per-window issue-time factorial experiment",
+      "assertion": "The per-window factorial headline is a 60-cell grid at the p90 quantile, with a p50 companion and a rho-rating surface.",
+      "db_check": "provenance.factorial_cell joined to runs where experiment='factorial_issuetime' and quantile='p90' and is_current: count(*) = 60; same for quantile='p50'.",
+      "criticality": "headline"
+    },
+    {
+      "line": 322,
+      "anchor": "tab:ap-manifest",
+      "quote": "factorial\\_issuetime\\_\\{p50\\_rho15, p90\\_rho\\{10,15,20,25\\}\\}\\_results.json};",
+      "numbers": [
+        "50",
+        "15",
+        "90",
+        "10",
+        "15",
+        "20",
+        "25"
+      ],
+      "metric": "rho_sweep_levels",
+      "subject": "issue-time factorial rho-rating sweep",
+      "assertion": "The factorial rho sweep covers rho in {10,15,20,25} at p90 plus rho=15 at p50.",
+      "db_check": "provenance.factorial_cell: select distinct quantile, rho where experiment='factorial_issuetime' and is_current; expect (p90,10),(p90,15),(p90,20),(p90,25),(p50,15).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 326,
+      "anchor": "tab:ap-manifest / sec:cl-aggregate",
+      "quote": "\\texttt{simulation/ run\\_44\\_week\\_surface\\_issuetime.py} (96 issue-time\n  aggregate cells) &",
+      "numbers": [
+        "96"
+      ],
+      "metric": "cells",
+      "subject": "week-scale issue-time aggregate surface",
+      "assertion": "The week-scale surface comprises 96 issue-time aggregate cells.",
+      "db_check": "provenance.runs / factorial_cell where experiment='week_surface_issuetime' and is_current: count(*) = 96.",
+      "criticality": "headline"
+    },
+    {
+      "line": 333,
+      "anchor": "tab:ap-manifest / tab:cl-aggregate",
+      "quote": "Tab.~\\ref{tab:cl-aggregate} (0.62$\\times$ headline is the issue-time\n  schedule; \\texttt{run\\_44\\_aggregate.sh} gives the target-time bound) &",
+      "numbers": [
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "week-scale aggregate cost headline, issue-time schedule",
+      "assertion": "The 0.62x cost headline of Table cl-aggregate comes from the issue-time schedule, with the target-time run providing a bound.",
+      "db_check": "provenance.cost_accounting joined to runs where experiment='aggregate44' and actuation='issuetime' and is_current: provisioned_ws ratio vs baseline = 0.62; compare the target-time variant. Must match line 11.",
+      "criticality": "headline"
+    },
+    {
+      "line": 340,
+      "anchor": "tab:ap-manifest",
+      "quote": "\\texttt{aggregate44/ fc\\_p90\\_L\\{15,30,45,165\\}\\_issuetime.*},\n  \\texttt{fc\\_p50\\_L30\\_issuetime.*},",
+      "numbers": [
+        "90",
+        "15",
+        "30",
+        "45",
+        "165",
+        "50",
+        "30"
+      ],
+      "metric": "lead_s",
+      "subject": "week-scale aggregate lead-time sweep",
+      "assertion": "The week-scale aggregate was run at lead times of 15, 30, 45 and 165 s at p90 plus lead 30 s at p50.",
+      "db_check": "provenance.runs where experiment='aggregate44' and actuation='issuetime': select distinct quantile, lead_s; expect p90 in (15,30,45,165) and p50 at 30.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 343,
+      "anchor": "tab:ap-manifest",
+      "quote": "\\texttt{aggregate44\\_strict/ \\{fc\\_p90\\_L*, fc\\_p50\\_L30,\n  fc\\_p90\\_rho20\\_L*\\}\\_strict.*} (re-warm sensitivity) \\\\",
+      "numbers": [
+        "90",
+        "50",
+        "30",
+        "90",
+        "20"
+      ],
+      "metric": "sensitivity_config",
+      "subject": "strict re-warm sensitivity variants of the week-scale aggregate",
+      "assertion": "A strict re-warm sensitivity was run for p90 across leads, p50 at lead 30, and p90 at rho=20 across leads.",
+      "db_check": "provenance.runs where experiment='aggregate44' and policy/actuation flag indicates strict-rewarm; select distinct quantile, rho, lead_s.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 348,
+      "anchor": "tab:ap-manifest / tab:val-anchor",
+      "quote": "\\texttt{simulation/live51/ worker\\_manager.py} (live control plane:\n  etcd/NATS, KV router, per-process TP2 mockers, Prometheus, planner) &",
+      "numbers": [
+        "51",
+        "2"
+      ],
+      "metric": "tp",
+      "subject": "live validation control plane (phase 5.1) worker configuration",
+      "assertion": "The live validation harness ran per-process TP2 mocker workers under a real etcd/NATS/KV-router control plane.",
+      "db_check": "provenance.runs where experiment='live51' and tp=2 and is_current; cross-check llm_run_summary and v_corroboration for the offline-twin vs live comparison.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 382,
+      "anchor": "Workspace layout",
+      "quote": "The\ncollected AIC datasets were contributed upstream as draft PR\nai-dynamo/aiconfigurator~\\#1312 (campaign through commit \\texttt{b55dd0b7}, pushed and open on\nthe draft PR).",
+      "numbers": [
+        "1312"
+      ],
+      "metric": "upstream_contribution",
+      "subject": "AIC encoder collection campaign contributed upstream",
+      "assertion": "The collected AIC datasets were contributed upstream as open draft PR aiconfigurator #1312 through commit b55dd0b7.",
+      "db_check": "UNVERIFIABLE: external PR/commit reference, not an experimental artifact in the provenance schema (PR number is a reference identifier).",
+      "criticality": "incidental"
+    }
+  ]
+}

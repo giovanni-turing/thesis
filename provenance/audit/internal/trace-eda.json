@@ -1,0 +1,130 @@
+{
+  "chapter": "trace-eda",
+  "source": "/home/gio/tese/tex/trace-eda.tex",
+  "n_relations_checked": 62,
+  "n_errors": 12,
+  "errors": [
+    {
+      "line": 196,
+      "quote": "further above its own mean at peak ($15.6\\times$ vs.\\ $4.7\\times$)",
+      "stated": "request signal peaks at 4.7x its mean",
+      "computed": "tab:eda-percentiles publishes requests/s (1-min) mean = 1.7 and max = 7.8. 7.8 / 1.7 = 4.588 -> 4.6x. The claimed 4.7x is only reachable from the unrounded mean 1e6/604800 = 1.6534 req/s (7.8/1.6534 = 4.717). The image counterpart is exact from the published table: 370/23.7 = 15.61 -> 15.6x.",
+      "relation": "peak/mean recomputed from tab:eda-percentiles (line 442)",
+      "severity": "rounding",
+      "propagates_to": "tab:eda-percentiles line 442 (mean 1.7); no restatement elsewhere in the chapter, but the 15.6x/4.7x pair is the headline burstiness contrast.",
+      "proposed_fix": "Either write \"($15.6\\times$ vs.\\ $4.6\\times$)\" to match the published mean of 1.7, or publish the mean at two decimals in tab:eda-percentiles (\"1.65\") so 4.7x is recomputable by the reader."
+    },
+    {
+      "line": 369,
+      "quote": "The image\nsignal's excess-dispersion also decays most slowly with window size\n(CV$^2$ $25.7\\!\\rightarrow\\!3.83$ from \\SI{1}{\\second} to \\SI{60}{\\second};\nFigure~\\ref{fig:eda-multires}),\nconsistent with its long-range dependence",
+      "stated": "the image signal's CV^2 decays most slowly with window size, consistent with long-range dependence",
+      "computed": "Relative decay for images: 3.83/25.7 = 0.149 (a 6.7x drop). For requests the chapter publishes the ingredients to derive the same ratio: Fano(1 s) = 1.8 (line 131) and mean per-second count = 1.6534, so CV^2(1 s, requests) = Fano/mean = 1.8/1.6534 = 1.089; with CV^2(60 s) = 0.32 the relative decay is 0.32/1.089 = 0.294 (a 3.4x drop). The image signal therefore decays FASTER in relative terms, not more slowly. Reading the decay as self-similar scaling CV^2(m) = CV^2(1) m^(2H-2) gives H = 0.85 for requests but only H = 0.77 for images, i.e. the 1 s -> 60 s decay is evidence AGAINST, not for, stronger long-range dependence in the image signal. (The chapter's own line 352 explanation -- a white shot-noise floor below one minute -- resolves the physics, but not the sentence as written.)",
+      "relation": "CV^2 window-scaling vs the Fano factor at 1 s and the CV^2 column of tab:eda-persistence",
+      "severity": "loose",
+      "propagates_to": "fig:eda-multires caption line 396 (\"decays the slowest\"); Summary line 482 (\"the burstiest (CV$^2$ 3.83)\").",
+      "proposed_fix": "Replace with: \"The image signal's excess dispersion also stays an order of magnitude above every other signal at every window size (CV$^2$ $25.7\\!\\rightarrow\\!3.83$ from \\SI{1}{\\second} to \\SI{60}{\\second}; Figure~\\ref{fig:eda-multires}): no practical aggregation window recovers a well-behaved image signal.\" Drop the \"decays most slowly\" and the \"consistent with its long-range dependence\" clause, which the sub-minute scaling does not support."
+    },
+    {
+      "line": 38,
+      "quote": "a non-constant per-image increment (${\\approx}277$ tokens per image at one\nimage, falling to ${\\approx}66$ at 529)",
+      "stated": "277 and 66 are per-image *increments* (marginal tokens added by one more image)",
+      "computed": "The numbers reproduce as AVERAGES, not marginals. The chapter's own line 408 reports the top-1% image-count requests carry a median of ~36,000 context tokens at a median of 529 images: 36,000/529 = 68.1 tokens per image, matching the stated 66. Under a genuinely marginal reading, with increments decaying monotonically from 277 to 66, cumulative context at 529 images would have to exceed 529 x 66 = 34,914 by a wide margin (the earlier, larger increments alone add several tens of thousands of tokens), contradicting the ~36,000 median. Symmetrically, the 277 figure cannot be reproduced as a difference of the chapter's published medians: median context 1,422 (multimodal) - 792 (text-only) = 630, not 277.",
+      "relation": "line 38 / line 48 caption vs line 408 (~36,000 ctx at median 529 images) and line 71 (modality medians)",
+      "severity": "ambiguous",
+      "propagates_to": "fig:eda-ctx-vs-img caption line 47-49, which repeats \"increment decays, from ${\\approx}277$ ... to ${\\approx}66$ at 529\".",
+      "proposed_fix": "Replace \"per-image increment\" with \"per-image token rate\" in both places, e.g. line 38: \"a non-constant per-image token rate (${\\approx}277$ context tokens per image at one image, falling to ${\\approx}66$ per image at 529)\"; and state explicitly that these are median-context-divided-by-image-count ratios, not marginal differences."
+    },
+    {
+      "line": 284,
+      "quote": "during burst minutes the mean prefill length is\n$2.69\\times$ that of calm minutes: more images and longer prefills arrive\ntogether ... Decode is the\nmirror image: during the same image bursts the generated-token rate rises only\n$1.78\\times$",
+      "stated": "prefill 2.69x vs decode 1.78x, presented as a like-for-like burst/calm comparison",
+      "computed": "The two ratios are of different quantities: 2.69x is a per-request LENGTH ratio (mean prefill tokens per request), 1.78x is a RATE ratio (generated tokens per second). They are not comparable, and the comparison is what carries the \"decode pool is nearly burst-neutral\" conclusion. A like-for-like prefill *rate* ratio would additionally include the burst-minute request-rate elevation and would be substantially larger than 2.69x; a like-for-like decode *length* ratio is given three lines later as 84/99 = 0.85x, i.e. a decrease. Either pairing changes the size of the contrast.",
+      "relation": "unit/definition consistency between the prefill and decode burst ratios",
+      "severity": "ambiguous",
+      "propagates_to": "line 288-289 (\"The decode pool is nearly burst-neutral while the vision and prefill stages are not\").",
+      "proposed_fix": "Make both ratios rates or both lengths, e.g.: \"during burst minutes the mean prefill length is $2.69\\times$ that of calm minutes ... Decode is the mirror image: per-request generation \\emph{shortens} (median 84 vs.\\ 99 tokens), and the offered generated-token \\emph{rate} rises only $1.78\\times$ against a $\\langle X\\rangle\\times$ rise in the prefill-token rate.\" State the prefill-rate ratio explicitly so the two published numbers are the same kind of quantity."
+    },
+    {
+      "line": 288,
+      "quote": "during the same image bursts the generated-token rate rises only\n$1.78\\times$, and per-request generation \\emph{shortens} (median 84\nvs.\\ 99 tokens)",
+      "stated": "implicitly, that the request rate barely moves during image bursts (lines 163, 273)",
+      "computed": "The decode-token rate factorizes as (request-rate ratio) x (mean generated tokens per request ratio). Taking the chapter's own per-request generation ratio 84/99 = 0.848 as a proxy for the mean, the implied burst/calm request-rate ratio is 1.78/0.848 = 2.10x. A ~2x elevation of the request rate during burst minutes is not \"barely moves\" (fig:eda-sevenday caption, line 163) nor \"invisible in the request signal\" (line 273). The invisibility claim is about the *relative* magnitudes (370/23.7 = 15.6x for images versus ~2x for requests), which is defensible, but the text states it as absolute invisibility.",
+      "relation": "decomposition of the decode-rate burst ratio into request-rate x per-request-length",
+      "severity": "loose",
+      "propagates_to": "fig:eda-sevenday caption line 163-165 (\"while the request rate barely moves\"); line 273 (\"bursts are invisible in the request signal\"); Summary line 481-483.",
+      "proposed_fix": "Soften the two invisibility statements to relative claims, e.g. line 273: \"--- an image-rate excursion of $15.6\\times$ its mean against a request-rate excursion of roughly $2\\times$, so bursts are all but invisible in the request signal\", and in the figure caption \"while the request rate moves by only a factor of about two\"."
+    },
+    {
+      "line": 241,
+      "quote": "explains only $R^2 = \\num{0.123}$ of the image-rate series\n($\\alpha = 15.1$ images per request, a forced through-origin fit ... Pearson $r$ against request rate is\n$0.36$ for images versus $0.81$ for decode)",
+      "stated": "R^2 = 0.123 for images and 0.654 for decode, alongside Pearson r = 0.36 and 0.81",
+      "computed": "r^2 for the decode side reproduces cleanly: 0.81^2 = 0.6561 vs the stated 0.654 (0.3% apart, within rounding of r). The image side does not: 0.36^2 = 0.1296 vs the stated 0.123, 5.4% apart -- four times the decode side's discrepancy. Separately, the through-origin slope alpha = 15.1 img/req is not the ratio of means (23.7/1.7 = 13.9, or 23.7/1.6534 = 14.3, the latter matching the exact mean images-per-request 28.7 x 0.500 = 14.35). Both gaps are explicable by the forced-through-origin fit (which uses an uncentred R^2 and a Sum(xy)/Sum(x^2) slope), but the chapter quotes a centred Pearson r and an uncentred R^2 side by side without saying so, and the reader cannot reconcile 0.123 with 0.36 or 15.1 with 14.3 from anything published.",
+      "relation": "R^2 vs Pearson r^2, and through-origin slope vs ratio of published means",
+      "severity": "ambiguous",
+      "propagates_to": "fig:eda-decouple caption line 257 ($R^2 = 0.12$, $15.1$ img/req); Summary line 482 ($R^2 = 0.123$); and the abstract/related-work restatements of the 0.123-vs-0.654 contrast.",
+      "proposed_fix": "Add the convention explicitly: \"($\\alpha = 15.1$ images per request, a forced through-origin fit whose $R^2$ is uncentred and therefore not $r^2$; the ratio of means is $14.3$ img/req)\". Alternatively report the centred $R^2 = 0.13$ for the image fit so it matches the quoted $r = 0.36$."
+    },
+    {
+      "line": 272,
+      "quote": "The largest episode\npeaks at \\num{370}~images/s while the request rate peaks at only\n\\num{4.48} requests/s --- bursts are invisible in the request signal",
+      "stated": "4.48 requests/s is an unremarkable request rate (\"only\")",
+      "computed": "tab:eda-percentiles gives requests/s (1-min) p99 = 4.35 and p99.9 = 5.73. So 4.48 req/s is ABOVE the request signal's own 99th percentile -- the peak minute of the largest image episode is, by the chapter's own definition at line 415, a hot-request minute. It is 2.64x the p50 (1.55) and 57% of the way from p99 to p99.9. Framing it with \"only\" understates it; the disjointness argument at line 414 rests on set overlap (5 of ~100), not on the largest episode's request rate being low.",
+      "relation": "4.48 req/s vs the requests/s percentile row of tab:eda-percentiles (line 442)",
+      "severity": "loose",
+      "propagates_to": "line 273 and fig:eda-sevenday caption line 163.",
+      "proposed_fix": "Replace with: \"The largest episode peaks at \\num{370}~images/s --- $15.6\\times$ the mean image rate --- while the request rate peaks at \\num{4.48} requests/s, only $2.9\\times$ its own median and barely past its p99 (\\num{4.35}): the image excursion is five times larger in relative terms.\" Drop \"only\" and \"invisible\"."
+    },
+    {
+      "line": 317,
+      "quote": "fit as the $1/f^{\\beta}$ slope over the\nsub-diurnal band (10 minutes to 12 hours, clear of the diurnal\nfundamental)",
+      "stated": "the Hurst fit band is clear of diurnal structure",
+      "computed": "Line 136 names the diurnal harmonic family as a 24 h fundamental with 12/8/6 h overtones. The stated fit band [10 min, 12 h] excludes only the 24 h fundamental; the 12 h, 8 h and 6 h overtones all fall inside it, and 12 h sits exactly on the band's upper edge where the periodogram has the fewest, highest-leverage bins. Every Hurst value in tab:eda-persistence (H = (1+beta)/2) inherits this.",
+      "relation": "fit band at line 317 vs the harmonic family named at line 136",
+      "severity": "loose",
+      "propagates_to": "the whole Hurst column of tab:eda-persistence (lines 227-232) and every H restatement (lines 197, 201, 314, 482).",
+      "proposed_fix": "Replace \"clear of the diurnal fundamental\" with \"excluding the \\SI{24}{\\hour} fundamental, though the 12/8/\\SI{6}{\\hour} overtones fall inside the band and are not notched out\", or move the band's upper edge below \\SI{6}{\\hour} and report the resulting $\\beta$."
+    },
+    {
+      "line": 265,
+      "quote": "The image-rate signal exceeds its 99th percentile (\\num{224}~images/s) in\n101 one-minute windows",
+      "stated": "101 minutes strictly EXCEED p99",
+      "computed": "Line 415 defines both hot sets as \"each signal's set of minutes at or above its own p99\" and reports the same count, 101, for the image signal. \"Exceeds\" (strict) and \"at or above\" (weak) are different predicates; the chapter uses the distinction load-bearingly for the request signal in the very next clause (\"the request set carries six minutes tied exactly at its threshold\"). The two statements about the same 101 minutes therefore use inconsistent conventions.",
+      "relation": "threshold-inclusion convention, line 265 vs line 415",
+      "severity": "ambiguous",
+      "propagates_to": "line 414-417 (106/101 hot minutes, Jaccard 0.02) and the burst-episode construction (87 runs -> 18 episodes).",
+      "proposed_fix": "Line 265: \"The image-rate signal reaches or exceeds its 99th percentile (\\num{224}~images/s) in 101 one-minute windows (no minutes tie at the threshold)\"."
+    },
+    {
+      "line": 387,
+      "quote": "images/s        & 100\\% & 20.1\\% & 6.9\\% & \\textbf{3.9\\%} & 2.6\\% \\\\",
+      "stated": "at 60 s a monitor sees 3.9% of the true one-second image peak, i.e. a ~25x understatement",
+      "computed": "The whole row is normalized by an unpublished one-second image peak. Inverting the chapter's own numbers: 1-min image peak = 370 img/s (tab:eda-percentiles) implies a 1 s peak of 370/0.039 = 9,487 img/s. The maximum images in a single request is 9,409 (= 97^2, line 34), and 370/9409 = 3.933%, which rounds exactly to the published 3.9%. The 1-second image peak is therefore almost certainly a SINGLE maximum-size request landing in one second, not a sustained surge -- and the headline \"understates the encoder pool's instantaneous surges by roughly 25x\" (line 366) is, on this reading, a statement about one request's arrival granularity.",
+      "relation": "1 s peak back-computed from tab:eda-multires x tab:eda-percentiles, against the max single-request image count",
+      "severity": "ambiguous",
+      "propagates_to": "line 363 (3.9%), line 366 (~25x), fig:eda-multires caption line 399 (~4%), Summary line 488 (\"under 4%\").",
+      "proposed_fix": "Publish the absolute one-second peaks in tab:eda-multires (a \"1 s peak (abs.)\" column) and state in the caption: \"the one-second image peak of ${\\approx}\\num{9500}$ images/s is essentially one maximum-size ($97^2$) request arriving within a single second; the aggregation loss is therefore a statement about request granularity as much as about sustained surges.\""
+    },
+    {
+      "line": 411,
+      "quote": "the busiest 1\\% of request-rate minutes carry ordinary-composition\ntraffic: median 1 image and median context and generation within a few percent\nof the global medians.",
+      "stated": "median 1 image is an ordinary, global-median-like value",
+      "computed": "Over ALL requests the median image count is 0, since exactly 50.0% of requests are text-only (line 31). The value 1 is the p50 of tab:eda-percentiles' NumImages row, which is explicitly labelled \"(image-bearing)\". So \"median 1 image\" agrees with the global median only under the image-bearing restriction, while the two companion quantities (context, generation) are compared against all-request medians (1,124 and 98). The sentence mixes two denominators in one clause.",
+      "relation": "denominator consistency, line 411 vs line 31 and the NumImages row label at line 438",
+      "severity": "ambiguous",
+      "propagates_to": "none downstream; local to sec:eda-multires.",
+      "proposed_fix": "\"...carry ordinary-composition traffic: median 1 image among their image-bearing requests (the global image-bearing median), and median context and generation within a few percent of the global medians (\\num{1124} and \\num{98}).\""
+    },
+    {
+      "line": 68,
+      "quote": "The top\npercentile of requests alone carries 15.2\\% of all context tokens and 13.4\\%\nof all generated tokens.",
+      "stated": "\"the top percentile of requests\" carries 15.2% / 13.4%",
+      "computed": "The ranking variable is unstated. The two shares are only mutually consistent under a per-field ranking (top 1% BY context tokens carries 15.2% of context tokens; top 1% BY generated tokens carries 13.4% of generated tokens) -- a single fixed 1% set cannot be the top set for both, because line 348 reports image count and generation length are independent (Spearman -0.06) and line 288 shows the heavy-context requests decode briefly (median 53 generated tokens, line 410). Under a single context-ranked set, its generated-token share would be near 1%, not 13.4%.",
+      "relation": "internal consistency of the two concentration shares against the independence result at line 348",
+      "severity": "ambiguous",
+      "propagates_to": "none downstream.",
+      "proposed_fix": "\"The top percentile of requests \\emph{by each field} carries 15.2\\% of all context tokens and 13.4\\% of all generated tokens respectively (two different request sets: context and generation length are nearly independent).\""
+    }
+  ],
+  "passed_checks": "STRONG CROSS-CHECKS THAT HOLD.\n(1) Rate-table vs request-table means, exact: mean ctx rate 4,813 tok/s / 1.65344 req/s = 2,911.0 tok/req = the published ContextTokens mean exactly; 309/1.65344 = 186.9 -> 187 = the published GeneratedTokens mean exactly. Implied request rate 1e6/604,800 = 1.6534 matches the Poisson(1.65) reference at line 150 and rounds to the tabled 1.7.\n(2) Modality split closes the image budget: mean images/request = 23.7/1.65344 = 14.334, and 28.7 (image-bearing mean) x 0.500 (exactly 50.0% text-only, line 31) = 14.35. Independent corroboration of both the 50/50 split and the images/s mean.\n(3) Fano factor at one minute recomputes from CV^2: 0.32 x (1.6534 x 60) = 31.75 vs the published 31.9 (line 131) -- agrees to the rounding of CV^2.\n(4) Multi-scale self-similarity of the request signal: CV^2(1 s) = Fano/mean = 1.8/1.6534 = 1.089; CV^2(60 s) = 0.32; the implied H = (2 + log(0.294)/log 60)/2 = 0.850, close to the spectral H = 0.83 in tab:eda-persistence.\n(5) H = (1+beta)/2 holds for all six rows of tab:eda-persistence: 0.66->0.83, 0.72->0.86, 0.74->0.87, 0.51->0.755->0.76, 0.81->0.905->0.91, 0.86->0.93.\n(6) tab:eda-archetypes column sums: requests 51.4+31.0+14.1+3.4 = 99.9%; image volume 1.3+1.1+11.9+85.7 = 100.0%; prefill 23.9+9.6+33.5+32.9 = 99.9% -- all rounding-consistent. \"A third of all prefill tokens\" (line 85) = 32.9% (32.9 vs 33.3, 1.3% relative) -- acceptable.\n(7) Clustering-vs-threshold class shares are consistent in direction and magnitude: the threshold frames class (k>10, i.e. >=121 images) is 2.7%/81.2% against the clustered video archetype's 3.4%/85.7%; the smaller set carries the smaller share. Implied means: 431 img/req (frames class) vs 361 img/req (video archetype), consistent with the archetype including ~7,000 lower-image requests at ~91 images each.\n(8) Frames-class share vs the NumImages percentiles: p95 (image-bearing) = 196 implies 2.5% of ALL requests have >=196 images; adding the (100,196) band gives the claimed 2.7% at >100 -- tight and consistent.\n(9) Perfect-square check: every NumImages percentile is a square -- 25=5^2, 196=14^2, 529=23^2, 1,089=33^2, 9,409=97^2 -- and the archetype p50 of 400 = 20^2 IS square (REFUTING extraction note #7, which called it non-square). 71 distinct k^2 values is consistent with k running to 97.\n(10) Modality medians bracket the global medians as a 50/50 mixture requires: context 792 < 1,124 < 1,422; generation 80 < 98 < 147.\n(11) Prefill share closes: 72.5% of 2.911e9 context tokens over 500,000 multimodal requests = 4,222 tok/req mean (median 1,422) and 1,601 tok/req for text-only (median 792) -- both plausibly right-skewed. The 72.5% (modality partition) vs 66.4% (two vision archetypes) gap is a different partition, not a contradiction, since the text archetypes contain image-bearing requests (they carry 1.3% + 1.1% of image volume).\n(12) Top-1% concentration shares are feasible against the percentile table: 15.2% of context over 10,000 requests implies a top-1% mean of 44,250, bracketed by p99 = 35,932 and p99.9 = 65,623; 13.4% of generation implies 2,505, bracketed by 1,066 and 3,943 with the 0.1% tail accounted.\n(13) Hot-minute set arithmetic: 7 days = 10,080 minutes; nominal 1% = 100.8; 100 + 6 tied = 106; Jaccard = 5/(106+101-5) = 5/202 = 0.0248 -> 0.02.\n(14) Aggregation-loss factors: 1/0.039 = 25.6 (\"roughly 25x\") and 1/0.371 = 2.70 (\"under 3x\"); both peak-retention rows are monotone decreasing across 1/5/15/60/300 s for all four signals.\n(15) Burstiness \"order of magnitude\": CV^2 3.83/0.32 = 12.0, genuinely >= 10.\n(16) Inter-arrival statistics are mutually consistent: median 312 ms against mean 604.8 ms gives median/mean = 0.516, below the exponential 0.693, exactly as a CV of 1.55 > 1 requires. REFUTING extraction note #9: the 1.55 collision with the requests/s p50 is coincidence, not a copy-paste error -- 1.55 is independently corroborated here.\n(17) Duplicate share: 151/1e6 = 1.51e-4 -> 1.5e-4.\n(18) Record-length artifact threshold: 84 h = 168 h / 2, i.e. two cycles in the record.\n(19) ACF shape is internally monotone and consistent: image ACF 1 -> 0.64 over the first 5 min then 0.64 -> 0.50 over the next 64 min; a steep-then-flat decay, as long-range dependence predicts, and not reproducible by a single exponential (0.5^(5/69) = 0.951).\n(20) Run/episode arithmetic is feasible: 101 exceedance minutes forming 87 contiguous runs requires exactly 14 adjacency continuations -- arithmetically possible, REFUTING extraction note #4 as an error (it remains worth a code check, but nothing in the chapter contradicts it).\n(21) Caption-vs-text restatements all agree within rounding: R^2 0.123/0.12; Fano 1.8 and 938; 6-minute median onset and 18 episodes; ACF 0.64 / 0.5 / 69 / 9 min; 3.9% -> \"~4%\" and 37.1% -> \"~37%\"; CV^2 3.83, H 0.93, 69-min memory in the Summary.\n(22) Burst threshold and peak agree with the percentile table: p99 images/s = 224 (line 265) and max = 370 (line 272) both match tab:eda-percentiles line 443; median steepest single-minute jump 208 img/s sits just below the 224 threshold, as expected.\n(23) The 12-hour band edge aside, the Hurst ORDERING claimed at line 201 (decode second-highest at 0.91, behind images at 0.93) is correct against the table.",
+  "notes": "Method: every relation was recomputed from numbers the chapter itself publishes, using the unrounded implied request rate 1e6/604800 = 1.65344 req/s where the text supplies it (line 150's Poisson(1.65)) and the rounded tabled values where it does not. Only relations that could be closed with published numbers were scored; pure trace statistics with no second appearance (Hill indices 1.9/6.6/7.2, Spearman -0.06, r = 0.89, silhouettes 0.388/0.387/0.378, the 93-96% episode composition, the 39 s max gap) are internally unfalsifiable and were not counted as errors.\n\nSeverity distribution: 1 rounding, 3 loose, 8 ambiguous, 0 outright wrong. The chapter's numerical core is unusually sound -- checks (1), (2), (3) and (5) are independent closures that a fabricated or stale table would not survive, and the request-level means are exactly reproduced by the rate table through the implied request rate.\n\nThe single hard defect is L196's 4.7x, which is not recomputable from the published mean of 1.7 (it needs 1.6534). Fix by publishing one more digit rather than by changing the ratio.\n\nThe highest-exposure soft defects are (a) L369's \"decays most slowly\" claim, which the chapter's own Fano-at-1s number contradicts on relative decay, and (b) the L387/L366 25x aggregation-loss headline, whose normalizer is almost certainly a single 9,409-image request (370/9409 = 3.933% reproduces the tabled 3.9% to three digits). Both are restated in the Summary and, per the extractor's cross-chapter notes, in the abstract's opening argument.\n\nExtraction-note dispositions: #1 CONFIRMED (reported as error 1). #2 CONFIRMED as an unstated-convention problem, not a numeric error (error 6). #3 CONFIRMED and refined -- the ratio of means is 14.33, not 13.9, once the unrounded request rate is used, and 14.33 is independently corroborated by 28.7 x 0.5 = 14.35 (folded into error 6). #4 REFUTED as arithmetic (see passed check 20). #5 CONFIRMED and strengthened -- 370/9409 = 3.933% reproduces the published 3.9% exactly, so the 1 s peak IS essentially one max-size request (error 10). #6 all CONFIRMED as passing. #7 half REFUTED: the column sums are fine AND 400 = 20^2 is a perfect square, so there is no tension with the L33 claim. #8 CONFIRMED as intentional (different partitions; the arithmetic in passed check 11 shows both can hold). #9 REFUTED as a copy-paste risk -- the CV of 1.55 is independently corroborated by median/mean inter-arrival 312/604.8 = 0.516 < ln 2 (passed check 16). #10 CONFIRMED (error 8).\n\nAdditional defects found beyond the extraction notes: errors 2, 3, 4, 5, 7, 9, 11 and 12."
+}

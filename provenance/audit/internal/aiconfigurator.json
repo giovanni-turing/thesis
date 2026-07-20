@@ -1,0 +1,139 @@
+{
+  "chapter": "aiconfigurator",
+  "n_relations_checked": 62,
+  "n_errors": 13,
+  "errors": [
+    {
+      "line": 452,
+      "quote": "Removing the two unmodeled modules leaves \\SI{8.92}{\\milli\\second} of AIC-comparable work against \\SI{7.82}{\\milli\\second} predicted, within ${\\approx}12\\%$, fully attributed to the kernel-variant and fusion differences above.",
+      "stated": "The 448^2 batch-1 kernel ledger closes 'term by term, with no unexplained residual' (line 433) and the 8.92 vs 7.82 ms gap is 'fully attributed' to the three named terms.",
+      "computed": "Gap to attribute = 8.917 - 7.822 = 1.095 ms. Attributions published in lines 440-449: (a) attention 1.300 measured vs 1.342 predicted = -0.042 ms; (b) GEMM total 'approx 6% above prediction' -- the predicted GEMM total cannot exceed 7.822 - 1.342 = 6.480 ms (the whole non-attention prediction, which also contains activation and add-norm), so 6% <= +0.389 ms; (c) unfused elementwise + projector layer norms 'a further approx 0.25 ms'. Maximum attributed = -0.042 + 0.389 + 0.250 = 0.597 ms. Unexplained residual >= 1.095 - 0.597 = 0.498 ms, i.e. >= 45% of the gap and 6.4% of the prediction. Conversely, if the elementwise term is the 1.18 ms reported at line 293 for the same shape and stack, the ledger closes only with a GEMM excess of -0.043/6.480 = -0.7%, contradicting the stated '+6%'. The three attributions cannot hold simultaneously.",
+      "relation": "kernel-ledger closure: measured_AIC_comparable - predicted = sum(attributed terms)",
+      "severity": "wrong",
+      "propagates_to": "line 18 chapter intro ('the end-to-end kernel-time ledger closes with no unexplained residual'); line 432-434; line 513 summary ('every remaining difference is enumerated and bounded'); conclusion chapter restatements of the validation.",
+      "proposed_fix": "Publish the predicted GEMM subtotal so the ledger is auditable, and replace 'and unfused elementwise operations and the projectors' layer norms account for a further ${\\approx}0.25$ ms' with the value consistent with the N=1 profile of Section~\\ref{sec:aic-model-vs-silicon}: '...account for a further ${\\approx}1.18$ ms (Section~\\ref{sec:aic-model-vs-silicon})'. If '+6%' GEMM and 0.25 ms elementwise are both correct, then delete 'with no unexplained residual' (line 434) and 'fully attributed' (line 452) and instead state 'leaving an unattributed ${\\approx}0.50$ ms (5.6% of kernel time)'."
+    },
+    {
+      "line": 196,
+      "quote": "The pre-infill 448-pixel path shows this stratum's cost here: $+4.3\\%$ to $-5.8\\%$ from the exact measurements.",
+      "stated": "The interpolated (pre-infill) 448-pixel prediction deviates from the exact measurements by +4.3% to -5.8%.",
+      "computed": "The pair (+4.3%, -5.8%) is defined at line 143 as the shift produced BY the correction, i.e. raw -> infilled: (8.16 - 7.822)/7.822 = +4.32%. The deviation of the pre-infill value FROM the exact (infilled) value is the inverse and opposite in sign: (7.822 - 8.16)/8.16 = -4.14% at one image, and correspondingly 1/0.942 - 1 = +6.16% at six images. So the correct interval as stated at line 196 is '-4.1% to +6.2%', not '+4.3% to -5.8%'.",
+      "relation": "sign and base of a relative deviation; (new-old)/old vs (old-new)/new",
+      "propagates_to": "line 143 (the source pair, which is correct in its own framing); Appendix engine-sensitivity discussion of interpolation error.",
+      "severity": "wrong",
+      "proposed_fix": "Replace with: 'The pre-infill 448-pixel path shows this stratum's cost here: $-4.1\\%$ to $+6.2\\%$ from the exact measurements (equivalently, the infill shifted the prediction by $+4.3\\%$ at one image and $-5.8\\%$ at six).'"
+    },
+    {
+      "line": 444,
+      "quote": "and unfused elementwise operations and the projectors' layer norms account for a further ${\\approx}0.25$ ms",
+      "stated": "Unfused elementwise + projector layer norms = approx 0.25 ms at 448^2, batch 1, HuggingFace-eager stack.",
+      "computed": "Line 293 reports, for the identical shape/stack/N=1 ledger, 'unfused elementwise work rises from 1.18 to \\SI{1.89}{\\milli\\second} per image' -- i.e. 1.18 ms at N=1, before even adding the projector layer norms. 1.18/0.25 = 4.7x. The two sections cannot both be describing the same quantity. (The figure data backing Section~3.4.1 carries 1.179 ms, confirming line 293.)",
+      "relation": "cross-section consistency of the same ledger category at the same operating point",
+      "propagates_to": "line 452 'fully attributed' (see finding 1); fig:aic-fn right panel, whose N=1 elementwise bar is 1.18 ms.",
+      "severity": "wrong",
+      "proposed_fix": "Reconcile to one value. If 1.18 ms is the elementwise total, write: 'and unfused elementwise operations and the projectors' layer norms account for a further \\SI{1.18}{\\milli\\second} (Section~\\ref{sec:aic-model-vs-silicon})'. If 0.25 ms is the *excess over the modeled activation/add-norm terms*, say so explicitly: '...exceed their modeled activation and add-norm counterparts by ${\\approx}0.25$ ms'."
+    },
+    {
+      "line": 296,
+      "quote": "these categories total \\SI{168.6}{\\milli\\second} at $N{=}64$ --- \\textbf{92\\% of the \\SI{182}{\\milli\\second} difference between the composition and the HuggingFace kernel time}",
+      "stated": "168.6 ms is 92% of 182 ms.",
+      "computed": "168.6/182 = 92.64%; against the unrounded denominator (511.23 x (1 - 0.0253) = 498.27 ms kernel time, minus composed 316.37 = 181.90 ms) 168.589/181.90 = 92.68%. Both round to 93%, not 92%. The stated 92% is a truncation. (The 182 ms denominator itself checks out exactly: 511.23 x 0.975 - 316.37 = 182.08.)",
+      "relation": "share = part/whole, correct rounding to two significant figures",
+      "propagates_to": "not restated elsewhere in the chapter; check the conclusion chapter for a repeat of the 92% attribution.",
+      "severity": "rounding",
+      "proposed_fix": "Replace '92\\%' with '93\\%' (or write 'roughly 93\\%')."
+    },
+    {
+      "line": 452,
+      "quote": "leaves \\SI{8.92}{\\milli\\second} of AIC-comparable work against \\SI{7.82}{\\milli\\second} predicted, within ${\\approx}12\\%$",
+      "stated": "The AIC-comparable measured/predicted discrepancy is approx 12%.",
+      "computed": "(8.917 - 7.822)/8.917 = 12.28% (measurement as base) but (8.917 - 7.822)/7.822 = 14.00% (prediction as base). Section~\\ref{sec:aic-model-vs-silicon} uses the *composed prediction* as base throughout (e.g. 178.3/160.20 - 1 = +11.30%, 333.7/316.37 - 1 = +5.48%, and the headline 12.8% bound). Under the chapter's own dominant convention this figure is 14.0%, not 12%. The base is never stated.",
+      "relation": "denominator convention for a relative discrepancy",
+      "propagates_to": "the 'within ${\\approx}3\\%$ (strictly 3.2\\%)' attention agreement at line 441 uses the same measurement-as-base convention ((1.342-1.300)/1.300 = 3.23%); prediction-as-base gives 3.13%. Both statements silently switch base relative to the f(N) section and the summary.",
+      "severity": "ambiguous",
+      "proposed_fix": "State the convention once in the Results subsection, e.g. 'all relative deviations in this subsection are taken with the measurement as denominator', or restate as prediction-base for consistency with Section~\\ref{sec:aic-model-vs-silicon}: '...against \\SI{7.82}{\\milli\\second} predicted, the prediction running ${\\approx}14\\%$ low'."
+    },
+    {
+      "line": 244,
+      "quote": "the ratio rises to $1.62\\times$ at $N{=}64$ (from ${\\approx}1.37\\times$ at small $N$), easing to $1.43\\times$ at the largest dispatch",
+      "stated": "Caption implies a dispatch point beyond N=64 where the ratio is 1.43.",
+      "computed": "Confirmed against the figure's own data: the measured HF curve extends to N=128 (1033.208 ms) against a composed 723.514 ms, ratio 1.428 -> 1.43; at N=96, 770.908/519.941 = 1.483. So 1.43 is arithmetically correct -- for N=128. But line 281 calls N=64 'the 64-image dispatch cap' and line 320 'the FIFO cap', and tab:aic-fn stops at 64. A reader who has only the table cannot locate 1.43, and 'the largest dispatch' collides with the body's dispatch cap. I therefore REFUTE the extractor's claim that 1.43 is stale, and instead flag it as a terminology defect.",
+      "relation": "figure caption vs table/body coverage; 'largest dispatch' vs 'dispatch cap'",
+      "propagates_to": "line 281 ('the 64-image dispatch cap'); line 320 ('the FIFO cap'); line 231 (the N in [1,128] sweep, the likely source of the 96/128 points).",
+      "severity": "ambiguous",
+      "proposed_fix": "Replace 'easing to $1.43\\times$ at the largest dispatch' with 'easing to $1.43\\times$ at the largest probed batch ($N{=}128$, beyond the pool's 64-image dispatch cap)'."
+    },
+    {
+      "line": 294,
+      "quote": "and the DeepStack gather/concatenation from 0.26 to \\SI{0.58}{\\milli\\second}",
+      "stated": "DeepStack gather = 0.26 ms at N=1, 448^2.",
+      "computed": "Line 450 gives \\SI{0.248}{\\milli\\second} for the same module, shape and stack; 0.248 rounds to 0.25, not 0.26. The figure data behind Section 3.4.1 carries 0.257 (-> 0.26), so the two sections are reporting two different profiling runs (0.257 vs 0.248, 3.6% apart) as though each were the value. The same is true of the patch-embedding convolution (0.459 ms at line 447 vs 0.495 ms in the figure's N=1 ledger, 7.8% apart) and the total kernel time (9.624 ms at line 437 vs a figure-ledger sum of 9.542 ms).",
+      "relation": "cross-section consistency of a single ledger cell",
+      "propagates_to": "line 447 (patch-embed 0.459 ms and its '4.8% of kernel time'); line 450; fig:aic-fn right panel.",
+      "severity": "ambiguous",
+      "proposed_fix": "Add one sentence at line 285 declaring that the N=1 ledger in this section is a distinct profiling run from Section~\\ref{sec:aic-validation}'s ('values differ from Table~\\ref{tab:aic-validation}'s ledger by up to 8\\%, run-to-run'), or re-quote both sections from a single run so that 0.248/0.26 and 0.459/0.495 agree."
+    },
+    {
+      "line": 314,
+      "quote": "so the $1.4$--$1.6\\times$ HuggingFace ratio measures the \\emph{execution stack}",
+      "stated": "The HuggingFace-to-composition ratio spans 1.4x to 1.6x.",
+      "computed": "tab:aic-fn ratios are 1.38, 1.37, 1.36, 1.50, 1.58, 1.62 -- min 1.36 (N=8), max 1.62 (N=64). The published range is therefore 1.36--1.62; '1.4--1.6' excludes four of the six table rows at the low end and understates the high end. Line 281 correctly says 'from ${\\approx}1.37$ ... to $1.62$', so the chapter contradicts itself on the same quantity two paragraphs apart.",
+      "relation": "prose range vs table min/max",
+      "severity": "loose",
+      "propagates_to": "line 517 summary ('the earlier ${\\approx}1.4$--$1.6\\times$ figure'); conclusion chapter, where '1.4--1.6x' is restated twice.",
+      "proposed_fix": "Replace '$1.4$--$1.6\\times$' with '$1.36$--$1.62\\times$' at line 314, and at line 517 with '${\\approx}1.4$--$1.6\\times$' -> '$1.36$--$1.62\\times$', matching Table~\\ref{tab:aic-fn} and line 281."
+    },
+    {
+      "line": 330,
+      "quote": "Third, \\textbf{amortization saturates by $N{\\approx}6$--$8$}.",
+      "stated": "The batching-benefit knee is N approx 6-8, restated at line 341 as 'around $N{\\approx}6$--$8$ on both'.",
+      "computed": "The HuggingFace anchor bottoms at N=6 (43.58/6 = 7.263 ms/image) -- a single point, not 6-8. The vLLM dense sweep is stated twice in the same sentence as bottoming at 'N approx 6-9' (lines 334 and 335). So the chapter asserts 6--8 in the two headline positions and 6--9 in the two supporting ones for the same knee.",
+      "relation": "internal cross-reference of a stated range",
+      "severity": "loose",
+      "propagates_to": "line 341; Chapter~\\ref{cap:twopool} batching-law discussion; conclusion.",
+      "proposed_fix": "Pick one and use it in all four places; on the published evidence write '$N{\\approx}6$--$9$' at lines 330 and 341 (the wider of the two, and the one the dense sweep supports), and delete the duplicated 'reaching its first plateau around $N{\\approx}6$--$9$' clause at line 335, which restates line 334."
+    },
+    {
+      "line": 334,
+      "quote": "the dense vLLM sweep bottoms at the same knee (\\SI{5.12}{\\milli\\second} at $N{\\approx}6$--$9$, $1.57\\times$ below single-image",
+      "stated": "vLLM per-image cost floor is 5.12 ms over N approx 6-9.",
+      "computed": "The chapter's own published vLLM anchor at N=8 (line 311, 42.2 ms) gives 42.2/8 = 5.275 ms/image -- 3.0% ABOVE the stated floor, at a batch size inside the stated floor interval. Also, '1.57x below single-image' implies a vLLM N=1 cost of 5.12 x 1.57 = 8.04 ms, which is never published (the composed N=1 is 8.16 ms). The reader cannot reconcile the anchor with the sweep because the sweep's per-N values are not published.",
+      "relation": "per-image cost = total/N; dense-sweep floor vs published anchor",
+      "severity": "ambiguous",
+      "propagates_to": "line 341 (batching benefit saturating on 'both' stacks); Appendix~\\ref{app:engine-sensitivity}.",
+      "proposed_fix": "Either publish the vLLM N=1 measurement and note the protocol difference explicitly -- 'the dense sweep (lighter protocol than the three anchors of the previous paragraph, which give 5.28 ms/image at $N{=}8$) bottoms at \\SI{5.12}{\\milli\\second}' -- or quote the floor as '${\\approx}5.1$--$5.3$\\,ms/image'."
+    },
+    {
+      "line": 350,
+      "quote": "the twelve batch sizes here are memoized in minutes",
+      "stated": "Twelve batch sizes were benchmarked for f(N) 'here'.",
+      "computed": "The chapter publishes six batch sizes in Table~\\ref{tab:aic-fn} (N = 1, 6, 8, 16, 32, 64), three vLLM anchors (N = 8, 32, 64, two of which duplicate table rows), and the figure carries eight measured HF points (adding N = 96, 128). No subset of the published data numbers twelve; the nearest counts are 6, 8, or 11 distinct N values.",
+      "relation": "stated count vs enumerable published points",
+      "severity": "ambiguous",
+      "propagates_to": "the fleet-sizing cost argument in the same paragraph, which rests on f(N) being cheap to memoize.",
+      "proposed_fix": "Replace 'the twelve batch sizes here' with the count actually published, e.g. 'the eight batch sizes of Figure~\\ref{fig:aic-fn}', or name the twelve explicitly."
+    },
+    {
+      "line": 502,
+      "quote": "the ${\\approx}3.1\\%$ of trace requests beyond it (up to ${\\approx}149$k tokens ...) are priced by stratum-three extrapolation",
+      "stated": "Extrapolation is used up to approx 149k tokens, justified by the stratum-three characterization in Section~\\ref{sec:aic-composition}.",
+      "computed": "Line 202 bounds the stratum-three validation at '147k-token contexts' ('probed on the H100 tables out to 147k-token contexts, this tracks the theoretical quadratic ... within a few percent per octave'). 149k > 147k, so the longest trace prefills sit just outside the range where the extrapolation was actually checked. The two numbers are 1.4% apart and are never reconciled.",
+      "relation": "validated extrapolation range vs range actually exercised",
+      "severity": "loose",
+      "propagates_to": "line 202; Chapter~\\ref{cap:twopool} burst-window TTFT tails, which the sentence says these prefills decide.",
+      "proposed_fix": "Make the probe cover the exercised range: change line 202 to 'probed on the H100 tables out to 150k-token contexts' if that is what was run, or change line 502 to '(up to ${\\approx}149$k tokens, marginally beyond the 147k probe of Section~\\ref{sec:aic-composition})'."
+    },
+    {
+      "line": 310,
+      "quote": "the vLLM-measured forward differs from the composed prediction by $-2.2\\%$, $+11.3\\%$, and $+5.5\\%$ ($42.2$, $178.3$, \\SI{333.7}{\\milli\\second} against the composed $43.1$, $160.2$, \\SI{316.4}{\\milli\\second})",
+      "stated": "N=8 residual is -2.2%, computed against a composed value the same sentence publishes as 43.1 ms.",
+      "computed": "From the values published in this sentence: 42.2/43.1 - 1 = -2.088% -> -2.1%. The claim -2.2% holds only against the unrounded 43.13 from Table~\\ref{tab:aic-fn}: 42.2/43.13 - 1 = -2.156% -> -2.2%. The other two reproduce from the sentence's own figures (178.3/160.2 - 1 = +11.30%; 333.7/316.4 - 1 = +5.47% -> +5.5%). A reader recomputing from the parenthetical alone gets -2.1%.",
+      "relation": "residual = measured/composed - 1, recomputed from published (rounded) vs unrounded values",
+      "severity": "rounding",
+      "propagates_to": "line 322 ('the anchor residuals $-2.2\\%$/$+11.3\\%$/$+5.5\\%$'); Appendix~\\ref{app:engine-sensitivity} line 186, whose table gives 42.2/43.1 and which also states -2.2%.",
+      "proposed_fix": "Quote the composed values to the table's precision inside the parenthetical: '($42.2$, $178.3$, \\SI{333.7}{\\milli\\second} against the composed $43.13$, $160.20$, \\SI{316.37}{\\milli\\second})', or restate the N=8 residual as $-2.1\\%$ in both places."
+    }
+  ],
+  "passed_checks": "TABLES REPRODUCE EXACTLY. tab:aic-fn ratio column, all six rows: 11.30/8.16=1.3848->1.38; 43.58/31.79=1.3709->1.37; 58.65/43.13=1.3598->1.36; 123.39/82.22=1.5007->1.50; 253.33/160.20=1.5813->1.58; 511.23/316.37=1.6159->1.62. tab:aic-validation, all three rows: 11.360/7.822=1.4523->1.45; 36.421/31.973=1.1391->1.14; 103.824/89.347=1.1620->1.16. Both tables' cells also match the figure's underlying series (11.299, 43.58, 58.648, 123.387, 253.327, 511.226 measured; 8.162, 31.792, 43.126, 82.217, 160.196, 316.369 composed).\n\nN=1 RECONCILIATION (lines 233-236) HOLDS ON BOTH SIDES. Prediction 7.822 -> 8.16 is the raw->infilled shift (+4.32%, matching the '+4.3% at one image' of line 143); measurement 11.360 -> 11.30 is (11.360-11.30)/11.360 = 0.53%, consistent with 'within approx 0.5%'; and the resulting ratios 8.16 -> 1.38 vs 7.822 -> 1.45 are exactly the two table cells. The 7.82 raw-slice cost (line 147) matches tab:aic-validation's 7.822 and the 8.16 infilled cost (line 149) matches tab:aic-fn's N=1 composed cell.\n\nN=1 VALIDATION LEDGER (partial). 9.624 + 1.736 = 11.360 exactly; 1.736/11.360 = 15.28% -> '15.3%'; 0.459/9.624 = 4.77% -> '4.8%'; 9.624 - 0.459 - 0.248 = 8.917 -> '8.92'; (1.342-1.300)/1.300 = 3.23% -> 'strictly 3.2%', consistent with 'within approx 3%'.\n\nN=64 ATTRIBUTION ARITHMETIC. The 182 ms denominator reproduces: 511.23 x (1 - 0.025) = 498.45, minus composed 316.37 = 182.08 ms (with the unrounded 2.53% dispatch share, 181.90 ms). The 168.6 ms numerator reproduces from the per-image bars: (1.888 + 0.582 + 0.164) x 64 = 168.59 ms. Per-image attention 1.300 -> 1.306 and GEMM 6.03 -> 3.69 both match the figure series (1.3000/1.3059, 6.029/3.692), as do elementwise 1.18 -> 1.89 (1.179/1.888) and DeepStack -> 0.58 (0.582). Dispatch amortization 15.3% -> 2.5% checks: 1 - 498.27/511.23 = 2.53%.\n\nvLLM ANCHORS. +11.3% (178.3/160.20 - 1 = 11.298%) and +5.5% (333.7/316.37 - 1 = 5.478%) both exact. HF-vs-vLLM slowdown '1.39--1.53x' exact at both ends: 58.65/42.2 = 1.3898 and 511.23/333.7 = 1.5320 (mid 253.33/178.3 = 1.4208, inside the range). The 12.8% bound is consistent with the stated max deviation +12.7% at N=52 (12.8 > 12.7) and with all three anchor residuals.\n\nAMORTIZATION (HuggingFace side). Floor at N=6: 43.58/6 = 7.2633 -> 7.26; '1.56x below single-image': 11.30/7.2633 = 1.5557 -> 1.56; drift to the cap: 511.23/64 = 7.9880 -> 7.99. All three exact.\n\nDATASET ROW ACCOUNTING. Infill: 7760 - 7679 = 81 attention rows and 34710 - 34326 = 384 GEMM rows, summing to exactly the stated 465-case infill. The summary's '7760 encoder-attention and 34710 GEMM' (line 509) matches the infilled-slice definition at line 149. The later PR HEAD 7770/34775 is consistently described as a superset outside the query path.\n\nHARDWARE AND MEMORY ENVELOPE. 32768 x 65536 x 2 bytes = 4,294,967,296 = 2^32 = 4 GiB exactly, matching the stated cutoff; and the stated grid edge is self-consistent with that cutoff (16384 x 65536 x 2 = 2 GiB, admitted; 32768 -> 4 GiB, excluded). Tensor throughput: 209.5e12/(170 SM x 2407e6 Hz) = 512.0 FLOP/SM/clock, exactly the dense bf16 FP32-accumulate rate, consistent with 'the FP16-accumulate rate is 2x this'. SOL factor: 0.0358/0.0061 = 5.869 -> 'approx 5.9', consistently restated at line 204.\n\nMODEL GEOMETRY. 16 heads x 72 = 1152 hidden (matches the '16x72 geometry' at line 117); QKV 1152 -> 3456 = 3 x 1152; projector input 4608 = 4 x 1152 (2x2 patch merge); 784/4 = 196 post-merge vision tokens (line 479); 5120/4096 = 5/4 exactly (line 388). Parameter count closes: 27 x (4 x 1152^2 + 2 x 1152 x 4304) = 411.1M plus 4 x (4608^2 + 4608 x 4096) = 160.4M gives 571.5M, ~576M with embeddings; 576e6 x 2 bytes = 1.152 GB -> '1.15 GB in bf16'.\n\nOTHER CONSISTENT RESTATEMENTS. The ~17% unlocked-clock inflation agrees between line 84 and line 524. The 12.8% vLLM bound is stated identically at lines 248, 262, 317, 352 and 517. The 4.00x projector-instance scaling (line 456) is exact by construction (4 instances / 1). The 1.45x -> 1.14-1.16x amortization narrative (line 459) matches tab:aic-validation. The raw-slice 7.82 ms service time used in the two-pool smoke test (line 471) is correctly labelled as predating the infill.",
+  "notes": "Method: recomputed every ratio, share, delta and sum in the chapter from the chapter's own published values, then cross-checked the two ledgers against the figure's backing series (figuras/aic/aic_fn_engines_aiccurve.csv and figuras_new/aic_fn.html) purely to adjudicate whether a prose number had a referent. No provenance DB was consulted.\n\nADJUDICATION OF THE EXTRACTOR'S THREE FLAGS: (1) the 1.43x caption value is REFUTED as an arithmetic error -- the figure genuinely extends to N=128, where 1033.208/723.514 = 1.428; the real defect is that the caption calls N=128 'the largest dispatch' while the body reserves 'dispatch cap' for N=64 (recorded as an ambiguity, finding 6). (2) The 0.25 vs 1.18 ms elementwise discrepancy is CONFIRMED and is the chapter's most consequential defect, because it is what breaks the 'no unexplained residual' claim (findings 1 and 3). (3) The 0.26 vs 0.248 DeepStack pair is CONFIRMED but is not a rounding error of one number -- the two sections quote two different profiling runs (0.257 and 0.248); the same run-to-run split shows up more strongly in the patch-embedding convolution (0.459 vs 0.495, 7.8% apart) and in the total kernel time (9.624 vs a 9.542 figure-ledger sum), which the extractor did not catch (finding 7).\n\nThe extractor's separate claim that the N=8 residual should be -2.1% is CONFIRMED only against the rounded 43.1 printed in that sentence; it is correct to -2.2% against the table's 43.13, so it is recorded as a rounding/presentation defect rather than a wrong number (finding 13).\n\nHIGHEST RISK REMAINING: the 12.8% headline bound rests on a single dense-sweep maximum of +12.7% at N=52, only 0.1pp of margin, and is asserted five times (lines 248, 262, 317, 352, 517). Appendix~\\ref{app:engine-sensitivity} reportedly states 'within 11.4%' for the same comparison -- a cross-file conflict that this chapter-internal pass cannot settle and that the cross-chapter pass should resolve.\n\nNOT INTERNALLY CHECKABLE (no defect asserted): the 120/120 rho=20 feasibility grid and the six-window 6-8 worker sizing (line 357-359); the encoder-delay p99 triple 589/606/644 ms; burst5's 8-vs-16 worker correction; the 3.1% extrapolated trace share; the 1157/276/17 shape counts; the 465-case infill composition; the dense sweep's 69 batch sizes and +21.8% at N=512; the 27.6 req/s and 32.4 ms TTFT smoke-test pair (offered load is 50 req/s at a 20 ms interval, but completion rate is decode-bound and no decode length is published, so the pair is under-determined rather than contradictory)."
+}

@@ -1,0 +1,570 @@
+===== Q1 =====
+  wall_run1: .025165962
+  wall_run2: .025590133
+  wall_run3: .025321969
+--- EXPLAIN (ANALYZE, BUFFERS) ---
+ERROR:  column d.forecast_model does not exist
+LINE 3: SELECT d.window_name, d.policy, d.forecast_model, d.quantile...
+                                        ^
+
+===== Q2 =====
+  wall_run1: .027787395
+  wall_run2: .028746584
+  wall_run3: .029137705
+--- EXPLAIN (ANALYZE, BUFFERS) ---
+                                                                               QUERY PLAN                                                                               
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=273.80..274.08 rows=110 width=218) (actual time=0.912..0.914 rows=7 loops=1)
+   Sort Key: grid_window.window_name
+   Sort Method: quicksort  Memory: 26kB
+   Buffers: shared hit=187
+   ->  Hash Left Join  (cost=253.25..270.07 rows=110 width=218) (actual time=0.890..0.897 rows=7 loops=1)
+         Hash Cond: (grid_window.window_name = cost_accounting.window_name)
+         Buffers: shared hit=184
+         ->  Hash Left Join  (cost=251.59..264.39 rows=110 width=178) (actual time=0.875..0.880 rows=7 loops=1)
+               Hash Cond: (grid_window.window_name = re.window_name)
+               Buffers: shared hit=183
+               ->  Hash Left Join  (cost=145.67..158.17 rows=110 width=170) (actual time=0.766..0.770 rows=7 loops=1)
+                     Hash Cond: (grid_window.window_name = fc.window_name)
+                     Buffers: shared hit=94
+                     ->  Seq Scan on grid_window  (cost=0.00..12.20 rows=110 width=52) (actual time=0.007..0.009 rows=7 loops=1)
+                           Filter: is_valid
+                           Buffers: shared hit=2
+                     ->  Hash  (cost=145.61..145.61 rows=5 width=125) (actual time=0.750..0.751 rows=5 loops=1)
+                           Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                           Buffers: shared hit=92
+                           ->  Subquery Scan on fc  (cost=141.62..145.61 rows=5 width=125) (actual time=0.695..0.746 rows=5 loops=1)
+                                 Buffers: shared hit=92
+                                 ->  Unique  (cost=141.62..145.56 rows=5 width=125) (actual time=0.694..0.744 rows=5 loops=1)
+                                       Buffers: shared hit=92
+                                       ->  Sort  (cost=141.62..143.59 rows=789 width=125) (actual time=0.692..0.709 rows=797 loops=1)
+                                             Sort Key: factorial_cell.window_name, factorial_cell.provisioned_ws
+                                             Sort Method: quicksort  Memory: 142kB
+                                             Buffers: shared hit=92
+                                             ->  Seq Scan on factorial_cell  (cost=0.00..103.65 rows=789 width=125) (actual time=0.016..0.205 rows=797 loops=1)
+                                                   Filter: (feasible AND (provisioned_ws IS NOT NULL) AND (policy = 'forecast'::text))
+                                                   Rows Removed by Filter: 375
+                                                   Buffers: shared hit=89
+               ->  Hash  (cost=105.86..105.86 rows=5 width=15) (actual time=0.099..0.100 rows=4 loops=1)
+                     Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                     Buffers: shared hit=89
+                     ->  Subquery Scan on re  (cost=105.50..105.86 rows=5 width=15) (actual time=0.094..0.098 rows=4 loops=1)
+                           Buffers: shared hit=89
+                           ->  Unique  (cost=105.50..105.81 rows=5 width=23) (actual time=0.093..0.097 rows=4 loops=1)
+                                 Buffers: shared hit=89
+                                 ->  Sort  (cost=105.50..105.65 rows=62 width=23) (actual time=0.093..0.095 rows=54 loops=1)
+                                       Sort Key: factorial_cell_1.window_name, factorial_cell_1.provisioned_ws
+                                       Sort Method: quicksort  Memory: 27kB
+                                       Buffers: shared hit=89
+                                       ->  Seq Scan on factorial_cell factorial_cell_1  (cost=0.00..103.65 rows=62 width=23) (actual time=0.006..0.074 rows=54 loops=1)
+                                             Filter: (feasible AND (provisioned_ws IS NOT NULL) AND (policy = 'reactive'::text))
+                                             Rows Removed by Filter: 1118
+                                             Buffers: shared hit=89
+         ->  Hash  (cost=1.60..1.60 rows=5 width=15) (actual time=0.006..0.006 rows=5 loops=1)
+               Buckets: 1024  Batches: 1  Memory Usage: 9kB
+               Buffers: shared hit=1
+               ->  Seq Scan on cost_accounting  (cost=0.00..1.60 rows=5 width=15) (actual time=0.002..0.004 rows=5 loops=1)
+                     Filter: ((policy = 'forecast'::text) AND (lead_s = 30))
+                     Rows Removed by Filter: 35
+                     Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=346
+ Planning Time: 0.662 ms
+ Execution Time: 0.985 ms
+(57 rows)
+
+
+===== Q3 =====
+  wall_run1: 7.549730325
+  wall_run2: 7.546271742
+  wall_run3: 7.695883890
+--- EXPLAIN (ANALYZE, BUFFERS) ---
+                                                                                         QUERY PLAN                                                                                         
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=7.39..1995626.07 rows=177 width=50) (actual time=452.111..8635.765 rows=178 loops=1)
+   Group Key: llm_request.run_id
+   Buffers: shared hit=78 read=527901, temp read=43034 written=43288
+   ->  Merge Append  (cost=7.39..1759761.75 rows=18868933 width=34) (actual time=425.618..3567.186 rows=18869922 loops=1)
+         Sort Key: llm_request.run_id
+         Buffers: shared hit=71 read=527900
+         ->  Index Scan using llm_request_a11_run_id_idx on llm_request_a11 llm_request_1  (cost=0.43..322421.31 rows=4228469 width=39) (actual time=425.383..857.803 rows=4228632 loops=1)
+               Buffers: shared read=123650
+         ->  Index Scan using llm_request_a12_run_id_idx on llm_request_a12 llm_request_2  (cost=0.43..365972.27 rows=3407723 width=34) (actual time=0.051..321.378 rows=3408480 loops=1)
+               Buffers: shared hit=7 read=95041
+         ->  Index Scan using llm_request_a13_run_id_idx on llm_request_a13 llm_request_3  (cost=0.43..88464.12 rows=2000313 width=34) (actual time=0.018..186.760 rows=2000000 loops=1)
+               Buffers: shared hit=10 read=53610
+         ->  Index Scan using llm_request_a14_run_id_idx on llm_request_a14 llm_request_4  (cost=0.43..115384.31 rows=2553659 width=30) (actual time=0.017..260.914 rows=2554209 loops=1)
+               Buffers: shared hit=1 read=70973
+         ->  Index Scan using llm_request_a15_run_id_idx on llm_request_a15 llm_request_5  (cost=0.43..135523.59 rows=2998944 width=30) (actual time=0.019..284.135 rows=2998797 loops=1)
+               Buffers: shared read=83339
+         ->  Index Scan using llm_request_a16_run_id_idx on llm_request_a16 llm_request_6  (cost=0.29..7980.62 rows=88003 width=86) (actual time=0.014..9.659 rows=88003 loops=1)
+               Buffers: shared hit=8 read=3058
+         ->  Index Scan using llm_request_a16_ft_run_id_idx on llm_request_a16_ft llm_request_7  (cost=0.42..11684.79 rows=248958 width=41) (actual time=0.018..26.159 rows=248958 loops=1)
+               Buffers: shared read=7309
+         ->  Index Scan using llm_request_a2_run_id_idx on llm_request_a2 llm_request_8  (cost=0.12..8.14 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_a2t_run_id_idx on llm_request_a2t llm_request_9  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_a2tf_run_id_idx on llm_request_a2tf llm_request_10  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_a2x_run_id_idx on llm_request_a2x llm_request_11  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_a6_run_id_idx on llm_request_a6 llm_request_12  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_ctmatrix_run_id_idx on llm_request_ctmatrix llm_request_13  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_eda_run_id_idx on llm_request_eda llm_request_14  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_episode_run_id_idx on llm_request_episode llm_request_15  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_ewma_run_id_idx on llm_request_ewma llm_request_16  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_factorial_run_id_idx on llm_request_factorial llm_request_17  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_g1_run_id_idx on llm_request_g1 llm_request_18  (cost=0.42..16694.53 rows=331674 width=45) (actual time=0.020..33.799 rows=331674 loops=1)
+               Buffers: shared read=9633
+         ->  Index Scan using llm_request_g2_run_id_idx on llm_request_g2 llm_request_19  (cost=0.29..638.79 rows=12372 width=49) (actual time=0.015..1.368 rows=12372 loops=1)
+               Buffers: shared hit=5 read=376
+         ->  Index Scan using llm_request_g3_32b_run_id_idx on llm_request_g3_32b llm_request_20  (cost=0.12..8.14 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_g4_run_id_idx on llm_request_g4 llm_request_21  (cost=0.43..133039.39 rows=2998797 width=33) (actual time=0.019..293.051 rows=2998797 loops=1)
+               Buffers: shared hit=20 read=80910
+         ->  Index Scan using llm_request_g6_run_id_idx on llm_request_g6 llm_request_22  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_grid_run_id_idx on llm_request_grid llm_request_23  (cost=0.12..8.14 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_live_run_id_idx on llm_request_live llm_request_24  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_phasee_run_id_idx on llm_request_phasee llm_request_25  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_planner_run_id_idx on llm_request_planner llm_request_26  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_predictors_run_id_idx on llm_request_predictors llm_request_27  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_reactive_run_id_idx on llm_request_reactive llm_request_28  (cost=0.12..51.79 rows=1 width=38) (actual time=0.006..0.006 rows=0 loops=1)
+               Buffers: shared read=1
+         ->  Index Scan using llm_request_riders_run_id_idx on llm_request_riders llm_request_29  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_sweeps_run_id_idx on llm_request_sweeps llm_request_30  (cost=0.12..8.14 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+         ->  Index Scan using llm_request_default_run_id_idx on llm_request_default llm_request_31  (cost=0.12..4.15 rows=1 width=35) (actual time=0.001..0.001 rows=0 loops=1)
+               Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=1159 read=175
+ Planning Time: 1.728 ms
+ JIT:
+   Functions: 67
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 1.834 ms, Inlining 30.882 ms, Optimization 239.027 ms, Emission 155.463 ms, Total 427.206 ms
+ Execution Time: 8647.338 ms
+(76 rows)
+
+
+===== Q4a =====
+  wall_run1: .074293710
+  wall_run2: .067333283
+  wall_run3: .078033845
+--- EXPLAIN (ANALYZE, BUFFERS) ---
+                                                           QUERY PLAN                                                            
+---------------------------------------------------------------------------------------------------------------------------------
+ Unique  (cost=4129.61..4545.61 rows=40 width=48) (actual time=40.649..43.204 rows=40 loops=1)
+   Buffers: shared hit=528
+   ->  Sort  (cost=4129.61..4233.61 rows=41600 width=48) (actual time=40.648..41.384 rows=41600 loops=1)
+         Sort Key: forecast_metrics.variate, forecast_metrics.resolution, forecast_metrics.mode, forecast_metrics.wape
+         Sort Method: quicksort  Memory: 3888kB
+         Buffers: shared hit=528
+         ->  Seq Scan on forecast_metrics  (cost=0.00..938.00 rows=41600 width=48) (actual time=0.003..2.294 rows=41600 loops=1)
+               Buffers: shared hit=522
+ Planning:
+   Buffers: shared hit=133
+ Planning Time: 0.333 ms
+ Execution Time: 43.420 ms
+(12 rows)
+
+
+===== Q4b =====
+  wall_run1: 1.388414402
+  wall_run2: 1.392868463
+  wall_run3: 1.398982090
+--- EXPLAIN (ANALYZE, BUFFERS) ---
+                                                                                     QUERY PLAN                                                                                     
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=2295352.96..2933475.29 rows=2213016 width=39) (actual time=1735.972..1740.754 rows=2076 loops=1)
+   Group Key: forecast.model, forecast.mode, forecast.variate, forecast.resolution, forecast.h
+   Buffers: shared hit=1185 read=604965
+   ->  Gather Merge  (cost=2295352.96..2811759.41 rows=4426032 width=47) (actual time=1735.950..1740.475 rows=2568 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=1185 read=604965
+         ->  Sort  (cost=2294352.94..2299885.48 rows=2213016 width=47) (actual time=1725.656..1725.676 rows=856 loops=3)
+               Sort Key: forecast.model, forecast.mode, forecast.variate, forecast.resolution, forecast.h
+               Sort Method: quicksort  Memory: 89kB
+               Buffers: shared hit=1185 read=604965
+               Worker 0:  Sort Method: quicksort  Memory: 85kB
+               Worker 1:  Sort Method: quicksort  Memory: 90kB
+               ->  Partial HashAggregate  (cost=1758764.06..1924970.80 rows=2213016 width=47) (actual time=1724.790..1725.031 rows=856 loops=3)
+                     Group Key: forecast.model, forecast.mode, forecast.variate, forecast.resolution, forecast.h
+                     Planned Partitions: 64  Batches: 1  Memory Usage: 1681kB
+                     Buffers: shared hit=1155 read=604965
+                     Worker 0:  Batches: 1  Memory Usage: 1689kB
+                     Worker 1:  Batches: 1  Memory Usage: 1689kB
+                     ->  Parallel Append  (cost=0.00..744464.95 rows=9220901 width=39) (actual time=285.822..962.072 rows=7334500 loops=3)
+                           Buffers: shared hit=1155 read=604965
+                           ->  Parallel Seq Scan on forecast_toto forecast_8  (cost=0.00..171863.40 rows=2296740 width=37) (actual time=280.928..644.467 rows=5512272 loops=1)
+                                 Filter: ((y_true IS NOT NULL) AND (point IS NOT NULL))
+                                 Buffers: shared hit=129 read=148767
+                           ->  Parallel Seq Scan on forecast_chronos forecast_2  (cost=0.00..170278.08 rows=2228608 width=41) (actual time=285.421..643.487 rows=5348592 loops=1)
+                                 Filter: ((y_true IS NOT NULL) AND (point IS NOT NULL))
+                                 Buffers: shared hit=128 read=147864
+                           ->  Parallel Seq Scan on forecast_timesfm forecast_7  (cost=0.00..91299.32 rows=1199532 width=40) (actual time=0.032..64.426 rows=959264 loops=3)
+                                 Filter: ((y_true IS NOT NULL) AND (point IS NOT NULL))
+                                 Buffers: shared hit=384 read=78920
+                           ->  Parallel Seq Scan on forecast_ewma forecast_3  (cost=0.00..90892.83 rows=1231683 width=38) (actual time=1.821..95.584 rows=1415862 loops=2)
+                                 Filter: ((y_true IS NOT NULL) AND (point IS NOT NULL))
+                                 Buffers: shared hit=256 read=78320
+                           ->  Parallel Seq Scan on forecast_holt_winters forecast_4  (cost=0.00..89558.72 rows=1131872 width=45) (actual time=0.029..184.047 rows=2716560 loops=1)
+                                 Filter: ((y_true IS NOT NULL) AND (point IS NOT NULL))
+                                 Buffers: shared hit=129 read=78111
+                           ->  Parallel Seq Scan on forecast_naive forecast_6  (cost=0.00..84433.33 rows=1132133 width=38) (actual time=291.113..472.295 rows=2716560 loops=1)
+                                 Filter: ((y_true IS NOT NULL) AND (point IS NOT NULL))
+                                 Buffers: shared hit=129 read=72983
+                           ->  Parallel Seq Scan on forecast_arima forecast_1  (cost=0.00..11.59 rows=157 width=148) (actual time=0.000..0.000 rows=0 loops=1)
+                                 Filter: ((y_true IS NOT NULL) AND (point IS NOT NULL))
+                           ->  Parallel Seq Scan on forecast_moirai forecast_5  (cost=0.00..11.59 rows=157 width=148) (actual time=0.000..0.000 rows=0 loops=1)
+                                 Filter: ((y_true IS NOT NULL) AND (point IS NOT NULL))
+                           ->  Parallel Seq Scan on forecast_default forecast_9  (cost=0.00..11.59 rows=157 width=148) (actual time=0.001..0.001 rows=0 loops=1)
+                                 Filter: ((y_true IS NOT NULL) AND (point IS NOT NULL))
+ Planning:
+   Buffers: shared hit=757
+ Planning Time: 0.843 ms
+ JIT:
+   Functions: 123
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 4.691 ms, Inlining 106.218 ms, Optimization 442.418 ms, Emission 308.864 ms, Total 862.190 ms
+ Execution Time: 1753.123 ms
+(53 rows)
+
+
+===== Q5 =====
+  wall_run1: .026738356
+  wall_run2: .023945512
+  wall_run3: .027489249
+--- EXPLAIN (ANALYZE, BUFFERS) ---
+                                                  QUERY PLAN                                                  
+--------------------------------------------------------------------------------------------------------------
+ Sort  (cost=48.01..48.23 rows=89 width=55) (actual time=0.245..0.247 rows=80 loops=1)
+   Sort Key: script, metric_path
+   Sort Method: quicksort  Memory: 31kB
+   Buffers: shared hit=26
+   ->  Seq Scan on eda_metric  (cost=0.00..45.12 rows=89 width=55) (actual time=0.027..0.092 rows=80 loops=1)
+         Filter: ((metric_path ~~ 'burst%'::text) OR (signal = 'rps'::text))
+         Rows Removed by Filter: 1395
+         Buffers: shared hit=23
+ Planning:
+   Buffers: shared hit=139
+ Planning Time: 0.297 ms
+ Execution Time: 0.274 ms
+(12 rows)
+
+
+===== Q6 =====
+  wall_run1: .368857827
+  wall_run2: .374667894
+  wall_run3: .374299158
+--- EXPLAIN (ANALYZE, BUFFERS) ---
+                                                                         QUERY PLAN                                                                         
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=0.55..183955.44 rows=1 width=57) (actual time=370.975..370.976 rows=1 loops=1)
+   Group Key: run_id
+   Buffers: shared hit=7126 read=34029, temp read=1980 written=1987
+   ->  Index Scan using vllm_token_itl_uq on vllm_token_itl  (cost=0.55..167030.11 rows=1354025 width=66) (actual time=0.034..136.677 rows=1354025 loops=1)
+         Buffers: shared hit=7118 read=34029
+ Planning:
+   Buffers: shared hit=140 read=45
+ Planning Time: 0.480 ms
+ JIT:
+   Functions: 6
+   Options: Inlining false, Optimization false, Expressions true, Deforming true
+   Timing: Generation 0.247 ms, Inlining 0.000 ms, Optimization 0.224 ms, Emission 4.432 ms, Total 4.902 ms
+ Execution Time: 383.174 ms
+(13 rows)
+
+
+===== Q7 =====
+  wall_run1: 2.162139818
+  wall_run2: 2.276114252
+  wall_run3: 2.180479371
+--- EXPLAIN (ANALYZE, BUFFERS) ---
+                                                                                   QUERY PLAN                                                                                    
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Nested Loop Left Join  (cost=399860.69..13949954.73 rows=35 width=107) (actual time=676.557..2965.403 rows=1938 loops=1)
+   Join Filter: ("*SELECT* 1".sla_metric = 'ttft'::text)
+   Rows Removed by Join Filter: 1436
+   Buffers: shared hit=57263 read=459938
+   ->  Gather  (cost=1384.88..3299.90 rows=35 width=138) (actual time=676.411..676.667 rows=1938 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=1286 read=2351
+         ->  Hash Join  (cost=384.88..2296.40 rows=15 width=138) (actual time=350.888..353.063 rows=646 loops=3)
+               Hash Cond: ("*SELECT* 1".sla_metric = "*VALUES*".column1)
+               Buffers: shared hit=1286 read=2351
+               ->  Parallel Append  (cost=384.81..2292.55 rows=967 width=130) (actual time=1.079..3.204 rows=646 loops=3)
+                     Buffers: shared hit=1160 read=2351
+                     ->  Subquery Scan on "*SELECT* 1"  (cost=661.26..1428.28 rows=1111 width=130) (actual time=2.039..3.304 rows=934 loops=1)
+                           Buffers: shared hit=689 read=658
+                           ->  Hash Left Join  (cost=661.26..1417.17 rows=1111 width=332) (actual time=2.038..3.269 rows=934 loops=1)
+                                 Hash Cond: (r.window_name = "*VALUES*_1".column1)
+                                 Filter: (COALESCE("*VALUES*_1".column2, r.window_name) IS NOT NULL)
+                                 Rows Removed by Filter: 183
+                                 Buffers: shared hit=689 read=658
+                                 ->  Hash Join  (cost=661.13..1410.66 rows=1117 width=73) (actual time=2.020..3.180 rows=1117 loops=1)
+                                       Hash Cond: (r.run_id = s.run_id)
+                                       Buffers: shared hit=689 read=658
+                                       ->  Seq Scan on runs r  (cost=0.00..741.51 rows=3051 width=65) (actual time=0.040..0.934 rows=3051 loops=1)
+                                             Buffers: shared hit=689 read=22
+                                       ->  Hash  (cost=647.17..647.17 rows=1117 width=37) (actual time=1.967..1.968 rows=1117 loops=1)
+                                             Buckets: 2048  Batches: 1  Memory Usage: 94kB
+                                             Buffers: shared read=636
+                                             ->  Seq Scan on encoder_run_summary s  (cost=0.00..647.17 rows=1117 width=37) (actual time=0.010..1.885 rows=1117 loops=1)
+                                                   Buffers: shared read=636
+                                 ->  Hash  (cost=0.06..0.06 rows=5 width=64) (actual time=0.007..0.008 rows=3 loops=1)
+                                       Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                       ->  Values Scan on "*VALUES*_1"  (cost=0.00..0.06 rows=5 width=64) (actual time=0.005..0.006 rows=3 loops=1)
+                                             Filter: (column2 IS NOT NULL)
+                                             Rows Removed by Filter: 2
+                     ->  Subquery Scan on "*SELECT* 2"  (cost=384.81..1143.86 rows=605 width=130) (actual time=1.194..3.559 rows=502 loops=1)
+                           Buffers: shared hit=22 read=1060
+                           ->  Hash Left Join  (cost=384.81..1137.81 rows=605 width=332) (actual time=1.193..3.540 rows=502 loops=1)
+                                 Hash Cond: (r_1.window_name = "*VALUES*_2".column1)
+                                 Filter: (COALESCE("*VALUES*_2".column2, r_1.window_name) IS NOT NULL)
+                                 Rows Removed by Filter: 108
+                                 Buffers: shared hit=22 read=1060
+                                 ->  Hash Join  (cost=384.68..1134.21 rows=608 width=73) (actual time=1.177..3.486 rows=610 loops=1)
+                                       Hash Cond: (r_1.run_id = l.run_id)
+                                       Buffers: shared hit=22 read=1060
+                                       ->  Seq Scan on runs r_1  (cost=0.00..741.51 rows=3051 width=65) (actual time=0.020..2.119 rows=3051 loops=1)
+                                             Buffers: shared hit=22 read=689
+                                       ->  Hash  (cost=377.08..377.08 rows=608 width=34) (actual time=1.147..1.147 rows=610 loops=1)
+                                             Buckets: 1024  Batches: 1  Memory Usage: 48kB
+                                             Buffers: shared read=371
+                                             ->  Seq Scan on llm_run_summary l  (cost=0.00..377.08 rows=608 width=34) (actual time=0.015..1.096 rows=610 loops=1)
+                                                   Buffers: shared read=371
+                                 ->  Hash  (cost=0.06..0.06 rows=5 width=64) (actual time=0.007..0.008 rows=3 loops=1)
+                                       Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                       ->  Values Scan on "*VALUES*_2"  (cost=0.00..0.06 rows=5 width=64) (actual time=0.004..0.005 rows=3 loops=1)
+                                             Filter: (column2 IS NOT NULL)
+                                             Rows Removed by Filter: 2
+                     ->  Subquery Scan on "*SELECT* 3"  (cost=384.81..1143.86 rows=605 width=130) (actual time=0.302..2.675 rows=502 loops=1)
+                           Buffers: shared hit=449 read=633
+                           ->  Hash Left Join  (cost=384.81..1137.81 rows=605 width=332) (actual time=0.301..2.651 rows=502 loops=1)
+                                 Hash Cond: (r_2.window_name = "*VALUES*_3".column1)
+                                 Filter: (COALESCE("*VALUES*_3".column2, r_2.window_name) IS NOT NULL)
+                                 Rows Removed by Filter: 108
+                                 Buffers: shared hit=449 read=633
+                                 ->  Hash Join  (cost=384.68..1134.21 rows=608 width=73) (actual time=0.289..2.598 rows=610 loops=1)
+                                       Hash Cond: (r_2.run_id = l_1.run_id)
+                                       Buffers: shared hit=449 read=633
+                                       ->  Seq Scan on runs r_2  (cost=0.00..741.51 rows=3051 width=65) (actual time=0.015..2.084 rows=3051 loops=1)
+                                             Buffers: shared hit=78 read=633
+                                       ->  Hash  (cost=377.08..377.08 rows=608 width=34) (actual time=0.265..0.265 rows=610 loops=1)
+                                             Buckets: 1024  Batches: 1  Memory Usage: 48kB
+                                             Buffers: shared hit=371
+                                             ->  Seq Scan on llm_run_summary l_1  (cost=0.00..377.08 rows=608 width=34) (actual time=0.006..0.205 rows=610 loops=1)
+                                                   Filter: (p99_itl_ms IS NOT NULL)
+                                                   Buffers: shared hit=371
+                                 ->  Hash  (cost=0.06..0.06 rows=5 width=64) (actual time=0.007..0.007 rows=3 loops=1)
+                                       Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                       ->  Values Scan on "*VALUES*_3"  (cost=0.00..0.06 rows=5 width=64) (actual time=0.004..0.005 rows=3 loops=1)
+                                             Filter: (column2 IS NOT NULL)
+                                             Rows Removed by Filter: 2
+               ->  Hash  (cost=0.04..0.04 rows=3 width=40) (actual time=349.728..349.729 rows=3 loops=3)
+                     Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                     ->  Values Scan on "*VALUES*"  (cost=0.00..0.04 rows=3 width=40) (actual time=349.704..349.715 rows=3 loops=3)
+   ->  Aggregate  (cost=398475.81..398475.82 rows=1 width=40) (actual time=1.181..1.181 rows=1 loops=1938)
+         Buffers: shared hit=55977 read=457587
+         ->  Append  (cost=0.43..373882.69 rows=3279082 width=8) (actual time=0.048..1.013 rows=8236 loops=1938)
+               Buffers: shared hit=55977 read=457587
+               ->  Index Scan using llm_request_a11_run_id_idx on llm_request_a11 l_3  (cost=0.43..87435.91 rows=81317 width=8) (actual time=0.001..0.417 rows=4364 loops=1938)
+                     Index Cond: (run_id = "*SELECT* 1".run_id)
+                     Buffers: shared hit=5691 read=247405
+               ->  Bitmap Heap Scan on llm_request_a12 l_4  (cost=1868.92..123583.77 rows=170386 width=8) (actual time=0.039..0.341 rows=3518 loops=1938)
+                     Recheck Cond: (run_id = "*SELECT* 1".run_id)
+                     Heap Blocks: exact=184694
+                     Buffers: shared hit=5759 read=190125
+                     ->  Bitmap Index Scan on llm_request_a12_run_id_idx  (cost=0.00..1826.33 rows=170386 width=0) (actual time=0.031..0.031 rows=3518 loops=1938)
+                           Index Cond: (run_id = "*SELECT* 1".run_id)
+                           Buffers: shared hit=5753 read=5437
+               ->  Index Scan using llm_request_a13_run_id_idx on llm_request_a13 l_5  (cost=0.43..46734.16 rows=1000156 width=8) (actual time=0.001..0.001 rows=0 loops=1938)
+                     Index Cond: (run_id = "*SELECT* 1".run_id)
+                     Buffers: shared hit=5814
+               ->  Index Scan using llm_request_a14_run_id_idx on llm_request_a14 l_6  (cost=0.43..40595.78 rows=851220 width=8) (actual time=0.001..0.001 rows=0 loops=1938)
+                     Index Cond: (run_id = "*SELECT* 1".run_id)
+                     Buffers: shared hit=5814
+               ->  Index Scan using llm_request_a15_run_id_idx on llm_request_a15 l_7  (cost=0.43..47677.27 rows=999648 width=8) (actual time=0.001..0.001 rows=0 loops=1938)
+                     Index Cond: (run_id = "*SELECT* 1".run_id)
+                     Buffers: shared hit=5814
+               ->  Index Scan using llm_request_a16_run_id_idx on llm_request_a16 l_8  (cost=0.29..3141.28 rows=3035 width=8) (actual time=0.001..0.001 rows=0 loops=1938)
+                     Index Cond: (run_id = "*SELECT* 1".run_id)
+                     Buffers: shared hit=3876
+               ->  Index Scan using llm_request_a16_ft_run_id_idx on llm_request_a16_ft l_9  (cost=0.42..775.72 rows=15560 width=8) (actual time=0.001..0.001 rows=0 loops=1938)
+                     Index Cond: (run_id = "*SELECT* 1".run_id)
+                     Buffers: shared hit=5814
+               ->  Seq Scan on llm_request_a2 l_10  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_a2t l_11  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_a2tf l_12  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_a2x l_13  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_a6 l_14  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_ctmatrix l_15  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_eda l_16  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_episode l_17  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_ewma l_18  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_factorial l_19  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Index Scan using llm_request_g1_run_id_idx on llm_request_g1 l_20  (cost=0.42..632.73 rows=11846 width=8) (actual time=0.001..0.035 rows=342 loops=1938)
+                     Index Cond: (run_id = "*SELECT* 1".run_id)
+                     Buffers: shared hit=5771 read=19299
+               ->  Index Scan using llm_request_g2_run_id_idx on llm_request_g2 l_21  (cost=0.29..203.09 rows=3093 width=8) (actual time=0.001..0.002 rows=13 loops=1938)
+                     Index Cond: (run_id = "*SELECT* 1".run_id)
+                     Buffers: shared hit=3872 read=758
+               ->  Seq Scan on llm_request_g3_32b l_22  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Index Scan using llm_request_g4_run_id_idx on llm_request_g4 l_23  (cost=0.43..6699.43 rows=142800 width=8) (actual time=0.001..0.001 rows=0 loops=1938)
+                     Index Cond: (run_id = "*SELECT* 1".run_id)
+                     Buffers: shared hit=5814
+               ->  Seq Scan on llm_request_g6 l_24  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_grid l_25  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_live l_26  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_phasee l_27  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_planner l_28  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_predictors l_29  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Bitmap Heap Scan on llm_request_reactive l_30  (cost=4.13..8.15 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Recheck Cond: (run_id = "*SELECT* 1".run_id)
+                     Buffers: shared hit=1938
+                     ->  Bitmap Index Scan on llm_request_reactive_run_id_idx  (cost=0.00..4.13 rows=1 width=0) (actual time=0.000..0.000 rows=0 loops=1938)
+                           Index Cond: (run_id = "*SELECT* 1".run_id)
+                           Buffers: shared hit=1938
+               ->  Seq Scan on llm_request_riders l_31  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_sweeps l_32  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+               ->  Seq Scan on llm_request_default l_33  (cost=0.00..0.00 rows=1 width=8) (actual time=0.000..0.000 rows=0 loops=1938)
+                     Filter: (run_id = "*SELECT* 1".run_id)
+ Planning:
+   Buffers: shared hit=1417 read=231
+ Planning Time: 3.965 ms
+ JIT:
+   Functions: 355
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 7.974 ms, Inlining 93.823 ms, Optimization 554.673 ms, Emission 400.657 ms, Total 1057.128 ms
+ Execution Time: 2980.572 ms
+(175 rows)
+
+
+===== Q8 =====
+  wall_run1: .094249121
+  wall_run2: .115116517
+  wall_run3: .107463485
+--- EXPLAIN (ANALYZE, BUFFERS) ---
+                                                                                    QUERY PLAN                                                                                     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=78208.57..78368.98 rows=64162 width=39) (actual time=21.223..23.812 rows=64804 loops=1)
+   Sort Key: llm_request.arrival_time_ms
+   Sort Method: external merge  Disk: 3680kB
+   Buffers: shared hit=1930, temp read=460 written=461
+   ->  Append  (cost=0.43..73085.42 rows=64162 width=39) (actual time=0.037..12.065 rows=64804 loops=1)
+         Buffers: shared hit=1927
+         ->  Index Scan using llm_request_a11_run_id_idx on llm_request_a11 llm_request_1  (cost=0.43..72704.63 rows=64132 width=39) (actual time=0.036..9.924 rows=64804 loops=1)
+               Index Cond: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+               Buffers: shared hit=1901
+         ->  Index Scan using llm_request_a12_run_id_idx on llm_request_a12 llm_request_2  (cost=0.43..8.45 rows=1 width=34) (actual time=0.020..0.020 rows=0 loops=1)
+               Index Cond: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+               Buffers: shared hit=3
+         ->  Index Scan using llm_request_a13_run_id_idx on llm_request_a13 llm_request_3  (cost=0.43..4.45 rows=1 width=34) (actual time=0.012..0.012 rows=0 loops=1)
+               Index Cond: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+               Buffers: shared hit=3
+         ->  Index Scan using llm_request_a14_run_id_idx on llm_request_a14 llm_request_4  (cost=0.43..4.45 rows=1 width=30) (actual time=0.007..0.007 rows=0 loops=1)
+               Index Cond: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+               Buffers: shared hit=3
+         ->  Index Scan using llm_request_a15_run_id_idx on llm_request_a15 llm_request_5  (cost=0.43..4.45 rows=1 width=30) (actual time=0.008..0.008 rows=0 loops=1)
+               Index Cond: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+               Buffers: shared hit=3
+         ->  Index Scan using llm_request_a16_run_id_idx on llm_request_a16 llm_request_6  (cost=0.29..8.31 rows=1 width=86) (actual time=0.008..0.008 rows=0 loops=1)
+               Index Cond: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+               Buffers: shared hit=2
+         ->  Index Scan using llm_request_a16_ft_run_id_idx on llm_request_a16_ft llm_request_7  (cost=0.42..8.44 rows=1 width=41) (actual time=0.006..0.006 rows=0 loops=1)
+               Index Cond: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+               Buffers: shared hit=3
+         ->  Seq Scan on llm_request_a2 llm_request_8  (cost=0.00..0.00 rows=1 width=48) (actual time=0.007..0.007 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_a2t llm_request_9  (cost=0.00..0.00 rows=1 width=48) (actual time=0.003..0.003 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_a2tf llm_request_10  (cost=0.00..0.00 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_a2x llm_request_11  (cost=0.00..0.00 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_a6 llm_request_12  (cost=0.00..0.00 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_ctmatrix llm_request_13  (cost=0.00..0.00 rows=1 width=48) (actual time=0.003..0.003 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_eda llm_request_14  (cost=0.00..0.00 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_episode llm_request_15  (cost=0.00..0.00 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_ewma llm_request_16  (cost=0.00..0.00 rows=1 width=48) (actual time=0.001..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_factorial llm_request_17  (cost=0.00..0.00 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Index Scan using llm_request_g1_run_id_idx on llm_request_g1 llm_request_18  (cost=0.42..4.44 rows=1 width=45) (actual time=0.007..0.007 rows=0 loops=1)
+               Index Cond: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+               Buffers: shared hit=3
+         ->  Index Scan using llm_request_g2_run_id_idx on llm_request_g2 llm_request_19  (cost=0.29..4.42 rows=1 width=49) (actual time=0.008..0.008 rows=0 loops=1)
+               Index Cond: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+               Buffers: shared hit=2
+         ->  Seq Scan on llm_request_g3_32b llm_request_20  (cost=0.00..0.00 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Index Scan using llm_request_g4_run_id_idx on llm_request_g4 llm_request_21  (cost=0.43..4.45 rows=1 width=33) (actual time=0.006..0.007 rows=0 loops=1)
+               Index Cond: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+               Buffers: shared hit=3
+         ->  Seq Scan on llm_request_g6 llm_request_22  (cost=0.00..0.00 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_grid llm_request_23  (cost=0.00..0.00 rows=1 width=48) (actual time=0.003..0.003 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_live llm_request_24  (cost=0.00..0.00 rows=1 width=48) (actual time=0.001..0.001 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_phasee llm_request_25  (cost=0.00..0.00 rows=1 width=48) (actual time=0.001..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_planner llm_request_26  (cost=0.00..0.00 rows=1 width=48) (actual time=0.003..0.003 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_predictors llm_request_27  (cost=0.00..0.00 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Index Scan using llm_request_reactive_run_id_idx on llm_request_reactive llm_request_28  (cost=0.12..8.14 rows=1 width=38) (actual time=0.006..0.006 rows=0 loops=1)
+               Index Cond: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+               Buffers: shared hit=1
+         ->  Seq Scan on llm_request_riders llm_request_29  (cost=0.00..0.00 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_sweeps llm_request_30  (cost=0.00..0.00 rows=1 width=48) (actual time=0.002..0.002 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+         ->  Seq Scan on llm_request_default llm_request_31  (cost=0.00..0.00 rows=1 width=35) (actual time=0.001..0.001 rows=0 loops=1)
+               Filter: (run_id = 'a11:burst1_fc_chronos_L120'::text)
+ Planning:
+   Buffers: shared hit=1339
+ Planning Time: 2.081 ms
+ Execution Time: 25.362 ms
+(83 rows)
+
+

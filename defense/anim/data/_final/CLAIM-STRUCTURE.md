@@ -52,7 +52,11 @@ two-pool total mixes the two.
 ## TIER 3 — NOT SUPPORTED. Do not write these.
 
 - **"Predictive provisioning is cheaper than static."** Encoder-only, and only against the deployed
-  fleet. On the LANGUAGE pool the forecast is DEARER than static in 6 of 7 folds (0.93x-3.81x).
+  fleet **on the covered span**. On the LANGUAGE pool the forecast is DEARER than static in 6 of 7
+  folds (0.93x-3.81x), and dearer than static on both G1 windows (2.2x-3.6x). On the ENCODER pool
+  it is dearer than the deployed fleet on F7 (1.10x) and, on F6, is **infeasible** while a static
+  C=5 fleet passes for 3.0% more. **A forecast-free static fleet is the arm to beat on both
+  pools**; no language-pool cost advantage may be claimed anywhere in the thesis or the defence.
 - **"Forecast beats reactive on cost."** The arms are not cost-matched: G1's forecast arm spends
   3-6x the reactive arm's GPU-hours. It is an SLA-attainment claim.
 - **"The baseline is 2x oversized."** A pooled-tail artifact. The defensible figure is 1.6x (8 vs 5),
@@ -91,7 +95,8 @@ That paragraph is fully defensible against every attack mounted in this session.
 | challenge | answer |
 |---|---|
 | Why C=8 and not a smaller static fleet? | G4_folds_FINAL.md — C=4 fails 3/5 burst folds; C*=5; 0.980x |
-| The language pool costs more than static | G4 Finding 5 — concede; it is an SLA claim there |
+| The language pool costs more than static | G4 Finding 5 **and G1 Correction 4b** — concede fully; it is an SLA claim there, never a cost claim |
+| On F6 the forecast FAILS and static C=5 passes | G4 Finding 4b — concede: 3.0% more worker-time buys feasibility. Do not argue this one |
 | e13 / F6 failures | ZEROSHOT-AS-STRENGTH.md §3 — mechanism boundary, model-independent |
-| Generalization from one trace | G4 — within-trace temporal folds; concede cross-workload openly |
-| tex/twopool.tex 882 ms | THESIS-TEXT-DEFECTS.md — wheel number under a p99-agreement sentence; fix before submission |
+| Generalization from one trace | G4 — within-trace TEMPORAL folds only; concede cross-workload openly |
+| tex/twopool.tex 882 ms | THESIS-TEXT-DEFECTS.md — the "882 -> 783" requote is **REFUTED**; that paragraph is wheel on both arms and is internally consistent. **Make no such edit.** |

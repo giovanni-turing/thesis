@@ -1,0 +1,269 @@
+{
+  "chapter": "related",
+  "claims": [
+    {
+      "line": 9,
+      "anchor": "cap:related",
+      "quote": "Six bodies of work border this thesis: LLM serving systems,",
+      "numbers": ["Six"],
+      "metric": "count_related_areas",
+      "subject": "structure of the related-work chapter",
+      "assertion": "The related work is organized into six bordering research areas.",
+      "db_check": "UNVERIFIABLE: rhetorical/structural count, not an experimental artifact; verify by counting \\section commands in tex/related.tex (sec:rel-llm, sec:rel-mm, sec:rel-autoscale, sec:rel-workload, sec:rel-forecast, sec:rel-sim = 6, excluding sec:rel-positioning).",
+      "criticality": "incidental"
+    },
+    {
+      "line": 33,
+      "anchor": "sec:rel-llm",
+      "quote": "A second line disaggregates the two phases of LLM inference themselves.",
+      "numbers": ["two"],
+      "metric": "count_llm_phases",
+      "subject": "prefill/decode phases of LLM inference",
+      "assertion": "LLM inference consists of two phases that can be disaggregated.",
+      "db_check": "UNVERIFIABLE: domain definition, no experimental artifact. Loosely corroborated by provenance.runs having pool in ('prefill','decode') for the LLM experiments.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 56,
+      "anchor": "sec:rel-mm",
+      "quote": "reporting 25--41.3\\%\nserving-cost savings (fewer GPUs at SLO, from 3.3--5.5$\\times$ higher\nthroughput) via modality-aware placement and\nscaling~\\cite{Qiu2025ModServe}",
+      "numbers": ["25", "41.3", "3.3", "5.5"],
+      "metric": "cost_savings_pct",
+      "subject": "ModServe (external system, production multimodal serving cluster)",
+      "assertion": "ModServe reports 25--41.3% serving-cost savings from modality-aware placement and scaling.",
+      "db_check": "UNVERIFIABLE: external citation (Qiu2025ModServe); no provenance artifact reproduces ModServe's own cost savings. Verify against the ModServe paper abstract/results section.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 57,
+      "anchor": "sec:rel-mm",
+      "quote": "(fewer GPUs at SLO, from 3.3--5.5$\\times$ higher\nthroughput)",
+      "numbers": ["3.3", "5.5"],
+      "metric": "throughput_speedup_x",
+      "subject": "ModServe (external system) throughput gain",
+      "assertion": "ModServe reports 3.3--5.5x higher throughput underlying its cost savings.",
+      "db_check": "UNVERIFIABLE: external citation (Qiu2025ModServe); verify against the ModServe paper. No provenance table measures ModServe throughput.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 104,
+      "anchor": "sec:rel-mm",
+      "quote": "even the \\emph{difficulty}\nof forecasting them (a 79\\% error for existing LLM traffic\npredictors~\\cite{Qiu2025ModServe})",
+      "numbers": ["79"],
+      "metric": "forecast_error_pct",
+      "subject": "existing LLM traffic predictors applied to ModServe per-modality signals",
+      "assertion": "ModServe reports a 79% error when existing LLM traffic predictors are applied to its per-modality demand signals.",
+      "db_check": "UNVERIFIABLE: external citation (Qiu2025ModServe). Contextually contrastable with provenance.forecast_metrics (wape) for this thesis's own predictors on the same trace, but the 79% figure itself is not reproduced here.",
+      "criticality": "headline"
+    },
+    {
+      "line": 153,
+      "anchor": "sec:rel-autoscale",
+      "quote": "SageServe combines a traffic\nforecast with an ILP over multi-datacenter GPU fleets, reporting\n${\\sim}25\\%$ GPU-hour savings over reactive\nscaling~\\cite{Jaiswal2025SageServe}",
+      "numbers": ["25"],
+      "metric": "gpu_hours_savings_pct",
+      "subject": "SageServe (external forecast-aware capacity manager)",
+      "assertion": "SageServe reports approximately 25% GPU-hour savings over reactive scaling.",
+      "db_check": "UNVERIFIABLE: external citation (Jaiswal2025SageServe). Analogous thesis quantity lives in provenance.llm_run_summary.gpu_hours / cost_accounting.provisioned_ws, but SageServe's number is not reproduced.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 155,
+      "anchor": "sec:rel-autoscale",
+      "quote": "WarmServe prewarms model instances\non shared GPUs from five-minute peak-load predictions, claiming\norder-of-magnitude TTFT improvements over reactive\nautoscaling~\\cite{WarmServe2025}",
+      "numbers": ["five"],
+      "metric": "forecast_horizon_minutes",
+      "subject": "WarmServe (external prewarming autoscaler)",
+      "assertion": "WarmServe drives prewarming from five-minute-ahead peak-load predictions.",
+      "db_check": "UNVERIFIABLE: external citation (WarmServe2025). Comparable thesis parameter is provenance.runs.lead_s / forecast_metrics.h; verify the 5-minute figure against the WarmServe paper.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 168,
+      "anchor": "sec:rel-autoscale (footnote on Dynamo planner version)",
+      "quote": "documentation and inspection of the source tree at the commit used for\nthis thesis's simulations (v1.3.0 source build; accessed 2026-07-07).",
+      "numbers": ["1.3.0"],
+      "metric": "engine_version",
+      "subject": "NVIDIA Dynamo planner version used for this thesis's simulations",
+      "assertion": "The Dynamo planner behavior described is that of the v1.3.0 source build used for this thesis's simulations.",
+      "db_check": "provenance.runs: SELECT DISTINCT engine, actuation FROM provenance.runs WHERE is_current AND experiment LIKE '%baseline%' -- confirm the recorded engine/version string is Dynamo v1.3.0; cross-check Appendix ap:artifacts manifest.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 174,
+      "anchor": "sec:rel-autoscale",
+      "quote": "HeteroScale coordinates scaling of heterogeneous prefill and decode\npools in production~\\cite{Li2025TamingChaos}, and TokenScale sizes the\ntwo pools on per-stage token-velocity signals",
+      "numbers": ["two"],
+      "metric": "count_pools",
+      "subject": "TokenScale / HeteroScale disaggregated text pipeline",
+      "assertion": "TokenScale sizes two pools (prefill and decode) on per-stage token-velocity signals.",
+      "db_check": "UNVERIFIABLE: external citation (Lai2025TokenScale); structural claim about another system's design.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 182,
+      "anchor": "sec:rel-autoscale",
+      "quote": "Two gaps remain. First, every system above watches (or forecasts) signals\nderived from the request/token stream of a text-only fleet;",
+      "numbers": ["Two"],
+      "metric": "count_gaps",
+      "subject": "gaps identified in the autoscaling literature",
+      "assertion": "The autoscaling literature leaves two gaps that this thesis addresses.",
+      "db_check": "UNVERIFIABLE: rhetorical structural count with no experimental artifact.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 188,
+      "anchor": "sec:rel-autoscale",
+      "quote": "carries almost no information about the vision pool's demand\n($R^2=\\num{0.123}$), so grafting these autoscalers onto a\nmodality-disaggregated deployment reproduces the missizing this thesis\nquantifies.",
+      "numbers": ["0.123"],
+      "metric": "r2",
+      "subject": "regression of vision-pool demand signal (image rate) on aggregate request rate, AzureLMMInferenceDataset2025 trace",
+      "assertion": "The aggregate request stream explains only R^2=0.123 of the vision pool's demand signal.",
+      "db_check": "Trace-EDA derived statistic; R^2 is not a stored column. Recompute from provenance.measured_request / provenance.windows aggregated at the EDA resolution (image rate vs request rate per window), and cross-check the identical value reported in tex/trace-eda.tex and the EDA stats JSON referenced by provenance.collector_fn. MUST be consistent with line 225 (0.12) and line 335 (0.123).",
+      "criticality": "headline"
+    },
+    {
+      "line": 206,
+      "anchor": "sec:rel-workload",
+      "quote": "same signatures (Fano factor growing by nearly three orders of magnitude\nwith window size, Hurst exponents up to ${\\approx}0.93$) in a multimodal\ninference workload's demand signals, strongest in the vision signal.",
+      "numbers": ["three"],
+      "metric": "fano_growth_orders_of_magnitude",
+      "subject": "Fano factor vs window size, multimodal trace demand signals (vision strongest)",
+      "assertion": "The Fano factor of the demand signals grows by nearly three orders of magnitude as the aggregation window widens.",
+      "db_check": "Derived from provenance.measured_request binned by window size (provenance.windows / resolution). Fano factor is not stored; recompute var/mean per window scale and check the max/min ratio spans ~10^3. Cross-check against the Fano figure and numbers in tex/trace-eda.tex.",
+      "criticality": "headline"
+    },
+    {
+      "line": 207,
+      "anchor": "sec:rel-workload",
+      "quote": "Hurst exponents up to ${\\approx}0.93$) in a multimodal\ninference workload's demand signals, strongest in the vision signal.",
+      "numbers": ["0.93"],
+      "metric": "hurst",
+      "subject": "Hurst exponent of the multimodal trace demand signals, maximum across the four signals (vision signal)",
+      "assertion": "Hurst exponents of the demand signals reach approximately 0.93, indicating strong long-range dependence, strongest in the vision signal.",
+      "db_check": "Derived EDA statistic, not a stored column. Recompute (R/S or DFA) from provenance.measured_request aggregated per signal/resolution; cross-check the per-signal Hurst table in tex/trace-eda.tex and the EDA stats JSON in provenance.collector_fn. Verify 0.93 is the MAX across signals and belongs to the vision/image-rate signal.",
+      "criticality": "headline"
+    },
+    {
+      "line": 213,
+      "anchor": "sec:rel-workload",
+      "quote": "BurstGPT's 213-day trace and\narrival-burstiness analysis~\\cite{Wang2024BurstGPT}",
+      "numbers": ["213"],
+      "metric": "trace_duration_days",
+      "subject": "BurstGPT public LLM trace (external)",
+      "assertion": "The BurstGPT public trace spans 213 days.",
+      "db_check": "UNVERIFIABLE: external dataset description (Wang2024BurstGPT); no provenance artifact. Verify against the BurstGPT paper/dataset README.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 225,
+      "anchor": "sec:rel-workload",
+      "quote": "needs from it: the per-pool demand-signal view --- the \\emph{quantified}\ndecoupling ($R^2{=}0.12$), burst anatomy, and persistence gradient ---",
+      "numbers": ["0.12"],
+      "metric": "r2",
+      "subject": "decoupling of vision-pool demand from request rate, AzureLMMInferenceDataset2025",
+      "assertion": "The vision pool's demand is quantifiably decoupled from request rate with R^2=0.12.",
+      "db_check": "Same derivation as line 188. CONSISTENCY CHECK: this rounds 0.123 to 0.12 while lines 188 and 335 give 0.123 -- confirm both refer to the same regression and that the rounding is intentional. Recompute from provenance.measured_request / windows at the EDA resolution.",
+      "criticality": "headline"
+    },
+    {
+      "line": 261,
+      "anchor": "sec:rel-forecast",
+      "quote": "benchmark of three TSFMs against classical baselines on all four demand\nsignals of a production multimodal trace, with the forecast consumed as\na scaler would consume it.",
+      "numbers": ["three"],
+      "metric": "count_tsfm_models",
+      "subject": "predictor benchmark of Chapter cap:predictors",
+      "assertion": "The thesis benchmarks three time-series foundation models zero-shot against classical baselines.",
+      "db_check": "SELECT DISTINCT model FROM provenance.forecast_metrics WHERE mode='zero-shot' -- count the TSFM models (expect exactly 3, e.g. TimesFM/Chronos/Toto family) plus classical baselines. Cross-check v_forecast_best.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 261,
+      "anchor": "sec:rel-forecast",
+      "quote": "against classical baselines on all four demand\nsignals of a production multimodal trace",
+      "numbers": ["four"],
+      "metric": "count_demand_signals",
+      "subject": "demand signals of the production multimodal trace used in the predictor benchmark",
+      "assertion": "The benchmark covers all four per-pool demand signals of the trace.",
+      "db_check": "SELECT DISTINCT variate FROM provenance.forecast_metrics -- expect exactly 4 demand signals (e.g. request rate, image rate, prefill/decode token demand). Cross-check against the signal definitions in tex/trace-eda.tex.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 289,
+      "anchor": "sec:rel-sim",
+      "quote": "LLMServingSim co-simulates the\naccelerator and the serving stack, its 2.0 release targeting\nheterogeneous and disaggregated serving\ninfrastructure~\\cite{Cho2024LLMServingSim,Cho2026LLMServingSim2}",
+      "numbers": ["2.0"],
+      "metric": "external_tool_version",
+      "subject": "LLMServingSim (external simulator)",
+      "assertion": "LLMServingSim's 2.0 release targets heterogeneous and disaggregated serving infrastructure.",
+      "db_check": "UNVERIFIABLE: external citation (Cho2026LLMServingSim2); version fact about another tool, no provenance artifact.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 312,
+      "anchor": "sec:rel-positioning",
+      "quote": "the vision pool's image rate: the burstiest of the four, nearly\ninvisible in the request \\emph{rate} a conventional autoscaler watches,\nand ramping to peak within replica cold-start times in the fast half of\nits bursts.",
+      "numbers": ["four", "half"],
+      "metric": "count_demand_signals_and_burst_fraction",
+      "subject": "vision pool image-rate signal versus the other three demand signals",
+      "assertion": "Among the four demand signals the image rate is the burstiest, and in the faster half of its bursts it ramps to peak within replica cold-start times.",
+      "db_check": "Burstiness ranking: recompute Fano/Hurst per variate from provenance.measured_request and confirm image rate ranks highest among the 4 signals. 'Fast half' = median burst ramp time < cold-start lead; check against the burst-anatomy artifact of Chapter trace-eda and provenance.runs.lead_s used in closed loop.",
+      "criticality": "headline"
+    },
+    {
+      "line": 326,
+      "anchor": "sec:rel-positioning",
+      "quote": "The thesis makes three precedence claims, each deliberately narrow.",
+      "numbers": ["three"],
+      "metric": "count_precedence_claims",
+      "subject": "novelty/precedence claims of the thesis",
+      "assertion": "The thesis makes exactly three narrow precedence claims.",
+      "db_check": "UNVERIFIABLE: rhetorical structural count; verify by counting the enumerated claims in the same paragraph (First.../Second.../Third...).",
+      "criticality": "incidental"
+    },
+    {
+      "line": 335,
+      "anchor": "sec:rel-positioning",
+      "quote": "the first work to measure that the vision pool's arrival signal is nearly decoupled\nfrom request rate ($R^2 = \\num{0.123}$, versus $\\num{0.654}$ for decode demand;\nChapter~\\ref{cap:trace-eda})",
+      "numbers": ["0.123", "0.654"],
+      "metric": "r2",
+      "subject": "R^2 of request rate against vision-pool arrival signal (0.123) versus decode demand (0.654)",
+      "assertion": "Request rate explains R^2=0.123 of the vision pool's arrival signal but R^2=0.654 of decode demand, showing the vision signal is nearly decoupled while the text-side signal is not.",
+      "db_check": "Derived regression, not stored. Recompute both regressions from provenance.measured_request / windows at the EDA resolution (per-variate demand vs request rate) and confirm 0.123 and 0.654 match the values in tex/trace-eda.tex. CONSISTENCY: must equal line 188 (0.123) and be the unrounded form of line 225 (0.12).",
+      "criticality": "headline"
+    },
+    {
+      "line": 355,
+      "anchor": "tab:rel-positioning",
+      "quote": "Table~\\ref{tab:rel-positioning} summarizes the landscape against the four\ningredients the claim requires, plus the evaluation modality each work\nbrings.",
+      "numbers": ["four"],
+      "metric": "count_table_ingredient_columns",
+      "subject": "positioning table column structure",
+      "assertion": "The positioning table compares works against four required ingredients plus an evaluation-modality column.",
+      "db_check": "UNVERIFIABLE: structural claim about the table; verify by counting columns in tab:rel-positioning (Modality disagg., Per-pool signals, Forecast scaling, Calibrated simulation = 4, plus Real-cluster GPU eval.).",
+      "criticality": "incidental"
+    },
+    {
+      "line": 361,
+      "anchor": "sec:rel-positioning",
+      "quote": "the tail SLA held in aggregate and\nper-episode at\n0.62 times the deployable static encoder fleet's provisioned\nworker-time, versus static-optimal and reactive baselines.",
+      "numbers": ["0.62"],
+      "metric": "cost_ratio",
+      "subject": "closed-loop predictive encoder-pool scaling versus the deployable static encoder fleet, provisioned worker-time",
+      "assertion": "The closed-loop policy holds the tail SLA in aggregate and per-episode while consuming 0.62 times the provisioned worker-time of the deployable static encoder fleet.",
+      "db_check": "provenance.cost_accounting / encoder_run_summary: ratio of provisioned_worker_seconds for the closed-loop predictive run to that of the best FEASIBLE static encoder config, filtered pool='encoder' AND is_current; cross-check provenance.v_cost_frontier_dual and v_closedloop_frontier. Also confirm feasibility via factorial_cell.feasible for the static comparator, and that encoder_delay_p99_ms meets the SLA in both aggregate and every episode (queue_divergent = false).",
+      "criticality": "headline"
+    },
+    {
+      "line": 392,
+      "anchor": "tab:rel-positioning",
+      "quote": "ModServe~\\cite{Qiu2025ModServe} & \\checkmark & \\checkmark & --- & --- & \\checkmark \\\\ ... \\textbf{This thesis} & \\checkmark & \\checkmark & \\checkmark & \\checkmark & $\\sim$ \\\\",
+      "numbers": [],
+      "metric": "positioning_matrix",
+      "subject": "positioning table rows (ModServe, EPD/HydraInfer, ElasticMM, SageServe/WarmServe, TokenScale/HeteroScale, Dynamo planner, Vidur/LLMServingSim 2.0, This thesis)",
+      "assertion": "The table asserts per-work coverage of modality disaggregation, per-pool signals, forecast scaling, calibrated simulation, and real-cluster GPU evaluation, with this thesis the only row checked on the first four.",
+      "db_check": "Qualitative matrix, no numeric cells. This thesis's row: calibrated-simulation checkmark backed by provenance.composed_e2e + collector_fn (physical anchors) and the mocked-engine replay recorded in provenance.runs.actuation; the $\\sim$ in the last column asserts NO real-cluster closed loop -- confirm no run in provenance.runs has actuation indicating a real GPU cluster closed loop.",
+      "criticality": "supporting"
+    }
+  ]
+}

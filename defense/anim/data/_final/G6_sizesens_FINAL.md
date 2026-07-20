@@ -45,7 +45,7 @@ interpolation.extrapolate_data_grid (inner_only=False). The 896 cells are theref
 and the driver's labelling is wrong in both directions. The 448 and 672 cells are inside the
 collected box; only 896 is affected.
 
-## Results (numbers unchanged, framing corrected)
+## Results (numbers unchanged, framing corrected) — **BURST3 ONLY; see Correction 5**
 Encoder-delay p99, burst3, forecast p90/rho15/L30 vs static C8:
 | image | fc @25G | fc @100G | static C8 @25G | static C8 @100G |
 |---|---:|---:|---:|---:|
@@ -54,6 +54,24 @@ Encoder-delay p99, burst3, forecast p90/rho15/L30 vs static C8:
 | 448 (assumed) | 588.4 PASS | 384.5 PASS | 716.4 PASS | 559.5 PASS |
 | 672 | 1397.4 FAIL | 938.7 PASS (6.1% margin) | 3489.0 FAIL | 3414.9 FAIL |
 | 896 (extrapolated) | 3469.0 FAIL | 3021.4 FAIL | 25163.1 FAIL | 25114.1 FAIL |
+
+## CORRECTION 5 (NEW) — WINDOW SCOPE: every cell in the table above is burst3
+The size ladder was graded on burst3 and the verdict is **not window-invariant**. Re-derived from
+g6_runs/*.stats.json, encoder-delay p99 at 672 px, forecast arm (fc_L30):
+
+| window | fc @25G | fc @100G |
+|---|---:|---:|
+| burst3 | 1397.4 FAIL | 938.7 PASS (6.1% margin) |
+| burst4 | 1397.4 FAIL | 938.7 PASS |
+| burst5 | 1397.4 FAIL | 938.7 PASS |
+| **steady24h** | **1972.5 FAIL** | **1927.5 FAIL** |
+
+At the 24-hour window the forecast arm at 672 px **FAILS on BOTH fabrics** — the "fabric rescue"
+does not exist there, and the 100 Gbps link buys only 2.3%. The same holds at 896 px (steady24h
+5716.3 @25G / 5632.5 @100G, both FAIL).
+=> **Never state the 672 px fabric crossing without naming its window.** The crossing near
+690-705 px is a burst3-and-siblings result; on the sustained 24 h window the assumed resolution
+sits much closer to the boundary than the burst cells suggest.
 
 ## Structural point that SURVIVES and is the most useful finding
 provisioned_worker_s is INVARIANT across image size (32,228.0 for every burst3 cell, both
@@ -70,4 +88,6 @@ f(64) + 272 ms x (px/32)^2/196 places the crossing near 690-705 px on a 100 Gbps
 assumed resolution sits just below it. Because the p90 schedule is driven by image count it is
 blind to size, and a size increase produces no provisioning response at all — unlike the
 engine-cost gap, which the p90 headroom absorbs with no added workers. The 25-versus-100 Gbps
-difference at 672 px reflects the single-stream handoff assumption as much as line rate."
+difference at 672 px reflects the single-stream handoff assumption as much as line rate, and it is
+a burst-window result: on the sustained 24-hour window the 672 px configuration misses the bound
+on both fabrics."

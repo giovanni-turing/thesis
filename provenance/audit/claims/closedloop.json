@@ -1,0 +1,2055 @@
+{
+  "chapter": "closedloop",
+  "claims": [
+    {
+      "line": 50,
+      "anchor": "sec:cl-controller (Temporal split)",
+      "quote": "The trace's\\nfirst 1.4 days are consumed as forecast \\emph{context}",
+      "numbers": [
+        "1.4"
+      ],
+      "metric": "context_span_days",
+      "subject": "Azure trace forecast-context prefix",
+      "assertion": "The first 1.4 days of the trace are consumed as zero-shot forecast context and never graded.",
+      "db_check": "provenance.windows / coverage_meta: span start vs first graded window start; expect 1.4-day gap",
+      "criticality": "supporting"
+    },
+    {
+      "line": 51,
+      "anchor": "sec:cl-controller (Temporal split)",
+      "quote": "the remaining 5.60 days\\nform the evaluation span, on which every closed-loop verdict in this\\nchapter is scored",
+      "numbers": [
+        "5.60"
+      ],
+      "metric": "eval_span_days",
+      "subject": "closed-loop evaluation span",
+      "assertion": "The evaluation span on which all closed-loop verdicts are scored is 5.60 days.",
+      "db_check": "provenance.coverage_meta or windows: max(end)-min(start) for window_name='week'/covered span = 5.60 days",
+      "criticality": "headline"
+    },
+    {
+      "line": 53,
+      "anchor": "sec:cl-controller (Temporal split)",
+      "quote": "(episodes burst1/3/4/5 and the calm day; the two\\npre-coverage episodes are graded only by forecast-free policies",
+      "numbers": [
+        "1",
+        "3",
+        "4",
+        "5",
+        "2"
+      ],
+      "metric": "window_count",
+      "subject": "in-span episodes",
+      "assertion": "Four burst episodes (burst1/3/4/5) plus the calm day are in-span; two episodes are pre-coverage.",
+      "db_check": "provenance.windows: count rows with in_span flag; expect 5 in-span (burst1,3,4,5,steady) and 2 out-of-span (burst2,burst6)",
+      "criticality": "supporting"
+    },
+    {
+      "line": 57,
+      "anchor": "sec:cl-controller (Temporal split)",
+      "quote": "issue time $=$ target $-\\,(h{-}1){\\cdot}15$\\,s, so\\nthe $h{=}1$ nowcast carries zero usable lead",
+      "numbers": [
+        "1",
+        "15",
+        "1"
+      ],
+      "metric": "issue_lead_s",
+      "subject": "rolling-origin forecast issue-time protocol",
+      "assertion": "Forecast issue time equals target minus (h-1)*15 s, so h=1 carries zero usable lead.",
+      "db_check": "UNVERIFIABLE: protocol definition, not a measured value; consistency checkable against forecast_metrics.h and resolution=15s",
+      "criticality": "incidental"
+    },
+    {
+      "line": 63,
+      "anchor": "sec:cl-controller",
+      "quote": "the headline\\nrating $\\rho{=}15$ is then chosen \\emph{ex post} as the conservative\\noperating point (Section~\\ref{sec:cl-aggregate} shows $\\rho{=}20$ also\\nclean, more cheaply)",
+      "numbers": [
+        "15",
+        "20"
+      ],
+      "metric": "capacity_rating_rho",
+      "subject": "encoder pool headline operating point",
+      "assertion": "The headline per-worker capacity rating is rho=15, with rho=20 also per-episode clean and cheaper.",
+      "db_check": "provenance.factorial_cell filter rho in (15,20), quantile='p90', pool='encoder', is_current via runs join; check feasible counts",
+      "criticality": "headline"
+    },
+    {
+      "line": 74,
+      "anchor": "sec:cl-matrix",
+      "quote": "graded on a per-window\\nfactorial --- 5 in-span windows $\\times$ 3 TSFMs $\\times$ 4 realizable\\nissued leads $\\{15,30,45,165\\}$\\,s",
+      "numbers": [
+        "5",
+        "3",
+        "4",
+        "15",
+        "30",
+        "45",
+        "165"
+      ],
+      "metric": "factorial_design_size",
+      "subject": "encoder p90 rho=15 issue-time factorial",
+      "assertion": "The encoder factorial is 5 windows x 3 TSFMs x 4 issued leads {15,30,45,165}s.",
+      "db_check": "provenance.factorial_cell join runs: count distinct window_name, model, lead_s for quantile='p90', rho=15, actuation='issue_time'",
+      "criticality": "headline"
+    },
+    {
+      "line": 77,
+      "anchor": "sec:cl-matrix",
+      "quote": "\\textbf{meets the SLA in all 60 of its cells: every window, every\\nmodel, every lead}, under \\emph{both} a warm-pool and a strict re-warm\\nreadiness model",
+      "numbers": [
+        "60"
+      ],
+      "metric": "feasible_count",
+      "subject": "encoder p90 rho=15 issue-time factorial",
+      "assertion": "The p90 forecast policy at rho=15 meets the SLA in all 60 factorial cells under both readiness models.",
+      "db_check": "provenance.factorial_cell: count(*) where quantile='p90' and rho=15 and feasible=true, grouped by readiness; expect 60 each",
+      "criticality": "headline"
+    },
+    {
+      "line": 79,
+      "anchor": "sec:cl-matrix",
+      "quote": "(the four burst windows pinned at the\\n\\SI{588}{\\milli\\second} service floor; the calm day 548--\\SI{734}{\\milli\\second})",
+      "numbers": [
+        "588",
+        "548",
+        "734"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "encoder pool, p90 rho=15, burst windows and calm day",
+      "assertion": "Burst windows pin at 588 ms encoder-delay p99 while the calm day spans 548-734 ms.",
+      "db_check": "provenance.factorial_cell p99_ms where quantile='p90', rho=15, window_name in burst1/3/4/5 (expect 588) and window_name='steady' (expect 548-734)",
+      "criticality": "headline"
+    },
+    {
+      "line": 83,
+      "anchor": "sec:cl-matrix",
+      "quote": "(adding\\np50, the reactive baseline, four capacity ratings, and a non-realizable\\n\\SI{300}{\\second} target-time lead; 560 target-time cells)",
+      "numbers": [
+        "300",
+        "560"
+      ],
+      "metric": "cells",
+      "subject": "exploratory target-time grid",
+      "assertion": "The exploratory target-time grid comprised 560 cells including a non-realizable 300 s lead.",
+      "db_check": "provenance.factorial_cell: count(*) where actuation='target_time'; expect 560",
+      "criticality": "supporting"
+    },
+    {
+      "line": 85,
+      "anchor": "sec:cl-matrix",
+      "quote": "the H=12 15-second\\narchive supplies at most $(12{-}1)\\times15 = \\SI{165}{\\second}$ of\\nforecast-issued lead",
+      "numbers": [
+        "12",
+        "15",
+        "12",
+        "1",
+        "15",
+        "165"
+      ],
+      "metric": "max_issued_lead_s",
+      "subject": "forecast archive horizon",
+      "assertion": "The H=12 15-second forecast archive supplies at most 165 s of forecast-issued lead.",
+      "db_check": "provenance.forecast_metrics: max(h)=12 at resolution='15s'; derived lead = (12-1)*15 = 165",
+      "criticality": "headline"
+    },
+    {
+      "line": 89,
+      "anchor": "sec:cl-matrix / tab:base-react-enc",
+      "quote": "the identically\\ninformed reactive controller loses burst3 at every lead and\\nburst4/5 beyond 45 seconds",
+      "numbers": [
+        "3",
+        "4",
+        "5",
+        "45"
+      ],
+      "metric": "feasible_count",
+      "subject": "reactive encoder controller",
+      "assertion": "The reactive controller fails burst3 at every lead and fails burst4/5 for leads beyond 45 s.",
+      "db_check": "provenance.factorial_cell where policy='reactive', pool='encoder': feasible=false for burst3 all lead_s; burst4/burst5 lead_s>45",
+      "criticality": "headline"
+    },
+    {
+      "line": 91,
+      "anchor": "sec:cl-matrix",
+      "quote": "the p90 schedule's p99 encoder delay is pinned at\\n\\SI{588}{\\milli\\second}, exactly the platform's zero-queueing\\nservice floor",
+      "numbers": [
+        "588"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "encoder pool, p90 forecast, burst windows",
+      "assertion": "The p90 schedule's encoder-delay p99 on burst windows is 588 ms, the zero-queueing service floor.",
+      "db_check": "provenance.encoder_run_summary encoder_delay_p99_ms where policy='forecast_p90', rho=15, window_name like 'burst%'",
+      "criticality": "headline"
+    },
+    {
+      "line": 93,
+      "anchor": "sec:cl-matrix",
+      "quote": "a full-batch forward ($f(64) =$\\n\\SI{316.4}{\\milli\\second}) plus the p99 handoff transfer\\n(\\SI{272}{\\milli\\second})",
+      "numbers": [
+        "64",
+        "316.4",
+        "272"
+      ],
+      "metric": "service_floor_components_ms",
+      "subject": "encoder service floor decomposition",
+      "assertion": "The 588 ms floor decomposes into a 316.4 ms full-batch (N=64) forward plus a 272 ms p99 handoff transfer.",
+      "db_check": "provenance.collector_fn: f(64)=316.4 ms for the AIC encoder model; handoff p99 from measured_request transfer column; 316.4+272=588.4",
+      "criticality": "headline"
+    },
+    {
+      "line": 101,
+      "anchor": "sec:cl-matrix (Quantile is the decisive dial)",
+      "quote": "at\\n$\\rho{=}15$ it clears only 23--24 of its 60 issue-time cells (24 under\\nthe warm-pool readiness model, 23 under strict re-warm)",
+      "numbers": [
+        "15",
+        "23",
+        "24",
+        "60",
+        "24",
+        "23"
+      ],
+      "metric": "feasible_count",
+      "subject": "encoder p50 forecast policy at rho=15",
+      "assertion": "The p50 policy clears only 24 of 60 cells warm-pool and 23 of 60 under strict re-warm.",
+      "db_check": "provenance.factorial_cell: count feasible=true where quantile='p50', rho=15, actuation='issue_time' grouped by readiness",
+      "criticality": "headline"
+    },
+    {
+      "line": 104,
+      "anchor": "sec:cl-matrix (Quantile is the decisive dial)",
+      "quote": "fails even\\nthe calm day (p99 \\SI{1073}{\\milli\\second} at every lead and model",
+      "numbers": [
+        "1073"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "encoder p50 forecast, calm day",
+      "assertion": "The p50 policy fails the calm day at encoder-delay p99 1073 ms at every lead and model.",
+      "db_check": "provenance.factorial_cell p99_ms where quantile='p50', rho=15, window_name='steady'; expect 1073 across lead_s and model",
+      "criticality": "headline"
+    },
+    {
+      "line": 107,
+      "anchor": "sec:cl-matrix (Quantile is the decisive dial)",
+      "quote": "(Chapter~\\ref{cap:predictors}: empirical coverage 0.88--0.90 at this\\ncadence)",
+      "numbers": [
+        "0.88",
+        "0.90"
+      ],
+      "metric": "quantile_coverage",
+      "subject": "p90 forecast band, 15-second cadence",
+      "assertion": "The calibrated p90 band achieves empirical coverage 0.88-0.90 at provisioning cadence.",
+      "db_check": "provenance.coverage table: empirical coverage for quantile='p90', resolution='15s'",
+      "criticality": "headline"
+    },
+    {
+      "line": 112,
+      "anchor": "sec:cl-matrix (Lead-invariance)",
+      "quote": "the p90 policy holds its\\nper-window p99 unchanged across leads from $L{=}15$ to \\SI{165}{\\second}",
+      "numbers": [
+        "15",
+        "165"
+      ],
+      "metric": "lead_invariance_s",
+      "subject": "encoder p90 policy across issued leads",
+      "assertion": "Per-window p99 is unchanged across issued leads from 15 to 165 s.",
+      "db_check": "provenance.factorial_cell: stddev(p99_ms) over lead_s for each window at quantile='p90', rho=15 should be 0",
+      "criticality": "headline"
+    },
+    {
+      "line": 114,
+      "anchor": "sec:cl-matrix (Lead-invariance)",
+      "quote": "at the \\SI{588}{\\milli\\second}\\nservice floor on every burst window and feasible (below\\n\\SI{734}{\\milli\\second}) on the calm day",
+      "numbers": [
+        "588",
+        "734"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "encoder p90 policy, burst windows and calm day",
+      "assertion": "p90 holds 588 ms on every burst window and stays below 734 ms on the calm day.",
+      "db_check": "provenance.factorial_cell p99_ms max over calm-day cells at quantile='p90', rho=15 <= 734",
+      "criticality": "supporting"
+    },
+    {
+      "line": 117,
+      "anchor": "sec:cl-matrix (Lead-invariance)",
+      "quote": "the\\nreactive twin degrades monotonically with\\nlead toward its never-scaled limit (burst3: 16{,}079 to\\n54{,}170\\,\\si{\\milli\\second})",
+      "numbers": [
+        "16079",
+        "54170"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "reactive encoder controller on burst3 across leads",
+      "assertion": "The reactive controller's burst3 p99 degrades from 16,079 ms to 54,170 ms as lead grows.",
+      "db_check": "provenance.factorial_cell p99_ms where policy='reactive', window_name='burst3' ordered by lead_s; expect min 16079 max 54170",
+      "criticality": "headline"
+    },
+    {
+      "line": 124,
+      "anchor": "sec:cl-matrix (Lead-invariance)",
+      "quote": "the\\nprovisioned \\emph{cost} is flat under the former and mildly\\nlead-dependent, 0.59--0.62$\\times$, under the latter",
+      "numbers": [
+        "0.59",
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "encoder p90 policy under strict re-warm readiness",
+      "assertion": "Under strict re-warm, provisioned cost is 0.59-0.62x static across leads.",
+      "db_check": "provenance.cost_accounting / v_cost_frontier_dual: provisioned_ws ratio vs static C=8 for readiness='strict_rewarm' across lead_s",
+      "criticality": "headline"
+    },
+    {
+      "line": 126,
+      "anchor": "sec:cl-matrix (Model choice is second-order)",
+      "quote": "All three foundation models pass\\nall 60 p90/$\\rho{15}$ cells",
+      "numbers": [
+        "3",
+        "60",
+        "15"
+      ],
+      "metric": "feasible_count",
+      "subject": "Chronos/Toto/TimesFM on the encoder factorial",
+      "assertion": "All three foundation models pass all 60 p90/rho=15 cells.",
+      "db_check": "provenance.factorial_cell: count feasible=true grouped by model where quantile='p90', rho=15; expect 20 each summing to 60",
+      "criticality": "headline"
+    },
+    {
+      "line": 132,
+      "anchor": "sec:cl-matrix (Model choice is second-order)",
+      "quote": "identical\\nserved-latency percentiles on the former, within \\SI{1}{\\milli\\second}\\nof mean TTFT on the latter, all failing together",
+      "numbers": [
+        "1"
+      ],
+      "metric": "mean_ttft_ms_spread",
+      "subject": "Dynamo shipped predictors (ARIMA, Kalman, Prophet)",
+      "assertion": "Swapping Dynamo's shipped predictors changes mean TTFT by under 1 ms and leaves the SLA verdict unchanged.",
+      "db_check": "provenance.llm_run_summary: compare p99_ttft_ms/mean across model in ('arima','kalman','prophet') on the same window",
+      "criticality": "supporting"
+    },
+    {
+      "line": 139,
+      "anchor": "sec:cl-matrix (Capacity rating)",
+      "quote": "At $\\rho \\in\\n\\{10,15,20\\}$ the p90 policy is \\emph{60/60} on the issue-time factorial\\nunder both readiness models",
+      "numbers": [
+        "10",
+        "15",
+        "20",
+        "60",
+        "60"
+      ],
+      "metric": "feasible_count",
+      "subject": "encoder p90 policy at rho 10/15/20",
+      "assertion": "At rho in {10,15,20} the p90 policy is 60/60 feasible under both readiness models.",
+      "db_check": "provenance.factorial_cell: count feasible=true grouped by rho where quantile='p90'; expect 60 for rho 10,15,20",
+      "criticality": "headline"
+    },
+    {
+      "line": 142,
+      "anchor": "sec:cl-matrix (Capacity rating)",
+      "quote": "(per-window p99 rises from the \\SI{588}{\\milli\\second} floor to\\n\\SI{746}{}/\\SI{860}{\\milli\\second} warm/strict at $\\rho{=}20$)",
+      "numbers": [
+        "588",
+        "746",
+        "860",
+        "20"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "encoder p90 policy at rho=20",
+      "assertion": "At rho=20 per-window p99 rises to 746 ms (warm) / 860 ms (strict) from the 588 ms floor.",
+      "db_check": "provenance.factorial_cell max(p99_ms) where quantile='p90', rho=20 grouped by readiness; expect 746 and 860",
+      "criticality": "supporting"
+    },
+    {
+      "line": 144,
+      "anchor": "sec:cl-matrix (Capacity rating)",
+      "quote": "only\\n$\\rho{=}25$ drops cells --- 9 of 60, all on burst5, the binding static\\nwindow, via backlog it never drains",
+      "numbers": [
+        "25",
+        "9",
+        "60",
+        "5"
+      ],
+      "metric": "infeasible_count",
+      "subject": "encoder p90 policy at rho=25",
+      "assertion": "At rho=25 the p90 policy drops 9 of 60 cells, all on burst5.",
+      "db_check": "provenance.v_infeasible / factorial_cell: count feasible=false where quantile='p90', rho=25; expect 9, all window_name='burst5'",
+      "criticality": "headline"
+    },
+    {
+      "line": 146,
+      "anchor": "sec:cl-matrix (Capacity rating)",
+      "quote": "The reactive policy, by contrast,\\nis insensitive to $\\rho$ (13--14 of 20 cells at every rating)",
+      "numbers": [
+        "13",
+        "14",
+        "20"
+      ],
+      "metric": "feasible_count",
+      "subject": "reactive encoder policy across capacity ratings",
+      "assertion": "The reactive policy passes 13-14 of 20 cells at every capacity rating.",
+      "db_check": "provenance.factorial_cell: count feasible=true where policy='reactive' grouped by rho; expect 13 or 14 out of 20",
+      "criticality": "supporting"
+    },
+    {
+      "line": 153,
+      "anchor": "sec:cl-matrix (Mechanism)",
+      "quote": "the p90\\nband crosses \\emph{ahead} of the observed rate on burst4 (by\\n\\SI{225}{\\second} at the \\SI{224}{img/s} one-minute-p99 threshold, a\\n\\SI{345}{\\second} usable issue-lead",
+      "numbers": [
+        "4",
+        "225",
+        "224",
+        "345"
+      ],
+      "metric": "detection_lead_s",
+      "subject": "p90 band as burst detector on burst4",
+      "assertion": "On burst4 the p90 band crosses 225 s ahead of the observed rate at a 224 img/s threshold, giving 345 s of usable issue-lead.",
+      "db_check": "UNVERIFIABLE from listed tables: detector-crossing analysis is a derived rider (riders44/ detection artifact), not a column in the provenance schema",
+      "criticality": "headline"
+    },
+    {
+      "line": 156,
+      "anchor": "sec:cl-matrix (Mechanism)",
+      "quote": "and still ahead at the tighter\\n\\SI{286}{img/s} 15-second-cadence threshold)",
+      "numbers": [
+        "286",
+        "15"
+      ],
+      "metric": "burst_threshold_img_s",
+      "subject": "15-second-cadence burst threshold",
+      "assertion": "At the tighter 286 img/s 15-second-cadence threshold the p90 band still crosses ahead on burst4.",
+      "db_check": "UNVERIFIABLE from listed tables: threshold-crossing rider artifact, no provenance column",
+      "criticality": "supporting"
+    },
+    {
+      "line": 157,
+      "anchor": "sec:cl-matrix (Mechanism)",
+      "quote": "on burst5 (by \\SI{105}{\\second}; under the tighter\\n15-second threshold burst5 lags)",
+      "numbers": [
+        "5",
+        "105",
+        "15"
+      ],
+      "metric": "detection_lead_s",
+      "subject": "p90 band as detector on burst5",
+      "assertion": "On burst5 the p90 band crosses 105 s ahead at the one-minute threshold but lags at the 15-second threshold.",
+      "db_check": "UNVERIFIABLE from listed tables: detector rider artifact",
+      "criticality": "supporting"
+    },
+    {
+      "line": 166,
+      "anchor": "sec:cl-matrix (Mechanism)",
+      "quote": "lifting provisioned capacity to ${\\approx}21$ workers, so capacity\\nis standing when the one-minute spike lands",
+      "numbers": [
+        "21"
+      ],
+      "metric": "provisioned_workers",
+      "subject": "p90 band standing headroom before burst3",
+      "assertion": "Graduated p90 headroom lifts provisioned capacity to about 21 workers before the burst3 spike.",
+      "db_check": "provenance.encoder_run_summary / schedule artifact: max worker count in the pre-onset interval for burst3 at quantile='p90', rho=15",
+      "criticality": "headline"
+    },
+    {
+      "line": 171,
+      "anchor": "sec:cl-matrix (Mechanism)",
+      "quote": "The point and p50 paths, sizing to the mean, detect the same\\nonsets 55 minutes to 4 hours late, or never",
+      "numbers": [
+        "55",
+        "4"
+      ],
+      "metric": "detection_lag",
+      "subject": "point and p50 forecast paths as detectors",
+      "assertion": "Point and p50 paths detect the same onsets 55 minutes to 4 hours late, or never.",
+      "db_check": "UNVERIFIABLE from listed tables: detector-lag rider artifact",
+      "criticality": "supporting"
+    },
+    {
+      "line": 172,
+      "anchor": "sec:cl-matrix (Mechanism)",
+      "quote": "the p90 band shows zero\\nfalse alarms across the calm day for every model",
+      "numbers": [
+        "0"
+      ],
+      "metric": "false_alarms",
+      "subject": "p90 band on calm day",
+      "assertion": "The p90 band produces zero false alarms across the calm day for every model.",
+      "db_check": "UNVERIFIABLE from listed tables: detector false-alarm count is a rider artifact",
+      "criticality": "supporting"
+    },
+    {
+      "line": 175,
+      "anchor": "sec:cl-matrix (Mechanism)",
+      "quote": "Counting\\nthreshold crossings over the \\emph{whole} 5.60-day span (outside the\\ntrue episodes), the p90 path crosses on 70--102 bins per day where the\\nobserved rate does not",
+      "numbers": [
+        "5.60",
+        "70",
+        "102"
+      ],
+      "metric": "false_crossings_per_day",
+      "subject": "p90 forecast path over the full span",
+      "assertion": "The p90 path crosses the threshold on 70-102 bins per day outside true episodes.",
+      "db_check": "UNVERIFIABLE from listed tables: crossing counts are a rider artifact, not a provenance column",
+      "criticality": "supporting"
+    },
+    {
+      "line": 178,
+      "anchor": "sec:cl-matrix (Mechanism)",
+      "quote": "while point and p50 cross essentially never\\n($\\leq$1 per day)",
+      "numbers": [
+        "1"
+      ],
+      "metric": "false_crossings_per_day",
+      "subject": "point and p50 paths",
+      "assertion": "Point and p50 paths cross the threshold at most once per day.",
+      "db_check": "UNVERIFIABLE from listed tables: rider artifact",
+      "criticality": "incidental"
+    },
+    {
+      "line": 181,
+      "anchor": "sec:cl-matrix (Mechanism)",
+      "quote": "the\\ncalibrated headroom (coverage 0.88--0.90, Chapter~\\ref{cap:predictors})",
+      "numbers": [
+        "0.88",
+        "0.90"
+      ],
+      "metric": "quantile_coverage",
+      "subject": "p90 band calibration",
+      "assertion": "The p90 band's empirical coverage is 0.88-0.90.",
+      "db_check": "provenance.coverage: empirical coverage for quantile='p90' at resolution='15s'",
+      "criticality": "supporting"
+    },
+    {
+      "line": 184,
+      "anchor": "sec:cl-matrix (Mechanism)",
+      "quote": "(the per-episode-clean band\\n$\\rho\\in\\{10,15,20\\}$ costs 0.48--0.89$\\times$ static)",
+      "numbers": [
+        "10",
+        "15",
+        "20",
+        "0.48",
+        "0.89"
+      ],
+      "metric": "cost_ratio",
+      "subject": "encoder p90 policy cost frontier over rho 10-20",
+      "assertion": "The per-episode-clean rho band {10,15,20} costs 0.48-0.89x the static fleet.",
+      "db_check": "provenance.v_cost_frontier_dual: provisioned_ws ratio vs static C=8 for rho in (10,15,20), quantile='p90'",
+      "criticality": "headline"
+    },
+    {
+      "line": 197,
+      "anchor": "sec:cl-matrix (Anticipation versus headroom)",
+      "quote": "the\\ntrailing-window p90 of the observed image rate (windows of 2--8\\,min) at\\nthe same $\\rho{=}15$ and lead",
+      "numbers": [
+        "2",
+        "8",
+        "15"
+      ],
+      "metric": "trailing_window_min",
+      "subject": "reactive-with-headroom controller",
+      "assertion": "The reactive-with-headroom controller uses trailing p90 windows of 2-8 minutes at rho=15.",
+      "db_check": "provenance.runs where policy='reactive_headroom': distinct trailing-window config values; expect 2..8 min",
+      "criticality": "supporting"
+    },
+    {
+      "line": 201,
+      "anchor": "sec:cl-matrix (Anticipation versus headroom)",
+      "quote": "on the one-minute onset (burst3)\\nit fails at every lead and window (p99 $1{,}973$--$11{,}568$\\,\\si{\\milli\\second}\\nagainst the forecast's \\SI{588}{\\milli\\second})",
+      "numbers": [
+        "3",
+        "1973",
+        "11568",
+        "588"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "reactive-with-headroom controller on burst3",
+      "assertion": "Reactive-with-headroom fails burst3 at every lead and window with p99 between 1,973 and 11,568 ms versus the forecast's 588 ms.",
+      "db_check": "provenance.encoder_run_summary encoder_delay_p99_ms where policy='reactive_headroom', window_name='burst3'; min 1973 max 11568",
+      "criticality": "headline"
+    },
+    {
+      "line": 203,
+      "anchor": "sec:cl-matrix (Anticipation versus headroom)",
+      "quote": "even though the headroom\\ncuts its p99 up to $8\\times$ below the point reactive",
+      "numbers": [
+        "8"
+      ],
+      "metric": "p99_reduction_factor",
+      "subject": "reactive-with-headroom vs point reactive on burst3",
+      "assertion": "Tail-aware headroom cuts the reactive p99 by up to 8x relative to the point reactive.",
+      "db_check": "provenance.encoder_run_summary: ratio of p99 for policy='reactive' over policy='reactive_headroom' at matched window/lead; max ~8",
+      "criticality": "supporting"
+    },
+    {
+      "line": 209,
+      "anchor": "sec:cl-matrix (Anticipation versus headroom)",
+      "quote": "genuine anticipatory lead is\\nmeasured only on the gradual onset (burst4, ${+}\\SI{345}{\\second}$)",
+      "numbers": [
+        "4",
+        "345"
+      ],
+      "metric": "detection_lead_s",
+      "subject": "burst4 anticipatory lead",
+      "assertion": "Genuine anticipatory lead of +345 s is measured only on burst4.",
+      "db_check": "UNVERIFIABLE from listed tables: detector rider artifact",
+      "criticality": "headline"
+    },
+    {
+      "line": 218,
+      "anchor": "sec:cl-matrix (cheap forward forecaster) / tab:cl-ewma",
+      "quote": "its p90 empirically calibrated\\non the 1.4-day forecast-context window to the same 0.88--0.90 coverage as the\\nfoundation-model band, by three standard schemes",
+      "numbers": [
+        "1.4",
+        "0.88",
+        "0.90",
+        "3"
+      ],
+      "metric": "quantile_coverage",
+      "subject": "forward EWMA p90 calibration",
+      "assertion": "The forward-EWMA p90 is calibrated on the 1.4-day context window to 0.88-0.90 coverage by three schemes.",
+      "db_check": "provenance.coverage where model='ewma': empirical coverage per calibration scheme; expect 0.88-0.90",
+      "criticality": "supporting"
+    },
+    {
+      "line": 223,
+      "anchor": "tab:cl-ewma",
+      "quote": "The two cheap calibrations clear the\\n\\emph{burst-masked} week aggregate (0.70$\\times$ and 0.56$\\times$, both at\\naggregate p99 \\SI{589}{\\milli\\second})",
+      "numbers": [
+        "0.70",
+        "0.56",
+        "589"
+      ],
+      "metric": "cost_ratio",
+      "subject": "EWMA additive-conformal and width-scaled calibrations, week aggregate",
+      "assertion": "The additive-conformal and width-scaled EWMA calibrations cost 0.70x and 0.56x static at aggregate p99 589 ms.",
+      "db_check": "provenance.cost_accounting + encoder_run_summary where model='ewma', mode in ('add_conformal','width_scaled'), window_name='week'",
+      "criticality": "supporting"
+    },
+    {
+      "line": 224,
+      "anchor": "tab:cl-ewma",
+      "quote": "but \\emph{fail} the fast onset (burst3\\np99 1{,}285 and 2{,}084\\,\\si{\\milli\\second})",
+      "numbers": [
+        "3",
+        "1285",
+        "2084"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "EWMA add-conformal and width-scaled on burst3",
+      "assertion": "The two cheap EWMA calibrations fail burst3 at p99 1,285 ms and 2,084 ms.",
+      "db_check": "provenance.encoder_run_summary encoder_delay_p99_ms where model='ewma', window_name='burst3'",
+      "criticality": "headline"
+    },
+    {
+      "line": 226,
+      "anchor": "tab:cl-ewma",
+      "quote": "and the high-volume onset\\n(burst5, backlog-divergent) under per-episode grading",
+      "numbers": [
+        "5"
+      ],
+      "metric": "queue_divergent",
+      "subject": "EWMA cheap calibrations on burst5",
+      "assertion": "The two cheap EWMA calibrations are backlog-divergent on burst5.",
+      "db_check": "provenance.encoder_run_summary queue_divergent=true where model='ewma', window_name='burst5'",
+      "criticality": "supporting"
+    },
+    {
+      "line": 229,
+      "anchor": "tab:cl-ewma",
+      "quote": "The one calibration that clears every episode\\n(multiplicative, burst3 \\SI{747}{\\milli\\second}) over-provisions moderate\\nactivity and costs 1.09$\\times$ static",
+      "numbers": [
+        "3",
+        "747",
+        "1.09"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "EWMA multiplicative-conformal calibration",
+      "assertion": "The multiplicative EWMA calibration clears every episode (burst3 747 ms) but costs 1.09x static.",
+      "db_check": "provenance.encoder_run_summary + cost_accounting where model='ewma', mode='mult_conformal'",
+      "criticality": "headline"
+    },
+    {
+      "line": 231,
+      "anchor": "tab:cl-ewma",
+      "quote": "($\\rho$-frontier 1.32/1.09/0.94/0.83$\\times$\\nat $\\rho\\in\\{10,15,20,25\\}$)",
+      "numbers": [
+        "1.32",
+        "1.09",
+        "0.94",
+        "0.83",
+        "10",
+        "15",
+        "20",
+        "25"
+      ],
+      "metric": "cost_ratio",
+      "subject": "EWMA multiplicative calibration rho-frontier",
+      "assertion": "The multiplicative EWMA rho-frontier is 1.32/1.09/0.94/0.83x at rho 10/15/20/25.",
+      "db_check": "provenance.v_cost_frontier_dual where model='ewma', mode='mult_conformal' grouped by rho",
+      "criticality": "supporting"
+    },
+    {
+      "line": 234,
+      "anchor": "tab:cl-ewma",
+      "quote": "Only the zero-shot foundation-model band clears every\\nepisode \\emph{and} beats static (0.62$\\times$)",
+      "numbers": [
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "foundation-model p90 policy, week aggregate",
+      "assertion": "Only the foundation-model band clears every episode and beats static at 0.62x.",
+      "db_check": "provenance.v_closedloop_frontier / cost_accounting: provisioned_ws ratio for quantile='p90', rho=15, model='chronos2' vs static C=8",
+      "criticality": "headline"
+    },
+    {
+      "line": 241,
+      "anchor": "tab:cl-ewma",
+      "quote": "The Chronos control reproduces the\\ncommitted figures to the digit throughout (burst3 \\SI{589}{\\milli\\second};\\nweek 0.62$\\times$; $\\rho$-frontier 0.89/0.62/0.48/0.40$\\times$; the p50 arm\\nfails at \\SI{2759}{\\milli\\second}/0.25$\\times$",
+      "numbers": [
+        "3",
+        "589",
+        "0.62",
+        "0.89",
+        "0.62",
+        "0.48",
+        "0.40",
+        "2759",
+        "0.25"
+      ],
+      "metric": "cost_ratio",
+      "subject": "Chronos control arm in the EWMA sweep",
+      "assertion": "The Chronos control reproduces burst3 589 ms, week 0.62x, rho-frontier 0.89/0.62/0.48/0.40x, and p50 failing at 2759 ms / 0.25x.",
+      "db_check": "provenance.v_cost_frontier_dual and encoder_run_summary for model='chronos2'; cross-check against verification/results/ewma_sweep.json",
+      "criticality": "headline"
+    },
+    {
+      "line": 249,
+      "anchor": "tab:cl-ewma caption",
+      "quote": "through the \\emph{identical} encoder loop ($\\rho{=}15$, issue-time actuation,\\nwarm-pool; each EWMA p90 calibrated on the 1.4-day context to 0.88--0.90\\ncoverage)",
+      "numbers": [
+        "15",
+        "1.4",
+        "0.88",
+        "0.90"
+      ],
+      "metric": "experiment_config",
+      "subject": "tab:cl-ewma experimental configuration",
+      "assertion": "All EWMA-vs-foundation comparisons run at rho=15, issue-time actuation, warm-pool, with p90 calibrated to 0.88-0.90 coverage.",
+      "db_check": "provenance.runs where experiment='ewma_sweep': rho=15, actuation='issue_time', readiness='warm_pool'",
+      "criticality": "incidental"
+    },
+    {
+      "line": 252,
+      "anchor": "tab:cl-ewma caption",
+      "quote": "Per-window encoder-delay p99 is lead-invariant over\\n$L\\in\\{15,\\ldots,165\\}$\\,s; ``agg'' is the week-scale cost versus the\\ndeployable static $C{=}8$ fleet.",
+      "numbers": [
+        "15",
+        "165",
+        "8"
+      ],
+      "metric": "lead_invariance_s",
+      "subject": "tab:cl-ewma columns",
+      "assertion": "Table p99 values are lead-invariant over L=15..165 s and 'agg' is cost versus the static C=8 fleet.",
+      "db_check": "provenance.runs: config_c=8 static baseline; factorial_cell stddev(p99_ms) over lead_s = 0",
+      "criticality": "incidental"
+    },
+    {
+      "line": 254,
+      "anchor": "tab:cl-ewma caption",
+      "quote": "\\emph{Every} policy clears the aggregate p99\\nat the \\SI{589}{\\milli\\second} service floor",
+      "numbers": [
+        "589"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "week aggregate across EWMA and foundation policies",
+      "assertion": "Every policy in the EWMA table clears the aggregate p99 at the 589 ms service floor.",
+      "db_check": "provenance.encoder_run_summary aggregate encoder_delay_p99_ms for all rows of experiment='ewma_sweep', window_name='week'",
+      "criticality": "supporting"
+    },
+    {
+      "line": 265,
+      "anchor": "tab:cl-ewma row Foundation (Chronos)",
+      "quote": "Foundation (Chronos)  & 589 & 589             & 589 & 589            & 681 & 0.62 & \\textbf{pass all}",
+      "numbers": [
+        "589",
+        "589",
+        "589",
+        "589",
+        "681",
+        "0.62"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "Chronos foundation policy across burst1/3/4/5, steady, and week aggregate",
+      "assertion": "The Chronos foundation policy yields 589 ms on all four bursts, 681 ms on steady, and 0.62x static cost, passing all episodes.",
+      "db_check": "provenance.encoder_run_summary joined runs where model='chronos2', quantile='p90', rho=15 per window_name; cost_accounting for the ratio",
+      "criticality": "headline"
+    },
+    {
+      "line": 266,
+      "anchor": "tab:cl-ewma row EWMA add-conformal",
+      "quote": "EWMA, add-conformal   & 658 & \\textbf{1{,}285}& 589 & div$^\\dagger$  & 418 & 0.70 & fail b3,\\,b5",
+      "numbers": [
+        "658",
+        "1285",
+        "589",
+        "418",
+        "0.70"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "EWMA additive-conformal policy per window",
+      "assertion": "EWMA add-conformal gives 658/1,285/589/divergent/418 ms on burst1/3/4/5/steady at 0.70x cost, failing b3 and b5.",
+      "db_check": "provenance.encoder_run_summary where model='ewma', mode='add_conformal' per window_name; queue_divergent for burst5",
+      "criticality": "supporting"
+    },
+    {
+      "line": 267,
+      "anchor": "tab:cl-ewma row EWMA mult-conformal",
+      "quote": "EWMA, mult-conformal  & 589 & 747             & 589 & 589            & 418 & 1.09 & pass all",
+      "numbers": [
+        "589",
+        "747",
+        "589",
+        "589",
+        "418",
+        "1.09"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "EWMA multiplicative-conformal policy per window",
+      "assertion": "EWMA mult-conformal gives 589/747/589/589/418 ms and costs 1.09x static, passing all episodes.",
+      "db_check": "provenance.encoder_run_summary where model='ewma', mode='mult_conformal' per window_name",
+      "criticality": "supporting"
+    },
+    {
+      "line": 268,
+      "anchor": "tab:cl-ewma row EWMA width-scaled",
+      "quote": "EWMA, width-scaled    & 611 & \\textbf{2{,}084}& 589 & div$^\\dagger$  & 736 & 0.56 & fail b3,\\,b5",
+      "numbers": [
+        "611",
+        "2084",
+        "589",
+        "736",
+        "0.56"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "EWMA width-scaled policy per window",
+      "assertion": "EWMA width-scaled gives 611/2,084/589/divergent/736 ms at 0.56x cost, failing b3 and b5.",
+      "db_check": "provenance.encoder_run_summary where model='ewma', mode='width_scaled' per window_name",
+      "criticality": "supporting"
+    },
+    {
+      "line": 281,
+      "anchor": "sec:cl-llm",
+      "quote": "replicas subject to realistic startup leads of 60--300 seconds, the\\npolicy passes the burst window at every lead",
+      "numbers": [
+        "60",
+        "300"
+      ],
+      "metric": "replica_lead_s",
+      "subject": "language pool replica startup leads",
+      "assertion": "The language-pool policy passes the burst window at every replica startup lead from 60 to 300 s.",
+      "db_check": "provenance.runs where pool='language': distinct lead_s in (60,...,300); llm_run_summary feasibility per lead",
+      "criticality": "headline"
+    },
+    {
+      "line": 282,
+      "anchor": "sec:cl-llm",
+      "quote": "(TTFT p99 736--757\\,\\si{\\milli\\second}, ITL p99\\n${\\approx}$\\SI{6.5}{\\milli\\second}, versus\\n\\SI{751}{\\milli\\second} with instant workers)",
+      "numbers": [
+        "736",
+        "757",
+        "6.5",
+        "751"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool p90 forecast on burst window across leads",
+      "assertion": "Across replica leads the language policy holds TTFT p99 736-757 ms and ITL p99 about 6.5 ms, versus 751 ms with instant workers.",
+      "db_check": "provenance.llm_run_summary p99_ttft_ms, p99_itl_ms where pool='language', policy='forecast_p90', window_name='burst1' across lead_s",
+      "criticality": "headline"
+    },
+    {
+      "line": 293,
+      "anchor": "sec:cl-llm",
+      "quote": "reads a \\emph{single} 15-second forecast bin per planner\\ntick --- the bin at tick index $4t$, its value pre-scaled to the tick's\\n60-second rate --- and steps four bins (one minute) per tick",
+      "numbers": [
+        "15",
+        "4",
+        "60",
+        "4",
+        "1"
+      ],
+      "metric": "forecast_hook_cadence",
+      "subject": "language-pool forecast hook sampling",
+      "assertion": "The language forecast hook samples one 15-second bin per 60-second planner tick, stepping four bins per tick.",
+      "db_check": "UNVERIFIABLE: implementation detail of the planner hook, not a measured artifact column",
+      "criticality": "incidental"
+    },
+    {
+      "line": 309,
+      "anchor": "tab:cl-triad caption",
+      "quote": "The two ingredients, separated (burst1, replica lead\\n\\SI{60}{\\second})",
+      "numbers": [
+        "1",
+        "60"
+      ],
+      "metric": "replica_lead_s",
+      "subject": "tab:cl-triad experiment configuration",
+      "assertion": "The triad comparison is run on burst1 at a 60-second replica lead.",
+      "db_check": "provenance.runs where experiment='cl_triad': window_name='burst1', lead_s=60",
+      "criticality": "incidental"
+    },
+    {
+      "line": 318,
+      "anchor": "tab:cl-triad row Reactive",
+      "quote": "Reactive planner (best ladder point) & 1{,}615.5 & 125.1 & FAIL",
+      "numbers": [
+        "1615.5",
+        "125.1"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "reactive planner on burst1 at 60 s lead",
+      "assertion": "The reactive planner's best ladder point fails with TTFT p99 1,615.5 ms and ITL p99 125.1 ms.",
+      "db_check": "provenance.llm_run_summary p99_ttft_ms=1615.5, p99_itl_ms=125.1 where policy='reactive', window_name='burst1', lead_s=60",
+      "criticality": "headline"
+    },
+    {
+      "line": 319,
+      "anchor": "tab:cl-triad row Forecast mean-based",
+      "quote": "Forecast, mean-based conversion & 1{,}716.6 & 126.8 & FAIL",
+      "numbers": [
+        "1716.6",
+        "126.8"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "forecast with mean-based conversion on burst1",
+      "assertion": "The forecast with mean-based conversion fails at TTFT p99 1,716.6 ms and ITL p99 126.8 ms.",
+      "db_check": "provenance.llm_run_summary where policy='forecast_mean_conv', window_name='burst1', lead_s=60",
+      "criticality": "headline"
+    },
+    {
+      "line": 320,
+      "anchor": "tab:cl-triad row Forecast tail-aware",
+      "quote": "Forecast, tail-aware conversion & 736.3 & 6.3 & PASS",
+      "numbers": [
+        "736.3",
+        "6.3"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "forecast with tail-aware conversion on burst1",
+      "assertion": "The forecast with tail-aware conversion passes at TTFT p99 736.3 ms and ITL p99 6.3 ms.",
+      "db_check": "provenance.llm_run_summary where policy='forecast_p90_tailaware', window_name='burst1', lead_s=60",
+      "criticality": "headline"
+    },
+    {
+      "line": 328,
+      "anchor": "sec:cl-llm",
+      "quote": "its belief\\nabout per-replica throughput (measured in-loop: median\\n\\SI{10.07}{req/s} per TP2 replica)",
+      "numbers": [
+        "10.07",
+        "2"
+      ],
+      "metric": "planner_belief_req_s",
+      "subject": "Dynamo planner per-replica throughput belief, TP2",
+      "assertion": "The planner's in-loop measured belief about per-replica throughput is a median 10.07 req/s per TP2 replica.",
+      "db_check": "provenance.llm_run_summary / measured_request: median served rate per replica where tp=2",
+      "criticality": "headline"
+    },
+    {
+      "line": 331,
+      "anchor": "sec:cl-llm",
+      "quote": "(\\SI{1.62}{req/s} on burst1's mix; bracketed in $[1.26, 1.44]$ on\\nburst4, the binding mix)",
+      "numbers": [
+        "1.62",
+        "1",
+        "1.26",
+        "1.44",
+        "4"
+      ],
+      "metric": "tail_knee_req_s",
+      "subject": "measured tail knee r_tail on burst1 and burst4",
+      "assertion": "The measured tail knee is 1.62 req/s on burst1's mix and bracketed in [1.26, 1.44] on burst4.",
+      "db_check": "provenance.llm_run_summary: largest offered rate with p99_ttft_ms under SLA, per window_name; derived knee",
+      "criticality": "headline"
+    },
+    {
+      "line": 335,
+      "anchor": "sec:cl-llm",
+      "quote": "validation flips exactly at the\\nformula's boundary on both windows tested (burst1: scale 4.64 fails,\\n6.22 passes at $-16\\%$ GPU-hours versus the conservative setting;\\nburst4: 6.22 fails, 7.0 passes)",
+      "numbers": [
+        "1",
+        "4.64",
+        "6.22",
+        "16",
+        "4",
+        "6.22",
+        "7.0"
+      ],
+      "metric": "conversion_scale_factor",
+      "subject": "tail-aware conversion scale validation on burst1 and burst4",
+      "assertion": "Conversion-scale validation flips at the formula boundary: burst1 4.64 fails / 6.22 passes at -16% GPU-hours; burst4 6.22 fails / 7.0 passes.",
+      "db_check": "provenance.llm_run_summary + gpu_hours where experiment='knee_validation' grouped by scale factor and window_name",
+      "criticality": "headline"
+    },
+    {
+      "line": 337,
+      "anchor": "sec:cl-llm",
+      "quote": "A ${\\approx}14\\%$ margin above the\\nbinding knee is retained as policy",
+      "numbers": [
+        "14"
+      ],
+      "metric": "policy_margin_pct",
+      "subject": "tail-aware conversion policy margin",
+      "assertion": "A margin of about 14% above the binding knee is retained as policy.",
+      "db_check": "Derived: compare adopted scale (7.0) against binding knee bracket upper end on burst4; check provenance.runs config metadata",
+      "criticality": "supporting"
+    },
+    {
+      "line": 339,
+      "anchor": "sec:cl-llm",
+      "quote": "planner-in-loop replays show ${\\approx}4\\%$ p99 run\\nnoise",
+      "numbers": [
+        "4"
+      ],
+      "metric": "p99_run_noise_pct",
+      "subject": "planner-in-loop replay reproducibility",
+      "assertion": "Planner-in-loop replays show approximately 4% p99 run noise.",
+      "db_check": "provenance.llm_run_summary: stddev/mean of p99_ttft_ms over repeated runs with identical config in runs (is_current variants)",
+      "criticality": "supporting"
+    },
+    {
+      "line": 342,
+      "anchor": "sec:cl-llm",
+      "quote": "The language-side saving is cross-window (TP1$\\times$2 on\\ncalm traffic, half the burst fleet's GPUs)",
+      "numbers": [
+        "1",
+        "2",
+        "2"
+      ],
+      "metric": "gpu_count_ratio",
+      "subject": "language pool calm-traffic fleet",
+      "assertion": "On calm traffic the language pool runs TP1x2, half the burst fleet's GPUs.",
+      "db_check": "provenance.runs: tp and n_replicas for pool='language', window_name='steady' vs burst windows; gpu count = tp*n_replicas",
+      "criticality": "supporting"
+    },
+    {
+      "line": 348,
+      "anchor": "sec:cl-llm (quantile dial)",
+      "quote": "Replaying burst3 end-to-end (60-second replica lead, tail-aware\\nconversion throughout)",
+      "numbers": [
+        "3",
+        "60"
+      ],
+      "metric": "replica_lead_s",
+      "subject": "burst3 language replay configuration",
+      "assertion": "The burst3 language-pool replay uses a 60-second replica lead with tail-aware conversion.",
+      "db_check": "provenance.runs where pool='language', window_name='burst3', lead_s=60",
+      "criticality": "incidental"
+    },
+    {
+      "line": 350,
+      "anchor": "sec:cl-llm (quantile dial)",
+      "quote": "reactive fails at TTFT p99\\n3{,}495\\,\\si{\\milli\\second}; the p50 forecast fails at\\n2{,}164\\,\\si{\\milli\\second}",
+      "numbers": [
+        "3495",
+        "2164"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool burst3, reactive and p50 forecast",
+      "assertion": "On burst3 the reactive planner fails at TTFT p99 3,495 ms and the p50 forecast at 2,164 ms.",
+      "db_check": "provenance.llm_run_summary p99_ttft_ms where window_name='burst3', policy in ('reactive','forecast_p50'), lead_s=60",
+      "criticality": "headline"
+    },
+    {
+      "line": 356,
+      "anchor": "sec:cl-llm (quantile dial)",
+      "quote": "and the p90 forecast passes at \\SI{651}{\\milli\\second}",
+      "numbers": [
+        "651"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool burst3, p90 forecast",
+      "assertion": "The p90 forecast passes burst3 at TTFT p99 651 ms.",
+      "db_check": "provenance.llm_run_summary p99_ttft_ms where window_name='burst3', policy='forecast_p90', lead_s=60",
+      "criticality": "headline"
+    },
+    {
+      "line": 364,
+      "anchor": "sec:cl-llm (quantile dial)",
+      "quote": "the p90 forecast passes each one at the service floor\\n(TTFT p99 651--706\\,\\si{\\milli\\second} across onsets of 1--220 minutes)\\nwhile the reactive planner fails all four\\n(1{,}615--3{,}495\\,\\si{\\milli\\second})",
+      "numbers": [
+        "651",
+        "706",
+        "1",
+        "220",
+        "1615",
+        "3495"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool, all four burst episodes",
+      "assertion": "Across all four burst episodes the p90 forecast passes at TTFT p99 651-706 ms while the reactive planner fails at 1,615-3,495 ms.",
+      "db_check": "provenance.llm_run_summary p99_ttft_ms grouped by window_name and policy for pool='language', burst windows",
+      "criticality": "headline"
+    },
+    {
+      "line": 369,
+      "anchor": "sec:cl-llm (week scale)",
+      "quote": "In a continuous replay of\\nthe full 5.60-day evaluation span through the planner (the composed\\ntrace under the winning encoder schedule, 60-second replica lead)",
+      "numbers": [
+        "5.60",
+        "60"
+      ],
+      "metric": "eval_span_days",
+      "subject": "language pool week-scale replay",
+      "assertion": "The language week-scale replay covers the full 5.60-day span at a 60-second replica lead.",
+      "db_check": "provenance.runs where pool='language', window_name='week', lead_s=60",
+      "criticality": "supporting"
+    },
+    {
+      "line": 371,
+      "anchor": "sec:cl-llm (week scale)",
+      "quote": "the p90-forecast policy \\textbf{passes the week} at TTFT p99\\n\\SI{651}{\\milli\\second}\\n(ITL p99 \\SI{6.4}{\\milli\\second}) for 518.6 H100 GPU-hours",
+      "numbers": [
+        "651",
+        "6.4",
+        "518.6"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool p90 forecast, week scale",
+      "assertion": "The p90-forecast policy passes the week at TTFT p99 651 ms, ITL p99 6.4 ms, for 518.6 H100 GPU-hours.",
+      "db_check": "provenance.llm_run_summary p99_ttft_ms, p99_itl_ms, gpu_hours where pool='language', policy='forecast_p90', window_name='week'",
+      "criticality": "headline"
+    },
+    {
+      "line": 374,
+      "anchor": "sec:cl-llm (week scale)",
+      "quote": "slightly\\nbelow the burst-sized static TP2$\\times$2 fleet's 537.4 for the same\\nspan (0.96$\\times$)",
+      "numbers": [
+        "2",
+        "2",
+        "537.4",
+        "0.96"
+      ],
+      "metric": "gpu_hours",
+      "subject": "static TP2x2 language fleet, week scale",
+      "assertion": "The static TP2x2 language fleet consumes 537.4 GPU-hours over the same span, making the forecast policy 0.96x.",
+      "db_check": "provenance.llm_run_summary gpu_hours where policy='static', tp=2, n_replicas=2, window_name='week'; ratio 518.6/537.4",
+      "criticality": "headline"
+    },
+    {
+      "line": 379,
+      "anchor": "sec:cl-llm (week scale)",
+      "quote": "replacing Chronos with Toto or TimesFM holds\\nthe tail at the identical \\SI{651}{\\milli\\second} (both pass), shifting\\nonly the provisioning cost (625 and 641 versus 518.6 GPU-hours ---\\n1.16$\\times$ and 1.19$\\times$",
+      "numbers": [
+        "651",
+        "625",
+        "641",
+        "518.6",
+        "1.16",
+        "1.19"
+      ],
+      "metric": "gpu_hours",
+      "subject": "Toto and TimesFM language week-scale runs",
+      "assertion": "Toto and TimesFM hold the week tail at 651 ms while costing 625 and 641 GPU-hours (1.16x and 1.19x the burst-static fleet) versus Chronos's 518.6.",
+      "db_check": "provenance.llm_run_summary gpu_hours and p99_ttft_ms where pool='language', window_name='week', model in ('toto','timesfm')",
+      "criticality": "headline"
+    },
+    {
+      "line": 385,
+      "anchor": "sec:cl-llm (week scale)",
+      "quote": "The reactive planner \\textbf{fails the\\nweek outright} (TTFT p99 1{,}197\\,\\si{\\milli\\second}) while spending\\n281.8 GPU-hours",
+      "numbers": [
+        "1197",
+        "281.8"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "reactive planner, week scale",
+      "assertion": "The reactive planner fails the week at TTFT p99 1,197 ms while spending 281.8 GPU-hours.",
+      "db_check": "provenance.llm_run_summary where pool='language', policy='reactive', window_name='week'",
+      "criticality": "headline"
+    },
+    {
+      "line": 391,
+      "anchor": "sec:cl-llm (week scale)",
+      "quote": "The p50 forecast also \\textbf{passes the week}\\non the language pool (TTFT p99 \\SI{828}{\\milli\\second}, for 319.9\\nGPU-hours: 38\\% cheaper than p90",
+      "numbers": [
+        "828",
+        "319.9",
+        "38"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "language pool p50 forecast, week scale",
+      "assertion": "The p50 forecast passes the language week at TTFT p99 828 ms for 319.9 GPU-hours, 38% cheaper than p90.",
+      "db_check": "provenance.llm_run_summary where pool='language', quantile='p50', window_name='week'; 1-319.9/518.6 = 38%",
+      "criticality": "headline"
+    },
+    {
+      "line": 393,
+      "anchor": "sec:cl-llm (week scale)",
+      "quote": "whereas on the encoder pool p50 fails every one of its 48\\nweek-scale cells",
+      "numbers": [
+        "48"
+      ],
+      "metric": "infeasible_count",
+      "subject": "encoder p50 policy, week-scale sweep",
+      "assertion": "On the encoder pool the p50 policy fails all 48 of its week-scale cells.",
+      "db_check": "provenance.factorial_cell / v_infeasible: count where quantile='p50', pool='encoder', window_name='week'; expect 48 all feasible=false",
+      "criticality": "headline"
+    },
+    {
+      "line": 411,
+      "anchor": "fig:cl-framework-diff caption (a)",
+      "quote": "the foundation models (blue) and Dynamo's shipped\\npredictors (yellow: ARIMA, Prophet, Kalman) cluster within\\n$0.02$ WAPE, and ARIMA ties Chronos",
+      "numbers": [
+        "0.02"
+      ],
+      "metric": "wape",
+      "subject": "forecast accuracy on the image signal at provisioning cadence",
+      "assertion": "Foundation models and Dynamo's shipped predictors cluster within 0.02 WAPE, with ARIMA tying Chronos.",
+      "db_check": "provenance.forecast_metrics wape where variate='image_rate', resolution='15s'; max-min across models <= 0.02",
+      "criticality": "headline"
+    },
+    {
+      "line": 415,
+      "anchor": "fig:cl-framework-diff caption (b)",
+      "quote": "Dynamo's\\nshipped predictors (\\SI{3{,}495}{\\milli\\second}, forecaster-invariant)\\nand the forecast at the median quantile\\n(\\SI{2{,}164}{\\milli\\second}) alike, while only the p90 forecast\\n\\emph{with a tail-aware conversion} passes (\\SI{651}{\\milli\\second})",
+      "numbers": [
+        "3495",
+        "2164",
+        "651"
+      ],
+      "metric": "p99_ttft_ms",
+      "subject": "burst3 closed loop, three policies",
+      "assertion": "On burst3, shipped predictors fail at 3,495 ms and p50 at 2,164 ms while p90 with tail-aware conversion passes at 651 ms.",
+      "db_check": "provenance.llm_run_summary p99_ttft_ms where window_name='burst3' grouped by policy/model",
+      "criticality": "headline"
+    },
+    {
+      "line": 421,
+      "anchor": "fig:cl-framework-diff caption (c)",
+      "quote": "both policies' online TTFT tails track their offline twins\\ndirectionally, within 1.1--6.8\\%",
+      "numbers": [
+        "1.1",
+        "6.8"
+      ],
+      "metric": "online_offline_delta_pct",
+      "subject": "live Dynamo runtime validation vs offline replay",
+      "assertion": "Online TTFT tails track their offline twins within 1.1-6.8%.",
+      "db_check": "provenance.v_corroboration: relative delta between live and simulated p99_ttft_ms per policy",
+      "criticality": "headline"
+    },
+    {
+      "line": 430,
+      "anchor": "sec:cl-aggregate",
+      "quote": "over the full\\nforecast-covered span (5.60 continuous days, 749{,}601 requests,\\n11.4M images, containing four of the six burst episodes and the calm\\nday)",
+      "numbers": [
+        "5.60",
+        "749601",
+        "11.4",
+        "4",
+        "6"
+      ],
+      "metric": "requests",
+      "subject": "week-scale covered span",
+      "assertion": "The covered span is 5.60 continuous days with 749,601 requests and 11.4M images, containing four of six burst episodes and the calm day.",
+      "db_check": "provenance.coverage_meta / measured_request: count(*) over the covered span = 749,601; sum(images) = 11.4M",
+      "criticality": "headline"
+    },
+    {
+      "line": 437,
+      "anchor": "tab:cl-aggregate caption",
+      "quote": "Week-scale aggregate (5.60-day covered span, 749{,}601\\nrequests)",
+      "numbers": [
+        "5.60",
+        "749601"
+      ],
+      "metric": "requests",
+      "subject": "tab:cl-aggregate span",
+      "assertion": "The week-scale aggregate table covers a 5.60-day span with 749,601 requests.",
+      "db_check": "provenance.coverage_meta for the aggregate run; completed_requests in encoder/llm run summary",
+      "criticality": "supporting"
+    },
+    {
+      "line": 440,
+      "anchor": "tab:cl-aggregate caption",
+      "quote": "(the aggregate p99 alone can mask sub-1\\% episodes). Forecast policies\\nuse Chronos-2 at $\\rho{=}15$",
+      "numbers": [
+        "1",
+        "2",
+        "15"
+      ],
+      "metric": "episode_share_pct",
+      "subject": "aggregate masking and table configuration",
+      "assertion": "The aggregate p99 can mask episodes making up under 1% of the span; forecast rows use Chronos-2 at rho=15.",
+      "db_check": "provenance.runs where model='chronos2', rho=15; episode request share from measured_request grouped by window",
+      "criticality": "supporting"
+    },
+    {
+      "line": 443,
+      "anchor": "tab:cl-aggregate caption",
+      "quote": "(each 180-second\\ntile's 12-step forecast is ordered at its origin, honouring\\nissue~$\\le$~decision)",
+      "numbers": [
+        "180",
+        "12"
+      ],
+      "metric": "forecast_tile_s",
+      "subject": "issue-time actuation protocol",
+      "assertion": "Each 180-second tile carries a 12-step forecast ordered at its origin.",
+      "db_check": "provenance.forecast_metrics: h up to 12 at resolution='15s' (12*15=180 s tile)",
+      "criticality": "incidental"
+    },
+    {
+      "line": 446,
+      "anchor": "tab:cl-aggregate caption",
+      "quote": "is\\nlead-invariant across the archive's realizable 15--\\SI{165}{\\second}\\nissued-lead range (2.41M at both ends; 0.59--0.62$\\times$ under strict\\nre-warm, see text)",
+      "numbers": [
+        "15",
+        "165",
+        "2.41",
+        "0.59",
+        "0.62"
+      ],
+      "metric": "provisioned_ws",
+      "subject": "encoder p90 provisioned worker-time across issued leads",
+      "assertion": "Provisioned worker-time is 2.41M at both ends of the 15-165 s issued-lead range, and 0.59-0.62x under strict re-warm.",
+      "db_check": "provenance.cost_accounting provisioned_ws where quantile='p90', rho=15, actuation='issue_time', lead_s in (15,165); expect 2.41e6",
+      "criticality": "headline"
+    },
+    {
+      "line": 450,
+      "anchor": "tab:cl-aggregate caption",
+      "quote": "is an\\noptimistic bound, cheaper at longer, less-realizable leads (2.38M at\\n$L{=}30$ down to 2.12M at the non-realizable $L{=}300$)",
+      "numbers": [
+        "2.38",
+        "30",
+        "2.12",
+        "300"
+      ],
+      "metric": "provisioned_ws",
+      "subject": "target-time indexed encoder schedule",
+      "assertion": "Target-time indexing yields 2.38M worker-seconds at L=30 falling to 2.12M at L=300.",
+      "db_check": "provenance.cost_accounting provisioned_ws where actuation='target_time', quantile='p90', rho=15, lead_s in (30,300)",
+      "criticality": "supporting"
+    },
+    {
+      "line": 452,
+      "anchor": "tab:cl-aggregate caption",
+      "quote": "The three\\nrows reading \\SI{588}{\\milli\\second} are distinct runs (their\\nworker-time and worst-case delay differ) that coincide at the\\nzero-queueing service floor",
+      "numbers": [
+        "3",
+        "588"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "tab:cl-aggregate rows at the service floor",
+      "assertion": "Three distinct runs coincide at the 588 ms zero-queueing service floor.",
+      "db_check": "provenance.encoder_run_summary: three distinct run_ids with encoder_delay_p99_ms=588 but differing provisioned_worker_seconds",
+      "criticality": "supporting"
+    },
+    {
+      "line": 454,
+      "anchor": "tab:cl-aggregate caption",
+      "quote": "a full-batch forward\\n($f(64)=\\SI{316.4}{\\milli\\second}$) plus the p99 handoff\\n(\\SI{272}{\\milli\\second})",
+      "numbers": [
+        "64",
+        "316.4",
+        "272"
+      ],
+      "metric": "service_floor_components_ms",
+      "subject": "service floor decomposition (repeat)",
+      "assertion": "The service floor is f(64)=316.4 ms plus a 272 ms p99 handoff.",
+      "db_check": "provenance.collector_fn f(64) for the encoder model; 316.4+272=588.4",
+      "criticality": "supporting"
+    },
+    {
+      "line": 458,
+      "anchor": "tab:cl-aggregate caption",
+      "quote": "Rows above it\\n(\\SI{644}{\\milli\\second} and up) carry queueing on top of that floor.",
+      "numbers": [
+        "644"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "static C=8 aggregate row",
+      "assertion": "Rows reading 644 ms and above carry queueing on top of the service floor.",
+      "db_check": "provenance.encoder_run_summary encoder_delay_p99_ms=644 where policy='static', config_c=8, window_name='week'",
+      "criticality": "supporting"
+    },
+    {
+      "line": 465,
+      "anchor": "tab:cl-aggregate row Static C=8",
+      "quote": "Static $C{=}8$ (deployable) & 644 & 3.87 & 1.00$\\times$ & pass",
+      "numbers": [
+        "8",
+        "644",
+        "3.87",
+        "1.00"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "static C=8 deployable encoder fleet, week aggregate",
+      "assertion": "The deployable static C=8 fleet reaches 644 ms p99 for 3.87M worker-seconds (1.00x baseline) and passes.",
+      "db_check": "provenance.encoder_run_summary + cost_accounting where policy='static', config_c=8, window_name='week'",
+      "criticality": "headline"
+    },
+    {
+      "line": 466,
+      "anchor": "tab:cl-aggregate row Static C=2",
+      "quote": "Static $C{=}2$ (calm-day optimum) & \\textbf{2{,}953} & 0.97 &\\n0.25$\\times$ & fail",
+      "numbers": [
+        "2",
+        "2953",
+        "0.97",
+        "0.25"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "static C=2 calm-day optimum, week aggregate",
+      "assertion": "Static C=2 fails at 2,953 ms p99 while costing 0.97M worker-seconds (0.25x).",
+      "db_check": "provenance.encoder_run_summary where policy='static', config_c=2, window_name='week'",
+      "criticality": "headline"
+    },
+    {
+      "line": 468,
+      "anchor": "tab:cl-aggregate row Forecast p90 L=30",
+      "quote": "Forecast p90, $L{=}30$\\,s (issue-time) & 588 & 2.41 & 0.62$\\times$ & pass",
+      "numbers": [
+        "30",
+        "588",
+        "2.41",
+        "0.62"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "encoder p90 forecast at L=30 s, issue-time, week aggregate",
+      "assertion": "The p90 forecast at L=30 s passes at 588 ms for 2.41M worker-seconds, 0.62x static.",
+      "db_check": "provenance.encoder_run_summary + cost_accounting where quantile='p90', rho=15, lead_s=30, actuation='issue_time', window_name='week'",
+      "criticality": "headline"
+    },
+    {
+      "line": 469,
+      "anchor": "tab:cl-aggregate row Forecast p90 L=165",
+      "quote": "Forecast p90, $L{=}165$\\,s (issue-time, max) & 588 & 2.41 & 0.62$\\times$ & pass",
+      "numbers": [
+        "165",
+        "588",
+        "2.41",
+        "0.62"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "encoder p90 forecast at L=165 s, issue-time, week aggregate",
+      "assertion": "The p90 forecast at the maximum realizable lead L=165 s also passes at 588 ms and 2.41M worker-seconds (0.62x).",
+      "db_check": "provenance.encoder_run_summary + cost_accounting where quantile='p90', rho=15, lead_s=165, actuation='issue_time', window_name='week'",
+      "criticality": "headline"
+    },
+    {
+      "line": 470,
+      "anchor": "tab:cl-aggregate row Forecast p50 L=30",
+      "quote": "Forecast p50, $L{=}30$\\,s & \\textbf{2{,}735} & 0.98 &\\n0.25$\\times$ &\\nfail",
+      "numbers": [
+        "30",
+        "2735",
+        "0.98",
+        "0.25"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "encoder p50 forecast at L=30 s, week aggregate",
+      "assertion": "The p50 forecast fails the week at 2,735 ms p99 while costing 0.98M worker-seconds (0.25x).",
+      "db_check": "provenance.encoder_run_summary + cost_accounting where quantile='p50', rho=15, lead_s=30, window_name='week'",
+      "criticality": "headline"
+    },
+    {
+      "line": 472,
+      "anchor": "tab:cl-aggregate row Reactive L=30",
+      "quote": "Reactive, $L{=}30$\\,s & 588 & 2.61 & 0.67$\\times$ & \\textbf{fails\\nburst3}",
+      "numbers": [
+        "30",
+        "588",
+        "2.61",
+        "0.67",
+        "3"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "reactive encoder policy at L=30 s, week aggregate",
+      "assertion": "The reactive policy at L=30 s reads 588 ms aggregate p99 for 2.61M worker-seconds (0.67x) but fails burst3.",
+      "db_check": "provenance.encoder_run_summary + cost_accounting where policy='reactive', lead_s=30, window_name='week'; per-episode via factorial_cell burst3",
+      "criticality": "headline"
+    },
+    {
+      "line": 474,
+      "anchor": "tab:cl-aggregate row Reactive L=300",
+      "quote": "Reactive, $L{=}300$\\,s & 905 & 1.67 & 0.43$\\times$ & \\textbf{fails\\nburst3}",
+      "numbers": [
+        "300",
+        "905",
+        "1.67",
+        "0.43",
+        "3"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "reactive encoder policy at L=300 s, week aggregate",
+      "assertion": "The reactive policy at L=300 s reads 905 ms aggregate p99 for 1.67M worker-seconds (0.43x) and fails burst3.",
+      "db_check": "provenance.encoder_run_summary + cost_accounting where policy='reactive', lead_s=300, window_name='week'",
+      "criticality": "headline"
+    },
+    {
+      "line": 481,
+      "anchor": "sec:cl-aggregate",
+      "quote": "the p90-forecast schedule meets the tail SLA over\\nthe aggregate \\emph{and} inside every in-span episode at 0.62\\ntimes the deployable static encoder fleet's provisioned worker-time",
+      "numbers": [
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "chapter headline cost ratio",
+      "assertion": "The p90-forecast schedule meets the SLA in aggregate and per-episode at 0.62x the static fleet's provisioned worker-time.",
+      "db_check": "provenance.v_closedloop_frontier / cost_accounting: 2.41e6/3.87e6 = 0.623 for quantile='p90', rho=15, is_current",
+      "criticality": "headline"
+    },
+    {
+      "line": 483,
+      "anchor": "sec:cl-aggregate",
+      "quote": "(2.41M worker-seconds versus 3.87M, at p99 \\SI{588}{\\milli\\second}\\nversus the static fleet's 644)",
+      "numbers": [
+        "2.41",
+        "3.87",
+        "588",
+        "644"
+      ],
+      "metric": "provisioned_ws",
+      "subject": "p90 forecast vs static C=8, week aggregate",
+      "assertion": "The p90 schedule uses 2.41M worker-seconds at 588 ms p99 versus static's 3.87M at 644 ms.",
+      "db_check": "provenance.cost_accounting provisioned_ws and encoder_run_summary p99 for the two policies over window_name='week'",
+      "criticality": "headline"
+    },
+    {
+      "line": 487,
+      "anchor": "sec:cl-aggregate",
+      "quote": "the cost is essentially lead-invariant across the\\narchive's realizable 15--\\SI{165}{\\second} issued-lead range (2.41M at\\nboth ends)",
+      "numbers": [
+        "15",
+        "165",
+        "2.41"
+      ],
+      "metric": "provisioned_ws",
+      "subject": "issue-time lead invariance of cost",
+      "assertion": "Provisioned cost is 2.41M worker-seconds at both ends of the 15-165 s issued-lead range.",
+      "db_check": "provenance.cost_accounting provisioned_ws where actuation='issue_time', lead_s in (15,165); expect identical 2.41e6",
+      "criticality": "headline"
+    },
+    {
+      "line": 491,
+      "anchor": "sec:cl-aggregate",
+      "quote": "(2.38M at $L{=}30$ to 2.12M at the non-realizable\\n$L{=}300$), and no issue-time schedule realizes it",
+      "numbers": [
+        "2.38",
+        "30",
+        "2.12",
+        "300"
+      ],
+      "metric": "provisioned_ws",
+      "subject": "target-time optimistic bound",
+      "assertion": "Target-time indexing gives 2.38M worker-seconds at L=30 and 2.12M at L=300, an unrealizable optimistic bound.",
+      "db_check": "provenance.cost_accounting where actuation='target_time', lead_s in (30,300)",
+      "criticality": "supporting"
+    },
+    {
+      "line": 498,
+      "anchor": "sec:cl-aggregate",
+      "quote": "the\\ncost is mildly lead-dependent (0.62$\\times$ at $L{=}15$ falling to\\n0.59$\\times$ at $L{=}165$), still passing at the \\SI{588}{\\milli\\second}\\nfloor at every lead",
+      "numbers": [
+        "0.62",
+        "15",
+        "0.59",
+        "165",
+        "588"
+      ],
+      "metric": "cost_ratio",
+      "subject": "strict re-warm readiness model",
+      "assertion": "Under strict re-warm the cost falls from 0.62x at L=15 to 0.59x at L=165 while still passing at the 588 ms floor.",
+      "db_check": "provenance.cost_accounting + factorial_cell where readiness='strict_rewarm', quantile='p90', rho=15 grouped by lead_s",
+      "criticality": "headline"
+    },
+    {
+      "line": 500,
+      "anchor": "sec:cl-aggregate",
+      "quote": "\\textbf{0.62$\\times$} is therefore the conservative\\nfigure across both readiness models",
+      "numbers": [
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "headline cost ratio robustness",
+      "assertion": "0.62x is the conservative cost figure across both readiness models.",
+      "db_check": "provenance.v_cost_frontier_dual: max ratio over readiness in ('warm_pool','strict_rewarm') for quantile='p90', rho=15",
+      "criticality": "headline"
+    },
+    {
+      "line": 507,
+      "anchor": "sec:cl-aggregate",
+      "quote": "Toto and TimesFM pass at the same service floor\\nacross the realizable-lead range, within the ${\\leq}4\\%$ cross-model cost\\nspread",
+      "numbers": [
+        "4"
+      ],
+      "metric": "cross_model_cost_spread_pct",
+      "subject": "Toto and TimesFM encoder week-scale schedules",
+      "assertion": "Toto and TimesFM pass at the same service floor with a cross-model cost spread of at most 4%.",
+      "db_check": "provenance.cost_accounting provisioned_ws grouped by model where quantile='p90', rho=15, pool='encoder'; (max-min)/min <= 0.04",
+      "criticality": "headline"
+    },
+    {
+      "line": 509,
+      "anchor": "sec:cl-aggregate",
+      "quote": "at 120M parameters it is the \\emph{smallest} of\\nthe three (Toto-2.0 is $20\\times$ larger)",
+      "numbers": [
+        "120",
+        "2.0",
+        "20"
+      ],
+      "metric": "model_parameters",
+      "subject": "Chronos-2 versus Toto-2.0 model size",
+      "assertion": "Chronos-2 has 120M parameters and is the smallest of the three, with Toto-2.0 20x larger.",
+      "db_check": "UNVERIFIABLE: published model card fact, not an experimental artifact in the provenance schema",
+      "criticality": "supporting"
+    },
+    {
+      "line": 515,
+      "anchor": "sec:cl-aggregate",
+      "quote": "A full week-scale sweep\\n(three forecasting models $\\times$ two quantiles $\\times$ four\\ncapacity ratings $\\times$ four leads",
+      "numbers": [
+        "3",
+        "2",
+        "4",
+        "4"
+      ],
+      "metric": "cells",
+      "subject": "week-scale sweep design",
+      "assertion": "The week-scale sweep is 3 models x 2 quantiles x 4 ratings x 4 leads (96 cells).",
+      "db_check": "provenance.runs where window_name='week', pool='encoder': count distinct (model, quantile, rho, lead_s) = 96",
+      "criticality": "supporting"
+    },
+    {
+      "line": 522,
+      "anchor": "sec:cl-aggregate",
+      "quote": "tracing a cost\\nfrontier from 0.89$\\times$ static at the conservative $\\rho{=}10$\\n(\\SI{588}{\\milli\\second}) down to 0.40$\\times$ at the aggressive\\n$\\rho{=}25$ (\\SI{748}{\\milli\\second}, still under the aggregate bound)",
+      "numbers": [
+        "0.89",
+        "10",
+        "588",
+        "0.40",
+        "25",
+        "748"
+      ],
+      "metric": "cost_ratio",
+      "subject": "encoder p90 week-scale rho cost frontier",
+      "assertion": "The week-scale cost frontier runs from 0.89x at rho=10 (588 ms) to 0.40x at rho=25 (748 ms).",
+      "db_check": "provenance.v_cost_frontier_dual: ratio and p99 per rho where quantile='p90', model='chronos2', window_name='week'",
+      "criticality": "headline"
+    },
+    {
+      "line": 528,
+      "anchor": "sec:cl-aggregate",
+      "quote": "shows only $\\rho{=}25$ dropping cells (9, all burst5).\\n$\\rho\\in\\{10,15,20\\}$ is per-episode-clean, spanning 0.48--0.89$\\times$.",
+      "numbers": [
+        "25",
+        "9",
+        "5",
+        "10",
+        "15",
+        "20",
+        "0.48",
+        "0.89"
+      ],
+      "metric": "infeasible_count",
+      "subject": "per-episode clean rho band",
+      "assertion": "Only rho=25 drops 9 cells (all burst5); rho in {10,15,20} is per-episode-clean spanning 0.48-0.89x.",
+      "db_check": "provenance.v_infeasible count by rho; v_cost_frontier_dual ratio range for rho in (10,15,20)",
+      "criticality": "headline"
+    },
+    {
+      "line": 530,
+      "anchor": "sec:cl-aggregate",
+      "quote": "The headline sits at $\\rho{=}15$ (0.62$\\times$): a \\emph{deliberately\\nconservative} operating point that holds the \\SI{588}{\\milli\\second}\\nfloor with margin.",
+      "numbers": [
+        "15",
+        "0.62",
+        "588"
+      ],
+      "metric": "cost_ratio",
+      "subject": "headline operating point",
+      "assertion": "The headline operating point rho=15 costs 0.62x while holding the 588 ms floor.",
+      "db_check": "provenance.v_closedloop_frontier where rho=15, quantile='p90'",
+      "criticality": "headline"
+    },
+    {
+      "line": 532,
+      "anchor": "sec:cl-aggregate",
+      "quote": "$\\rho{=}20$ also passes 60/60 --- more cheaply, at\\n${\\approx}0.48\\times$ (aggregate 0.46--0.48$\\times$ across readiness\\nmodels and realizable leads)",
+      "numbers": [
+        "20",
+        "60",
+        "60",
+        "0.48",
+        "0.46",
+        "0.48"
+      ],
+      "metric": "cost_ratio",
+      "subject": "encoder p90 policy at rho=20",
+      "assertion": "rho=20 passes 60/60 at about 0.48x, with aggregate 0.46-0.48x across readiness models and leads.",
+      "db_check": "provenance.factorial_cell feasible count at rho=20 (expect 60); cost_accounting ratio range 0.46-0.48",
+      "criticality": "headline"
+    },
+    {
+      "line": 534,
+      "anchor": "sec:cl-aggregate",
+      "quote": "but runs closer to the bound (per-window\\np99 to \\SI{860}{\\milli\\second} under strict re-warm), so the extra\\n${\\sim}0.14\\times$ saving is bought against tail margin",
+      "numbers": [
+        "860",
+        "0.14"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "rho=20 tail margin tradeoff",
+      "assertion": "rho=20 reaches per-window p99 860 ms under strict re-warm, buying about 0.14x extra saving against tail margin.",
+      "db_check": "provenance.factorial_cell max(p99_ms) where rho=20, readiness='strict_rewarm'; 0.62-0.48=0.14",
+      "criticality": "supporting"
+    },
+    {
+      "line": 541,
+      "anchor": "sec:cl-aggregate",
+      "quote": "consistent with its per-window issue-time\\nfactorial clearing only 23--24 of 60 cells",
+      "numbers": [
+        "23",
+        "24",
+        "60"
+      ],
+      "metric": "feasible_count",
+      "subject": "encoder p50 factorial (repeat)",
+      "assertion": "The p50 policy clears only 23-24 of 60 per-window issue-time cells.",
+      "db_check": "provenance.factorial_cell count feasible=true where quantile='p50', rho=15, actuation='issue_time'",
+      "criticality": "supporting"
+    },
+    {
+      "line": 543,
+      "anchor": "sec:cl-aggregate",
+      "quote": "p99 rises monotonically with $\\rho$ (588 at\\n$\\rho{\\le}15$, up to 748 at $\\rho{=}25$) as the fleet shrinks.",
+      "numbers": [
+        "588",
+        "15",
+        "748",
+        "25"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "week aggregate p99 versus rho",
+      "assertion": "Aggregate p99 rises monotonically with rho, from 588 ms at rho<=15 to 748 ms at rho=25.",
+      "db_check": "provenance.encoder_run_summary encoder_delay_p99_ms grouped by rho where quantile='p90', window_name='week'",
+      "criticality": "supporting"
+    },
+    {
+      "line": 550,
+      "anchor": "sec:cl-aggregate",
+      "quote": "the aggregate hides it\\nbecause burst3's ${\\approx}3{,}100$ requests are under half a percent\\nof the span",
+      "numbers": [
+        "3",
+        "3100",
+        "0.5"
+      ],
+      "metric": "requests",
+      "subject": "burst3 request volume share of the span",
+      "assertion": "Burst3 contains about 3,100 requests, under half a percent of the 749,601-request span.",
+      "db_check": "provenance.measured_request: count(*) where window_name='burst3'; 3100/749601 = 0.41%",
+      "criticality": "headline"
+    },
+    {
+      "line": 555,
+      "anchor": "sec:cl-aggregate",
+      "quote": "The p50 row completes the symmetry: an excellent\\n\\emph{cost} policy (0.25$\\times$) that fails the SLA outright",
+      "numbers": [
+        "0.25"
+      ],
+      "metric": "cost_ratio",
+      "subject": "encoder p50 policy cost",
+      "assertion": "The p50 policy costs 0.25x static but fails the SLA outright.",
+      "db_check": "provenance.cost_accounting ratio where quantile='p50', rho=15, window_name='week'; feasible=false",
+      "criticality": "supporting"
+    },
+    {
+      "line": 564,
+      "anchor": "sec:cl-limits",
+      "quote": "its\\ninference cost (${\\sim}$seconds per tick on CPU-class hardware for the\\nmodels used) is not charged to the fleet",
+      "numbers": [],
+      "metric": "forecast_inference_cost_s",
+      "subject": "forecast inference overhead",
+      "assertion": "Forecast inference costs on the order of seconds per tick on CPU-class hardware and is not charged to the fleet.",
+      "db_check": "UNVERIFIABLE: no measured inference-latency artifact named in the provenance schema",
+      "criticality": "incidental"
+    },
+    {
+      "line": 566,
+      "anchor": "sec:cl-limits",
+      "quote": "The per-worker capacity rating\\n$\\rho$ is a swept control knob (four settings, graded above)",
+      "numbers": [
+        "4"
+      ],
+      "metric": "rho_settings_count",
+      "subject": "capacity rating sweep",
+      "assertion": "The capacity rating rho is swept over four settings.",
+      "db_check": "provenance.runs: count distinct rho for pool='encoder'; expect 4 (10,15,20,25)",
+      "criticality": "incidental"
+    },
+    {
+      "line": 584,
+      "anchor": "sec:cl-limits",
+      "quote": "The inter-pool handoff is priced single-stream\\n(${\\approx}1.6$\\,MB per image)",
+      "numbers": [
+        "1.6"
+      ],
+      "metric": "handoff_payload_mb",
+      "subject": "inter-pool embedding handoff payload",
+      "assertion": "The inter-pool handoff is priced at about 1.6 MB per image single-stream.",
+      "db_check": "UNVERIFIABLE from listed tables: payload size is a platform model parameter; check runs config metadata for the handoff model",
+      "criticality": "supporting"
+    },
+    {
+      "line": 585,
+      "anchor": "sec:cl-limits",
+      "quote": "Qwen3-VL's DeepStack projections\\nquadruple that payload, and a sensitivity replay of the aggregate at\\nthe $4\\times$ payload on the modeled 25\\,Gbps link raises p99 handoff\\nfrom 272 to 1{,}087\\,\\si{\\milli\\second}",
+      "numbers": [
+        "3",
+        "4",
+        "25",
+        "272",
+        "1087"
+      ],
+      "metric": "handoff_p99_ms",
+      "subject": "4x payload sensitivity replay on a 25 Gbps link",
+      "assertion": "At 4x payload on a 25 Gbps link the p99 handoff rises from 272 ms to 1,087 ms.",
+      "db_check": "provenance.encoder_run_summary / composed_e2e for the sensitivity run with payload_scale=4; handoff component p99",
+      "criticality": "headline"
+    },
+    {
+      "line": 587,
+      "anchor": "sec:cl-limits",
+      "quote": "(encoder-delay p99\\n1{,}404\\,\\si{\\milli\\second} --- an SLA violation from transfer\\nalone)",
+      "numbers": [
+        "1404"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "4x payload sensitivity replay",
+      "assertion": "At 4x payload the encoder-delay p99 is 1,404 ms, violating the SLA from transfer alone.",
+      "db_check": "provenance.encoder_run_summary encoder_delay_p99_ms for the 4x-payload sensitivity run",
+      "criticality": "headline"
+    },
+    {
+      "line": 592,
+      "anchor": "sec:cl-limits",
+      "quote": "because the\\n1{,}087\\,\\si{\\milli\\second} handoff floor is common to all. The\\n\\SI{588}{\\milli\\second} floor therefore assumes an\\nembedding-only handoff or a ${\\geq}100$\\,Gbps inter-pool fabric",
+      "numbers": [
+        "1087",
+        "588",
+        "100"
+      ],
+      "metric": "handoff_p99_ms",
+      "subject": "fabric requirement for the 588 ms floor",
+      "assertion": "The 588 ms floor assumes an embedding-only handoff or a >=100 Gbps inter-pool fabric, since the 1,087 ms handoff floor otherwise binds every policy.",
+      "db_check": "Derived from the 4x-payload sensitivity run in provenance.encoder_run_summary plus the linear transfer model",
+      "criticality": "supporting"
+    },
+    {
+      "line": 603,
+      "anchor": "sec:cl-limits",
+      "quote": "Replay-level p99 noise is ${\\approx}4\\%$;\\nno quoted \\emph{policy} contrast ... is within that band",
+      "numbers": [
+        "4"
+      ],
+      "metric": "p99_run_noise_pct",
+      "subject": "replay reproducibility",
+      "assertion": "Replay-level p99 noise is about 4% and no quoted policy contrast falls within that band.",
+      "db_check": "provenance.runs/encoder_run_summary: coefficient of variation of p99 over repeated identical-config runs",
+      "criticality": "supporting"
+    },
+    {
+      "line": 606,
+      "anchor": "sec:cl-limits",
+      "quote": "(the vLLM reprice, 606 vs.\\ \\SI{589}{\\milli\\second}; the\\ncross-model cost spread, ${\\leq}4\\%$)",
+      "numbers": [
+        "606",
+        "589",
+        "4"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "vLLM reprice robustness check",
+      "assertion": "The vLLM reprice yields 606 ms versus 589 ms under AIC, a within-noise agreement.",
+      "db_check": "provenance.encoder_run_summary where engine='vllm' vs engine='aic' for the p90/rho=15 week schedule",
+      "criticality": "headline"
+    },
+    {
+      "line": 614,
+      "anchor": "sec:cl-limits / app:engine-sensitivity",
+      "quote": "vLLM's own\\nQwen3-VL vision tower --- a standalone eager forward through its own\\nvision-tower implementation --- matches AIC to within 12.8\\%",
+      "numbers": [
+        "3",
+        "12.8"
+      ],
+      "metric": "engine_model_error_pct",
+      "subject": "AIC encoder model vs measured vLLM vision tower",
+      "assertion": "The AIC encoder model matches vLLM's own vision-tower forward cost to within 12.8%.",
+      "db_check": "provenance.collector_fn: relative residual between engine='aic' and engine='vllm' f(N) curves; max |residual| = 12.8%",
+      "criticality": "headline"
+    },
+    {
+      "line": 616,
+      "anchor": "sec:cl-limits",
+      "quote": "The earlier apparent\\n${\\approx}2\\times$ gap was an execution-stack artifact ... (the ${\\approx}1.4$--$1.6\\times$\\nHuggingFace$\\to$vLLM overhead)",
+      "numbers": [
+        "2",
+        "1.4",
+        "1.6"
+      ],
+      "metric": "engine_overhead_ratio",
+      "subject": "HuggingFace-to-vLLM execution stack overhead",
+      "assertion": "The earlier ~2x AIC-vs-silicon gap is explained by a 1.4-1.6x HuggingFace-to-vLLM execution-stack overhead.",
+      "db_check": "provenance.collector_fn: ratio of engine='hf_eager' to engine='vllm' f(N) across N; expect 1.4-1.6",
+      "criticality": "headline"
+    },
+    {
+      "line": 621,
+      "anchor": "sec:cl-limits",
+      "quote": "holds the week-scale encoder-delay p99 at \\SI{606}{\\milli\\second} (versus\\n\\SI{589}{\\milli\\second} under AIC), non-divergent and far under the\\n\\SI{1000}{\\milli\\second} bound",
+      "numbers": [
+        "606",
+        "589",
+        "1000"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "p90/rho=15 week schedule repriced at measured vLLM f(N)",
+      "assertion": "Repriced at the measured vLLM f(N) the week-scale encoder-delay p99 is 606 ms versus 589 ms under AIC, far under the 1000 ms bound.",
+      "db_check": "provenance.encoder_run_summary encoder_delay_p99_ms where engine='vllm', quantile='p90', rho=15, window_name='week'",
+      "criticality": "headline"
+    },
+    {
+      "line": 627,
+      "anchor": "sec:cl-limits",
+      "quote": "also stays feasible on every in-span burst window (encoder-delay\\np99 784 versus \\SI{588}{\\milli\\second} under AIC)",
+      "numbers": [
+        "784",
+        "588"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "p90/rho=15 schedule under HuggingFace-eager f(N)",
+      "assertion": "Under the slower HuggingFace-eager f(N) the schedule stays feasible on every burst window at 784 ms versus 588 ms under AIC.",
+      "db_check": "provenance.encoder_run_summary where engine='hf_eager', quantile='p90', rho=15, window_name like 'burst%'",
+      "criticality": "headline"
+    },
+    {
+      "line": 628,
+      "anchor": "sec:cl-limits",
+      "quote": "the $\\rho{=}15$/p90\\nheadroom provisions 24--32 workers at the burst peaks, far above the 12--16\\neven that slower stack requires",
+      "numbers": [
+        "15",
+        "24",
+        "32",
+        "12",
+        "16"
+      ],
+      "metric": "provisioned_workers",
+      "subject": "burst-peak worker provisioning under p90/rho=15",
+      "assertion": "The p90/rho=15 schedule provisions 24-32 workers at burst peaks versus the 12-16 the slower HF stack requires.",
+      "db_check": "provenance.encoder_run_summary / schedule artifact: max worker count per burst window at quantile='p90', rho=15",
+      "criticality": "supporting"
+    },
+    {
+      "line": 632,
+      "anchor": "sec:cl-limits",
+      "quote": "matches the composition to within 12.8\\% across the whole $N\\le64$ serving\\nregime (the FIFO cap; canonical residuals $-2.2\\%$, $+11.3\\%$, $+5.5\\%$ at\\n$N\\in\\{8,32,64\\}$)",
+      "numbers": [
+        "12.8",
+        "64",
+        "2.2",
+        "11.3",
+        "5.5",
+        "8",
+        "32",
+        "64"
+      ],
+      "metric": "engine_model_error_pct",
+      "subject": "AIC vs vLLM per-forward cost residuals",
+      "assertion": "Across N<=64 the vLLM cost matches the AIC composition within 12.8%, with residuals -2.2%, +11.3%, +5.5% at N=8/32/64.",
+      "db_check": "provenance.collector_fn: per-N residual between engine='vllm' and engine='aic' at N in (8,32,64)",
+      "criticality": "headline"
+    },
+    {
+      "line": 635,
+      "anchor": "sec:cl-limits",
+      "quote": "the static $C{=}8$ \\emph{denominator} itself stays\\nfeasible when repriced at the same vLLM cost (encoder-delay p99\\n\\SI{692}{\\milli\\second} versus \\SI{647}{\\milli\\second} under AIC in that\\nreprice harness",
+      "numbers": [
+        "8",
+        "692",
+        "647"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "static C=8 denominator repriced at vLLM cost",
+      "assertion": "The static C=8 denominator stays feasible when repriced at vLLM cost, at 692 ms versus 647 ms under AIC in the reprice harness.",
+      "db_check": "provenance.encoder_run_summary where policy='static', config_c=8, engine in ('vllm','aic'), experiment='reprice'",
+      "criticality": "headline"
+    },
+    {
+      "line": 638,
+      "anchor": "sec:cl-limits",
+      "quote": "the Table~\\ref{tab:cl-aggregate} aggregate\\nreads \\SI{644}{\\milli\\second} under AIC, a ${<}0.5\\%$ harness difference\\nwithin run noise",
+      "numbers": [
+        "644",
+        "0.5"
+      ],
+      "metric": "harness_difference_pct",
+      "subject": "static C=8 aggregate p99 across harnesses",
+      "assertion": "The static C=8 aggregate reads 644 ms in the main table versus 647 ms in the reprice harness, a sub-0.5% difference.",
+      "db_check": "provenance.encoder_run_summary: compare encoder_delay_p99_ms for policy='static', config_c=8 across experiment values; (647-644)/644 = 0.47%",
+      "criticality": "supporting"
+    },
+    {
+      "line": 643,
+      "anchor": "sec:cl-limits",
+      "quote": "every quantity here (the $4\\times$/$2\\times$ over-provisioning, the\\n$\\rho$ frontier, the 0.62$\\times$) derives from a single Azure\\nproduction trace over one 5.60-day span",
+      "numbers": [
+        "4",
+        "2",
+        "0.62",
+        "5.60"
+      ],
+      "metric": "cost_ratio",
+      "subject": "generalization scope of the chapter's numbers",
+      "assertion": "The 4x/2x over-provisioning, the rho frontier, and the 0.62x all derive from a single Azure trace over one 5.60-day span.",
+      "db_check": "provenance.runs: count distinct trace/experiment source; expect a single Azure trace across all rows",
+      "criticality": "headline"
+    },
+    {
+      "line": 653,
+      "anchor": "sec:cl-summary",
+      "quote": "holds the tail SLA at every forecast-issued lead tested\\n(15--\\SI{165}{\\second})",
+      "numbers": [
+        "15",
+        "165"
+      ],
+      "metric": "lead_invariance_s",
+      "subject": "encoder pool summary claim",
+      "assertion": "The p90 encoder policy holds the tail SLA at every forecast-issued lead from 15 to 165 s.",
+      "db_check": "provenance.factorial_cell: all feasible=true where quantile='p90', rho=15, lead_s in (15,30,45,165)",
+      "criticality": "headline"
+    },
+    {
+      "line": 666,
+      "anchor": "sec:cl-summary",
+      "quote": "the policy meets the SLA in aggregate and per-episode at 0.62\\ntimes the deployable static encoder fleet's worker-time",
+      "numbers": [
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "chapter summary economic clause",
+      "assertion": "Over the covered week the policy meets the SLA in aggregate and per-episode at 0.62x the static encoder fleet's worker-time.",
+      "db_check": "provenance.v_closedloop_frontier / cost_accounting: ratio for quantile='p90', rho=15, is_current=true",
+      "criticality": "headline"
+    },
+    {
+      "line": 669,
+      "anchor": "sec:cl-summary",
+      "quote": "lead-invariant across the archive's realizable\\nrange under the warm-pool readiness model, 0.59--0.62$\\times$ under\\nstrict re-warm",
+      "numbers": [
+        "0.59",
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "summary readiness-model cost range",
+      "assertion": "Cost is lead-invariant under warm-pool and 0.59-0.62x under strict re-warm.",
+      "db_check": "provenance.v_cost_frontier_dual: ratio range grouped by readiness for quantile='p90', rho=15",
+      "criticality": "headline"
+    }
+  ]
+}

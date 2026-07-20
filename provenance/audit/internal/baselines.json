@@ -1,0 +1,70 @@
+{
+  "chapter": "baselines",
+  "source": "/home/gio/tese/tex/baselines.tex",
+  "n_relations_checked": 52,
+  "n_errors": 6,
+  "errors": [
+    {
+      "line": 108,
+      "quote": "TP1$\\times$4 fails every burst window (TTFT p99 1{,}314--1{,}331\\,\\si{\\milli\\second})",
+      "stated": "TP1x4 TTFT p99 spans 1,314-1,331 ms across the burst windows",
+      "computed": "tab:base-tp (lines 139-143) publishes TP1x4 values 1318, 1331, 1315, 1317, 1316. min = 1,315 (burst3), max = 1,331 (burst2). The stated lower bound 1,314 appears in no table cell. Note the companion TP2x2 range quoted in the same sentence (763--846) DOES match the table exactly (min 763 burst1, max 846 burst3), so the asymmetry is not a deliberate unrounded-vs-rounded convention. If 1,314 is burst6's value, that is a second defect: prose says 'every burst window' (six windows) while the table lists only burst1-burst5.",
+      "relation": "prose range vs table cells (min/max)",
+      "severity": "wrong",
+      "propagates_to": "line 110 '1.55--1.74$\\times$ tail reduction' (ratio range is computed from the same five tabulated rows and does hold); tab:base-tp caption line 128-132; any restatement of the TP1-vs-TP2 tail contrast in cap:closedloop or cap:twopool",
+      "proposed_fix": "Replace '1{,}314--1{,}331' with '1{,}315--1{,}331'. If burst6 genuinely supplies 1,314, instead add a burst6 row to tab:base-tp (with its TP2x2 p99 and tail cut) and keep 1,314; otherwise also soften 'every burst window' to 'every tabulated burst window'."
+    },
+    {
+      "line": 93,
+      "quote": "burst1 to 7, burst3/burst4 to 8, burst6 to 8\n(58.2/3.6/25.2/10.9 5090-hours)",
+      "stated": "burst6 stage-conditional cost = 10.9 5090-GPU-hours at C*=8",
+      "computed": "From tab:base-grid, burst6 span = 1.37 h. 1.37 x 8 = 10.96, which rounds to 11.0, not 10.9. The other three reproduce exactly from the published spans: 8.32x7 = 58.24 -> 58.2; 0.45x8 = 3.60 -> 3.6; 3.15x8 = 25.20 -> 25.2. So the same GPU-hours = span x C* rule that generates the other three fails only here. 10.9 requires an unrounded span <= 1.3687 h, which the reader cannot see (the table publishes 1.37, and 1.37x6 = 8.22 -> 8.2 matches the table's 8.2 either way, so the table gives no way to recover the finer span).",
+      "relation": "5090 GPU-hours = window span (h) x C*",
+      "severity": "rounding",
+      "propagates_to": "the sentence's own arithmetic invariant (the other three values in the same parenthesis); any downstream stage-conditional cost total",
+      "proposed_fix": "Replace '10.9' with '11.0' (58.2/3.6/25.2/11.0 5090-hours), or publish burst6's span to three decimals in tab:base-grid if the true span is below 1.369 h."
+    },
+    {
+      "line": 159,
+      "quote": "window-mean TTFT/ITL under its 500/50\\,ms targets",
+      "stated": "the planner's operating control targets are 500/50 ms; the ladder of Sec. 3 then 'tightens' them",
+      "computed": "tab:base-ladder (lines 190-193) and line 169 start the ladder at 400/40 ms, not at 500/50 ms. The 'tightening' therefore begins one rung below the operating point the chapter just defined, and the 10% / 1.8 GPU-h spend delta (18.6 -> 20.4) is measured over 400/40 -> 200/20, not over the 500/50 baseline the 14 configurations actually ran at. No 500/50 row exists anywhere in the chapter, so the reader cannot connect the two experiments.",
+      "relation": "control-target definition consistency between sec:base-reactive-llm paragraph 1 and tab:base-ladder",
+      "severity": "ambiguous",
+      "propagates_to": "line 169-171 ('tightening the planner's window-mean targets from 400/40 to 200/20'), line 172 'a 10\\% spend increase buying nothing', line 258 summary claim 'spend cannot buy the tail back under lead'",
+      "proposed_fix": "Either add a 500/50 row to tab:base-ladder and state 'from 500/50 to 200/20', or at line 169 write 'starting one rung tighter than the shipped 500/50 targets, at 400/40, and tightening to 200/20'."
+    },
+    {
+      "line": 204,
+      "quote": "the same worker-mapping law (workers $= \\lceil \\text{demand} / \\rho \\rceil$ at per-worker capacity rating $\\rho$ \\si{img/s}, hysteresis 3 minutes, lead $L$)",
+      "stated": "the reactive encoder baseline sizes at rho = 15 img/s per worker (line 208, 'the chapter's operating rating')",
+      "computed": "At the burst peak of 337-370 img/s (line 30), rho=15 implies ceil(337/15) = 23 to ceil(370/15) = 25 workers. But tab:base-grid's static optimum for the same windows is C* = 6-8 workers, i.e. an implied per-worker service rate of at least 337/8 = 42 img/s. The reactive baseline is therefore sized by a capacity model roughly 2.8x more conservative than the one that produced the static optimum, and the chapter never reports the reactive baseline's provisioned worker-seconds, so its cost is not comparable with the 5090 GPU-h column it is being contrasted against. The p99 = 588 ms floor across most cells is consistent with heavy overprovisioning, not with parity.",
+      "relation": "per-worker capacity model consistency between sec:base-static (grid) and sec:base-reactive-enc (mapping law); GPU-time comparability across the two baselines",
+      "severity": "ambiguous",
+      "propagates_to": "tab:base-react-enc caption (line 212-214); line 260-261 summary claim that the encoder reactive baseline 'loses every window whose onset is faster than the lead time' (a latency-only verdict presented alongside a cost framing); the same rho ladder in cap:closedloop",
+      "proposed_fix": "State explicitly at line 208 that rho=15 img/s is a conservative rating that provisions well above the static optimum (ceil(337/15)=23 workers at peak vs C*=8), so the reactive encoder baseline is graded on latency only and is not cost-comparable to Table~\\ref{tab:base-grid}; or report its provisioned 5090 worker-seconds per window."
+    },
+    {
+      "line": 115,
+      "quote": "the encoder requirement swings from 2 workers on the calm day to 8 on burst5: the order-of-magnitude missizing of Chapter~\\ref{cap:trace-eda}, now as a fleet-sizing fact",
+      "stated": "the fleet-sizing swing instantiates an order-of-magnitude (~10x) missizing",
+      "computed": "The published swing is 8/2 = 4x in workers. The underlying demand swing is 370/57 = 6.5x in peak image rate (line 30-31). Neither is an order of magnitude. The chapter's own numbers support 4x (fleet) / 6.5x (peak rate).",
+      "relation": "qualitative magnitude claim vs the chapter's own published ratio",
+      "severity": "loose",
+      "propagates_to": "line 252-253 summary ('$4\\times$/$2\\times$ calm-day overprovisioning ... RQ1's missizing, priced'), which correctly says 4x; conclusion.tex and tese.tex abstract, which both assert 'order of magnitude'",
+      "proposed_fix": "Replace 'the order-of-magnitude missizing' with 'the burst/calm missizing of Chapter~\\ref{cap:trace-eda} (6.5$\\times$ in peak image rate), now as a 4$\\times$ fleet-sizing fact'."
+    },
+    {
+      "line": 97,
+      "quote": "the deployable static fleet that\ncarries the cost headline of Chapter~\\ref{cap:closedloop}\n(0.62$\\times$ static)",
+      "stated": "0.62x is measured against 'the deployable static' fleet, defined at line 118-119 as the single fleet surviving all windows (C=8 + TP2x2)",
+      "computed": "This chapter defines two distinct static denominators only ~20 lines apart: the per-window static optimum of tab:base-grid (C* = 2-8, 5090 GPU-h 3.2-49.9) and the deployable static (C=8 everywhere). They differ by up to 8/6 = 1.33x on burst1/burst6 and 8/2 = 4x on the calm day, so the headline changes materially with the choice. Line 97 names the deployable one; the abstract of tese.tex reportedly says 'menor frota estatica viavel' (smallest feasible) and conclusion.tex 'best static configuration' -- different denominators. Within this chapter the definition is stated, but the parenthetical '(0.62$\\times$ static)' drops the qualifier that makes it well-defined.",
+      "relation": "denominator definition consistency for the headline cost ratio",
+      "severity": "ambiguous",
+      "propagates_to": "conclusion.tex lines 81/95 ('deployable static' vs 'best static'), tese.tex abstract line 67 and resumo line 112, related.tex line 361, intro.tex lines 271/481/514",
+      "proposed_fix": "Write '(0.62$\\times$ the \\emph{deployable} static fleet)' at line 98 and use exactly that phrase at every restatement site; never abbreviate to '0.62$\\times$ static' or 'best static'."
+    }
+  ],
+  "passed_checks": "All 7 5090-GPU-h cells of tab:base-grid reproduce as span x C*: 8.32x6=49.92->49.9; 1.90x8=15.2; 0.45x7=3.15->3.2; 3.15x7=22.05->22.1; 1.35x8=10.8; 1.37x6=8.22->8.2; 24.0x2=48.0. All 7 H100-GPU-h cells reproduce as span x (TP x N): TP2x2=4 H100s gives 33.28->33.3, 7.6, 1.8, 12.6, 5.4, 5.48->5.5; steady TP1x2=2 H100s gives 48.0. Three of the four stage-conditional 5090-hours reproduce (58.2, 3.6, 25.2). 'rise by one to two workers' holds: 6->7, 7->8, 7->8, 6->8. 'deployable static C=8 the same under either metric' holds: base metric peaks at 8 (burst2, burst5); conditional metric peaks at 8 (burst3/4/6). All 5 tail-cut ratios in tab:base-tp reproduce: 1318/763=1.727->1.73; 1331/766=1.738->1.74; 1315/846=1.554->1.55; 1317/792=1.663->1.66; 1316/781=1.685->1.68. Prose TP2x2 range '763--846' matches the table min/max exactly. Prose '1.55--1.74x tail reduction' matches the tail-cut column min/max exactly. 'Four TP1 replicas and one TP2x2 group are both four H100s' holds (4x1 = 2x2). Calm-day overprovisioning '4x on the vision side and 2x on the language side' holds (8/2 encoders; 4/2 H100s). 'encoder requirement swings from 2 ... to 8 on burst5' matches the table. Protocol 'onsets 1--220 minutes' matches tab:base-react-enc row labels (min 1, max 220). 'peak 1-minute image rates 337--370 img/s' is consistent with burst6's stated 337 (line 239). 'Across the seven windows this yields 14 configurations' = 7x2. All 14 language configs violating the tail SLA is consistent with the quoted TTFT p99 range 1,079--3,495 ms vs the 1,000 ms bound, and burst ITL p99 121--162 ms vs the 100 ms bound. tab:base-ladder GPU-h is monotone increasing (18.6, 19.2, 19.4, 20.4) as claimed; '10% spend increase' = (20.4-18.6)/18.6 = 9.68% (rounds to 10%); 'TTFT p99 stays pinned at 1,616--1,620' holds under round-half-up (1615.5->1616, 1619.6->1620); the ladder's ITL p99 125.1-127.1 ms falls inside the earlier 121--162 ms range. All 7 L* values in tab:base-react-enc follow from the 1,000 ms encoder bound applied to their rows (burst1 638<1000 -> 300 s; burst2/4/5 pass at 15/30/45 and fail at 300 -> 45 s; burst3 fails at all four -> none; burst6 905<1000 at 45 s -> 45 s; steady 884<1000 -> 300 s), and every bolded cell is >1000 ms while no unbolded cell is. burst3's 'p99 encoder delay 9.5--54 s' matches 9,481 ms and 54,170 ms. 'The two fastest onsets' correctly identifies burst3 and burst6 (both onset 1 min). tab:base-tp's '1000 ms SLO' caption agrees with the chapter SLA at line 15. The 1.4-day forecast-context reservation is consistent with burst2/burst6 being the only windows excluded from forecast policies.",
+  "notes": "Extractor's four flagged items adjudicated independently: (1) CONFIRMED - 1,314 is absent from tab:base-tp, min is 1,315; recorded as 'wrong'. (2) CONFIRMED - 1.37x8=10.96 rounds to 11.0, and the other three values in the same parenthesis reproduce exactly from the published spans, so the rule is real and burst6 breaks it; recorded as 'rounding'. (3) REFUTED as an error - 1615.5 rounds to 1616 under round-half-up and 1619.6 rounds to 1620, so '1,616--1,620' is a correct rounded statement of the tabulated range; moved to passed_checks. (4) CONFIRMED - the 500/50 vs 400/40 base mismatch is real and changes what the 10% spend delta is measured against; recorded as 'ambiguous'. Two further defects the extractor did not flag: the rho=15 img/s per-worker rating is irreconcilable with C*=8 serving a 337-370 img/s peak (implies >=42 img/s per worker) without an explicit statement that the reactive encoder baseline is latency-graded only, and the 'order-of-magnitude missizing' phrase overstates the chapter's own 4x fleet / 6.5x rate swing. No error was recorded where the discrepancy could be explained by an unpublished unrounded value that the chapter elsewhere makes visible; the burst6 10.9 case is recorded precisely because no such value is visible to the reader."
+}

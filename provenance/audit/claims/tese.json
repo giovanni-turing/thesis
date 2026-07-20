@@ -1,0 +1,291 @@
+{
+  "chapter": "tese",
+  "claims": [
+    {
+      "line": 49,
+      "anchor": "chapter*{Abstract}",
+      "quote": "On the first public\nproduction trace of a multimodal inference cluster (Azure, one million\nrequests over seven days)",
+      "numbers": [
+        "one million"
+      ],
+      "metric": "requests",
+      "subject": "Azure LMM inference production trace (whole trace, both pools)",
+      "assertion": "The Azure multimodal production trace contains one million requests.",
+      "db_check": "provenance.measured_request: SELECT count(*) FROM provenance.measured_request; cross-check provenance.coverage / coverage_meta for total request count of the source trace, and provenance.windows for the trace span.",
+      "criticality": "headline"
+    },
+    {
+      "line": 49,
+      "anchor": "chapter*{Abstract}",
+      "quote": "(Azure, one million\nrequests over seven days)",
+      "numbers": [
+        "seven"
+      ],
+      "metric": "trace_duration_days",
+      "subject": "Azure LMM inference production trace span",
+      "assertion": "The Azure multimodal production trace spans seven days.",
+      "db_check": "provenance.windows: SELECT min(start_ts), max(end_ts), (max(end_ts)-min(start_ts)) FROM provenance.windows; confirm the full-trace span is ~7 days.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 51,
+      "anchor": "chapter*{Abstract}",
+      "quote": "image\narrivals are nearly decoupled from request rate ($R^2 = 0.12$)",
+      "numbers": [
+        "0.12"
+      ],
+      "metric": "r_squared",
+      "subject": "image-arrival rate regressed on request rate, encoder (vision) pool vs language pool signal",
+      "assertion": "Image arrivals are nearly decoupled from request rate, with coefficient of determination R^2 = 0.12.",
+      "db_check": "UNVERIFIABLE from the listed tables directly: R^2 is a trace-EDA statistic, not stored in runs/*_run_summary. Recompute from provenance.measured_request (per-bin image count vs request count) or locate the EDA artifact referenced by provenance.collector_fn / coverage_meta.",
+      "criticality": "headline"
+    },
+    {
+      "line": 51,
+      "anchor": "chapter*{Abstract}",
+      "quote": "image\narrivals are nearly decoupled from request rate ($R^2 = 0.12$), an order of\nmagnitude burstier",
+      "numbers": [
+        "order of magnitude"
+      ],
+      "metric": "burstiness_ratio",
+      "subject": "image-arrival series vs request-rate series burstiness (Fano / CV^2)",
+      "assertion": "Image arrivals are approximately ten times burstier than the request-rate series.",
+      "db_check": "UNVERIFIABLE from the listed tables directly: burstiness (Fano factor / CV^2) is a trace-EDA descriptor. Recompute per-bin Fano from provenance.measured_request grouped by signal; compare image vs request series ratio >= 10.",
+      "criticality": "headline"
+    },
+    {
+      "line": 52,
+      "anchor": "chapter*{Abstract}",
+      "quote": "and disjoint from it at the extremes (Jaccard 0.02).",
+      "numbers": [
+        "0.02"
+      ],
+      "metric": "jaccard_index",
+      "subject": "overlap of top-percentile (extreme) bins between image-arrival and request-rate series",
+      "assertion": "The extreme (top-tail) bins of the image-arrival and request-rate series overlap with Jaccard index 0.02.",
+      "db_check": "UNVERIFIABLE from the listed tables directly: Jaccard of extreme-bin sets is a trace-EDA statistic. Recompute from provenance.measured_request by binning both signals and intersecting top-quantile bin sets.",
+      "criticality": "headline"
+    },
+    {
+      "line": 59,
+      "anchor": "chapter*{Abstract}",
+      "quote": "reproduces the decoupling mechanically: the pools' saturation\nknees sit an order of magnitude apart",
+      "numbers": [
+        "order of magnitude"
+      ],
+      "metric": "saturation_knee_ratio",
+      "subject": "encoder pool vs language pool saturation knee (two-pool simulation platform)",
+      "assertion": "The encoder-pool and language-pool saturation knees are separated by about an order of magnitude in load scale.",
+      "db_check": "provenance.factorial_cell: compare the load/rho at which feasible flips false for encoder-pool cells vs language-pool cells (SELECT pool, rho, config_c, feasible FROM provenance.factorial_cell JOIN provenance.runs USING(run_id) ORDER BY pool, rho); also provenance.v_infeasible for the knee boundary.",
+      "criticality": "headline"
+    },
+    {
+      "line": 60,
+      "anchor": "chapter*{Abstract}",
+      "quote": "episodic encoder queueing at 29\\% mean\nutilization, invisible to rate- and utilization-based monitors",
+      "numbers": [
+        "29"
+      ],
+      "metric": "mean_utilization_pct",
+      "subject": "encoder (vision) pool during the largest burst window",
+      "assertion": "The encoder pool exhibits episodic queueing while its mean utilization is only 29 percent.",
+      "db_check": "provenance.encoder_run_summary: mean utilization = busy_worker_seconds / provisioned_worker_seconds for the largest-burst window run (SELECT busy_worker_seconds/provisioned_worker_seconds, encoder_delay_p99_ms, queue_divergent FROM provenance.encoder_run_summary JOIN provenance.runs USING(run_id) WHERE pool='encoder' AND window_name = <largest burst> AND is_current).",
+      "criticality": "headline"
+    },
+    {
+      "line": 67,
+      "anchor": "chapter*{Abstract}",
+      "quote": "at\n0.62$\\times$ the deployable static encoder fleet's GPU-time",
+      "numbers": [
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "forecast-driven per-pool schedule vs smallest deployable static encoder fleet, week-scale GPU-time",
+      "assertion": "The forecast-driven encoder schedule consumes 0.62 times the GPU-time of the smallest deployable static encoder fleet.",
+      "db_check": "provenance.cost_accounting joined to provenance.runs: ratio of provisioned_ws for policy='forecast' over policy='static' (smallest feasible config_c) on the encoder pool, full-week window; cross-check provenance.v_cost_frontier_dual and v_closedloop_frontier.",
+      "criticality": "headline"
+    },
+    {
+      "line": 68,
+      "anchor": "chapter*{Abstract}",
+      "quote": "(the\nlanguage fleet near-break-even, 0.96$\\times$)",
+      "numbers": [
+        "0.96"
+      ],
+      "metric": "cost_ratio",
+      "subject": "forecast-driven per-pool schedule vs deployable static language fleet, week-scale GPU-time",
+      "assertion": "The forecast-driven language-pool schedule consumes 0.96 times the GPU-time of the deployable static language fleet (near break-even).",
+      "db_check": "provenance.cost_accounting joined to provenance.runs: ratio of provisioned_ws for policy='forecast' over policy='static' on the language pool, full-week window; cross-check provenance.v_cost_frontier_dual.",
+      "criticality": "headline"
+    },
+    {
+      "line": 69,
+      "anchor": "chapter*{Abstract}",
+      "quote": "On the hardest burst the\nlanguage-pool p90-versus-reactive verdict pair reproduces through\nDynamo's real control plane with mocked engines",
+      "numbers": [
+        "90"
+      ],
+      "metric": "quantile_level",
+      "subject": "language-pool forecast quantile used for the live-runtime reproduction verdict",
+      "assertion": "The reproduced language-pool verdict pair is the one at forecast quantile p90 versus the reactive controller.",
+      "db_check": "provenance.runs: SELECT quantile, policy, actuation FROM provenance.runs WHERE pool='language' AND experiment LIKE '%validation%' AND is_current; confirm quantile=0.90 and a matching reactive run, then compare provenance.llm_run_summary.p99_ttft_ms verdicts.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 89,
+      "anchor": "chapter*{Resumo}",
+      "quote": "de um \\emph{cluster} de infer\\^encia multimodal (Azure, um milh\\~ao de\nrequisi\\c{c}\\~oes em sete dias)",
+      "numbers": [
+        "um milhão"
+      ],
+      "metric": "requests",
+      "subject": "Azure LMM inference production trace (Portuguese abstract restatement)",
+      "assertion": "The Portuguese abstract restates that the Azure trace contains one million requests.",
+      "db_check": "provenance.measured_request: SELECT count(*); must agree with the English abstract figure on line 49.",
+      "criticality": "headline"
+    },
+    {
+      "line": 90,
+      "anchor": "chapter*{Resumo}",
+      "quote": "(Azure, um milh\\~ao de\nrequisi\\c{c}\\~oes em sete dias)",
+      "numbers": [
+        "sete"
+      ],
+      "metric": "trace_duration_days",
+      "subject": "Azure trace span (Portuguese abstract restatement)",
+      "assertion": "The Portuguese abstract restates that the trace spans seven days.",
+      "db_check": "provenance.windows span check; must agree with line 49.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 92,
+      "anchor": "chapter*{Resumo}",
+      "quote": "as chegadas de imagens s\\~ao quase desacopladas da taxa de\nrequisi\\c{c}\\~oes ($R^2 = 0{,}12$)",
+      "numbers": [
+        "0,12"
+      ],
+      "metric": "r_squared",
+      "subject": "image arrivals vs request rate (Portuguese abstract restatement)",
+      "assertion": "The Portuguese abstract restates R^2 = 0.12 for image arrivals against request rate.",
+      "db_check": "Recompute from provenance.measured_request as for line 51; must agree with the English abstract value 0.12.",
+      "criticality": "headline"
+    },
+    {
+      "line": 92,
+      "anchor": "chapter*{Resumo}",
+      "quote": "($R^2 = 0{,}12$), uma ordem de magnitude mais\nintermitentes",
+      "numbers": [
+        "ordem de magnitude"
+      ],
+      "metric": "burstiness_ratio",
+      "subject": "image-arrival vs request-rate burstiness (Portuguese abstract restatement)",
+      "assertion": "The Portuguese abstract restates that image arrivals are an order of magnitude burstier.",
+      "db_check": "Recompute Fano/CV^2 ratio from provenance.measured_request; must agree with line 51.",
+      "criticality": "headline"
+    },
+    {
+      "line": 93,
+      "anchor": "chapter*{Resumo}",
+      "quote": "e disjuntas dela nos extremos (Jaccard 0{,}02)",
+      "numbers": [
+        "0,02"
+      ],
+      "metric": "jaccard_index",
+      "subject": "extreme-bin overlap of image vs request series (Portuguese abstract restatement)",
+      "assertion": "The Portuguese abstract restates a Jaccard index of 0.02 at the extremes.",
+      "db_check": "Recompute extreme-bin Jaccard from provenance.measured_request; must agree with line 52.",
+      "criticality": "headline"
+    },
+    {
+      "line": 101,
+      "anchor": "chapter*{Resumo}",
+      "quote": "os \\emph{pools} saturam a escalas separadas\npor uma ordem de magnitude",
+      "numbers": [
+        "ordem de magnitude"
+      ],
+      "metric": "saturation_knee_ratio",
+      "subject": "encoder vs language pool saturation scales (Portuguese abstract restatement)",
+      "assertion": "The Portuguese abstract restates that the two pools saturate at scales an order of magnitude apart.",
+      "db_check": "provenance.factorial_cell knee comparison as for line 59; must agree with the English abstract.",
+      "criticality": "headline"
+    },
+    {
+      "line": 104,
+      "anchor": "chapter*{Resumo}",
+      "quote": "enfileiramento\nepis\\'odico no codificador a 29\\% de utiliza\\c{c}\\~ao m\\'edia",
+      "numbers": [
+        "29"
+      ],
+      "metric": "mean_utilization_pct",
+      "subject": "encoder pool mean utilization during episodic queueing (Portuguese abstract restatement)",
+      "assertion": "The Portuguese abstract restates episodic encoder queueing at 29 percent mean utilization.",
+      "db_check": "provenance.encoder_run_summary busy/provisioned ratio as for line 60; must agree with the English abstract.",
+      "criticality": "headline"
+    },
+    {
+      "line": 112,
+      "anchor": "chapter*{Resumo}",
+      "quote": "a\n0,62$\\times$ o tempo de GPU da menor frota est\\'atica vi\\'avel de\ncodificadores",
+      "numbers": [
+        "0,62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "forecast vs smallest feasible static encoder fleet GPU-time (Portuguese abstract restatement)",
+      "assertion": "The Portuguese abstract restates the encoder-pool cost ratio of 0.62x versus the smallest feasible static fleet.",
+      "db_check": "provenance.cost_accounting encoder ratio as for line 67; must agree with the English abstract and with line 133.",
+      "criticality": "headline"
+    },
+    {
+      "line": 114,
+      "anchor": "chapter*{Resumo}",
+      "quote": "(com a frota de linguagem praticamente em equil\\'ibrio,\n0,96$\\times$)",
+      "numbers": [
+        "0,96"
+      ],
+      "metric": "cost_ratio",
+      "subject": "forecast vs static language fleet GPU-time (Portuguese abstract restatement)",
+      "assertion": "The Portuguese abstract restates the language-pool cost ratio of 0.96x (near break-even).",
+      "db_check": "provenance.cost_accounting language ratio as for line 68; must agree with the English abstract.",
+      "criticality": "headline"
+    },
+    {
+      "line": 115,
+      "anchor": "chapter*{Resumo}",
+      "quote": "o par de veredictos\np90-versus-reativo do \\emph{pool} de linguagem se reproduz",
+      "numbers": [
+        "90"
+      ],
+      "metric": "quantile_level",
+      "subject": "language-pool forecast quantile in the live-runtime reproduction (Portuguese restatement)",
+      "assertion": "The Portuguese abstract restates that the reproduced language-pool verdict pair is at quantile p90 versus reactive.",
+      "db_check": "provenance.runs quantile filter as for line 69; must agree with the English abstract.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 133,
+      "anchor": "chapter*{Note on this draft}",
+      "quote": "issue-time actuation and the issue-time\nweek-scale aggregate that backs the 0.62$\\times$ figure",
+      "numbers": [
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "encoder-pool week-scale cost headline, attributed to the issue-time actuation re-run",
+      "assertion": "The 0.62x encoder cost headline is backed by the issue-time-actuation week-scale aggregate re-run.",
+      "db_check": "provenance.cost_accounting joined to provenance.runs WHERE actuation='issue_time' AND is_current, encoder pool, week window: verify the forecast/static provisioned_ws ratio equals 0.62 and that superseded (is_current=false) runs are excluded.",
+      "criticality": "headline"
+    },
+    {
+      "line": 256,
+      "anchor": "bibitem{Dynamo2025}",
+      "quote": "Accessed 2026-07-07 (v1.x\nline; simulations use the v1.3.0 source build).",
+      "numbers": [
+        "1.3.0"
+      ],
+      "metric": "dynamo_version",
+      "subject": "Dynamo source build used for all language-pool simulations",
+      "assertion": "All simulations in the thesis use the Dynamo v1.3.0 source build.",
+      "db_check": "provenance.runs: SELECT DISTINCT engine FROM provenance.runs WHERE is_current; confirm the recorded engine/version string is Dynamo v1.3.0 for every language-pool simulation run.",
+      "criticality": "incidental"
+    }
+  ]
+}

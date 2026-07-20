@@ -1,0 +1,160 @@
+{
+  "chapter": "twopool",
+  "n_reviewed": 15,
+  "n_upheld": 10,
+  "n_overturned": 4,
+  "rulings": [
+    {
+      "line": 61,
+      "quote": "TTFT p99 grows $1.24\\times$ and the maximum TTFT and inter-token latency roughly double ($1.8\\times$ and $1.9\\times$)",
+      "original_verdict": "ARTIFACT_SUPERSEDED",
+      "ruling": "upheld",
+      "final_verdict": "ARTIFACT_SUPERSEDED",
+      "criticality": "headline",
+      "evidence": "psql -c \"select run_id,mean_ttft_ms,p99_ttft_ms,max_ttft_ms from provenance.llm_run_summary where run_id in ('sweeps:llm_head2k_poly_s1','sweeps:llm_head2k_aic_s1');\" -> aic 72.639/306.729/7598.103, poly 67.390/249.441/2539.914. The archived artifacts the table actually cites, /home/gio/tese/simulation/results/srcbuild/llm_head2k_{poly,aic}_src.json, give poly p99 248.46453 / max 2539.9137 / max_itl 180.69856 and aic p99 307.36448 / max 4517.5683 / max_itl 347.73152. Ratios: 307.36448/248.46453 = 1.2370 -> 1.24; 4517.5683/2539.9137 = 1.7786 -> 1.8; 347.73152/180.69856 = 1.9244 -> 1.9. All three exact at published precision. The chapter TEXT ITSELF (twopool.tex:58-66) declares the AIC column is the source-built runtime and explicitly documents the wheel-runtime max-TTFT inflation as 7.6 vs 4.5 s -- i.e. the thesis already names the very DB row the first pass compared against, and calls it the artifact.",
+      "final_fix": "NO EDIT. The thesis is right and self-documenting. DB action only: ingest simulation/results/srcbuild/llm_head2k_{poly,aic}_src.json as the current rows for the tab:sim-poly-aic metrics and set superseded_by on sweeps:llm_head2k_{poly,aic}_s1 for those metrics."
+    },
+    {
+      "line": 103,
+      "quote": "TTFT avg / p99 / max (ms) & 67.3 / 248 / 2{,}540 & 68.2 / 307 / 4{,}518",
+      "original_verdict": "ARTIFACT_SUPERSEDED",
+      "ruling": "upheld",
+      "final_verdict": "ARTIFACT_SUPERSEDED",
+      "criticality": "headline",
+      "evidence": "srcbuild poly mean_ttft_ms 67.30122 -> 67.3; p99_ttft_ms 248.46453 -> 248; max_ttft_ms 2539.91366 -> 2,540. srcbuild aic 68.23318 -> 68.2; 307.36448 -> 307; 4517.56828 -> 4,518. Six of six cells exact. The ingested DB rows (wheel runtime) differ on avg and max only.",
+      "final_fix": "NO EDIT. Same DB action as line 61."
+    },
+    {
+      "line": 104,
+      "quote": "Request latency avg / p99 (ms) & 1{,}413 / 6{,}879 & 1{,}590 / 8{,}163",
+      "original_verdict": "ARTIFACT_SUPERSEDED",
+      "ruling": "upheld",
+      "final_verdict": "ARTIFACT_SUPERSEDED",
+      "criticality": "supporting",
+      "evidence": "srcbuild poly mean_e2e_latency_ms 1412.95029 -> 1,413; p99_e2e_latency_ms 6878.76756 -> 6,879. srcbuild aic 1589.62103 -> 1,590; 8163.49788 -> 8,163. Exact.",
+      "final_fix": "NO EDIT. Same DB action as line 61."
+    },
+    {
+      "line": 105,
+      "quote": "Inter-token latency avg / max (ms) & 6.79 / 181 & 7.67 / 348",
+      "original_verdict": "ARTIFACT_SUPERSEDED",
+      "ruling": "upheld",
+      "final_verdict": "ARTIFACT_SUPERSEDED",
+      "criticality": "supporting",
+      "evidence": "srcbuild poly mean_itl_ms 6.78509 -> 6.79; max_itl_ms 180.69856 -> 181. srcbuild aic 7.67120 -> 7.67; 347.73152 -> 348. Exact.",
+      "final_fix": "NO EDIT. Same DB action as line 61."
+    },
+    {
+      "line": 106,
+      "quote": "Output tok/s per user (avg) & 160.6 & 142.0",
+      "original_verdict": "ARTIFACT_SUPERSEDED",
+      "ruling": "upheld",
+      "final_verdict": "ARTIFACT_SUPERSEDED",
+      "criticality": "supporting",
+      "evidence": "srcbuild poly mean_output_token_throughput_per_user 160.63317 -> 160.6; aic 141.95316 -> 142.0. Exact.",
+      "final_fix": "NO EDIT. Same DB action as line 61."
+    },
+    {
+      "line": 82,
+      "quote": "its knee sits at $s{=}1$ ($2.8$~req/s) against the 8B's $s{=}2$: decoder scale halves the language pool's operating envelope",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "headline",
+      "evidence": "The first pass reported 'no 235B run exists in the DB'; 25 now do. psql -c \"select run_id,p99_ttft_ms,p99_itl_ms from provenance.llm_run_summary where run_id like '%235%' order by run_id;\" -> misc:235b_tp8_s1 ITL p99 87.863 (PASS, <100); s1p1208 96.714 (PASS); s1p1351 100.440 (FAIL); s1p5 148.181 (FAIL); misc:235b_tp8_s2 213.044 (FAIL). So s=2 is now MEASURED to violate the ITL bound and the SLA crossing is located at s in [1.121, 1.135] -- on the integer sweep grid the last feasible point is s=1. The 8B comparison also holds: sweeps:llm_head2k_aic_s2 ITL p99 67.334 (PASS), s3 109.513 (FAIL) -> knee s=2. Offered rate from the thesis-era artifact simulation/results/235b/llm_head2k_aic235btp8_s1.json: 2000/(723864.995/1000) = 2.76295 req/s -> 2.8. Note the misc:235b_tp8_* rows are a later, finer defence-prep sweep (source /home/gio/tese/defense/anim/data/g3_32b/reports/) giving TTFT p99 388.06 at s=1 where the thesis quotes 397.68 from its own artifact; the two are separate executions, so the thesis's 398/1,402/87.7 remain sourced from simulation/results/235b/ and are unchanged.",
+      "final_fix": "NO EDIT. The knee-at-$s{=}1$ inference is now closed by measurement (misc:235b_tp8_s2 ITL p99 213.04 ms > 100 ms). Do NOT apply the first pass's proposed hedge 'by inference from an ITL p99 of 87.7 ms' -- that would weaken a claim the data now supports."
+    },
+    {
+      "line": 118,
+      "quote": "every factoring of $N$ images into (batch, images-per-request) --- $(1,64)$, $(2,32)$, $(64,1)$ --- returns the same latency to the microsecond",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "revised",
+      "final_verdict": "INSUFFICIENT_DATA",
+      "criticality": "headline",
+      "evidence": "No factoring dimension exists anywhere in provenance: psql -c \"select column_name from information_schema.columns where table_schema='provenance' and table_name='collector_encoder_fn';\" has no batch column, and collector_fn/collector_encoder_fn key latency on total n_images alone. HOWEVER the probe IS recorded contemporaneously in the project's own log, progress/phase2-simulation.md:106-109: 'AIC's encoder prediction is EXACTLY a function of total images per forward -- (batch_size=1, n=64) == (64, 1) == every factoring, delta 0.000000 ms'. So the claim is corroborated by the generating record, just not by an ingested artifact. (The f(1)/f(64) values in that note, 7.822/314.498, are an older AIC build; the thesis's 8.16/316.4 match the current DB: collector_encoder_fn engine='aic', image_px=448, n_images=64 -> 316.369.)",
+      "final_fix": "NO EDIT to the thesis. This is a DB-coverage gap, not a thesis defect: the invariance is documented in progress/phase2-simulation.md:106-109 with delta 0.000000 ms. Recommended (optional) DB action: ingest the factoring probe with an explicit (batch, images_per_request) key so a future audit can re-derive it. If the author wants belt-and-braces, cite the probe record in Appendix~\\ref{ap:artifacts}."
+    },
+    {
+      "line": 151,
+      "quote": "the policy changes nothing at the steady head (delay percentiles identical to three decimals)",
+      "original_verdict": "INSUFFICIENT_DATA",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "supporting",
+      "evidence": "The first pass compared the WRONG ROWS. psql -c \"select run_id,encoder_delay_p50_ms,encoder_delay_p90_ms,encoder_delay_p99_ms from provenance.encoder_run_summary where run_id like '%head2k%';\" -> sweeps:vision_head2k_s1 = 8.876/52.255/199.110 and sweeps:llm_head2k = 8.536/54.621/200.207. Those are a vision-pool converter run and the LANGUAGE isolation run -- two different experiments, not the sequential-vs-batched pair the sentence is about. The actual sequential-vs-batched validation is recorded at progress/phase2-simulation.md:116-118: 'isolation JSONL byte-identical to Phase 1; delay percentiles unchanged at the idle 2k head (p50/p90/p99 exactly equal; max +5.9 ms from chunking the one 121-image request)'. Phase 1 is the pre-batching (sequential) converter, so this IS the comparison the thesis claims, and it reports exact equality. Independent corroboration that the head is policy-insensitive: sweeps:vision_head2k_s1/s2/s4/s8 are all bit-identical at 8.876/52.255/199.110.",
+      "final_fix": "NO EDIT. Do NOT apply the first pass's proposed softening to 'delay percentiles agree to within 1 ms' -- it would weaken a correct claim on the basis of a comparison between two unrelated runs."
+    },
+    {
+      "line": 185,
+      "quote": "the cost model matches to within $12.8\\%$ across the whole $N\\le64$ serving regime (a dense sweep of 69 batch sizes)",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "upheld",
+      "final_verdict": "DEFINITIONAL",
+      "criticality": "headline",
+      "evidence": "psql -c \"select count(*) n_all, count(*) filter (where n_images<=64) n_le64, min(n_images), max(n_images) from provenance.collector_encoder_fn where source_path like '%vllm_eager_dense%';\" -> 69 / 64 / 1 / 512. So the dense sweep is 69 points spanning N=1..512, of which exactly 64 are in the N<=64 regime. The 12.8% BOUND is correct and must not be touched: progress/results-ledger.md:479 records 'across the whole DENSE N<=64 grid max |dev| = +12.7% at N=52 ... beyond the FIFO cap it climbs to +21.8% at N=512', and 12.8% is the thesis-wide band (the +12.7% maximum sits inside it). Only the parenthetical mis-scopes: it reads as if all 69 swept sizes lie in the N<=64 regime.",
+      "final_fix": "Replace `across the whole $N\\le64$ serving regime (a dense sweep of 69 batch sizes)` with `across the whole $N\\le64$ serving regime (64 consecutive batch sizes within a dense $N{=}1$--$512$ sweep of 69 points)`. No number changes; 12.8% stays."
+    },
+    {
+      "line": 217,
+      "quote": "validated against the week replay to within 8\\% at p99: \\SI{706}{} modelled versus \\SI{651}{\\milli\\second} replayed",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "upheld",
+      "final_verdict": "DEFINITIONAL",
+      "criticality": "headline",
+      "evidence": "Both quoted figures are exactly right. simulation/results/rerun_verify/e2e_ingress_to_first_token.json -> ttft_validation.modeled.p99 = 705.94, ttft_validation.replay_report.p99 = 651.1395369768143. psql -c \"select window_name,arm,ttft_p99_ms from provenance.composed_e2e where window_name='week';\" -> fc_chronos/fc_toto/fc_timesfm all 651.1. Unrounded relative error against the REPLAYED reference: (705.94-651.1395)/651.1395 = 8.4160%; against the modelled value: (705.94-651.1395)/705.94 = 7.7627%. Only the second convention supports 'within 8%', and validating a model against a measurement conventionally normalises by the measurement. The defect is the unstated denominator, not the numbers.",
+      "final_fix": "Replace `to within 8\\% at p99` with `to within 8.5\\% at p99`. 8.5% is true under BOTH denominators (8.42% and 7.76%), so it cannot introduce an error. Justification: 705.94 vs 651.1395 from the artifact above."
+    },
+    {
+      "line": 230,
+      "quote": "because the two tails are positively correlated ($r{=}0.52$ on image-bearing requests)",
+      "original_verdict": "THESIS_WRONG",
+      "ruling": "upheld",
+      "final_verdict": "THESIS_WRONG",
+      "criticality": "headline",
+      "evidence": "Current artifact simulation/results/rerun_verify/e2e_ingress_to_first_token.json -> correlation_enc_vs_ttft.image_requests_only = 0.527 (all_requests 0.424). 0.527 -> 0.53 at two decimals. Adversarial check for a stale-artifact rescue CONFIRMS the defect rather than refuting it: `git show a1d12a1^:simulation/results/rerun_verify/e2e_ingress_to_first_token.json` gives image_requests_only = 0.516 (all_requests 0.415) -- the pre-regeneration TARGET-time run. So 0.52 is the rounding of the SUPERSEDED 0.516; commit a1d12a1 rebuilt the artifact on issue-time inputs (ledger 'e2e script now reads the issue-time jsonl') and the thesis number was never propagated. The thesis is stale, not the DB.",
+      "final_fix": "Replace `($r{=}0.52$ on image-bearing requests)` with `($r{=}0.53$ on image-bearing requests)`. Source: simulation/results/rerun_verify/e2e_ingress_to_first_token.json -> correlation_enc_vs_ttft.image_requests_only = 0.527."
+    },
+    {
+      "line": 311,
+      "quote": "sizing both pools off one signal would overprovision the encoder fleet by that factor in calm traffic",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "supporting",
+      "evidence": "This is not a measured-quantity claim and does not present itself as one: the subjunctive 'would overprovision ... by that factor' explicitly forwards the factor from the immediately preceding measured separation. That separation is verified: language knee under calibrated timing at s=2 (sweeps:llm_head2k_aic_s2 ITL p99 67.334 PASS, s3 109.513 FAIL) against a vision pool uncrossed through s=32 (sweeps:vision_head2k_s32 encoder_delay_p99_ms 787.18 < 1000) -> 32/2 = 16, and the thesis states the weaker, correct '>10'. The first pass's own proposed fix concedes the sentence is 'already hedged'.",
+      "final_fix": "NO EDIT. The sentence is an explicitly subjunctive corollary of a separation that is measured and correctly stated as '>10'."
+    },
+    {
+      "line": 391,
+      "quote": "Language-pool results are reported for the 8B at TP1 with a 235B-TP8 spot-check ...; intermediate family members (32B) were not priced",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "upheld",
+      "final_verdict": "DEFINITIONAL",
+      "criticality": "incidental",
+      "evidence": "psql -c \"select run_id,tp from provenance.runs where tp=2 and pool='language';\" -> sweeps:llm_burst1_aic_tp2_s1 exists and is thesis-era; the chapter itself reports it (tab:sim-knees caption, twopool.tex:265: 'a TP2$\\times$2 shape passes the same window at \\SI{748}{\\milli\\second}'). So the limitation sentence understates the chapter's own coverage. The 32B clause is CORRECT for the thesis: the only 32B rows in the DB (misc:32b_tp2_*, 95 rows, created_at 2026-07-20 01:28) come from /home/gio/tese/defense/anim/data/g3_32b/ -- defence-presentation material generated after the manuscript, carrying no thesis content, so 'were not priced' stands as a statement about this work.",
+      "final_fix": "Replace `Language-pool results are reported for the 8B at TP1 with a 235B-TP8 spot-check` with `Language-pool results are reported for the 8B at TP1, with a TP2$\\times$2 spot-check on the burst window and a 235B-TP8 spot-check`. Leave the 32B clause untouched -- do NOT edit it on the strength of the misc:32b_tp2_* rows, which are post-manuscript defence artifacts."
+    },
+    {
+      "line": 403,
+      "quote": "the steady-window knee moves by one octave between the two models (Table~\\ref{tab:sim-knees}) and the burst verdict changes outright",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "upheld",
+      "final_verdict": "DEFINITIONAL",
+      "criticality": "supporting",
+      "evidence": "The knees themselves are right. psql -c \"select run_id,p99_ttft_ms,p99_itl_ms from provenance.llm_run_summary where run_id like 'sweeps:llm_head2k%';\" -> poly s3 ITL p99 94.336 (PASS) / s4 154.237 (FAIL) -> knee s=3; aic s2 67.334 (PASS) / s3 109.513 (FAIL) -> knee s=2. An octave is a factor of 2; the shift is 3 -> 2, a factor 1.5 (0.585 octaves), and on offered load 8.3 -> 5.5 req/s, a factor 1.509. No rounding or bracketing convention makes 1.5 'one octave'. The sweep grid is unit-spaced below s=4, so the honest description is one grid step. Note the same paragraph's other loose use at twopool.tex:387 ('one to two octaves higher') is about a different, genuinely octave-spaced region and is not touched here.",
+      "final_fix": "Replace `the steady-window knee moves by one octave between the two models` with `the steady-window knee moves by one sweep step between the two models ($s{=}3$ polynomial to $s{=}2$ calibrated, a factor $1.5$ in offered load, $8.3\\to5.5$~req/s)`. Sources: sweeps:llm_head2k_poly_s3/s4 and sweeps:llm_head2k_aic_s2/s3 ITL p99 above; offered rates as published in tab:sim-knees."
+    },
+    {
+      "line": 436,
+      "quote": "per-image cost scales roughly with patch count, so a $224^2$-dominated workload would run ${\\approx}4\\times$ cheaper per image and a $672^2$-dominated one ${\\approx}2.25\\times$ dearer",
+      "original_verdict": "DEFINITIONAL",
+      "ruling": "overturned",
+      "final_verdict": "CONFIRMED",
+      "criticality": "supporting",
+      "evidence": "The sentence states its own derivation ('scales roughly with patch count') and then reports the patch-count ratios, which are exact: (448/224)^2 = 4.00 and (672/448)^2 = 2.25. It is a correctly executed statement of the stated law, not a misreported measurement, and is doubly hedged ('roughly', '$\\approx$'). The measured AIC anchors are consistent within that hedge: psql -c \"select engine,image_px,n_images,mean_ms from provenance.collector_encoder_fn where n_images=64 and engine='aic';\" -> 224px 74.885, 448px 317.299, 672px 787.718 -> 317.299/74.885 = 4.237 and 787.718/317.299 = 2.483, i.e. 6% and 10% off the patch-count law in the SAME direction (AIC slightly superlinear), which is what 'roughly' encodes. Refusing to publish 2.25 here would mean the sentence no longer says what its own premise implies.",
+      "final_fix": "NO EDIT. Optional, non-mandatory clarity addition only, if the author wants the measured anchors on the page: append `(measured $4.2\\times$ and $2.5\\times$ at $N{=}64$)`. Do NOT replace 2.25 with 2.48 -- 2.25 is the patch-count figure the sentence explicitly derives."
+    }
+  ],
+  "rejected_fixes": "FIVE first-pass fixes are REJECTED; applying any would introduce an error or a false weakening.\n1. line 82 -- REJECTED: reword to 'its knee sits at $s{=}1$ (2.8 req/s) BY INFERENCE from an ITL p99 of 87.7 ms', and/or 'run llm_head2k_aic235btp8_s2 to close the knee'. The s=2 run now exists (misc:235b_tp8_s2, ITL p99 213.044 ms > 100) and 25 finer 235B-TP8 points bracket the crossing at s in [1.121,1.135]. The knee is MEASURED, not inferred; hedging it would understate a supported result.\n2. line 151 -- REJECTED: soften to 'delay percentiles agree to within 1 ms'. Based on comparing sweeps:vision_head2k_s1 (8.876/52.255/199.110) against sweeps:llm_head2k (8.536/54.621/200.207), which are a vision-converter run and a language isolation run -- two different experiments, not the sequential-vs-batched pair. The real validation (progress/phase2-simulation.md:116-118) reports p50/p90/p99 EXACTLY EQUAL at the 2k head.\n3. line 436 -- REJECTED: replacing $\\approx2.25\\times$ with the measured 2.48x (or 2.5x) as if the thesis had misquoted a measurement. 2.25 is the exact patch-count ratio (672/448)^2, which is what the sentence says it is deriving. Substituting the AIC anchor would make the sentence contradict its own stated premise.\n4. line 61 / 103 / 104 / 105 / 106 -- REJECTED as thesis edits: any change of the tab:sim-poly-aic cells or the 1.24/1.8/1.9 ratios toward the ingested sweeps:llm_head2k_{poly,aic}_s1 rows. Those rows are the WHEEL-runtime execution (max_ttft 7598.10 ms) that twopool.tex:64-66 explicitly names and discards; the source-built artifacts reproduce every published cell exactly. Editing them would replace six correct numbers with six wrong ones.\n5. line 391 -- REJECTED: editing the '32B were not priced' clause on the strength of the misc:32b_tp2_* rows. Those 95 rows were created 2026-07-20 from defense/anim/data/g3_32b/ (defence-presentation material, post-manuscript, no thesis content). Only the TP2 spot-check omission is a real gap.\nSeparately NOTED but out of scope for this file: internal_defects line 276 flags tab:sim-knees' polynomial steady cell '249' against tab:sim-poly-aic's '248'. Both are defensible in isolation -- 249.441 is the wheel-runtime poly p99 (DB) and 248.465 the source-built one -- but they are the SAME run under two builds, so the two tables cite different runtimes for one cell. Resolving it means picking the srcbuild value 248 in tab:sim-knees for consistency with tab:sim-poly-aic; do not 'fix' tab:sim-poly-aic to 249.",
+  "notes": "Row-selection checks performed: is_current=t on every row consulted; experiment/pool/tp/window filters verified (the 235B rows carry tp=8, pool='language', kind='K1'); knee determination uses the DUAL bound (TTFT p99 < 1000 ms AND ITL p99 < 100 ms) as defined at twopool.tex:290-296, and in every steady-window case the ITL bound is the binding one, matching the '(ITL-bound)' label in tab:sim-knees. No percentage in this file was recomputed from a published rounded cell: the 8.42%/7.76% pair at line 217 uses 705.94 and 651.1395369768143 unrounded, and the 12.7% max deviation at line 185 is quoted from the ledger's dense-grid computation rather than re-derived from table cells. Net worklist for twopool after adversarial review: FOUR text edits (lines 185, 217, 230, 403 -- of which only 230 changes a published number, 0.52 -> 0.53) plus one optional incidental (391); everything else is NO EDIT. Two DB actions: ingest the srcbuild pair and mark the wheel rows superseded for the timing-table metrics; optionally ingest the AIC factoring probe with an explicit batch dimension."
+}

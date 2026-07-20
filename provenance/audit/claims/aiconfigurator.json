@@ -1,0 +1,1652 @@
+{
+  "chapter": "aiconfigurator",
+  "claims": [
+    {
+      "line": 18,
+      "anchor": "cap:aiconfigurator (chapter abstract)",
+      "quote": "the collected attention operator agrees within ${\\approx}3\\%$, and the end-to-end kernel-time ledger closes with no unexplained residual",
+      "numbers": [
+        "3"
+      ],
+      "metric": "attention_operator_agreement_pct",
+      "subject": "AIC encoder-attention operator vs measured Qwen3-VL ViT attention kernels on RTX 5090",
+      "assertion": "Chapter abstract asserts the collected encoder-attention operator prediction agrees with silicon measurement within ~3%.",
+      "db_check": "UNVERIFIABLE in provenance DB: kernel-level profile of the HF eager forward is a collector artifact (collector_artifacts/), not a run row; cross-check against collector_fn / phaseE anchor_fidelity artifact.",
+      "criticality": "headline"
+    },
+    {
+      "line": 36,
+      "anchor": "sec:aic-motivation",
+      "quote": "only the speed-of-light (SOL) mode answers, underestimating the measured operator latency by a factor of ${\\approx}5.9$ at a representative shape",
+      "numbers": [
+        "5.9"
+      ],
+      "metric": "sol_underestimate_factor",
+      "subject": "AIC SOL mode vs measured encoder_attention on rtx_pro_6000_server / RTX 5090",
+      "assertion": "AIC's speed-of-light fallback under-predicts measured encoder-attention latency by a factor of about 5.9.",
+      "db_check": "UNVERIFIABLE in provenance DB: SOL-vs-measured operator probe is an AIC collector/probe artifact; no runs/llm_run_summary row models operator-level SOL queries.",
+      "criticality": "headline"
+    },
+    {
+      "line": 37,
+      "anchor": "sec:aic-motivation",
+      "quote": "(\\SI{0.0061}{\\milli\\second} SOL predicted on \\texttt{rtx\\_pro\\_6000\\_server} vs.\\ \\SI{0.0358}{\\milli\\second} measured on the RTX~5090 at batch~1, 784~patches",
+      "numbers": [
+        "0.0061",
+        "0.0358",
+        "1",
+        "784"
+      ],
+      "metric": "encoder_attention_op_latency_ms",
+      "subject": "single encoder_attention operator, batch 1, seq 784, RTX 5090 vs rtx_pro_6000_server SOL",
+      "assertion": "At batch 1 / 784 patches the SOL prediction is 0.0061 ms against 0.0358 ms measured on RTX 5090.",
+      "db_check": "UNVERIFIABLE in provenance DB: per-operator microbenchmark values live in the AIC systems/data tables, not in provenance.* ; verify against systems/data/rtx_5090/vllm/0.22.0 encoder-attention rows.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 53,
+      "anchor": "sec:aic-collection (target system)",
+      "quote": "(GB202 die, consumer Blackwell, compute capability 12.0, \\SI{32607}{\\mebi\\byte} GDDR7, observed board power limit \\SI{600}{\\watt}",
+      "numbers": [
+        "12.0",
+        "32607",
+        "600"
+      ],
+      "metric": "gpu_hardware_spec",
+      "subject": "NVIDIA GeForce RTX 5090 benchmark node",
+      "assertion": "The RTX 5090 used has compute capability 12.0, 32607 MiB of GDDR7 and an observed 600 W board power limit.",
+      "db_check": "UNVERIFIABLE in provenance DB: node hardware inventory; nearest handle is runs.gpu='rtx_5090' but the DB stores no memory/power fields.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 55,
+      "anchor": "sec:aic-collection (target system)",
+      "quote": "driver 595.71.05, CUDA~13.2; memory and power figures from \\texttt{nvidia-smi} on the benchmark node",
+      "numbers": [
+        "595.71.05",
+        "13.2"
+      ],
+      "metric": "driver_cuda_version",
+      "subject": "RTX 5090 benchmark node software stack",
+      "assertion": "The collection node ran driver 595.71.05 and CUDA 13.2.",
+      "db_check": "UNVERIFIABLE in provenance DB: environment metadata not modeled in provenance schema.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 60,
+      "anchor": "sec:aic-collection (target system)",
+      "quote": "per-SM, per-MHz throughput at the official \\SI{2407}{\\mega\\hertz} boost clock, yielding \\SI{209.5}{\\tera\\flop\\per\\second} dense bf16 (FP32 accumulate; the FP16-accumulate rate is $2\\times$ this)",
+      "numbers": [
+        "2407",
+        "209.5",
+        "2"
+      ],
+      "metric": "tensor_core_bf16_tflops",
+      "subject": "rtx_5090 AIC system file, dense bf16 FP32-accumulate",
+      "assertion": "The rtx_5090 AIC system entry declares 209.5 TFLOP/s dense bf16 at the 2407 MHz boost clock, with FP16-accumulate twice that.",
+      "db_check": "UNVERIFIABLE in provenance DB: system-file constant scaled from rtx_pro_6000_server, not an experimental measurement; check systems/rtx_5090.yaml in the aiconfigurator fork.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 75,
+      "anchor": "sec:aic-collection (kernel fidelity)",
+      "quote": "On compute capability 12.0 under vLLM~0.22.0 this resolves to FlashAttention~\\cite{Dao2023FlashAttention2}",
+      "numbers": [
+        "12.0",
+        "0.22.0"
+      ],
+      "metric": "kernel_backend_selection",
+      "subject": "vLLM get_vit_attn_backend on cc 12.0, vLLM 0.22.0",
+      "assertion": "On compute capability 12.0 with vLLM 0.22.0 the ViT attention backend resolves to FlashAttention.",
+      "db_check": "UNVERIFIABLE in provenance DB: backend-selection fact recorded in collector output; runs.engine may record 'vllm' but not the kernel_source.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 80,
+      "anchor": "sec:aic-collection (kernel fidelity)",
+      "quote": "the collector module's compatibility gate (\\texttt{vllm>=0.21.0}) rules out the older framework versions AIC's manifest still lists",
+      "numbers": [
+        "0.21.0"
+      ],
+      "metric": "collector_version_gate",
+      "subject": "AIC vLLM encoder-attention collector module",
+      "assertion": "The collector requires vLLM >= 0.21.0, excluding older framework versions listed in AIC's manifest.",
+      "db_check": "UNVERIFIABLE in provenance DB: source-code property of the AIC collector, not an experimental result.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 84,
+      "anchor": "sec:aic-collection (clock control)",
+      "quote": "an initial collection at unlocked clocks ran ${\\approx}17\\%$ faster than the final dataset",
+      "numbers": [
+        "17"
+      ],
+      "metric": "unlocked_clock_speedup_pct",
+      "subject": "RTX 5090 encoder-attention/GEMM collection, unlocked vs locked clocks",
+      "assertion": "Collecting at unlocked consumer-GPU clocks inflated measured kernel performance by about 17% relative to the locked-clock dataset.",
+      "db_check": "UNVERIFIABLE in provenance DB: requires the superseded unlocked-clock collection artifact vs the locked one; compare the two systems/data/rtx_5090 dataset commits.",
+      "criticality": "headline"
+    },
+    {
+      "line": 86,
+      "anchor": "sec:aic-collection (clock control)",
+      "quote": "recollected at locked clocks: SM \\SI{2407}{\\mega\\hertz}, memory \\SI{14001}{\\mega\\hertz}",
+      "numbers": [
+        "2407",
+        "14001"
+      ],
+      "metric": "locked_clock_mhz",
+      "subject": "RTX 5090 collection protocol",
+      "assertion": "All reported data was collected with SM clock locked at 2407 MHz and memory at 14001 MHz.",
+      "db_check": "UNVERIFIABLE in provenance DB: protocol setting recorded in collector artifacts, not the provenance schema.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 96,
+      "anchor": "sec:aic-collection (out-of-envelope shapes)",
+      "quote": "The GEMM base sweep's giant tail is memory-infeasible on this \\SI{32}{\\gibi\\byte} card",
+      "numbers": [
+        "32"
+      ],
+      "metric": "device_memory_gib",
+      "subject": "RTX 5090 GEMM base sweep envelope",
+      "assertion": "The RTX 5090 card has 32 GiB of device memory bounding the GEMM sweep.",
+      "db_check": "UNVERIFIABLE in provenance DB: hardware constant.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 97,
+      "anchor": "sec:aic-collection (out-of-envelope shapes)",
+      "quote": "at $M{=}32768$, $N{=}65536$ the bf16 output tensor alone is \\SI{4}{\\gibi\\byte} ($2^{32}$ bytes)",
+      "numbers": [
+        "32768",
+        "65536",
+        "4",
+        "2",
+        "32"
+      ],
+      "metric": "gemm_output_tensor_bytes",
+      "subject": "bf16 GEMM shape M=32768, N=65536",
+      "assertion": "At M=32768, N=65536 the bf16 output tensor alone occupies 4 GiB (2^32 bytes).",
+      "db_check": "Arithmetic check only (32768*65536*2 = 2^32 bytes); UNVERIFIABLE in provenance DB.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 99,
+      "anchor": "sec:aic-collection (out-of-envelope shapes)",
+      "quote": "so 1{,}157 such shapes fail to allocate and 276 more are pre-skipped by a \\SI{4}{\\gibi\\byte} tensor-footprint cutoff",
+      "numbers": [
+        "1157",
+        "276",
+        "4"
+      ],
+      "metric": "gemm_shapes_excluded_count",
+      "subject": "RTX 5090 bf16 GEMM base sweep",
+      "assertion": "1,157 giant GEMM shapes failed to allocate and 276 more were pre-skipped by a 4 GiB tensor-footprint cutoff.",
+      "db_check": "UNVERIFIABLE in provenance DB: collection-campaign counts; verify in the collector logs / audit artifacts of PR #1312.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 104,
+      "anchor": "sec:aic-collection (out-of-envelope shapes)",
+      "quote": "the collected grid runs exactly to the memory limit: at $N{=}65536$, up to $M{=}16384$ but not $M{=}32768$",
+      "numbers": [
+        "65536",
+        "16384",
+        "32768"
+      ],
+      "metric": "gemm_grid_edge",
+      "subject": "RTX 5090 bf16 GEMM collected grid",
+      "assertion": "At N=65536 the collected grid extends to M=16384 and stops before M=32768.",
+      "db_check": "UNVERIFIABLE in provenance DB: grid coverage of the AIC data files.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 105,
+      "anchor": "sec:aic-collection (out-of-envelope shapes)",
+      "quote": "the Qwen3-VL tower this system costs never queries the square-giant regime, $n\\le\\num{5120}$",
+      "numbers": [
+        "5120"
+      ],
+      "metric": "queried_gemm_n_max",
+      "subject": "Qwen3-VL vision tower GEMM queries",
+      "assertion": "The Qwen3-VL tower only queries GEMM shapes with n <= 5120, never the square-giant regime.",
+      "db_check": "UNVERIFIABLE in provenance DB: property of the model operator graph; inspect AIC's Qwen3-VL encoder graph expansion.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 109,
+      "anchor": "sec:aic-collection (out-of-envelope shapes)",
+      "quote": "seventeen small shapes ($M{\\le}2$) that \\emph{spuriously} reported out-of-memory in the fragmentation wake of those failures --- the only genuine gaps --- were requeued",
+      "numbers": [
+        "17",
+        "2"
+      ],
+      "metric": "requeued_shape_count",
+      "subject": "RTX 5090 bf16 GEMM collection, M<=2 shapes",
+      "assertion": "Seventeen small (M<=2) GEMM shapes spuriously OOM'd and were requeued and collected cleanly in a fresh container.",
+      "db_check": "UNVERIFIABLE in provenance DB: collection-campaign remediation count; check collector logs for the requeue run.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 115,
+      "anchor": "sec:aic-collection (collected dataset)",
+      "quote": "comprises \\num{7679} encoder-attention cases (batch $\\in\\{1,\\dots,64\\}$, sequence length $\\in[1, 65536]$, 35 head configurations including the $16\\times 72$ geometry",
+      "numbers": [
+        "7679",
+        "1",
+        "64",
+        "1",
+        "65536",
+        "35",
+        "16",
+        "72"
+      ],
+      "metric": "encoder_attention_rows",
+      "subject": "RTX 5090 vllm 0.22.0 campaign dataset (raw slice)",
+      "assertion": "The raw campaign dataset holds 7,679 encoder-attention cases over batch 1-64, seq 1-65536, and 35 head configurations including 16 heads of dim 72.",
+      "db_check": "UNVERIFIABLE in provenance DB: dataset row counts belong to systems/data/rtx_5090/vllm/0.22.0/; count rows in the AIC data files.",
+      "criticality": "headline"
+    },
+    {
+      "line": 118,
+      "anchor": "sec:aic-collection (collected dataset)",
+      "quote": "zero errors) and \\num{34326} unique bf16 GEMM rows, both under \\texttt{systems/data/rtx\\_5090/vllm/0.22.0/}",
+      "numbers": [
+        "0",
+        "34326"
+      ],
+      "metric": "gemm_rows",
+      "subject": "RTX 5090 vllm 0.22.0 campaign dataset (raw slice)",
+      "assertion": "The raw campaign dataset holds 34,326 unique bf16 GEMM rows collected with zero errors.",
+      "db_check": "UNVERIFIABLE in provenance DB: dataset row count; count rows in systems/data/rtx_5090/vllm/0.22.0/.",
+      "criticality": "headline"
+    },
+    {
+      "line": 121,
+      "anchor": "sec:aic-collection (collected dataset)",
+      "quote": "contributed upstream as a draft pull request (ai-dynamo/aiconfigurator \\#1312)",
+      "numbers": [
+        "1312"
+      ],
+      "metric": "upstream_pr_number",
+      "subject": "ai-dynamo/aiconfigurator draft PR",
+      "assertion": "The dataset and system registration were contributed upstream as draft PR #1312.",
+      "db_check": "UNVERIFIABLE in provenance DB: external artifact identifier (GitHub PR).",
+      "criticality": "incidental"
+    },
+    {
+      "line": 133,
+      "anchor": "sec:aic-collection (targeted shape infill)",
+      "quote": "the 448-pixel image is 784 patches, so every encoder-attention query interpolated between the collected $s{=}576$ and $s{=}1024$ lines",
+      "numbers": [
+        "448",
+        "784",
+        "576",
+        "1024"
+      ],
+      "metric": "patch_count",
+      "subject": "448x448 image, Qwen3-VL vision tower",
+      "assertion": "A 448-pixel image yields 784 patches, which fell between the collected s=576 and s=1024 grid lines before infill.",
+      "db_check": "UNVERIFIABLE in provenance DB: grid/geometry property; 448/16=28, 28^2=784 is arithmetic.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 136,
+      "anchor": "sec:aic-collection (targeted shape infill)",
+      "quote": "the companion GEMMs at $m = 784N$ crossed into the sparsely-anchored giant-shape region for $N \\gtrsim 42$",
+      "numbers": [
+        "784",
+        "42"
+      ],
+      "metric": "gemm_giant_region_threshold",
+      "subject": "encoder block GEMMs at m=784N",
+      "assertion": "Encoder block GEMMs at m=784N entered the sparsely-anchored giant-shape region for N above about 42.",
+      "db_check": "UNVERIFIABLE in provenance DB: grid-coverage property of the AIC GEMM table.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 137,
+      "anchor": "sec:aic-collection (targeted shape infill)",
+      "quote": "A 465-case infill (the $s \\in \\{784, 3136, 12544\\}$ attention lines and the encoder graph's exact GEMM shapes for $N \\in [1,64]$) was collected under the identical protocol",
+      "numbers": [
+        "465",
+        "784",
+        "3136",
+        "12544",
+        "1",
+        "64"
+      ],
+      "metric": "infill_case_count",
+      "subject": "RTX 5090 shape-infill collection",
+      "assertion": "A 465-case infill added the s in {784,3136,12544} attention lines and the exact encoder GEMM shapes for N in [1,64].",
+      "db_check": "UNVERIFIABLE in provenance DB: collection-campaign count; verify in the infill commit 656ac8ca artifacts.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 141,
+      "anchor": "sec:aic-collection (targeted shape infill)",
+      "quote": "bringing the dataset to \\num{7760} attention and \\num{34710} GEMM rows and making the 448-pixel query path grid-exact",
+      "numbers": [
+        "7760",
+        "34710",
+        "448"
+      ],
+      "metric": "infilled_dataset_rows",
+      "subject": "RTX 5090 vllm 0.22.0 infilled slice",
+      "assertion": "After infill the dataset holds 7,760 attention and 34,710 GEMM rows.",
+      "db_check": "UNVERIFIABLE in provenance DB: dataset row count; count rows in the infilled AIC data files.",
+      "criticality": "headline"
+    },
+    {
+      "line": 143,
+      "anchor": "sec:aic-collection (targeted shape infill)",
+      "quote": "The correction shifted predicted encoder costs by $+4.3\\%$ at one image, $-5.8\\%$ at six, and under $1\\%$ at 32 and above.",
+      "numbers": [
+        "4.3",
+        "5.8",
+        "1",
+        "32"
+      ],
+      "metric": "infill_cost_shift_pct",
+      "subject": "AIC composed encoder cost f(N), raw vs infilled slice",
+      "assertion": "The infill changed predicted encoder cost by +4.3% at N=1, -5.8% at N=6 and under 1% for N>=32.",
+      "db_check": "Cross-check provenance.collector_fn rows for the same N under the raw vs infilled dataset version, or recompute f(N) with both AIC data slices.",
+      "criticality": "headline"
+    },
+    {
+      "line": 146,
+      "anchor": "sec:aic-collection (targeted shape infill)",
+      "quote": "\\emph{raw slice} (\\num{7679}/\\num{34326} rows; single-image cost \\SI{7.82}{\\milli\\second})",
+      "numbers": [
+        "7679",
+        "34326",
+        "7.82"
+      ],
+      "metric": "encoder_cost_single_image_ms",
+      "subject": "AIC composed encoder forward, N=1, 448^2, raw slice",
+      "assertion": "The raw slice predicts a single-image encoder cost of 7.82 ms.",
+      "db_check": "provenance.collector_fn where gpu='rtx_5090' and n_images=1 (raw-slice dataset version); also appears as the service time in encoder_run_summary-backing configs.",
+      "criticality": "headline"
+    },
+    {
+      "line": 149,
+      "anchor": "sec:aic-collection (targeted shape infill)",
+      "quote": "\\emph{infilled slice} (\\num{7760}/\\num{34710} rows; single-image cost \\SI{8.16}{\\milli\\second}) feeds every simulation result in Chapter~\\ref{cap:twopool}",
+      "numbers": [
+        "7760",
+        "34710",
+        "8.16"
+      ],
+      "metric": "encoder_cost_single_image_ms",
+      "subject": "AIC composed encoder forward, N=1, 448^2, infilled slice",
+      "assertion": "The infilled slice predicts a single-image encoder cost of 8.16 ms, and feeds all downstream simulation.",
+      "db_check": "provenance.collector_fn where gpu='rtx_5090' and n_images=1 (infilled dataset version); must match tab:aic-fn N=1 composed column.",
+      "criticality": "headline"
+    },
+    {
+      "line": 152,
+      "anchor": "sec:aic-collection (targeted shape infill)",
+      "quote": "The current upstream PR HEAD (\\texttt{b55dd0b7}) carries \\num{7770}/\\num{34775} rows after a later large-batch coverage audit",
+      "numbers": [
+        "7770",
+        "34775"
+      ],
+      "metric": "upstream_head_dataset_rows",
+      "subject": "aiconfigurator PR #1312 HEAD dataset",
+      "assertion": "The upstream PR HEAD carries 7,770 attention and 34,775 GEMM rows, whose extra rows are outside the 448-pixel query path.",
+      "db_check": "UNVERIFIABLE in provenance DB: upstream dataset row count at commit b55dd0b7.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 157,
+      "anchor": "sec:aic-collection (targeted shape infill)",
+      "quote": "re-derived under the corrected data: encoder-delay percentiles moved by at most ${\\approx}1\\%$, and no finding changed",
+      "numbers": [
+        "1"
+      ],
+      "metric": "encoder_delay_p99_shift_pct",
+      "subject": "Chapter twopool encoder-delay percentiles, raw vs infilled slice",
+      "assertion": "Re-deriving Chapter 5 results on the infilled data moved encoder-delay percentiles by at most about 1%.",
+      "db_check": "Compare provenance.encoder_run_summary.encoder_delay_p99_ms across runs differing only in the AIC dataset version (raw vs infilled), same pool/window_name/policy.",
+      "criticality": "headline"
+    },
+    {
+      "line": 159,
+      "anchor": "sec:aic-collection (targeted shape infill)",
+      "quote": "one marginal optimum shifted by a single worker (an episode whose configuration had sat \\SI{3}{\\milli\\second} inside the tail bound)",
+      "numbers": [
+        "1",
+        "3"
+      ],
+      "metric": "sizing_shift_workers",
+      "subject": "baseline-chapter worker-sizing episode near the tail bound",
+      "assertion": "One worker-sizing optimum shifted by a single worker after the data correction, in an episode sitting 3 ms inside the tail bound.",
+      "db_check": "provenance.factorial_cell filtered to the episode's window/policy; compare feasible/p99_ms at config_c and config_c+1 across dataset versions.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 170,
+      "anchor": "sec:aic-composition",
+      "quote": "the model configuration expands into the concrete 27-block operator sequence",
+      "numbers": [
+        "27"
+      ],
+      "metric": "encoder_block_count",
+      "subject": "Qwen3-VL vision tower operator graph in AIC",
+      "assertion": "The Qwen3-VL encoder expands into a 27-block operator sequence in AIC's graph.",
+      "db_check": "UNVERIFIABLE in provenance DB: model-architecture constant from the checkpoint config.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 174,
+      "anchor": "sec:aic-composition",
+      "quote": "Tensor-parallel communication terms are analytic and zero at TP=1.",
+      "numbers": [
+        "1"
+      ],
+      "metric": "tp_degree",
+      "subject": "AIC composition, TP=1",
+      "assertion": "At TP=1 the analytic tensor-parallel communication terms contribute zero to the composed latency.",
+      "db_check": "provenance.runs.tp = 1 for encoder-pool runs; the claim itself is a model property.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 185,
+      "anchor": "sec:aic-composition (stratum 1)",
+      "quote": "the returned latency \\emph{is} the silicon measurement: here, the mean of six CUDA-graph replays of the production vLLM kernel at locked clocks",
+      "numbers": [
+        "6"
+      ],
+      "metric": "replay_count",
+      "subject": "AIC collected grid-point measurement protocol",
+      "assertion": "Each collected grid point is the mean of six CUDA-graph replays of the production vLLM kernel.",
+      "db_check": "UNVERIFIABLE in provenance DB: collector protocol constant.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 188,
+      "anchor": "sec:aic-composition (stratum 1)",
+      "quote": "every 448-pixel encoder-attention and block-GEMM query for $N \\le 64$ is an exact hit",
+      "numbers": [
+        "448",
+        "64"
+      ],
+      "metric": "exact_hit_coverage",
+      "subject": "448-pixel encoder query path after infill, N<=64",
+      "assertion": "After infill, every 448-pixel encoder-attention and block-GEMM query for N<=64 is an exact grid hit rather than interpolated.",
+      "db_check": "UNVERIFIABLE in provenance DB: grid-coverage property; verify by replaying AIC queries with interpolation logging.",
+      "criticality": "headline"
+    },
+    {
+      "line": 196,
+      "anchor": "sec:aic-composition (stratum 2)",
+      "quote": "The pre-infill 448-pixel path shows this stratum's cost here: $+4.3\\%$ to $-5.8\\%$ from the exact measurements.",
+      "numbers": [
+        "448",
+        "4.3",
+        "5.8"
+      ],
+      "metric": "interpolation_error_pct",
+      "subject": "AIC interpolation stratum on the pre-infill 448-pixel path",
+      "assertion": "Interpolation on the pre-infill 448-pixel path cost between +4.3% and -5.8% versus the exact measurements.",
+      "db_check": "Same check as line 143: compare collector_fn f(N) under raw vs infilled dataset versions.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 200,
+      "anchor": "sec:aic-composition (stratum 3)",
+      "quote": "probed on the H100 tables out to 147k-token contexts, this tracks the theoretical quadratic of attention within a few percent per octave",
+      "numbers": [
+        "147"
+      ],
+      "metric": "extrapolation_error_per_octave",
+      "subject": "AIC h100 attention table extrapolation beyond grid edge",
+      "assertion": "Extrapolation beyond the H100 grid edge out to 147k-token contexts tracks the quadratic attention scaling within a few percent per octave.",
+      "db_check": "UNVERIFIABLE in provenance DB: an AIC-table probe, not a logged run; reproduce by querying the h100_sxm tables.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 204,
+      "anchor": "sec:aic-composition (stratum 3)",
+      "quote": "That analytic floor is ${\\approx}5.9\\times$ optimistic for encoder attention",
+      "numbers": [
+        "5.9"
+      ],
+      "metric": "sol_underestimate_factor",
+      "subject": "AIC speed-of-light mode, encoder attention",
+      "assertion": "The speed-of-light analytic floor is about 5.9x optimistic for encoder attention.",
+      "db_check": "UNVERIFIABLE in provenance DB: duplicate of the line-36 probe.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 230,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "(five replications of fifty CUDA-event iterations each, locked clocks; an every-integer sweep of $N \\in [1,128]$ at lighter protocol agrees within 1\\%)",
+      "numbers": [
+        "5",
+        "50",
+        "1",
+        "128",
+        "1"
+      ],
+      "metric": "measurement_protocol_agreement_pct",
+      "subject": "extracted Qwen3-VL tower, HuggingFace eager, RTX 5090",
+      "assertion": "The f(N) measurement used 5 replications of 50 CUDA-event iterations, and an every-integer N in [1,128] sweep at lighter protocol agrees within 1%.",
+      "db_check": "provenance.collector_fn rows for the every-integer sweep vs the quoted anchor points (gpu='rtx_5090', engine='hf_eager').",
+      "criticality": "supporting"
+    },
+    {
+      "line": 233,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "the prediction from raw to infilled data ($7.82 \\to \\SI{8.16}{\\milli\\second}$) and the measurement to this section's protocol ($11.360 \\to \\SI{11.30}{\\milli\\second}$, within ${\\approx}0.5\\%$)",
+      "numbers": [
+        "7.82",
+        "8.16",
+        "11.360",
+        "11.30",
+        "0.5"
+      ],
+      "metric": "encoder_n1_predicted_and_measured_ms",
+      "subject": "N=1 448^2 encoder forward, raw vs infilled prediction and two measurement protocols",
+      "assertion": "The N=1 prediction moved 7.82 to 8.16 ms with infill and the measurement 11.360 to 11.30 ms (within ~0.5%) with the new protocol.",
+      "db_check": "provenance.collector_fn where n_images=1 for both engines/dataset versions; measured 11.360 traces to the tab:aic-validation artifact.",
+      "criticality": "headline"
+    },
+    {
+      "line": 235,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "hence the ratio $1.38$ here against $1.45$ there",
+      "numbers": [
+        "1.38",
+        "1.45"
+      ],
+      "metric": "measured_to_composed_ratio",
+      "subject": "N=1 448^2 encoder forward, HuggingFace eager vs AIC composition",
+      "assertion": "The measured/composed ratio at N=1 is 1.38 under the new protocol and infilled data versus 1.45 in the validation table.",
+      "db_check": "Derived: 11.30/8.16=1.385 and 11.360/7.822=1.452; cross-check provenance.collector_fn measured_ms/composed_ms at n_images=1.",
+      "criticality": "headline"
+    },
+    {
+      "line": 243,
+      "anchor": "fig:aic-fn",
+      "quote": "the ratio rises to $1.62\\times$ at $N{=}64$ (from ${\\approx}1.37\\times$ at small $N$), easing to $1.43\\times$ at the largest dispatch",
+      "numbers": [
+        "1.62",
+        "64",
+        "1.37",
+        "1.43"
+      ],
+      "metric": "hf_to_composed_ratio",
+      "subject": "HuggingFace eager f(N) vs AIC composition across N",
+      "assertion": "The HuggingFace-to-composition ratio rises from ~1.37x at small N to 1.62x at N=64 and eases to 1.43x at the largest dispatch.",
+      "db_check": "provenance.collector_fn (engine='hf_eager') ratio column across n_images; NOTE the caption's 1.43x at 'largest dispatch' is inconsistent with 1.62x at N=64 being the cap in the body text (line 281) -- flag for review.",
+      "criticality": "headline"
+    },
+    {
+      "line": 248,
+      "anchor": "fig:aic-fn",
+      "quote": "a direct vLLM measurement (Section~\\ref{sec:aic-model-vs-silicon}) matches the composition to within $12.8\\%$",
+      "numbers": [
+        "12.8"
+      ],
+      "metric": "vllm_vs_composed_max_dev_pct",
+      "subject": "vLLM Qwen3-VL vision tower forward vs AIC composition, N<=64",
+      "assertion": "A direct vLLM measurement matches the AIC composition to within 12.8%.",
+      "db_check": "provenance.collector_fn where engine='vllm' and gpu='rtx_5090'; max abs deviation vs composed over n_images<=64.",
+      "criticality": "headline"
+    },
+    {
+      "line": 248,
+      "anchor": "fig:aic-fn",
+      "quote": "Right: the measured kernel ledger per image at $N{=}1$ and $N{=}64$",
+      "numbers": [
+        "1",
+        "64"
+      ],
+      "metric": "kernel_ledger_batch_points",
+      "subject": "measured kernel ledger, HuggingFace stack",
+      "assertion": "The kernel ledger is reported per image at N=1 and N=64.",
+      "db_check": "UNVERIFIABLE in provenance DB: profiler ledger is a collector artifact.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 260,
+      "anchor": "tab:aic-fn",
+      "quote": "measurement is the \\emph{HuggingFace-transformers eager} stack, 95\\% CIs $\\leq \\pm 0.3$\\,ms",
+      "numbers": [
+        "95",
+        "0.3"
+      ],
+      "metric": "measurement_ci_ms",
+      "subject": "tab:aic-fn measured column, HuggingFace eager",
+      "assertion": "All measured values in tab:aic-fn carry 95% CIs no wider than +/-0.3 ms.",
+      "db_check": "provenance.collector_fn CI columns for the tab:aic-fn anchor points.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 262,
+      "anchor": "tab:aic-fn",
+      "quote": "The vLLM serving engine---the target of AIC's kernel data---is measured directly in the text below and matches the composition to within $12.8\\%$.",
+      "numbers": [
+        "12.8"
+      ],
+      "metric": "vllm_vs_composed_max_dev_pct",
+      "subject": "vLLM engine vs AIC composition",
+      "assertion": "The caption repeats that vLLM matches the composition within 12.8%.",
+      "db_check": "provenance.collector_fn engine='vllm': max abs pct deviation from composed for n_images<=64.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 269,
+      "anchor": "tab:aic-fn",
+      "quote": "1   & 11.30  & 8.16   & 1.38 \\\\",
+      "numbers": [
+        "1",
+        "11.30",
+        "8.16",
+        "1.38"
+      ],
+      "metric": "fn_measured_composed_ratio",
+      "subject": "encoder forward over N=1 images of 448^2, RTX 5090 bf16, HuggingFace eager vs AIC composition",
+      "assertion": "At N=1 the measured forward is 11.30 ms against a composed 8.16 ms, a ratio of 1.38.",
+      "db_check": "provenance.collector_fn where gpu='rtx_5090' and engine='hf_eager' and n_images=1: measured_ms, composed_ms, ratio; ratio must equal measured/composed.",
+      "criticality": "headline"
+    },
+    {
+      "line": 270,
+      "anchor": "tab:aic-fn",
+      "quote": "6   & 43.58  & 31.79   & 1.37 \\\\",
+      "numbers": [
+        "6",
+        "43.58",
+        "31.79",
+        "1.37"
+      ],
+      "metric": "fn_measured_composed_ratio",
+      "subject": "encoder forward over N=6 images of 448^2, RTX 5090 bf16, HuggingFace eager vs AIC composition",
+      "assertion": "At N=6 the measured forward is 43.58 ms against a composed 31.79 ms, a ratio of 1.37.",
+      "db_check": "provenance.collector_fn where gpu='rtx_5090' and engine='hf_eager' and n_images=6: measured_ms, composed_ms, ratio; ratio must equal measured/composed.",
+      "criticality": "headline"
+    },
+    {
+      "line": 271,
+      "anchor": "tab:aic-fn",
+      "quote": "8   & 58.65  & 43.13   & 1.36 \\\\",
+      "numbers": [
+        "8",
+        "58.65",
+        "43.13",
+        "1.36"
+      ],
+      "metric": "fn_measured_composed_ratio",
+      "subject": "encoder forward over N=8 images of 448^2, RTX 5090 bf16, HuggingFace eager vs AIC composition",
+      "assertion": "At N=8 the measured forward is 58.65 ms against a composed 43.13 ms, a ratio of 1.36.",
+      "db_check": "provenance.collector_fn where gpu='rtx_5090' and engine='hf_eager' and n_images=8: measured_ms, composed_ms, ratio; ratio must equal measured/composed.",
+      "criticality": "headline"
+    },
+    {
+      "line": 272,
+      "anchor": "tab:aic-fn",
+      "quote": "16   & 123.39  & 82.22   & 1.50 \\\\",
+      "numbers": [
+        "16",
+        "123.39",
+        "82.22",
+        "1.50"
+      ],
+      "metric": "fn_measured_composed_ratio",
+      "subject": "encoder forward over N=16 images of 448^2, RTX 5090 bf16, HuggingFace eager vs AIC composition",
+      "assertion": "At N=16 the measured forward is 123.39 ms against a composed 82.22 ms, a ratio of 1.50.",
+      "db_check": "provenance.collector_fn where gpu='rtx_5090' and engine='hf_eager' and n_images=16: measured_ms, composed_ms, ratio; ratio must equal measured/composed.",
+      "criticality": "headline"
+    },
+    {
+      "line": 273,
+      "anchor": "tab:aic-fn",
+      "quote": "32   & 253.33  & 160.20   & 1.58 \\\\",
+      "numbers": [
+        "32",
+        "253.33",
+        "160.20",
+        "1.58"
+      ],
+      "metric": "fn_measured_composed_ratio",
+      "subject": "encoder forward over N=32 images of 448^2, RTX 5090 bf16, HuggingFace eager vs AIC composition",
+      "assertion": "At N=32 the measured forward is 253.33 ms against a composed 160.20 ms, a ratio of 1.58.",
+      "db_check": "provenance.collector_fn where gpu='rtx_5090' and engine='hf_eager' and n_images=32: measured_ms, composed_ms, ratio; ratio must equal measured/composed.",
+      "criticality": "headline"
+    },
+    {
+      "line": 274,
+      "anchor": "tab:aic-fn",
+      "quote": "64   & 511.23  & 316.37   & 1.62 \\\\",
+      "numbers": [
+        "64",
+        "511.23",
+        "316.37",
+        "1.62"
+      ],
+      "metric": "fn_measured_composed_ratio",
+      "subject": "encoder forward over N=64 images of 448^2, RTX 5090 bf16, HuggingFace eager vs AIC composition",
+      "assertion": "At N=64 the measured forward is 511.23 ms against a composed 316.37 ms, a ratio of 1.62.",
+      "db_check": "provenance.collector_fn where gpu='rtx_5090' and engine='hf_eager' and n_images=64: measured_ms, composed_ms, ratio; ratio must equal measured/composed.",
+      "criticality": "headline"
+    },
+    {
+      "line": 281,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "from ${\\approx}1.37$ at small batches to $1.62$ at the 64-image dispatch cap",
+      "numbers": [
+        "1.37",
+        "1.62",
+        "64"
+      ],
+      "metric": "hf_to_composed_ratio",
+      "subject": "HuggingFace eager vs composition across batch axis",
+      "assertion": "The HuggingFace ratio grows from about 1.37 at small batches to 1.62 at the 64-image dispatch cap.",
+      "db_check": "provenance.collector_fn engine='hf_eager': ratio at n_images in (6,8) vs n_images=64.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 288,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "attention is precisely linear per image (\\SI{1.300}{\\milli\\second} at $N{=}1$, \\SI{1.306}{\\milli\\second} at $N{=}64$; the windowed-attention structure)",
+      "numbers": [
+        "1.300",
+        "1",
+        "1.306",
+        "64"
+      ],
+      "metric": "attention_kernel_time_per_image_ms",
+      "subject": "measured attention kernel time per image, N=1 vs N=64",
+      "assertion": "Measured attention kernel time per image is 1.300 ms at N=1 and 1.306 ms at N=64, i.e. linear in N.",
+      "db_check": "UNVERIFIABLE in provenance DB: per-operator kernel profile artifact (Nsight/torch profiler), not stored in provenance.*.",
+      "criticality": "headline"
+    },
+    {
+      "line": 289,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "per-image GEMM time \\emph{falls} from 6.03 to \\SI{3.69}{\\milli\\second} as larger $m$ improves kernel efficiency",
+      "numbers": [
+        "6.03",
+        "3.69"
+      ],
+      "metric": "gemm_kernel_time_per_image_ms",
+      "subject": "measured GEMM kernel time per image, N=1 vs N=64",
+      "assertion": "Per-image GEMM kernel time falls from 6.03 ms at N=1 to 3.69 ms at N=64.",
+      "db_check": "UNVERIFIABLE in provenance DB: kernel-profile artifact.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 291,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "Dispatch gaps, 15.3\\% of wall time at $N{=}1$, amortize to 2.5\\%.",
+      "numbers": [
+        "15.3",
+        "1",
+        "2.5"
+      ],
+      "metric": "dispatch_gap_fraction_pct",
+      "subject": "HuggingFace eager execution stack, N=1 vs N=64",
+      "assertion": "Inter-kernel dispatch gaps are 15.3% of wall time at N=1 and amortize to 2.5% at N=64.",
+      "db_check": "UNVERIFIABLE in provenance DB: kernel-profile artifact; 15.3% must be consistent with 1.736/11.360 in Section aic-validation.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 293,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "unfused elementwise work rises from 1.18 to \\SI{1.89}{\\milli\\second} per image and the DeepStack gather/concatenation from 0.26 to \\SI{0.58}{\\milli\\second}",
+      "numbers": [
+        "1.18",
+        "1.89",
+        "0.26",
+        "0.58"
+      ],
+      "metric": "unmodeled_kernel_time_per_image_ms",
+      "subject": "HuggingFace stack unfused elementwise and DeepStack gather, N=1 vs N=64",
+      "assertion": "Per-image unfused elementwise time rises 1.18 to 1.89 ms and DeepStack gather 0.26 to 0.58 ms from N=1 to N=64.",
+      "db_check": "UNVERIFIABLE in provenance DB: kernel-profile artifact; 0.26 must reconcile with the 0.248 ms DeepStack figure at line 450.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 296,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "these categories total \\SI{168.6}{\\milli\\second} at $N{=}64$ --- \\textbf{92\\% of the \\SI{182}{\\milli\\second} difference between the composition and the HuggingFace kernel time}",
+      "numbers": [
+        "168.6",
+        "64",
+        "92",
+        "182"
+      ],
+      "metric": "unmodeled_share_pct",
+      "subject": "HuggingFace vs composition residual attribution at N=64",
+      "assertion": "Unmodeled categories total 168.6 ms at N=64, accounting for 92% of the 182 ms composition-vs-HuggingFace kernel-time gap.",
+      "db_check": "UNVERIFIABLE in provenance DB: profiler attribution; arithmetic check 168.6/182 = 92.6%.",
+      "criticality": "headline"
+    },
+    {
+      "line": 310,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "at $N\\in\\{8,32,64\\}$ the vLLM-measured forward differs from the composed prediction by $-2.2\\%$, $+11.3\\%$, and $+5.5\\%$",
+      "numbers": [
+        "8",
+        "32",
+        "64",
+        "2.2",
+        "11.3",
+        "5.5"
+      ],
+      "metric": "vllm_vs_composed_dev_pct",
+      "subject": "vLLM Qwen3-VL vision tower vs AIC composition at N=8,32,64",
+      "assertion": "The vLLM-measured forward differs from the composition by -2.2%, +11.3% and +5.5% at N=8, 32 and 64.",
+      "db_check": "provenance.collector_fn where engine='vllm' and n_images in (8,32,64): (measured-composed)/composed.",
+      "criticality": "headline"
+    },
+    {
+      "line": 311,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "($42.2$, $178.3$, \\SI{333.7}{\\milli\\second} against the composed $43.1$, $160.2$, \\SI{316.4}{\\milli\\second})",
+      "numbers": [
+        "42.2",
+        "178.3",
+        "333.7",
+        "43.1",
+        "160.2",
+        "316.4"
+      ],
+      "metric": "vllm_measured_ms",
+      "subject": "vLLM vision tower forward vs composed, N=8,32,64",
+      "assertion": "vLLM measures 42.2, 178.3 and 333.7 ms against composed 43.1, 160.2 and 316.4 ms at N=8, 32 and 64.",
+      "db_check": "provenance.collector_fn engine='vllm' n_images in (8,32,64) measured_ms/composed_ms; composed must match tab:aic-fn (43.13, 160.20, 316.37).",
+      "criticality": "headline"
+    },
+    {
+      "line": 313,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "The HuggingFace forward is $1.39$--$1.53\\times$ slower than vLLM's over the same range",
+      "numbers": [
+        "1.39",
+        "1.53"
+      ],
+      "metric": "hf_over_vllm_ratio",
+      "subject": "HuggingFace eager vs vLLM forward, N=8..64",
+      "assertion": "The HuggingFace forward is 1.39-1.53x slower than vLLM's over N=8..64.",
+      "db_check": "Derive from provenance.collector_fn: measured_ms(engine='hf_eager')/measured_ms(engine='vllm') at matching n_images (58.65/42.2=1.39, 253.33/178.3=1.42, 511.23/333.7=1.53).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 314,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "so the $1.4$--$1.6\\times$ HuggingFace ratio measures the \\emph{execution stack}",
+      "numbers": [
+        "1.4",
+        "1.6"
+      ],
+      "metric": "hf_to_composed_ratio",
+      "subject": "HuggingFace vs AIC composition, summary range",
+      "assertion": "The HuggingFace-to-composition ratio spans 1.4-1.6x and reflects execution-stack overhead.",
+      "db_check": "provenance.collector_fn engine='hf_eager' ratio range over n_images<=64.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 317,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "the composition holds to within $12.8\\%$ across the whole $N\\le64$ serving regime",
+      "numbers": [
+        "12.8",
+        "64"
+      ],
+      "metric": "vllm_vs_composed_max_dev_pct",
+      "subject": "AIC composition vs vLLM, N<=64",
+      "assertion": "Against vLLM the composition holds to within 12.8% across the whole N<=64 serving regime.",
+      "db_check": "provenance.collector_fn engine='vllm', n_images<=64: max(abs((measured-composed)/composed)).",
+      "criticality": "headline"
+    },
+    {
+      "line": 319,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "A dense sweep ($N{=}1$--$512$, 69 batch sizes, per-$N$ Student-$t$ $95\\%$ CI below \\SI{0.06}{\\milli\\second}) confirms it",
+      "numbers": [
+        "1",
+        "512",
+        "69",
+        "95",
+        "0.06"
+      ],
+      "metric": "dense_sweep_design",
+      "subject": "dense vLLM batch sweep on RTX 5090",
+      "assertion": "The dense vLLM sweep covers N=1-512 at 69 batch sizes with per-N 95% Student-t CIs below 0.06 ms.",
+      "db_check": "provenance.collector_fn engine='vllm': count(distinct n_images)=69, max(ci_half_width_ms)<0.06.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 322,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "every batch size up to the FIFO cap stays within $12.8\\%$ of the composition (maximum deviation $+12.7\\%$ at $N{=}52$",
+      "numbers": [
+        "12.8",
+        "12.7",
+        "52"
+      ],
+      "metric": "vllm_max_dev_pct",
+      "subject": "dense vLLM sweep vs composition, N<=64",
+      "assertion": "Maximum deviation from the composition below the FIFO cap is +12.7% at N=52, inside the 12.8% bound.",
+      "db_check": "provenance.collector_fn engine='vllm' n_images<=64 order by abs deviation desc limit 1 -> expect n_images=52, +12.7%.",
+      "criticality": "headline"
+    },
+    {
+      "line": 324,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "beyond the cap the composition progressively under-prices vLLM, reaching $+21.8\\%$ at $N{=}512$",
+      "numbers": [
+        "21.8",
+        "512"
+      ],
+      "metric": "vllm_vs_composed_dev_pct",
+      "subject": "dense vLLM sweep at N=512, beyond FIFO cap",
+      "assertion": "Beyond the dispatch cap the composition under-prices vLLM by up to +21.8% at N=512.",
+      "db_check": "provenance.collector_fn engine='vllm' n_images=512: (measured-composed)/composed.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 330,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "\\textbf{amortization saturates by $N{\\approx}6$--$8$}",
+      "numbers": [
+        "6",
+        "8"
+      ],
+      "metric": "amortization_knee_n",
+      "subject": "per-image encoder cost curve, both stacks",
+      "assertion": "Batching benefit saturates by N of about 6-8 images.",
+      "db_check": "provenance.collector_fn: argmin over n_images of measured_ms/n_images, per engine.",
+      "criticality": "headline"
+    },
+    {
+      "line": 331,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "per-image cost bottoms at $N{=}6$ (\\SI{7.26}{\\milli\\second}, $1.56\\times$ below single-image) and drifts back to \\SI{7.99}{\\milli\\second} by the cap",
+      "numbers": [
+        "6",
+        "7.26",
+        "1.56",
+        "7.99"
+      ],
+      "metric": "per_image_cost_ms",
+      "subject": "HuggingFace eager per-image encoder cost",
+      "assertion": "On HuggingFace, per-image cost bottoms at 7.26 ms at N=6 (1.56x below single-image) and drifts to 7.99 ms at the cap.",
+      "db_check": "provenance.collector_fn engine='hf_eager': measured_ms/n_images at n_images=6 (43.58/6=7.263) and 64 (511.23/64=7.988); ratio 11.30/7.26=1.556.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 334,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "the dense vLLM sweep bottoms at the same knee (\\SI{5.12}{\\milli\\second} at $N{\\approx}6$--$9$, $1.57\\times$ below single-image",
+      "numbers": [
+        "5.12",
+        "6",
+        "9",
+        "1.57"
+      ],
+      "metric": "per_image_cost_ms",
+      "subject": "dense vLLM sweep per-image encoder cost",
+      "assertion": "The vLLM per-image cost bottoms at 5.12 ms around N=6-9, 1.57x below the single-image cost.",
+      "db_check": "provenance.collector_fn engine='vllm': min(measured_ms/n_images) and the n_images achieving it.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 336,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "later batch sizes drift back up to ${\\sim}10\\%$ above the floor, e.g.\\ $+9.9\\%$ at $N{=}23$",
+      "numbers": [
+        "10",
+        "9.9",
+        "23"
+      ],
+      "metric": "per_image_cost_drift_pct",
+      "subject": "dense vLLM sweep, N=23",
+      "assertion": "Per-image vLLM cost drifts up to about 10% above the floor, e.g. +9.9% at N=23.",
+      "db_check": "provenance.collector_fn engine='vllm' n_images=23: (measured_ms/23)/min_per_image - 1.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 341,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "the realized batching \\emph{benefit} saturates around $N{\\approx}6$--$8$ on both rather than continuing to the cap",
+      "numbers": [
+        "6",
+        "8"
+      ],
+      "metric": "amortization_knee_n",
+      "subject": "both execution stacks",
+      "assertion": "Batching benefit saturates around N=6-8 on both the HuggingFace and vLLM stacks.",
+      "db_check": "provenance.collector_fn per-image minima per engine.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 350,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "the twelve batch sizes here are memoized in minutes",
+      "numbers": [
+        "12"
+      ],
+      "metric": "benchmark_batch_size_count",
+      "subject": "per-accelerator f(N) benchmark",
+      "assertion": "The f(N) benchmark needed here covers twelve batch sizes and memoizes in minutes.",
+      "db_check": "provenance.collector_fn: count(distinct n_images) for the anchor (non-dense) sweep.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 352,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "the vLLM per-forward cost matches the AIC composition to within $12.8\\%$ across the whole $N\\le64$ serving regime",
+      "numbers": [
+        "12.8",
+        "64"
+      ],
+      "metric": "vllm_vs_composed_max_dev_pct",
+      "subject": "vLLM vs AIC composition, N<=64",
+      "assertion": "vLLM per-forward cost matches the AIC composition within 12.8% for all N<=64.",
+      "db_check": "provenance.collector_fn engine='vllm' n_images<=64: max abs pct deviation.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 354,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "leaves the encoder-delay p99 at \\SI{606}{\\milli\\second} (from \\SI{589}{\\milli\\second}, non-divergent, far under the \\SI{1000}{\\milli\\second} SLA)",
+      "numbers": [
+        "606",
+        "589",
+        "1000"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "week schedule replay, encoder repriced at measured vLLM cost vs AIC-priced",
+      "assertion": "Repricing the week schedule at the measured vLLM cost moves encoder-delay p99 from 589 ms to 606 ms, both far under the 1000 ms SLA.",
+      "db_check": "provenance.encoder_run_summary joined runs on window_name='week' comparing the AIC-priced run (589) and the vLLM-repriced run (606); check queue_divergent=false on both.",
+      "criticality": "headline"
+    },
+    {
+      "line": 357,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "all six windows size at the p99 latency knee (\\num{6}--\\num{8} workers)",
+      "numbers": [
+        "6",
+        "6",
+        "8"
+      ],
+      "metric": "encoder_workers_c",
+      "subject": "all six evaluation windows, encoder-pool sizing",
+      "assertion": "All six windows size at 6-8 encoder workers at the p99 latency knee.",
+      "db_check": "provenance.factorial_cell: per window_name, min(config_c) where feasible=true -> expect values in [6,8] for six distinct windows.",
+      "criticality": "headline"
+    },
+    {
+      "line": 360,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "$\\rho{=}20$ feasible in every per-window cell ($120/120$), $\\rho{=}25$ losing exactly the burst5 cells",
+      "numbers": [
+        "20",
+        "120",
+        "120",
+        "25",
+        "5"
+      ],
+      "metric": "feasible_count",
+      "subject": "capacity-rating frontier, per-window factorial cells",
+      "assertion": "At rho=20 all 120 per-window cells are feasible; at rho=25 exactly the burst5 cells become infeasible.",
+      "db_check": "provenance.factorial_cell where rho=20: count(*)=120 and count(feasible)=120; then rho=25 and join v_infeasible to confirm only window_name='burst5' rows fail.",
+      "criticality": "headline"
+    },
+    {
+      "line": 363,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "burst5's honest size is \\num{8} workers, set by the same p99 knee, not the \\num{16} an earlier sustained-volume divergence flag reported",
+      "numbers": [
+        "8",
+        "16"
+      ],
+      "metric": "encoder_workers_c",
+      "subject": "burst5 window encoder-pool sizing",
+      "assertion": "Burst5's correct encoder size is 8 workers, not the 16 an earlier divergence flag reported.",
+      "db_check": "provenance.factorial_cell where window_name='burst5': min(config_c) with feasible=true and readiness ok -> expect 8; check is_current on the superseded 16-worker run.",
+      "criticality": "headline"
+    },
+    {
+      "line": 366,
+      "anchor": "sec:aic-model-vs-silicon",
+      "quote": "the backlog slope is ${\\approx}0$ over the arrival window and the tiled-trace backlog constant, so $C{=}8$ is feasible at week scale (encoder-delay p99 \\SI{644}{\\milli\\second})",
+      "numbers": [
+        "0",
+        "8",
+        "644"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "burst5 tiled to week scale at C=8",
+      "assertion": "At C=8 the burst5 tiled-trace backlog is flat and encoder-delay p99 is 644 ms, so C=8 is feasible at week scale.",
+      "db_check": "provenance.encoder_run_summary join runs where window_name='burst5' and config_c=8: encoder_delay_p99_ms ~ 644 and queue_divergent=false.",
+      "criticality": "headline"
+    },
+    {
+      "line": 379,
+      "anchor": "sec:aic-validation (setup)",
+      "quote": "a 27-block ViT (hidden size 1152, 16 heads of dimension 72, GELU MLP of width 4304)",
+      "numbers": [
+        "27",
+        "1152",
+        "16",
+        "72",
+        "4304"
+      ],
+      "metric": "encoder_architecture",
+      "subject": "Qwen/Qwen3-VL-8B-Instruct vision tower",
+      "assertion": "The validated tower is a 27-block ViT with hidden size 1152, 16 heads of dim 72 and MLP width 4304.",
+      "db_check": "UNVERIFIABLE in provenance DB: checkpoint config constant; verify against Qwen3-VL-8B-Instruct config.json.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 380,
+      "anchor": "sec:aic-validation (setup)",
+      "quote": "a PatchMerger projector into the language model's \\num{4096}-dimensional embedding space",
+      "numbers": [
+        "4096"
+      ],
+      "metric": "projector_output_dim",
+      "subject": "Qwen3-VL-8B PatchMerger projector",
+      "assertion": "The PatchMerger projects into the 4096-dimensional LM embedding space.",
+      "db_check": "UNVERIFIABLE in provenance DB: model config constant.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 383,
+      "anchor": "sec:aic-validation (setup)",
+      "quote": "plus three DeepStack mergers that project intermediate activations from blocks 8, 16, and 24",
+      "numbers": [
+        "3",
+        "8",
+        "16",
+        "24"
+      ],
+      "metric": "deepstack_merger_blocks",
+      "subject": "Qwen3-VL vision tower DeepStack mergers",
+      "assertion": "Three DeepStack mergers take intermediate activations from blocks 8, 16 and 24.",
+      "db_check": "UNVERIFIABLE in provenance DB: model config constant.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 384,
+      "anchor": "sec:aic-validation (setup)",
+      "quote": "The Qwen3-VL family shares this tower across its 8B, 32B, and 235B variants~\\cite{Qwen3VL2025}",
+      "numbers": [
+        "8",
+        "32",
+        "235"
+      ],
+      "metric": "model_variants",
+      "subject": "Qwen3-VL family",
+      "assertion": "The 8B, 32B and 235B Qwen3-VL variants share the same vision tower.",
+      "db_check": "UNVERIFIABLE in provenance DB: model-family property from the Qwen3-VL release.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 387,
+      "anchor": "sec:aic-validation (setup)",
+      "quote": "while the 32B projects into its 5120-dimensional embedding space; its final projector GEMM and handoff bytes scale by $5/4$",
+      "numbers": [
+        "32",
+        "5120",
+        "5",
+        "4"
+      ],
+      "metric": "projector_scaling_factor",
+      "subject": "Qwen3-VL-32B projector",
+      "assertion": "The 32B variant's 5120-dim embedding makes its final projector GEMM and handoff bytes scale by 5/4.",
+      "db_check": "UNVERIFIABLE in provenance DB: analytic consequence of 5120/4096 = 5/4.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 389,
+      "anchor": "sec:aic-validation (setup)",
+      "quote": "The tower (576M parameters, \\SI{1.15}{\\giga\\byte} in bf16) was extracted from the full checkpoint",
+      "numbers": [
+        "576",
+        "1.15"
+      ],
+      "metric": "tower_parameter_count",
+      "subject": "extracted Qwen3VLVisionModel",
+      "assertion": "The extracted vision tower has 576M parameters, 1.15 GB in bf16.",
+      "db_check": "UNVERIFIABLE in provenance DB: checkpoint property; 576M x 2 bytes = 1.15 GB is an arithmetic check.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 396,
+      "anchor": "sec:aic-validation (setup)",
+      "quote": "bf16, with 5 independent replications of 50 timed iterations each (10 warm-up passes per replication)",
+      "numbers": [
+        "5",
+        "50",
+        "10"
+      ],
+      "metric": "measurement_protocol",
+      "subject": "validation measurement of the extracted tower",
+      "assertion": "Validation measurement used 5 replications of 50 timed iterations with 10 warm-up passes each.",
+      "db_check": "UNVERIFIABLE in provenance DB: measurement protocol constant recorded in the validation artifact.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 400,
+      "anchor": "sec:aic-validation (setup)",
+      "quote": "per block: fused add-norm, QKV GEMM ($1152\\to3456$), encoder attention (with rotary factor 0.5), output projection ($1152\\to1152$), MLP GEMMs ($1152\\to4304\\to1152$)",
+      "numbers": [
+        "1152",
+        "3456",
+        "0.5",
+        "1152",
+        "1152",
+        "1152",
+        "4304",
+        "1152"
+      ],
+      "metric": "operator_graph_dims",
+      "subject": "AIC Qwen3-VL encoder operator graph, per block",
+      "assertion": "Each modeled block is a QKV GEMM 1152->3456, encoder attention with rotary factor 0.5, output projection 1152->1152 and MLP GEMMs 1152->4304->1152.",
+      "db_check": "UNVERIFIABLE in provenance DB: operator-graph definition; verify in AIC's model-graph builder.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 403,
+      "anchor": "sec:aic-validation (setup)",
+      "quote": "plus four projector instances (the main merger and the three DeepStack mergers, $4608\\to4608\\to4096$ each)",
+      "numbers": [
+        "4",
+        "3",
+        "4608",
+        "4608",
+        "4096"
+      ],
+      "metric": "projector_instances",
+      "subject": "AIC Qwen3-VL projector modeling",
+      "assertion": "AIC models four projector instances of shape 4608->4608->4096.",
+      "db_check": "UNVERIFIABLE in provenance DB: operator-graph definition.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 410,
+      "anchor": "tab:aic-validation",
+      "quote": "Confidence intervals are 95\\% $t$-intervals across the five replications.",
+      "numbers": [
+        "95",
+        "5"
+      ],
+      "metric": "ci_method",
+      "subject": "validation measurements",
+      "assertion": "Reported intervals are 95% t-intervals across five replications.",
+      "db_check": "UNVERIFIABLE in provenance DB: statistical protocol.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 425,
+      "anchor": "tab:aic-validation",
+      "quote": "$448^2$  & 784   & $11.360 \\pm 0.006$  & 7.822  & 1.45 \\\\",
+      "numbers": [
+        "448",
+        "784",
+        "11.360",
+        "0.006",
+        "7.822",
+        "1.45"
+      ],
+      "metric": "encoder_forward_latency_ms",
+      "subject": "448^2 image (784 patches), batch 1, RTX 5090 bf16, measured vs AIC raw-slice prediction",
+      "assertion": "At 448^2 the measured forward is 11.360+/-0.006 ms against 7.822 ms predicted, ratio 1.45.",
+      "db_check": "UNVERIFIABLE in provenance DB: single-image validation measurement lives in collector_artifacts/phaseE_physical_anchor/; cross-check 11.360/7.822=1.452.",
+      "criticality": "headline"
+    },
+    {
+      "line": 426,
+      "anchor": "tab:aic-validation",
+      "quote": "$896^2$  & 3136  & $36.421 \\pm 0.010$  & 31.973 & 1.14 \\\\",
+      "numbers": [
+        "896",
+        "3136",
+        "36.421",
+        "0.010",
+        "31.973",
+        "1.14"
+      ],
+      "metric": "encoder_forward_latency_ms",
+      "subject": "896^2 image (3136 patches), batch 1, RTX 5090 bf16",
+      "assertion": "At 896^2 the measured forward is 36.421+/-0.010 ms against 31.973 ms predicted, ratio 1.14.",
+      "db_check": "UNVERIFIABLE in provenance DB: validation artifact; arithmetic check 36.421/31.973=1.139.",
+      "criticality": "headline"
+    },
+    {
+      "line": 427,
+      "anchor": "tab:aic-validation",
+      "quote": "$1344^2$ & 7056  & $103.824 \\pm 0.022$ & 89.347 & 1.16 \\\\",
+      "numbers": [
+        "1344",
+        "7056",
+        "103.824",
+        "0.022",
+        "89.347",
+        "1.16"
+      ],
+      "metric": "encoder_forward_latency_ms",
+      "subject": "1344^2 image (7056 patches), batch 1, RTX 5090 bf16",
+      "assertion": "At 1344^2 the measured forward is 103.824+/-0.022 ms against 89.347 ms predicted, ratio 1.16.",
+      "db_check": "UNVERIFIABLE in provenance DB: validation artifact; arithmetic check 103.824/89.347=1.162.",
+      "criticality": "headline"
+    },
+    {
+      "line": 435,
+      "anchor": "sec:aic-validation (results)",
+      "quote": "At $448^2$, the \\SI{11.360}{\\milli\\second} wall time decomposes into \\SI{9.624}{\\milli\\second} of pure CUDA kernel time plus \\SI{1.736}{\\milli\\second} (15.3\\%) of inter-kernel dispatch gaps",
+      "numbers": [
+        "448",
+        "11.360",
+        "9.624",
+        "1.736",
+        "15.3"
+      ],
+      "metric": "kernel_time_decomposition_ms",
+      "subject": "448^2 batch-1 HuggingFace eager forward, RTX 5090",
+      "assertion": "The 11.360 ms wall time splits into 9.624 ms kernel time and 1.736 ms (15.3%) of dispatch gaps.",
+      "db_check": "UNVERIFIABLE in provenance DB: kernel-profile ledger artifact; arithmetic check 9.624+1.736=11.360 and 1.736/11.360=15.28%.",
+      "criticality": "headline"
+    },
+    {
+      "line": 440,
+      "anchor": "sec:aic-validation (results)",
+      "quote": "the attention kernels sum to \\SI{1.300}{\\milli\\second} against a predicted \\SI{1.342}{\\milli\\second}: \\textbf{agreement within ${\\approx}3\\%$} (strictly 3.2\\%)",
+      "numbers": [
+        "1.300",
+        "1.342",
+        "3",
+        "3.2"
+      ],
+      "metric": "attention_operator_agreement_pct",
+      "subject": "encoder-attention operator, 448^2 batch 1, measured vs AIC prediction",
+      "assertion": "Measured attention kernels total 1.300 ms against 1.342 ms predicted, agreeing within 3.2%.",
+      "db_check": "UNVERIFIABLE in provenance DB: operator-level profile; arithmetic check (1.342-1.300)/1.300=3.23%.",
+      "criticality": "headline"
+    },
+    {
+      "line": 442,
+      "anchor": "sec:aic-validation (results)",
+      "quote": "The GEMM total runs ${\\approx}6\\%$ above prediction (HuggingFace selects different cutlass variants than vLLM's GEMM path)",
+      "numbers": [
+        "6"
+      ],
+      "metric": "gemm_total_deviation_pct",
+      "subject": "GEMM kernels, 448^2 batch 1, HuggingFace vs AIC prediction",
+      "assertion": "Measured GEMM total runs about 6% above the AIC prediction.",
+      "db_check": "UNVERIFIABLE in provenance DB: kernel-profile ledger artifact.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 444,
+      "anchor": "sec:aic-validation (results)",
+      "quote": "unfused elementwise operations and the projectors' layer norms account for a further ${\\approx}0.25$ ms",
+      "numbers": [
+        "0.25"
+      ],
+      "metric": "unfused_elementwise_ms",
+      "subject": "448^2 batch 1 kernel ledger",
+      "assertion": "Unfused elementwise ops and projector layer norms add about 0.25 ms.",
+      "db_check": "UNVERIFIABLE in provenance DB: kernel-profile ledger; NOTE apparent tension with the 1.18 ms per-image unfused elementwise figure at line 293 -- flag for review.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 447,
+      "anchor": "sec:aic-validation (results)",
+      "quote": "the patch-embedding convolution (\\SI{0.459}{\\milli\\second}, 4.8\\% of kernel time; an inefficient convolution shape",
+      "numbers": [
+        "0.459",
+        "4.8"
+      ],
+      "metric": "patch_embed_conv_ms",
+      "subject": "patch-embedding convolution, 448^2 batch 1",
+      "assertion": "The patch-embedding convolution costs 0.459 ms, 4.8% of kernel time, and is outside AIC's graph.",
+      "db_check": "UNVERIFIABLE in provenance DB: kernel-profile ledger; arithmetic check 0.459/9.624=4.77%.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 450,
+      "anchor": "sec:aic-validation (results)",
+      "quote": "and the DeepStack gather/concatenation (\\SI{0.248}{\\milli\\second})",
+      "numbers": [
+        "0.248"
+      ],
+      "metric": "deepstack_gather_ms",
+      "subject": "DeepStack gather/concatenation, 448^2 batch 1",
+      "assertion": "The DeepStack gather/concatenation costs 0.248 ms and is outside AIC's graph.",
+      "db_check": "UNVERIFIABLE in provenance DB: kernel-profile ledger; reconcile with the 0.26 ms figure quoted at line 294.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 451,
+      "anchor": "sec:aic-validation (results)",
+      "quote": "Removing the two unmodeled modules leaves \\SI{8.92}{\\milli\\second} of AIC-comparable work against \\SI{7.82}{\\milli\\second} predicted, within ${\\approx}12\\%$",
+      "numbers": [
+        "8.92",
+        "7.82",
+        "12"
+      ],
+      "metric": "aic_comparable_gap_pct",
+      "subject": "448^2 batch 1, AIC-comparable kernel time vs raw-slice prediction",
+      "assertion": "After removing the two unmodeled modules, 8.92 ms of AIC-comparable work stands against 7.82 ms predicted, within ~12%.",
+      "db_check": "UNVERIFIABLE in provenance DB: profile-derived; arithmetic check 9.624-0.459-0.248=8.917 and (8.92-7.82)/8.92=12.3%.",
+      "criticality": "headline"
+    },
+    {
+      "line": 455,
+      "anchor": "sec:aic-validation (results)",
+      "quote": "forcing the instance count from four to one scales the predicted projector cost by exactly $4.00\\times$",
+      "numbers": [
+        "4",
+        "1",
+        "4.00"
+      ],
+      "metric": "projector_instance_scaling",
+      "subject": "AIC projector instantiation ablation",
+      "assertion": "Forcing AIC's projector instance count from four to one scales the predicted projector cost by exactly 4.00x.",
+      "db_check": "UNVERIFIABLE in provenance DB: AIC-model ablation, reproducible by re-running the composition with instances=1.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 458,
+      "anchor": "sec:aic-validation (results)",
+      "quote": "the gap shrinks from $1.45\\times$ at $448^2$ to $1.14$--$1.16\\times$ at larger images",
+      "numbers": [
+        "1.45",
+        "448",
+        "1.14",
+        "1.16"
+      ],
+      "metric": "measured_to_predicted_ratio",
+      "subject": "validation ratios across image sizes",
+      "assertion": "The measured/predicted ratio shrinks from 1.45x at 448^2 to 1.14-1.16x at larger images as dispatch overhead amortizes.",
+      "db_check": "Consistency check against tab:aic-validation ratio column (1.45, 1.14, 1.16).",
+      "criticality": "headline"
+    },
+    {
+      "line": 472,
+      "anchor": "sec:aic-twopool",
+      "quote": "whose per-image service time (\\SI{7.82}{\\milli\\second} at $448^2$; the raw slice, as this test predates the infill) comes from the AIC prediction",
+      "numbers": [
+        "7.82",
+        "448"
+      ],
+      "metric": "encoder_service_time_ms",
+      "subject": "vision-pool FIFO simulation, per-image service time (raw slice)",
+      "assertion": "The two-pool smoke test uses a 7.82 ms per-image encoder service time from the raw-slice AIC prediction.",
+      "db_check": "provenance.runs joined encoder_run_summary for the smoke experiment; service time is a config field of the encoder simulation, cross-check collector_fn n_images=1 raw slice.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 477,
+      "anchor": "sec:aic-twopool",
+      "quote": "input length equal to text tokens plus the 196 post-merge vision tokens per image",
+      "numbers": [
+        "196"
+      ],
+      "metric": "vision_tokens_per_image",
+      "subject": "composed trace, Qwen3-VL post-merge vision tokens for a 448^2 image",
+      "assertion": "Each 448^2 image contributes 196 post-merge vision tokens to the LLM input length.",
+      "db_check": "UNVERIFIABLE in provenance DB directly: 784/4=196 is the merger arithmetic; may appear in provenance.measured_request input-length composition.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 481,
+      "anchor": "sec:aic-twopool",
+      "quote": "in offline mode with a KV-aware router over two simulated workers",
+      "numbers": [
+        "2"
+      ],
+      "metric": "n_replicas",
+      "subject": "dynamo.replay smoke test LLM pool",
+      "assertion": "The smoke test replays through a KV-aware router over two simulated LLM workers.",
+      "db_check": "provenance.runs where experiment='aic_twopool_smoke': n_replicas=2, policy/router field = KV-aware.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 482,
+      "anchor": "sec:aic-twopool",
+      "quote": "A 50-request smoke workload (one $448^2$ image and 256 text tokens per request, \\SI{20}{\\milli\\second} arrival interval)",
+      "numbers": [
+        "50",
+        "448",
+        "256",
+        "20"
+      ],
+      "metric": "requests",
+      "subject": "two-pool smoke workload",
+      "assertion": "The smoke workload is 50 requests, each one 448^2 image plus 256 text tokens, at a 20 ms arrival interval.",
+      "db_check": "provenance.llm_run_summary.completed_requests = 50 for the smoke run; provenance.measured_request count for that run_id.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 484,
+      "anchor": "sec:aic-twopool",
+      "quote": "produces a complete AIPerf-style report (mean time-to-first-token \\SI{32.4}{\\milli\\second}; 27.6 requests per second)",
+      "numbers": [
+        "32.4",
+        "27.6"
+      ],
+      "metric": "mean_ttft_ms",
+      "subject": "two-pool smoke test end-to-end report",
+      "assertion": "The smoke test reports a mean TTFT of 32.4 ms and 27.6 requests per second.",
+      "db_check": "provenance.llm_run_summary for the smoke run: mean TTFT and throughput; note the schema exposes p99_ttft_ms, so mean TTFT may need the raw AIPerf artifact.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 500,
+      "anchor": "sec:aic-twopool",
+      "quote": "the \\texttt{h100\\_sxm} context-attention grid is collected up to \\num{16384}-token inputs",
+      "numbers": [
+        "16384"
+      ],
+      "metric": "context_attention_grid_max_tokens",
+      "subject": "AIC h100_sxm context-attention table",
+      "assertion": "AIC's h100_sxm context-attention grid extends to 16384-token inputs.",
+      "db_check": "UNVERIFIABLE in provenance DB: AIC shipped-data grid extent.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 501,
+      "anchor": "sec:aic-twopool",
+      "quote": "so the ${\\approx}3.1\\%$ of trace requests beyond it (up to ${\\approx}149$k tokens, including the frames-class prefills that decide burst-window TTFT tails) are priced by stratum-three extrapolation",
+      "numbers": [
+        "3.1",
+        "149"
+      ],
+      "metric": "extrapolated_request_share_pct",
+      "subject": "Azure multimodal trace requests exceeding the h100_sxm grid",
+      "assertion": "About 3.1% of trace requests exceed the 16384-token grid (up to ~149k tokens) and are priced by extrapolation.",
+      "db_check": "provenance.measured_request: count(*) filter (input_tokens > 16384) / count(*) over the trace; max(input_tokens) ~ 149000.",
+      "criticality": "headline"
+    },
+    {
+      "line": 509,
+      "anchor": "Summary",
+      "quote": "the load-bearing simulation snapshot of \\num{7760} encoder-attention and \\num{34710} GEMM data points",
+      "numbers": [
+        "7760",
+        "34710"
+      ],
+      "metric": "infilled_dataset_rows",
+      "subject": "RTX 5090 infilled dataset (load-bearing snapshot)",
+      "assertion": "The load-bearing dataset comprises 7,760 encoder-attention and 34,710 GEMM data points.",
+      "db_check": "UNVERIFIABLE in provenance DB: dataset row count; must match line 141.",
+      "criticality": "headline"
+    },
+    {
+      "line": 513,
+      "anchor": "Summary",
+      "quote": "Agreement is within ${\\approx}3\\%$ on the collected attention operator",
+      "numbers": [
+        "3"
+      ],
+      "metric": "attention_operator_agreement_pct",
+      "subject": "encoder-attention operator, measured vs AIC",
+      "assertion": "The summary restates ~3% agreement on the collected attention operator.",
+      "db_check": "UNVERIFIABLE in provenance DB: must match the 3.2% figure at line 441.",
+      "criticality": "headline"
+    },
+    {
+      "line": 517,
+      "anchor": "Summary",
+      "quote": "the composed forward is validated against the serving engine's own vision tower (vLLM, a standalone eager FlashAttention forward) to within $12.8\\%$",
+      "numbers": [
+        "12.8"
+      ],
+      "metric": "vllm_vs_composed_max_dev_pct",
+      "subject": "AIC composition vs vLLM vision tower",
+      "assertion": "The composition is validated against vLLM's own vision tower to within 12.8%.",
+      "db_check": "provenance.collector_fn engine='vllm' n_images<=64: max abs pct deviation.",
+      "criticality": "headline"
+    },
+    {
+      "line": 517,
+      "anchor": "Summary",
+      "quote": "the earlier ${\\approx}1.4$--$1.6\\times$ figure being a difference against HuggingFace-transformers",
+      "numbers": [
+        "1.4",
+        "1.6"
+      ],
+      "metric": "hf_to_composed_ratio",
+      "subject": "HuggingFace-transformers vs AIC composition",
+      "assertion": "The earlier 1.4-1.6x gap is attributed to the HuggingFace execution stack.",
+      "db_check": "provenance.collector_fn engine='hf_eager' ratio range.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 519,
+      "anchor": "Summary",
+      "quote": "(residual up to $+12.7\\%$ across the $N\\le64$ serving regime)",
+      "numbers": [
+        "12.7",
+        "64"
+      ],
+      "metric": "vllm_max_dev_pct",
+      "subject": "vLLM vs composition residual, N<=64",
+      "assertion": "The maximum residual against vLLM across N<=64 is +12.7%.",
+      "db_check": "provenance.collector_fn engine='vllm' n_images<=64: max deviation, expect +12.7% at n_images=52.",
+      "criticality": "headline"
+    },
+    {
+      "line": 524,
+      "anchor": "Summary",
+      "quote": "unlocked consumer-GPU clocks silently inflate collected performance by ${\\approx}17\\%$ while leaving validation ratios unchanged",
+      "numbers": [
+        "17"
+      ],
+      "metric": "unlocked_clock_speedup_pct",
+      "subject": "RTX 5090 collection, unlocked vs locked clocks",
+      "assertion": "Unlocked consumer-GPU clocks inflate collected performance by about 17% without changing validation ratios.",
+      "db_check": "UNVERIFIABLE in provenance DB: requires the superseded unlocked-clock dataset; must match line 84.",
+      "criticality": "headline"
+    }
+  ]
+}

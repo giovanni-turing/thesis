@@ -119,7 +119,7 @@ engines & vLLM / SGLang / TensorRT-LLM: forward-pass execution &
 tagged \texttt{dynamo} release, \texttt{v0.1.0}, is dated 2025-03-17; a roughly
 twelve-month \texttt{0.x} line followed --- signalled as pre-stable by SemVer
 alone, with no literal ``alpha''/``beta'' labels and only \texttt{-rc}
-release-candidate tags ahead of some minors --- before the first \emph{stable}
+release-candidate tags ahead of a few patch releases --- before the first \emph{stable}
 \texttt{v1.0.0} on 2026-03-13. Because minor versions land at roughly monthly
 cadence, every result here targets a deliberately pinned snapshot:
 \texttt{ai-dynamo} 1.2.1 (wheel) / 1.3.0 (source, both post-1.0),
@@ -141,7 +141,7 @@ queue replays that produce the cost headline run on the
 \textbf{\texttt{dynamo.replay}} runtime, and the live closed-loop validation
 drives a real Dynamo control plane with \textbf{aiperf} as the client (the
 \texttt{live\_fc} / \texttt{live\_re} runs and their
-\texttt{profile\_export\_aiperf.json} exports, Chapter~\ref{cap:closedloop}).
+\texttt{profile\_export\_aiperf.json} exports, Chapter~\ref{cap:validation}).
 
 \paragraph{What it contributes back.} Two things return upstream to
 \textbf{aiconfigurator}: a draft coverage pull request (the missing
@@ -163,6 +163,7 @@ any component of it.
 reasons about single-node pool economics, not multi-node \textbf{grove}
 deployment; and although the live closed loop exercises the real Dynamo control
 plane (planner, worker manager, discovery, metrics), its engines are
-\emph{mocked} --- a full-serving-path run with real GPU engines behind
-\textbf{aiperf} remains future work, consistent with the caveat in
+\emph{mocked} --- a full-serving-path run with real GPU \emph{engines} (rather
+than TP2 mockers) behind \textbf{aiperf} remains future work, consistent with
+the caveat in
 Appendix~\ref{app:engine-sensitivity}.

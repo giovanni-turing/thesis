@@ -1,0 +1,79 @@
+{
+  "chapter": "conclusion",
+  "n_relations_checked": 28,
+  "n_errors": 7,
+  "errors": [
+    {
+      "line": 53,
+      "quote": "with TTFT p99 within 1.1--6.8\\% (ITL p99 verdicts agreeing too: forecast sub-bound, reactive above bound in both)",
+      "stated": "live-vs-simulated TTFT p99 agreement spans 1.1--6.8%",
+      "computed": "Lower bound comes from the reactive row of tab:val-anchor (validation.tex:72): live 3,531 ms vs offline twin 3,495 ms. (3531-3495)/3495 = 36/3495 = 0.010300 = 1.0300% -> 1.0% at one decimal. Normalising by the live value instead: 36/3531 = 1.0195% -> also 1.0%. No convention over the published cells yields 1.1%. Upper bound verifies: (695-651)/651 = 6.759% -> 6.8%.",
+      "relation": "text (conclusion) vs table tab:val-anchor delta column and vs validation.tex prose",
+      "severity": "wrong",
+      "propagates_to": "validation.tex:72 (table cell '+1.1%'), validation.tex:83 ('p99 within 1.1% of the simulation'), validation.tex:97 ('within 1.1--6.8%'), validation.tex:159; intro.tex:536-538 restates the same range",
+      "proposed_fix": "Replace '1.1--6.8\\%' with '1.0--6.8\\%' here and at validation.tex lines 72, 83, 97, 159 and intro.tex 536-538 (or correct the underlying 3,531/3,495 cells if they are stale)."
+    },
+    {
+      "line": 85,
+      "quote": "the language fleet passes the same span at 0.96$\\times$ its burst-sized static shape",
+      "stated": "language-pool cost ratio 0.96x the burst-sized static TP2x2 fleet",
+      "computed": "From closedloop.tex:373-375 the ratio is 518.6 / 537.4 H100 GPU-hours = 0.965017, which rounds to 0.97 at two decimals, not 0.96. 0.96 is only reachable by truncation, or from an unrounded numerator below 515.9 GPU-hours.",
+      "relation": "recomputation of a published ratio from the two published GPU-hour totals",
+      "severity": "rounding",
+      "propagates_to": "closedloop.tex:375 (source of the 0.96x), tese.tex abstract (0.96) and resumo (0,96)",
+      "proposed_fix": "Either change '0.96$\\times$' to '0.97$\\times$' at conclusion.tex:85, closedloop.tex:375 and both abstract sites, or publish the unrounded GPU-hours that actually give 0.96 (numerator < 515.9 h at 537.4 h denominator)."
+    },
+    {
+      "line": 95,
+      "quote": "at roughly two-thirds of the best static encoder fleet's GPU-time (RQ4)",
+      "stated": "the encoder cost ratio is roughly two-thirds",
+      "computed": "The published ratio is 0.62x (closedloop tab:cl-aggregate: 2.41M / 3.87M worker-seconds = 0.62274). Two-thirds = 0.6667, i.e. 7.1% relatively higher than the actual figure; the nearest simple fraction to 0.6227 is five-eighths (0.625). Worse, 0.67x is itself a published row in the same table (the reactive policy, 2.61/3.87 = 0.674), so 'two-thirds' names the reactive controller's ratio, not the forecast policy's.",
+      "relation": "prose paraphrase of the headline ratio vs tab:cl-aggregate",
+      "severity": "loose",
+      "propagates_to": "conclusion.tex:81 (0.62x, the precise statement); closedloop.tex:481-483, 666-667",
+      "proposed_fix": "Replace 'roughly two-thirds' with 'roughly five-eighths' or, better, with the exact figure: 'at 0.62$\\times$ the deployable static encoder fleet's provisioned worker-time (RQ4)'."
+    },
+    {
+      "line": 95,
+      "quote": "at roughly two-thirds of the best static encoder fleet's GPU-time (RQ4)",
+      "stated": "denominator = 'the best static encoder fleet's GPU-time'",
+      "computed": "Line 81 of the same chapter defines the denominator as 'the deployable static encoder fleet's provisioned worker-time', which closedloop.tex:465 and baselines.tex:118-120 fix as static C=8 (3.87M worker-seconds), the fleet feasible on ALL windows. 'Best static' is a different predicate: by cost the best static fleet is C=2 (0.97M worker-seconds, 0.25x), against which the forecast policy would be 2.41/0.97 = 2.48x, i.e. 2.5x MORE expensive, not two-thirds. Also 'GPU-time' vs 'provisioned worker-time' are different units unless 1 encoder worker = 1 GPU, which this chapter never states. The Resumo (tese.tex:112) uses yet a third phrasing, 'a menor frota estatica viavel' (smallest feasible static fleet).",
+      "relation": "definitional consistency of the cost-ratio denominator across lines 81, 95 and the abstract/resumo",
+      "severity": "ambiguous",
+      "propagates_to": "tese.tex:67 ('deployable static encoder fleet's GPU-time'), tese.tex:112 ('menor frota estatica viavel'), related.tex:361, intro.tex:271/481/514",
+      "proposed_fix": "Use one phrase everywhere: 'the deployable static encoder fleet (C=8, the smallest fleet feasible on every window)' and one unit, 'provisioned worker-time'. At line 95 write: 'at 0.62$\\times$ the deployable static encoder fleet's provisioned worker-time (RQ4)'."
+    },
+    {
+      "line": 24,
+      "quote": "burst-feasible fleets need 6--8 encoder workers and a TP2 language shape against 2 workers and TP1 on the calm day, a $4\\times$/$2\\times$ overprovisioning",
+      "stated": "a 6--8 worker burst requirement implies 4x overprovisioning vs 2 calm-day workers",
+      "computed": "8/2 = 4.0 but 6/2 = 3.0. The quoted range therefore spans 3x--4x per window (baselines tab: C* = 6,8,7,7,8,6 for burst1..6). The 4x is correct only for the single deployable static fleet C=8 (the max over windows), which is how baselines.tex:118-120 defines it -- but the conclusion attaches the 4x to the 6--8 range rather than to C=8, so as written the arithmetic does not follow from the numbers given.",
+      "relation": "ratio recomputation, prose vs baselines.tex static grid",
+      "severity": "ambiguous",
+      "propagates_to": "baselines.tex:118-120 and 252-253 (same 4x/2x phrasing, but there correctly anchored to C=8)",
+      "proposed_fix": "Rewrite as: 'burst-feasible fleets need 6--8 encoder workers and a TP2 language shape against 2 workers and TP1 on the calm day, so the single fleet deployable on every window ($C{=}8$, TP2$\\times$2) overprovisions the calm day $4\\times$ on the vision side and $2\\times$ on the language side, plus a fleet-shape change no replica scaler can perform.'"
+    },
+    {
+      "line": 41,
+      "quote": "a composed forward that matches vLLM's own vision tower to within $12.8\\%$",
+      "stated": "unqualified 12.8% agreement between the composed forward and vLLM's vision tower",
+      "computed": "aiconfigurator.tex:317-325 and apendice.tex:196-198 both scope the bound: 'within 12.8% across the whole $N\\le64$ serving regime', with the error growing to +21.8% past the FIFO cap at N=512. The dense sweep is N=1--512 (69 batch sizes). The bound as stated at line 41 is therefore true only over the N<=64 subset; lines 104 and 121 of this same chapter do carry the qualifier, line 41 does not.",
+      "relation": "internal cross-reference within the chapter (lines 41 vs 104 vs 121) and against the source chapter's scoping",
+      "severity": "loose",
+      "propagates_to": "conclusion.tex:104 and 121 (correctly qualified); intro.tex:249 and 510",
+      "proposed_fix": "At line 41 write: 'a composed forward that matches vLLM's own vision tower to within $12.8\\%$ across the $N\\le64$ serving regime'."
+    },
+    {
+      "line": 60,
+      "quote": "meets the tail SLA on every window at every cold-start lead from 15 to 165 seconds (the forecast archive's maximum issued lead)",
+      "stated": "the SLA holds at every cold-start lead in the continuous interval 15--165 s",
+      "computed": "closedloop.tex:74-79 defines the factorial as 5 in-span windows x 3 TSFMs x 4 realizable issued leads {15,30,45,165} s = 60 cells (5*3*4 = 60, checks out). Only four discrete leads were exercised; 'every cold-start lead from 15 to 165 seconds' reads as a continuum and is not what was tested. The 60-cell claim itself verifies.",
+      "relation": "unit/definition consistency: swept discrete lead set vs prose 'every lead from X to Y'",
+      "severity": "loose",
+      "propagates_to": "conclusion.tex:62 ('at every lead'), intro.tex:264-265 and 479",
+      "proposed_fix": "Write: 'at every tested cold-start lead ($L\\in\\{15,30,45,165\\}$\\,s, the archive's maximum issued lead being 165\\,s)'."
+    }
+  ],
+  "passed_checks": "VERIFIED CORRECT (recomputed): (1) replica-time agreement 5.3--7.6% (line 55): (6063-6400)/6400 = -5.266% -> 5.3%; (1799-1948)/1948 = -7.649% -> 7.6%. Both bounds exact. (2) TTFT upper bound 6.8% (line 53): (695-651)/651 = 6.759% -> 6.8%. (3) ITL p99 verdict agreement (line 54): SLA bound 100 ms; forecast 11.5 live / 9.7 offline (both sub-bound), reactive 150.7 / 152.7 (both above). Verdicts agree in both columns as claimed. (4) 588 ms service floor (lines 68, 102): f(64)=316.4 ms + p99 handoff 272 ms = 588.4 ms -> 588. (5) 0.62x cost ratio (line 81): 2.41M / 3.87M worker-seconds = 0.62274 -> 0.62. (6) EWMA 1.09x (line 71) matches closedloop tab:cl-ewma and the rho-frontier 1.32/1.09/0.94/0.83 at rho in {10,15,20,25}. (7) Span accounting (lines 79 vs 98): 1.4 days of forecast context + 5.60 graded days = 7.0 days; the 'seven-day trace' and the '5.60-day covered span' are consistent, not contradictory (REFUTES extractor flag 5). (8) R^2 restatements (lines 17-18): trace-eda publishes 0.123 and 0.654; 0.12 and 0.65 are correct roundings. (9) Jaccard 0.02 (line 19): 5/202 = 0.0248 -> 0.02. (10) 29% encoder mean utilization (line 21) matches twopool.tex:340/362/375 exactly. (11) 6--8 encoder workers (line 24) matches baselines C* = {6,8,7,7,8,6}: min 6, max 8, and calm day 2, TP1x2 vs TP2x2 = 2x GPUs. (12) Twenty (resolution, signal) cells (line 30) = 4 signals x 5 resolutions. (13) p90 coverage 0.88--0.90 (line 34) matches predictors.tex:301-302 and 418, and closedloop.tex:105-106 and 219. (14) ~3% dominant-operator agreement (line 39) matches aiconfigurator.tex:17, 441, 513. (15) 12.8% is one computation at lines 41/104/121 (aiconfigurator 248/262/317/352, apendice 168/196/214) -- REFUTES the concern that the three sites are independent numbers. (16) 1.4--1.6x HuggingFace gap (lines 42, 106) matches aiconfigurator.tex:314 and apendice.tex:194 at both sites. (17) The 15 s at line 60 (minimum issued lead) and the 15 s at line 65 (detection threshold) are genuinely different quantities that happen to share a value; both are correctly used. (18) burst3 = the one-minute-onset burst = the fastest-onset burst used for the Dynamo anchor: consistent across lines 50, 62, 66 and validation tab:val-anchor. (19) Reactive fails burst3 at every lead (line 62) matches closedloop.tex:87-89. (20) burst4 as the only genuinely anticipated (gradual) onset, burst3/burst5 lagging (lines 65-67) matches closedloop.tex:206-210 ('+345 s' on burst4). (21) Strict re-warm 0.59--0.62x (line 84) matches closedloop.tex:498-500 and 446 exactly, including the direction (0.62x at L=15 falling to 0.59x at L=165) -- REFUTES extractor flag 2 as an internal inconsistency, though see notes. (22) N=1--64 matched-engine sweep (line 105) and 69 batch sizes over N=1--512 (line 120) both match apendice.tex:166/205 and aiconfigurator.tex:319. (23) 'pools saturating an order of magnitude apart' (line 20) is conservative against twopool.tex:307, whose measured separation is 32/2 = 16x (a censored lower bound).",
+  "notes": "Method: this chapter contains no tables or figures, so every check is a cross-reference against the source chapters (validation.tex, closedloop.tex, baselines.tex, twopool.tex, aiconfigurator.tex, apendice.tex, predictors.tex, trace-eda.tex) plus direct recomputation from the values those chapters publish. Extractor flags adjudicated: (1) DENOMINATOR MISMATCH -- CONFIRMED, recorded twice at line 95 (the 'best static' wording and the 'two-thirds' paraphrase are separate defects; note that 0.67x is literally the reactive row of tab:cl-aggregate, which makes 'two-thirds' actively misleading). (2) STRICT RE-WARM DIRECTION -- REFUTED as an internal inconsistency: closedloop.tex:496-500 states the mechanism explicitly (a retired replica re-orders and re-pays lead, so longer leads retire capacity for longer and provision less), and 0.62x is deliberately kept as the conservative headline across both readiness models. It remains counterintuitive to a reader of the conclusion alone, which drops the mechanism; consider adding 'falling with lead' to line 84. (3) 4x/2x ARITHMETIC -- PARTIALLY CONFIRMED: 4x is correct for the deployable C=8 fleet but does not follow from the 6--8 range the sentence quotes; recorded as ambiguous with a rewrite. (4) REPEATED LITERALS -- all trace to single computations (12.8% x3, 588 ms x2, 1.4--1.6x x2); the two 15 s values are distinct quantities, correctly used. (5) SPAN TENSION -- REFUTED: 1.4 + 5.60 = 7.0 days, the split is stated in closedloop.tex:47-51. (6) UNVERIFIABLE-FROM-SCHEMA claims (R^2, Jaccard, detection lag, >=100 Gbps fabric) -- out of scope for this no-DB pass; all are internally consistent with their source chapters, and the fabric assumption is analytic by construction. One additional observation not recorded as a defect: line 68's '(588 ms p99)' service floor is the burst-window figure; closedloop.tex:80 gives the calm day as 548--734 ms, so 'leaving the service floor' is exact for bursts and approximate for the calm day. The severest defect by propagation is the 1.1% -> 1.0% error, which is wrong at five sites across three chapters."
+}

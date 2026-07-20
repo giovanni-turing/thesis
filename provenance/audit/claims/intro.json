@@ -1,0 +1,1133 @@
+{
+  "chapter": "intro",
+  "claims": [
+    {
+      "line": 38,
+      "anchor": "cap:intro",
+      "quote": "zero-shot, by pretrained time-series foundation models that beat classical baselines on every demand signal at every resolution tested",
+      "numbers": [
+        "0"
+      ],
+      "metric": "forecast_win_rate",
+      "subject": "TSFM vs classical baselines, all signals x resolutions",
+      "assertion": "Pretrained time-series foundation models beat classical baselines on every demand signal at every resolution tested (a clean sweep).",
+      "db_check": "provenance.forecast_metrics / v_forecast_best: group by (resolution, variate), check argmin(wape) model is a foundation model in every cell; expect 20 cells.",
+      "criticality": "headline"
+    },
+    {
+      "line": 43,
+      "anchor": "cap:intro",
+      "quote": "reproduces the decoupling as measured behavior: saturation knees an order of magnitude apart",
+      "numbers": [
+        "10"
+      ],
+      "metric": "saturation_knee_ratio",
+      "subject": "vision pool vs language pool, steady traffic",
+      "assertion": "The two pools' saturation knees are an order of magnitude apart in offered load.",
+      "db_check": "provenance.factorial_cell: compare max feasible rho for pool='encoder' vs pool='llm' on the steady window; ratio ~10x.",
+      "criticality": "headline"
+    },
+    {
+      "line": 50,
+      "anchor": "cap:intro",
+      "quote": "at a fraction of the deployable static encoder fleet's provisioned GPU-time over the covered week",
+      "numbers": [],
+      "metric": "cost_ratio",
+      "subject": "forecast policy vs deployable static encoder fleet, covered week",
+      "assertion": "The per-pool predictive policy uses only a fraction of the deployable static encoder fleet's provisioned GPU-time over the covered week.",
+      "db_check": "provenance.cost_accounting / v_cost_frontier_dual: provisioned_ws(policy='forecast_p90') / provisioned_ws(policy='static_best') over the covered span.",
+      "criticality": "headline"
+    },
+    {
+      "line": 83,
+      "anchor": "sec:intro-context",
+      "quote": "it comes as $k\\times k$ tile and frame grids of up to $97^2=\\num{9409}$ images in a single request",
+      "numbers": [
+        "97",
+        "9409"
+      ],
+      "metric": "max_images_per_request",
+      "subject": "AzureLMMInferenceDataset2025 trace",
+      "assertion": "The largest single request in the trace carries a 97x97 grid = 9409 images.",
+      "db_check": "provenance.measured_request (or trace EDA source table): SELECT max(image_count) -> 9409; check sqrt is integer 97.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 101,
+      "anchor": "sec:intro-context (footnote)",
+      "quote": "the 576M-parameter vision encoder reaches serving-ready in ${\\approx}$3--5\\,s of \\emph{model-side} work",
+      "numbers": [
+        "576",
+        "3",
+        "5"
+      ],
+      "metric": "encoder_model_side_readiness_s",
+      "subject": "Qwen3-VL vision tower on the benchmark node",
+      "assertion": "The 576M-parameter vision encoder becomes serving-ready in approximately 3-5 s of model-side work.",
+      "db_check": "UNVERIFIABLE from listed schema: startup/readiness microbenchmark is not in provenance tables (no readiness-timing table); check collector_artifacts readiness measurement instead.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 103,
+      "anchor": "sec:intro-context (footnote)",
+      "quote": "the 1.15\\,GB checkpoint costs only 0.11\\,s to read (O\\_DIRECT NVMe) plus 0.13\\,s of host-to-device transfer",
+      "numbers": [
+        "1.15",
+        "0.11",
+        "0.13"
+      ],
+      "metric": "checkpoint_load_s",
+      "subject": "576M vision encoder checkpoint on benchmark node",
+      "assertion": "The 1.15 GB encoder checkpoint takes 0.11 s to read from NVMe and 0.13 s to transfer host-to-device.",
+      "db_check": "UNVERIFIABLE from listed schema: checkpoint IO/H2D microbenchmark has no provenance table; verify against the readiness audit artifact.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 105,
+      "anchor": "sec:intro-context (footnote)",
+      "quote": "Encoder-pool lead times above ${\\approx}5$\\,s therefore measure orchestration",
+      "numbers": [
+        "5"
+      ],
+      "metric": "encoder_lead_time_threshold_s",
+      "subject": "encoder pool cold start attribution",
+      "assertion": "Encoder-pool cold-start lead times beyond ~5 s are attributable to orchestration rather than model loading.",
+      "db_check": "UNVERIFIABLE from listed schema: an attribution argument, not a stored measurement; derived from the 3-5 s readiness number.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 128,
+      "anchor": "sec:intro-gap",
+      "quote": "one million requests over exactly seven days of a multimodal inference cluster",
+      "numbers": [
+        "1000000",
+        "7"
+      ],
+      "metric": "requests",
+      "subject": "AzureLMMInferenceDataset2025 trace",
+      "assertion": "The trace contains one million requests spanning exactly seven days.",
+      "db_check": "provenance.windows / measured_request: SELECT count(*) FROM provenance.measured_request (trace ingest) = 1e6; max(ts)-min(ts) = 7 days.",
+      "criticality": "headline"
+    },
+    {
+      "line": 131,
+      "anchor": "sec:intro-gap",
+      "quote": "Exactly half the requests are text-only.",
+      "numbers": [
+        "0.5"
+      ],
+      "metric": "text_only_fraction",
+      "subject": "AzureLMMInferenceDataset2025 trace",
+      "assertion": "Exactly 50% of trace requests carry no images.",
+      "db_check": "provenance.measured_request: SELECT avg((image_count=0)::int) over the full trace = 0.50.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 133,
+      "anchor": "sec:intro-gap",
+      "quote": "the \\emph{frames} class of video-like requests (grids larger than $10\\times10$, only 2.7\\% of all requests)",
+      "numbers": [
+        "10",
+        "2.7"
+      ],
+      "metric": "frames_class_request_share_pct",
+      "subject": "frames class, full trace",
+      "assertion": "Requests with grids larger than 10x10 (the frames class) are 2.7% of all requests.",
+      "db_check": "provenance.measured_request: share of rows with image_count > 100 over all rows = 0.027.",
+      "criticality": "headline"
+    },
+    {
+      "line": 134,
+      "anchor": "sec:intro-gap",
+      "quote": "accounts for 81.2\\% of all image volume",
+      "numbers": [
+        "81.2"
+      ],
+      "metric": "frames_class_image_volume_share_pct",
+      "subject": "frames class, full trace",
+      "assertion": "The frames class accounts for 81.2% of total image volume in the trace.",
+      "db_check": "provenance.measured_request: sum(image_count) where image_count>100 divided by sum(image_count) overall = 0.812.",
+      "criticality": "headline"
+    },
+    {
+      "line": 147,
+      "anchor": "sec:intro-gap",
+      "quote": "A constant-fraction model (vision work as a fixed multiple of request rate) explains only $R^2=\\num{0.123}$ of the image-rate series",
+      "numbers": [
+        "0.123"
+      ],
+      "metric": "r2_constant_fraction_image_rate",
+      "subject": "image rate vs request rate, one-minute resolution",
+      "assertion": "A constant-fraction-of-request-rate model explains only R^2=0.123 of the image-rate series.",
+      "db_check": "Trace-EDA artifact table (no explicit provenance table listed for R^2); nearest: recompute from provenance.measured_request minute aggregates. Flag as EDA-derived.",
+      "criticality": "headline"
+    },
+    {
+      "line": 148,
+      "anchor": "sec:intro-gap",
+      "quote": "but $R^2=\\num{0.654}$ of decode demand (measured as offered work stamped at arrival, an upper bound on decode load)",
+      "numbers": [
+        "0.654"
+      ],
+      "metric": "r2_constant_fraction_decode",
+      "subject": "generated-token rate vs request rate, one-minute resolution",
+      "assertion": "The same constant-fraction model explains R^2=0.654 of decode (generated-token) demand.",
+      "db_check": "Trace-EDA artifact; recompute from provenance.measured_request minute aggregates of gen_tokens vs requests.",
+      "criticality": "headline"
+    },
+    {
+      "line": 150,
+      "anchor": "sec:intro-gap",
+      "quote": "The image signal is also an order of magnitude burstier (CV$^2$ 3.83 versus 0.32 at one-minute resolution)",
+      "numbers": [
+        "3.83",
+        "0.32"
+      ],
+      "metric": "cv2",
+      "subject": "image rate vs request rate, one-minute resolution",
+      "assertion": "At one-minute resolution the image signal has CV^2 = 3.83 versus 0.32 for the request signal.",
+      "db_check": "Trace-EDA artifact; recompute squared coefficient of variation of minute-binned image/s and req/s from provenance.measured_request.",
+      "criticality": "headline"
+    },
+    {
+      "line": 153,
+      "anchor": "sec:intro-gap",
+      "quote": "the week's largest burst drives image load to \\SI{370}{img/s}",
+      "numbers": [
+        "370"
+      ],
+      "metric": "peak_image_rate_img_s",
+      "subject": "largest burst episode, image signal",
+      "assertion": "The week's largest burst reaches a peak image rate of 370 img/s.",
+      "db_check": "provenance.windows (burst window definition) joined to minute aggregates of provenance.measured_request: max minute image rate in the largest burst = 370.",
+      "criticality": "headline"
+    },
+    {
+      "line": 154,
+      "anchor": "sec:intro-gap",
+      "quote": "nearly sixteen times its weekly mean",
+      "numbers": [
+        "16"
+      ],
+      "metric": "peak_to_mean_ratio_image",
+      "subject": "image signal, week",
+      "assertion": "The largest burst's peak image rate is nearly sixteen times the weekly mean image rate.",
+      "db_check": "Derived: 370 img/s divided by weekly mean image rate from provenance.measured_request; expect ~16x (implies weekly mean ~23 img/s).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 155,
+      "anchor": "sec:intro-gap",
+      "quote": "while the request rate in those same minutes peaks below \\num{4.5} requests per second",
+      "numbers": [
+        "4.5"
+      ],
+      "metric": "request_rate_peak_in_burst_rps",
+      "subject": "request signal during the largest image burst",
+      "assertion": "During the largest image burst the request rate peaks below 4.5 req/s.",
+      "db_check": "Minute aggregates of provenance.measured_request restricted to the largest burst window: max req/s < 4.5.",
+      "criticality": "headline"
+    },
+    {
+      "line": 155,
+      "anchor": "sec:intro-gap",
+      "quote": "barely above its own p99 of 4.35",
+      "numbers": [
+        "4.35"
+      ],
+      "metric": "p99_request_rate_rps",
+      "subject": "request signal, full week",
+      "assertion": "The weekly p99 of the request rate is 4.35 req/s.",
+      "db_check": "Minute aggregates of provenance.measured_request over the full week: percentile_cont(0.99) of req/s = 4.35.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 156,
+      "anchor": "sec:intro-gap",
+      "quote": "the two signals' top-percentile minutes are essentially disjoint (Jaccard $0.02$)",
+      "numbers": [
+        "0.02"
+      ],
+      "metric": "jaccard_top_percentile_minutes",
+      "subject": "image-rate vs request-rate top-percentile minutes, week",
+      "assertion": "The top-percentile minutes of the image and request signals overlap with Jaccard index 0.02.",
+      "db_check": "Trace-EDA artifact; recompute Jaccard of top-1% minute sets from provenance.measured_request minute aggregates.",
+      "criticality": "headline"
+    },
+    {
+      "line": 158,
+      "anchor": "sec:intro-gap",
+      "quote": "Each major burst is a near-pure flood of the frames class (93--96\\% of episode image volume)",
+      "numbers": [
+        "93",
+        "96"
+      ],
+      "metric": "frames_share_of_burst_image_volume_pct",
+      "subject": "burst episodes, frames class",
+      "assertion": "Within each major burst episode the frames class supplies 93-96% of image volume.",
+      "db_check": "provenance.windows (episode bounds) x measured_request: per-episode sum(image_count where frames)/sum(image_count) in [0.93,0.96].",
+      "criticality": "supporting"
+    },
+    {
+      "line": 165,
+      "anchor": "sec:intro-gap",
+      "quote": "Onsets ramp from baseline to peak in a median of six minutes (the fastest in one)",
+      "numbers": [
+        "6",
+        "1"
+      ],
+      "metric": "burst_onset_duration_min",
+      "subject": "burst onsets, image signal",
+      "assertion": "Burst onsets ramp baseline-to-peak in a median of 6 minutes, the fastest in 1 minute.",
+      "db_check": "Trace-EDA burst-anatomy artifact; derive onset durations per episode from provenance.windows + minute image-rate series.",
+      "criticality": "headline"
+    },
+    {
+      "line": 166,
+      "anchor": "sec:intro-gap",
+      "quote": "with a median steepest single-minute jump of \\SI{208}{img/s}",
+      "numbers": [
+        "208"
+      ],
+      "metric": "median_steepest_minute_jump_img_s",
+      "subject": "burst onsets, image signal",
+      "assertion": "The median steepest single-minute increase in image rate across onsets is 208 img/s.",
+      "db_check": "Trace-EDA burst-anatomy artifact; per-episode max first-difference of minute image rate, median = 208.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 170,
+      "anchor": "sec:intro-gap",
+      "quote": "the Fano factor of the counting process grows from 1.8 at one second to 938 at one hour",
+      "numbers": [
+        "1.8",
+        "938"
+      ],
+      "metric": "fano_factor",
+      "subject": "arrival counting process, 1 s to 1 h aggregation",
+      "assertion": "The Fano factor of the arrival process rises from 1.8 at one-second aggregation to 938 at one-hour aggregation.",
+      "db_check": "Trace-EDA artifact; recompute variance/mean of counts at 1 s and 3600 s bins from provenance.measured_request arrival timestamps.",
+      "criticality": "headline"
+    },
+    {
+      "line": 178,
+      "anchor": "sec:intro-gap",
+      "quote": "p99 encoder delay reaches \\SI{5.0}{\\second} at 29\\% mean utilization",
+      "numbers": [
+        "5.0",
+        "29"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "encoder pool at trace's own recorded rate, two-pool simulation",
+      "assertion": "At the trace's own rate the encoder pool's p99 delay reaches 5.0 s while mean utilization is only 29%.",
+      "db_check": "provenance.encoder_run_summary: encoder_delay_p99_ms ~= 5000 for the trace-rate (rho=1) run; utilization = busy_worker_seconds/provisioned_worker_seconds ~= 0.29.",
+      "criticality": "headline"
+    },
+    {
+      "line": 186,
+      "anchor": "sec:intro-gap",
+      "quote": "the image signal's autocorrelation half-life is 69 minutes against nine for requests",
+      "numbers": [
+        "69",
+        "9"
+      ],
+      "metric": "acf_half_life_min",
+      "subject": "image vs request signal, one-minute resolution",
+      "assertion": "The image signal's autocorrelation half-life is 69 minutes versus 9 minutes for the request signal.",
+      "db_check": "Trace-EDA persistence artifact; recompute ACF half-life on minute-binned series from provenance.measured_request.",
+      "criticality": "headline"
+    },
+    {
+      "line": 188,
+      "anchor": "sec:intro-gap",
+      "quote": "Hurst ${\\approx}0.93$ versus $0.83$ for requests",
+      "numbers": [
+        "0.93",
+        "0.83"
+      ],
+      "metric": "hurst",
+      "subject": "image vs request signal",
+      "assertion": "The image signal's Hurst exponent is ~0.93 versus 0.83 for the request signal.",
+      "db_check": "Trace-EDA persistence artifact; spectral/LRD estimator over minute-binned series from provenance.measured_request.",
+      "criticality": "headline"
+    },
+    {
+      "line": 211,
+      "anchor": "sec:intro-thesis",
+      "quote": "at a fraction of the best static \\emph{encoder} fleet's GPU-hours; the language pool, separately provisioned on its own hardware, is near-break-even.",
+      "numbers": [],
+      "metric": "cost_ratio",
+      "subject": "forecast policy vs best static encoder fleet; language pool",
+      "assertion": "Forecast-driven scaling costs a fraction of the best static encoder fleet's GPU-hours while the language pool is near cost-parity.",
+      "db_check": "provenance.cost_accounting / v_cost_frontier_dual: encoder provisioned_ws ratio << 1; llm gpu_hours ratio ~= 1 (from llm_run_summary.gpu_hours).",
+      "criticality": "headline"
+    },
+    {
+      "line": 224,
+      "anchor": "RQ1",
+      "quote": "saturation knees an order of magnitude apart on steady traffic; inside bursts the vision pool fails invisibly at the trace's own rate",
+      "numbers": [
+        "10"
+      ],
+      "metric": "saturation_knee_ratio",
+      "subject": "vision vs language pool, steady traffic",
+      "assertion": "The two pools' saturation knees differ by an order of magnitude on steady traffic.",
+      "db_check": "provenance.factorial_cell: max feasible rho per pool on the steady window; ratio ~10x.",
+      "criticality": "headline"
+    },
+    {
+      "line": 233,
+      "anchor": "RQ2 / cap:predictors",
+      "quote": "three foundation models beat every classical baseline in all twenty (resolution, signal) cells",
+      "numbers": [
+        "3",
+        "20"
+      ],
+      "metric": "forecast_win_cells",
+      "subject": "TSFM vs classical baselines",
+      "assertion": "Three foundation models beat every classical baseline in all 20 (resolution, signal) cells.",
+      "db_check": "provenance.forecast_metrics: distinct (resolution, variate) = 20; per cell min(wape) among foundation models < min(wape) among naive/ETS/Holt-Winters.",
+      "criticality": "headline"
+    },
+    {
+      "line": 234,
+      "anchor": "RQ2 / cap:predictors",
+      "quote": "accuracy decays only marginally across a twelve-step horizon, covering the median burst onset",
+      "numbers": [
+        "12"
+      ],
+      "metric": "forecast_horizon_steps",
+      "subject": "TSFM forecasts at one-minute resolution",
+      "assertion": "Forecast accuracy degrades only marginally out to a twelve-step horizon.",
+      "db_check": "provenance.forecast_metrics: wape vs h for h in 1..12 at resolution='1min'; check small monotone increase.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 248,
+      "anchor": "RQ3 / cap:aiconfigurator",
+      "quote": "the collected encoder-attention operator agrees with physical measurement within ${\\approx}3\\%$",
+      "numbers": [
+        "3"
+      ],
+      "metric": "aic_vs_physical_error_pct",
+      "subject": "encoder attention operator, RTX 5090",
+      "assertion": "The collected encoder-attention operator matches physical measurement to within about 3%.",
+      "db_check": "provenance.collector_fn + physical anchor artifact: relative error of AIC-predicted vs measured attention kernel time <= ~0.03.",
+      "criticality": "headline"
+    },
+    {
+      "line": 249,
+      "anchor": "RQ3 / cap:aiconfigurator",
+      "quote": "validates the composed forward to within $12.8\\%$ across the $N\\le64$ batch axis",
+      "numbers": [
+        "12.8",
+        "64"
+      ],
+      "metric": "composed_forward_error_pct",
+      "subject": "vLLM vision tower, batch N<=64",
+      "assertion": "A matched-engine vLLM silicon measurement validates the composed encoder forward to within 12.8% for batch sizes up to 64.",
+      "db_check": "provenance.collector_fn / anchor-fidelity artifact: max |predicted-measured|/measured over N<=64 = 0.128.",
+      "criticality": "headline"
+    },
+    {
+      "line": 249,
+      "anchor": "RQ3 / cap:aiconfigurator",
+      "quote": "the earlier ${\\approx}1.4$--$1.6\\times$ figure is an execution-engine difference (HuggingFace eager vs.\\ vLLM's kernels)",
+      "numbers": [
+        "1.4",
+        "1.6"
+      ],
+      "metric": "hf_eager_vs_aic_ratio",
+      "subject": "HuggingFace eager vision tower vs AIC model",
+      "assertion": "The previously reported 1.4-1.6x under-modelling is attributed to the HuggingFace-eager execution engine, not the cost model.",
+      "db_check": "provenance.collector_fn / engine-sensitivity appendix artifact: ratio measured(HF eager)/predicted in [1.4,1.6].",
+      "criticality": "headline"
+    },
+    {
+      "line": 253,
+      "anchor": "RQ3 / cap:twopool",
+      "quote": "exposes the latency tails the simulator's default polynomial flattens (TTFT p99 $+24\\%$ on the steady window)",
+      "numbers": [
+        "24"
+      ],
+      "metric": "ttft_p99_calibration_delta_pct",
+      "subject": "language pool, steady window, calibrated vs polynomial timing",
+      "assertion": "Calibrated language-pool timing raises steady-window TTFT p99 by 24% relative to the simulator's default polynomial model.",
+      "db_check": "provenance.llm_run_summary joined via runs: p99_ttft_ms for actuation/model='calibrated' vs 'polynomial' on window_name='steady'; ratio 1.24.",
+      "criticality": "headline"
+    },
+    {
+      "line": 254,
+      "anchor": "RQ3 / cap:twopool",
+      "quote": "on the burst window the polynomial misses a $1.9\\times$ SLA violation outright",
+      "numbers": [
+        "1.9"
+      ],
+      "metric": "ttft_p99_sla_violation_ratio",
+      "subject": "language pool, burst window, calibrated timing",
+      "assertion": "On the burst window the calibrated model shows a 1.9x SLA violation that the polynomial model does not surface.",
+      "db_check": "provenance.llm_run_summary: p99_ttft_ms(calibrated, burst)/1000 ms SLA = 1.9 while polynomial run is feasible.",
+      "criticality": "headline"
+    },
+    {
+      "line": 265,
+      "anchor": "RQ4 / cap:closedloop",
+      "quote": "holds the tail bound on every window at every forecast-issued cold-start lead from 15 to \\SI{165}{\\second}",
+      "numbers": [
+        "15",
+        "165"
+      ],
+      "metric": "lead_time_range_s",
+      "subject": "forecast p90 encoder policy, all windows",
+      "assertion": "The forecast-driven encoder policy meets the tail bound on every window at every forecast-issued lead from 15 s to 165 s.",
+      "db_check": "provenance.factorial_cell: policy='forecast_p90', all lead_s in [15,165] -> feasible = true for every window_name.",
+      "criticality": "headline"
+    },
+    {
+      "line": 265,
+      "anchor": "RQ4 / cap:closedloop",
+      "quote": "the burst windows at the \\SI{588}{\\milli\\second} zero-queueing service floor",
+      "numbers": [
+        "588"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "forecast policy, burst windows",
+      "assertion": "On burst windows the forecast policy's encoder p99 delay sits at the 588 ms zero-queueing service floor.",
+      "db_check": "provenance.encoder_run_summary via runs where policy='forecast_p90' and window_name like 'burst%': encoder_delay_p99_ms ~= 588.",
+      "criticality": "headline"
+    },
+    {
+      "line": 266,
+      "anchor": "RQ4 / cap:closedloop",
+      "quote": "the calm day below \\SI{734}{\\milli\\second}",
+      "numbers": [
+        "734"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "forecast policy, calm-day window",
+      "assertion": "On the calm-day window the forecast policy's encoder p99 delay stays below 734 ms.",
+      "db_check": "provenance.encoder_run_summary where window_name='calm' and policy='forecast_p90': encoder_delay_p99_ms < 734.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 268,
+      "anchor": "RQ4 / cap:closedloop",
+      "quote": "loses the fastest-onset burst at every lead (p99 9.5--54\\,\\si{\\second})",
+      "numbers": [
+        "9.5",
+        "54"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "reactive controller on image signal, fastest-onset burst",
+      "assertion": "The reactive controller violates the bound on the fastest-onset burst at every lead, with p99 encoder delay 9.5-54 s.",
+      "db_check": "provenance.encoder_run_summary via runs where policy='reactive' and window_name = fastest-onset burst: encoder_delay_p99_ms in [9500,54000] for all lead_s.",
+      "criticality": "headline"
+    },
+    {
+      "line": 270,
+      "anchor": "RQ4 / cap:closedloop",
+      "quote": "Over the 5.60-day covered span the policy meets the SLA in aggregate and inside every episode",
+      "numbers": [
+        "5.60"
+      ],
+      "metric": "covered_span_days",
+      "subject": "forecast policy coverage window",
+      "assertion": "The priced coverage span is 5.60 days, over which the policy meets the SLA in aggregate and per episode.",
+      "db_check": "provenance.coverage / coverage_meta: total covered duration = 5.60 days; all episodes feasible.",
+      "criticality": "headline"
+    },
+    {
+      "line": 271,
+      "anchor": "RQ4 / cap:closedloop",
+      "quote": "at 0.62 times the deployable static encoder fleet's provisioned worker-time",
+      "numbers": [
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "forecast p90 policy vs deployable static encoder fleet",
+      "assertion": "The forecast policy uses 0.62x the deployable static encoder fleet's provisioned worker-time.",
+      "db_check": "provenance.cost_accounting: provisioned_ws(policy='forecast_p90')/provisioned_ws(policy='static_deployable') = 0.62 over the covered span.",
+      "criticality": "headline"
+    },
+    {
+      "line": 274,
+      "anchor": "RQ4 / cap:closedloop",
+      "quote": "lead-invariant across the archive's realizable range under a warm-pool readiness model, 0.59--0.62$\\times$ under a strict re-warm one",
+      "numbers": [
+        "0.59",
+        "0.62"
+      ],
+      "metric": "cost_ratio",
+      "subject": "forecast policy under strict re-warm readiness model",
+      "assertion": "Under a strict re-warm readiness model the cost ratio spans 0.59-0.62x, versus lead-invariant 0.62x under warm-pool readiness.",
+      "db_check": "provenance.factorial_cell.readiness in ('warm','rewarm') joined to cost_accounting: ratio range per readiness model.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 276,
+      "anchor": "RQ4 / cap:closedloop",
+      "quote": "all fourteen configurations satisfy their own window-mean control law while violating the tail SLA",
+      "numbers": [
+        "14"
+      ],
+      "metric": "reactive_config_count",
+      "subject": "reactive language-pool planner configurations",
+      "assertion": "All fourteen reactive language-pool configurations satisfy their window-mean control law yet violate the tail SLA.",
+      "db_check": "provenance.factorial_cell / v_infeasible where policy='reactive' and pool='llm': count(distinct config) = 14, all feasible=false on p99.",
+      "criticality": "headline"
+    },
+    {
+      "line": 306,
+      "anchor": "sec:intro-approach",
+      "quote": "querying performance data collected for this thesis on an NVIDIA GeForce RTX~5090: the 576M-parameter tower fits comfortably in consumer memory",
+      "numbers": [
+        "576"
+      ],
+      "metric": "encoder_params_millions",
+      "subject": "Qwen3-VL vision tower",
+      "assertion": "The vision tower has 576M parameters, small enough for consumer GPU memory.",
+      "db_check": "UNVERIFIABLE from provenance schema: a model-architecture fact, not an experimental measurement (checkable against the Qwen3-VL checkpoint).",
+      "criticality": "incidental"
+    },
+    {
+      "line": 311,
+      "anchor": "sec:intro-approach",
+      "quote": "AIC has no usable fallback (its speed-of-light bound is ${\\approx}5.9\\times$ optimistic)",
+      "numbers": [
+        "5.9"
+      ],
+      "metric": "sol_optimism_ratio",
+      "subject": "aiconfigurator speed-of-light fallback vs measured encoder time",
+      "assertion": "AIC's speed-of-light fallback underestimates encoder time by about 5.9x.",
+      "db_check": "provenance.collector_fn: ratio measured_time/sol_bound_time for the encoder forward ~= 5.9.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 337,
+      "anchor": "fig:intro-arch",
+      "quote": "Azure LMM trace\\\\\\scriptsize 1M requests / 7 days",
+      "numbers": [
+        "1000000",
+        "7"
+      ],
+      "metric": "requests",
+      "subject": "AzureLMMInferenceDataset2025 trace (figure label)",
+      "assertion": "The figure labels the trace as 1M requests over 7 days.",
+      "db_check": "provenance.measured_request count = 1e6; span = 7 days (same check as line 128).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 343,
+      "anchor": "fig:intro-arch",
+      "quote": "\\scriptsize SLO: enc.\\ delay p99 $<$ 1 s",
+      "numbers": [
+        "1"
+      ],
+      "metric": "encoder_delay_p99_sla_s",
+      "subject": "vision pool SLO",
+      "assertion": "The vision pool's SLO is encoder delay p99 below 1 s.",
+      "db_check": "provenance.factorial_cell.feasible definition / encoder_run_summary threshold: encoder_delay_p99_ms < 1000.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 348,
+      "anchor": "fig:intro-arch",
+      "quote": "\\scriptsize SLO: TTFT p99 $<$ 1 s,",
+      "numbers": [
+        "1"
+      ],
+      "metric": "ttft_p99_sla_s",
+      "subject": "language pool SLO",
+      "assertion": "The language pool's TTFT SLO is p99 below 1 s.",
+      "db_check": "provenance.llm_run_summary threshold: p99_ttft_ms < 1000 defines feasible.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 349,
+      "anchor": "fig:intro-arch",
+      "quote": "\\scriptsize ITL p99 $<$ 100 ms",
+      "numbers": [
+        "100"
+      ],
+      "metric": "itl_p99_sla_ms",
+      "subject": "language pool SLO",
+      "assertion": "The language pool's ITL SLO is p99 below 100 ms.",
+      "db_check": "provenance.llm_run_summary threshold: p99_itl_ms < 100 defines feasible.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 357,
+      "anchor": "fig:intro-arch",
+      "quote": "node[lbl, below] {$196{\\times}4096$\\\\bf16/img} (llm)",
+      "numbers": [
+        "196",
+        "4096"
+      ],
+      "metric": "handoff_bytes_per_image",
+      "subject": "inter-pool handoff payload, Qwen3-VL 8B",
+      "assertion": "Each image's handoff payload is a 196x4096 bf16 embedding tensor.",
+      "db_check": "UNVERIFIABLE from provenance schema: an architecture-derived payload size; cross-check against the handoff-bound derivation in cap:twopool.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 374,
+      "anchor": "sec:intro-approach",
+      "quote": "the 8B, 32B, and 235B variants share one vision tower, and the 8B and 235B also share its 4096-dimensional projector",
+      "numbers": [
+        "8",
+        "32",
+        "235",
+        "4096"
+      ],
+      "metric": "model_family_dims",
+      "subject": "Qwen3-VL family",
+      "assertion": "Qwen3-VL 8B/32B/235B share one vision tower; 8B and 235B share a 4096-dimensional projector.",
+      "db_check": "UNVERIFIABLE from provenance schema: model-architecture fact; verify against Qwen3-VL configs.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 379,
+      "anchor": "sec:intro-approach",
+      "quote": "whose projector targets its 5120-dimensional embedding space, the final projector GEMM and the handoff bytes scale by $5/4$",
+      "numbers": [
+        "5120",
+        "5",
+        "4"
+      ],
+      "metric": "projector_dim_scaling",
+      "subject": "Qwen3-VL 32B",
+      "assertion": "For the 32B variant (5120-d embedding) the projector GEMM and handoff bytes scale by 5/4.",
+      "db_check": "UNVERIFIABLE from provenance schema: architecture-derived scaling; cross-check cap:aiconfigurator derivation.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 380,
+      "anchor": "sec:intro-approach",
+      "quote": "A spot-check pricing the 235B flagship at tensor-parallel~8 on the same shipped H100 data finds its saturation knee one swept octave below the 8B's",
+      "numbers": [
+        "235",
+        "8",
+        "1"
+      ],
+      "metric": "saturation_knee_octaves",
+      "subject": "Qwen3-VL 235B at TP8 vs 8B",
+      "assertion": "The 235B model at TP8 saturates one swept octave (2x) lower in offered load than the 8B.",
+      "db_check": "provenance.factorial_cell where model='qwen3vl-235b' and tp=8 vs model='qwen3vl-8b': max feasible rho differs by one octave.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 385,
+      "anchor": "sec:intro-approach",
+      "quote": "Forecasting uses three pretrained time-series foundation models (TimesFM-2.0, Chronos-2, and Toto-2.0) against naive, exponential-smoothing, and Holt--Winters baselines",
+      "numbers": [
+        "3",
+        "3"
+      ],
+      "metric": "forecast_model_counts",
+      "subject": "predictor benchmark design",
+      "assertion": "The benchmark compares three foundation models against three classical baselines.",
+      "db_check": "provenance.forecast_metrics: SELECT DISTINCT model -> 3 foundation + 3 classical.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 406,
+      "anchor": "sec:intro-contrib",
+      "quote": "the first to \\emph{quantify} the decoupling ($R^2{=}0.12$)",
+      "numbers": [
+        "0.12"
+      ],
+      "metric": "r2_constant_fraction_image_rate",
+      "subject": "image rate vs request rate",
+      "assertion": "The vision-request decoupling is quantified as R^2=0.12 (rounded restatement of 0.123).",
+      "db_check": "Same check as line 147; verify consistency of 0.12 vs 0.123 rounding.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 415,
+      "anchor": "sec:intro-contrib",
+      "quote": "plus the workload facts any converter must honor ($k^2$ grids, 50\\% text-only, vision tokens embedded non-constantly in the context-token field)",
+      "numbers": [
+        "2",
+        "50"
+      ],
+      "metric": "text_only_fraction",
+      "subject": "trace workload facts",
+      "assertion": "50% of requests are text-only and image grids are k^2 shaped.",
+      "db_check": "provenance.measured_request: share of image_count=0 rows = 0.50; image counts are perfect squares.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 426,
+      "anchor": "sec:intro-contrib",
+      "quote": "three foundation models against three classical baselines, four signals at five resolutions, one rolling-origin protocol",
+      "numbers": [
+        "3",
+        "3",
+        "4",
+        "5",
+        "1"
+      ],
+      "metric": "benchmark_grid",
+      "subject": "predictor benchmark design",
+      "assertion": "The benchmark spans 3 foundation models, 3 classical baselines, 4 signals, and 5 resolutions.",
+      "db_check": "provenance.forecast_metrics: count(distinct model)=6, count(distinct variate)=4, count(distinct resolution)=5.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 427,
+      "anchor": "sec:intro-contrib",
+      "quote": "The foundation models win all twenty cells",
+      "numbers": [
+        "20"
+      ],
+      "metric": "forecast_win_cells",
+      "subject": "TSFM vs classical baselines",
+      "assertion": "Foundation models win all twenty (signal, resolution) cells.",
+      "db_check": "provenance.v_forecast_best: 20 rows, each with a foundation model as best; consistent with 4 signals x 5 resolutions.",
+      "criticality": "headline"
+    },
+    {
+      "line": 428,
+      "anchor": "sec:intro-contrib",
+      "quote": "twelve steps of lead cost only ${\\approx}2$ WAPE points at one-minute resolution",
+      "numbers": [
+        "12",
+        "2"
+      ],
+      "metric": "wape_degradation_points",
+      "subject": "TSFM forecasts, one-minute resolution, h=1 to h=12",
+      "assertion": "Going from short lead to twelve steps of lead costs only about 2 WAPE points at one-minute resolution.",
+      "db_check": "provenance.forecast_metrics where resolution='1min': wape(h=12) - wape(h=1) ~= 0.02 (2 points).",
+      "criticality": "headline"
+    },
+    {
+      "line": 430,
+      "anchor": "sec:intro-contrib",
+      "quote": "its p90 edge empirically calibrated at provisioning cadence (coverage 0.88--0.90 across all models and signals)",
+      "numbers": [
+        "90",
+        "0.88",
+        "0.90"
+      ],
+      "metric": "quantile_coverage",
+      "subject": "p90 forecast band, all models and signals",
+      "assertion": "The p90 forecast band achieves empirical coverage of 0.88-0.90 across all models and signals.",
+      "db_check": "provenance.coverage joined to coverage_meta where quantile=0.9: empirical coverage in [0.88,0.90] for every model/signal.",
+      "criticality": "headline"
+    },
+    {
+      "line": 431,
+      "anchor": "sec:intro-contrib",
+      "quote": "The full set (21.4 million rows, each a point, nine quantiles, and the realized value) is archived with the metric tables",
+      "numbers": [
+        "21.4",
+        "9"
+      ],
+      "metric": "forecast_rows",
+      "subject": "archived forecast set",
+      "assertion": "The archived forecast set contains 21.4 million rows, each with a point forecast, nine quantiles, and the realized value.",
+      "db_check": "Forecast archive row count (parquet/DB): count(*) = 2.14e7; provenance.runs.quantile distinct = 9.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 442,
+      "anchor": "sec:intro-contrib",
+      "quote": "contributed upstream (draft PR ai-dynamo/aiconfigurator~\\#1312)",
+      "numbers": [
+        "1312"
+      ],
+      "metric": "pr_number",
+      "subject": "upstream aiconfigurator contribution",
+      "assertion": "The collected datasets were contributed upstream as draft PR ai-dynamo/aiconfigurator #1312.",
+      "db_check": "UNVERIFIABLE in provenance DB: external GitHub artifact; verify via gh pr view ai-dynamo/aiconfigurator 1312.",
+      "criticality": "incidental"
+    },
+    {
+      "line": 443,
+      "anchor": "sec:intro-contrib",
+      "quote": "the kernel-time ledger closed against a physical measurement of the same network on the same silicon (dominant operator within ${\\approx}3\\%$)",
+      "numbers": [
+        "3"
+      ],
+      "metric": "aic_vs_physical_error_pct",
+      "subject": "dominant encoder operator, RTX 5090",
+      "assertion": "The dominant encoder operator agrees with physical measurement within about 3%.",
+      "db_check": "provenance.collector_fn + anchor artifact: dominant-operator relative error <= 0.03 (same as line 248).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 448,
+      "anchor": "sec:intro-contrib",
+      "quote": "unlocked consumer-GPU clocks silently inflate collected data by ${\\approx}17\\%$ while leaving validation ratios unchanged",
+      "numbers": [
+        "17"
+      ],
+      "metric": "clock_lock_inflation_pct",
+      "subject": "RTX 5090 collection, unlocked vs locked clocks",
+      "assertion": "Collecting with unlocked consumer-GPU clocks inflates timing data by about 17%.",
+      "db_check": "provenance.collector_fn: ratio of unlocked-clock to locked-clock collected times ~= 1.17.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 461,
+      "anchor": "sec:intro-contrib",
+      "quote": "episodic queueing at the trace's own rate and 29\\% mean utilization, invisible to rate- and utilization-based monitors",
+      "numbers": [
+        "29"
+      ],
+      "metric": "encoder_mean_utilization_pct",
+      "subject": "encoder pool at trace rate",
+      "assertion": "The encoder pool queues episodically at only 29% mean utilization.",
+      "db_check": "provenance.encoder_run_summary: busy_worker_seconds/provisioned_worker_seconds = 0.29 for the trace-rate run.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 467,
+      "anchor": "sec:intro-contrib",
+      "quote": "The static-optimal worker-grid frontier per window (burst windows need 6--8 encoder workers at trace rate against 2 on a calm day, TP2 language shapes throughout)",
+      "numbers": [
+        "6",
+        "8",
+        "2",
+        "2"
+      ],
+      "metric": "static_optimal_workers",
+      "subject": "static-optimal frontier per window",
+      "assertion": "Burst windows require 6-8 encoder workers at trace rate versus 2 on the calm day, with TP2 language shapes throughout.",
+      "db_check": "provenance.factorial_cell where policy='static': min config_c with feasible=true per window_name -> 6-8 for bursts, 2 for calm; runs.tp=2 for llm.",
+      "criticality": "headline"
+    },
+    {
+      "line": 476,
+      "anchor": "sec:intro-contrib",
+      "quote": "a broader 560-cell target-time grid located the operating point",
+      "numbers": [
+        "560"
+      ],
+      "metric": "factorial_cells",
+      "subject": "target-time factorial grid",
+      "assertion": "A 560-cell target-time factorial grid was swept to locate the operating point.",
+      "db_check": "provenance.factorial_cell where actuation='target_time': count(*) = 560.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 478,
+      "anchor": "sec:intro-contrib",
+      "quote": "At the operating rating ($\\rho{=}15$) the p90-forecast policy delivers the RQ4 verdict",
+      "numbers": [
+        "15",
+        "90"
+      ],
+      "metric": "rho",
+      "subject": "operating capacity rating for the p90 forecast policy",
+      "assertion": "The operating point is capacity rating rho=15 with the p90 forecast quantile.",
+      "db_check": "provenance.runs where policy='forecast' and rho=15 and quantile=0.9; joined to factorial_cell for the verdict.",
+      "criticality": "headline"
+    },
+    {
+      "line": 479,
+      "anchor": "sec:intro-contrib",
+      "quote": "every window at every forecast-issued lead from 15 to \\SI{165}{\\second} --- burst windows at the \\SI{588}{\\milli\\second} zero-queueing service floor, the calm day below \\SI{734}{\\milli\\second} --- at 0.62$\\times$",
+      "numbers": [
+        "15",
+        "165",
+        "588",
+        "734",
+        "0.62"
+      ],
+      "metric": "encoder_delay_p99_ms",
+      "subject": "p90 forecast policy at rho=15, all windows",
+      "assertion": "At rho=15 the p90 forecast policy holds every window at leads 15-165 s (bursts at 588 ms, calm below 734 ms) for 0.62x static worker-time.",
+      "db_check": "provenance.factorial_cell + encoder_run_summary + cost_accounting for policy='forecast_p90', rho=15: feasible everywhere, p99 values 588/<734, cost ratio 0.62.",
+      "criticality": "headline"
+    },
+    {
+      "line": 493,
+      "anchor": "sec:intro-contrib",
+      "quote": "an EWMA at a calibrated quantile, through the same loop, misses the fast onsets or costs 1.09$\\times$ static",
+      "numbers": [
+        "1.09"
+      ],
+      "metric": "cost_ratio",
+      "subject": "EWMA forecaster ablation vs static fleet",
+      "assertion": "A calibrated-quantile EWMA either misses fast onsets or costs 1.09x the static fleet.",
+      "db_check": "provenance.cost_accounting via runs where model='ewma': provisioned_ws / static provisioned_ws = 1.09; check factorial_cell.feasible for the fast-onset burst.",
+      "criticality": "headline"
+    },
+    {
+      "line": 501,
+      "anchor": "sec:intro-scope",
+      "quote": "one seven-day production trace with a by-construction 50/50 modality split",
+      "numbers": [
+        "7",
+        "50",
+        "50"
+      ],
+      "metric": "text_only_fraction",
+      "subject": "AzureLMMInferenceDataset2025 trace",
+      "assertion": "The trace is seven days long with a 50/50 text-only vs image-bearing split.",
+      "db_check": "provenance.measured_request: 7-day span; 50% image_count=0.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 507,
+      "anchor": "sec:intro-scope",
+      "quote": "the encoder pool assumes a uniform $448^2$ image",
+      "numbers": [
+        "448"
+      ],
+      "metric": "image_resolution_px",
+      "subject": "encoder pool cost-model assumption",
+      "assertion": "The encoder cost model assumes every image is 448x448 pixels.",
+      "db_check": "provenance.collector_fn / runs config: encoder collection performed at 448x448 input resolution.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 509,
+      "anchor": "sec:intro-scope",
+      "quote": "a matched-engine (vLLM) silicon check over a dense sweep ($N{=}1$--$512$, 69 batch sizes) on a standalone vision-tower forward",
+      "numbers": [
+        "1",
+        "512",
+        "69"
+      ],
+      "metric": "validation_batch_sizes",
+      "subject": "vLLM vision-tower validation sweep",
+      "assertion": "The matched-engine validation swept 69 batch sizes from N=1 to N=512.",
+      "db_check": "provenance.collector_fn / anchor-fidelity artifact: count(distinct batch_size) = 69, min 1, max 512.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 510,
+      "anchor": "sec:intro-scope",
+      "quote": "holding within $12.8\\%$ across the whole $N\\le64$ serving regime, with the earlier ${\\approx}1.4$--$1.6\\times$ figure attributed to an alternate execution engine",
+      "numbers": [
+        "12.8",
+        "64",
+        "1.4",
+        "1.6"
+      ],
+      "metric": "composed_forward_error_pct",
+      "subject": "vLLM vision tower vs AIC, N<=64",
+      "assertion": "The composed forward holds within 12.8% for N<=64, and the earlier 1.4-1.6x gap is an execution-engine artifact.",
+      "db_check": "Same as line 249: anchor-fidelity artifact max relative error 0.128 over N<=64.",
+      "criticality": "headline"
+    },
+    {
+      "line": 514,
+      "anchor": "sec:intro-scope",
+      "quote": "at Qwen3-VL's full DeepStack payload the \\SI{588}{\\milli\\second} floor and the 0.62$\\times$ result assume an embedding-only handoff or a ${\\geq}100$\\,Gbps fabric",
+      "numbers": [
+        "588",
+        "0.62",
+        "100"
+      ],
+      "metric": "handoff_fabric_gbps",
+      "subject": "inter-pool handoff assumption",
+      "assertion": "The 588 ms floor and 0.62x cost result require an embedding-only handoff or a fabric of at least 100 Gbps.",
+      "db_check": "provenance.composed_e2e: enc_p99_ms floor 588 under the assumed handoff bandwidth; sensitivity rows for 100 Gbps vs 25 Gbps.",
+      "criticality": "headline"
+    },
+    {
+      "line": 516,
+      "anchor": "sec:intro-scope",
+      "quote": "since on the default 25\\,Gbps link transfer alone violates the bound for every policy",
+      "numbers": [
+        "25"
+      ],
+      "metric": "handoff_fabric_gbps",
+      "subject": "inter-pool handoff at 25 Gbps, all policies",
+      "assertion": "On a 25 Gbps link the DeepStack handoff transfer alone violates the 1 s bound for every policy.",
+      "db_check": "provenance.composed_e2e where fabric=25Gbps: transfer component alone > 1000 ms for all policies.",
+      "criticality": "headline"
+    },
+    {
+      "line": 521,
+      "anchor": "sec:intro-scope",
+      "quote": "knee detection uses the thesis's evaluation SLA (TTFT and encoder-delay p99 under \\SI{1}{\\second}, inter-token p99 under \\SI{100}{\\milli\\second})",
+      "numbers": [
+        "1",
+        "100"
+      ],
+      "metric": "evaluation_sla",
+      "subject": "thesis evaluation SLA",
+      "assertion": "The evaluation SLA is TTFT p99 < 1 s, encoder-delay p99 < 1 s, and ITL p99 < 100 ms.",
+      "db_check": "provenance.factorial_cell.feasible predicate: p99_ms<1000 for ttft/encoder, p99_itl_ms<100.",
+      "criticality": "supporting"
+    },
+    {
+      "line": 526,
+      "anchor": "sec:intro-scope",
+      "quote": "language-pool results characterize the 8B model at TP1 but deploy it at TP2$\\times$2 (the burst-feasible shape), with a 235B-TP8 spot-check",
+      "numbers": [
+        "8",
+        "1",
+        "2",
+        "2",
+        "235",
+        "8"
+      ],
+      "metric": "tp_config",
+      "subject": "language pool configurations",
+      "assertion": "Language-pool characterization uses 8B at TP1, deployment uses TP2x2, plus a 235B-TP8 spot check.",
+      "db_check": "provenance.runs: distinct (model, tp, n_replicas) for pool='llm' -> (8B,1,*), (8B,2,2), (235B,8,*).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 536,
+      "anchor": "sec:intro-scope / cap:validation",
+      "quote": "reproduce the simulated verdicts in both directions with TTFT p99 within 1.1--6.8\\%",
+      "numbers": [
+        "1.1",
+        "6.8"
+      ],
+      "metric": "ttft_p99_sim_vs_live_error_pct",
+      "subject": "live Dynamo replay vs simulation, fastest-onset burst",
+      "assertion": "Live Dynamo replay reproduces simulated TTFT p99 within 1.1-6.8% for both the forecast and reactive policies.",
+      "db_check": "provenance.v_corroboration (or llm_run_summary joined on runs.actuation='live' vs 'sim'): |p99_ttft_ms diff|/sim in [0.011,0.068].",
+      "criticality": "headline"
+    },
+    {
+      "line": 537,
+      "anchor": "sec:intro-scope / cap:validation",
+      "quote": "sub-bound for the forecast policy, 11.5 versus 9.7\\,ms",
+      "numbers": [
+        "11.5",
+        "9.7"
+      ],
+      "metric": "p99_itl_ms",
+      "subject": "forecast policy, live vs simulated",
+      "assertion": "The forecast policy's ITL p99 is 11.5 ms live versus 9.7 ms simulated, both well under the 100 ms bound.",
+      "db_check": "provenance.llm_run_summary via runs where policy='forecast': p99_itl_ms = 11.5 (live) and 9.7 (sim).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 538,
+      "anchor": "sec:intro-scope / cap:validation",
+      "quote": "\\emph{above} the \\SI{100}{\\milli\\second} bound for the reactive policy, 150.7 versus 152.7\\,ms",
+      "numbers": [
+        "100",
+        "150.7",
+        "152.7"
+      ],
+      "metric": "p99_itl_ms",
+      "subject": "reactive policy, live vs simulated",
+      "assertion": "The reactive policy's ITL p99 exceeds the 100 ms bound in both live (150.7 ms) and simulated (152.7 ms) runs.",
+      "db_check": "provenance.llm_run_summary via runs where policy='reactive': p99_itl_ms = 150.7 (live), 152.7 (sim).",
+      "criticality": "supporting"
+    },
+    {
+      "line": 539,
+      "anchor": "sec:intro-scope / cap:validation",
+      "quote": "and provisioned replica-time within 8\\% (Chapter~\\ref{cap:validation})",
+      "numbers": [
+        "8"
+      ],
+      "metric": "provisioned_ws_sim_vs_live_error_pct",
+      "subject": "live Dynamo replay vs simulation",
+      "assertion": "Live and simulated provisioned replica-time agree within 8%.",
+      "db_check": "provenance.cost_accounting / v_corroboration: |provisioned_ws(live)-provisioned_ws(sim)|/sim <= 0.08.",
+      "criticality": "headline"
+    }
+  ]
+}
