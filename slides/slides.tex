@@ -150,7 +150,7 @@
       \end{tabular}
     \end{column}
     \begin{column}{0.58\textwidth}
-      \centering\includegraphics[width=\linewidth]{eda/eda_c_seven_day_signals}
+      \centering\includegraphics[width=\linewidth]{fig/eda_c_seven_day_signals}
     \end{column}
   \end{columns}
 \end{frame}
@@ -170,7 +170,7 @@
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \centering\includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{eda/eda_d_img_vs_req_scatter}
+      \centering\includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{fig/eda_d_img_vs_req_scatter}
     \end{column}
   \end{columns}
 \end{frame}
@@ -182,7 +182,7 @@
           provisioner needs. The decoupling that blinds reactive autoscaling is paired with
           the persistence that enables \emph{anticipation}.
   \end{itemize}
-  \centering\includegraphics[width=0.86\linewidth,height=0.54\textheight,keepaspectratio]{eda/eda_i_burst_onsets}
+  \centering\includegraphics[width=0.86\linewidth,height=0.54\textheight,keepaspectratio]{fig/eda_i_burst_onsets}
 \end{frame}
 
 % ------------------------------------------------------------------
@@ -249,7 +249,7 @@
           \textbf{validated} against vLLM's own vision tower over a dense 69-point sweep
           ($N{=}1$--$512$); the $N{\le}64$ serving regime agrees within \textbf{12.8\%}.
   \end{itemize}
-  \centering\includegraphics[width=0.98\linewidth,height=0.58\textheight,keepaspectratio]{aic/aic_fn_engines}
+  \centering\includegraphics[width=0.98\linewidth,height=0.58\textheight,keepaspectratio]{fig/aic_fn_engines}
 \end{frame}
 
 \begin{frame}{The mechanics of decoupling: knees an order of magnitude apart}
@@ -260,7 +260,7 @@
           encoder queueing at 29\% \emph{mean} utilization}, which yields only to capacity.
           RQ1's decoupling, reproduced \emph{mechanically}.
   \end{itemize}
-  \centering\includegraphics[width=0.9\linewidth,height=0.44\textheight,keepaspectratio]{sim/sim_knees}
+  \centering\includegraphics[width=0.9\linewidth,height=0.44\textheight,keepaspectratio]{fig/sim_knees}
 \end{frame}
 
 % ------------------------------------------------------------------
@@ -304,7 +304,7 @@
           zero-queueing floor --- while a \textbf{same-signal reactive baseline} (trailing point
           rate, no p90 headroom) loses burst3 at every lead and burst4/5 beyond \SI{45}{\second}.
   \end{itemize}
-  \centering\includegraphics[width=0.88\linewidth,height=0.54\textheight,keepaspectratio]{sim/sim_burst_queue}
+  \centering\includegraphics[width=0.88\linewidth,height=0.54\textheight,keepaspectratio]{fig/sim_burst_queue}
 \end{frame}
 
 \begin{frame}{What makes it work: the ablation ledger}
