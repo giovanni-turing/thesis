@@ -67,7 +67,7 @@ def recover_delays(jsonl: Path) -> np.ndarray:
 
 payload = {"meta": {
     "span_s": span, "bin_s": B, "requests": int(AGG["max_requests"]),
-    "total_images": 11400000, "t0_iso": str(t0), "lead_s": LEAD, "rho": 15,
+    "total_images": int(n_img.sum()), "t0_iso": str(t0), "lead_s": LEAD, "rho": 15,
     "sla_ms": 1000.0, "episodes": episodes,
     "static_c8_ws": verif["static_C8"]["provisioned_ws"],
     "sources": ["defense/anim/data/a6_runs/ (gen_a6_runs.py; all 5 endpoints ledger-verified)",

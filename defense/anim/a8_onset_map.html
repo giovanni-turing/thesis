@@ -149,10 +149,14 @@ function draw() {
   // summary
   const inplay = DATA.episodes.filter(e => e.re[lead] !== null);
   const rf = inplay.filter(e => e.re[lead] >= DATA.sla).length;
-  const ff = DATA.episodes.filter(e => e.fc[lead] !== null && e.fc[lead] >= DATA.sla).length;
+  const fmiss = DATA.episodes.filter(e => e.fc[lead] !== null && e.fc[lead] >= DATA.sla)
+                             .map(e => e.label);
+  const ff = fmiss.length;
+  const ftxt = ff === 0 ? "none"
+    : fmiss.join(", ") + (fmiss.length === 1 && fmiss[0] === "e13" ? " — the forecast-miss boundary case" : "");
   document.getElementById("summary").innerHTML =
     `At L = <b>${lead} s</b>: reactive fails <b>${rf} of ${inplay.length}</b> episodes · ` +
-    `forecast fails <b>${ff}</b> (${ff ? "e13 — the forecast-miss boundary case" : "none"}) · ` +
+    `forecast fails <b>${ff}</b> (${ftxt}) · ` +
     `the dead zone grows with lead — drag it.`;
 }
 document.querySelectorAll("#leadSeg button").forEach(b => b.onclick = () => {

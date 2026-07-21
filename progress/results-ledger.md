@@ -1753,3 +1753,29 @@ supersedes: the prior "STILL BROKEN / PERMANENTLY UNRECOVERABLE" list (which nam
             failures + the 5,634/26.6% census) — updated here to 5 by-design failures (adds C214)
             and the 5,673/27.1% census. No measurement altered.
 commit:     uncommitted (working tree)
+
+## Correction: language-week ratio 0.96x -> 0.965x + live error disclosure (2026-07-21)
+artifact:   simulation/results/llm_week/week_fc_p90.report.json (gpu_hours=518.6063); live51/live_runs/{live_fc,live_re}/profile_export_aiperf.json (3092/1 err, 3089/4 err of 3093)
+result:     518.6063 / (4 GPU x 483,662.5 s = 537.4029 GPU-h) = 0.96502 -> printed ratio amended to 0.965x (5 sites); tab:val-anchor caption now discloses per-run success counts and latency-conditional verdicts
+feeds:      tex/tese.tex (abstract EN/PT), tex/closedloop.tex (S:cl-llm, cost bullet, volume), tex/conclusion.tex, tex/validation.tex (caption, setup); supersedes the bare "0.96x" wording (R18 amended, verify_all.sh updated)
+
+## Defense animations: DB-backed verification + fixes + design pass (2026-07-20)
+artifact:   defense/anim/{index,a1,a2,a6,a8,a9,a11,a12}*.html (rebuilt), data/coverage_manifest.json (regen), data/a6_data.json (meta patch); shots in defense/anim/build/shots/review/
+result:     5 parallel agents verified every on-screen number against provenance DB (technonous
+            postgres, schema provenance): ~2,500 comparisons over 212 a2*-runs, 52 a11, 20 a12,
+            80 coverage rows, A1/A6 endpoints+series checksums, A8 18 episodes, A9 buckets,
+            index claims — ZERO numeric mismatches (all display-rounding only). Fixed 6
+            staleness/wording defects: index "128 converter runs"->144 + "39 planner replays"->52
+            + TimesFM named + ambiguous "1/2 the cost" reworded; a8 forecast-miss label now
+            data-driven per lead (L165 = e8+e13, was hardcoded "e13"); a2 scope adds TimesFM;
+            a11 "every L60 twin" wording scoped to burst3 anchors; extract_a6 total_images
+            literal 11,400,000 -> computed 11,408,002 (+ data patch); a1 peak label states both
+            conventions (374 offered / 370 trace-arrival). build_coverage_manifest.py now
+            enumerates A15 (999,599x3, ttft 651.1) with per_model_expctx + guarantee key;
+            guarantee still complete:true. Design: header flex-wrap/no-shrink fix on a2/a11/a12
+            (title collapse + clipped 165s button at 1600px); NEW per-lead endpoint-p99 chip
+            strips on a2 (588ms x4 PASS vs 9.48->54.2s FAIL) and a11 (651/651/669 PASS vs
+            3.49s x3 lead-invariant FAIL), clickable, verdict-glyphed. A9 blank-WebGL in
+            headless shots = chromium flag artifact, not a page defect.
+feeds:      defense presentation only (no thesis text touched); supersedes nothing ledgered
+commit:     uncommitted (working tree)

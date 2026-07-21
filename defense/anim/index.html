@@ -75,10 +75,10 @@
   <div class="card" data-href="a2_the_race.html" id="k2">
     <span class="kbd-chip">2</span>
     <h2><span>A2 · SLIDE “FORECAST HOLDS WHERE REACTIVE BREAKS”</span>The race</h2>
-    <p>Forecast (<b>Chronos-2 ↔ Toto-2</b> p90 toggle, issue-time) vs. reactive under the identical law —
+    <p>Forecast (<b>Chronos-2 ↔ Toto-2 ↔ TimesFM-2.0</b> p90 toggle, issue-time) vs. reactive under the identical law —
     <b>9 episodes</b> across the onset gradient × <b>lead slider</b> 15/30/45/165 s
     (keys 1–4). Live tickers: cost (both accountings), mean delay, running p99,
-    queue. 128 converter runs; every ledgered endpoint reproduced exactly.</p>
+    queue. 144 converter runs; every ledgered endpoint reproduced exactly.</p>
     <div class="nums">
       <div class="num"><span class="dot" style="background:var(--orange)"></span>burst3 reactive <b>9.5 → 54 s</b> by lead</div>
       <div class="num"><span class="dot" style="background:var(--blue)"></span>forecast pinned at <b>588 ms</b>, queue <b>0</b></div>
@@ -160,13 +160,13 @@
     <h2><span>A11 · SLIDE “PER-POOL MECHANISM” (LANGUAGE)</span>The race: language pool</h2>
     <p>The A2 race, now for the <b>language pool</b> through Dynamo's real planner:
     forecast + tail-aware conversion vs. the reactive SLA planner, <b>5 windows</b>
-    (incl. the full week) × <b>Chronos↔Toto</b> × replica lead 60/120/300 s.
-    Live: TP2-replica staircase, running TTFT/ITL p99, GPU-h. 39 planner replays,
+    (incl. the full week) × <b>Chronos↔Toto↔TimesFM</b> × replica lead 60/120/300 s.
+    Live: TP2-replica staircase, running TTFT/ITL p99, GPU-h. 52 planner replays,
     every L60 anchor reproducing the ledgered twin.</p>
     <div class="nums">
       <div class="num"><span class="dot" style="background:var(--blue)"></span>forecast <b>651 ms · PASS</b> at every lead</div>
       <div class="num"><span class="dot" style="background:var(--orange)"></span>reactive <b>3.49 s · FAIL</b> — own window-mean law met, tail violated</div>
-      <div class="num"><span class="dot" style="background:var(--violet)"></span>week: forecast 651 ms vs reactive 1.19 s at ½ the cost</div>
+      <div class="num"><span class="dot" style="background:var(--violet)"></span>week: forecast 651 ms PASS vs reactive 1.19 s FAIL — reactive's ½ spend buys the breach</div>
     </div>
     <div class="links" onclick="event.stopPropagation()">
       <a href="a11_llm_race.html#w=burst3&m=toto&L=60">burst3</a>

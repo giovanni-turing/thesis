@@ -54,12 +54,25 @@ for m, r in a14.items():
                      "requests": r.get("lang_requests"), "expect": r.get("max_requests"),
                      "full": None, "ok": "error" not in r})
 
+# --- A15: expanding-context forecast E2E (99.96% of the trace, all models) ---
+wins_ext = load(D / "windows_ext.json")
+N_EXPCTX = wins_ext.get("span_expctx", {}).get("max_requests", 999_599)
+a15 = load(D / "a15_runs/verification.json")
+for m, r in a15.items():
+    if "lang_requests" in r:
+        rows.append({"fleet": "A15", "run": f"{m} expanding-context E2E", "pool": "both (E2E)",
+                     "requests": r.get("lang_requests"), "expect": N_EXPCTX,
+                     "full": None, "ok": "error" not in r})
+
 manifest = {
     "trace_requests": N_TRACE, "forecast_span_requests": N_SPAN,
     "per_model_maxspan": {m: {"requests": a14[m].get("lang_requests"),
                               "pct_of_1M": a14[m].get("pct_of_1M"),
                               "ttft_p99": a14[m].get("ttft_p99")} for m in a14},
     "context_days_requests": N_TRACE - N_SPAN,
+    "per_model_expctx": {m: {"requests": a15[m].get("lang_requests"),
+                             "pct_of_1M": a15[m].get("pct_of_1M"),
+                             "ttft_p99": a15[m].get("ttft_p99")} for m in a15},
     "coverage": {
         "encoder_full_trace": {
             "policies": ["static_C8", "static_C2", "reactive"],
@@ -88,10 +101,13 @@ enc_ok = ft_enc and all(r.get("requests") == N_TRACE and "error" not in r
 llm_ok = ft_llm and all(r.get("requests") == N_TRACE and r.get("completed") == N_TRACE
                         and "error" not in r for r in ft_llm.values())
 a14_ok = bool(a14) and all("error" not in a14[m] and a14[m].get("lang_requests") == a14[m].get("max_requests") for m in a14)
+a15_ok = bool(a15) and all("error" not in a15[m] and a15[m].get("lang_requests") == N_EXPCTX
+                           and a15[m].get("completed") == N_EXPCTX for m in a15)
 manifest["guarantee"] = {
     "encoder_all_1M_covered": bool(enc_ok),
     "language_all_1M_covered": bool(llm_ok),
     "per_model_maxspan_covered": a14_ok,
+    "per_model_expctx_covered": a15_ok,
     "complete": bool(enc_ok and llm_ok),
 }
 
@@ -113,6 +129,12 @@ if a14:
     print("--- per-model max-span forecast E2E (both pools) ---")
     for m in a14:
         r = a14[m]
+        print(f"  {m:8} {r.get('lang_requests',0):>9,} req ({r.get('pct_of_1M')}% of 1M) "
+              f"TTFT p99 {r.get('ttft_p99')} ms  {'ok' if 'error' not in r else 'ERR'}")
+if a15:
+    print("--- per-model expanding-context forecast E2E (both pools) ---")
+    for m in a15:
+        r = a15[m]
         print(f"  {m:8} {r.get('lang_requests',0):>9,} req ({r.get('pct_of_1M')}% of 1M) "
               f"TTFT p99 {r.get('ttft_p99')} ms  {'ok' if 'error' not in r else 'ERR'}")
 print(f"FULL-COVERAGE GUARANTEE MET: {g['complete']}")

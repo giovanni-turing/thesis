@@ -19,6 +19,23 @@
   }
  },
  "context_days_requests": 250399,
+ "per_model_expctx": {
+  "timesfm": {
+   "requests": 999599,
+   "pct_of_1M": 99.96,
+   "ttft_p99": 651.1
+  },
+  "toto": {
+   "requests": 999599,
+   "pct_of_1M": 99.96,
+   "ttft_p99": 651.1
+  },
+  "chronos": {
+   "requests": 999599,
+   "pct_of_1M": 99.96,
+   "ttft_p99": 651.1
+  }
+ },
  "coverage": {
   "encoder_full_trace": {
    "policies": [
@@ -769,12 +786,40 @@
    "expect": 749601,
    "full": null,
    "ok": true
+  },
+  {
+   "fleet": "A15",
+   "run": "timesfm expanding-context E2E",
+   "pool": "both (E2E)",
+   "requests": 999599,
+   "expect": 999599,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A15",
+   "run": "toto expanding-context E2E",
+   "pool": "both (E2E)",
+   "requests": 999599,
+   "expect": 999599,
+   "full": null,
+   "ok": true
+  },
+  {
+   "fleet": "A15",
+   "run": "chronos expanding-context E2E",
+   "pool": "both (E2E)",
+   "requests": 999599,
+   "expect": 999599,
+   "full": null,
+   "ok": true
   }
  ],
  "guarantee": {
   "encoder_all_1M_covered": true,
   "language_all_1M_covered": true,
   "per_model_maxspan_covered": true,
+  "per_model_expctx_covered": true,
   "complete": true
  }
 }
