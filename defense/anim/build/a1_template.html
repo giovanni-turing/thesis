@@ -56,7 +56,10 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     display: flex; flex-direction: column; padding: 12px 16px 10px; min-height: 0;
     position: relative;
+    box-shadow: 0 1px 3px rgba(11,11,11,0.05);
   }
+  #cardDash { border-top: 4px solid var(--good); }
+  #cardReal { border-top: 4px solid var(--critical); }
   .card h2 { font-size: 13px; font-weight: 700; letter-spacing: 0.10em; color: var(--ink-2); }
   .card h2 .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
   .tiles { display: flex; gap: 10px; margin: 8px 0 4px; }
@@ -84,8 +87,8 @@
   }
   .verdict.show { display: flex; }
   .verdict .big { font-size: 22px; font-variant-numeric: tabular-nums; }
-  .verdict.ok  { border-left: 6px solid var(--good); }
-  .verdict.bad { border-left: 6px solid var(--critical); }
+  .verdict.ok  { border-left: 6px solid var(--good); background: #eef7ec; }
+  .verdict.bad { border-left: 6px solid var(--critical); background: #fdf0ee; }
   footer {
     display: flex; gap: 16px; align-items: center;
     padding: 4px 20px 8px; font-size: 11px; color: var(--muted);
@@ -321,7 +324,7 @@ class Chart {
 function minuteLine(ch, upto, data, color) {
   const ctx = ch.ctx, mMax = Math.min(Math.floor(upto/60), data.length - 1);
   if (mMax < 1) return;
-  ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = "round";
+  ctx.strokeStyle = color; ctx.lineWidth = 2.4; ctx.lineJoin = "round";
   ctx.beginPath();
   for (let m = 0; m <= mMax; m++) {
     const px = ch.x(m*60 + 30), py = ch.y(data[m]);

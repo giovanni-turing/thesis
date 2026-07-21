@@ -89,6 +89,13 @@ function draw() {
   cv.width = W * dpr; cv.height = H * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, W, H);
+  // zone washes (soft, non-data: the phase-diagram reading aid)
+  let zg = ctx.createLinearGradient(PAD.l, 0, x(8), 0);
+  zg.addColorStop(0, "rgba(208,59,59,0.07)"); zg.addColorStop(1, "rgba(208,59,59,0)");
+  ctx.fillStyle = zg; ctx.fillRect(PAD.l, PAD.t, x(8) - PAD.l, H - PAD.t - PAD.b);
+  zg = ctx.createLinearGradient(x(20), 0, W - PAD.r, 0);
+  zg.addColorStop(0, "rgba(12,163,12,0)"); zg.addColorStop(1, "rgba(12,163,12,0.06)");
+  ctx.fillStyle = zg; ctx.fillRect(x(20), PAD.t, W - PAD.r - x(20), H - PAD.t - PAD.b);
   // grid + axes
   ctx.font = "11px system-ui"; ctx.fillStyle = css("--muted");
   for (const t of [1, 2, 5, 10, 30, 60, 120, 220]) {
@@ -111,10 +118,12 @@ function draw() {
   ctx.save(); ctx.translate(16, (PAD.t + H - PAD.b) / 2); ctx.rotate(-Math.PI / 2);
   ctx.textBaseline = "top"; ctx.fillText("episode peak (img/s, 1-min)", 0, 0); ctx.restore();
   // region hints
-  ctx.font = "600 11.5px system-ui"; ctx.fillStyle = css("--muted");
+  ctx.font = "650 12px system-ui";
   ctx.textAlign = "left"; ctx.textBaseline = "top";
+  ctx.fillStyle = "rgba(176,48,48,0.8)";
   ctx.fillText("← fast onsets: reactive-dead zone", PAD.l + 10, PAD.t + 6);
   ctx.textAlign = "right";
+  ctx.fillStyle = "rgba(38,110,38,0.85)";
   ctx.fillText("slow onsets: observable in time →", W - PAD.r - 10, PAD.t + 6);
   // dots
   pts = [];

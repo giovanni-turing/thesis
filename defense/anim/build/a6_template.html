@@ -40,7 +40,7 @@
   .plabel .desc { font-size: 10px; color: var(--ink-2); margin-top: 2px; line-height: 1.3; }
   .plabel .wnow { font-size: 11px; color: var(--ink-2); margin-top: 3px; }
   .plabel .wnow b { font-size: 15px; font-variant-numeric: tabular-nums; }
-  .rowchart { flex: 1; position: relative; background: var(--surface);
+  .rowchart { box-shadow: 0 1px 2px rgba(11,11,11,0.05); flex: 1; position: relative; background: var(--surface);
     border: 1px solid var(--border); border-radius: 10px; }
   .odo { width: 705px; display: flex; gap: 6px; align-items: center; }
   .odo .cell { flex: 1; border: 1px solid var(--border); border-radius: 9px;
@@ -164,7 +164,7 @@ for (const r of ROWS) {
       <div class="desc">${r.desc}</div>
       <div class="wnow">workers <b id="${r.tag}_w">–</b> · queue <b id="${r.tag}_q">0</b></div>
     </div>
-    <div class="rowchart" id="${r.tag}_chart"><canvas></canvas></div>
+    <div class="rowchart" id="${r.tag}_chart" style="border-left:4px solid ${r.hue}"><canvas></canvas></div>
     <div class="odo">
       <div class="cell"><div class="k">cost so far</div>
         <div class="v"><span id="${r.tag}_cost">0</span><span style="font-size:11px"> wh</span></div>
