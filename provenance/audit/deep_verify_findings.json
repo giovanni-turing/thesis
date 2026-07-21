@@ -1,0 +1,119 @@
+{
+ "candidate_count": 87,
+ "confirmed_count": 16,
+ "summary": "The reduced thesis is substantively sound — no confirmed problem invalidates a result, model, or headline claim. After dedup, 14 real defects remain (the three validation.tex:154 entries collapse to one). All are reduction-induced editorial damage from over-aggressive compression: 1 high, 3 medium, 10 low. The single high and one medium (validation.tex:154, closedloop.tex tab:cl-ewma) are the only reader-visible quantitative contradictions and both are prose/label vs. table mismatches with correct underlying numbers — not wrong results. The high is a genuine falsifiable overclaim (\"all three metrics agree within single-digit percent\" while the cited table's forecast ITL cell is +1.8 ms = 18.6%). The other two mediums are a lost span-definition breaking a fold-count reconciliation (closedloop.tex:901) and an onset descriptor flipped against its supporting figure (closedloop.tex:118-119). The 589-vs-588 floor is a one-off typo contradicting the same number at ~12 other sites. The 10 lows are dangling/circular references, an undefined acronym pair (KVBM, ARIMA), and two grammar slips. Every fix is a localized one-to-few-line edit; none require re-running experiments. Verdict: thesis argument holds, but 4 high/medium fixes must land before a committee read, hence not clean.",
+ "confirmed_problems": [
+  {
+   "file": "tex/validation.tex",
+   "locus": "line 152-155, \\section{Scope of the anchor} concluding sentence (cites Table~\\ref{tab:val-anchor})",
+   "severity": "high",
+   "category": "overclaim-introduced / prose-table-mismatch",
+   "problem": "Concluding sentence claims \"all three metrics agree within single-digit percent (Table~\\ref{tab:val-anchor})\", but the cited table (line 67) gives the forecast-policy ITL p99 as Live 11.5 ms vs Offline 9.7 ms = +1.8 ms, i.e. +18.6% — double-digit. The table renders that one cell in absolute ms precisely because the relative gap is large, so the contradiction is invisible on the page unless the reader computes it. The reduction deleted the honest qualifier (\"differs by 1.8 ms, 18.0%, both far under the 100 ms bound\") and replaced it with a blanket claim the table's own cell declined to make; validation.tex now contradicts both its cited table and the intro.tex parallel passage. Falsifiable by an examiner doing 11.5/9.7. (Deduped: three separate confirmations of this same defect, ranked at their max severity.)",
+   "fix": "Replace \"all three metrics agree within single-digit percent (Table~\\ref{tab:val-anchor})\" with a claim the table supports, e.g. \"TTFT and provisioned replica-time agree within single-digit percent and the ITL SLA verdicts are identical (the forecast policy's ITL differs by \\SI{1.8}{\\milli\\second}, a small absolute gap on a \\SI{9.7}{\\milli\\second} base, far under the \\SI{100}{\\milli\\second} bound; Table~\\ref{tab:val-anchor})\"."
+  },
+  {
+   "file": "tex/closedloop.tex",
+   "locus": "line 901, 'Splitting the expanding-context span into seven disjoint 24-hour folds'",
+   "severity": "medium",
+   "category": "lost-definition / arithmetic-inconsistency",
+   "problem": "The cut deleted the sole definition of \"the expanding-context span\" (999599 requests over 6.998 days; the term now appears nowhere else in tex/). Two harms: the definite-article term has no antecedent, and it creates an arithmetic mismatch — the passage prices the headline on \"one 5.60-day span\" yet splits \"the expanding-context span\" into SEVEN disjoint 24-hour folds (=7 days) and cites \"five burst-bearing folds\"/\"six of seven folds\". Seven 24-hour folds cannot come from 5.60 days; they come from the deleted 6.998-day span. A committee reader flags the mismatch.",
+   "fix": "Restore a compact span definition at l.901, minimally the day count so \"seven 24-hour folds\" reconciles: \"Splitting the expanding-context span (\\num{999599} requests over 6.998 days --- context plus evaluation, longer than the 5.60-day span the headline is priced on, reproducing its aggregate ratio at 0.612$\\times$) into seven disjoint 24-hour folds...\""
+  },
+  {
+   "file": "tex/closedloop.tex",
+   "locus": "line 118-119, item 'Model choice is second-order'",
+   "severity": "medium",
+   "category": "number-mismatch / onset-descriptor-flip",
+   "problem": "States the three shipped predictors leave the verdict unchanged \"all failing together on a slow-onset burst.\" The only supporting evidence (Fig. cl-framework-diff (b), caption L338-342: \"3,495 ms, forecaster-invariant\") is burst3, which the chapter repeatedly labels the FASTEST/one-minute onset (L138-139, 160-161, 175, 281). The chapter's own logic also makes \"slow-onset\" self-contradictory: on the slow onset mean-based sizing PASSES (L280-281), so shipped predictors would not all fail there. The onset characterization flips against the figure a reader reaches.",
+   "fix": "On line 119 change \"all failing together on a slow-onset burst\" to \"all failing together on the fast onset (burst3)\"."
+  },
+  {
+   "file": "tex/closedloop.tex",
+   "locus": "tab:cl-ewma — caption line 199 and passing-floor cells rows 210-213",
+   "severity": "medium",
+   "category": "number-mismatch",
+   "problem": "The deterministic encoder service floor is 588 ms at every other site in this file (lines 74, 85, 104, 127, 162, 371; reactive tables 503-517; ledger rows 681-690) and in the provenance DB (216 floor runs round to 588, zero in [588.5,589.5)). Only tab:cl-ewma writes 589 — caption L199 and passing-floor cells at L210 (x4), L211 (burst4), L212 (burst1/burst4/burst5), L213 (burst4). Same load-bearing quantity given two values in one document; a reader-facing contradiction on a headline number.",
+   "fix": "Change 589->588 at the floor sites only: caption line 199; row 210 all four burst cells; row 211 burst4; row 212 burst1/burst4/burst5; row 213 burst4. Leave non-floor values (658, 1,285, div, 611, 2,084, 747, steady/agg columns) unchanged."
+  },
+  {
+   "file": "tex/predictors.tex",
+   "locus": "line 24-27 intro sentence; references Appendix ap:artifacts (apendice.tex:240)",
+   "severity": "low",
+   "category": "dangling-reference",
+   "problem": "Intro promises \"exact row counts in the provenance manifest (Appendix~\\ref{ap:artifacts})\", but the manifest cell (apendice.tex:236-240) reads only \"predictors/... -> results/*.parquet (26 files)\" — no row counts anywhere in the appendix or manuscript (the prior 21404640 / 20749440 figures were deleted). The \\ref resolves but the promised content is absent; the 26-file count does match.",
+   "fix": "Preferred (also restores lost scale numbers): add counts to apendice.tex:240, e.g. \"\\texttt{results/*.parquet} (26 files, \\num{21404640} rows; \\num{20749440} on the common span)\". Alternatively reword intro to \"archived next to the metric tables (Appendix~\\ref{ap:artifacts})\", dropping the count promise."
+  },
+  {
+   "file": "tex/twopool.tex",
+   "locus": "line 250-251, Table~\\ref{tab:sim-knees} caption 'Provenance caveat' clause",
+   "severity": "low",
+   "category": "dangling-reference",
+   "problem": "Caption clause \"...breaches the 100 ms bound with margin well above the inter-runtime spread\" compares two operands the reduction stripped of all definition: the s=3 ITL value (was 109.51 ms, deleted everywhere) and the inter-runtime spread (was 22% TTFT / 61% ITL p99 at s=16, deleted). \"inter-runtime\" occurs only at this line; the original \"reported above\" pointer was also cut. The cited appendix does not quantify the spread. Load-bearing knee claim (s=2 meets every bound) is intact and verifiable.",
+   "fix": "Replace the dangling comparison with a self-contained statement grounded in the appendix, e.g.: \"...$s{=}2$ meets every bound and the $s{=}3$ inter-token p99 breaches the \\SI{100}{\\milli\\second} bound outright, while the wheel-vs-source runtime difference perturbs only extreme-tail maxima, not p99 (Appendix~\\ref{ap:artifacts}).\""
+  },
+  {
+   "file": "tex/twopool.tex",
+   "locus": "line 68-70 (§sec:sim-timing), parenthetical '(per-runtime numbers in Appendix~\\ref{ap:artifacts})'",
+   "severity": "low",
+   "category": "dangling-reference",
+   "problem": "Parenthetical promises per-runtime numbers in the appendix, but the manifest (apendice.tex:231-274) contains no wheel-vs-source divergence numbers; the appendix's only runtime note (L48-53) points back to this chapter, making it a circular pointer. Deleted numbers (7.6 vs 4.5 s; 22%/61% p99) live in neither location. Core claim (wheel inflated extreme tail; source runtime used for headlines) survives.",
+   "fix": "Delete the parenthetical so the sentence ends at \"...the events it prices.\" Alternatively restore one compact inline figure, e.g. \"(max TTFT 7.6 vs.\\ 4.5~s on identical perf data)\"."
+  },
+  {
+   "file": "tex/aiconfigurator.tex",
+   "locus": "line 15-16, chapter-intro sentence",
+   "severity": "low",
+   "category": "grammar / dropped-auxiliary",
+   "problem": "Compression dropped the coordinating \"and\" and the passive auxiliary \"is\": \"...agrees within ~3%, the kernel-time ledger attributed term by term except a ~0.7ms remainder.\" \"attributed\" is left as a bare past participle with no finite verb parallel to \"agrees\", producing a comma splice in the chapter's opening summary.",
+   "fix": "Change \"${\\approx}3\\%$, the kernel-time ledger attributed term by term except a\" to \"${\\approx}3\\%$, and the kernel-time ledger is attributed term by term except a\" (restoring \"and\" + \"is\"; minimal fix is inserting \"is\" before \"attributed\")."
+  },
+  {
+   "file": "tex/apendice.tex",
+   "locus": "line 184, \\S app:engine-sensitivity Scope paragraph",
+   "severity": "low",
+   "category": "dangling-reference / self-reference",
+   "problem": "Reduction-inserted clause \"per-resolution ratios are archived (Appendix~\\ref{ap:artifacts})\" sits inside the very chapter that carries \\label{ap:artifacts} (line 6), so it renders as a circular self-pointer '(Appendix A)'. Also redundant with the next sentence, which names the artifact explicitly (vllm_multires.{py,json}).",
+   "fix": "Delete the parenthetical self-reference so line 184 reads 'per-resolution ratios are archived.' — the artifact is already named in the following sentence."
+  },
+  {
+   "file": "tex/apendice_ecosystem.tex",
+   "locus": "line 77, dynamo row, 'Layer / role' cell",
+   "severity": "low",
+   "category": "undefined-acronym",
+   "problem": "\"KVBM\" occurs exactly once in the whole tex tree and is never expanded; it is the only bare acronym flanked by two fully-spelled phrases in the cell, and this appendix is not wired into tese.tex so it cannot borrow a definition from the main body (none exists there either).",
+   "fix": "Expand on first use: change \"disaggregated KV-aware routing, KVBM, SLA planner\" to \"...routing, tiered KV block manager (KVBM), SLA planner\" (or drop the acronym: \"...tiered KV block manager, SLA planner\")."
+  },
+  {
+   "file": "tex/baselines.tex",
+   "locus": "line 95",
+   "severity": "low",
+   "category": "subject-verb-agreement",
+   "problem": "Line 95: \"The encoder $C^{*}$ minimize the all-request encoder-delay p99...\". Subject $C^{*}$ is unambiguously singular (a single optimal encoder-worker count), so the base form \"minimize\" is a grammatical agreement error.",
+   "fix": "Change \"minimize\" to \"minimizes\"."
+  },
+  {
+   "file": "tex/baselines.tex",
+   "locus": "line 53 (and :153); List of Abbreviations tese.tex:153-174",
+   "severity": "low",
+   "category": "undefined-acronym",
+   "problem": "ARIMA is used in main-body prose (baselines.tex:53,153; related.tex; predictors.tex; closedloop.tex; validation.tex) but never expanded anywhere (zero hits for 'autoregressive integrated'). The List of Abbreviations lists every peer forecasting acronym (ACF, EWMA, MAE, TSFM, WAPE) but omits ARIMA — the lone gap among the forecasting terms.",
+   "fix": "Add one row to the List of Abbreviations in tex/tese.tex after line 155 (AIC), alphabetical: 'ARIMA & autoregressive integrated moving average \\\\'."
+  },
+  {
+   "file": "tex/closedloop.tex",
+   "locus": "L533-537, cross-reference 'the physics of Section~\\ref{sec:cl-aggregate}'",
+   "severity": "low",
+   "category": "dangling-reference / mistargeted-ref",
+   "problem": "Attributes \"the physics\" (queue empty, delay collapses onto the 588 ms floor) to sec:cl-aggregate, but that mechanism — and the coined term \"physics\" (used only at L89 and L533) — is established in sec:cl-matrix (L84-89 floor decomposition + \"...what remains is physics\"). sec:cl-aggregate's own caption (L371-372) defers the floor back to sec:cl-matrix. A reader following the reference lands on a section that redirects onward.",
+   "fix": "On line 534 change \\ref{sec:cl-aggregate} to \\ref{sec:cl-matrix}."
+  },
+  {
+   "file": "tex/trace-eda.tex",
+   "locus": "lines 122-123, parenthetical after the Fano-factor sentence (§'Temporal structure')",
+   "severity": "low",
+   "category": "non-sequitur / orphaned-reference",
+   "problem": "The reduction deleted the clause 'a seven-day record cannot establish asymptotically unbounded growth, but', which introduced the observation window that the surviving 'within the window' referred to. 'the window' (definite singular) now has no antecedent — nearest nouns are 'counting windows' (plural) and 'the measured range' — reading as a leftover fragment. Intended meaning (every aggregation scale is overdispersed) still recoverable.",
+   "fix": "Replace 'within the window every aggregation' with 'across the measured range every aggregation', giving '(Figure~\\ref{fig:eda-arrival}; across the measured range every aggregation scale an autoscaler could use is overdispersed).'"
+  }
+ ]
+}

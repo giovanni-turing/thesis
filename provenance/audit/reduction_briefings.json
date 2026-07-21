@@ -1,0 +1,891 @@
+{
+ "global_must_survive_caveats": [
+  "decode series is offered-work stamped at arrival: faithful in total volume, temporally displaced, licenses no pointwise provisioning claim",
+  "encoder cost model collected on REAL RTX 5090 silicon, physically validated (~3% attention, <=12.8% vs vLLM tower N<=64), upstreamed to AIC as a draft PR",
+  "language pool is Dynamo DES on calibrated H100 AIC timing (NOT real H100); live anchor = real Dynamo control plane + MOCKED engines, validates the control loop not silicon",
+  "single 7-day Azure trace; results not claimed fold-invariant",
+  "588 ms floor = analytic single-stream, embedding-only handoff assumption",
+  "predictive arms cost MORE GPU-hours than static in some pools/windows; the saving is 0.62x on the encoder worker-time denominator",
+  "order-time vs readiness-time billing distinction; 3-denominator cost accounting"
+ ],
+ "chapters": {
+  "tex/intro.tex": {
+   "file": "tex/intro.tex",
+   "role": "Frames the whole thesis: sets up modality-disaggregated multimodal serving, states the per-pool-provisioning thesis, poses RQ1-4, previews method (trace-driven sim anchored in silicon), and lists the five contributions.",
+   "current_words": 4138,
+   "target_words": 3050,
+   "action": "Collapse the RQ-answers block and the Contributions block, which state the SAME findings with the SAME numbers twice — let one carry the numeric detail, the other the shape. State the 0.62x/588ms/15-165s payoff once (currently in 5 places). Offload the cold-start lead-time footnote breakdown and the decode-stamp-bias percentage dump to body/appendix. Compress the Qwen3-VL portability detail.",
+   "must_survive_findings": [
+    "Per-pool demand decouples: vision (image) demand is nearly independent of the request rate a conventional autoscaler watches (R^2=0.12 vs 0.65 for decode; Jaccard 0.02 on top-percentile minutes), so no single signal can size every pool.",
+    "The signal most dangerous to reactive scaling is the most forecastable: the image signal is both the burstiest (CV^2 3.83 vs 0.32) and the most persistent (Hurst approx 0.93), and pretrained time-series foundation models forecast it zero-shot at provisioning horizons, beating classical baselines in all 20 (signal x resolution) cells.",
+    "In a silicon-calibrated two-pool simulation the pools' saturation knees sit an order of magnitude apart, and the encoder pool violates its tail SLO invisibly at the trace's own rate (p99 5.0s at 29% mean utilization) where rate/utilization monitors see a healthy pool.",
+    "Closing the loop, per-pool provisioning (forecast for vision, tail-aware conversion for language) holds the tail SLA through burst onsets that defeat an identically-informed reactive controller, at 0.62x the deployable static encoder fleet's GPU-time; anticipatory headroom (not signal choice) is the operative advantage and mean-based conversion is the language-pool's specific defect.",
+    "Methodological anchor that must survive: the encoder cost model was collected on real silicon (RTX 5090), validated physically (~3% on attention, within 12.8% against vLLM's own vision tower across N<=64) and upstreamed to AIC; the closed loop was replayed against the live Dynamo control plane."
+   ],
+   "cut_list": [
+    {
+     "category": "intra-redundancy",
+     "where": "RQ answers (lines 219-284) vs Contributions (lines 402-496)",
+     "what": "RQ1<->Contribution1 (R^2 decoupling), RQ2<->Contribution2 (20 cells, 12-step horizon, quantile-as-headroom), RQ3<->Contribution3 (~3% attention, 12.8% vLLM, 1.4-1.6x attribution), RQ4<->Contributions 4&5 (knees, 0.62x, 588ms floor, leads 15-165s, reactive loses fast onset) each state the SAME finding with the SAME numbers twice. Collapse the RQ block to the questions plus one-clause answers and let the Contributions carry the numeric detail (or vice versa) instead of both carrying it in full.",
+     "save": 380
+    },
+    {
+     "category": "number-dump",
+     "where": "lead-time footnote, lines 99-114",
+     "what": "Full per-pool cold-start breakdown (3-5s model-side, 1.15GB checkpoint at 0.11s O_DIRECT NVMe, 0.13s host-to-device, hundreds-of-millions vs hundreds-of-billions params). The two load-bearing claims are: encoder lead is orchestration-bound while language lead is tens-of-seconds-and-up, so the closed loop sweeps per-pool leads rather than one constant. The DB/body chapter carries the per-component timings.",
+     "save": 130
+    },
+    {
+     "category": "number-dump",
+     "where": "scope decode-stamp bias, lines 507-515",
+     "what": "Enumeration '54-56%... 55-58%... 2.9-3.2% at 60s... within 7.8e-7 over 1000000 requests... spans zero'. Keep the single load-bearing caveat ('the stamped decode series is faithful in total volume but temporally displaced and licenses no provisioning claim in either direction'); the appendix/DB carry the per-bin percentages.",
+     "save": 90
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "0.62x / 588ms floor / 15-165s leads: lines 48-51, 211-214, 264-279, 480-485, 526-528",
+     "what": "The headline payoff (0.62x static encoder worker-time, 588ms zero-queueing floor, forecast holds every window across 15-165s leads) is stated in the opening, the thesis-statement quote, RQ4, Contribution 5, and Scope. State once with full precision, reference thereafter.",
+     "save": 90
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "decode-stamp caveat: lines 148-150, 227-228, 503-515",
+     "what": "'offered work stamped at arrival, faithful in total volume but temporally displaced, not a pointwise upper bound' is repeated in the gap parenthetical, RQ1's 'offered-work reading', and the scope paragraph. Say it once well.",
+     "save": 55
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "opening paragraph 2 (lines 27-51) vs thesis-statement quote (lines 202-215)",
+     "what": "The position + payoff (each pool on its own signal; vision by forecast, language by tail-aware conversion; persistence enables prediction; fraction of static fleet cost) is stated in near-identical form in the opening hook and again in the formal quote. Tighten the opening paragraph since the formal statement follows.",
+     "save": 80
+    },
+    {
+     "category": "verbose-prose",
+     "where": "Qwen3-VL portability detail, lines 374-385",
+     "what": "8B/32B/235B shared-tower argument with the 4096-dim projector, the 5/4 GEMM/handoff scaling for the 32B's 5120-dim space, and the 235B-TP8 'one octave below' spot-check. Compress to: the family shares one vision tower so the encoder result transfers, and a 235B-TP8 spot-check shows decoder scale shrinks only the language pool's envelope. Details belong in the body.",
+     "save": 70
+    },
+    {
+     "category": "number-dump",
+     "where": "gap-section secondary figures, lines 152-174, 185-191",
+     "what": "Several precise figures beyond the headlines are trimmable: 'barely above its own p99 of 4.35', 'median steepest single-minute jump of 208 img/s', 'autocorrelation half-life is 69 minutes against nine'. Keep the shape-defining headlines (370 img/s ~16x mean, CV^2 3.83 vs 0.32, Jaccard 0.02, Fano 1.8->938, Hurst 0.93); offload the rest.",
+     "save": 55
+    }
+   ],
+   "owns": [],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/related.tex": {
+   "file": "tex/related.tex",
+   "role": "Related-work survey that positions the thesis across six literatures (LLM serving, multimodal serving, autoscaling, workload characterization, TSFM forecasting, simulators) through one lens — \"which load signal a system watches\" — and stakes three narrow precedence claims plus an honest simulation-not-real-cluster caveat.",
+   "current_words": 2915,
+   "target_words": 2185,
+   "action": "The one positioning argument (decoupling + inversion + ModServe-qualitative-vs-forecast contrast, R^2=0.12) is told 4x. Reduce each section to a one-line gap statement; let the Positioning synthesis carry it once. Drop the re-litigation inside the three precedence claims, compress the Halfin-Whitt queueing digression to one sentence, trim quoted source metrics, cut 'to our knowledge' from 4→1.",
+   "must_survive_findings": [
+    "Premise established by survey: prefill/decode disaggregation plus now-mainstream encoder disaggregation (vLLM/SGLang ship it) make the separately-scaled encoder pool real, turning the thesis's question operational rather than hypothetical.",
+    "Core gap: every prior autoscaler — including disaggregated ones (TokenScale, HeteroScale) and forecast-aware ones (SageServe, WarmServe, Dynamo's planner) — watches signals derived from the text request/token stream; none forecasts the per-pool vision demand signal, which is nearly decoupled from request rate (R^2 approx 0.12).",
+    "The motivating inversion: the vision image-rate signal is the burstiest and least rate-visible of the four demand signals yet the most persistent/forecastable at provisioning horizons — making per-pool predictive provisioning simultaneously necessary and feasible.",
+    "Honest positioning: no ingredient is novel; the contribution is their required conjunction (no single signal sizes both pools) plus the calibrated platform, expressed as three deliberately narrow precedence claims and an explicit 'evaluation is simulation, not a real-cluster closed loop' caveat (Table tab:rel-positioning)."
+   ],
+   "cut_list": [
+    {
+     "category": "intra-redundancy",
+     "where": "sec:rel-mm closing (95-106), sec:rel-autoscale 'Two gaps' (182-193), sec:rel-workload closing (224-230), and sec:rel-positioning (307-374)",
+     "what": "The same positioning story — vision signal decoupled from request rate (R^2 approx 0.12), burstiest yet most forecastable, ModServe characterizes qualitatively but does not forecast — is told ~4 times. R^2=0.123/0.12 appears at lines 98/188, 230, 339; the ModServe qualitative-vs-forecast contrast at 100-106, 224-230, and 330-342; the inversion at 88-106, 313-322, 340-342. Let each section end with a one-line gap statement and let Positioning carry the full synthesis once.",
+     "save": 200
+    },
+    {
+     "category": "verbose-prose",
+     "where": "sec:rel-positioning three precedence claims, 330-358",
+     "what": "The three narrow claims each re-explain what ModServe / Diao et al. / Yu2026HeteroServe already do before narrowing — content already given in rel-mm, rel-forecast, rel-sim respectively. Keep the narrowed claim sentences; drop the re-litigation of each baseline's behavior.",
+     "save": 110
+    },
+    {
+     "category": "tangential-background",
+     "where": "Halfin--Whitt square-root safety-staffing passage, 270-281",
+     "what": "~110-word classical-queueing digression grounding the capacity conversion; the newsvendor/critical-fractile framing (264-269) already grounds forecast use. Compress to ~40 words stating the square-root-staffing analogue in one sentence; the derivation belongs in cap:closedloop.",
+     "save": 60
+    },
+    {
+     "category": "number-dump",
+     "where": "sec:rel-mm 56-58; sec:rel-workload 207-210",
+     "what": "Quoted-from-source metrics not load-bearing to positioning: ModServe's '25--41.3% ... 3.3--5.5x higher throughput' can become 'substantial serving-cost savings'; the exact Fano progression '1.8 at 1s to 938 at 1hr' is a cap:trace-eda result the DB carries — keep the 'nearly three orders of magnitude' headline, drop the endpoints.",
+     "save": 30
+    },
+    {
+     "category": "hedging-overqualification",
+     "where": "'to our knowledge' at 224, 321-322, 337, 353",
+     "what": "Repeated four times; the disclaimer is credible once (in Positioning). Also trim the meta-explanatory preamble of the grey-literature footnote (76-83, 'Grey-literature convention: engine blog posts are cited...').",
+     "save": 40
+    },
+    {
+     "category": "number-dump",
+     "where": "sec:rel-positioning parenthetical, 361-367",
+     "what": "The '0.62 times the deployable static encoder fleet's provisioned worker-time' payoff preview duplicates cap:baselines/cap:closedloop; a related-work chapter can defer the number and just say the calibrated-simulation checkmark is earned there.",
+     "save": 25
+    }
+   ],
+   "owns": [],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/trace-eda.tex": {
+   "file": "tex/trace-eda.tex",
+   "role": "The empirical-motivation chapter: characterizes the Azure multimodal trace to establish the workload facts (vision decoupled from request rate, bursty, forecastable) that justify a separate vision pool and predictive scaling — the premise the rest of the thesis builds on.",
+   "current_words": 3205,
+   "target_words": 2540,
+   "action": "Say the Hurst-derived and offered-work-dagger caveats once each (currently 2x and 3-4x). Compress the near-tie k-means silhouette hedging (0.388/0.387/0.378) and the 'depends on system params outside this dataset' refrain (3x→1). Offload two lookup tables (tab:eda-percentiles, tab:eda-multires) to the appendix — every cited value is already inline. Move the eval-window design figure to baselines where the windows are used. Trim editorializing figure-caption tails.",
+   "must_survive_findings": [
+    "Vision work is decoupled from request rate: a constant-fraction model explains only R2=0.123 of image rate (vs 0.654 for decode), and the two pools' extreme-load minutes are essentially disjoint (Jaccard 0.02, 5 shared minutes) - provisioning vision from the request signal misses exactly the moments that matter.",
+    "The vision/image signal is simultaneously the burstiest AND the most persistent of the four demand signals (CV2 3.83 vs 0.32; 69-min vs 9-min autocorrelation memory; H~0.93) - burstiness and forecastable structure concentrate in the same vision-borne signal, which is the feasibility premise for predictive scaling.",
+    "Burstiness is scale-free: the arrival process is non-Poisson at every scale (Fano factor 1.8 at 1s -> 938 at 1h) and minute-resolution monitoring recovers under 4% of the true instantaneous image peak (vs 37% for requests) - no aggregation window smooths the vision surges away.",
+    "The trace contains essentially one burst type: frames-class floods (k>10 grids) supplying 93-96% of every top episode's image volume, ramping baseline-to-peak in a median 6 minutes; bursts compound on the prefill stage (2.69x prefill length) while decode stays nearly burst-neutral.",
+    "Framing structural facts: 50/50 text/multimodal split is by construction, images arrive as k^2 tile/frame batches (not independent images), and ContextTokens embeds the traced model's vision tokens non-additively - so the converter drives encoder work from NumImages separately."
+   ],
+   "cut_list": [
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "Reading note lines 184-186 vs table caption lines 214-215",
+     "what": "The 'Hurst is derived from the spectral slope (H=(1+beta)/2), not an independent estimate' caveat is stated in full twice - once as body reading-note ('one estimator viewed two ways, not two corroborating measurements') and again verbatim in the tab:eda-persistence caption. Keep it once (the caption suffices, since the table is where Hurst appears); delete the body reading note.",
+     "save": 30
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "Lines 186-192, 201-206, table caption 215-217, summary 485",
+     "what": "The dagger / 'offered-work arrival, not decode occupancy' caveat about the decode series is spelled out 3-4 times: body reading note, the 'not monotone' paragraph ('plausibly manufactured by the arrival-stamping construction'), the table caption, and again in the summary. State the arrival-stamping caveat once well (table caption), and let the dagger symbol carry it elsewhere.",
+     "save": 45
+    },
+    {
+     "category": "hedging-overqualification",
+     "where": "Clustering discussion, lines 78-90",
+     "what": "The k-means archetypes are wrapped in heavy near-tie hedging: 'maximizes the silhouette ... at 0.388, though only marginally over k=8 (0.387) and k=3 (0.378) ... the separation is weak and the k=4 preference statistically a near-tie, so the groups are interpretive rather than sharply distinct', plus the two-paragraph reconciliation of the cluster's video archetype with the threshold-defined frames class ('the two definitions overlap but are not identical, hence the slightly different shares'). Compress to one hedge sentence + one reconciliation clause; the enumerated silhouette values (0.388/0.387/0.378) are DB-backed and can go.",
+     "save": 65
+    },
+    {
+     "category": "hedging-overqualification",
+     "where": "'depends on system parameters outside this dataset', lines 248-251, 295-297, 353-354",
+     "what": "The refrain 'the dataset establishes the information/asymmetry but what a policy can do depends on system parameters (cold-start, capacity, cost) outside this dataset / settled in the closed-loop chapters' recurs three times. Say once (e.g. at first use in sec:eda-vision) and drop the two restatements.",
+     "save": 35
+    },
+    {
+     "category": "verbose-prose",
+     "where": "'not monotone' passage, lines 200-209",
+     "what": "~90 words to say 'decode's shortest half-life pairs with second-highest H, the two orderings disagree, we make no joint claim and build only on the images-vs-requests contrast.' The mechanistic speculation ('compresses each request's decode work into one minute, whitening short lags while leaving the slow envelope intact') is already covered by the dagger caveat. Compress to two sentences.",
+     "save": 45
+    },
+    {
+     "category": "oversized-table",
+     "where": "Table tab:eda-percentiles + caption, lines 426-448",
+     "what": "Full 7-signal x 7-column global percentile reference table (mean/p50/p90/p95/p99/p99.9/max). Every load-bearing percentile the body cites (p99 image 224, max 370, p99 context 35,932, etc.) is already quoted inline, and all are DB/appendix-backed. This is a lookup table, not a finding - offload to the reproduction appendix and keep a one-line pointer.",
+     "save": 55
+    },
+    {
+     "category": "oversized-table",
+     "where": "Table tab:eda-multires, lines 374-390",
+     "what": "5-window x 4-signal peak-fraction table. The body (lines 362-372) already states the headline contrast (37% request vs 3.9% image retained at 60s, ~25x understatement) and the CV2 25.7->3.83 decay. The full 20-cell grid is redundant with fig:eda-multires (right panel) plus the prose; keep the figure, offload the table.",
+     "save": 35
+    },
+    {
+     "category": "redundant-figure",
+     "where": "Figure fig:eda-windows, lines 169-181",
+     "what": "The stratified eval-window figure with its ~75-word caption (b1-b6 padding, calmest day, 1.4-day forecast context, why b2/b6 are forecast-free) is experimental-design apparatus for Chapters baselines/closedloop, not a characterization finding. Move figure+caption to the baselines chapter where the windows are actually used; leave a one-clause forward reference here.",
+     "save": 80
+    },
+    {
+     "category": "number-dump",
+     "where": "Tail-index / Hill enumeration, lines 64-69",
+     "what": "'Hill ~1.9 ... Hill ~6.6 and 7.2 ... top percentile carries 15.2% of context tokens and 13.4% of generated tokens' - explicitly flagged as 'indicative values, no formal goodness-of-fit claim.' Keep the qualitative finding (generated tokens heaviest -> decode is quantile-driven); the specific Hill values and dual share percentages are DB-backed detail.",
+     "save": 25
+    },
+    {
+     "category": "hedging-overqualification",
+     "where": "Fano/spectral caveats, lines 133-143",
+     "what": "Parenthetical 'a seven-day record cannot establish asymptotically unbounded growth, but within the window every aggregation scale an autoscaler could use is overdispersed', plus the sub-diurnal sidelobe / '84-hour and above are record-length artifacts' discussion. The 84-hour-artifact and sidelobe details are tangential precision; compress the Fano caveat to one clause and cut the record-length-artifact sentence (the 7-day limitation is already in sec:eda-limitations).",
+     "save": 40
+    },
+    {
+     "category": "verbose-prose",
+     "where": "Figure captions throughout (e.g. eda-clusters L120-121, eda-arrival L152-154, eda-acf L334-337, eda-multires L399-401)",
+     "what": "Several captions restate the body finding AND re-draw the design implication already made in prose ('which is the disaggregation argument stated at the workload level', 'reactive smoothing alone cannot absorb it', 'A coarse monitor does not merely blur the vision surges, it erases them', 'That is the feasibility premise for the predictive-scaling contribution'). Trim each caption's editorializing tail to the standalone-figure description; the interpretation lives in the body.",
+     "save": 55
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "Burst-compounding numbers, lines 289-297",
+     "what": "Onset parentheticals '(10th percentile 2 min, fastest 1 min), with a median steepest single-minute jump of 208 images/s' plus 'The fastest onsets (1-2 minutes) are comparable to or faster than replica cold-starts of tens of seconds to minutes' - the cold-start comparison is then repeated in the onset figure caption (L306-307). Keep median 6-min onset + the cold-start comparison once; the distributional percentiles are DB-backed.",
+     "save": 25
+    }
+   ],
+   "owns": [
+    "R^2=0.12 decoupling + Jaccard 0.02 + saturation knees an order apart",
+    "decode offered-work / arrival-stamp caveat (dagger table caption is its home)"
+   ],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/predictors.tex": {
+   "file": "tex/predictors.tex",
+   "role": "Validates the thesis's central feasibility premise — that demand signals (esp. vision image-rate) are forecastable at provisioning horizons — by benchmarking 3 zero-shot TS foundation models vs 3 classical baselines and Dynamo's shipped predictors, producing the forecast signal the closed-loop chapters consume.",
+   "current_words": 3281,
+   "target_words": 2720,
+   "action": "Tightest of the results chapters — offload per-config WAPE dumps (shipped-predictor 4-way numbers, quantile nested counts, coverage parentheticals) to DB, keeping one representative gap + the load-bearing p90=0.88-0.90. Consolidate the ~7 'the closed loop settles it' forward-references to 1-2. Say the no-skill-floor and common-span caveats once each.",
+   "must_survive_findings": [
+    "Zero-shot foundation models beat every classical baseline in all 20 (resolution, signal) cells with no tuning: a modest 2-9% relative edge at provisioning cadence (1-min bins) widening to ~one-third on the image signal at 1-second bins — but 1s is the WAPE~100% no-skill floor, so the operative claim is 'usable at minutes, nothing forecasts single sub-minute bins.'",
+    "Horizon degradation is mild: foundation-model WAPE grows only a few points from h=1 to h=12, so the Chapter-EDA persistence translates into 12 minutes of usable lead time that covers the median vision burst onset.",
+    "Inter-model choice is noise-level (a three-way tie, several column wins decided by <=0.1 WAPE with no significance); and Dynamo's shipped predictors (ARIMA/Kalman/Prophet/constant) never reach the foundation-model level while foundation models don't dramatically beat them either — making the closed-loop predictor-choice result mechanical.",
+    "Cross-signal covariates are nearly irrelevant at provisioning cadence (the forecasting-side echo of pool decoupling, R^2=0.12 req->img), helping only in the sub-15s shot-noise regime; the stronger additive context-reconstruction variant fails because the image forecast is the worst component exactly at the burst onsets where the structural bet needed it.",
+    "The p90 upper band edge is empirically calibrated at 1-minute cadence (coverage 0.88-0.90 across models/signals), making upper-quantile headroom a sound provisioning input; but no fixed quantile improves on a median-point model's point path (band is headroom, not point correction), and the lower edge/band-width is distorted by zero-ties."
+   ],
+   "cut_list": [
+    {
+     "category": "number-dump",
+     "where": "intro, lines 26-29",
+     "what": "'26 Parquet files, 21,404,640 forecast rows... 20,749,440 on the common evaluation span' plus the '(1 point + 9 quantiles)' breakdown. Provenance DB + reproduction manifest carry exact counts; keep 'the full forecast set is archived next to the metric tables' and drop the row-count enumeration.",
+     "save": 18
+    },
+    {
+     "category": "number-dump",
+     "where": "Rolling-origin grid, lines 49-56",
+     "what": "Per-model context budgets 'C=1928 (cap 2048), 3976 (cap 4096), 8072 (cap 8192)' and origin counts 'leaving 167 origins... up to 49,727 at 1-second'. State the rule (max context minus 120 forecast tokens) and the two endpoint origin counts already used elsewhere; offload the per-model cap triple to appendix.",
+     "save": 25
+    },
+    {
+     "category": "number-dump",
+     "where": "Metrics paragraph, lines 92-100",
+     "what": "Wall-clock breakdown 'about 2.5h... baselines a minute each... Chronos-2 and Toto-2 dominate at roughly one hour and 80 minutes' and 'averaged over 54,000-56,600 origins, 4ms (TimesFM) to 51ms (Chronos-2 cov)'. The load-bearing point is only 'per-decision GPU cost is comfortably inside any 15-60s decision cadence' — compress the timing enumeration to the min/max per-forecast latency.",
+     "save": 40
+    },
+    {
+     "category": "number-dump",
+     "where": "Dynamo shipped-predictor paragraph, lines 188-198",
+     "what": "Per-config WAPE dump: 'ARIMA 0.521... 0.515... at 15s ARIMA 0.668 against 0.637, Kalman 0.811 trails naive 0.764, Prophet 0.733'. Finding ('shipped predictors sit at/below the classical frontier, none reaches foundation level') survives with one representative gap; offload the four-way per-resolution numbers.",
+     "save": 35
+    },
+    {
+     "category": "number-dump",
+     "where": "Fourth finding MAE, lines 219-221",
+     "what": "Four-signal MAE enumeration 'miss by ~1,302 images (21.7 img/s vs mean ~41)... 35.6 requests, 166.6k context tokens, 8.1k generated tokens per bin'. Keep the image MAE as the calibration anchor (it is the thesis's focus signal); drop the other three signals' MAE to the DB.",
+     "save": 20
+    },
+    {
+     "category": "number-dump",
+     "where": "Additive-variant paragraph, lines 244-257",
+     "what": "'R^2=0.94 with image term 34-36% of context mass... WAPE within 1.3 points... image forecast worst component (73-100% WAPE vs 57-72% for direct context and 33-38% for requests)'. The mechanism-diagnostic finding survives with the qualitative claim and one contrast; trim the multi-signal per-component WAPE ranges.",
+     "save": 22
+    },
+    {
+     "category": "number-dump",
+     "where": "Quantiles section, lines 282-296",
+     "what": "'beats point in 51... TimesFM beaten in 18 of 20 (median -1.7%, p50 head in 17 of 18, p10 in the last, 1-second images), Gaussian baselines 31 more (up to -45% Holt-Winters)... Chronos-2/Toto-2: 2 of 80'. The finding (wins concentrate in non-median heads; median-point models gain nothing) is clean; the nested parenthetical counts are offloadable.",
+     "save": 28
+    },
+    {
+     "category": "number-dump",
+     "where": "Coverage paragraph, lines 301-311",
+     "what": "Keep the load-bearing p90=0.88-0.90 (a shining point), but the parenthetical '(Chronos-2 cov on images: 0.888)', median '0.43-0.48', and lower-edge '0.14-0.21 on images against 0.07-0.14 on the others' plus '69%... 29% at 1-second' are enumeration the DB carries — compress to 'upper edge calibrated, median ~0.45, lower edge zero-tie distorted'.",
+     "save": 20
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "closed-loop forward-references: lines 74-75, 104, 201-203, 313-314, 328, 332-334, 344-346",
+     "what": "Roughly seven separate 'the closed loop will price/quantify/operationalize this' promissory notes. Load-bearing once or twice (deployment-cost asymmetry; quantile sweep). Consolidate the rest — the reader does not need reminding at every subsection that the next chapter settles it.",
+     "save": 35
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "shot-noise / no-skill-floor: lines 158-166, 214-217, 292-293, 416-417",
+     "what": "The 'WAPE~100% is the no-skill floor / individual k^2-image arrivals unpredictable, only the envelope is' point is stated in full three times plus the summary. Keep the fullest statement (first finding) and reduce the later ones to a back-reference.",
+     "save": 18
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "common-span over-represents burst: lines 57-63, 143-146, 219-220, figure captions",
+     "what": "The '1-minute common span covers only the final 33.4h / contains the week's largest burst / column-to-column WAPE not comparable' caveat recurs. State it once cleanly in the protocol; the in-line reminders at 143-146 and 219-220 can shrink to a pointer.",
+     "save": 15
+    },
+    {
+     "category": "tangential-background",
+     "where": "newsvendor digression, lines 328-334",
+     "what": "The critical-fractile/newsvendor framing ('optimal level follows from the ratio of under- to over-provisioning cost... the closed-loop chapter selects its operating quantile empirically in that spirit') is a nice pointer but restates the closed-loop-prices-it refrain with added citation. Compress to one sentence.",
+     "save": 20
+    },
+    {
+     "category": "verbose-prose",
+     "where": "'Two boundaries' paragraph, lines 340-352",
+     "what": "Load-bearing honesty (WAPE != control value; minute paths are provisioning not scheduler signals) but stated at length with overlap to the Summary and Limitations. Tighten to half the words without losing either boundary.",
+     "save": 22
+    },
+    {
+     "category": "verbose-prose",
+     "where": "Limitations fixed-parameter-baseline caveat, lines 388-394",
+     "what": "The 'baselines are fixed-parameter, context-capped, Holt-Winters never sees two diurnal cycles, tuning would narrow margins' caveat largely repeats the protocol (lines 76-79). Keep the one-line 'read margins as a lower bound on tuned-baseline competitiveness'; trim the re-explanation.",
+     "save": 20
+    }
+   ],
+   "owns": [],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/aiconfigurator.tex": {
+   "file": "tex/aiconfigurator.tex",
+   "role": "Builds and validates the silicon-calibrated AIC cost model for the vision encoder (RTX 5090 collection + physical validation), the pricing engine every downstream two-pool simulation depends on.",
+   "current_words": 3714,
+   "target_words": 2450,
+   "action": "Offload per-cell ms ledgers and row-count bookkeeping (7679/34326 vs 7760/34710 states, per-image shift table) to DB. Cut the next-chapter fleet-sizing results preview (belongs to twopool) to one forward pointer. State 12.8% once (not 6x). Cut PR commit-hash chain and the alternate-kernel_ledger footnote to the manifest. Collapse the 'raw vs infilled slice' re-explanation (3x) to once.",
+   "must_survive_findings": [
+    "AIC ships no encoder-attention data for consumer/workstation GPUs and gives no usable fallback (SILICON/HYBRID/EMPIRICAL all hard-error); only speed-of-light answers, and it is ~5.9x optimistic - so image-aware costing on consumer hardware requires collecting silicon, which this chapter does (7760 encoder-attention + 34710 GEMM rows on RTX 5090, locked clocks, contributed upstream as PR #1312).",
+    "Validated against direct measurement of the real Qwen3-VL vision tower on the same GPU: the collected attention operator agrees within ~3% and the end-to-end kernel-time ledger is attributed term by term except a ~0.7ms remainder.",
+    "The composed forward matches vLLM's own vision tower (the engine AIC's kernels are actually drawn from) to within 12.8% across the whole N<=64 serving regime; the larger 1.4-1.6x gap versus HuggingFace-transformers is an execution-stack artifact (unfused per-image work AIC's graph omits), not an AIC error.",
+    "Two methodological findings with independent value: unlocked consumer-GPU clocks silently inflate collected performance by ~17% (while leaving measured/predicted ratios unchanged), and AIC's support matrix masks the encoder gap by skipping the encoder phase whenever no image dimensions are supplied.",
+    "The calibrated encoder model composed with Dynamo's discrete-event LLM-pool simulator establishes the end-to-end two-pool pipeline for the autoscaling experiments that follow."
+   ],
+   "cut_list": [
+    {
+     "category": "number-dump",
+     "where": "sec:aic-collection, 'Targeted shape infill' paragraph, lines 132-162",
+     "what": "~430-word paragraph enumerating three dataset states (7679/34326, 7760/34710, 7770/34775 rows), single-image costs (7.82/8.16 ms), per-image shift percentages (+4.3%/-5.8%/<1%/at most ~1%), and the single-worker-optimum-shift episode. Keep the finding (infill made the 448px query path grid-exact and changed no result), offload the row-count bookkeeping and the shift table to the provenance DB / reproduction manifest.",
+     "save": 250
+    },
+    {
+     "category": "number-dump",
+     "where": "fleet-sizing consequence paragraph, lines 347-373",
+     "what": "Previews Chapter twopool's own results (606/589/644 ms, 1000ms SLA, 6-8 workers, rho=20 120/120, rho=25 losing burst5, burst5 8-vs-16 worker correction). These are load-bearing findings of the NEXT chapter, not this one; compress to one forward-pointing sentence (AIC-priced sizing carries no separate silicon penalty; sizing/frontier detailed in Ch. twopool) and let that chapter carry the numbers.",
+     "save": 160
+    },
+    {
+     "category": "number-dump",
+     "where": "sec:aic-model-vs-silicon attribution, lines 281-301 and dense-sweep lines 303-330",
+     "what": "Dense per-N kernel enumeration (attention 1.300/1.306ms, GEMM 6.03->3.69ms, dispatch 15.3%->2.5%, elementwise 1.18->1.89, DeepStack 0.26->0.58, 168.6ms=92% of 182ms) plus the vLLM residual triples (-2.2%/+11.3%/+5.5%, +12.7% at N=52, +21.8% at N=512). Keep the two headlines (HF ratio grows because HF carries per-image work AIC omits, 92% attributed; vLLM within 12.8% across N<=64, over-cap regime never batched). Offload the per-cell numbers.",
+     "save": 200
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "'within 12.8%' stated at lines 250, 263-264, 319-320, 324, 353, 528-529",
+     "what": "The vLLM-agreement figure is repeated ~6 times (fig caption, table caption, body twice, fleet paragraph, summary). State it once precisely in the body; drop from the two captions and consolidate the summary mention.",
+     "save": 45
+    },
+    {
+     "category": "number-dump",
+     "where": "sec:aic-validation Results, lines 435-468 plus footnote 442-446",
+     "what": "Term-by-term ms enumeration (9.624 kernel + 1.736 dispatch, attention 1.300 vs 1.342, GEMM ~6% high, 1.04 vs 0.79, patch-embed 0.459/4.8%, DeepStack 0.248, 8.92 vs 7.82, 4.00x projector scaling) and the footnote giving an ALTERNATE kernel_ledger profile's slightly different values. Keep the finding (~3% attention agreement, ~0.7ms unattributed remainder, two unmodeled modules named). Cut the alternate-profile footnote entirely (pure provenance) and thin the per-term numbers.",
+     "save": 120
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "'out-of-envelope shapes' lines 96-113; 'raw vs infilled slice' repeated at 146-152, 232-238, 419-422",
+     "what": "The defensive 'empty cells are the hardware envelope, not a data gap' argument runs ~180 words with full enumeration (1157 fail, 276 pre-skipped, 4GiB cutoff, M=32768/N=65536, 17 spurious M<=2 shapes); compress to two sentences. Separately, the raw-slice-vs-infilled-slice disambiguation is re-explained three times - say once, then just label numbers.",
+     "save": 130
+    },
+    {
+     "category": "number-dump",
+     "where": "footnote lines 122-130 (PR commit hashes)",
+     "what": "Chain of commit hashes (1e8b9cac, b55dd0b7, 656ac8ca, 12306db5, 492a3444) and branch names belongs in the reproduction manifest/Appendix artifacts, not the body footnote. Keep only 'contributed upstream as draft PR #1312 (see Appendix artifacts)'.",
+     "save": 55
+    },
+    {
+     "category": "verbose-prose",
+     "where": "amortization 'Third' paragraph, lines 332-345",
+     "what": "The batching-benefit-saturates-at-N~6-8 point is explicitly said to be 'established there' (Ch. twopool); the per-stack floor numbers (7.26/7.99/5.12 ms, 1.56x/1.57x, +9.9% at N=23) are enumeration. Compress to one sentence stating the knee on both stacks.",
+     "save": 90
+    },
+    {
+     "category": "redundant-figure",
+     "where": "Figure aic-fn caption lines 243-253 vs Table tab:aic-fn lines 257-279",
+     "what": "Figure and table both present f(N); the caption re-states ratio values (1.62x, 1.37x, 1.43x) already in the table's Ratio column and the body. Trim caption to the one interpretive sentence (right panel shows the growing HF-stack overhead).",
+     "save": 35
+    },
+    {
+     "category": "hedging-overqualification",
+     "where": "scattered: 'so the discrepancy is predominantly execution-stack-specific' (line 320) after already saying it (303-304); 'and decisively', 'Two structural facts emerge... First/Second/Third' framing that then adds a fourth block",
+     "what": "Redundant restatements and the miscounted 'two facts' scaffolding; tighten the execution-stack conclusion to a single assertion and drop the doubled qualifier.",
+     "save": 40
+    }
+   ],
+   "owns": [
+    "12.8% vLLM fidelity + 1.4-1.6x HuggingFace-overhead attribution"
+   ],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/twopool.tex": {
+   "file": "tex/twopool.tex",
+   "role": "Composes the three prior ingredients (workload, forecasts, encoder cost model) into the running two-pool serving simulation and establishes the platform's three load-bearing results: timing fidelity, an exact encoder batching law + handoff bound, and the order-of-magnitude saturation-knee separation that motivates the rest of the thesis.",
+   "current_words": 4010,
+   "target_words": 3250,
+   "action": "Fix the two hotspots: the composed first-token reconstruction (one ~1.3s quantity estimated three ways with full arithmetic) → 2-3 sentences; the ~1,400-word Limitations section → offload resolution-repricing per-cell numbers, the runtime-provenance caption, and the instrumentation-artifact number dump to appendix. Merge doubled 'execution-stack difference' clause.",
+   "must_survive_findings": [
+    "Calibrated per-request timing (AIC h100) exposes language-pool latency tails the mocker's default polynomial flattens (TTFT p99 1.24x, max TTFT/ITL ~2x); burst failure is visible ONLY under calibrated timing, so it must back every headline run.",
+    "The encoder cost model admits an exact batching law: a forward is priced by its total image count regardless of how images factor into (batch, images-per-request), grounding a greedy-FIFO chunk-parallel dispatch policy and an analytic handoff bound.",
+    "The central decoupling result, now a property of the simulated system: on steady traffic the two pools' saturation knees sit an order of magnitude apart (vision uncrossed at 32x the trace rate, language knee at s=2 calibrated), so sizing both off one signal overprovisions the encoder fleet >10x.",
+    "Inside the largest burst both pools violate the SLA at the naive 2x2 topology in structurally different ways: a REMOVABLE language-pool TP1 prefill floor (TP2 passes the same window) versus episodic vision-pool FIFO head-of-line queueing (p99 delay 5.0s at 29% mean utilization) that is invisible to rate- and utilization-based monitoring and yields only to capacity.",
+    "Secondary but load-bearing: under the dual-bound SLA the steady-window language pool is decode-bound (ITL), not TTFT-bound, so per-user token throughput sets its capacity envelope."
+   ],
+   "cut_list": [
+    {
+     "category": "number-dump",
+     "where": "Composed first-token reconstruction, lines 213-241 (sec:sim-knees)",
+     "what": "One quantity (composed ingress-to-first-token p99 ~1.3s) is estimated three ways with full arithmetic exposed: modelled 1.30s (588+706), lower estimate 1.24s (651 aggregate TTFT), and a forward-referenced measured 1240ms from Ch. closedloop, plus the 21.9%-overstatement and r=0.53 detail. The finding (composed tail ~1.3s, close to the naive SUM not the max, because the two tails are positively correlated) can be stated in 2-3 sentences; the three near-identical figures, the 706-vs-651 validation, and the closedloop preview are DB/appendix- and later-chapter-backed enumerations.",
+     "save": 190
+    },
+    {
+     "category": "number-dump",
+     "where": "Limitations resolution-repricing block, lines 461-486",
+     "what": "Keep the genuine structural finding (provisioned worker-time is invariant across image size because the schedule is driven by image count, so size increase = pure service inflation with no provisioning response). Offload the per-cell enumerations the provenance DB/appendix now carry: 32228.0 worker-seconds, the 690-705px crossing and closed-form floor formula, 938.7 vs 1000ms 6.1% margin, 1972/1927ms 24h numbers, and the 5.2/5.0/6.7s dispatch-cap triple.",
+     "save": 120
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "Table 2 caption 'Provenance caveat', lines 276-284",
+     "what": "~130-word caption paragraph explaining that the sweep set mixes source-built and wheel-based runtimes (which s-points came from which build). The only load-bearing conclusion is 'the tabulated knee is not sensitive to this: s=2 meets every bound, s=3 breaches by margin above the inter-runtime spread.' The per-point runtime attribution duplicates the body's runtime-artifact discussion (lines 66-74) and belongs in the appendix.",
+     "save": 85
+    },
+    {
+     "category": "number-dump",
+     "where": "Runtime instrumentation-artifact digression, lines 66-74",
+     "what": "The instrumentation-artifact lesson (a timing hook slower than the events it prices leaks wall-time into the simulated clock) is worth one sentence. The number enumeration (7.6 vs 4.5s max TTFT, up to 22% TTFT p99 / 61% ITL p99 divergence at s=16, identical p99 at s=1) is appendix material.",
+     "save": 55
+    },
+    {
+     "category": "verbose-prose",
+     "where": "Token-accounting conventions limitation, lines 428-450",
+     "what": "The honesty point (burst-window language verdict is convention-dependent because ContextTokens embeds the traced model's ~66 tok/image vs a Qwen3-VL-consistent ~104k-token prefill; vision verdict is not) must survive but is stated at ~230 words with the tensor-inconsistency spelled out twice ('the last two describe the same tensor inconsistently' then re-derived). Tighten to the two-way bias statement plus the one-line honest reading.",
+     "save": 60
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "Handoff-bound engine-stack sentence, lines 182-188",
+     "what": "The clause literally says 'is an execution-stack difference' and then 'predominantly an execution-stack difference' inside the same sentence, with the HuggingFace-eager-vs-vLLM-kernels explanation given twice. Collapse to one statement plus the 12.8% match figure.",
+     "save": 35
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "Vision-failure narration across body + Fig. sim-burst-queue caption, lines 356-364, 384-393",
+     "what": "The '29% mean utilization / p99 delay 5.0s / episodic FIFO queueing / invisible to rate- and mean-utilization monitoring' point is stated in the burst paragraph, restated as the queue-depth mechanism (lines 366-382), and restated again nearly verbatim in the figure caption. The caption can point to the finding rather than re-derive it (queue spikes past 1000, peaks 4701, drains between).",
+     "save": 45
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "Handoff bandwidth-only caveat, lines 176-179 and 488-489",
+     "what": "The 'bound is bandwidth-only; contention/serialization/NIC-PCIe/topology not modeled; a measured NIXL curve can later replace it' caveat appears in the encoder section and is repeated in Limitations ('the handoff term remains the bandwidth-only, DeepStack-undercounting bound, not a measured NIXL curve'). Say it once in Limitations and cross-reference.",
+     "save": 35
+    },
+    {
+     "category": "hedging-overqualification",
+     "where": "Scattered parentheticals, e.g. lines 220-223 ('a modelled reconstruction rather than a request-linked replay measurement... the per-request joint reconstruction, each request's replay-recorded encoder delay plus its modelled prefill'), 234-241",
+     "what": "Multiple restatements of what a number IS after it has been given, and triple-qualified 'a marginal sensitivity, not a second joint reconstruction' asides. These re-label already-stated quantities and can be cut without losing the caveat.",
+     "save": 50
+    }
+   ],
+   "owns": [],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/baselines.tex": {
+   "file": "tex/baselines.tex",
+   "role": "Establishes the two comparison baselines (best static fleet, reactive autoscaler) on both pools under the evaluation SLA, so the next chapter's predictive-provisioning gains have a fair, identically-informed reference to beat.",
+   "current_words": 2000,
+   "target_words": 1560,
+   "action": "Drop the redundant ladder table (prose already gives both endpoints + verdict). Cut prose numeric ranges that duplicate tab:base-tp. State the mean-based-conversion defect once (3x). Compress the over-corroborated order-vs-readiness billing caveat (keep the rule, offload the 52-run 1.0%/3.5-38.0% corroboration). Thin tab:base-react-enc repeated-588 columns.",
+   "must_survive_findings": [
+    "The static optimum is burst-shaped: deployable only as C=8 encoders + TP2x2 (4 H100s), which overprovisions the calm day 4x on vision / 2x on language AND embeds a TP-shape change no replica autoscaler can morph at runtime -- RQ1's missizing priced as a fleet (lines 122-146, 273-282).",
+    "Every burst window forces TP2 and the gain is layout, not budget: a ~36k-token prefill floor pins TTFT p99 at ~1285ms at TP1 regardless of replica count; at iso-cost (4 H100s) TP1x4 fails every burst while TP2x2 passes, a 1.55-1.74x tail cut from parallelism alone (lines 122-135, Table tab:base-tp).",
+    "Reactive language control fails structurally via mean-based capacity conversion: all 14 configs meet the planner's own window-mean law yet violate the tail SLA (variants A and B alike), and tightening targets raises spend while the tail stays pinned -- spend cannot buy the tail back under lead (lines 179-199).",
+    "Reactive encoder control on the correct observed image signal still loses every window whose onset is faster than the affordable lead (burst3's fast, high-volume onset defeats it at every tested lead); yet at full-trace aggregate scale it holds the bound at 0.687x the deployable fleet's worker-time -- a real saving that does not overturn the per-window verdicts (lines 255-294).",
+    "Load-bearing honesty caveat that must survive: the two pools bill from different instants (language from order, with startup ramp + drain tail already inside every GPU-hour and no cold-start surcharge addable; encoder from readiness, warm-up reported separately) -- a second reason the classes are never summed (lines 21-40)."
+   ],
+   "cut_list": [
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "\"From order or from readiness\" paragraph, lines 21-40",
+     "what": "The billing-convention caveat is load-bearing but stated at ~2x needed length with numerical corroboration the DB carries: 'reproduces every reported GPU-hour to within 1.0%, whereas a readiness-lagged counterfactual ... falls 3.5-38.0% short on the reactive arms'. Keep the rule (language=order, ramp+drain inside, no surcharge; encoder=readiness, warm-up separate; hence never summed); offload the 52-run corroboration numbers to provenance and cut the doubled framing ('must be stated rather than assumed away' + 'a second reason, beyond hardware class').",
+     "save": 85
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "Ladder table tab:base-ladder (lines 201-218) vs its prose (lines 190-193)",
+     "what": "The 4-row table enumerates 400/40..200/20 -> H100-h, TTFT p99, ITL p99, but the prose already states both endpoints and the verdict ('18.6->20.4', 'pinned at 1,616-1,620ms', '10% spend increase buying nothing'). The DB carries the full ladder; drop the table and keep the two-endpoint prose sentence.",
+     "save": 55
+    },
+    {
+     "category": "number-dump",
+     "where": "Stage-conditional metric passage, lines 110-120",
+     "what": "Per-window enumeration of the alternative-metric optima -- 'burst1 to 7, burst3/burst4 to 8, burst6 to 8 (58.2/3.6/25.2/10.9 5090-hours), burst2/burst5/steady unchanged' -- is offloadable. The finding is: under the stage-conditional metric optima rise 1-2 workers but the deployable C=8 is unchanged. State that; drop the per-burst list and the parenthetical hours.",
+     "save": 40
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "First structural fact prose (lines 129-133) vs Table tab:base-tp (lines 148-168)",
+     "what": "The prose gives the ranges 'TP1x4 fails ... (1,314-1,331ms) while TP2x2 passes ... (763-846ms), a 1.55-1.74x tail reduction' and the table then lists every per-window value of exactly those three quantities. Keep the table (it shows the iso-cost pairing cleanly) and cut the parenthetical numeric ranges from the prose, or vice versa -- one is redundant.",
+     "save": 30
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "Reactive-language 'mean-based conversion' point, stated at lines 184-187, again 194-199",
+     "what": "The defect ('mean-based capacity conversion') is asserted three times: 'The defect is the mean-based capacity conversion' then 'the sizing stays mean-based' then 'The failure here is the conversion, not thrift, and not timing'. Say it once well; the burst1-onset-220min sub-argument and the 'complement of the fast-onset case' aside can compress to one clause.",
+     "save": 40
+    },
+    {
+     "category": "oversized-table",
+     "where": "Table tab:base-react-enc, lines 232-253",
+     "what": "7 rows x 4 lead columns where most feasible cells are the identical floor '588' and the violation magnitudes (4,282 / 3,063 / 6,729 / 4,606 / 54,170) are DB-backed number-dump. The load-bearing content is the L* column (last lead at which SLA holds). Compress: drop or fold the repeated-588 columns, keep onset + L* + burst3's every-lead failure, letting the prose (lines 255-268) carry the pattern.",
+     "save": 35
+    },
+    {
+     "category": "number-dump",
+     "where": "Reactive-language parenthetical ranges, lines 181-183",
+     "what": "'roughly 1.5-4x margin on window-mean TTFT and 5-7x on ITL' and '(TTFT p99 1,079-3,495ms; burst windows additionally fail ITL p99 at 121-162ms)' are supporting ranges the DB carries; the finding is 'all 14 meet the control law while violating the tail SLA'. Trim to one range or offload.",
+     "save": 25
+    },
+    {
+     "category": "verbose-prose",
+     "where": "Summary, lines 270-294",
+     "what": "Restates all four findings then re-caveats the full-trace result at length ('it does not overturn the per-window verdicts above, because the full trace is graded in aggregate only -- the same masking this chapter and Section documents -- and reactive control still loses burst3 whenever burst3 is graded on its own'). Keep the genuinely-new full-trace saving (0.687x, 677 vs 2905 vs 588ms) but the masking caveat is already made in-body; compress the restatement ~30%.",
+     "save": 45
+    },
+    {
+     "category": "verbose-prose",
+     "where": "Encoder interpretation tail, lines 264-268",
+     "what": "'It is the same peak arriving against a thinner request stream, so the backlog outlasts any affordable lead. Watching the right signal is necessary but not sufficient: against a fast, high-volume onset, no affordable lead delivers workers before the queue does the damage.' -- two sentences making one point; merge to one.",
+     "save": 20
+    }
+   ],
+   "owns": [
+    "mean-based capacity conversion is the language pool defect"
+   ],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/closedloop.tex": {
+   "file": "tex/closedloop.tex",
+   "role": "The thesis's payoff chapter: it drives per-pool worker schedules from the zero-shot forecasts and prices them against baselines, answering RQ4 (forecasting buys encoder-pool savings and language-pool compliance).",
+   "current_words": 9394,
+   "target_words": 6100,
+   "action": "Biggest single lever. Say each caveat ONCE (readiness-model, 588ms floor, issue-vs-target actuation are each stated 4x; graduated-headroom mechanism 3-4x). Offload the ledger's full-precision worker-second dumps, per-window warm-up fractions, naive-sum per-window error list, and row-count 'volume of evidence' to the provenance DB/appendix — keep the ratios (0.62x / 0.687x / 1.03x break-even), the three-denominator distinction, and every honesty boundary. Trim two oversized tables (cl-ledger-enc tied-at-floor rows). Delete throat-clearing ('stated plainly and without softening').",
+   "must_survive_findings": [
+    "Encoder pool: the p90-forecast policy meets the tail SLA in all 60 issue-time cells (every window x model x lead, both readiness models), lead-invariant from 15 to 165 s, while the identically-informed reactive controller loses burst3 at every lead — and the mechanism is the calibrated p90 band's graduated standing headroom, NOT clean onset detection (the forecast lags the fastest onset). Quantile (p90 vs p50) is the decisive dial.",
+    "Language pool: the same forecast passes bursts only through a DERIVED tail-aware capacity conversion (belief-to-knee ratio r_hat/r_tail); the good forecast with the planner's native mean-based conversion fails like reactive. Division of labour: on the encoder pool forecasting buys savings, on the language pool it buys compliance (2-6x MORE GPU cost, ~break-even vs burst-sized static).",
+    "Week-scale economics: the p90 schedule meets the SLA in aggregate AND per-episode at 0.62x the deployable static encoder fleet (0.59-0.62x across readiness models); rho is a cost knob (0.48-0.89x frontier, only rho=25 drops cells). A cheap forward EWMA at a calibrated p90 does NOT reproduce it — the calibrated band SHAPE, not forecast accuracy, is load-bearing (Table cl-ewma).",
+    "Evaluation-methodology contributions that must survive: aggregate p99 masks sub-1% burst episodes (dashboard-masking) so grading must be joint aggregate+per-episode; the composed E2E tail must be a per-request join, not a sum of per-pool p99s (up to 21.9% overstatement on burst3); and cost ratios flip sign with the denominator (language pool genuinely at break-even).",
+    "Honesty boundaries kept load-bearing: per-burst-window every autoscaling arm costs MORE than static (saving is a week-scale phenomenon); the 0.62x is not fold-invariant (0.47-1.10x across 24h folds, misses the bound on the e13 fold); and the 588 ms floor assumes an embedding-only/>=100 Gbps handoff (4x DeepStack payload violates for every policy including static)."
+   ],
+   "cut_list": [
+    {
+     "category": "intra-redundancy",
+     "where": "sec:cl-matrix, lines 100-211 (the description-list item 'Quantile/Lead-invariance' + 'Mechanism: graduated headroom' para + binary-detector para + 'Anticipation versus headroom' para)",
+     "what": "The 'graduated headroom, not clean detection' mechanism is stated 3-4 times: once in the description items, again in full in the Mechanism paragraph, again in the binary-detector paragraph, again in Anticipation-vs-headroom. Consolidate to one clean statement + the two decisive detector-crossing numbers (burst4 +345 s lead; burst3 lags at h=1). The crossing-threshold enumeration (225 s, 345 s, 105 s at 224 img/s and 286 img/s thresholds; 70-102 vs <=1 bins/day) is DB-backed detail that can be halved.",
+     "save": 260
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "engine/silicon paragraph in Limitations, lines 1072-1104",
+     "what": "Repeats Appendix engine-sensitivity content with a full number cascade (12.8%, 1.4-1.6x HF->vLLM, 606 vs 589, 784 vs 588, 692 vs 647, residuals -2.2/+11.3/+5.5%). Finding to keep: 0.62x holds under directly-measured vLLM cost, both schedule numerator and static denominator stay feasible. The per-batch residuals and the two-stage reprice narrative belong in the appendix it already cites.",
+     "save": 200
+    },
+    {
+     "category": "number-dump",
+     "where": "sec:cl-ledger-enc, 'Cold start, and the denominator it hides' para, lines 693-711",
+     "what": "Per-window warm-up-fraction enumeration (73.7/34.6/25.3/22.7/21.9%) and paired worker-second comparisons (17,018 vs 31,553; 29,558 vs 34,523; burst1 559,268 vs 576,659; burst5 93,560 vs 101,371; calm 175,586 vs 191,427; burst4 253,503 vs 250,594). The finding — anticipation makes warm-up a rounding error (forecast <9.4% vs reactive up to 73.7% on burst3) and flips the bill-from-order comparison — survives in one sentence; the raw pairs are in the DB and the table already carries the L=30 warm-up columns.",
+     "save": 190
+    },
+    {
+     "category": "number-dump",
+     "where": "sec:cl-ledger-cost itemize, lines 899-942",
+     "what": "Full-precision worker-second figures ('2,410,754.7', '8 x 483,659.8 = 3,869,278.4', '3,323,189.5 against 4,838,397.6', '1,209,599.4', '503.7'). State the ratios (0.62x, 0.687x, 1.03x break-even) and let provenance carry the raw seconds. Keep the three-denominator distinction and the break-even honesty — those are findings.",
+     "save": 150
+    },
+    {
+     "category": "number-dump",
+     "where": "sec:cl-ledger-scale 'The volume of evidence', lines 981-1009",
+     "what": "Granular per-partition row counts (21,395,430 composed rows, 3,348,130 language rows, 121,060 occupancy samples, 872,980/931,628 max-span requests, 21,400,000-row archive). Keep the rhetorical headline (2060 runs / ~99M-row provenance spine / 44 consistency checks / live burst3 twice) and the two caveats; the per-partition enumeration is exactly what the DB exists to hold.",
+     "save": 150
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "issue-time vs target-time actuation, lines 82-88, 446-459 (caption), 486-493, 516-518",
+     "what": "The mechanic that the H=12 archive supplies at most 165 s issued lead and that target-time indexing is an optimistic upper bound is explained four separate times (body, table caption, aggregate para, sweep para). Say it once well and cross-reference.",
+     "save": 150
+    },
+    {
+     "category": "verbose-prose",
+     "where": "sec:cl-ledger-joint naive-sum discussion, lines 838-877",
+     "what": "The per-window naive-sum error enumeration (+56/2.1%, +84/5.0%, +184/8.9%, +331/11.1%, +4,784/21.9%) plus a long 'arithmetic coincidence, not construction' justification. The methodological finding (E2E tail must be a per-request join; naive sum overstates, up to 21.9% on burst3) is worth keeping; the full per-window list and the defensive 'coincidence not construction' paragraph can be compressed by half.",
+     "save": 150
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "warm-pool vs strict re-warm readiness model + '0.59-0.62x', lines 121-125, 449-451, 495-503, 532-538, 1157-1159",
+     "what": "The two-readiness-model caveat and its 0.59-0.62x span are restated in the lead-invariance item, the aggregate caption, the aggregate body, the rho-sweep, and the summary. Define both models once, quote 0.62x as the conservative figure, and drop the repeated re-derivations.",
+     "save": 140
+    },
+    {
+     "category": "verbose-prose",
+     "where": "'The controller is not free, and charging it changes nothing' para, lines 957-979",
+     "what": "A sensitivity whose own conclusion is 'changes nothing' (0.623x -> 0.624x on GPU; 0.65-0.66x on CPU) runs ~350 words with the Toto-CPU-feasibility aside and price-ratio qualifications. Compress to: charging the forecaster's inference moves the ratio by <0.001x on GPU and keeps it well under 1.00x on CPU (only Toto@15 s CPU fails, on feasibility not cost). Offload the vCPU pricing arithmetic.",
+     "save": 130
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "588 ms service-floor decomposition (f(64)=316.4 + 272 handoff), lines 92-96, 456-459 (caption), 483-485, 651-655",
+     "what": "The floor = full-batch forward + p99 handoff decomposition, and 'these are distinct runs coinciding at the zero-queueing floor', are spelled out four times. State the decomposition once; later mentions need only say 'the 588 ms service floor'.",
+     "save": 120
+    },
+    {
+     "category": "hedging-overqualification",
+     "where": "language-pool held-cursor / 'sampled-signal experiment' caveat, lines 285-300, 350-362, 1150-1151",
+     "what": "The long parenthetical that the language hook reads one bin per tick, tests the conversion not anticipation, and is 'best read as a synthetic sampled-signal experiment' is repeated three times (section open, quantile-dial para, summary). Say it once precisely; the re-hedges add defensive length without new content.",
+     "save": 120
+    },
+    {
+     "category": "oversized-table",
+     "where": "Table cl-ledger-enc, lines 595-644 (+ derivable columns)",
+     "what": "11-column table where 4 of 5 windows tie exactly at the 588 floor. The 5090h column is explicitly 'derived as worker-seconds/3600, not stored' and the warm-up appears in both k-ws and %. Drop the derived/duplicated columns (keep k-ws and one warm-up figure) and consider collapsing the tied-at-floor rows to a single note, since the whole separation lives in burst3 — as the prose already says.",
+     "save": 120
+    },
+    {
+     "category": "verbose-prose",
+     "where": "EWMA prose + rho-frontier duplicate numbers, lines 213-245 and 526-538",
+     "what": "The Chronos-control reproduction list (588; 0.62x; frontier 0.89/0.62/0.48/0.40x; p50 2735/0.25x) and the EWMA frontier 1.32/1.09/0.94/0.83x are quoted in prose and again around the sweep; the rho-frontier 0.48-0.89x appears at lines 184, 530, 534. Keep Table cl-ewma as the anchor and state each frontier once.",
+     "save": 110
+    },
+    {
+     "category": "hedging-overqualification",
+     "where": "scattered throat-clearing, lines 656 ('Stated plainly and without softening'), 793 ('worth stating outright'), 839 ('a methodological point the thesis should not leave implicit'), 547 ('Two rows demand care')",
+     "what": "Meta-narration announcing that a point is important or honest; the honest point itself carries the weight. Delete the framing clauses.",
+     "save": 45
+    }
+   ],
+   "owns": [
+    "0.62x static-encoder cost ratio (readiness-model definition)",
+    "588 ms zero-queueing floor + f(64)=316.4 + 272ms handoff decomposition"
+   ],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/validation.tex": {
+   "file": "tex/validation.tex",
+   "role": "The sim-to-real anchor: shows the closed-loop planner behavior validated in offline replay reproduces on Dynamo's live control plane, in both PASS and FAIL directions -- the RQ3 platform-validity capstone.",
+   "current_words": 1216,
+   "target_words": 1055,
+   "action": "Already the tightest chapter — light touch only. Say the single-live-run caveat once (2x), replace the scope conclusion that reprints Table 5.1 digits with a qualitative statement, compress two over-worded bullets. Do not cut findings.",
+   "must_survive_findings": [
+    "On burst3 (the hardest fleet window), the live stack reproduces the simulated verdicts in BOTH directions: forecast policy PASSes the tail SLA live as simulated, reactive FAILs live as simulated (Table 5.1), with TTFT p99 within 1.1-6.8% and provisioned replica-seconds within 8%.",
+    "Mechanistic account of WHY agreement holds: the demand path is byte-identical (same predictor/registry code, only the clock differs -- first-tick 29.86 rps in both), while the capacity belief diverges at tick 1 but tracks the same post-cap applied trajectory.",
+    "The live-only divergences are harness properties, not policy properties: live startup_time inverts offline semantics (routable-but-dead window), and the live planner's capacity model starves at calm load -- fixed via fpm_observation_mode contributed upstream to Dynamo.",
+    "The anchor's scope is explicit and honest: it validates the control LOOP (mocked engine, language pool, one window, two policies), not GPU silicon -- which the aiconfigurator chapter anchored physically instead."
+   ],
+   "cut_list": [
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "lines 98-99 and 165-166",
+     "what": "The 'single live run per policy, so this is a point difference not a repeated-run noise band' caveat is stated twice, nearly verbatim. Keep it once (in Results, at first use); delete the restatement in the Scope conclusion.",
+     "save": 22
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "Scope conclusion, lines 161-164",
+     "what": "The closing sentence re-enumerates 'TTFT differs by 1.1-6.8% and provisioned replica-seconds by 5.3-7.6%, ITL differs by 1.8ms/18.0% under the 100ms bound' -- all already in Table 5.1 and the Results section (lines 67-97). Replace with a qualitative statement ('all three metrics agree within single-digit-percent, verdicts identical') and let the table carry the digits.",
+     "save": 35
+    },
+    {
+     "category": "number-dump",
+     "where": "capacity-starvation bullet, lines 124-127",
+     "what": "'across the archived runs 2--3 of the first ~200 tracking-mode samples over five minutes at ~2 req/s were mixed (~1%)' is a per-run enumeration the provenance DB now backs. Compress to 'only ~1% of calm-load samples were the mixed passes the capacity model needs.'",
+     "save": 18
+    },
+    {
+     "category": "verbose-prose",
+     "where": "budget-units bullet, lines 141-147",
+     "what": "The tail 'so the reported language provisioning is the post-cap applied capacity, at which the policy still meets the SLA; what the cap changes is the provisioned count, not the pass/fail verdict, and the live/offline unit inconsistency changes neither (both equalized to the same applied cap)' states 'verdict unaffected' three ways. Collapse to one clause: cap binds (24->8 replicas) and reshapes provisioned count but not the verdict; the unit mismatch is equalized and remains a reportable upstream defect.",
+     "save": 30
+    },
+    {
+     "category": "verbose-prose",
+     "where": "Setup, lines 14-20 and 40-48",
+     "what": "The live-stack component inventory and the offline-twin definition are both slightly over-worded (e.g. the parenthetical 'nothing in the Dynamo tree consumes VirtualConnector decisions for live workers'; the full re-listing of 'identical trace, planner configuration, capacity mapping, lead, and replica budget'). Tighten enumerations to the load-bearing items.",
+     "save": 25
+    },
+    {
+     "category": "verbose-prose",
+     "where": "Results, p50 parenthetical, lines 100-103",
+     "what": "'(The p50 leg of the split --- p50 also failing --- is established offline only, Chapter X; no live p50 run was performed.)' -- fold into a shorter half-sentence; the double 'p50 also failing / no live p50 run' is redundant.",
+     "save": 12
+    }
+   ],
+   "owns": [
+    "simulation-not-live / mocked-engine (TP2) scope caveat"
+   ],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/conclusion.tex": {
+   "file": "tex/conclusion.tex",
+   "role": "Answers the four RQs from evidence, restates the thesis statement, scopes the claims, and lists future work — the reader's single-page takeaway of the whole thesis.",
+   "current_words": 1126,
+   "target_words": 830,
+   "action": "State 12.8% once (currently 3x), 588ms once (3x), 1.4-1.6x once (2x). Compress RQ1/RQ3/RQ4 statistic cascades to finding-shape + one headline number each. In 'what bounds these claims', keep the three genuine scope limits and cut the encoder-validation re-derivation (duplicates RQ3). Trim appositive asides.",
+   "must_survive_findings": [
+    "RQ1: the request-rate signal a conventional autoscaler watches does not carry the vision pool's demand — the pools' demands decouple and saturate an order of magnitude apart, so missizing requires a fleet-shape change (TP + worker count) no replica scaler can perform.",
+    "RQ2: three pretrained time-series foundation models forecast the vision signal zero-shot, beating every classical baseline across all cells at provisioning horizons, with an empirically calibrated p90 band.",
+    "RQ3: the encoder cost model was collected and validated on real silicon to within 12.8% of vLLM's own vision tower (the earlier 1.4-1.6x gap was HuggingFace execution overhead, not model error).",
+    "RQ4: the p90-forecast schedule holds the tail SLA at every cold-start lead — including the fast onset that defeats an identically-informed reactive controller — at ~0.62x the static encoder fleet's GPU-time; the load-bearing mechanism is the calibrated band SHAPE, not forecast accuracy, and the language pool needs a tail-aware capacity conversion.",
+    "The scope caveats that must survive: one seven-day trace with an offered-work upper bound on decode; the inter-pool handoff is an analytic single-stream bound (the 588ms floor and cost ratio assume embedding-only handoff or >=100Gbps); the vision control loop is simulated against measured silicon, not yet a live serving loop."
+   ],
+   "cut_list": [
+    {
+     "category": "intra-redundancy",
+     "where": "12.8% fidelity number, stated at lines 41-44, 104-108, and 122",
+     "what": "The '12.8% vs vLLM vision tower, 1.4-1.6x gap was HuggingFace overhead' story is fully re-derived three times (RQ3, the bounds paragraph, and future work), each with its own parenthetical about the dense N=1-512 / 64-batch sweep. State it once well (in RQ3); the bounds and future-work occurrences can each shrink to a one-clause reference. DB+Appendix engine-sensitivity carry the sweep detail.",
+     "save": 70
+    },
+    {
+     "category": "number-dump",
+     "where": "RQ1, lines 18-26",
+     "what": "Exact statistics (R^2=0.12 vs 0.65, Jaccard 0.02, 29% mean utilization, '6-8 encoder workers and a TP2 shape against 2 workers and TP1', 4x/2x) can be compressed to the finding shape — decoupled, saturate an order of magnitude apart, requires a fleet-shape change — with the raw values offloaded to the trace/grid chapters and provenance DB.",
+     "save": 35
+    },
+    {
+     "category": "number-dump",
+     "where": "RQ3, lines 39-55",
+     "what": "The cascade of fidelity figures (~3% attention, ~6% GEMM, TTFT p99 1.1-6.8%, ITL p99, replica-time 5.3-7.6%) re-enumerates body-chapter validation numbers. Keep the two load-bearing claims (silicon-validated cost model; control loop reproduces simulated verdicts through the real Dynamo control plane) and offload the per-stratum/per-metric percentages.",
+     "save": 45
+    },
+    {
+     "category": "number-dump",
+     "where": "RQ4, lines 79-87",
+     "what": "Multiple cost ratios and thresholds (0.62x, 0.59-0.62x under strict re-warm, 0.96x language, 1.09x EWMA, leads 15-165s, 588ms floor) plus 'no setting in the tested target ladder repairs it under lead'. Keep ~0.62x headline and the mechanism; collapse the re-warm/language/EWMA sub-ratios to parenthetical minimum, drop the ladder clause.",
+     "save": 40
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "'What bounds these claims', lines 98-114",
+     "what": "Half of this paragraph re-explains the encoder-cost silicon validation already given in RQ3 (lines 104-108 duplicate 42-44 with more sweep detail). Keep the three genuine scope limits (single trace + offered-work bound; analytic single-stream handoff -> 588ms/cost-ratio assumptions; simulated not live loop). Compress the validation re-derivation to one clause pointing back to RQ3/Appendix.",
+     "save": 55
+    },
+    {
+     "category": "verbose-prose",
+     "where": "Future work, lines 128-141 (esp. the parenthetical fourth extension)",
+     "what": "The closed-negative 'structural language-pool predictor' parenthetical (128-132) re-explains a result already in Chapter predictors; and the 12.8%/dense-sweep restatement (120-122) repeats RQ3. Tighten to one sentence each. The seam-preview and workload-breadth items are already tight — keep.",
+     "save": 30
+    },
+    {
+     "category": "hedging-overqualification",
+     "where": "throughout — parenthetical asides, lines 34, 66-68, 87, 93",
+     "what": "Elegant-but-dense appositive asides ('the forecasting-side echo of the decoupling', 'the trace chapter's dashboard-masking, recurring in the evaluation metric', 'the honest complement to the mocked-engine control-loop anchor') add rhetoric over the plain claim. Trim to the claim itself; these are the phrases that make shining points hard to find.",
+     "save": 25
+    }
+   ],
+   "owns": [],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/apendice.tex": {
+   "file": "tex/apendice.tex",
+   "role": "The reproduction manifest: pins the software environment, maps every figure/table to its generating script + primary artifact, and hosts the supplementary engine-sensitivity analysis that defends the encoder cost model. This appendix IS the provenance backbone the rest of the thesis leans on.",
+   "current_words": 2200,
+   "target_words": 1760,
+   "action": "Keep manifest + env tables INTACT (they are the offload target). Trim the engine-sensitivity section that reads like a mini-results-chapter: state the 12.8%/12.7%/21.8% band once (not across intro+table+figure+observations+scope), let Table/Fig carry per-N detail. Compress clock-lock provenance (3x→1) and commit-hash bookkeeping.",
+   "must_survive_findings": [
+    "The AIC batch-axis discrepancy is an execution-engine artifact, not a cost-model error: against vLLM (the engine AIC's kernels are actually drawn from) the composed encoder forward matches within ~12.8% across the entire N<=64 serving regime, diverging to +21.8% only past the FIFO cap; the earlier '1.4-1.6x gap' was purely a HuggingFace->vLLM stack difference (lines 120-210).",
+    "Queue-replay validation: repricing f(N) at the measured vLLM curve leaves the week-scale encoder-delay p99 at 606ms vs 589ms under AIC (non-divergent), so the AIC-priced cost ratio carries no separate silicon penalty (lines 219-231).",
+    "Two encoder-path gaps in AIC were found and returned upstream (draft PR #1312): the missing pixel-to-hidden patch-embed GEMM (~0.3% at N=64) and the blanked large-batch ViT GEMM/attention shapes; both are additive, committed rows preserved (lines 237-254).",
+    "The manifest itself (Table tab:ap-manifest) + environment table (tab:ap-env): element->script->artifact map plus pinned load-bearing versions and the two dynamo.replay runtimes that matter for reproduction (lines 24-59, 256-385)."
+   ],
+   "cut_list": [
+    {
+     "category": "number-dump",
+     "where": "pred-heatmap figure caption, lines 88-104",
+     "what": "Per-cell enumeration the annotated heatmap already shows and the DB backs: 'within 3% of per-cell optimum', 'TimesFM within 6%... reaches 22% above best on images', the full column-win roll-call ('all twelve cells... except on images at 1s and on requests and images at 30s'), and especially 'the two modes tie to five decimals, both 0.98761, the univariate marginally lower' and 'Every one of these margins is within 2% of the column best'. Keep the shape (Chronos-2/Toto-2 near-optimal everywhere, Holt-Winters worst-in-column because trend extrapolation fights mean reversion); cut the cell-by-cell tally.",
+     "save": 90
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "engine-sensitivity: intro (128), table (155-164), figure caption (171-187), three observations (189-210), scope (211-235)",
+     "what": "The same three numbers recur 4-5 times: the +/-12.8% band, the +12.7% in-regime residual, and the +21.8%/+1.69x beyond-cap drift; likewise the per-N vLLM ratios (-2.2%,+11.3%,+5.5% at N=8/32/64) restate the table rows verbatim. State the band + beyond-cap drift once in prose and let Table tab:app-engine and Fig fig:app-engines carry the per-N detail; the 'Three observations' paragraph can shrink to two sentences.",
+     "save": 130
+    },
+    {
+     "category": "methodological-caveat-repetition",
+     "where": "clock-lock provenance: env-table caption (28-33), lines 133-141, figure caption (175)",
+     "what": "The SM 2377-2400 / mem 14001 / 2407-boost / persistence-mode-'not a hard lock' distinction is spelled out three times. The separate-recollection point ('no memory-clock reading and no lock-command log were captured' vs the sudo self-lock attempt) is worth one sentence, not a full paragraph plus two caption restatements.",
+     "save": 55
+    },
+    {
+     "category": "verbose-prose",
+     "where": "Environment prose, lines 61-80",
+     "what": "Commit-hash bookkeeping and relocatability detail that duplicates the results-ledger and manifest: 'runs through commit b55dd0b7 (infill 656ac8ca, collector fix 12306db5, large-batch ViT coverage 492a3444)... only the Dynamo live-planner branch (33a9babe01) remains a local commit', plus 'resolves its data paths from TESE_ROOT and relocates cleanly; some older, historical scripts still hard-code absolute paths' and the uv.lock/gitignored-.venv explanation. Compress to: encoder campaign on PR #1312 through b55dd0b7; one branch local; eda locked via uv.",
+     "save": 85
+    },
+    {
+     "category": "number-dump",
+     "where": "Scope paragraph, lines 211-235",
+     "what": "Re-dumps the sweep protocol already in the figure caption ('69 batch sizes, five replications of fifty timed forwards each, per-N Student-t 95% CI below 0.06ms') and the multi-resolution ratio grid ('within 12.8% at 448^2 and below, mean 0.99-1.05... within 15.5% at the two largest, mean 1.09-1.11 at 640^2/896^2'). Keep the honesty core (forward compute not full serving path; synthetic weights; queue-replay non-divergent; live confirmation future work); offload the CI/replication and per-resolution means to the DB.",
+     "save": 50
+    },
+    {
+     "category": "verbose-prose",
+     "where": "Opening paragraph, lines 8-20",
+     "what": "The parenthetical examples ('the audit-driven re-runs behind the corrected cost headline, the issue-time week-scale aggregate that backs the 0.62x figure, and end-to-end latency... archived under verification/ and simulation/results/') and the itemized ledger-fields list preview content the manifest table then delivers. Trim to one sentence: every claim is script-generated over archived inputs, recorded in results-ledger.md, distilled by the two tables below.",
+     "save": 30
+    }
+   ],
+   "owns": [
+    "12.8%/12.7%/21.8% engine-sensitivity band (per-N detail)"
+   ],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/apendice_ecosystem.tex": {
+   "file": "tex/apendice_ecosystem.tex",
+   "role": "Appendix orientation: names the five ai-dynamo components, how they compose into one loop, and — the load-bearing part — exactly which the thesis consumes vs contributes back to, plus scope/maturity caveats.",
+   "current_words": 1162,
+   "target_words": 790,
+   "action": "Compress each of the five component paragraphs to role + the one hook the thesis touches (drop TP/PP/DP/EP, KVBM tier-chain, meson/PyO3 internals). Cut the 'What it consumes' / 'Scope' restatements of the table's own columns to pointers. Keep the consume/contribute mapping, the positioning, and the mocked-engine caveat in full. Trim SemVer archaeology.",
+   "must_survive_findings": [
+    "The consume/contribute mapping: the thesis consumes aiconfigurator's cost model, the dynamo.replay runtime, and aiperf as live client; it contributes back a draft coverage PR to aiconfigurator (patch-embedding op, large-batch GEMM/attention for ViTs, collector OOM fix) plus a silicon validation of aiconfigurator's encoder cost model against direct RTX 5090 measurements of vLLM's vision tower.",
+    "The positioning of the contribution: a forecast-driven and modality-decoupled per-pool provisioning layer sitting in the same architectural slot as Dynamo's SLA planner but sizing ahead of demand and provisioning encoder vs language pools separately — complementary, not a replacement.",
+    "The scope/honesty caveat: single-node pool economics not multi-node grove orchestration, and the live closed loop drives a real Dynamo control plane but with mocked (TP2) engines — a real-GPU-engine run behind aiperf remains future work.",
+    "The pinning caveat: the stack is young/fast-moving (monthly minors), so every result targets deliberately pinned snapshots and contributions are described at the level of mechanism, which outlives specific APIs."
+   ],
+   "cut_list": [
+    {
+     "category": "tangential-background",
+     "where": "Five component paragraphs, lines 20-64 (aiconfigurator/grove/dynamo/nixl/aiperf)",
+     "what": "Deep internal-mechanism detail beyond what the thesis's use requires and largely restated by the table's 'Layer / role' column: TP/PP/DP/EP parallelism enumeration, SILICON/HYBRID/EMPIRICAL/SOL modes, radix-tree prefix scoring, the KVBM GPU->CPU->SSD->remote tier chain, meson/PyO3 build details, credit-based flow control 'off its message bus', and the Mooncake/BurstGPT replay-timing modes. Thesis intro already introduces the stack; here compress each component to role + the one hook the thesis actually touches.",
+     "save": 190
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "'Where this thesis fits' subsection, lines 132-169 (esp. 'What it consumes' 137-144 and 'Scope' 162-169)",
+     "what": "Restates the table's 'Use in this thesis' column: 'What it consumes' re-lists aiconfigurator cost model + dynamo.replay + aiperf already in the table rows; 'Scope' repeats grove 'Not used / single-node' and the mocked-engines caveat already carried by the table and by App. engine-sensitivity. Keep 'contributes back' and 'positioning' (the shining points) in full; cut the consume/scope re-statements to pointers.",
+     "save": 95
+    },
+    {
+     "category": "verbose-prose",
+     "where": "'Maturity and pinning' paragraph, lines 118-130",
+     "what": "SemVer archaeology is over-told: 'signalled as pre-stable by SemVer alone, with no literal alpha/beta labels and only -rc release-candidate tags ahead of a few patch releases' plus the two exact release dates. Keep the headline (young, ~monthly minors -> deliberately pinned snapshots) and the pinned version list (also in Table ap-env), drop the label/tag genealogy.",
+     "save": 55
+    },
+    {
+     "category": "intra-redundancy",
+     "where": "'How they compose' paragraph, lines 70-77",
+     "what": "The bolded plans/orchestrates/serves/moves/measures loop re-narrates the same five roles just given in the component paragraphs and again in the table. Trim to one or two sentences naming the loop and pointing at the table.",
+     "save": 40
+    }
+   ],
+   "owns": [],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  },
+  "tex/tese.tex": {
+   "file": "tex/tese.tex",
+   "role": "Root: Abstract (EN) + Resumo (PT) both restate the full headline.",
+   "current_words": 700,
+   "target_words": 450,
+   "action": "Trim Abstract and Resumo mutual mirror to position + two load-bearing numbers (0.62x encoder, 0.96x language). Keep BOTH (Resumo USP-required). ONLY edit the Abstract and Resumo blocks; touch nothing else.",
+   "must_survive_findings": [
+    "per-pool decoupling thesis",
+    "0.62x encoder / 0.96x language cost result",
+    "anchor: encoder RTX5090 silicon, language simulated, live=mocked engines"
+   ],
+   "cut_list": [
+    {
+     "category": "intra-redundancy",
+     "where": "Abstract L44-77 + Resumo L82-124",
+     "what": "both enumerate R^2=0.12, Jaccard 0.02, 0.62x, 0.96x, knees",
+     "save": 250
+    }
+   ],
+   "owns": [],
+   "cross_ref_note": "For any HEADLINE number your chapter does NOT own (owns[]), do NOT re-derive it with its full sweep/parenthetical -- compress to ONE clause. No new \\ref plumbing needed; a short clause suffices. State your OWN headline once in full, keep its \\label."
+  }
+ }
+}

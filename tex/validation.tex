@@ -12,12 +12,11 @@ Every closed-loop result so far ran through Dynamo's \emph{offline}
 replay: real planner code, virtual clock, in-process actuation. This
 chapter anchors that platform to the \emph{live} stack: the same
 policies, on the same workload, executed through Dynamo's real control
-plane in real time --- HTTP frontend with the in-process KV router,
-independent mocker worker processes discovered over etcd, metrics
-scraped by Prometheus, the SLA planner as its own service, and
-scaling decisions actuated through the planner's VirtualConnector
-protocol by a worker-manager written for this thesis (nothing in the
-Dynamo tree consumes VirtualConnector decisions for live workers). The
+plane in real time --- HTTP frontend with in-process KV router,
+independent mocker workers discovered over etcd, Prometheus metrics,
+the SLA planner as its own service, and scaling actuated through the
+planner's VirtualConnector protocol by a worker-manager written for
+this thesis. The
 question is the platform-validity one (RQ3), asked at the last layer
 simulation cannot reach: \emph{does the simulated control loop behave
 the same on the real stack?}
@@ -43,8 +42,8 @@ cold-start lead is modeled by delayed spawn (59\,s + a measured
 1.0\,s spawn-to-registered latency); mocker-native
 \texttt{startup\_time} could not be reused because its live semantics
 \emph{invert} the offline ones (Section~\ref{sec:val-findings}). Each
-live run is compared against an offline twin (the identical trace,
-planner configuration, capacity mapping, lead, and replica budget)
+live run is compared against an offline twin --- identical trace,
+planner configuration, capacity mapping, lead, and budget ---
 re-run through the replay platform of the preceding chapters.
 
 \section{Results: verdicts, tails, and decisions agree}
@@ -98,9 +97,8 @@ client-observed TTFT tails land within 1.1--6.8\% of the simulated ones
 (a single live run per policy, so this is a point difference between the
 two systems, not a repeated-run noise band). The burst3 policy split
 reproduces on the real stack in the two policies carried live: the p90
-forecast passes where the reactive baseline fails. (The p50 leg of the
-split --- p50 also failing --- is established offline only,
-Chapter~\ref{cap:closedloop}; no live p50 run was performed.)
+forecast passes where the reactive baseline fails (the failing p50 leg
+is established offline only, Chapter~\ref{cap:closedloop}).
 
 \section{What the live stack revealed}
 \label{sec:val-findings}
@@ -119,11 +117,9 @@ preferentially fills; hence the delayed-spawn modeling of the Setup.
 planner samples worker metrics in tracking mode (the \emph{latest}
 forward pass per worker, once per load tick), while the offline
 replay feeds \emph{every} pass. Mixed prefill+decode passes, the only
-samples that inform aggregated capacity, are rare at calm load: only a
-handful arrive --- across the archived runs 2--3 of the first
-${\approx}200$ tracking-mode samples over five minutes at
-${\approx}2$\,req/s were mixed (${\approx}1\%$) --- too few to make the
-capacity model ready. It would warm only once the workload was already busy,
+samples that inform aggregated capacity, are rare at calm load: only
+${\approx}1\%$ of calm-load samples are the mixed passes the capacity
+model needs --- too few to make it ready. It would warm only once the workload was already busy,
 too late for scale-ahead decisions. The fix (contributed to the Dynamo
 tree as an opt-in \texttt{fpm\_observation\_mode}) drains every
 published pass into the same regression feed the replay uses;
@@ -139,12 +135,9 @@ replicas at \texttt{max\_gpu\_budget}; the live planner divides the
 same field by GPUs-per-replica. The anchor comparison equalizes the
 caps. The cap \emph{does} bind in these episode replays --- the
 tail-aware forecast requests up to 24 language replicas and
-\texttt{max\_gpu\_budget}${=}8$ clamps it to 8 --- so the reported
-language provisioning is the post-cap \emph{applied} capacity, at which
-the policy still meets the SLA; what the cap changes is the provisioned
-count, not the pass/fail verdict, and the live/offline unit inconsistency
-changes neither (both equalized to the same applied cap). The
-inconsistency remains a reportable upstream defect.
+\texttt{max\_gpu\_budget}${=}8$ clamps it to 8 --- so it reshapes the
+provisioned count, not the pass/fail verdict; the unit mismatch is
+equalized to the same applied cap and remains a reportable upstream defect.
 \end{description}
 
 \section{Scope of the anchor}
@@ -158,11 +151,11 @@ only in simulation), and mocked engine execution. It validates the
 Chapter~\ref{cap:aiconfigurator} anchored physically on the encoder
 side. Within that scope the conclusion is direct: the platform's
 closed-loop behavior transfers to the real stack in both verdict
-directions --- TTFT differs by 1.1--6.8\% and provisioned replica-seconds
-by 5.3--7.6\%, and the ITL SLA verdicts agree (though the forecast policy's
-ITL differs by \SI{1.8}{\milli\second}, 18.0\%, both far under the
-\SI{100}{\milli\second} bound) --- across one live run per policy (a point
-difference, not a repeated-trial noise band), and the divergences that
+directions --- the SLA verdicts are identical on all three metrics,
+TTFT and provisioned replica-time agree within single-digit percent, and the
+forecast policy's ITL differs by \SI{1.8}{\milli\second} (18\%, on a
+\SI{9.7}{\milli\second} base, far under the \SI{100}{\milli\second} bound;
+Table~\ref{tab:val-anchor}) --- and the divergences that
 do exist
 (identified, explained, in one case fixed on a local branch to be proposed upstream) are properties
 of the harnesses, not of the policies this thesis compares.

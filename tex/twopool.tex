@@ -32,9 +32,8 @@ property of the simulated serving system itself.
 \section{Architecture: two pools, one seam}
 \label{sec:sim-arch}
 
-Dynamo's discrete-event worker simulator (the \emph{mocker}; marketed
-as DynoSim) models text token processing only, so the vision stage
-cannot live inside it. The
+Dynamo's discrete-event worker simulator (the \emph{mocker}) models text
+token processing only, so the vision stage cannot live inside it. The
 composition instead runs the vision pool as an event-driven FIFO of $C$
 encoder workers \emph{inside the workload converter}, costed per forward
 by AIC's encoder graph on the collected \texttt{rtx\_5090} data, and
@@ -63,26 +62,20 @@ latency roughly double ($1.8\times$ and $1.9\times$). Burst behavior,
 what autoscaling experiments measure, is visible only under
 calibrated timing, so all headline runs use AIC timing; the polynomial
 is retained for cheap coverage sweeps. These AIC
-numbers come from the source-built runtime, whose calibrated predictions
-run in-core (Rust) in microseconds. An earlier wheel-based runtime ran them
-as per-request Python callbacks whose wall-time leaked into the simulated
-clock, inflating the \emph{extreme} tail (identical p99 at $s{=}1$, maximum
-TTFT 7.6 vs.\ 4.5~s on identical perf data; the two runtimes diverge with
-distance from the knee, by up to $22\%$ in TTFT p99 and $61\%$ in ITL p99 at
-$s{=}16$): an instrumentation artifact to
-guard against when a timing hook is slower than the events it
-prices.
+numbers come from the source-built runtime, whose predictions run in-core
+(Rust) in microseconds; an earlier wheel-based runtime ran them as
+per-request Python callbacks whose wall-time leaked into the simulated clock
+and inflated the extreme tail --- an instrumentation artifact to guard
+against when a timing hook is slower than the events it prices.
 
 \paragraph{Family transfer.} The language-pool numbers in this chapter are
 for Qwen3-VL-8B at TP1. A spot-check prices the family flagship,
-Qwen3-VL-235B-A22B at TP8 (MoE-TP~8), on the same shipped H100 data, window,
-and topology: TTFT p99 of 398~ms at $1\times$ the trace
-rate against the 8B's 307~ms, with $2\times$ the decode latency
-throughout (TPOT 14.9 vs.\ 7.9~ms; 87 vs.\ 142 output tok/s per user).
-Under the evaluation SLA the decode bound is what moves: the flagship's ITL
-p99 is already \SI{87.7}{\milli\second} at the trace's own rate, so its
-knee sits at $s{=}1$ ($2.8$~req/s) against the 8B's $s{=}2$: decoder
-scale halves the language pool's operating envelope. The vision
+Qwen3-VL-235B-A22B at TP8, on the same shipped H100 data, window,
+and topology: ${\sim}2\times$ the 8B's decode latency throughout, with ITL
+p99 already \SI{87.7}{\milli\second} at the trace's own rate, so the decode
+bound moves and its knee drops to $s{=}1$ against the 8B's $s{=}2$ ---
+decoder scale halves the language pool's operating envelope (per-metric
+numbers in Appendix~\ref{ap:artifacts}). The vision
 side needs no such caveat: the ViT \emph{and} its 4096-dimensional projector
 output are identical between the 8B and the 235B
 (Chapter~\ref{cap:aiconfigurator}), so the encoder cost model, batching
@@ -124,12 +117,12 @@ operator at the total token count. Each dispatched batch is therefore
 costed at its image total, and batching pays: $f(1) = \SI{8.16}{\milli\second}$
 per image alone versus $f(64) = \SI{316.4}{\milli\second}$:
 \SI{4.94}{\milli\second} per image amortized, a $1.65\times$ throughput gain
-that amounts to a ${\sim}\SI{3.2}{\milli\second}$ fixed per-forward
-overhead. (Measured end-to-end, the realized gain is smaller and
-saturates by $N{\approx}6$--$8$; this amortization ceiling is a compute
-property observed on both execution stacks --- HuggingFace-transformers and
-vLLM --- a compute effect rather than a cost-model artifact (Section~\ref{sec:aic-model-vs-silicon}), and is
-conservative for the saturation results below.) Dispatch is greedy FIFO: a freed worker takes
+(a ${\sim}\SI{3.2}{\milli\second}$ fixed per-forward overhead).
+(Measured end-to-end the realized gain is smaller and
+saturates by $N{\approx}6$--$8$, a compute property of both execution stacks
+(HuggingFace-transformers and vLLM) rather than a cost-model artifact
+(Section~\ref{sec:aic-model-vs-silicon}), conservative for the saturation
+results below.) Dispatch is greedy FIFO: a freed worker takes
 whole queued requests, in order, up to a 64-image cap (the collected batch
 range, so no extrapolation); a request exceeding the cap alone (the
 trace reaches $97^2 = \num{9409}$ images) is chunked into $\leq
@@ -137,54 +130,48 @@ trace reaches $97^2 = \num{9409}$ images) is chunked into $\leq
 several free workers drain one oversized request concurrently.
 Chunk-parallel dispatch is a \emph{simulator policy assumption}:
 consistent with encoder-disaggregated runtimes that route image groups
-independently across encoder instances, but not a property of the
-trace. It is physically grounded (images are independent in the
-encoder) and makes encoder tail latency \emph{capacity-controllable}:
-under the sequential alternative (one request's chunks chained on one
-worker, retained behind a converter flag), the largest requests carry an
-intrinsic multi-second service floor that no worker count removes
-(measured on the fastest-onset episode, delay p99 plateaus at
-\SI{2.9}{\second} from 4 through 32 workers). That floor makes every
-frames-heavy window statically infeasible under the evaluation SLA by
-construction. The largest request still costs ${\approx}\SI{46}{\second}$
-of kernel time (148 forwards: $147 \times f(64) + f(1)$), spread
-across whatever workers are free. Under low load a lone request
-dispatches immediately; the policy changes nothing at the steady head
-(delay percentiles identical to three decimals) and matters exactly
-where batching should --- inside bursts.
+independently across encoder instances, physically grounded (images are
+independent in the encoder), but not a property of the trace. It makes
+encoder tail latency \emph{capacity-controllable}: under the sequential
+alternative (chunks chained on one worker, retained behind a converter flag)
+the largest requests carry an intrinsic multi-second service floor that no
+worker count removes (delay p99 plateaus at \SI{2.9}{\second} from 4 through
+32 workers), making every frames-heavy window statically infeasible by
+construction. The largest request costs ${\approx}\SI{46}{\second}$ of
+kernel time regardless, spread across whatever workers are free. Under low
+load the policy changes nothing at the steady head (delay percentiles
+identical to three decimals) and matters exactly where batching should ---
+inside bursts.
 
 \paragraph{Handoff.} The encoder's output crosses pools. The runs
 charge the \emph{main} projector stream (post-merge vision embeddings
 of $196 \times 4096$ bf16 values per image, ${\approx}\SI{1.6}{\mega\byte}$
-per image, \SI{194}{\mega\byte} for a 121-image request), bounded
+per image), bounded
 analytically as $\text{RTT} + \text{bytes}/\text{bandwidth}$ on a
 parameterized link (default \SI{25}{Gbps}): \SI{0.71}{\milli\second} at
 the median request of the steady window, \SI{62}{\milli\second} at its
 121-image maximum. Two caveats delimit the bound. First, a
 disaggregated Qwen3-VL deployment must also ship the three DeepStack
-projections the language model consumes in its early layers (three more
-$196 \times 4096$ tensors per image), quadrupling the payload to
+projections the language model consumes in its early layers (three more such
+tensors per image), quadrupling the payload to
 ${\approx}\SI{6.4}{\mega\byte}$ per image (${\approx}\SI{250}{\milli\second}$
 at the 121-image maximum on the default link). That payload is still
-second-order against
-the multi-second queueing tails this chapter measures, but the
-single-stream figure used in the runs is a known undercount for this
-family; Chapter~\ref{cap:closedloop}'s limitations quantify the
-$4\times$-payload sensitivity on the week-scale aggregate. Second, the bound is
+second-order against the multi-second queueing tails this chapter measures,
+but the single-stream figure is a known undercount for this family, whose
+$4\times$-payload sensitivity Chapter~\ref{cap:closedloop}'s limitations
+quantify on the week-scale aggregate. Second, the bound is
 \emph{bandwidth-only}: contention, serialization points, NIC/PCIe
 placement, and cross-node topology are not modeled, so it is a lower
-bound on transfer latency, not a tail estimate. The transfer is charged
-to request latency but not to the worker (asynchronous DMA/NIC),
-which is optimistic for encoder throughput. A measured NIXL transfer curve can
-later replace the bound without touching anything downstream. The trace records no image sizes, so the
+bound on transfer latency, not a tail estimate; it is charged to request
+latency but not to the worker (asynchronous DMA/NIC), optimistic for encoder
+throughput, and a measured NIXL curve can later replace it. The trace records no image sizes, so the
 uniform 448\textsuperscript{2} assumption of
 Chapter~\ref{cap:aiconfigurator} stands. The
-${\sim}1.4$--$1.6\times$ offset (and, at $896^2$, $1.14\times$) earlier read
-as an AIC-versus-silicon gap at that resolution is an execution-\emph{stack}
-difference --- the HuggingFace-transformers eager path is slower than the
-serving engine's own kernels --- predominantly an execution-stack difference: measured against
-a standalone eager forward through vLLM's own vision-tower implementation at
-$448^2$ the cost model matches to within $12.8\%$ across the whole $N\le64$ serving regime (64 consecutive batch sizes within a dense $N{=}1$--$512$ sweep of 69 points)
+${\sim}1.4$--$1.6\times$ offset earlier read as an AIC-versus-silicon gap
+at that resolution is an execution-\emph{stack} difference (the
+HuggingFace-transformers eager path is slower than the serving engine's own
+kernels); against vLLM's own vision tower at $448^2$ the cost model matches
+to within $12.8\%$ across the $N\le64$ regime
 (Appendix~\ref{app:engine-sensitivity}).
 
 {\renewcommand{\sectionmark}[1]{}%
@@ -201,9 +188,8 @@ vision pool. Each pool is graded against the thesis's evaluation
 SLA, tail-based by design because burst-time tails are the
 failure mode under study: the language pool must hold TTFT p99
 $<\SI{1}{\second}$ \emph{and} inter-token latency (ITL, the per-token
-decode gap that TPOT summarizes) p99 $<\SI{100}{\milli\second}$
-(first token within a second and at least 10~tokens/s for the worst
-percentile user); the vision pool must hold encoder delay p99
+decode gap that TPOT summarizes) p99 $<\SI{100}{\milli\second}$; the vision
+pool must hold encoder delay p99
 $<\SI{1}{\second}$, matching the language TTFT budget. This encoder
 percentile is taken over \emph{all} requests --- a text-only request
 incurs zero encoder delay, so it is a user-population tail, not a
@@ -212,42 +198,25 @@ variant is reported alongside it where the distinction matters
 (Chapter~\ref{cap:baselines}). Summing the two
 stage budgets gives ${\approx}\SI{2}{\second}$ to first token at roughly
 the p98 level (a union bound over two p99s, not an end-to-end p99
-guarantee). Reconstructed on the aggregate composed run --- recovering
-each request's ingress time and adding its replay-recorded encoder delay
-(recovered exactly, p99 \SI{588}{\milli\second}) to its per-request
-prefill TTFT (modelled by AIC and validated against the week replay to
-within 8.5\% at p99: \SI{706}{} modelled versus \SI{651}{\milli\second}
-replayed), a modelled reconstruction rather than a request-linked replay
-measurement --- the ingress-to-first-token p99 is
-${\approx}\SI{1.30}{\second}$: the per-request joint reconstruction,
-each request's replay-recorded encoder delay plus its modelled prefill.
-(A lower estimate of ${\approx}\SI{1.24}{\second}$ follows from summing
-the replay's own \emph{aggregate} TTFT tail, \SI{651}{} rather than the
-modelled \SI{706}{\milli\second}, with the encoder tail under the same
-near-comonotonic coupling --- a marginal sensitivity, not a second joint
-reconstruction.) Chapter~\ref{cap:closedloop} later replaces this
-reconstruction with a \emph{measured} request-linked join on the same
-window, which puts the composed p99 at \SI{1240}{\milli\second}
-(Table~\ref{tab:cl-ledger-joint}) --- consistent with the lower estimate
-here --- and shows that the naive sum of the two marginals is exact only
-while neither pool queues, overstating the composed tail by up to
-21.9\% once reactive control lets the encoder back up. Either way it is close to the naive sum of
-the two marginals (${\approx}\SI{0.59}{}$ plus ${\approx}\SI{0.65}{}$--%
-$\SI{0.71}{\second}$) rather than
-their max, because the two tails are positively correlated ($r{=}0.53$ on
-image-bearing requests): the same frames-class requests drive both large
-encoder batches and long prefills. It sits within the \SI{2}{\second}
-union budget but is roughly twice either per-stage marginal, so the two
-separately reported percentiles understate the modelled first-token wait.
+guarantee). A modelled reconstruction on the composed run ---
+each request's replay-recorded encoder delay plus its AIC-modelled
+prefill --- puts the ingress-to-first-token p99 at
+${\approx}\SI{1.3}{\second}$: within the \SI{2}{\second} budget but close to
+the naive \emph{sum} of the marginals rather than their max, because the two
+tails are positively correlated (the same frames-class requests drive both
+large encoder batches and long prefills).
+Chapter~\ref{cap:closedloop} replaces this with a \emph{measured}
+request-linked join (Table~\ref{tab:cl-ledger-joint}), showing the naive sum
+is exact only while neither pool queues, so the separately reported
+per-stage percentiles understate the modelled first-token wait.
 The
 specific bounds double Dynamo's default planner targets
 ($500/\SI{50}{\milli\second}$, window-mean) applied as tail bounds,
-an interactivity envelope consistent with common practice in
-disaggregated-serving evaluations~\cite{Zhong2024DistServe,Patke2025Chiron}.
-(The reactive baseline of the next chapter regulates on those
-native \emph{window-mean} targets; that is
-its control law, evaluated like every other policy against the bounds
-above.) Terminology: a burst \emph{episode} is a contiguous
+consistent with common practice in
+disaggregated-serving evaluations~\cite{Zhong2024DistServe,Patke2025Chiron};
+the next chapter's reactive baseline regulates on those native
+\emph{window-mean} targets but is graded against these tail bounds like every
+policy. Terminology: a burst \emph{episode} is a contiguous
 above-p99 excursion of the image signal as defined in
 Chapter~\ref{cap:trace-eda}; a \emph{scenario window} is the trace slice
 a simulation runs, enveloping an episode with calm margin. Two windows
@@ -274,14 +243,11 @@ frames-class prefill floor at TP1 (a TP2$\times$2 shape passes the same
 window at \SI{748}{\milli\second}, Section~\ref{sec:sim-knees}), the
 vision pool through queueing. The last column reports TTFT p99 for
 language rows and encoder-delay p99 for vision rows. \emph{Provenance
-caveat:} the underlying sweep set is not runtime-homogeneous. The
-language/steady/AIC curve's $s{=}3$ point was produced under the
-source-built runtime while its $s{=}1$, $2$, $4$ and $16$ points come from
-the earlier wheel-based build; the burst row and the \SI{748}{\milli\second}
-figure above are source-built throughout. The tabulated knee is not
-sensitive to this: $s{=}2$ meets every bound and the $s{=}3$ inter-token p99
-of \SI{109.51}{\milli\second} breaches the \SI{100}{\milli\second} bound with
-margin well above the inter-runtime spread reported above.}
+caveat:} the underlying sweep set mixes source-built and wheel-based
+runtimes (per-point attribution in Appendix~\ref{ap:artifacts}); the
+tabulated knee is not sensitive to this: $s{=}2$ meets every bound and the
+$s{=}3$ inter-token p99 breaches the \SI{100}{\milli\second} bound
+outright.}
 \label{tab:sim-knees}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -321,19 +287,16 @@ single load axis serves both pools.}
 
 On the steady head the separation
 is an order of magnitude: the vision pool is uncrossed at $32\times$ the
-trace rate while the language pool's knee sits at $s{=}3$ (polynomial) or
-$s{=}2$ (calibrated, failing at $s{=}3$). Since the sweep is
-octave-spaced above $s{=}4$, the demonstrated separation is a factor
-${>}10$ under calibrated timing, and sizing both pools off one signal
-would overprovision the encoder fleet by that factor in calm traffic. A
-second structural fact falls out of the dual-bound SLA: the steady-window
-language pool is \emph{decode-bound}, not TTFT-bound. At the knee's
-successor point the TTFT budget still has $1.8$--$2.1\times$ slack while
-ITL p99 has crossed ($154$ at $s{=}4$ polynomial; $110$ at $s{=}3$
-calibrated, both in \si{\milli\second}), so language-pool capacity under
-an interactive SLA is set by sustained token throughput per user, the
-axis the 235B spot-check of Section~\ref{sec:sim-timing} stresses
-further.
+trace rate while the language knee sits at $s{=}3$ (polynomial) or
+$s{=}2$ (calibrated). Since the sweep is octave-spaced above $s{=}4$, the
+separation is a factor ${>}10$ under calibrated timing, so sizing both pools
+off one signal would overprovision the encoder fleet by that factor in calm
+traffic. A second structural fact falls out of the dual-bound SLA: the
+steady-window language pool is \emph{decode-bound}, not TTFT-bound --- at the
+knee's successor point the TTFT budget still has $1.8$--$2.1\times$ slack
+while ITL p99 has crossed, so language-pool capacity under an interactive SLA
+is set by sustained token throughput per user, the axis the 235B spot-check
+of Section~\ref{sec:sim-timing} stresses further.
 
 Inside the burst window, calibrated timing overturns the polynomial's
 language-pool verdict: under the polynomial the
@@ -347,8 +310,7 @@ through 16 TP1 workers on this window). At the naive topology the
 burst thus breaks \emph{both} pools, and the two failures differ
 structurally. The language pool's is a per-request compute floor: visible
 in any TTFT dashboard, and removed by one static parallelism
-decision. TP2 at the same worker count (doubling the GPUs per worker,
-four in total) passes the window with
+decision. TP2 at the same worker count (four GPUs in total) passes the window with
 \SI{748}{\milli\second} TTFT p99 and \SI{6.6}{\milli\second} ITL p99 ---
 the full SLA, with margin, at the episode's rate. The vision pool's
 failure has no such fix: its p99 encoder delay
@@ -358,26 +320,20 @@ mean-utilization monitors (the minute-mean stays low even as the 1-minute
 peak busy fraction reaches 0.90), and yields only to capacity (the grid,
 AIC-costed: six
 encoder workers, $3\times$ this topology, are needed at the trace's own
-rate). At the SLA-shaped language configuration the contrast holds
-verbatim: fed the same requests at the trace's own recorded rate, the
-vision pool violates its bound while the language pool meets the full
-SLA.
+rate).
 
 Figure~\ref{fig:sim-burst-queue} exposes the mechanism in the vision
 pool. The window's 7{,}716 frames-class requests (${>}64$ images each)
-decompose into 56{,}510 chunk units of at most 64 images; with the
-smaller requests batched behind them, the pool executes 83{,}376 forwards
-over the window (every forward at most \SI{316.4}{\milli\second}),
-and arrivals clump: the worst second lands 2{,}726 images at once. Behind
-a strict FIFO, a frames flood therefore monopolizes \emph{every} worker at
-once: the backlog exceeds 1{,}000 queued images for 805 seconds spread
-across the eight-hour window, peaking at 4{,}701, each excursion a
-multi-second p99 event, yet the pool drains fully between
-excursions. This is the provisioning
-gap in its sharpest form: request rate (\SI{2.2}{req/s}, unremarkable),
-mean utilization (29\%), and every minute-averaged signal read healthy
-while the tail SLA is violated episodically all day. Catching it
-requires watching (or
+decompose into chunk units of at most 64 images that, with smaller requests
+batched behind them, drive 83{,}376 forwards over the window; arrivals
+clump, the worst second landing 2{,}726 images at once. Behind a strict
+FIFO, a frames flood monopolizes \emph{every} worker at once: the backlog
+exceeds 1{,}000 queued images for 805 seconds across the eight-hour window,
+peaking at 4{,}701, each excursion a multi-second p99 event, yet the pool
+drains fully between excursions. This is the provisioning
+gap in its sharpest form: request rate, mean utilization, and every
+minute-averaged signal read healthy while the tail SLA is violated
+episodically all day. Catching it requires watching (or
 forecasting) the image signal itself, at the horizons
 Chapter~\ref{cap:predictors} showed to be forecastable.
 
@@ -386,11 +342,9 @@ Chapter~\ref{cap:predictors} showed to be forecastable.
 \includegraphics[width=\linewidth]{figuras/sim/sim_burst_queue}
 \caption{Inside the burst window at the trace's own rate: offered image
 load (top, 1-minute mean of the per-second series) and the encoder pool's
-queued-image depth (bottom, per second). The queue repeatedly spikes past
-1{,}000 images (peaking at 4{,}701) and fully drains between spikes,
-so the window's \emph{mean} utilization stays at 29\% while p99 encoder
-delay reaches \SI{5.0}{\second}: episodic FIFO head-of-line blocking by
-frames-class floods, invisible to rate- or mean-utilization monitoring.}
+queued-image depth (bottom, per second). The queue repeatedly spikes and
+fully drains between spikes --- the episodic FIFO head-of-line blocking
+behind frames-class floods analyzed in the text.}
 \label{fig:sim-burst-queue}
 \end{figure}
 
@@ -398,11 +352,10 @@ frames-class floods, invisible to rate- or mean-utilization monitoring.}
 \label{sec:sim-limitations}
 
 The evaluation SLA's specific bounds (\SI{1}{\second}/\SI{100}{\milli\second}/%
-\SI{1}{\second}) are a design choice: defensible for interactive
-multimodal serving, but the knee positions shift with them (under a lax
-TTFT-only \SI{2}{\second} bound the language knees sit one to two octaves
-higher); the sweep curves themselves are SLA-free and re-derivable under
-any bounds. The topology is locked at 2$\times$2 workers here; the
+\SI{1}{\second}) are a design choice: the knee positions shift with them
+(under a lax TTFT-only \SI{2}{\second} bound the language knees sit one to
+two octaves higher), though the sweep curves are SLA-free and re-derivable
+under any bounds. The topology is locked at 2$\times$2 workers here; the
 worker-count grid is the static-optimal baseline's search space, not this
 chapter's. Language-pool results are reported for the 8B at TP1, with
 a TP2$\times$2 spot-check on the burst window and
@@ -416,10 +369,8 @@ is trusted from AIC's shipped \texttt{h100\_sxm} database and Dynamo's
 engine, and is not --- and within this work cannot be --- re-validated
 against physical H100 measurement. The polynomial-versus-AIC comparison
 quantifies the conclusions' \emph{sensitivity} to that timing model, which
-is not the same as its accuracy; the steady-window knee moves by one
-sweep step between the two models ($s{=}3$ polynomial to $s{=}2$
-calibrated, a factor $1.5$ in offered load, $8.3\to5.5$~req/s) and the burst
-verdict changes outright. One pricing caveat carries over: requests
+is not the same as its accuracy; the steady-window knee moves by one sweep
+step between the two models and the burst verdict changes outright. One pricing caveat carries over: requests
 beyond the \texttt{h100\_sxm} grid's \num{16384}-token edge
 (${\approx}3.1\%$ of the trace, up to ${\approx}149$k tokens, including
 the frames-class prefills that decide the burst-window TTFT tail)
@@ -427,27 +378,19 @@ are priced by extrapolation (Section~\ref{sec:aic-composition}).
 
 \emph{Per-request token accounting mixes conventions, with aligned
 biases.} The simulation costs encoder work as a full $448^2$ forward per
-image, ships $196 \times 4096$ post-merge tokens per image across the
-seam, and sets the language pool's prefill length to the trace's
-\texttt{ContextTokens} verbatim, which embeds the \emph{traced}
-model's vision tokenization at ${\approx}277 \to 66$ tokens per image at
-scale (Chapter~\ref{cap:trace-eda}). The last two describe the same
-tensor inconsistently: under the simulation's own encoder assumptions a
-Qwen3-VL-consistent prefill for the median top-1\% frames request would
-be ${\geq}529 \times 196 \approx 104$k tokens, roughly $3\times$ the
-recorded ${\approx}36$k. Frames-class language-pool work is thus
-undercounted relative to the target model (making the language pool look
-better in bursts), while the uniform full-compute $448^2$ assumption
-likely overstates frames-class encoder work relative to the traced
-production model (making the vision pool look worse). Both biases lean
-toward the burst asymmetry reported above; the TP1 prefill floor is
-robust to them (at $3\times$ the tokens it worsens), but the TP2 margin
-is not: under the 196-per-image convention the frames-class prefills
-would strain even TP2. The honest reading is that the burst-window
-language verdict is convention-dependent while the vision verdict is
-not. The choice made here (\texttt{ContextTokens} verbatim) keeps
-the workload self-consistent with the trace at the cost of
-target-model consistency; a both-conventions sensitivity run remains future work.
+image and ships $196 \times 4096$ post-merge tokens per image across the
+seam, but sets the language pool's prefill length to the trace's
+\texttt{ContextTokens} verbatim --- which embeds the \emph{traced}
+model's vision tokenization (${\approx}66$ tokens per image,
+Chapter~\ref{cap:trace-eda}), roughly $3\times$ below a
+Qwen3-VL-consistent 196-per-image prefill. Frames-class language work is
+thus undercounted (making the language pool look better in bursts) while the
+uniform $448^2$ assumption overstates frames-class encoder work (making the
+vision pool look worse); both biases lean toward the burst asymmetry above.
+The TP1 prefill floor is robust to them (it worsens at $3\times$ the tokens);
+the TP2 margin is not. The honest reading: the burst-window language verdict
+is convention-dependent while the vision verdict is not, and a
+both-conventions sensitivity run remains future work.
 
 All encoder timing derives from a single RTX~5090 node (locked clocks);
 cross-unit silicon variance is unquantified. The vision pool inherits
@@ -458,58 +401,43 @@ workload would run ${\approx}4\times$ cheaper per image and a
 $672^2$-dominated one ${\approx}2.25\times$ dearer, shifting knee
 positions but not the queueing mechanism). Because image sizes are not
 recorded, that assumption can only be stress-tested, not validated.
-Repricing the encoder through the collected RTX~5090 operator database
-at other resolutions --- AIC's own operators against the same
-\texttt{rtx\_5090/vllm-0.22.0} performance database --- the burst-window
-verdict holds at $448^2$ and below on both modelled fabrics, and the
-closed-form service floor $f(64) + \SI{272}{\milli\second} \times
-(\text{px}/32)^2/196$ places the crossing near 690--705\,px on a
-\SI{100}{\giga bit\per\second} link, so the assumed resolution sits just
-below it. The structural finding is the more useful one: provisioned
-worker-time is \emph{invariant} across image size (\num{32228.0}
-worker-seconds for every burst3 cell on both fabrics), because the
-p90 schedule is driven by image \emph{count} and is therefore blind to
-\emph{size}. A size increase arrives as pure service-time inflation with
-no provisioning response at all --- unlike the engine-cost gap above,
-which the p90 headroom absorbs with no added workers. Four limits bound
-this: the ladder grades 448 cells, all on burst windows; the
-$672^2$ cell that passes on the faster fabric does so by only $6.1\%$
-(\SI{938.7}{\milli\second} against the \SI{1000}{\milli\second} bound)
-and reflects the single-stream handoff assumption as much as line rate;
-the $896^2$ cells extrapolate beyond the collected batch axis; and every
-size distribution is \emph{assumed}, since the trace records counts
-only. The window scope is binding in particular: on the sustained
-24-hour window the $672^2$ configuration misses the bound on
-\emph{both} fabrics (\SI{1972}{} and \SI{1927}{\milli\second}), so the
-fabric margin at that resolution is a burst-window result and must never
-be quoted without its window. The dispatch cap is not the
-source of the burst verdict (p99 encoder delay 5.2/5.0/\SI{6.7}{\second}
-at caps of 32/64/128, the last extrapolating beyond the collected batch
-range); the handoff term remains the bandwidth-only,
-DeepStack-undercounting bound of Section~\ref{sec:sim-encoder}, not a
-measured NIXL curve. Request ingress (image fetch/decode,
+Repricing the encoder at other resolutions through the collected RTX~5090
+operator database (per-cell numbers in Appendix~\ref{ap:artifacts}), the
+burst-window verdict holds at $448^2$ and below on both modelled fabrics,
+with the service floor crossing the bound near 690--705\,px, so the assumed
+resolution sits just below it. The structural finding is more useful:
+provisioned worker-time is \emph{invariant} across image size, because the
+schedule is driven by image \emph{count} and is blind to \emph{size} --- a
+size increase arrives as pure service-time inflation with no provisioning
+response, unlike the engine-cost gap above, which p90 headroom absorbs with
+no added workers. Two scope limits bind: the $672^2$ margin on the faster
+fabric is thin and reflects the single-stream handoff assumption, and on the
+sustained 24-hour window $672^2$ misses the bound on \emph{both} fabrics ---
+so that fabric margin is a burst-window result and must never be quoted
+without its window ($896^2$ cells extrapolate beyond the collected batch
+axis, and every size distribution is \emph{assumed}). The dispatch cap is
+not the source of the burst verdict (verified across caps 32/64/128); the
+handoff term remains the bandwidth-only, DeepStack-undercounting bound of
+Section~\ref{sec:sim-encoder}, not a measured NIXL curve. Request ingress (image fetch/decode,
 preprocessing, tokenization, front-end queueing) is not simulated;
 the boundary is accelerator-side service and queueing.
 Encoder delays fold into language-pool arrivals through the trace seam,
 which serializes the pools per request (no speculative overlap of encoder
 and prefill work); this is conservative for composed TTFT (overlap could only
 lower it). Finally, per-pool knees were measured with the other pool
-absent by construction (isolation trace / converter-only), which
-makes them attributable. Composed-system claims are made only where
-composed runs exist (the baseline chapter's grid, which re-derives the
-per-window optima on encoder-delay-shifted traces across all six burst
-windows and a 24-hour steady window), and the steady head used here is
+absent (isolation trace / converter-only), making them attributable;
+composed-system claims are made only where composed runs exist (the baseline
+chapter's grid, which re-derives per-window optima across all six burst
+windows and a 24-hour steady window). The steady head used here is
 vision-lean (2.9 images per request against the trace's ${\approx}14$),
 which the 24-hour steady window corrects.
 
 \section{Summary}
 
-The two-pool simulation now runs the real trace end to end on calibrated
-timing for both pools: an encoder pool following an exact, probe-verified
-batching law with a bounded inter-pool handoff, and a language pool whose
-calibrated timing surfaces the tails the default polynomial hides. Under
-arrival-speedup sweeps and a tail-based interactive SLA, the composed
-system reproduces the thesis's motivating claim as measured behavior:
+The two-pool simulation runs the real trace end to end on calibrated
+timing for both pools, and under arrival-speedup sweeps against a tail-based
+interactive SLA it reproduces the thesis's motivating claim as measured
+behavior:
 on steady traffic the pools saturate an order of magnitude apart, and
 inside the largest burst both fail at the naive topology, differently
 --- a removable TP1 prefill floor against episodic FIFO queueing that

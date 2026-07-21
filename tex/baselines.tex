@@ -14,81 +14,66 @@ fleet and a \emph{reactive} autoscaler. Both are established here on the
 platform of Chapter~\ref{cap:twopool}, under the evaluation SLA
 defined there (per window: language TTFT p99 $<$ \SI{1}{\second} and ITL
 p99 $<$ \SI{100}{\milli\second}; encoder delay p99 $<$
-\SI{1}{\second}), and scored together with provisioned GPU-time
-\emph{per hardware class} (RTX~5090-class worker-seconds for the encoder
-pool, H100 GPU-hours for the language pool; never summed across classes).
+\SI{1}{\second}), and scored on provisioned GPU-time \emph{per hardware
+class} (RTX~5090-class worker-seconds for the encoder pool, H100
+GPU-hours for the language pool; never summed across classes).
 
 \paragraph{From order or from readiness: the pools bill differently.}
-The two classes are also billed from different instants, and the
-difference must be stated rather than assumed away. The language-pool
-GPU-hour figures reported throughout this thesis bill from instance
-\emph{order} rather than readiness: the discrete-event mocker integrates
-the \emph{provisioned} worker count --- active, starting-up and draining
-alike --- so the startup ramp and the scale-down drain tail are already
-inside every reported language GPU-hour, and \emph{no cold-start
-surcharge may be added to it}. The encoder pool applies cold start by
-delaying availability instead, and therefore bills from
-\emph{readiness}; its cold-start component is reported separately as a
-warm-up column (Section~\ref{sec:cl-ledger-enc}). A composed two-pool
-total consequently mixes the two conventions and must state which
-applies to which pool --- a second reason, beyond hardware class, that
-the two are never summed. The language convention is read directly off
-the mocker's collector and corroborated numerically over the 52 language
-runs of this thesis: the order-time staircase integral reproduces every
-reported GPU-hour to within $1.0\%$, whereas a readiness-lagged
-counterfactual --- each run charged from its own startup time --- falls
-$3.5$--$38.0\%$ short on the reactive arms, which up-step most often.
+The two classes bill from different instants. Language-pool GPU-hours
+bill from instance \emph{order}, not readiness: the discrete-event
+mocker integrates the \emph{provisioned} worker count --- active,
+starting-up and draining alike --- so the startup ramp and scale-down
+drain tail are already inside every reported language GPU-hour, and
+\emph{no cold-start surcharge may be added to it}. The encoder pool bills
+from \emph{readiness}, its cold-start reported separately as a warm-up
+column (Section~\ref{sec:cl-ledger-enc}). Mixing the two conventions is a
+second reason, beyond hardware class, the classes are never summed; the
+order-time convention is read off the mocker's collector and corroborated
+over the language runs (Appendix~\ref{ap:artifacts}).
 
-Both baselines get every structural advantage the predictive policy
-of Chapter~\ref{cap:closedloop} will have: the same windows,
-actuation mechanics, and cold-start leads. Whatever
-separates the policies is therefore information, not plumbing.
+Both baselines get every structural advantage the predictive policy of
+Chapter~\ref{cap:closedloop} will have --- same windows, actuation
+mechanics, cold-start leads --- so whatever separates the policies is
+information, not plumbing.
 
 \section{Protocol}
 \label{sec:base-protocol}
 
 The workload windows are the six largest burst episodes of
-Chapter~\ref{cap:trace-eda} (peak 1-minute image rates 337--370
-\si{img/s}, onsets 1--220 minutes) plus the calmest full day of the trace
-(2024-10-19; peak \SI{57}{img/s}) as the steady reference --- all shaded
-in place on the week in Figure~\ref{fig:eda-windows}. Each burst window
+Chapter~\ref{cap:trace-eda} (onsets 1--220 minutes) plus the calmest full
+day of the trace (2024-10-19; peak \SI{57}{img/s}) as the steady
+reference --- all shaded on the week in Figure~\ref{fig:eda-windows}. Each burst window
 brackets its episode with a $\pm$10-minute calm margin (the median-crossing
 envelope of Section~\ref{sec:eda-vision}), so every replay begins and ends
-with a drained encoder queue; this padded span sets the
+with a drained encoder queue and this padded span sets the
 window's GPU-time denominator. Two episodes
 (burst2/6) fall in the trace's first 1.4 days, reserved as forecast
-context (the temporal split is stated in
-Chapter~\ref{cap:closedloop}); they are graded here by every
-policy that needs no archived forecast (the static grid, the
-language-pool reactive baseline, and the reactive encoder baseline ---
-the reactive planner's own ARIMA loop is internal, not the archived
-zero-shot forecast these windows lack), but not by any forecast policy.
-Each policy
-produces, per window, a worker schedule for the encoder pool ($C(t)$
-workers) and a configuration or replica schedule for the language pool
-($\mathrm{TP}\times N$ H100 workers), and is graded on the two-pool replay. Cold-start lead is modeled explicitly: a scale-up
+context (temporal split, Chapter~\ref{cap:closedloop}); they are graded
+here only by the forecast-free policies --- the static grid and both
+reactive baselines (ARIMA loop internal, not the archived forecast these
+windows lack). Each policy produces, per window, a worker schedule for
+the encoder pool ($C(t)$ workers) and a configuration or replica schedule
+for the language pool ($\mathrm{TP}\times N$ H100 workers), graded on the
+two-pool replay. Cold-start lead is modeled explicitly: a scale-up
 decision issued at $t$ delivers usable capacity at $t+L$, with $L$
-swept per pool (encoder $L \in \{15,30,45,300\}$\,\si{\second},
-brackets spanning orchestration regimes above the measured
-3--5\,\si{\second} model-side floor; language
+swept per pool (encoder $L \in \{15,30,45,300\}$\,\si{\second}, above the
+measured 3--5\,\si{\second} model-side floor; language
 $L \in \{60,\ldots,300\}$\,\si{\second}, the weight-loading regime).
 Scale-downs take effect immediately, guarded by a 3-minute hysteresis.
 
 \section{The static optimum: burst-shaped, calm-day expensive}
 \label{sec:base-static}
 
-A grid search (encoder workers $C$ crossed with
-language shapes $\mathrm{TP}\times N$, refined around the feasibility
-frontier; 101 evaluated points, all archived) yields the smallest
-grid-feasible fleet per window
-(Table~\ref{tab:base-grid}).
+A grid search (encoder workers $C$ crossed with language shapes
+$\mathrm{TP}\times N$, refined around the feasibility frontier; 101 points
+archived, Appendix~\ref{ap:artifacts}) yields the smallest grid-feasible
+fleet per window (Table~\ref{tab:base-grid}).
 
 \begin{table}[htbp]
 \centering
 \caption{Static-optimal fleet per window under the evaluation SLA.
-$C^{*}$ is the minimum feasible encoder-worker count;
-the language optimum is the cheapest feasible
-$\mathrm{TP}\times N$ shape. GPU-time is per hardware class over the
+$C^{*}$: minimum feasible encoder-worker count; LLM shape: cheapest
+feasible $\mathrm{TP}\times N$. GPU-time per hardware class over the
 window span.}
 \label{tab:base-grid}
 \small
@@ -107,33 +92,25 @@ steady (24 h) & 24.0 & 2 & TP1$\times$2 & 48.0 & 48.0 \\
 \end{tabular}
 \end{table}
 
-The encoder $C^{*}$ minimize the all-request encoder-delay p99
+The encoder $C^{*}$ minimizes the all-request encoder-delay p99
 (Chapter~\ref{cap:twopool}); under the stage-conditional metric
-(image-bearing requests only, excluding the ${\approx}50\%$ text-only
-requests that never enter the encoder) the burst optima rise by one to
-two workers --- burst1 to 7, burst3/burst4 to 8, burst6 to 8
-(58.2/3.6/25.2/10.9 5090-hours), burst2/burst5/steady unchanged. The
-deployable static $C{=}8$ is the same under either metric --- the binding
-burst windows peak at eight workers either way --- so the choice of
-metric reshapes only the per-window table, not the deployable fleet that
-carries the cost headline of Chapter~\ref{cap:closedloop}
-(0.62$\times$ static).
+(image-bearing requests only) the burst optima rise one to two workers,
+but the deployable static $C{=}8$ is unchanged --- binding burst windows
+peak at eight either way --- so the metric reshapes only the per-window
+table, not the deployable fleet behind the cost headline of
+Chapter~\ref{cap:closedloop} (0.62$\times$ static).
 
 Three structural facts follow. First, \textbf{every burst window forces
 the language pool to TP2, and the gain is the parallelism layout, not
 the GPU budget}. At TP1 no replica count is feasible: the burst's
 ${\approx}36$k-token frames-class prefills pin TTFT p99 at
-${\approx}$\SI{1285}{\milli\second} even at $N{=}16$. This is a
-\emph{prefill floor} that replica scaling cannot buy down. Four TP1
-replicas and one
+${\approx}$\SI{1285}{\milli\second} even at $N{=}16$, a \emph{prefill
+floor} replica scaling cannot buy down. Four TP1 replicas and one
 TP2$\times$2 group are both four H100s, yet TP1$\times$4 fails every
-burst window (TTFT p99 1{,}314--1{,}331\,\si{\milli\second}) while
-TP2$\times$2 passes every one (763--846\,\si{\milli\second}), a
-1.55--1.74$\times$ tail reduction from the layout alone
-(Table~\ref{tab:base-tp}). Intra-request tensor parallelism shortens the
-single long prefill that independent replicas can only queue;
-Chapter~\ref{cap:twopool} quotes \SI{748.4}{\milli\second} for
-the same shape on its isolation trace. Second, the encoder requirement
+burst window while TP2$\times$2 passes every one --- a 1.55--1.74$\times$
+tail cut from layout alone (Table~\ref{tab:base-tp}): intra-request
+tensor parallelism shortens the single long prefill that independent
+replicas can only queue. Second, the encoder requirement
 swings from 2 workers on the calm day to 8 on burst5: the
 order-of-magnitude missizing of Chapter~\ref{cap:trace-eda}, now as a
 fleet-sizing fact. Third, the single static fleet that survives
@@ -147,11 +124,11 @@ no frontier movement).
 
 \begin{table}[htbp]
 \centering
-\caption{Iso-cost tensor parallelism on the language pool. TP1$\times$4
-and TP2$\times$2 both cost four H100s; only the parallelism layout
-differs. TTFT p99 per burst window under the \SI{1000}{\milli\second}
-SLO (ITL p99 within bound in both columns); AIC timing on each window's
-composed trace at its static-optimal encoder count.}
+\caption{Iso-cost tensor parallelism on the language pool: TP1$\times$4
+and TP2$\times$2 both cost four H100s. TTFT p99 per burst window under the
+\SI{1000}{\milli\second} SLO (ITL p99 within bound in both columns); AIC
+timing on each window's composed trace at its static-optimal encoder
+count.}
 \label{tab:base-tp}
 \small
 \begin{tabular}{@{}lrrr@{}}
@@ -170,64 +147,40 @@ burst5 & 1{,}316 \emph{(fail)} & 781 \emph{(pass)} & 1.68$\times$ \\
 \section{Reactive control on the language pool}
 \label{sec:base-reactive-llm}
 
-The reactive baseline is Dynamo's SLA planner, the production
-controller of the platform this thesis targets, run through the same
-replay path in both its shipped load-based variant (A) and its
-SLA-target variant (B, ARIMA-driven throughput loop plus load loop).
-Across the seven windows this yields 14 configurations, each at its
-window's optimal TP shape.
+The reactive baseline is Dynamo's SLA planner, the production controller
+of the platform this thesis targets, run through the same replay path in
+both its shipped load-based variant (A) and its SLA-target variant (B,
+ARIMA-driven throughput loop plus load loop). Across the seven windows
+this yields 14 configurations, each at its window's optimal TP shape.
 \textbf{All fourteen configurations satisfy the planner's own control
-law (window-mean TTFT/ITL under its 500/50\,ms targets, with
-roughly 1.5--4$\times$ margin on window-mean TTFT and 5--7$\times$ on ITL) while violating the tail SLA} (TTFT p99
-1{,}079--3{,}495\,\si{\milli\second}; burst windows
-additionally fail ITL p99 at 121--162\,\si{\milli\second}). Variants A
-and B fail alike, so loop tuning is not the issue. The defect is the
-\emph{mean-based capacity conversion}: sizing replicas so mean
-throughput meets mean demand leaves no room for the tail the SLA
-prices.
+law (window-mean TTFT/ITL under its 500/50\,ms targets) while violating
+the tail SLA} (TTFT p99 up to 3{,}495\,\si{\milli\second}; burst windows
+additionally fail ITL p99). Variants A and B fail alike, so loop tuning
+is not the issue. The defect is the \emph{mean-based capacity
+conversion}: sizing replicas so mean throughput meets mean demand leaves
+no room for the tail the SLA prices.
 
 Nor can spend buy the tail back under realistic lead. Holding a 60-second
 replica lead and tightening the planner's window-mean targets from
 400/40 to 200/20\,\si{\milli\second} on burst1 raises GPU-hours
-monotonically (18.6\,$\to$\,20.4) while TTFT p99 stays pinned at
-1{,}616--1{,}620\,\si{\milli\second} --- a 10\% spend increase buying
-nothing (Table~\ref{tab:base-ladder}). Burst1's onset is 220 minutes, so
-a trailing window sees it in ample time; tightening the window-\emph{mean}
-targets nonetheless cannot buy the tail, because the sizing stays
-mean-based. The failure here is the \emph{conversion}, not thrift, and not
-timing --- the complement of the fast-onset case, where timing is decisive
-(the encoder triad above).
-
-\begin{table}[htbp]
-\centering
-\caption{Reactive target ladder on burst1 under a 60-second replica
-lead: tightening the window-mean control targets raises spend without
-moving the tail.}
-\label{tab:base-ladder}
-\small
-\begin{tabular}{@{}lrrr@{}}
-\toprule
-Planner target (TTFT/ITL, ms) & H100 GPU-h & TTFT p99 (ms) & ITL p99 (ms) \\
-\midrule
-400 / 40 & 18.6 & 1{,}619.6 & 127.1 \\
-300 / 30 & 19.2 & 1{,}616.6 & 126.5 \\
-250 / 25 & 19.4 & 1{,}616.0 & 126.2 \\
-200 / 20 & 20.4 & 1{,}615.5 & 125.1 \\
-\bottomrule
-\end{tabular}
-\end{table}
+monotonically (18.6\,$\to$\,20.4) while TTFT p99 stays pinned near
+1{,}616\,\si{\milli\second} --- a 10\% spend increase buying nothing.
+Burst1's 220-minute onset gives a trailing window ample time, yet
+tightening the mean targets still cannot buy the tail: the failure is the
+conversion, not thrift or timing (the complement of the fast-onset
+encoder case below).
 
 \section{Reactive control on the encoder pool}
 \label{sec:base-reactive-enc}
 
 The encoder pool has no native reactive controller, so the fair strawman
-is \emph{identically informed} with the predictive
-policy of the next chapter: the same worker-mapping law (workers
-$= \lceil \text{demand} / \rho \rceil$ at per-worker capacity rating
-$\rho$ \si{img/s}, hysteresis 3 minutes, lead $L$), fed by the trailing
-window of the \emph{observed image rate} --- the correct per-pool signal,
-observed rather than forecast. Table~\ref{tab:base-react-enc} grades it
-at the chapter's operating rating ($\rho{=}15$) across cold-start leads.
+is \emph{identically informed} with the next chapter's predictive policy:
+the same worker-mapping law (workers $= \lceil \text{demand} / \rho
+\rceil$ at per-worker capacity rating $\rho$ \si{img/s}, hysteresis 3
+minutes, lead $L$), fed by the trailing window of the \emph{observed
+image rate} --- the correct per-pool signal, observed not forecast.
+Table~\ref{tab:base-react-enc} grades it at the operating rating
+($\rho{=}15$) across cold-start leads.
 
 \begin{table}[htbp]
 \centering
@@ -236,59 +189,53 @@ at the chapter's operating rating ($\rho{=}15$) across cold-start leads.
 SLA violation. $L^{*}$ = largest lead at which the SLA holds.}
 \label{tab:base-react-enc}
 \small
-\begin{tabular}{@{}lrrrrl@{}}
+\begin{tabular}{@{}lrrl@{}}
 \toprule
-Window & $L{=}15$\,s & 30\,s & 45\,s & 300\,s & $L^{*}$ \\
+Window & $L{=}15$\,s & 300\,s & $L^{*}$ \\
 \midrule
-burst1 (onset 220\,min) & 588 & 588 & 588 & 638 & 300\,s \\
-burst2 (onset 48\,min) & 588 & 588 & 588 & \textbf{4{,}282} & 45\,s \\
-burst3 (onset 1\,min) & \textbf{9{,}481} & \textbf{16{,}079} &
-\textbf{28{,}342} & \textbf{54{,}170} & none \\
-burst4 (onset 60\,min) & 588 & 588 & 588 & \textbf{3{,}063} & 45\,s \\
-burst5 (onset 35\,min) & 588 & 588 & 588 & \textbf{6{,}729} & 45\,s \\
-burst6 (onset 1\,min) & 588 & 749 & 905 & \textbf{4{,}606} & 45\,s \\
-steady (24\,h) & 548 & 682 & 734 & 884 & 300\,s \\
+burst1 (onset 220\,min) & 588 & 638 & 300\,s \\
+burst2 (onset 48\,min) & 588 & \textbf{4{,}282} & 45\,s \\
+burst3 (onset 1\,min) & \textbf{9{,}481} & \textbf{54{,}170} & none \\
+burst4 (onset 60\,min) & 588 & \textbf{3{,}063} & 45\,s \\
+burst5 (onset 35\,min) & 588 & \textbf{6{,}729} & 45\,s \\
+burst6 (onset 1\,min) & 588 & \textbf{4{,}606} & 45\,s \\
+steady (24\,h) & 548 & 884 & 300\,s \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The pattern tracks onset speed and peak volume together. Slow ramps
 (burst1, the calm day) are reactive-scalable at any tested lead; medium
-onsets survive only sub-minute leads ($L^{*}{=}$\SI{45}{\second},
-below the lead times realistically available to pod-scheduled GPU
-workers). The two fastest onsets diverge by volume: burst6's one-minute
-onset is caught at short leads ($L^{*}{=}$\SI{45}{\second}) because its
-peak (\SI{337}{img/s}) drains within a batch, whereas burst3's
-one-minute onset defeats the controller at \emph{every} lead, including
-\SI{15}{\second} (p99 encoder delay 9.5--54\,\si{\second}, degrading
-toward the never-scaled limit). It is the same peak arriving against a
-thinner request stream, so the backlog outlasts any affordable lead.
-Watching the right signal is necessary but not sufficient: against a
-fast, high-volume onset, no affordable lead delivers workers before the
-queue does the damage.
+onsets survive only sub-minute leads ($L^{*}{=}$\SI{45}{\second}, below
+what pod-scheduled GPU workers realistically offer). The two fastest
+onsets diverge by volume: burst6's one-minute onset is caught at short
+leads ($L^{*}{=}$\SI{45}{\second}) because its peak (\SI{337}{img/s})
+drains within a batch, whereas burst3's one-minute onset defeats the
+controller at \emph{every} lead, including \SI{15}{\second} (p99 encoder
+delay 9.5--54\,\si{\second}). It is the same peak against a thinner
+request stream: watching the right signal is necessary but not
+sufficient, since against a fast, high-volume onset no affordable lead
+delivers workers before the queue does the damage.
 
 \section{Summary}
 \label{sec:base-summary}
 
-The static optimum is
-burst-shaped: deployable only as 8 encoders + TP2$\times$2, i.e.\
-$4\times$/$2\times$ calm-day overprovisioning plus a TP-shape change no
-replica scaler performs (RQ1's missizing, priced). The reactive
-alternative fails on both pools for the same structural reason,
-information arriving too late and converted through means: all fourteen
-language-pool configurations meet their own window-mean law while
-violating the tail SLA; spend cannot buy the tail back under lead; and
-even the correct encoder signal read reactively loses every window whose
-onset is faster than the lead time. Both baselines are also exercised at
-full-trace scale, on all \num{1000000} requests of the seven-day trace
-and on both pools: there the deployable $C{=}8$ encoder fleet passes at
+The static optimum is burst-shaped: deployable only as 8 encoders +
+TP2$\times$2, i.e.\ $4\times$/$2\times$ calm-day overprovisioning plus a
+TP-shape change no replica scaler performs (RQ1's missizing, priced).
+The reactive alternative fails on both pools for one structural reason
+--- information arriving too late and converted through means: the
+fourteen language-pool configurations meet their own window-mean law
+while violating the tail SLA, spend cannot buy the tail back under lead,
+and even the correct encoder signal read reactively loses every window
+whose onset is faster than the lead. At full-trace scale
+(\num{1000000} requests), the deployable $C{=}8$ encoder fleet passes at
 encoder-delay p99 \SI{677}{\milli\second} while the calm-day $C{=}2$
 fleet fails at \SI{2905}{\milli\second}, and reactive encoder control
 holds the bound at \SI{588}{\milli\second} for 0.687$\times$ the
-deployable fleet's provisioned worker-time. That last figure is a real
-aggregate-scale saving and is reported as such; it does not overturn the
-per-window verdicts above, because the full trace is graded in aggregate
-only --- the same masking this chapter and
-Section~\ref{sec:cl-ledger} document --- and reactive control still loses
-burst3 whenever burst3 is graded on its own. Whether \emph{forecasting} those
-same per-pool signals closes the gap is the subject of the next chapter.
+deployable fleet's worker-time --- a real aggregate-scale saving, but
+graded in aggregate only (the same masking documented in
+Section~\ref{sec:cl-ledger}), so it does not overturn the per-window
+verdicts: reactive control still loses burst3 graded on its own. Whether
+\emph{forecasting} those same per-pool signals closes
+the gap is the subject of the next chapter.

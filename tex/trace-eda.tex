@@ -59,14 +59,11 @@ encoder work from \texttt{NumImages} separately.}
 All three request-level marginals carry large upper-tail mass relative
 to their medians: ``heavy-tailed'' in the operational sense used
 throughout this chapter
-(Table~\ref{tab:eda-percentiles}, Section~\ref{sec:eda-globals}).
-Tail-index estimates (Hill estimator over the top percentile of order
-statistics; indicative values, no formal goodness-of-fit claim):
-generated tokens are the heaviest (Hill ${\approx}1.9$), so decode-side
-capacity is quantile- rather than mean-driven; context tokens and image
-counts have tamer tails (Hill ${\approx}6.6$ and $7.2$). The top
-percentile of requests alone carries 15.2\% of all context tokens and 13.4\%
-of all generated tokens.
+(Section~\ref{sec:eda-globals}).
+By tail-index estimate (Hill estimator, indicative only), generated
+tokens are the heaviest, so decode-side capacity is quantile- rather
+than mean-driven, while context tokens and image counts have tamer
+tails.
 Multimodal requests have longer inputs but \emph{shorter} outputs than
 text-only requests (context median 1{,}422 vs.\ 792 tokens; generation
 median 80 vs.\ 147), a question-answering profile against longer-form
@@ -75,19 +72,14 @@ text chat.
 Unsupervised clustering of all requests on $\log(1{+}\text{images})$,
 $\log(1{+}\text{context})$, and $\log(1{+}\text{generated})$ renders
 four interpretable archetypes (Table~\ref{tab:eda-archetypes},
-Figure~\ref{fig:eda-clusters}). The fit is cuML $k$-means with $k{=}4$,
-which maximizes the silhouette over $k \in \{3,\dots,9\}$ at $0.388$,
-though only marginally over $k{=}8$ ($0.387$) and $k{=}3$ ($0.378$)
-(50k-point evaluation subsample, fixed seed); the separation is weak and
-the $k{=}4$ preference statistically a near-tie, so the groups are
-interpretive rather than sharply distinct. The
-video/frame-analysis archetype (3.4\% of requests)
-carries 85.7\% of all image volume and a third of
-all prefill tokens. It is the clustering's rendering of the
-threshold-defined \emph{frames class} used elsewhere
-($k{>}10$ grids: 2.7\% of requests, 81.2\% of image volume); the two
-definitions overlap but are not identical, hence the slightly different
-shares. Each archetype stresses a different serving
+Figure~\ref{fig:eda-clusters}). The fit is cuML $k$-means with $k{=}4$ (silhouette-selected over
+$k \in \{3,\dots,9\}$, a near-tie, so the groups are interpretive rather
+than sharply distinct). The video/frame-analysis archetype (3.4\% of
+requests) carries 85.7\% of all image volume and a third of all prefill
+tokens --- the clustering's rendering of the threshold-defined
+\emph{frames class} used elsewhere ($k{>}10$ grids: 2.7\% of requests,
+81.2\% of image volume), the two overlapping but not identical. Each
+archetype stresses a different serving
 stage: video jobs the vision encoder and prefill; conversational text
 decode; extraction-style requests almost nothing.
 
@@ -116,9 +108,7 @@ Vision: video/frame analysis    & 3.4\%  & \textbf{85.7\%} & 32.9\% & 400 / 31{,
 requests in the (context, generation) plane; the two text archetypes (blue,
 orange) separate by output length, the two vision archetypes (green) by scale.
 Right: the same groups in image-count space, where the video/frame archetype
-occupies the high-\texttt{NumImages} tail. A single serving endpoint receives
-four workloads that each stress a different stage (decode, encoder, or
-prefill), which is the disaggregation argument stated at the workload level.}
+occupies the high-\texttt{NumImages} tail.}
 \label{fig:eda-clusters}
 \end{figure}
 
@@ -127,20 +117,14 @@ prefill), which is the disaggregation argument stated at the workload level.}
 
 The arrival process is not Poisson at any operationally relevant scale:
 inter-arrival coefficient of variation 1.55, overdispersed per-second
-counts, and a Fano factor that keeps growing across the entire measured
-range of counting windows, from 1.8 at \SI{1}{\second} through 31.9 at
-one minute to 938 at one hour
-(Figure~\ref{fig:eda-arrival}; a seven-day record cannot establish
-asymptotically unbounded growth, but within the window every aggregation
+counts, and a Fano factor that keeps growing across the measured
+range of counting windows, from 1.8 at \SI{1}{\second} to 938 at one hour
+(Figure~\ref{fig:eda-arrival}; every aggregation
 scale an autoscaler could use is overdispersed).
 Spectrally, a diurnal harmonic family (\SI{24}{\hour} fundamental with
 weaker 12/8/\SI{6}{\hour} overtones) sits on a strong $1/f^{\beta}$
-long-range-dependent background.
-No sharp non-harmonic line dominates the sub-diurnal band above that
-background; the few sub-diurnal peaks that surface are consistent with
-sidelobes of the diurnal line in a seven-cycle record. Periods of
-\SI{84}{\hour} and above are record-length artifacts of the seven-day
-window rather than weekly cycles.
+long-range-dependent background, with no sharp non-harmonic line
+dominating the sub-diurnal band above it.
 
 \begin{figure}[htbp]
 \centering
@@ -150,8 +134,7 @@ inter-arrival survival curve is far heavier than the matched exponential.
 Middle: per-second counts are overdispersed against Poisson$(1.65)$. Right: the
 Fano factor climbs from $1.8$ at \SI{1}{\second} to $938$ at one hour instead of
 staying at the Poisson value of $1$: burstiness is scale-free, so no
-aggregation window smooths it away and reactive smoothing alone cannot absorb
-it.}
+aggregation window smooths it away.}
 \label{fig:eda-arrival}
 \end{figure}
 
@@ -169,28 +152,18 @@ moves.}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figuras/eda/eda_eval_windows}
-\caption{The stratified sub-sample the experiments run on, over the same
-week. Shaded on the 1-minute image rate: the six largest burst episodes
-(b1--b6, each padded $\pm$10 minutes to its median-crossing envelope),
-the calmest full day (2024-10-19, the steady reference), and the leading
-1.4 days consumed as zero-shot forecast context and never graded ---
-which is why b2 and b6, falling inside it, are evaluated only by
-forecast-free policies (Chapters~\ref{cap:baselines}
-and~\ref{cap:closedloop}).}
+\caption{The stratified evaluation sub-sample used in
+Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}, shaded on the
+1-minute image rate: the six largest burst episodes (b1--b6, padded
+$\pm$10 minutes), the calmest full day, and the leading 1.4 days consumed
+as forecast context (so b2 and b6, inside it, are graded only by
+forecast-free policies).}
 \label{fig:eda-windows}
 \end{figure}
 
 Table~\ref{tab:eda-persistence} summarizes the four demand signals at
-one-minute resolution. Two reading notes. First, the Hurst column is
-\emph{derived} from the spectral slope ($H = (1+\beta)/2$): one
-estimator viewed two ways, not two corroborating measurements. Second, all rate signals stamp a request's
-full token volume at its arrival minute (the trace carries no
-durations). That is faithful for images and prefill, which execute near
-arrival, but the decode series thereby becomes an \emph{offered-work
-arrival} signal ($\dagger$) whose burstiness and persistence describe
-arriving decode work, not decode occupancy (a smoothed, lagged version).
-
-The load-bearing contrast is between the two pools' arrival signals:
+one-minute resolution (Hurst and the decode-series $\dagger$ qualified in
+the caption). The load-bearing contrast is between the two pools' arrival signals:
 the image signal is simultaneously an order of magnitude burstier than
 the request signal (CV$^2$ 3.83 vs.\ 0.32 on the same one-minute clock),
 further above its own mean at peak ($15.6\times$ vs.\ $4.7\times$),
@@ -199,14 +172,10 @@ more persistent spectrally ($H \approx 0.93$ vs.\ $0.83$). Burstiness
 and forecastable structure concentrate in the same, vision-borne signal.
 Across all four signals the picture is not monotone: the decode series
 pairs the \emph{shortest} correlation half-life (\SI{5}{\minute}) with
-the second-highest spectral persistence ($H \approx 0.91$). That
-combination is plausibly manufactured by the arrival-stamping
-construction ($\dagger$), which compresses each request's decode work
-into one minute (whitening short lags) while leaving the slow demand
-envelope intact. The
-half-life and Hurst orderings therefore disagree, and no joint claim is
-made on them; the thesis builds on the
-images-versus-requests contrast, which every column supports.
+the second-highest persistence ($H \approx 0.91$), an artifact of the
+arrival-stamping construction ($\dagger$). The half-life and Hurst
+orderings disagree, so no joint claim is made on them; the thesis builds
+only on the images-versus-requests contrast, which every column supports.
 
 \begin{table}[htbp]
 \centering
@@ -242,8 +211,7 @@ rate) explains only $R^2 = \num{0.123}$ of the image-rate series
 ($\alpha = 15.1$ images per request, a forced through-origin fit;
 Figure~\ref{fig:eda-decouple}), while
 decode load is largely carried
-by request rate ($R^2 = \num{0.654}$; Pearson $r$ against request rate is
-$0.35$ for images versus $0.81$ for decode). The request-rate signal
+by request rate ($R^2 = \num{0.654}$). The request-rate signal
 (the input of conventional autoscalers) carries most information about
 decode demand, almost none about vision demand. What a scaling
 policy can do with this depends on system parameters (cold-start time,
@@ -257,15 +225,13 @@ the information asymmetry itself.
 best-fit constant-fraction line ($15.1$ img/req) explains only $R^2 = 0.12$:
 the same request rate coincides with image rates spanning two orders of
 magnitude, and the highest image-rate windows are not the highest request-rate
-windows. Request rate, the signal a conventional autoscaler watches,
-carries almost no information about vision load.}
+windows.}
 \label{fig:eda-decouple}
 \end{figure}
 
 The image-rate signal exceeds its 99th percentile (\num{224}~images/s) in
-101 one-minute windows; consecutive windows form 87 contiguous runs,
-which merge into 18 burst episodes after extending each run to its
-surrounding median crossings (runs sharing an envelope are one episode).
+101 one-minute windows that merge into 18 burst episodes after extending
+each run to its surrounding median crossings.
 The six largest, plus the calmest day, form the evaluation windows of
 Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}
 (Figure~\ref{fig:eda-windows}). The largest episode
@@ -276,8 +242,7 @@ Episode composition is homogeneous: the frames class supplies
 93--96\% of the image volume of every top episode, and clustering the 18
 episodes on shape and composition features isolates a single mixed-composition
 outlier against an otherwise uniform population. In effect the trace
-contains \emph{one burst type}: frames-class floods varying in
-magnitude and duration.
+contains \emph{one burst type}: frames-class floods.
 
 Bursts compound on the prefill side. Multimodal requests carry 72.5\% of
 all prefill tokens, and during burst minutes the mean prefill length is
@@ -287,14 +252,10 @@ mirror image: during the same image bursts the generated-token rate rises only
 $1.78\times$, and per-request generation \emph{shortens} (median 84
 vs.\ 99 tokens). The decode pool is nearly burst-neutral while the vision
 and prefill stages are not. Burst onsets are fast:
-baseline-to-peak in a median of \SI{6}{\minute}
-(10th percentile \SI{2}{\minute}, fastest \SI{1}{\minute}), with a median
-steepest single-minute jump of \num{208}~images/s. The fastest onsets
-(1--2 minutes) are comparable to or faster than replica cold-starts of
-tens of seconds to
-minutes. The onset time is the budget for any scaling decision; whether
-it defeats reactive control is settled per policy in the closed-loop
-chapters (Figure~\ref{fig:eda-onsets}).
+baseline-to-peak in a median of \SI{6}{\minute}, the fastest comparable
+to or faster than replica cold-starts of tens of seconds to minutes. The
+onset time is the budget for any scaling decision
+(Figure~\ref{fig:eda-onsets}).
 
 \begin{figure}[htbp]
 \centering
@@ -302,27 +263,23 @@ chapters (Figure~\ref{fig:eda-onsets}).
 \caption{Burst onset speed across the 18 episodes. Left: the baseline-to-peak
 ramp time is a median of \SI{6}{\minute}, with the fastest episodes reaching
 peak in one to two minutes. Right: fast onset does not mean small
-burst; some of the steepest ramps reach the highest peaks. The onset
-time is the budget available to a scaling decision, at the fast end
-comparable to replica cold-start times.}
+burst; some of the steepest ramps reach the highest peaks.}
 \label{fig:eda-onsets}
 \end{figure}
 
 \section{Signal predictability}
 \label{sec:eda-predictability}
 
-The image signal's 69-minute autocorrelation half-life on the raw
-series (autocorrelation 0.64 at a 5-minute lag) pairs with
-$H \approx 0.93$. The latter is fit as the $1/f^{\beta}$ slope over the
+The image signal's 69-minute autocorrelation half-life pairs with
+$H \approx 0.93$, the latter fit as the $1/f^{\beta}$ slope over the
 sub-diurnal band (10 minutes to 12 hours, clear of the diurnal
 fundamental), so it reflects scale-free structure rather than the daily
-cycle (Figure~\ref{fig:eda-acf}). The
-image-versus-request \emph{contrast} (69 versus 9 minutes) is robust to
-seasonality in any case, both signals carrying the same diurnal component.
-Its
-long-range dependence also suggests that purely short-memory models
-(Poisson or low-order ARMA) may structurally underfit it --- a risk, not
-a theorem, which Chapter~\ref{cap:predictors} tests empirically.
+cycle (Figure~\ref{fig:eda-acf}); the image-versus-request \emph{contrast}
+(69 versus 9 minutes) is robust to seasonality, both signals carrying the
+same diurnal component. This long-range dependence suggests purely
+short-memory models (Poisson or low-order ARMA) may structurally underfit
+it --- a risk, not a theorem, which Chapter~\ref{cap:predictors} tests
+empirically.
 
 \begin{figure}[htbp]
 \centering
@@ -330,11 +287,9 @@ a theorem, which Chapter~\ref{cap:predictors} tests empirically.
 \caption{Autocorrelation of the two arrival signals versus lag. The image
 signal (blue) retains autocorrelation $0.64$ at a five-minute lag and crosses
 $0.5$ only at \SI{69}{\minute}, against \SI{9}{\minute} for the request signal
-(green). The demand most invisible to request-rate monitoring is also the most
-\emph{persistent}: its envelope is forecastable at the longest leads (though its
+(green). Its envelope is forecastable at the longest leads, though its
 per-bin accuracy is the lowest of the four signals, precisely because it is the
-burstiest; Chapter~\ref{cap:predictors}). That is the feasibility premise for the
-predictive-scaling contribution.}
+burstiest (Chapter~\ref{cap:predictors}).}
 \label{fig:eda-acf}
 \end{figure}
 
@@ -346,19 +301,19 @@ these tests; Chapter~\ref{cap:predictors}'s covariate experiments probe
 that direction and find nearly nothing to exploit at provisioning
 cadence.) At request level,
 image count and generation length are independent (Spearman $-0.06$;
-per-bucket median generation shows no monotonic trend, swinging
-non-monotonically across image counts from 1 to 529). At window level, the image--generation cross-correlation peaks
+per-bucket median generation shows no monotonic trend across image
+counts). At window level, the image--generation cross-correlation peaks
 sharply at lag zero with no lead. Below the one-minute scale, all signals
 reach a white shot-noise floor: finer-grained inputs add noise, not
-information, though the required decision frequency again depends on
-system parameters this dataset lacks.
+information.
 
 \section{Resolution sensitivity and tail regimes}
 \label{sec:eda-multires}
 
 The burstiness results depend on the observation window, differently per
-signal. Table~\ref{tab:eda-multires} tracks each signal's peak at a given
-window size as a fraction of its \SI{1}{\second} peak. Coarsening the
+signal (each signal's peak at a given window size as a fraction of its
+\SI{1}{\second} peak is tabulated in the provenance manifest,
+Appendix~\ref{ap:artifacts}). Coarsening the
 window hides the vision peaks far
 faster than the request peaks: at \SI{60}{\second} a monitor still sees 37\% of
 the true one-second request peak but only \textbf{3.9\%} of the one-second image
@@ -371,24 +326,6 @@ Figure~\ref{fig:eda-multires}),
 consistent with its long-range dependence: no practical aggregation window
 recovers a well-behaved image signal.
 
-\begin{table}[htbp]
-\centering
-\caption{Observed peak at each window size as a fraction of the
-\SI{1}{\second} peak. Vision peaks vanish under aggregation an order of
-magnitude faster than request peaks.}
-\label{tab:eda-multires}
-\begin{tabular}{lrrrrr}
-\toprule
-Signal & \SI{1}{\second} & \SI{5}{\second} & \SI{15}{\second} & \SI{60}{\second} & \SI{300}{\second} \\
-\midrule
-requests/s      & 100\% & 58.1\% & 46.7\% & 37.1\% & 23.4\% \\
-context tokens/s & 100\% & 26.8\% & 18.0\% & 11.2\% & 7.4\% \\
-generated tokens/s & 100\% & 21.8\% & 12.3\% & 6.5\% & 4.3\% \\
-images/s        & 100\% & 20.1\% & 6.9\% & \textbf{3.9\%} & 2.6\% \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figuras/eda/eda_q_multires}
@@ -396,9 +333,7 @@ images/s        & 100\% & 20.1\% & 6.9\% & \textbf{3.9\%} & 2.6\% \\
 (CV$^2$) versus window size; the image signal (blue) stays an order of
 magnitude burstier than the request signal (green) across every window and
 decays the slowest. Right: peak observed at each window as a fraction of the
-\SI{1}{\second} peak; image peaks collapse to ${\approx}4\%$ by
-\SI{60}{\second} while request peaks retain ${\approx}37\%$. A coarse monitor
-does not merely blur the vision surges, it erases them.}
+\SI{1}{\second} peak.}
 \label{fig:eda-multires}
 \end{figure}
 
@@ -406,16 +341,13 @@ Conditioning the request marginals on their own extremes exposes who occupies
 each tail. The top-1\% context-token requests are 81.6\% multimodal with a
 median of 529 images --- the large-context tail \emph{is} the frames class, not
 long text prompts. The top-1\% image-count requests are 100\% multimodal, carry
-a median of ${\approx}\num{36000}$ context tokens (tail-deterministic
-image--context coupling), and decode only briefly (median 53 generated tokens).
+a median of ${\approx}\num{36000}$ context tokens, and decode only briefly
+(median 53 generated tokens).
 By contrast the busiest 1\% of request-rate minutes carry ordinary-composition
-traffic: median 1 image and median context and generation within about 8\%
-of the global medians. High request rate does not imply heavy per-request
-work. Most sharply, of 106 hot-request and 101 hot-image
-minutes (each signal's set of minutes at or above its own p99; the
-request set carries six minutes tied exactly at its threshold, so
-it exceeds the nominal $1\%$ of \num{10080}),
-only \textbf{5} are shared (Jaccard 0.02). The two pools' extreme-load events
+traffic: median 1 image and near-global-median context and generation.
+High request rate does not imply heavy per-request work. Most sharply, of 106 hot-request and 101 hot-image
+minutes (each signal's minutes at or above its own p99),
+only \textbf{5} are shared (Jaccard 0.02): the two pools' extreme-load events
 are essentially disjoint. This is the decoupling of
 Section~\ref{sec:eda-vision} at its strongest: provisioning the
 vision pool from the request signal misses precisely the moments that matter.
@@ -423,29 +355,10 @@ vision pool from the request signal misses precisely the moments that matter.
 \section{Global reference percentiles}
 \label{sec:eda-globals}
 
-\begin{table}[htbp]
-\centering
-\caption{Global percentiles: request-level marginals (counts of images
-and tokens per request) and 1-minute rates (per-second units as
-labeled).}
-\label{tab:eda-percentiles}
-\footnotesize
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{lrrrrrrr}
-\toprule
-Signal & mean & p50 & p90 & p95 & p99 & p99.9 & max \\
-\midrule
-NumImages (image-bearing) & 28.7 & 1 & 25 & 196 & 529 & 1{,}089 & 9{,}409 \\
-ContextTokens  & 2{,}911 & 1{,}124 & 5{,}828 & 9{,}755 & 35{,}932 & 65{,}623 & 148{,}569 \\
-GeneratedTokens & 187 & 98 & 433 & 603 & 1{,}066 & 3{,}943 & 16{,}384 \\
-\midrule
-requests/s (1-min) & 1.7 & 1.55 & 2.88 & 3.33 & 4.35 & 5.73 & 7.8 \\
-images/s (1-min) & 23.7 & 5.6 & 77 & 132 & 224 & 322 & 370 \\
-ctx tokens/s (1-min) & 4{,}813 & 3{,}537 & 10{,}326 & 14{,}157 & 21{,}610 & 30{,}647 & 39{,}108 \\
-gen tokens/s (1-min) & 309 & 281 & 531 & 629 & 1{,}010 & 1{,}599 & 2{,}164 \\
-\bottomrule
-\end{tabular}
-\end{table}
+Global percentiles for all seven signals --- the request-level marginals
+(images and tokens per request) and the 1-minute rates --- are tabulated
+in the provenance manifest (Appendix~\ref{ap:artifacts}). Every
+load-bearing value is quoted inline where it is used.
 
 \section{Limitations}
 \label{sec:eda-limitations}

@@ -9,72 +9,47 @@
 work builds on}
 \label{app:ecosystem}
 
-This thesis is a systems study built on a concrete software stack rather than an
-abstraction of one. NVIDIA's \texttt{ai-dynamo} project is a family of five
-first-party repositories that together implement datacenter-scale
-\emph{disaggregated} large-language-model inference, one repository per layer of
-the deployment lifecycle. This appendix records what those components are, how
-they compose, and --- the reason it belongs here --- exactly which of them this
-work consumes and which it contributes back to.
+NVIDIA's \texttt{ai-dynamo} project is a family of five first-party
+repositories implementing datacenter-scale \emph{disaggregated}
+large-language-model inference, one per layer of the deployment lifecycle. This
+appendix records what those components are, how they compose, and --- the reason
+it belongs here --- which of them this work consumes and which it contributes
+back to.
 
-\paragraph{aiconfigurator (offline planner).} Given a model, a GPU count and a
-GPU type, its search chooses how many prefill and decode workers to run and at
-what parallelism (tensor, pipeline, data and expert; TP/PP/DP/EP) to maximise
-throughput subject to TTFT and TPOT service-level objectives, then emits
-ready-to-deploy Dynamo or llm-d configuration files. Its estimates come from a
-performance database of kernel latencies \emph{collected on real silicon}
-(per-GPU CSVs, consumed in \texttt{SILICON}, \texttt{HYBRID}, \texttt{EMPIRICAL}
-or \texttt{SOL} modes) and interpolated between measured shapes; a separate
-collector subsystem benchmarks those kernels. The operator graph is assembled in
-Python but priced per operator by a Rust core (``Python builds, Rust
-executes'').
+\paragraph{aiconfigurator (offline planner).} An offline search that chooses
+prefill/decode worker counts and parallelism to maximise throughput under
+TTFT/TPOT SLOs, emitting ready-to-deploy Dynamo configs from a performance
+database of kernel latencies \emph{collected on real silicon}. This thesis
+consumes its per-operator cost model.
 
 \paragraph{grove (Kubernetes operator).} A Go operator that deploys an entire
-inference topology from a single declarative Custom Resource. The user writes one
-\texttt{PodCliqueSet}; the operator expands it through
-\texttt{PodCliqueScalingGroup} and \texttt{PodClique} into a \texttt{PodGang} ---
-the all-or-nothing unit the scheduler gang-schedules --- so a disaggregated
-prefill/decode system comes up (or not) atomically. Placement is topology-aware
-(for example, NVLink domains), and autoscaling can be delegated to the Dynamo
-planner.
+disaggregated topology from a single declarative Custom Resource, gang-scheduling
+prefill/decode as an all-or-nothing unit. Outside this study's scope.
 
-\paragraph{dynamo (serving hub).} The hub of the stack: a datacenter-scale
-orchestration runtime that sits \emph{above} the inference engines (vLLM,
-SGLang, TensorRT-LLM) rather than replacing them, with a Rust performance core
-and a Python integration layer (PyO3). It provides disaggregated prefill/decode
-worker pools, KV-cache-aware routing (a radix tree scores workers by prefix
-overlap so redundant prefill is skipped), a tiered KV block manager
-(KVBM: GPU\,$\rightarrow$\,CPU\,$\rightarrow$\,SSD\,$\rightarrow$\,remote) and
-SLA-driven autoscaling planners. Its \texttt{mocker} offers GPU-free simulation
-of a deployment, reusing the aiconfigurator cost core.
+\paragraph{dynamo (serving hub).} The hub: an orchestration runtime that sits
+\emph{above} the inference engines (vLLM, SGLang, TensorRT-LLM) rather than
+replacing them, providing disaggregated prefill/decode pools, KV-aware routing
+and SLA-driven autoscaling planners. Its \texttt{dynamo.replay} runtime drives
+this thesis's queue replays; its \texttt{mocker} offers GPU-free simulation
+reusing the aiconfigurator cost core.
 
-\paragraph{nixl (KV-cache data plane).} A point-to-point transfer library
-(C++/CUDA, built with \texttt{meson}) that moves data between heterogeneous
-memory and storage behind a plugin backend architecture --- UCX for
-RDMA/IB/RoCE/NVLink is the primary backend, with GPUDirect Storage and others
-available. Dynamo uses it to move KV cache from prefill to decode workers over
-RDMA.
+\paragraph{nixl (KV-cache data plane).} A point-to-point transfer library that
+moves KV cache between prefill and decode workers over RDMA. Not exercised
+directly here.
 
-\paragraph{aiperf (benchmark client).} The measurement client: an asynchronous,
-multi-process benchmarking tool (the successor to GenAI-Perf) that drives an
+\paragraph{aiperf (benchmark client).} The measurement client (successor to
+GenAI-Perf): an asynchronous, multi-process tool that drives an
 OpenAI-compatible endpoint and reports client-observed TTFT, inter-token latency
-(ITL, $\approx$ TPOT), throughput and goodput. Credit-based flow control keeps
-the request hot path off its message bus, and it can replay production traces
-(Mooncake, BurstGPT) under fixed-schedule, request-rate, user-centric or
-adaptive timing.
+(ITL~$\approx$~TPOT), throughput and goodput. This thesis uses it as the live
+client.
 
-Beneath these five sit the inference engines themselves (vLLM, SGLang,
-TensorRT-LLM), which execute the forward passes; the \texttt{ai-dynamo} layer
-sizes, orchestrates, transports and measures around them.
+Beneath these five sit the inference engines (vLLM, SGLang, TensorRT-LLM) that
+execute the forward passes; the \texttt{ai-dynamo} layer sizes, orchestrates,
+transports and measures around them.
 
-\paragraph{How they compose.} The five form one loop. \textbf{aiconfigurator
-plans} a configuration offline; \textbf{grove orchestrates} it onto Kubernetes as
-one gang-scheduled resource; \textbf{dynamo serves} requests through KV-aware
-disaggregated routing; \textbf{nixl moves} the KV cache between the prefill and
-decode pools; and \textbf{aiperf measures} whether the deployment met its SLAs
---- feeding the observed latencies back against the very targets aiconfigurator
-planned to. Table~\ref{tab:app-ecosystem} names each layer and how this thesis
-uses it.
+\paragraph{How they compose.} The five form one loop with observed latencies fed
+back against aiconfigurator's targets. Table~\ref{tab:app-ecosystem} names each
+layer and how this thesis uses it.
 
 % A stack / data-flow figure (aiconfigurator -> grove -> dynamo -> nixl ->
 % aiperf, with the vLLM/SGLang/TRT-LLM engines beneath) could go here; omitted
@@ -99,7 +74,7 @@ aiconfigurator & Offline planner: worker counts + parallelism under TTFT/TPOT SL
 grove & Kubernetes operator; gang-scheduled disaggregated topology &
   Not used --- the study reasons about single-node pool economics, not multi-node
   orchestration \\
-dynamo & Serving hub: disaggregated KV-aware routing, KVBM, SLA planner &
+dynamo & Serving hub: disaggregated KV-aware routing, tiered KV block manager (KVBM), SLA planner &
   \texttt{dynamo.replay} runtime drives the queue replays; the proposed per-pool
   provisioning layer sits above it, adjacent to its SLA planner \\
 nixl & KV-cache RDMA transfer plane &
@@ -115,33 +90,24 @@ engines & vLLM / SGLang / TensorRT-LLM: forward-pass execution &
 \end{tabular}
 \end{table}
 
-\paragraph{Maturity and pinning.} The stack is young and fast-moving. The first
-tagged \texttt{dynamo} release, \texttt{v0.1.0}, is dated 2025-03-17; a roughly
-twelve-month \texttt{0.x} line followed --- signalled as pre-stable by SemVer
-alone, with no literal ``alpha''/``beta'' labels and only \texttt{-rc}
-release-candidate tags ahead of a few patch releases --- before the first \emph{stable}
-\texttt{v1.0.0} on 2026-03-13. Because minor versions land at roughly monthly
-cadence, every result here targets a deliberately pinned snapshot:
-\texttt{ai-dynamo} 1.2.1 (wheel) / 1.3.0 (source, both post-1.0),
+\paragraph{Maturity and pinning.} The stack is young and fast-moving, minor
+versions landing roughly monthly, so every result targets a deliberately pinned
+snapshot: \texttt{ai-dynamo} 1.2.1 (wheel) / 1.3.0 (source),
 \texttt{aiconfigurator} 0.10.0 (editable, data branch) and \texttt{aiperf}
-0.11.0 (Table~\ref{tab:ap-env}). The contributions are accordingly described at
-the level of mechanism --- per-pool forecasting, capacity-rating sizing --- which
-outlives specific APIs, rather than at the level of call signatures, which do
-not.
+0.11.0 (Table~\ref{tab:ap-env}). Contributions are accordingly described at the
+level of mechanism --- per-pool forecasting, capacity-rating sizing --- which
+outlives specific APIs.
 
 \subsection{Where this thesis fits}
 
-This work is a provisioning-and-planning study layered on top of the stack above,
-not a modification of its serving core.
+This work is a provisioning-and-planning layer on the stack above, not a
+modification of its serving core.
 
-\paragraph{What it consumes.} The economic argument is priced with
-\textbf{aiconfigurator}'s cost model: the encoder and language pools are sized
-against its per-operator latency composition (Chapter~\ref{cap:twopool}). The
-queue replays that produce the cost headline run on the
-\textbf{\texttt{dynamo.replay}} runtime, and the live closed-loop validation
-drives a real Dynamo control plane with \textbf{aiperf} as the client (the
-\texttt{live\_fc} / \texttt{live\_re} runs and their
-\texttt{profile\_export\_aiperf.json} exports, Chapter~\ref{cap:validation}).
+\paragraph{What it consumes.} \textbf{aiconfigurator}'s cost model prices the two
+pools (Chapter~\ref{cap:twopool}), the \textbf{\texttt{dynamo.replay}} runtime
+runs the queue replays, and \textbf{aiperf} drives a real Dynamo control plane as
+live client (\texttt{live\_fc} / \texttt{live\_re}, Chapter~\ref{cap:validation})
+--- as the table's ``Use in this thesis'' column records.
 
 \paragraph{What it contributes back.} Two things return upstream to
 \textbf{aiconfigurator}: a draft coverage pull request (the missing
@@ -159,11 +125,9 @@ forecast, rather than reacting to observed load) and \emph{modality-decoupled}
 aggregate token load). It is complementary to the stack, not a replacement for
 any component of it.
 
-\paragraph{Scope.} The study is deliberately narrow where the stack is broad. It
+\paragraph{Scope.} The study is deliberately narrow where the stack is broad: it
 reasons about single-node pool economics, not multi-node \textbf{grove}
-deployment; and although the live closed loop exercises the real Dynamo control
-plane (planner, worker manager, discovery, metrics), its engines are
-\emph{mocked} --- a full-serving-path run with real GPU \emph{engines} (rather
-than TP2 mockers) behind \textbf{aiperf} remains future work, consistent with
-the caveat in
-Appendix~\ref{app:engine-sensitivity}.
+deployment; and although the live closed loop drives the real Dynamo control
+plane, its engines are \emph{mocked} (TP2) --- a full-serving-path run with real
+GPU \emph{engines} behind \textbf{aiperf} remains future work
+(Appendix~\ref{app:engine-sensitivity}).

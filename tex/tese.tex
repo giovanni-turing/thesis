@@ -43,33 +43,31 @@ Modality-Disaggregated Multimodal Model Serving}
 \addcontentsline{toc}{chapter}{Abstract}
 Multimodal model serving increasingly disaggregates by modality: a
 vision-encoder pool turns images into embedding tokens, a language pool
-runs prefill and decode. Each pool is then provisioned separately, yet the
+runs prefill and decode, and each is provisioned separately. Yet the
 prevailing reactive practice (scaling on request rate or utilization)
 assumes those signals carry every pool's demand. On the first public
 production trace of a multimodal inference cluster (Azure, one million
 requests over seven days), that assumption fails for the vision pool: image
-arrivals are nearly decoupled from request rate ($R^2 = 0.12$), an order of
-magnitude burstier, and disjoint from it at the extremes (Jaccard 0.02).
-Yet they are also the most \emph{persistent}: forecastable at provisioning
-horizons, where zero-shot time-series foundation models beat classical
-baselines on every signal. A two-pool simulation platform, its encoder costs
-collected on RTX 5090 silicon (submitted upstream to NVIDIA's aiconfigurator as a draft PR) and
-validated physically, composed with Dynamo's calibrated H100 language-pool
-simulator, reproduces the decoupling mechanically: the pools' saturation
+arrivals are nearly decoupled from request rate, an order of magnitude
+burstier, and disjoint from it at the extremes. Yet they are also the most
+\emph{persistent}: forecastable at provisioning horizons, where zero-shot
+time-series foundation models beat classical baselines on every signal. A
+two-pool simulation platform --- its encoder costs collected on RTX 5090
+silicon (submitted upstream to NVIDIA's aiconfigurator as a draft PR) and
+physically validated, composed with Dynamo's calibrated H100 language-pool
+simulator --- reproduces the decoupling mechanically: the pools' saturation
 knees sit an order of magnitude apart, and the largest burst breaks both (a
-shape-fixable prefill floor; episodic encoder queueing at 29\% mean
-utilization, invisible to rate- and utilization-based monitors). Closing the
-loop, forecast-driven per-pool schedules hold the tail-latency SLA through
-burst onsets that defeat an identically informed reactive controller ---
-by anticipatory provisioning on the encoder pool, and a tail-aware
-\emph{conversion} of the same forecast (tested under a held cursor, not a
-second anticipation experiment) on the language pool --- at
-0.62$\times$ the deployable static encoder fleet's GPU-time (the
-language fleet near-break-even, 0.96$\times$). On the hardest burst the
-language-pool p90-versus-reactive verdict pair reproduces through
-Dynamo's real control plane with mocked engines; the encoder cost model
-is anchored separately on RTX~5090 silicon, and the week-scale economics
-are simulated.
+shape-fixable prefill floor; episodic encoder queueing invisible to rate-
+and utilization-based monitors). Closing the loop, forecast-driven per-pool
+schedules hold the tail-latency SLA through burst onsets that defeat an
+identically informed reactive controller --- anticipatory on the encoder
+pool, and a tail-aware held-cursor \emph{conversion} of the same forecast
+(not a second anticipation experiment) on the language pool --- at
+0.62$\times$ the deployable static encoder fleet's GPU-time (the language
+fleet near-break-even, 0.96$\times$). The language-pool p90-versus-reactive
+verdict reproduces through Dynamo's real control plane with mocked engines;
+the encoder cost model is anchored separately on RTX~5090 silicon, and the
+week-scale economics are simulated.
 
 \medskip
 \noindent\textbf{Keywords:} multimodal model serving; modality
@@ -82,15 +80,15 @@ tail latency.
 O servi\c{c}o de modelos multimodais tem se desagregado por modalidade: um
 \emph{pool} codificador de vis\~ao converte imagens em \emph{tokens} de
 \emph{embedding}, e um \emph{pool} de linguagem executa \emph{prefill} e
-\emph{decode}. Cada \emph{pool} passa a ser provisionado separadamente, mas
+\emph{decode}, cada um provisionado separadamente. Mas
 a pr\'atica reativa vigente (escalar pela taxa de requisi\c{c}\~oes ou
 pela utiliza\c{c}\~ao) assume que esses sinais carregam a demanda de
 todos os \emph{pools}. No primeiro \emph{trace} p\'ublico de produ\c{c}\~ao
 de um \emph{cluster} de infer\^encia multimodal (Azure, um milh\~ao de
 requisi\c{c}\~oes em sete dias), essa hip\'otese falha para o \emph{pool} de
 vis\~ao: as chegadas de imagens s\~ao quase desacopladas da taxa de
-requisi\c{c}\~oes ($R^2 = 0{,}12$), uma ordem de magnitude mais
-intermitentes e disjuntas dela nos extremos (Jaccard 0{,}02). Por\'em
+requisi\c{c}\~oes, uma ordem de magnitude mais
+intermitentes e disjuntas dela nos extremos. Por\'em
 s\~ao tamb\'em as mais \emph{persistentes} e, portanto, previs\'iveis nos
 horizontes de provisionamento, onde modelos de funda\c{c}\~ao de s\'eries
 temporais, em \emph{zero-shot}, superam as \emph{baselines} cl\'assicas em
@@ -101,13 +99,13 @@ de eventos discretos do Dynamo sob tempos H100 calibrados, reproduz o
 desacoplamento mecanicamente: os \emph{pools} saturam a escalas separadas
 por uma ordem de magnitude, e a maior rajada quebra ambos (um piso de
 \emph{prefill} corrig\'ivel por uma mudan\c{c}a de paralelismo; enfileiramento
-epis\'odico no codificador a 29\% de utiliza\c{c}\~ao m\'edia, invis\'ivel a
+epis\'odico no codificador invis\'ivel a
 monitores de taxa e utiliza\c{c}\~ao). Fechando o la\c{c}o, o escalonamento
 preditivo por \emph{pool} sustenta a SLA de lat\^encia de cauda em in\'icios
 de rajada que derrotam um controlador reativo igualmente informado ---
 por provisionamento antecipat\'orio no \emph{pool} codificador e por uma
-\emph{convers\~ao} ciente de cauda da mesma previs\~ao (testada sob um
-cursor fixo, n\~ao um segundo experimento de antecipa\c{c}\~ao) no
+\emph{convers\~ao} ciente de cauda da mesma previs\~ao (sob cursor fixo,
+n\~ao um segundo experimento de antecipa\c{c}\~ao) no
 \emph{pool} de linguagem --- a
 0,62$\times$ o tempo de GPU da menor frota est\'atica vi\'avel de
 codificadores (com a frota de linguagem praticamente em equil\'ibrio,
@@ -155,6 +153,7 @@ institutional template is adopted.
 \begin{tabular}{@{}ll@{}}
 ACF & autocorrelation function \\
 AIC & \textit{aiconfigurator}, NVIDIA's offline deployment planner \\
+ARIMA & autoregressive integrated moving average \\
 CV$^2$ & squared coefficient of variation (excess dispersion) \\
 EWMA & exponentially weighted moving average \\
 FIFO & first-in, first-out (queue discipline) \\
