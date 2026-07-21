@@ -71,8 +71,9 @@ against when a timing hook is slower than the events it prices.
 \paragraph{Family transfer.} The language-pool numbers in this chapter are
 for Qwen3-VL-8B at TP1. A spot-check prices the family flagship,
 Qwen3-VL-235B-A22B at TP8, on the same shipped H100 data, window,
-and topology: ${\sim}2\times$ the 8B's decode latency throughout, with ITL
-p99 already \SI{87.7}{\milli\second} at the trace's own rate, so the decode
+and topology: ${\sim}1.9\times$ the 8B's mean decode latency at the trace's own rate
+(1.2--3.9$\times$ across the sweep), with ITL
+p99 \SI{86.2}{\milli\second} at that rate, so the decode
 bound moves and its knee drops to $s{=}1$ against the 8B's $s{=}2$ ---
 decoder scale halves the language pool's operating envelope (per-metric
 numbers in Appendix~\ref{ap:artifacts}). The vision
@@ -258,9 +259,9 @@ Vision / AIC & burst & \textbf{none: over at $s{=}1$} & 116 img/s & $5{,}013$ at
 (log--log), swept by arrival speedup at the fixed 2$\times$2-worker
 topology; knee markers apply the full evaluation SLA, so the steady-window
 language knees sit \emph{below} the TTFT line: they are set by the
-inter-token bound (``ITL-bound''), which crosses first. On the steady
-window (blue) the language knee sits at $s{=}3$ (polynomial) and $s{=}2$
-(calibrated) while the vision pool remains under its bound through
+inter-token bound (``ITL-bound''), which crosses first. On the 2{,}000-request steady head (blue, labelled \texttt{head2k} in the
+figure --- distinct from the 24-hour steady window) the language knee sits at
+$s{=}3$ (polynomial) and $s{=}2$ (calibrated) while the vision pool remains under its bound through
 $s{=}32$; at the calibrated language knee the encoder idles at 4.5\%
 utilization. On the burst window (green) both calibrated curves start
 \emph{above} their bounds at the episode's own recorded rate: the
@@ -396,8 +397,11 @@ schedule is driven by image \emph{count} and is blind to \emph{size} --- a
 size increase arrives as pure service-time inflation with no provisioning
 response, unlike the engine-cost gap above, which p90 headroom absorbs with
 no added workers. Two scope limits bind: the $672^2$ margin on the faster
-fabric is thin and reflects the single-stream handoff assumption, and on the
-sustained 24-hour window $672^2$ misses the bound on \emph{both} fabrics ---
+fabric is thin and reflects the single-stream handoff assumption, and under
+the plain forecast schedule (\texttt{fc\_L30}) on the sustained 24-hour window
+$672^2$ misses the bound on \emph{both} fabrics (the forecast-aware variant and
+the deployable static-$C{=}8$ reference still meet it on the faster fabric,
+\SI{842}{\milli\second}) ---
 so that fabric margin is a burst-window result and must never be quoted
 without its window ($896^2$ cells extrapolate beyond the collected batch
 axis, and every size distribution is \emph{assumed}). The dispatch cap is
@@ -415,7 +419,8 @@ composed-system claims are made only where composed runs exist (the baseline
 chapter's grid, which re-derives per-window optima across all six burst
 windows and a 24-hour steady window). The steady head used here is
 vision-lean (2.9 images per request against the trace's ${\approx}14$),
-which the 24-hour steady window corrects.
+which the 24-hour steady window partly mitigates, raising the rate to 5.3
+images per request --- still well below the trace-wide 14.3.
 
 \section{Summary}
 

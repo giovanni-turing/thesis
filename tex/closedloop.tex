@@ -80,7 +80,8 @@ at most $(12{-}1)\times15 = \SI{165}{\second}$ of forecast-issued lead,
 and the \SI{300}{\second} cell reached the floor only by target-time
 indexing --- an upper bound, not an issued lead. By contrast, the
 identically informed reactive controller loses burst3 at every lead and
-burst4/5 beyond 45 seconds (Table~\ref{tab:base-react-enc}). On the
+burst5 beyond 45 seconds, though burst4 still passes at $L{=}\SI{165}{\second}$
+(\SI{904.7}{\milli\second}) (Table~\ref{tab:base-react-enc}). On the
 burst windows the p90 schedule's p99 encoder delay is pinned at
 \SI{588}{\milli\second}, the platform's zero-queueing
 service floor: a full-batch forward ($f(64) =$
@@ -116,7 +117,7 @@ all 60 p90/$\rho{15}$ cells, consistent with the small cross-model
 spreads of Chapter~\ref{cap:predictors}. The same holds for the predictor
 a production planner ships: swapping Dynamo's own load predictor among
 ARIMA, Kalman, and Prophet leaves the SLA verdict unchanged (all failing
-together on the fast onset, burst3), because the integer-replica conversion
+together on burst4 and the 24-hour steady window), because the integer-replica conversion
 quantizes the differing forecasts onto the same worker schedule.
 Predictor choice is second-order \emph{within} these families; the
 signal, the conversion, and the calibrated band \emph{shape} are not
@@ -358,9 +359,10 @@ compliance. ``Episodes'' grades each in-span burst episode separately
 use Chronos-2 at $\rho{=}15$; $L$ is the cold-start lead. Forecast
 schedules use issue-time actuation; worker-time is integrated from
 readiness under the warm-pool model (cold-start warm-up reported
-separately, Section~\ref{sec:cl-ledger-enc}) and is lead-invariant
-across the archive's
-realizable 15--\SI{165}{\second} issued-lead range (see text). The three
+separately, Section~\ref{sec:cl-ledger-enc}) and varies only
+modestly across the archive's
+realizable 15--\SI{165}{\second} issued-lead range, declining systematically by
+${\sim}6$--7\% from $L{=}15$ to \SI{165}{\second} (see text). The three
 rows reading \SI{588}{\milli\second} are distinct runs that coincide at
 the zero-queueing service floor (Section~\ref{sec:cl-matrix}); rows above
 it carry queueing on top of that floor.}

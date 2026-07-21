@@ -152,7 +152,8 @@ bins, and no policy should assume otherwise.
 
 Second, \textbf{which model wins is resolution-dependent, and the
 inter-model ranking is noise-level}. Toto-2 (usually with covariates)
-takes the fine-bin cells and Chronos-2 most of the coarse ones. But the
+takes nearly all the 1\,s--30\,s cells; at \SI{45}{\second} TimesFM leads, and at
+\SI{1}{\minute} Toto-2 has the most wins, with Chronos-2 and EWMA behind it. But the
 spreads are small (typically under 2 WAPE points) and
 several bolded column wins are decided by $\leq$0.1 WAPE point, below
 plausible sampling variability with no significance test attached. The
@@ -164,10 +165,11 @@ The comparison extends to production practice: Dynamo's SLA planner
 selects a load predictor from a fixed registry (ARIMA, Kalman, Prophet, or
 constant). Run through the same protocol on the image signal (shipped
 defaults; the constant predictor reproduces the naive baseline's WAPE
-exactly), all four sit at or below the classical frontier and none reaches
-the foundation-model level: at \SI{1}{\minute} the best (ARIMA) ties the
-classical baselines and trails the best foundation model by about a WAPE
-point, widening at finer resolutions (per-config numbers in
+exactly), at \SI{1}{\minute} all four sit at or below the classical frontier and none
+reaches the foundation-model level (at \SI{15}{\second}, ARIMA and Prophet edge
+ahead of the classical baselines and ARIMA matches Chronos): the best (ARIMA)
+ties the classical baselines and trails the best foundation model by about a
+WAPE point, with the gap widening at finer resolutions (per-config numbers in
 Appendix~\ref{ap:artifacts}). The point is not that foundation models
 forecast this signal dramatically better but that the shipped predictors
 do not (the closed-loop consequence is in Chapter~\ref{cap:closedloop}).

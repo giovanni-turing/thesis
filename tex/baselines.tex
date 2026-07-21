@@ -206,8 +206,9 @@ steady (24\,h) & 548 & 884 & 300\,s \\
 
 The pattern tracks onset speed and peak volume together. Slow ramps
 (burst1, the calm day) are reactive-scalable at any tested lead; medium
-onsets survive only sub-minute leads ($L^{*}{=}$\SI{45}{\second}, below
-what pod-scheduled GPU workers realistically offer). The two fastest
+onsets survive only short leads ($L^{*}{=}$45--\SI{165}{\second}; two of
+three windows are limited to \SI{45}{\second}, below what pod-scheduled GPU
+workers realistically offer, though burst4 tolerates a 2.75-minute lead). The two fastest
 onsets diverge by volume: burst6's one-minute onset is caught at short
 leads ($L^{*}{=}$\SI{45}{\second}) because its peak (\SI{337}{img/s})
 drains within a batch, whereas burst3's one-minute onset defeats the

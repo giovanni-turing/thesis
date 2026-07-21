@@ -191,8 +191,9 @@ arrival-burstiness analysis~\cite{Wang2024BurstGPT}; ServeGen's
 generative modeling of Alibaba production workloads, which notes that
 realistic workloads must be composed per category rather than as one
 stream~\cite{Xiang2025ServeGen}; and Aegaeon's multi-month view of
-bursty multi-model traffic at Alibaba~\cite{Xiang2025Aegaeon}. All are text-centric:
-their request descriptors are token counts and timestamps. The
+bursty multi-model traffic at Alibaba~\cite{Xiang2025Aegaeon}. All but ServeGen are text-centric:
+their request descriptors are token counts and timestamps (ServeGen models
+per-category multimodal descriptors). The
 \textit{AzureLMMInferenceDataset2025} released with
 ModServe~\cite{Qiu2025ModServe} is the first public
 production trace of a \emph{multimodal} inference cluster;
