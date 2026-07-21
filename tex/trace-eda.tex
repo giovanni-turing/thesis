@@ -60,10 +60,8 @@ All three request-level marginals carry large upper-tail mass relative
 to their medians: ``heavy-tailed'' in the operational sense used
 throughout this chapter
 (Section~\ref{sec:eda-globals}).
-By tail-index estimate (Hill estimator, indicative only), generated
-tokens are the heaviest, so decode-side capacity is quantile- rather
-than mean-driven, while context tokens and image counts have tamer
-tails.
+Generated tokens are the heaviest-tailed (Hill estimate, indicative), so
+decode-side capacity is quantile- rather than mean-driven.
 Multimodal requests have longer inputs but \emph{shorter} outputs than
 text-only requests (context median 1{,}422 vs.\ 792 tokens; generation
 median 80 vs.\ 147), a question-answering profile against longer-form
@@ -72,9 +70,8 @@ text chat.
 Unsupervised clustering of all requests on $\log(1{+}\text{images})$,
 $\log(1{+}\text{context})$, and $\log(1{+}\text{generated})$ renders
 four interpretable archetypes (Table~\ref{tab:eda-archetypes},
-Figure~\ref{fig:eda-clusters}). The fit is cuML $k$-means with $k{=}4$ (silhouette-selected over
-$k \in \{3,\dots,9\}$, a near-tie, so the groups are interpretive rather
-than sharply distinct). The video/frame-analysis archetype (3.4\% of
+Figure~\ref{fig:eda-clusters}). The fit is $k$-means with $k{=}4$ (silhouette-selected, a near-tie, so
+the groups are interpretive rather than sharply distinct). The video/frame-analysis archetype (3.4\% of
 requests) carries 85.7\% of all image volume and a third of all prefill
 tokens --- the clustering's rendering of the threshold-defined
 \emph{frames class} used elsewhere ($k{>}10$ grids: 2.7\% of requests,
@@ -131,10 +128,10 @@ dominating the sub-diurnal band above it.
 \includegraphics[width=\linewidth]{figuras/eda/eda_e_arrival_process}
 \caption{The arrival process is not Poisson at any scale. Left: the empirical
 inter-arrival survival curve is far heavier than the matched exponential.
-Middle: per-second counts are overdispersed against Poisson$(1.65)$. Right: the
-Fano factor climbs from $1.8$ at \SI{1}{\second} to $938$ at one hour instead of
-staying at the Poisson value of $1$: burstiness is scale-free, so no
-aggregation window smooths it away.}
+Middle: per-second counts are overdispersed against Poisson$(1.65)$.
+Right: the Fano factor climbs nearly three orders of magnitude with the
+counting window instead of staying at the Poisson value of 1:
+burstiness is scale-free, so no aggregation window smooths it away.}
 \label{fig:eda-arrival}
 \end{figure}
 
@@ -285,8 +282,8 @@ empirically.
 \centering
 \includegraphics[width=0.72\linewidth]{figuras/eda/eda_d_acf}
 \caption{Autocorrelation of the two arrival signals versus lag. The image
-signal (blue) retains autocorrelation $0.64$ at a five-minute lag and crosses
-$0.5$ only at \SI{69}{\minute}, against \SI{9}{\minute} for the request signal
+signal (blue) crosses $0.5$ only at \SI{69}{\minute}, against
+\SI{9}{\minute} for the request signal
 (green). Its envelope is forecastable at the longest leads, though its
 per-bin accuracy is the lowest of the four signals, precisely because it is the
 burstiest (Chapter~\ref{cap:predictors}).}
@@ -392,12 +389,10 @@ Half the requests are text-only, images arrive as tile/frame batches,
 four archetypes stress different serving stages, and the arrival process
 is non-Poisson at every scale, with diurnal harmonics over a
 long-range-dependent background. The vision demand signal is at once the
-least visible to request-rate monitoring ($R^2 = 0.123$), the burstiest
-(CV$^2$ 3.83; single-class frames floods ramping in a median of six
-minutes), and the most persistent ($H \approx 0.93$, 69-minute memory),
-while decode demand, read as offered work, is largely rate-carried and
-comparatively benign. Even the extremes are disjoint (5 shared minutes
-of ${\approx}100$ each), and minute-resolution monitoring recovers under
-4\% of the true instantaneous image peak. These are properties of the
-dataset; the chapters that follow develop their consequences for
+least visible to request-rate monitoring ($R^2 = 0.123$), the burstiest,
+and the most persistent ($H \approx 0.93$), its extremes essentially
+disjoint from the request signal's and its instantaneous peaks invisible
+to minute-resolution monitoring; decode demand, read as offered work, is
+largely rate-carried and comparatively benign. These are properties of
+the dataset; the chapters that follow develop their consequences for
 serving-system design.

@@ -88,8 +88,7 @@ the encoder's model-side load is a few seconds, so its lead is
 orchestration-bound (pod scheduling, image pull, node acquisition), while
 language-pool workers, with an order of magnitude more weights plus engine
 and KV-cache initialization, sit in the tens-of-seconds-and-up regime ---
-so the closed-loop evaluation sweeps per-pool lead ranges rather than one
-shared constant.} Prediction-driven capacity management
+so the evaluation sweeps per-pool leads.} Prediction-driven capacity management
 has appeared for text-only LLM fleets --- forecast-aware fleet
 planning~\cite{Jaiswal2025SageServe}, prewarming GPUs against forecast peak
 load~\cite{WarmServe2025} --- but watches aggregate, request-level signals;
@@ -122,13 +121,11 @@ interchangeable. A constant-fraction model (vision work as a fixed
 multiple of request rate) explains only $R^2=\num{0.123}$ of the
 image-rate series but $R^2=\num{0.654}$ of decode demand (offered-work
 stamped at arrival --- Chapter~\ref{cap:trace-eda}). The image signal is
-also an order of magnitude burstier (CV$^2$ 3.83 versus 0.32 at
-one-minute resolution), and its extremes do not co-occur with the request
-signal's: the week's largest burst drives image load to \SI{370}{img/s},
-nearly sixteen times its weekly mean, while the request rate in those
-minutes barely moves, leaving the two signals' top-percentile minutes
-essentially disjoint (Jaccard $0.02$). Each major burst is a near-pure
-flood of the frames class, whose arrival the request rate barely registers.
+also an order of magnitude burstier, and its extremes do not co-occur
+with the request signal's: the week's largest burst drives image load to
+nearly sixteen times its weekly mean while the request rate barely
+moves, leaving the two signals' top-percentile minutes essentially
+disjoint. Each major burst is a near-pure flood of the frames class.
 Yet the load is knowable: every request declares its image count at
 admission, so watching the right signal needs no new instrumentation, only
 aggregating what the request stream already contains.
@@ -138,8 +135,8 @@ baseline to peak in a median of six minutes; against replica cold starts
 of tens of seconds to minutes, a third of the bursts arrive too fast for a
 policy that waits to observe them. Aggregation does not rescue the
 reactive loop: the arrival process is overdispersed at every operational
-scale (Fano factor from 1.8 at one second to 938 at one hour), so no
-averaging window makes the signal safe for a threshold rule --- the
+scale (the Fano factor grows nearly three orders of magnitude with the
+counting window), so no averaging window makes the signal safe for a threshold rule --- the
 scale-free burstiness long documented for network and Web
 traffic~\cite{Leland1994,Crovella1997} reappearing in a serving system's
 demand signals. The failure is also invisible to the dashboards reactive
@@ -154,9 +151,10 @@ healthy pool all day.
 The signals that carry the vision pool's load are not only the burstiest
 but the most persistent: the image signal's long-range-dependence exponent
 is the strongest of the four (Hurst ${\approx}0.93$ versus $0.83$ for
-requests). The signal most dangerous to reactive scaling is thus the most
-forecastable, at exactly the horizons provisioning needs --- minutes to
-tens of minutes, the scale of burst onsets and replica cold starts. The
+requests). The signal most dangerous to reactive scaling thus retains
+the most predictive structure at exactly the horizons provisioning needs
+--- minutes to tens of minutes, the scale of burst onsets and replica
+cold starts. The
 provisioning gap is a lead-time problem, and the lead time is available ---
 to a forecaster.
 
@@ -203,23 +201,17 @@ and~\ref{cap:twopool} build that platform: the collected encoder operator
 agrees with physical measurement, a matched-engine check validates the
 composed forward against the serving engine's own vision tower (vLLM;
 Appendix~\ref{app:engine-sensitivity}), and the language pool's calibrated
-timing exposes the tails the simulator's default polynomial flattens (on
-the burst window the polynomial misses an SLA violation outright).
+timing exposes the tails the simulator's default polynomial flattens.
 
 \item[RQ4 --- Closed-loop payoff.] Does provisioning each pool on its own
 signal --- a \emph{forecast} for vision, a tail-aware \emph{conversion} for
 language --- improve SLA compliance and GPU-hours over the best static
 configuration and a reactive planner during burst episodes?
 Chapters~\ref{cap:baselines} and~\ref{cap:closedloop} answer yes and locate
-\emph{why}: the forecast-driven encoder schedule holds the tail bound on
-every window at every cold-start lead, where a reactive controller on the
-\emph{same} image signal loses the fastest-onset burst --- anticipatory
-headroom, not signal choice, is the operative advantage (numbers in
-Contribution~5). The reactive planner's language-pool failure is
-diagnostic: it satisfies its own window-mean control law while violating
-the tail SLA, and the same forecast through a mean conversion fails
-likewise --- mean-based conversion is the defect, and a measured tail-aware
-conversion repairs it.
+\emph{why}: anticipatory headroom, not signal choice, carries the
+encoder pool, and a measured tail-aware conversion --- not loop tuning
+--- repairs the mean-based sizing defect every reactive configuration
+shares (numbers in Contribution~5).
 \end{description}
 
 {\renewcommand{\sectionmark}[1]{}%
@@ -384,29 +376,20 @@ Section~\ref{sec:intro-gap}, fixable only by capacity). The decoupling of
 Chapter~\ref{cap:trace-eda}, reproduced as system behavior.
 
 \item \textbf{Baselines and the closed predictive-scaling loop}
-(Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}). The
-static-optimal worker-grid frontier per window (burst windows need 6--8
-encoder workers at trace rate against 2 on a calm day, TP2 language
-shapes throughout); the reactive SLA-planner baseline, which satisfies
-its own window-mean control law while violating the tail SLA; and the
-contribution proper: the vision pool's forecast
-driving its encoder worker schedules under cold-start lead, scored as SLA
-compliance $\times$ provisioned worker-time in a per-window issue-time
-factorial. At
-the operating rating ($\rho{=}15$) the p90-forecast policy delivers the
-RQ4 verdict (every window at every forecast-issued lead from 15 to
-\SI{165}{\second} --- burst windows at the \SI{588}{\milli\second}
-zero-queueing service floor, the calm day below \SI{734}{\milli\second}
---- at 0.62$\times$ the deployable static encoder fleet's
-worker-time), while the reactive controller on the \emph{same} signal
-loses the fastest-onset burst at every lead and sees its apparent aggregate
-pass dissolve under per-episode grading. The p90 band stands encoder
-capacity up before the peak with zero calm-day false alarms; the language
-pool needs a derived tail-aware conversion (a measured belief-to-knee ratio)
-as the second necessary ingredient. A cheap forecaster does not substitute:
-an EWMA at a calibrated quantile, through the same loop, misses the fast
-onsets or costs 1.09$\times$ static, so the calibrated band shape ---
-supplied zero-shot by the foundation models --- is load-bearing.
+(Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}): the
+static-optimal worker-grid frontier per window, the reactive SLA-planner
+baseline that satisfies its own window-mean control law while violating
+the tail SLA, and the contribution proper --- the vision pool's forecast
+driving its encoder worker schedules under cold-start lead. The
+p90-forecast policy holds the SLA on every forecast-covered window at
+every forecast-issued lead, and prices the covered week at 0.62$\times$
+the deployable static encoder fleet's worker-time, while the reactive
+controller on the \emph{same}
+signal loses the fastest-onset burst at every lead; the language pool
+needs a derived tail-aware conversion as the second necessary
+ingredient, and a calibrated-EWMA control shows the band \emph{shape}
+--- supplied zero-shot by the foundation models --- to be load-bearing,
+not forecast accuracy.
 \end{enumerate}
 
 \section{Scope and limitations}
@@ -414,48 +397,34 @@ supplied zero-shot by the foundation models --- is load-bearing.
 
 The claims are scoped by their evidence. The workload is one seven-day
 production trace with a by-construction 50/50 modality split and
-arrival-side information only: the rate signals stamp each request's full
-token volume at its arrival minute. For encoder and prefill work this is
-faithful; for decode it is \emph{not} a pointwise upper bound --- the
-stamped decode series is faithful in total volume but temporally displaced,
-and the sign of the bias over the population the controller actually samples
-spans zero, so the series licenses no provisioning claim in either
-direction (per-bin displacement quantified in
-Chapter~\ref{cap:trace-eda}). The
-trace records image counts, not sizes, so the encoder pool assumes a
-uniform $448^2$ image, and its cost model is validated against the serving
-engine's own vision tower --- a matched-engine (vLLM) check on a standalone
-vision-tower forward, holding within $12.8\%$ across the whole $N\le64$
-serving regime, the earlier ${\approx}1.4$--$1.6\times$ figure attributed to
-an alternate execution engine (HuggingFace eager) and predominantly
-execution-stack-specific (Appendix~\ref{app:engine-sensitivity}). The
-inter-pool handoff is priced
-single-stream: at Qwen3-VL's full DeepStack payload the
+arrival-side information only; the stamped decode series is faithful in
+total volume but temporally displaced, licensing no pointwise
+provisioning claim in either direction (quantified in
+Chapter~\ref{cap:trace-eda}). The trace records image counts, not sizes,
+so the encoder pool assumes a uniform $448^2$ image; its cost model is
+validated against the serving engine's own vision tower within
+$12.8\%$ across the serving regime, the earlier
+${\approx}1.4$--$1.6\times$ figure being execution-stack-specific
+(Appendix~\ref{app:engine-sensitivity}). The inter-pool handoff is
+priced single-stream: at Qwen3-VL's full DeepStack payload the
 \SI{588}{\milli\second} floor and the 0.62$\times$ result assume an
-embedding-only handoff or a ${\geq}100$\,Gbps fabric, since on the default
-25\,Gbps link transfer alone violates the bound for every policy
+embedding-only handoff or a ${\geq}100$\,Gbps fabric
 (Chapter~\ref{cap:closedloop}) --- a fabric requirement, not a policy
-weakness. The simulation is open-loop and deterministic; the inter-pool seam
-serializes each request's encoder and prefill phases (no speculative
-overlap); knee detection uses the thesis's evaluation SLA (TTFT and
-encoder-delay p99 under \SI{1}{\second}, inter-token p99 under
-\SI{100}{\milli\second}; Chapter~\ref{cap:twopool}), a design choice
-whose sensitivity is quantified there; and language-pool results
-characterize the 8B model at TP1 but deploy it at TP2$\times$2 (the
-burst-feasible shape), with a 235B-TP8 spot-check, leaving intermediate
-family members unpriced. The burst-window language \emph{pass} at TP2 is
-also token-accounting-convention-dependent (Chapter~\ref{cap:twopool}); the
-TP1 prefill floor and the vision-pool verdict are not. Forecasts are zero-shot (no fine-tuning on
-the trace), the conservative reading of the foundation models'
-capability.
-Finally, the control loop is anchored to the real stack: the winning policy
-and the reactive baseline, replayed against the live Dynamo runtime (real
-control plane, mocked engines) on the fastest-onset burst, reproduce the
-simulated verdicts in both directions --- TTFT p99 within 1.1--6.8\%, ITL
-p99 sub-bound for the forecast policy and \emph{above} the
-\SI{100}{\milli\second} bound for the reactive one, provisioned replica-time
-within 8\% (Chapter~\ref{cap:validation}); the physical encoder-worker
-anchor remains future work.
+weakness. The simulation is open-loop and deterministic, with no
+speculative encoder--prefill overlap; the evaluation SLA's bounds are a
+design choice whose sensitivity Chapter~\ref{cap:twopool} quantifies;
+language-pool results characterize the 8B at TP1 but deploy it at
+TP2$\times$2, with a 235B-TP8 spot-check, intermediate family members
+unpriced --- and the burst-window language \emph{pass} at TP2 is
+token-accounting-convention-dependent while the TP1 prefill floor and
+the vision-pool verdict are not (Chapter~\ref{cap:twopool}). Forecasts
+are zero-shot, the conservative reading of the foundation models'
+capability. Finally, the control loop is anchored to the real stack:
+both policies, replayed against the live Dynamo runtime (real control
+plane, mocked engines) on the fastest-onset burst, reproduce the
+simulated verdicts in both directions --- TTFT p99 within 1.1--6.8\%,
+provisioned replica-time within 8\% (Chapter~\ref{cap:validation}); the
+physical encoder-worker anchor remains future work.
 
 \section{Organization}
 \label{sec:intro-org}

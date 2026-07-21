@@ -97,25 +97,20 @@ the reactive loop is standardized infrastructure: Kubernetes' Horizontal
 Pod Autoscaler scales on aggregate utilization or custom metrics, KEDA
 generalizes the trigger to event sources, and Knative's KPA regulates on
 request concurrency~\cite{K8sAutoscalers}. All watch the one
-request stream, the inheritance this thesis interrogates. For ML
-serving, Swayam derived provisioning rules from SLA
-models~\cite{Gujarati2017Swayam}; MArk combined proactive and reactive
-scaling over heterogeneous instances~\cite{Zhang2019MArk};
-Clockwork made worker performance predictable
-bottom-up~\cite{Gujarati2020Clockwork}; INFaaS automated model-variant
-selection and scaling~\cite{Romero2021INFaaS}; AlpaServe showed that statistical
-multiplexing across model-parallel replicas changes the provisioning
-calculus~\cite{Li2023AlpaServe}. Closest in spirit to per-pool
-provisioning, InferLine sized each stage of multi-model prediction
-\emph{pipelines} under an end-to-end tail-latency
-SLO~\cite{Crankshaw2020InferLine}. But its stages are pre-LLM
-models fed by signals of the one request stream, so the question of \emph{which
+request stream, the inheritance this thesis interrogates. A pre-LLM ML-serving line established SLO-aware provisioning itself
+(Swayam's SLA-derived rules, MArk's proactive--reactive mix, Clockwork's
+predictable workers, INFaaS's model-variant scaling, AlpaServe's
+multiplexed model
+parallelism~\cite{Gujarati2017Swayam,Zhang2019MArk,Gujarati2020Clockwork,Romero2021INFaaS,Li2023AlpaServe}).
+Closest in spirit to per-pool provisioning, InferLine sized each stage
+of multi-model prediction \emph{pipelines} under an end-to-end
+tail-latency SLO~\cite{Crankshaw2020InferLine} --- but its stages are
+fed by signals of the one request stream, so the question of \emph{which
 signal} sizes each stage never arises. At the infrastructure level,
-Google's Autopilot established history-driven (including
-time-series--based)
-autoscaling as production practice~\cite{Rzadca2020Autopilot}. The common thread: the watched
-signal is the aggregate request stream or utilization. For
-single-stage, text-only services, that is a reasonable proxy for the one pool's
+Google's Autopilot established history-driven autoscaling as production
+practice~\cite{Rzadca2020Autopilot}. The common thread: the watched
+signal is the aggregate request stream or utilization --- for
+single-stage, text-only services, a reasonable proxy for the one pool's
 demand.
 
 The LLM era stressed this loop from two sides. On the supply side, cold
@@ -217,10 +212,9 @@ TimesFM, a decoder-only model pretrained on billions of
 points~\cite{Das2024TimesFM}; Chronos, which tokenizes series for a
 language-model backbone~\cite{Ansari2024Chronos}, and its successor
 Chronos-2 with native multivariate and covariate
-support~\cite{Ansari2025Chronos2}; Moirai's unified any-frequency
-training~\cite{Woo2024Moirai}; Lag-Llama's probabilistic
-head~\cite{Rasul2023LagLlama}; Time-MoE's billion-parameter
-sparse scaling~\cite{Shi2025TimeMoE}; and Datadog's Toto family, trained
+support~\cite{Ansari2025Chronos2}; Moirai, Lag-Llama, and Time-MoE
+broadening the
+family~\cite{Woo2024Moirai,Rasul2023LagLlama,Shi2025TimeMoE}; and Datadog's Toto family, trained
 at scale on observability telemetry (the domain closest to serving
 demand signals), released with the BOOM observability
 benchmark~\cite{Cohen2024Toto,Cohen2025BOOM} and scaled up in
@@ -281,8 +275,9 @@ but a finding. The demand signal most dangerous to reactive scaling is
 the vision pool's image rate: the burstiest of the four, nearly
 invisible in the request \emph{rate} a conventional autoscaler watches,
 and ramping to peak within replica cold-start times in its fastest
-bursts. That same signal is also the most persistent, hence the most
-forecastable, at exactly the horizons provisioning requires
+bursts. That same signal is also the most persistent, retaining usable
+predictive structure at exactly the horizons provisioning requires ---
+despite the largest per-bin error
 (Chapters~\ref{cap:trace-eda} and~\ref{cap:predictors}). That inversion
 makes per-pool predictive provisioning both necessary and feasible in
 modality-disaggregated serving, a property no prior work states or tests.
@@ -300,7 +295,7 @@ to our knowledge the first work to measure that the vision pool's
 arrival signal is nearly decoupled from request rate
 ($R^2 = \num{0.123}$ versus $\num{0.654}$ for decode demand;
 Chapter~\ref{cap:trace-eda}) and to turn that inversion --- burstiest
-and least rate-visible, yet most forecastable --- into a per-pool
+and least rate-visible, yet most persistent --- into a per-pool
 predictive provisioning signal. Second, against zero-shot foundation
 models already benchmarked on cloud demand for
 provisioning~\cite{Diao2024Forecasting,Toner2025ZeroShot}, the first
@@ -333,11 +328,8 @@ addressed; $\sim$ = partially (see text); --- = not addressed. The
 ``Forecast'' column marks scaling driven by an explicit time-series
 demand forecast (\checkmark); $\sim$ marks a proactive heuristic on
 aggregate or leading-indicator signals (long-run periodicity, burst
-tolerance, token velocity) rather than a per-pool demand forecast. The
-last column reports the evaluation modality: this thesis's $\sim$
-denotes silicon-calibrated simulation with physical encoder anchors and
-a mocked-engine live-runtime replay; a real-cluster closed loop is
-future work.}
+tolerance, token velocity) rather than a per-pool demand forecast. Last
+column: evaluation modality (this thesis's $\sim$: see text).}
 \label{tab:rel-positioning}
 \footnotesize
 \setlength{\tabcolsep}{3pt}

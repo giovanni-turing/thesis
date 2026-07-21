@@ -24,8 +24,15 @@ bad()  { printf "  \033[31mFAIL\033[0m  %s\n" "$1"; FAIL=$((FAIL+1)); }
 warn() { printf "  \033[33mWARN\033[0m  %s\n" "$1"; WARN=$((WARN+1)); }
 hdr()  { printf "\n\033[1m%s\033[0m\n" "$1"; }
 
-export PGPASSWORD=$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' postgres 2>/dev/null \
-                    | sed -n 's/^POSTGRES_PASSWORD=//p')
+# Password source order: env override > credentials file (post-rotation) > container env (stale after rotation)
+if [ -z "${PGPASSWORD:-}" ]; then
+  if [ -f "$(dirname "$0")/.goku_credentials" ]; then
+    export PGPASSWORD=$(sed -n 's/.*password=//p' "$(dirname "$0")/.goku_credentials" | head -1)
+  else
+    export PGPASSWORD=$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' postgres 2>/dev/null \
+                        | sed -n 's/^POSTGRES_PASSWORD=//p')
+  fi
+fi
 Q() { psql -h localhost -p 5433 -U goku -d postgres -tAc "$1" 2>/dev/null; }
 
 WANT_DATA=1; WANT_THESIS=1

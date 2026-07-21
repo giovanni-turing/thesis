@@ -93,12 +93,10 @@ steady (24 h) & 24.0 & 2 & TP1$\times$2 & 48.0 & 48.0 \\
 \end{table}
 
 The encoder $C^{*}$ minimizes the all-request encoder-delay p99
-(Chapter~\ref{cap:twopool}); under the stage-conditional metric
-(image-bearing requests only) the burst optima rise one to two workers,
-but the deployable static $C{=}8$ is unchanged --- binding burst windows
-peak at eight either way --- so the metric reshapes only the per-window
-table, not the deployable fleet behind the cost headline of
-Chapter~\ref{cap:closedloop} (0.62$\times$ static).
+(Chapter~\ref{cap:twopool}); under the stage-conditional metric the
+burst optima rise one to two workers but the deployable static $C{=}8$
+is unchanged, so the metric reshapes only the per-window table, not the
+fleet behind Chapter~\ref{cap:closedloop}'s cost headline.
 
 Three structural facts follow. First, \textbf{every burst window forces
 the language pool to TP2, and the gain is the parallelism layout, not
@@ -106,8 +104,9 @@ the GPU budget}. At TP1 no replica count is feasible: the burst's
 ${\approx}36$k-token frames-class prefills pin TTFT p99 at
 ${\approx}$\SI{1285}{\milli\second} even at $N{=}16$, a \emph{prefill
 floor} replica scaling cannot buy down. Four TP1 replicas and one
-TP2$\times$2 group are both four H100s, yet TP1$\times$4 fails every
-burst window while TP2$\times$2 passes every one --- a 1.55--1.74$\times$
+TP2$\times$2 group are both four H100s, yet TP1$\times$4 fails all five
+tabulated burst windows while TP2$\times$2 passes each --- a
+1.55--1.74$\times$
 tail cut from layout alone (Table~\ref{tab:base-tp}): intra-request
 tensor parallelism shortens the single long prefill that independent
 replicas can only queue. Second, the encoder requirement
@@ -229,12 +228,10 @@ fourteen language-pool configurations meet their own window-mean law
 while violating the tail SLA, spend cannot buy the tail back under lead,
 and even the correct encoder signal read reactively loses every window
 whose onset is faster than the lead. At full-trace scale
-(\num{1000000} requests), the deployable $C{=}8$ encoder fleet passes at
-encoder-delay p99 \SI{677}{\milli\second} while the calm-day $C{=}2$
-fleet fails at \SI{2905}{\milli\second}, and reactive encoder control
-holds the bound at \SI{588}{\milli\second} for 0.687$\times$ the
-deployable fleet's worker-time --- a real aggregate-scale saving, but
-graded in aggregate only (the same masking documented in
+(\num{1000000} requests), the deployable $C{=}8$ fleet passes, the
+calm-day $C{=}2$ fleet fails, and reactive encoder control holds the
+bound for 0.687$\times$ the deployable fleet's worker-time --- a real
+aggregate-scale saving, but graded in aggregate only (the masking of
 Section~\ref{sec:cl-ledger}), so it does not overturn the per-window
 verdicts: reactive control still loses burst3 graded on its own. Whether
 \emph{forecasting} those same per-pool signals closes

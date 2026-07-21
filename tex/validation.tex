@@ -134,10 +134,11 @@ reproducible live; decision \emph{values} at matching times are.
 replicas at \texttt{max\_gpu\_budget}; the live planner divides the
 same field by GPUs-per-replica. The anchor comparison equalizes the
 caps. The cap \emph{does} bind in these episode replays --- the
-tail-aware forecast requests up to 24 language replicas and
-\texttt{max\_gpu\_budget}${=}8$ clamps it to 8 --- so it reshapes the
-provisioned count, not the pass/fail verdict; the unit mismatch is
-equalized to the same applied cap and remains a reportable upstream defect.
+tail-aware forecast requests up to 24 language replicas against the
+equalized four-replica (8-GPU) cap --- so it reshapes the provisioned
+count, not the pass/fail verdict; the unit mismatch (the same field read
+as GPUs live and as replicas offline) remains a reportable upstream
+defect.
 \end{description}
 
 \section{Scope of the anchor}
@@ -151,7 +152,7 @@ only in simulation), and mocked engine execution. It validates the
 Chapter~\ref{cap:aiconfigurator} anchored physically on the encoder
 side. Within that scope the conclusion is direct: the platform's
 closed-loop behavior transfers to the real stack in both verdict
-directions --- the SLA verdicts are identical on all three metrics,
+directions --- the SLA verdicts agree on both graded metrics,
 TTFT and provisioned replica-time agree within single-digit percent, and the
 forecast policy's ITL differs by \SI{1.8}{\milli\second} (18\%, on a
 \SI{9.7}{\milli\second} base, far under the \SI{100}{\milli\second} bound;

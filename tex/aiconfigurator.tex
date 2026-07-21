@@ -81,13 +81,10 @@ unlocked and locked datasets (clock state scales both sides and cancels);
 only the locked dataset makes the absolute numbers interpretable.
 
 \paragraph{Out-of-envelope shapes, not coverage gaps.} The GEMM sweep's
-giant tail is memory-infeasible on this \SI{32}{\gibi\byte} card: the
-largest shapes exceed device memory and are left empty rather than filled
-synthetically --- an exclusion at the hardware envelope, not a hole in the
-data the encoder is priced from (the Qwen3-VL tower this system costs never
-queries that regime, $n\le\num{5120}$). A handful of small shapes that
-\emph{spuriously} reported out-of-memory in the allocation-fragmentation
-wake, the only genuine gaps, were requeued and collected cleanly.
+giant tail exceeds this card's \SI{32}{\gibi\byte} and is left empty ---
+an exclusion at the hardware envelope, outside the regime the Qwen3-VL
+tower queries ($n\le\num{5120}$); a handful of spurious out-of-memory
+shapes, the only genuine gaps, were requeued and collected cleanly.
 
 \subsection{Collected dataset}
 
@@ -112,9 +109,8 @@ Section~\ref{sec:aic-validation}, and the \emph{infilled slice}
 (\SI{8.16}{\milli\second}), which feeds every simulation from
 Chapter~\ref{cap:twopool} on. Re-deriving Chapter~\ref{cap:twopool} under
 the corrected data moved encoder-delay percentiles by at most
-${\approx}1\%$ and changed no finding --- one marginal worker-sizing
-optimum shifted by a single worker --- which is why grid-exact silicon at
-the query shapes was worth collecting; per-state row counts are in the
+${\approx}1\%$ and changed no finding (one marginal worker-sizing
+optimum shifted by a single worker); per-state row counts are in the
 provenance manifest (Appendix~\ref{ap:artifacts}).
 
 {\renewcommand{\sectionmark}[1]{}%
@@ -333,17 +329,12 @@ that it is validated.
 
 The calibrated encoder model was composed with Dynamo's offline LLM-pool
 simulator (\texttt{dynamo.replay}) in a minimal end-to-end test of the
-two-pool architecture. Stage one simulates the vision pool as a FIFO queue
-over $C$ encoder workers priced by the AIC prediction on the collected
-RTX~5090 silicon, folding each request's encoder delay (queue wait plus
-service) into its arrival timestamp at the language pool; stage two replays
-the composed trace (input length equal to text tokens plus post-merge vision
-tokens per image, disjoint prefix-hash sets ruling out spurious cache reuse)
-through \texttt{dynamo.replay} with a KV-aware router. A 50-request smoke
-workload
-produces a complete AIPerf-style report, confirming that silicon, encoder
-costing, queueing composition, and the LLM-pool simulator interoperate end
-to end.
+two-pool architecture: a FIFO vision pool priced by the AIC prediction
+folds each request's encoder delay into its language-pool arrival
+timestamp, and the composed trace (disjoint prefix-hash sets ruling out
+spurious cache reuse) replays through \texttt{dynamo.replay} with a
+KV-aware router. A 50-request smoke workload produces a complete
+AIPerf-style report, confirming the pipeline interoperates end to end.
 
 The first fidelity upgrade this pipeline invites --- AIC engine timing for
 the language pool on the datacenter \texttt{h100\_sxm} system, replacing the
@@ -362,10 +353,9 @@ encoder-attention and \num{34710} GEMM data points collected on the target
 consumer GPU under locked clocks, contributed upstream, and validated
 against physical measurement of the real network on the same hardware.
 Agreement is within ${\approx}3\%$ on the collected attention operator,
-every remaining difference enumerated and bounded, and the composed forward
-matches the serving engine's own vision tower (vLLM) to within $12.8\%$ ---
-the ${\approx}1.4$--$1.6\times$ figure being a HuggingFace-transformers
-execution-stack difference (Appendix~\ref{app:engine-sensitivity}). Two
+and the composed forward matches the serving engine's own vision tower
+(vLLM) to within $12.8\%$, the ${\approx}1.4$--$1.6\times$ figure being
+an execution-stack difference (Appendix~\ref{app:engine-sensitivity}). Two
 findings have independent value: AIC provides no usable fallback for encoder
 timing on systems without collected data (its support matrix masks this by
 skipping the encoder phase), and unlocked consumer-GPU clocks silently

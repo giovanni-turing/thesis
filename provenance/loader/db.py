@@ -12,13 +12,21 @@ PGHOST, PGPORT, PGUSER, PGDATABASE = "localhost", "5433", "goku", "postgres"
 
 @functools.lru_cache(maxsize=1)
 def _password():
+    # Source order: env override > credentials file (post-rotation) > container env (init-only, stale after ALTER ROLE)
+    if os.environ.get("POSTGRES_PASSWORD"):
+        return os.environ["POSTGRES_PASSWORD"]
+    cred = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".goku_credentials")
+    if os.path.exists(cred):
+        for line in open(cred):
+            if "password=" in line:
+                return line.rsplit("password=", 1)[1].strip()
     r = subprocess.run(
         ["docker", "inspect", "-f", "{{range .Config.Env}}{{println .}}{{end}}", "postgres"],
         capture_output=True, text=True)
     for line in r.stdout.splitlines():
         if line.startswith("POSTGRES_PASSWORD="):
             return line.split("=", 1)[1]
-    raise RuntimeError("POSTGRES_PASSWORD not found in `docker inspect postgres`")
+    raise RuntimeError("POSTGRES_PASSWORD not found in env, credentials file, or `docker inspect postgres`")
 
 
 @functools.lru_cache(maxsize=1)

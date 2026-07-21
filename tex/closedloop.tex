@@ -142,15 +142,14 @@ detection: it rests on the calibrated band's \emph{graduated headroom},
 which already sits elevated during the ambient activity \emph{before} the
 spike, lifting provisioned capacity to ${\approx}21$ workers, so capacity
 is standing when the one-minute spike lands. Read as an alarm the p90
-band is trigger-happy --- it crosses on 70--102 bins per day where the
-observed rate does not, against $\leq$1 for point and p50 --- but it is
-used as the \emph{provisioning quantile}, and that standing headroom
-(coverage 0.88--0.90, Chapter~\ref{cap:predictors}) is exactly the slight
-over-provisioning the $\rho$-frontier prices (the per-episode-clean band
-$\rho\in\{10,15,20\}$ costs 0.48--0.89$\times$ static). Point and p50
-paths, sizing to the mean, detect the same onsets 55 minutes to 4 hours
-late or never and fail as provisioning signals; the p90 band shows zero
-false alarms across the calm day for every model.
+band is trigger-happy, but it is used as the \emph{provisioning
+quantile}, and that standing headroom (coverage 0.88--0.90,
+Chapter~\ref{cap:predictors}) is exactly the slight over-provisioning the
+$\rho$-frontier of Section~\ref{sec:cl-aggregate} prices. Point and p50
+paths, sizing to the mean, detect the same onsets late or never and fail
+as provisioning signals; the p90 band shows zero false alarms across the
+calm day for every model (per-model detection counts in the provenance
+manifest, Appendix~\ref{ap:artifacts}).
 
 \paragraph{Anticipation versus headroom, separated directly.} The raw
 forecast-versus-reactive contrast changes two dials at once. Running the
@@ -170,23 +169,18 @@ whether a classical \emph{forward} forecaster at a calibrated quantile
 would reproduce the headline. It does not (Table~\ref{tab:cl-ewma}).
 Driving the identical encoder loop with a forward EWMA point path --- its
 p90 calibrated on the 1.4-day context to the same 0.88--0.90 coverage by
-three standard schemes --- exposes a coverage-versus-cost bind. The two
-cheap calibrations clear the \emph{burst-masked} week aggregate but
-\emph{fail} the fast onset (burst3) and the high-volume onset (burst5)
-under per-episode grading --- the same dashboard-masking, now on a
-forward forecaster. The one calibration that clears every episode
-over-provisions and costs 1.09$\times$ static, coming under the static
-fleet only at $\rho{\geq}20$ ($\rho$-frontier 1.32/1.09/0.94/0.83$\times$),
-where even the foundation policy loses burst5. Only the zero-shot
-foundation-model band clears every episode \emph{and} beats static
-(0.62$\times$). The refinement of ``model choice is second-order'' is
-thus precise: forecast \emph{accuracy} is second-order (ARIMA ties
-Chronos, Chapter~\ref{cap:predictors}), but the calibrated p90 band
-\emph{shape} is not --- a state-adaptive band that lifts at onsets without
-inflating in calm holds the tail and stays cheap, which the foundation
-models supply zero-shot while standard forward-EWMA calibrations do not.
-The Chronos control reproduces the committed figures to within run noise
-($<1\%$) throughout.
+three standard schemes --- exposes a coverage-versus-cost bind: the two
+cheap calibrations clear the burst-masked week aggregate but fail the
+fast and high-volume onsets under per-episode grading, and the one
+calibration that clears every episode over-provisions at 1.09$\times$
+static. Only the zero-shot foundation-model band clears every episode
+\emph{and} beats static (0.62$\times$). The refinement of ``model choice
+is second-order'' is thus precise: forecast \emph{accuracy} is
+second-order (ARIMA ties Chronos, Chapter~\ref{cap:predictors}), but the
+calibrated band \emph{shape} is not --- a state-adaptive band that lifts
+at onsets without inflating in calm, which the foundation models supply
+zero-shot while standard forward-EWMA calibrations do not. The Chronos
+control reproduces the committed figures to within run noise ($<1\%$).
 
 \begin{table}[htbp]
 \centering
@@ -291,7 +285,8 @@ language pool the conversion dial under a held cursor, not a second
 anticipation test. (This
 burst3 configuration is also the policy pair
 carried to the live-stack validation of Chapter~\ref{cap:validation}.)
-The verdict is not particular to burst3: replaying every burst episode
+The verdict is not particular to burst3: replaying every
+forecast-covered burst episode
 end-to-end, the p90 forecast passes each one at the service floor
 (TTFT p99 651--706\,\si{\milli\second} across onsets of 1--220 minutes)
 while the reactive planner fails all four
@@ -319,33 +314,26 @@ The quantile matters less here than on the encoder pool, and the
 contrast is diagnostic. The p50 forecast also \textbf{passes the week}
 on the language pool (TTFT p99 \SI{828}{\milli\second}, 319.9
 GPU-hours: 38\% cheaper than p90), whereas on the encoder pool p50 fails
-every one of its 48 week-scale cells. The mechanism is the burstiness
-gap: the tail-aware conversion is applied to both, but image demand is
-bursty enough that a median forecast's mean-sizing floods the encoder
-FIFO, while the smoother context-token demand is served adequately even
-at p50. What is universal is the \emph{conversion} --- mean-based reactive
-control fails both pools, tail-aware forecast control passes both --- and
-what is pool-specific is how much the \emph{quantile} adds: most where the
-signal is burstiest.
+every one of its 48 week-scale cells --- the burstiness gap: image
+demand floods the encoder FIFO under median sizing while the smoother
+context-token demand is served adequately even at p50. What is universal
+is the \emph{conversion}; what is pool-specific is how much the
+\emph{quantile} adds --- most where the signal is burstiest.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figuras/pred/pred_framework_diff}
 \caption{Why the framework differs, in three measurements.
-\textbf{(a)} On the image signal at provisioning cadence the predictors
-are near-parity: the foundation models (blue) and Dynamo's shipped
-predictors (yellow: ARIMA, Prophet, Kalman) cluster within
-$0.02$ WAPE, and ARIMA ties Chronos. \textbf{(b)} Yet on the burst3
-closed loop the verdict is categorical: every mean-conversion policy
-fails the SLA --- Dynamo's shipped predictors
-(\SI{3{,}495}{\milli\second}, forecaster-invariant) and the
-median-quantile forecast (\SI{2{,}164}{\milli\second}) alike --- while
-only the p90 forecast \emph{with a tail-aware conversion} passes
-(\SI{651}{\milli\second}). The differentiator is the signal and the
-conversion, not accuracy. \textbf{(c)} And the verdict holds on the live
+\textbf{(a)} At provisioning cadence the predictors are near-parity: the
+foundation models (blue) and Dynamo's shipped predictors (yellow)
+cluster within $0.02$ WAPE. \textbf{(b)} Yet on the burst3 closed loop
+the verdict is categorical: every mean-conversion policy fails the SLA
+and only the p90 forecast with a tail-aware conversion passes --- the
+differentiator is the signal and the conversion, not accuracy (values in
+Section~\ref{sec:cl-llm}). \textbf{(c)} The verdict holds on the live
 Dynamo runtime: both policies' online TTFT tails track their offline
-twins directionally, within 1.1--6.8\% (Chapter~\ref{cap:validation}; a
-single live run per policy, not a repeated-trial noise band).}
+twins within 1.1--6.8\% (Chapter~\ref{cap:validation}; a single live run
+per policy, not a repeated-trial noise band).}
 \label{fig:cl-framework-diff}
 \end{figure}
 
@@ -539,12 +527,9 @@ encoder statistic, forecasting does not beat reactive control on four of
 the five composed windows --- they tie exactly, at the floor. The whole
 encoder-latency advantage on this arm set lives in burst3}, where the
 reactive p99 of 16{,}079 is 15$\times$ over the \SI{1000}{\milli\second}
-bound while forecast holds the floor. The two out-of-span windows add
-separations the composed arm set cannot show:
-at $L{=}300$\,\si{\second} the reactive controller reaches
-\SI{4282}{\milli\second} on burst2 and \SI{4606}{\milli\second} on
-burst6 while the forecast arms hold \SI{588}{\milli\second}
-(Table~\ref{tab:base-react-enc}).
+bound while forecast holds the floor. Reactive control also fails the
+two out-of-span windows at long lead (Table~\ref{tab:base-react-enc});
+no archived forecast covers those episodes.
 
 Where the arms \emph{do} separate on every window is the worst case,
 which the p99 does not see: reactive's worst excursion above the bound
@@ -640,10 +625,8 @@ columns grade TTFT only.}
 compliance, not thrift.} Forecast holds TTFT p99 at
 \SI{651}{\milli\second} and ITL p99 at ${\approx}\SI{5.1}{\milli\second}$
 on all five windows; reactive violates TTFT on \emph{all five} and ITL on
-four. The one reactive ITL pass is the aggregate window, and it passes
-only because week-scale aggregation masks the burst excursions it fails
-individually --- the same dashboard-masking Section~\ref{sec:cl-aggregate}
-documents for the encoder. The duration columns are what a boolean
+four (the aggregate-window ITL pass is the masking of
+Section~\ref{sec:cl-aggregate} again). The duration columns are what a boolean
 feasibility flag cannot say: reactive leaves burst3's TTFT bound breached
 for 87 seconds (5.37\% of wall-clock) affecting 9.96\% of requests.
 
@@ -720,8 +703,7 @@ of Section~\ref{sec:sim-knees}: the measured composed p99 on the
 aggregate window is \SI{1240}{\milli\second}, in line with the
 ${\approx}\SI{1.24}{\second}$ estimate built there.
 
-Read jointly, the improvement is then stated once and completely:
-forecast holds the composed tail flat at \SI{1240}{\milli\second} on
+Read jointly: forecast holds the composed tail flat at \SI{1240}{\milli\second} on
 thirteen of fifteen arms and within \SI{20}{\milli\second} of it on the
 other two, independently of window, while reactive control ranges from
 \SI{1696}{} to \SI{21868}{\milli\second} --- $1.4\times$ to
@@ -807,31 +789,24 @@ Appendix~\ref{ap:artifacts}). The controller actually replayed, at
 \subsection{The volume of evidence}
 \label{sec:cl-ledger-scale}
 
-The results of this chapter are not a handful of runs. The provenance
-store from which every number above is drawn held \num{2060} simulation
-runs across the committed families, validated by 44 automated
-consistency checks over the schema; against that spine the composed arm
-set resolves to exactly 20 request-linked arms, each matched one-to-one
-to its run by artifact path.
-
-The per-run volumes are large: the aggregate window replays \num{749601}
-requests \emph{per pool} and the full-trace runs \num{1000000} per pool
-over 7 days, backed by tens of millions of per-request rows and the
-rolling-origin forecast archive of Chapter~\ref{cap:predictors}
-(per-partition counts in the provenance manifest,
-Appendix~\ref{ap:artifacts}). Finally, the layer none of this can
-simulate: the live validation of Chapter~\ref{cap:validation} runs the
-burst3 window through Dynamo's real control plane, in real time, twice
---- once per policy --- at \num{3093} requests each. Those workers are
-mocker processes on the shared AIC timing model, not GPUs: the live
-anchor validates the control loop, not silicon.
-
-One caveat keeps that volume from being over-read: scale is not
-independence. The runs replay a \emph{single} production trace, so a
-million requests is a million requests from one week of one service, and
-the generalisation limits of Section~\ref{sec:cl-limits} apply
-undiminished (the still-generating families a16, g2, g3\_32b, g6 are
-excluded from every table above, as the scope note said).
+The results of this chapter are not a handful of runs: the provenance
+store behind every number above held \num{2060} simulation runs across
+the committed families, validated by 44 automated consistency checks,
+against which the composed arm set resolves to exactly 20 request-linked
+arms matched one-to-one by artifact path. The aggregate window replays
+\num{749601} requests \emph{per pool} and the full trace \num{1000000},
+backed by tens of millions of per-request rows and the rolling-origin
+forecast archive (per-partition counts in the provenance manifest,
+Appendix~\ref{ap:artifacts}); the live validation of
+Chapter~\ref{cap:validation} adds the one layer none of this simulates,
+running burst3 through Dynamo's real control plane in real time, twice
+--- \num{3093} requests per policy, on mocker workers under the shared
+AIC timing model: the live anchor validates the control loop, not
+silicon. One caveat keeps that volume from being over-read: scale is not
+independence --- the runs replay a \emph{single} production trace, and
+the limits of Section~\ref{sec:cl-limits} apply undiminished (the
+still-generating families a16, g2, g3\_32b, g6 are excluded from every
+table above).
 
 \section{Limitations}
 \label{sec:cl-limits}
@@ -925,21 +900,16 @@ unaddressed.
 
 RQ4 is answered affirmatively, with the mechanism identified per pool.
 On the encoder pool, forecasting the pool's own signal at the calibrated
-p90 edge holds the tail SLA at every forecast-issued lead tested
-(15--\SI{165}{\second}), including
+p90 edge holds the tail SLA at every forecast-issued lead, including
 the one-minute onset that defeats an identically informed reactive
-controller at \emph{every} lead, because the p90 band's graduated standing
+controller at \emph{every} lead, because the band's graduated standing
 headroom --- not clean onset detection --- stands capacity up before the
 peak, leaving only the service-time floor. On the
-language pool the same forecast, converted tail-aware, passes bursts
-under realistic replica leads --- a \emph{conversion} result, tested
-under a held forecast cursor rather than a second anticipation test ---
-but only through that tail-aware capacity conversion, derived here as a
-measured belief-to-knee ratio, which repairs the mean-based sizing defect
+language pool the same forecast passes bursts under realistic replica
+leads only through the tail-aware capacity conversion --- a measured
+belief-to-knee ratio, tested under a held forecast cursor rather than a
+second anticipation test --- which repairs the mean-based sizing defect
 shared by every reactive configuration tested. Priced over the covered
-week, the policy meets the SLA in aggregate and per-episode at 0.62
-times the deployable static encoder fleet's worker-time (actuated on
-forecast issue time; lead-invariant across the archive's realizable
-range under the warm-pool readiness model, 0.59--0.62$\times$ under
-strict re-warm) --- the thesis statement's economic clause, now
-number-backed.
+week, the policy meets the SLA in aggregate and per-episode at
+\textbf{0.62 times the deployable static encoder fleet's worker-time}
+--- the thesis statement's economic clause, now number-backed.

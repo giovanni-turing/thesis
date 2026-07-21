@@ -110,19 +110,17 @@ Output tok/s per user (avg) & 160.6 & 142.0 \\
 
 \paragraph{Batching.} Probed directly, AIC's encoder graph prices a
 forward \emph{exactly} by its total images:
-every factoring of $N$ images into (batch, images-per-request) --- $(1,64)$,
-$(2,32)$, $(64,1)$ --- returns the same latency to the microsecond, because
+every factoring of $N$ images into (batch, images-per-request) --- $(1,64)$
+or $(64,1)$ --- returns the same latency to the microsecond, because
 attention is evaluated at the product batch$\times$images and every other
 operator at the total token count. Each dispatched batch is therefore
 costed at its image total, and batching pays: $f(1) = \SI{8.16}{\milli\second}$
 per image alone versus $f(64) = \SI{316.4}{\milli\second}$:
-\SI{4.94}{\milli\second} per image amortized, a $1.65\times$ throughput gain
-(a ${\sim}\SI{3.2}{\milli\second}$ fixed per-forward overhead).
-(Measured end-to-end the realized gain is smaller and
-saturates by $N{\approx}6$--$8$, a compute property of both execution stacks
-(HuggingFace-transformers and vLLM) rather than a cost-model artifact
-(Section~\ref{sec:aic-model-vs-silicon}), conservative for the saturation
-results below.) Dispatch is greedy FIFO: a freed worker takes
+\SI{4.94}{\milli\second} per image amortized, a $1.65\times$ throughput
+gain. (Measured end-to-end the realized gain is smaller and saturates by
+$N{\approx}6$--$8$ on both execution stacks --- conservative for the
+saturation results below; Section~\ref{sec:aic-model-vs-silicon}.)
+Dispatch is greedy FIFO: a freed worker takes
 whole queued requests, in order, up to a 64-image cap (the collected batch
 range, so no extrapolation); a request exceeding the cap alone (the
 trace reaches $97^2 = \num{9409}$ images) is chunked into $\leq
@@ -138,10 +136,9 @@ the largest requests carry an intrinsic multi-second service floor that no
 worker count removes (delay p99 plateaus at \SI{2.9}{\second} from 4 through
 32 workers), making every frames-heavy window statically infeasible by
 construction. The largest request costs ${\approx}\SI{46}{\second}$ of
-kernel time regardless, spread across whatever workers are free. Under low
-load the policy changes nothing at the steady head (delay percentiles
-identical to three decimals) and matters exactly where batching should ---
-inside bursts.
+kernel time regardless, spread across whatever workers are free. Under low load the policy
+changes nothing (steady-head percentiles identical to three decimals);
+it matters inside bursts.
 
 \paragraph{Handoff.} The encoder's output crosses pools. The runs
 charge the \emph{main} projector stream (post-merge vision embeddings
@@ -164,14 +161,10 @@ quantify on the week-scale aggregate. Second, the bound is
 placement, and cross-node topology are not modeled, so it is a lower
 bound on transfer latency, not a tail estimate; it is charged to request
 latency but not to the worker (asynchronous DMA/NIC), optimistic for encoder
-throughput, and a measured NIXL curve can later replace it. The trace records no image sizes, so the
-uniform 448\textsuperscript{2} assumption of
-Chapter~\ref{cap:aiconfigurator} stands. The
-${\sim}1.4$--$1.6\times$ offset earlier read as an AIC-versus-silicon gap
-at that resolution is an execution-\emph{stack} difference (the
-HuggingFace-transformers eager path is slower than the serving engine's own
-kernels); against vLLM's own vision tower at $448^2$ the cost model matches
-to within $12.8\%$ across the $N\le64$ regime
+throughput, and a measured NIXL curve can later replace it. The trace
+records no image sizes, so the uniform 448\textsuperscript{2} assumption
+of Chapter~\ref{cap:aiconfigurator} stands, and the cost model matches
+vLLM's own vision tower within $12.8\%$ across the serving regime
 (Appendix~\ref{app:engine-sensitivity}).
 
 {\renewcommand{\sectionmark}[1]{}%
@@ -198,17 +191,10 @@ variant is reported alongside it where the distinction matters
 (Chapter~\ref{cap:baselines}). Summing the two
 stage budgets gives ${\approx}\SI{2}{\second}$ to first token at roughly
 the p98 level (a union bound over two p99s, not an end-to-end p99
-guarantee). A modelled reconstruction on the composed run ---
-each request's replay-recorded encoder delay plus its AIC-modelled
-prefill --- puts the ingress-to-first-token p99 at
-${\approx}\SI{1.3}{\second}$: within the \SI{2}{\second} budget but close to
-the naive \emph{sum} of the marginals rather than their max, because the two
-tails are positively correlated (the same frames-class requests drive both
-large encoder batches and long prefills).
-Chapter~\ref{cap:closedloop} replaces this with a \emph{measured}
-request-linked join (Table~\ref{tab:cl-ledger-joint}), showing the naive sum
-is exact only while neither pool queues, so the separately reported
-per-stage percentiles understate the modelled first-token wait.
+guarantee); a modelled reconstruction on the composed run puts the
+ingress-to-first-token p99 at ${\approx}\SI{1.3}{\second}$, which the
+\emph{measured} request-linked join of Chapter~\ref{cap:closedloop}
+(Table~\ref{tab:cl-ledger-joint}) confirms.
 The
 specific bounds double Dynamo's default planner targets
 ($500/\SI{50}{\milli\second}$, window-mean) applied as tail bounds,
@@ -396,10 +382,9 @@ All encoder timing derives from a single RTX~5090 node (locked clocks);
 cross-unit silicon variance is unquantified. The vision pool inherits
 the uniform-448\textsuperscript{2}
 image assumption and the encoder cost model's engine-sensitivity at that
-resolution (Section~\ref{sec:sim-encoder}; per-image cost scales roughly with patch count, so a $224^2$-dominated
-workload would run ${\approx}4\times$ cheaper per image and a
-$672^2$-dominated one ${\approx}2.25\times$ dearer, shifting knee
-positions but not the queueing mechanism). Because image sizes are not
+resolution (Section~\ref{sec:sim-encoder}; per-image cost scales roughly with patch
+count, shifting knee positions but not the queueing mechanism). Because
+image sizes are not
 recorded, that assumption can only be stress-tested, not validated.
 Repricing the encoder at other resolutions through the collected RTX~5090
 operator database (per-cell numbers in Appendix~\ref{ap:artifacts}), the
@@ -436,8 +421,8 @@ which the 24-hour steady window corrects.
 
 The two-pool simulation runs the real trace end to end on calibrated
 timing for both pools, and under arrival-speedup sweeps against a tail-based
-interactive SLA it reproduces the thesis's motivating claim as measured
-behavior:
+interactive SLA it reproduces the thesis's motivating claim as simulated
+behavior under calibrated timing:
 on steady traffic the pools saturate an order of magnitude apart, and
 inside the largest burst both fail at the naive topology, differently
 --- a removable TP1 prefill floor against episodic FIFO queueing that

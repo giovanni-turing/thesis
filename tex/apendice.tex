@@ -139,15 +139,15 @@ Figure~\ref{fig:app-engines} plots the engines across the whole batch axis.
 \centering
 \includegraphics[width=\linewidth]{figuras/aic/aic_fn_engines}
 \caption{Dense $f(N)$ for the four execution engines vs.\ the AIC
-composition ($448^2$, RTX~5090 external lock target SM~2400\,/\,mem~14001\,\si{\mega\hertz};
-vLLM: 69 batch sizes, per-$N$ Student-$t$ $95\%$ CI below \SI{0.06}{\milli\second}; HuggingFace swept at 69 batch sizes and \texttt{torch.compile} at 13, both with wider CIs).
-\emph{Left}: forward latency (log--log). \emph{Right}: each engine relative
-to the composition; the shaded band marks $\pm12.8\%$ and the dotted line
-the FIFO cap ($N{=}64$). vLLM stays inside the band across the serving
-regime; HuggingFace-SDPA climbs to $1.69\times$ by $N{=}512$,
+composition ($448^2$, RTX~5090, external clock lock; dense sweeps with
+tight CIs, details in the artifact). \emph{Left}: forward latency
+(log--log). \emph{Right}: each engine relative to the composition; the
+shaded band marks $\pm12.8\%$ and the dotted line the FIFO cap
+($N{=}64$). vLLM stays inside the band across the serving regime;
+HuggingFace-SDPA climbs to $1.69\times$ by $N{=}512$,
 \texttt{torch.compile} between. The AIC curve is the postinfill snapshot
-for $N\le128$ and the composed model beyond, persisted as
-\texttt{aic\_fn\_engines\_aiccurve.csv}.}
+for $N\le128$ and the composed model beyond
+(\texttt{aic\_fn\_engines\_aiccurve.csv}).}
 \label{fig:app-engines}
 \end{figure}
 
@@ -195,16 +195,13 @@ patch-embedding \textsc{gemm}; a \emph{subsequent} branch added a guarded
 \texttt{encoder\_patch\_embed\_gemm} ($\approx0.3\%$ of the forward at
 $N{=}64$; the DeepStack mergers were already modelled). This addition
 postdates the load-bearing simulation snapshot of the main text, in which
-the operator is absent, so the two are consistent. Second, the perf
-tables blanked the ViT's
-large-batch shapes --- the \textsc{gemm} token-count grid stopped at
-$m{=}\num{32768}$ (the ViT needs $m{=}784N$ up to \num{401408}) and the
-attention grid at batch~$64$ (the ViT is queried at batch~$=N$,
-$\text{isl}{=}784$) --- so past $N{\approx}42$ the model extrapolated beyond
-the grid; ViT-shape rows at large $m$ and attention rows to batch~$512$
-were collected on the 5090 (a collector out-of-memory fix made the ViT's
-large-$m$ shapes collectable on a 32\,GB card). These are additive data/tooling
-corrections; the committed rows are preserved exactly.
+the operator is absent, so the two are consistent. Second, the perf tables blanked the ViT's large-batch shapes --- the
+\textsc{gemm} and attention grids stopped well short of the shapes the
+ViT queries, so past $N{\approx}42$ the model extrapolated beyond the
+grid; ViT-shape rows at large $m$ and attention rows to batch~$512$ were
+collected on the 5090 (with a collector out-of-memory fix for a 32\,GB
+card). These are additive data/tooling corrections; the committed rows
+are preserved exactly.
 
 \section{Figure and table manifest}
 
@@ -292,6 +289,12 @@ Week-scale surface (\S\ref{sec:cl-aggregate}; quantile-decisive,
   aggregate cells) &
   \texttt{simulation/results/ week\_surface\_issuetime/
   week\_surface\_issuetime\_results.json} \\
+Language-pool week replay (\S\ref{sec:cl-llm}: 651\,ms / 518.6 GPU-h;
+  p50, Toto, TimesFM, reactive arms) &
+  \texttt{simulation/results/ llm\_week/launch.sh} (composed trace +
+  winning encoder schedule through the planner) &
+  \texttt{llm\_week/ week\_\{fc\_p90, fc\_p90\_toto, fc\_p90\_timesfm,
+  fc\_p50, re\}.report.json} \\
 Onset detection (\S\ref{sec:cl-matrix}) &
   \texttt{simulation/ detect\_onsets\_44.py} &
   \texttt{results/riders44/ detection\_delay.json} \\

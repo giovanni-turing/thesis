@@ -111,3 +111,6 @@ defense/anim/data/**/*.jsonl
 defense/anim/data/**/*.log
 # timestamped figure backup (throwaway copy)
 /figuras_backup_1784438929/
+provenance/.ro_credentials
+provenance/.picolo_credentials
+provenance/.goku_credentials
