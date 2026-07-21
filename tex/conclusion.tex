@@ -17,12 +17,13 @@ conventional autoscaler watches does not carry the vision pool's demand:
 the two pools' demands decouple statistically and saturate an order of
 magnitude apart on steady traffic, with the encoder pool failing its
 tail bound at the trace's own recorded rate --- invisibly to rate- and
-utilization-based monitors. Correcting the missizing needs not just more
-replicas but a fleet-shape change (worker count and tensor-parallel
-shape) that no replica scaler can perform.
+utilization-based monitors. Correcting the missizing needs more encoder
+workers and, on the language pool, a tensor-parallel shape change that
+no replica scaler can perform.
 
 \paragraph{RQ2 --- Forecastability: yes, zero-shot.} Three pretrained
-time-series foundation models beat every classical baseline in all
+time-series foundation models beat every tested fixed-parameter
+classical baseline in all
 twenty (resolution, signal) cells under one rolling-origin protocol;
 accuracy degrades only marginally across a twelve-step horizon covering
 the median burst onset, covariates are nearly irrelevant at
@@ -47,9 +48,10 @@ silicon.
 
 \paragraph{RQ4 --- Closed-loop payoff: yes, with the mechanism
 identified.} On the encoder pool, the p90-forecast schedule meets the
-tail SLA on every window at every cold-start lead, including the
-one-minute-onset burst that defeats an identically informed reactive
-controller at every lead. It does so because the p90 band holds
+tail SLA on all five forecast-covered windows at all four issued leads
+(15--\SI{165}{\second}), including the one-minute-onset burst that
+defeats an identically
+informed reactive controller at every lead. It does so because the p90 band holds
 anticipatory headroom that matures within the cold-start lead, standing
 capacity up before the spike and leaving the service floor intact. The
 forecaster is load-bearing but its \emph{accuracy} is second-order: a
@@ -61,14 +63,17 @@ anticipation experiment --- the forecast passes bursts under realistic
 replica leads only when combined with a tail-aware capacity conversion
 (a measured belief-to-knee ratio); fed through the planner's native
 mean-based conversion it fails like the reactive baseline, so the defect
-is the conversion, not loop tuning. Over the covered span the policy
-holds the SLA in aggregate and inside every episode at
-\textbf{0.62$\times$ the deployable static encoder fleet's provisioned
-worker-time} (billed at forecast-issue time under a warm-pool readiness
-model, 0.59--0.62$\times$ under strict re-warm; the language fleet
-passes at 0.96$\times$ its burst-sized static shape), while the reactive
-controller's apparent aggregate pass dissolves under per-episode
-grading.
+is the conversion, not loop tuning. Over the covered 5.60-day span the
+policy holds the SLA in aggregate and inside all four in-span burst
+episodes, and prices
+that span at \textbf{0.62$\times$ the deployable static encoder fleet's
+provisioned worker-time} --- a week-scale saving: inside individual
+burst windows every autoscaling arm costs \emph{more} than static
+(issue-time actuation, warm-pool readiness; 0.59--0.62$\times$ under
+strict re-warm; the Chronos-p90 language schedule passes at
+0.965$\times$ a time-matched static TP2$\times$2 reference) --- while
+the reactive controller's apparent
+aggregate pass dissolves under per-episode grading.
 
 \paragraph{The thesis statement, revisited.} Every clause is now
 backed: the pools' demands decouple and saturate far apart (RQ1),
@@ -76,8 +81,8 @@ the least visible signal is the most persistent and forecastable
 zero-shot at provisioning horizons (RQ2), and scaling the vision pool on
 those forecasts --- with the language pool on their tail-aware conversion
 --- holds the tail objective through the onsets that defeat reactive control
-at every tested lead, at roughly two-thirds of the best static
-encoder fleet's GPU-time (RQ4).
+at every tested lead and, over the covered week, at roughly two-thirds
+of the best static encoder fleet's GPU-time (RQ4).
 
 \paragraph{What bounds these claims.} The evidence is one seven-day
 production trace with an offered-work upper bound on decode demand

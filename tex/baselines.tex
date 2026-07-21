@@ -126,8 +126,9 @@ no frontier movement).
 \caption{Iso-cost tensor parallelism on the language pool: TP1$\times$4
 and TP2$\times$2 both cost four H100s. TTFT p99 per burst window under the
 \SI{1000}{\milli\second} SLO (ITL p99 within bound in both columns); AIC
-timing on each window's composed trace at its static-optimal encoder
-count.}
+timing on each window's composed trace at its archived grid encoder
+count --- burst1--4 at the window optimum, burst5 archived at $C{=}16$
+(predating its corrected $C^{*}{=}8$).}
 \label{tab:base-tp}
 \small
 \begin{tabular}{@{}lrrr@{}}

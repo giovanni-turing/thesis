@@ -26,8 +26,8 @@ the same on the real stack?}
 
 The anchor window is burst3, the one-minute-onset episode and the
 hardest case in the fleet matrix, replayed in real time
-(\SI{27}{\minute}, 3{,}093 requests) by a fixed-schedule load client
-(aiperf). The client synthesizes each request at its trace timestamp with its
+(\SI{27}{\minute}, 3{,}093 scheduled requests) by a fixed-schedule load
+client (aiperf). The client synthesizes each request at its trace timestamp with its
 exact token counts and prefix-sharing structure, and measures TTFT/ITL
 client-side. Both anchor policies run the production planner service:
 the \emph{forecast} policy is the thesis's winning configuration
@@ -51,12 +51,16 @@ re-run through the replay platform of the preceding chapters.
 
 \begin{table}[htbp]
 \centering
-\caption{Live stack versus offline twin on burst3 (evaluation SLA:
+\caption[Live stack versus offline twin on burst3]{Live stack versus offline twin on burst3 (evaluation SLA:
 TTFT p99 $<$ \SI{1}{\second}, ITL p99 $<$
 \SI{100}{\milli\second}; budget-matched at 4 TP2 replicas). ITL p99 is the
 per-request inter-token latency $(\text{RequestLatency}-\text{TTFT})/(\text{OSL}-1)$
 computed like-for-like in both columns, matching aiperf's live metric and
-Dynamo's SLA definition (ITL${=}$TPOT).}
+Dynamo's SLA definition (ITL${=}$TPOT). Live tails are computed over
+successful responses --- 3{,}092 of the 3{,}093 scheduled for the
+forecast run and 3{,}089 for the reactive run (1 empty-response error and
+4 HTTP-500s, respectively) --- so the verdicts grade latency on completed
+requests, not availability.}
 \label{tab:val-anchor}
 \small
 \begin{tabular}{@{}llrrr@{}}

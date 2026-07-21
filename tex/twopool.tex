@@ -356,11 +356,11 @@ engine, and is not --- and within this work cannot be --- re-validated
 against physical H100 measurement. The polynomial-versus-AIC comparison
 quantifies the conclusions' \emph{sensitivity} to that timing model, which
 is not the same as its accuracy; the steady-window knee moves by one sweep
-step between the two models and the burst verdict changes outright. One pricing caveat carries over: requests
-beyond the \texttt{h100\_sxm} grid's \num{16384}-token edge
-(${\approx}3.1\%$ of the trace, up to ${\approx}149$k tokens, including
-the frames-class prefills that decide the burst-window TTFT tail)
-are priced by extrapolation (Section~\ref{sec:aic-composition}).
+step between the two models and the burst verdict changes outright. One pricing caveat carries over from Section~\ref{sec:aic-composition}:
+the ${\approx}3.1\%$ of requests beyond the collected \num{16384}-token
+grid (a share counted under the trace-token convention) are priced by
+extrapolation --- including the frames-class prefills that decide the
+burst-window TTFT tail.
 
 \emph{Per-request token accounting mixes conventions, with aligned
 biases.} The simulation costs encoder work as a full $448^2$ forward per

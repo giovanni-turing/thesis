@@ -1418,3 +1418,67 @@ Four method errors in the first pass account for nearly all 67 reversals. Any fu
 4. **Querying the wrong column.** `runs.model` holds **forecast**-model names (hiding an entire 26-run 235B
    sweep); `p99_itl_ms` is not `p99_tpot_ms` (manufacturing a phantom 8 ms discrepancy). Confirm the column
    maps to the table's stated definition.
+
+---
+
+## Addendum (2026-07-21): R18 amended — 0.96x -> 0.965x; live error-count disclosure
+
+Reviewer-caught, verified against primary artifacts before applying:
+
+1. **Language-week ratio.** Raw operands: `simulation/results/llm_week/week_fc_p90.report.json`
+   `gpu_hours = 518.6063`; static reference = 4 H100-GPUs x covered span
+   (3,869,300 s / 8 = 483,662.5 s) = 537.4029 GPU-h. Ratio = **0.96502**.
+   The printed `0.96x` was a mis-rounding (2-dp rounding of 0.965 is 0.97);
+   corrected to **0.965x** at all 5 sites (abstract EN/PT, closedloop x2,
+   conclusion). "Near-break-even" reading unchanged (strengthened). The
+   request-matched 1.03x (518.6/503.7 = 1.0296) is unaffected.
+   R18's original protection (against regressing to wrong-runtime values)
+   remains; the protected value is now 0.965x (gate updated).
+
+2. **Live validation populations.** aiperf exports: forecast tails over
+   3,092 of 3,093 scheduled (1 InvalidInferenceResultError empty-response);
+   reactive over 3,089 (4 HTTP-500 "Failed to generate completions").
+   Disclosed in tab:val-anchor's caption; verdicts stated as
+   latency-conditional on completed requests, not an availability grade.
+   closedloop volume-of-evidence now says "scheduled requests".
+
+### Addendum 2 (2026-07-21): billing-verb + compliance/cost-scope fixes (reviewer round 2)
+
+1. conclusion RQ4 said the 0.62x worker-time was "billed at forecast-issue
+   time" -- wrong verb: the encoder bills FROM READINESS (warm-up billed
+   from order reported separately); the schedule is ACTUATED at issue time
+   (closedloop's own convention). Fixed to "issue-time actuation, warm-pool
+   readiness".
+2. Compliance/cost merge: three sites attached the week-only 0.62x /
+   "fraction of GPU-hours" saving to burst-level compliance clauses
+   (conclusion RQ4, thesis-revisited, the intro thesis-statement quote).
+   All three now scope the saving to the covered week and RQ4 names the
+   boundary (per-burst every arm costs MORE than static). Also fixed a
+   round-1 miss: conclusion RQ4 "every window" -> "every forecast-covered
+   window".
+
+### Addendum 3 (2026-07-21): v2 external audit absorbed (verified item-by-item)
+
+All empirical claims in thesis_shortening_report_v2.md were verified against
+primary artifacts/DB before application. CONFIRMED+APPLIED: intro RQ4
+compliance/cost separation; cl-aggregate caption actuation-vs-integration;
+0.965x scoping (Chronos-p90 + time-matched TP2x2) at promotion sites;
+population enumeration (5 windows / 4 leads / 4 in-span episodes); abstract
+EN/PT parity set (draft-PR status, one-live-run, hardest-burst, 5.60-day span,
+worker-time units, persistence-not-causal); base-tp caption relabel (burst5
+archived C=16, verified on disk; burst1-4 at C*); per-burst range population
+(1.80=timesfm L30 warm b3, 2.90=timesfm warm b4, leads 15-45 verified in
+factorial artifact); language folds 0.93-3.81x >1 in 6/7 (g4_folds verified);
+cl-ewma floor cells REVERTED 588->589 per the harness's own artifact
+(ewma_baseline_*.json p99=589.301 incl. the chronos control; my deep-verify
+589->588 edit had relied on a DB population that never contained these runs)
+with a cross-harness footnote; ITL 5.1->5.1-6.3; stale "remaining windows"
+sentence; 3.1% dedupe + trace-token convention; AIC snapshot label +
+cross-refs; manifest rows added (base-tp, cl-ewma, ledgers, folds, dynamo
+registry, additive ablation, runtime logs, framework-diff, infill counts);
+false pointers repaired. REFUTED (artifact evidence): P1.5's "one-minute
+only" coverage narrowing -- quantile_coverage.json shows p90 coverage
+0.881-0.901 at 15-SECOND bins across all models/signals, so the claim was
+GROUNDED at both cadences instead. DEFERRED (structural, user decision):
+ledger compaction, 200-word abstract rewrite, ~6k-word structural cut,
+framework-diff deletion, question-only RQs.

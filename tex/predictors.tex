@@ -66,7 +66,8 @@ attention mixes the signals. TimesFM has no covariate interface and is
 the strict univariate-per-signal control. (This is \emph{not} the
 request-rate-only policy of a conventional autoscaler, which watches one
 signal for every pool.) The baselines are configured conventionally, with fixed textbook
-parameters (exact settings in the archived benchmark configuration,
+parameters (set in the versioned benchmark code,
+\texttt{predictors/\{ewma,holt\_winters\}.py};
 Appendix~\ref{ap:artifacts}). Point forecasts are
 the median for Chronos-2 and Toto-2, the mean head for TimesFM, and the
 model value for the baselines, whose quantile bands are Gaussian
@@ -80,7 +81,8 @@ alongside MAE where absolute units aid interpretation. Metrics are
 computed at the first step ($h{=}1$), per horizon step, and pooled over
 the horizon (\emph{overall}), for the point forecast and for each
 quantile as a candidate point forecast. The full benchmark runs on one
-RTX~5090 (wall-clock in Appendix~\ref{ap:artifacts}). Per decision the cost
+RTX~5090 (runtime logs archived beside the metric tables,
+Appendix~\ref{ap:artifacts}). Per decision the cost
 is small: one 12-step forecast of all four signals costs
 \SI{4}{\milli\second} (TimesFM) to \SI{51}{\milli\second} (Chronos-2 with
 covariates) of GPU time, comfortably inside any 15--60-second cadence. The
@@ -253,7 +255,8 @@ sizing, not point correction.
 \paragraph{Is the band calibrated?} Headroom sizing is sound only if the
 band edges mean what they claim, so empirical coverage was computed over
 the archived quantiles (fraction of realized values at or below each
-predicted quantile). At 1-minute resolution the upper edge, the one
+predicted quantile). At provisioning cadences (15-second and 1-minute
+bins) the upper edge, the one
 provisioning consumes, is essentially calibrated for every model and
 signal: p90 coverage 0.88--0.90 against the nominal 0.90. Median coverage
 sits near 0.45; the lower edge is distorted by zero-ties (the p10
@@ -329,7 +332,8 @@ absent from this accuracy benchmark but present where it matters more: the
 reactive baseline of Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}
 runs Dynamo's planner with its ARIMA predictor unmodified. Quantile
 calibration is partially assessed (Section~\ref{sec:pred-quantiles}: upper
-edge calibrated at 1-minute cadence, lower edge distorted by zero ties);
+edge calibrated at 15-second and 1-minute cadence, lower edge distorted
+by zero ties);
 horizon- and burst-conditional coverage remain open. Chronos-2
 occasionally emits locally crossed quantiles (its head does not enforce
 monotonicity); values are recorded as produced apart from the

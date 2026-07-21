@@ -243,9 +243,9 @@ single queue-feasibility search (encoder-delay p99 within the SLA, backlog
 non-divergent), identical in every window and differing only in the
 per-batch cost $f(N)$. Because the measured vLLM cost matches the AIC
 composition across the serving regime, AIC-priced sizing carries no
-separate silicon penalty; the resulting per-window worker counts, the
-capacity-rating frontier, and one burst-window sizing correction are
-detailed in Chapter~\ref{cap:twopool}, and the full execution-engine
+separate silicon penalty; the resulting per-window worker counts are
+detailed in Chapter~\ref{cap:baselines}, the capacity-rating frontier in
+Chapter~\ref{cap:closedloop}, and the full execution-engine
 sensitivity study in Appendix~\ref{app:engine-sensitivity}.
 
 \section{Validation against physical measurement}
@@ -348,7 +348,8 @@ decide burst-window TTFT tails) are priced by stratum-three extrapolation
 
 \section{Summary}
 
-The vision-pool cost model now rests on measured silicon: \num{7760}
+The vision-pool cost model now rests on measured silicon: the
+post-infill simulation snapshot of \num{7760}
 encoder-attention and \num{34710} GEMM data points collected on the target
 consumer GPU under locked clocks, contributed upstream, and validated
 against physical measurement of the real network on the same hardware.

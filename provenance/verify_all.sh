@@ -159,8 +159,63 @@ must_exist "tab:sim-poly-aic poly cell 67.3 / 248"  "67.3 / 248"
 must_exist "twopool 'were not priced' (R26)"        "were not priced"
 must_exist "live-vs-sim band 1.1--6.8% (R1)"        "1.1--6.8"
 must_exist "235B ITL p99 87.7 ms (wheel-consistent)" "87.7"
-N96=$(grep -rho '0[.,]96' tex/*.tex 2>/dev/null | wc -l)
-[ "$N96" -ge 4 ] && ok "0.96x intact at $N96 sites (R18)" || bad "0.96x present at only $N96 sites (expected >=4)"
+# ---- DERIVED-VALUE RECOMPUTATION (protocol R-A, added 2026-07-21) ----------
+# Every printed headline ratio is recomputed from RAW operands (artifact files
+# where they exist, provenance-commented operand pairs otherwise) and the
+# printed value must be the correct rounding. Transcription-only checking is
+# what let 0.96x survive four passes. See provenance/audit/REVIEW_PROTOCOL.md.
+DERIVED=$(python3 - <<'PYEOF'
+import json, sys
+fails = []
+def chk(name, val, printed, prec):
+    r = round(val, prec)
+    ok = abs(r - printed) < 10**(-prec) / 2
+    print(("PASS " if ok else "FAIL ") + f"{name}: raw={val:.5f} -> {r} (printed {printed})")
+    if not ok: fails.append(name)
+# [1] language-week ratio: numerator READ FROM ARTIFACT, denom = 4 GPU x span
+try:
+    fc = json.load(open('simulation/results/llm_week/week_fc_p90.report.json'))['gpu_hours']
+except Exception as e:
+    fc = None; print(f"FAIL llm-week artifact unreadable: {e}"); fails.append('llm_week')
+if fc is not None:
+    span_s = 3869300.0 / 8            # static C=8 encoder ws / 8 workers
+    static = 4 * span_s / 3600
+    chk('0.965x language week', fc / static, 0.965, 3)
+    chk('1.03x request-matched', fc / 503.7, 1.03, 2)
+# [2] encoder week 0.62x (operands: tab:cl-aggregate, aggregate44 fc_p90_L30 / static C8)
+chk('0.62x encoder week', 2410800.0 / 3869300.0, 0.62, 2)
+# [3] full-trace reactive 0.687x (tab:cl-ledger-enc full-trace block)
+chk('0.687x full trace', 3323200.0 / 4838400.0, 0.687, 3)
+# [4] burst3 naive-sum error +21.9% (tab:cl-ledger-joint)
+chk('21.9% naive-sum error', 100 * (26652.0 - 21868.0) / 21868.0, 21.9, 1)
+# [5] live populations: counts + errors READ FROM ARTIFACTS (protocol R-B)
+try:
+    for run, n_exp, e_exp in [('live_fc', 3092, 1), ('live_re', 3089, 4)]:
+        d = json.load(open(f'simulation/results/live51/live_runs/{run}/profile_export_aiperf.json'))
+        n = d['time_to_first_token']['count']; e = d['error_summary'][0]['count']
+        ok = (n == n_exp and e == e_exp and n + e == 3093)
+        print(("PASS " if ok else "FAIL ") + f"{run} population: {n} tails + {e} errors = {n+e} of 3093")
+        if not ok: fails.append(run)
+except Exception as e:
+    print(f"FAIL live artifacts unreadable: {e}"); fails.append('live')
+sys.exit(1 if fails else 0)
+PYEOF
+)
+DERIVED_RC=$?
+while IFS= read -r line; do
+  case "$line" in PASS*) ok "derived: ${line#PASS }";; FAIL*) bad "derived: ${line#FAIL }";; esac
+done <<< "$DERIVED"
+# verb-convention regression (protocol R-C)
+BILLMISUSE=$(grep -rcE "billed at (forecast-)?issue" tex/*.tex | grep -v ':0' | wc -l)
+[ "$BILLMISUSE" -eq 0 ] && ok "no billing-verb misuse (billed-at-issue: 0; R-C)" || bad "billing-verb misuse present (R-C)"
+
+# R18 AMENDED 2026-07-21: raw operands 518.6063/537.4029 = 0.96502 -> printed
+# ratio corrected 0.96x -> 0.965x at all sites (reviewer-caught mis-rounding;
+# 2-dp rounding of 0.965 would be 0.97, so the 3-dp form with operands is used).
+N96=$(grep -rho '0[.,]965' tex/*.tex 2>/dev/null | wc -l)
+[ "$N96" -ge 4 ] && ok "0.965x intact at $N96 sites (R18-amended)" || bad "0.965x present at only $N96 sites (expected >=4)"
+N96OLD=$(grep -rho '0[.,]96[^5]' tex/*.tex 2>/dev/null | grep -vc '0[.,]965' || true)
+[ "$N96OLD" -eq 0 ] && ok "no stale 0.96x remains (all amended to 0.965x)" || bad "stale 0.96x still present at $N96OLD site(s)"
 
 # B3 containment -- post-manuscript defence material must not be ADDED as a thesis result.
 # Semantics matter: pre-existing limitation language legitimately mentions these concepts

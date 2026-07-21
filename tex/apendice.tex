@@ -232,9 +232,18 @@ Tabs.~\ref{tab:eda-archetypes},~\ref{tab:eda-persistence} &
   \texttt{*\_stats.json} (same dir) \\
 Tab.~\ref{tab:pred-wape};
 Figs.~\ref{fig:pred-heatmap}--\ref{fig:pred-horizon},
-\ref{fig:pred-band}, \ref{fig:pred-models} &
+\ref{fig:pred-band}, \ref{fig:pred-models},
+\ref{fig:cl-framework-diff} &
   \texttt{predictors/ \{benchmark, precision, figures\_tex\}.py} &
-  \texttt{results/*.parquet} (26 files) \\
+  \texttt{results/*.parquet} (26 files); runtime logs
+  \texttt{results/logs/} \\
+Dynamo shipped-predictor comparison (\S\ref{sec:pred-point}) &
+  registry sweep through the same protocol &
+  \texttt{predictors/ results\_dynamo/ \{arima,kalman,prophet,
+  constant\}\_*.json; comparison\_table.csv} \\
+Additive context decomposition (\S\ref{sec:pred-covariates}) &
+  structural ablation over the archive &
+  \texttt{results/metrics/ additive\_structural\_ablation.json} \\
 Quantile coverage (\S\ref{sec:pred-quantiles}) &
   coverage pass over the archive &
   \texttt{results/metrics/ quantile\_coverage.json} \\
@@ -247,7 +256,8 @@ Tab.~\ref{tab:aic-fn}, Fig.~\ref{fig:aic-fn} &
   \texttt{kernel\_ledger\_N\{1,64\}.json} \\
 Shape infill (\S\ref{sec:aic-collection}) &
   \texttt{collector\_artifacts/ phaseC\_vit\_shape\_infill/} &
-  merged parquets (AIC branch, \texttt{656ac8ca}) \\
+  merged parquets (AIC branch, \texttt{656ac8ca}); row counts
+  7{,}679$\to$7{,}760 attn, 34{,}326$\to$34{,}710 GEMM \\
 Tab.~\ref{tab:sim-poly-aic} &
   \texttt{simulation/run\_replay.sh} &
   \texttt{results/srcbuild/ llm\_head2k\_*\_src.json} \\
@@ -260,6 +270,22 @@ Fig.~\ref{fig:sim-burst-queue} &
 Cap sensitivity (\S\ref{sec:sim-limitations}) &
   \texttt{workload/trace\_to\_two\_pool.py} &
   \texttt{results/cap\_sensitivity/} \\
+Tab.~\ref{tab:base-tp} (iso-cost TP; burst5 archived at $C{=}16$) &
+  \texttt{simulation/sweep\_grid.py} (TP cells) &
+  \texttt{results/grid/reports/ grid\_llm\_*\_\{N4\_aic,
+  N2\_TP2\_aic\}.report.json} \\
+Tab.~\ref{tab:cl-ewma} (EWMA calibration loop) &
+  EWMA p90 calibration through the identical encoder loop &
+  \texttt{verification/results/ ewma\_\{baseline\_*, sweep\}.json} \\
+Tabs.~\ref{tab:cl-ledger-enc}--\ref{tab:cl-ledger-joint}
+  (request-linked arm set) &
+  composed replays joined one-to-one by artifact path &
+  provenance store (schema \texttt{provenance}: \texttt{v\_joint\_e2e},
+  \texttt{v\_pool\_latency}, \texttt{v\_pool\_cost}) over
+  \texttt{simulation/results/} \\
+Daily folds (\S\ref{sec:cl-limits}) &
+  fold split + per-fold replay &
+  \texttt{defense/anim/data/ g4\_folds/folds\_table.md} \\
 Tab.~\ref{tab:base-grid} (burst5 $C^{*}$ corrected to 8) &
   \texttt{simulation/sweep\_grid.py} (+35 close-out corner runs);
   burst5 stability correction \texttt{verification/scripts/ burst5\_stability.py} &

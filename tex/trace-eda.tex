@@ -112,7 +112,8 @@ occupies the high-\texttt{NumImages} tail.}
 \section{Temporal structure}
 \label{sec:eda-temporal}
 
-The arrival process is not Poisson at any operationally relevant scale:
+The arrival process is not Poisson at any tested scale
+(\SI{1}{\second}--\SI{1}{\hour}):
 inter-arrival coefficient of variation 1.55, overdispersed per-second
 counts, and a Fano factor that keeps growing across the measured
 range of counting windows, from 1.8 at \SI{1}{\second} to 938 at one hour
@@ -239,7 +240,8 @@ Episode composition is homogeneous: the frames class supplies
 93--96\% of the image volume of every top episode, and clustering the 18
 episodes on shape and composition features isolates a single mixed-composition
 outlier against an otherwise uniform population. In effect the trace
-contains \emph{one burst type}: frames-class floods.
+contains one dominant burst type --- frames-class floods --- plus that
+single mixed-composition outlier.
 
 Bursts compound on the prefill side. Multimodal requests carry 72.5\% of
 all prefill tokens, and during burst minutes the mean prefill length is
@@ -387,7 +389,7 @@ decoupling, and with it the case for a separate vision-pool signal.
 
 Half the requests are text-only, images arrive as tile/frame batches,
 four archetypes stress different serving stages, and the arrival process
-is non-Poisson at every scale, with diurnal harmonics over a
+is non-Poisson at every tested scale, with diurnal harmonics over a
 long-range-dependent background. The vision demand signal is at once the
 least visible to request-rate monitoring ($R^2 = 0.123$), the burstiest,
 and the most persistent ($H \approx 0.93$), its extremes essentially

@@ -134,9 +134,10 @@ Nor would watching the right signal reactively suffice. Onsets ramp from
 baseline to peak in a median of six minutes; against replica cold starts
 of tens of seconds to minutes, a third of the bursts arrive too fast for a
 policy that waits to observe them. Aggregation does not rescue the
-reactive loop: the arrival process is overdispersed at every operational
-scale (the Fano factor grows nearly three orders of magnitude with the
-counting window), so no averaging window makes the signal safe for a threshold rule --- the
+reactive loop: the arrival process is overdispersed at every tested
+operational scale (the Fano factor grows nearly three orders of
+magnitude with the
+counting window), so no tested averaging window makes the signal safe for a threshold rule --- the
 scale-free burstiness long documented for network and Web
 traffic~\cite{Leland1994,Crovella1997} reappearing in a serving system's
 demand signals. The failure is also invisible to the dashboards reactive
@@ -173,7 +174,8 @@ least visible to conventional autoscaling is also the most persistent:
 pretrained time-series models forecast it, zero-shot, at the horizons
 provisioning requires. Scaling on these forecasts holds the tail latency
 objective through the burst onsets that defeat reactive control at every
-tested cold-start lead time, at a fraction of the best static \emph{encoder}
+tested cold-start lead time and, over the evaluated week, at a fraction
+of the best static \emph{encoder}
 fleet's GPU-hours; the language pool, separately provisioned on its own
 hardware, is near-break-even.
 \end{quote}
@@ -190,7 +192,8 @@ yes for decode, on the offered-work reading of its signal.
 
 \item[RQ2 --- Forecastability.] Are the per-pool signals forecastable at
 provisioning horizons, zero-shot, by pretrained time-series models?
-Chapter~\ref{cap:predictors} answers yes: the foundation models beat every
+Chapter~\ref{cap:predictors} answers yes: the foundation models beat
+every tested
 classical baseline, accuracy decays only marginally across the horizon
 covering the median burst onset, and covariates are nearly irrelevant at
 provisioning cadence (the forecasting-side echo of RQ1's decoupling).
@@ -205,8 +208,9 @@ timing exposes the tails the simulator's default polynomial flattens.
 
 \item[RQ4 --- Closed-loop payoff.] Does provisioning each pool on its own
 signal --- a \emph{forecast} for vision, a tail-aware \emph{conversion} for
-language --- improve SLA compliance and GPU-hours over the best static
-configuration and a reactive planner during burst episodes?
+language --- hold tail-SLA compliance through burst episodes that defeat
+a reactive planner, and reduce GPU-hours against the best static
+configuration over the evaluation span?
 Chapters~\ref{cap:baselines} and~\ref{cap:closedloop} answer yes and locate
 \emph{why}: anticipatory headroom, not signal choice, carries the
 encoder pool, and a measured tail-aware conversion --- not loop tuning
@@ -281,7 +285,7 @@ Figure~\ref{fig:intro-arch} sketches the system.
   \scriptsize quantile headroom, cold-start lead};
 \draw[arr] (trace) -- node[lbl, above] {requests} (vis);
 \draw[arr] (vis) -- node[lbl, above] {seam:\\arrival $+$ delay}
-  node[lbl, below] {$196{\times}4096$\\bf16/img} (llm);
+  node[lbl, below] {main stream\\$196{\times}4096$ bf16/img} (llm);
 \draw[arr] (fc.west) -| node[lbl, left, pos=0.85] {$C(t)$} (vis.north);
 \draw[arr] (fc.east) -| node[lbl, right, pos=0.85] {$N(t)$} (llm.north);
 \draw[arr, dashed] (trace.north) |- node[lbl, above, pos=0.72]
@@ -389,7 +393,7 @@ signal loses the fastest-onset burst at every lead; the language pool
 needs a derived tail-aware conversion as the second necessary
 ingredient, and a calibrated-EWMA control shows the band \emph{shape}
 --- supplied zero-shot by the foundation models --- to be load-bearing,
-not forecast accuracy.
+not point-forecast accuracy alone.
 \end{enumerate}
 
 \section{Scope and limitations}

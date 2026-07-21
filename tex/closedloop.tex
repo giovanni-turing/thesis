@@ -190,8 +190,11 @@ warm-pool; each EWMA p90 calibrated on the 1.4-day context to 0.88--0.90
 coverage). Per-window encoder-delay p99 is lead-invariant over
 $L\in\{15,\ldots,165\}$\,s; ``agg'' is the week-scale cost versus the
 deployable static $C{=}8$ fleet. \emph{Every} policy clears the aggregate p99
-at the \SI{588}{\milli\second} service floor --- the burst-masking of
-Section~\ref{sec:cl-aggregate} --- so the operative verdict is per-episode.}
+at the \SI{589}{\milli\second} service floor --- the burst-masking of
+Section~\ref{sec:cl-aggregate} --- so the operative verdict is
+per-episode. (This harness's replay normalization reads the shared floor
+\SI{1}{\milli\second} above the main issue-time artifacts'
+\SI{588}{\milli\second}; it is the same floor.)}
 \label{tab:cl-ewma}
 \small
 \begin{tabular}{@{}lrrrrrrl@{}}
@@ -201,10 +204,10 @@ per-episode \\
  & \multicolumn{5}{c}{encoder-delay p99 (\si{\milli\second})} &
 $\times$static & verdict \\
 \midrule
-Foundation (Chronos)  & 588 & 588             & 588 & 588            & 681 & 0.62 & \textbf{pass all} \\
-EWMA, add-conformal   & 658 & \textbf{1{,}285}& 588 & div$^\dagger$  & 418 & 0.70 & fail b3,\,b5 \\
-EWMA, mult-conformal  & 588 & 747             & 588 & 588            & 418 & 1.09 & pass all \\
-EWMA, width-scaled    & 611 & \textbf{2{,}084}& 588 & div$^\dagger$  & 736 & 0.56 & fail b3,\,b5 \\
+Foundation (Chronos)  & 589 & 589             & 589 & 589            & 681 & 0.62 & \textbf{pass all} \\
+EWMA, add-conformal   & 658 & \textbf{1{,}285}& 589 & div$^\dagger$  & 418 & 0.70 & fail b3,\,b5 \\
+EWMA, mult-conformal  & 589 & 747             & 589 & 589            & 418 & 1.09 & pass all \\
+EWMA, width-scaled    & 611 & \textbf{2{,}084}& 589 & div$^\dagger$  & 736 & 0.56 & fail b3,\,b5 \\
 \bottomrule
 \end{tabular}
 
@@ -299,7 +302,7 @@ p90-forecast policy \textbf{passes the week} at TTFT p99
 \SI{651}{\milli\second}
 (ITL p99 \SI{6.4}{\milli\second}) for 518.6 H100 GPU-hours, slightly
 below the burst-sized static TP2$\times$2 fleet's 537.4 for the same
-span (0.96$\times$; replica scaling cannot morph TP2 into TP1, so the
+span (0.965$\times$; replica scaling cannot morph TP2 into TP1, so the
 language pool's dynamic savings are structurally small). The week
 verdict is forecast-model-independent: replacing Chronos with Toto or
 TimesFM holds the tail at the identical \SI{651}{\milli\second} (both
@@ -353,8 +356,10 @@ requests): encoder-delay p99, provisioned worker-time, and per-episode
 compliance. ``Episodes'' grades each in-span burst episode separately
 (the aggregate p99 alone can mask sub-1\% episodes). Forecast policies
 use Chronos-2 at $\rho{=}15$; $L$ is the cold-start lead. Forecast
-worker-time is actuated on forecast \emph{issue} time and, under the
-warm-pool readiness model, is lead-invariant across the archive's
+schedules use issue-time actuation; worker-time is integrated from
+readiness under the warm-pool model (cold-start warm-up reported
+separately, Section~\ref{sec:cl-ledger-enc}) and is lead-invariant
+across the archive's
 realizable 15--\SI{165}{\second} issued-lead range (see text). The three
 rows reading \SI{588}{\milli\second} are distinct runs that coincide at
 the zero-queueing service floor (Section~\ref{sec:cl-matrix}); rows above
@@ -623,7 +628,7 @@ columns grade TTFT only.}
 
 \paragraph{This pool separates on every window, and the separation is
 compliance, not thrift.} Forecast holds TTFT p99 at
-\SI{651}{\milli\second} and ITL p99 at ${\approx}\SI{5.1}{\milli\second}$
+\SI{651}{\milli\second} and ITL p99 at 5.1--6.3\,\si{\milli\second}
 on all five windows; reactive violates TTFT on \emph{all five} and ITL on
 four (the aggregate-window ITL pass is the masking of
 Section~\ref{sec:cl-aggregate} again). The duration columns are what a boolean
@@ -739,7 +744,9 @@ denominator for the aggregate window, since $C^{*}$ is defined per window.
 \item \textbf{Encoder, per burst window --- the boundary condition on
 that headline.} Against the deployable static fleet over each burst
 window's own span, \emph{every} autoscaling arm costs \emph{more} than
-static: forecast 1.80--2.90$\times$ and reactive 2.19--2.67$\times$
+static: forecast 1.80--2.90$\times$ across the three-model
+warm-readiness arms at issued leads 15--45\,\si{\second} and reactive
+2.19--2.67$\times$
 (per-window oracle optimum, 2.06--3.32$\times$ and 2.50--3.10$\times$). A
 short bursty window gives an autoscaler no runway to amortise spin-up, so
 the encoder saving is a \emph{week-scale} phenomenon materialising only
@@ -752,7 +759,7 @@ same arm reads 2.75$\times$, but $C{=}2$ is not a defensible denominator
 on this trace: it fails at \SI{2905}{\milli\second}. The full trace is
 graded in aggregate only and has no forecast arm, so it neither confirms
 nor contradicts the per-episode result.
-\item \textbf{Language pool.} The 0.96$\times$ of
+\item \textbf{Language pool.} The 0.965$\times$ of
 Section~\ref{sec:cl-llm} is 518.6 H100 GPU-hours against a static
 TP2$\times$2 shape \emph{time-scaled} to the same span (537.4\,GPU-hours).
 But scaling the static reference by \emph{request count} rather than time
@@ -800,7 +807,7 @@ forecast archive (per-partition counts in the provenance manifest,
 Appendix~\ref{ap:artifacts}); the live validation of
 Chapter~\ref{cap:validation} adds the one layer none of this simulates,
 running burst3 through Dynamo's real control plane in real time, twice
---- \num{3093} requests per policy, on mocker workers under the shared
+--- \num{3093} scheduled requests per policy, on mocker workers under the shared
 AIC timing model: the live anchor validates the control loop, not
 silicon. One caveat keeps that volume from being over-read: scale is not
 independence --- the runs replay a \emph{single} production trace, and
@@ -822,10 +829,10 @@ the tail bound under bursty within-bin arrivals, not mean throughput ---
 the encoder-side analogue of the language pool's belief-to-knee gap.
 Language-pool closed-loop evidence covers the largest burst (all leads,
 both conversions), the fastest onset (carried live in
-Chapter~\ref{cap:validation}), the binding mix,
-and the full evaluation span; the remaining
-windows are priced by the grid and the knee formula rather than
-replayed end-to-end. The replay is open-loop: arrivals follow the trace
+Chapter~\ref{cap:validation}), the binding mix, every forecast-covered
+burst episode end-to-end, and the full evaluation span; burst2/6
+(uncovered) and the calm day are priced by the grid and the knee formula
+rather than replayed end-to-end. The replay is open-loop: arrivals follow the trace
 regardless of experienced latency, so overload cannot shed or defer
 demand as clients would --- policies are compared under identical
 offered load, and the decode signal is the offered-work upper bound of
@@ -883,7 +890,12 @@ ranges 0.47--1.10$\times$ over the five burst-bearing folds, $\rho{=}15$
 is feasible in six of seven folds but cheapest in none, and the policy
 misses the bound on the fold containing the e13 onset (encoder-delay p99
 \SI{1262}{\milli\second}), where a static $C{=}5$ fleet passes for only
-$3\%$ more worker-time. Three limits travel with that qualification: the
+$3\%$ more worker-time. The language pool's fold ratios run
+0.93--3.81$\times$ against the same-fold static comparator --- above
+parity in six of seven folds, since short folds amortize nothing --- and
+the fixed $C{=}8$ encoder denominator is an accounting reference, not
+per-fold re-optimized (one truncated fold's $C{=}8$ row ends with a
+non-empty queue and is marked infeasible). Three limits travel with that qualification: the
 ratio is monotone in each fold's offered image load (a $12\times$ demand
 spread produces part of the range by construction); the folds are
 disjoint \emph{test} windows but not training-independent, each forecast
@@ -912,4 +924,5 @@ second anticipation test --- which repairs the mean-based sizing defect
 shared by every reactive configuration tested. Priced over the covered
 week, the policy meets the SLA in aggregate and per-episode at
 \textbf{0.62 times the deployable static encoder fleet's worker-time}
---- the thesis statement's economic clause, now number-backed.
+--- a week-scale figure (per burst window, every arm costs more than
+static) --- the thesis statement's economic clause, now number-backed.

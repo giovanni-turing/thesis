@@ -51,10 +51,12 @@ requests over seven days), that assumption fails for the vision pool: image
 arrivals are nearly decoupled from request rate, an order of magnitude
 burstier, and disjoint from it at the extremes. Yet they are also the most
 \emph{persistent}: forecastable at provisioning horizons, where zero-shot
-time-series foundation models beat classical baselines on every signal. A
+time-series foundation models beat the tested classical baselines on
+every signal. A
 two-pool simulation platform --- its encoder costs collected on RTX 5090
 silicon (submitted upstream to NVIDIA's aiconfigurator as a draft PR) and
-physically validated, composed with Dynamo's calibrated H100 language-pool
+validated against the serving engine's own vision tower, composed with
+Dynamo's calibrated H100 language-pool
 simulator --- reproduces the decoupling mechanically: the pools' saturation
 knees sit an order of magnitude apart, and the largest burst breaks both (a
 shape-fixable prefill floor; episodic encoder queueing invisible to rate-
@@ -62,10 +64,13 @@ and utilization-based monitors). Closing the loop, forecast-driven per-pool
 schedules hold the tail-latency SLA through burst onsets that defeat an
 identically informed reactive controller --- anticipatory on the encoder
 pool, a tail-aware \emph{conversion} of the same forecast on the
-language pool --- pricing the forecast-covered week at
-0.62$\times$ the deployable static encoder fleet's GPU-time (the language
-fleet near-break-even, 0.96$\times$). The language-pool p90-versus-reactive
-verdict reproduces through Dynamo's real control plane with mocked engines;
+language pool --- pricing the 5.60-day forecast-covered span at
+0.62$\times$ the deployable static encoder fleet's worker-time (the
+Chronos-p90 language schedule near break-even at 0.965$\times$ a
+time-matched static TP2$\times$2 reference). The language-pool
+p90-versus-reactive
+verdict reproduces on the hardest burst through Dynamo's real control
+plane with mocked engines (one live run per policy);
 the encoder cost model is anchored separately on RTX~5090 silicon, and the
 week-scale economics are simulated.
 
@@ -89,12 +94,14 @@ requisi\c{c}\~oes em sete dias), essa hip\'otese falha para o \emph{pool} de
 vis\~ao: as chegadas de imagens s\~ao quase desacopladas da taxa de
 requisi\c{c}\~oes, uma ordem de magnitude mais
 intermitentes e disjuntas dela nos extremos. Por\'em
-s\~ao tamb\'em as mais \emph{persistentes} e, portanto, previs\'iveis nos
+s\~ao tamb\'em as mais \emph{persistentes} --- previs\'iveis nos
 horizontes de provisionamento, onde modelos de funda\c{c}\~ao de s\'eries
-temporais, em \emph{zero-shot}, superam as \emph{baselines} cl\'assicas em
+temporais, em \emph{zero-shot}, superam as \emph{baselines} cl\'assicas
+testadas em
 todos os sinais. Uma plataforma de simula\c{c}\~ao de dois \emph{pools}, com
-custos do codificador medidos em sil\'icio RTX 5090 (contribu\'idos ao
-aiconfigurator da NVIDIA) e validados fisicamente, compostos com o simulador
+custos do codificador medidos em sil\'icio RTX 5090 (submetidos ao
+aiconfigurator da NVIDIA como \emph{draft PR}) e validados contra a
+pr\'opria torre de vis\~ao do motor de servi\c{c}o, compostos com o simulador
 de eventos discretos do Dynamo sob tempos H100 calibrados, reproduz o
 desacoplamento mecanicamente: os \emph{pools} saturam a escalas separadas
 por uma ordem de magnitude, e a maior rajada quebra ambos (um piso de
@@ -105,13 +112,15 @@ preditivo por \emph{pool} sustenta a SLA de lat\^encia de cauda em in\'icios
 de rajada que derrotam um controlador reativo igualmente informado ---
 por provisionamento antecipat\'orio no \emph{pool} codificador e por uma
 \emph{convers\~ao} ciente de cauda da mesma previs\~ao no
-\emph{pool} de linguagem --- precificando a semana coberta pela
-previs\~ao a
-0,62$\times$ o tempo de GPU da menor frota est\'atica vi\'avel de
-codificadores (com a frota de linguagem praticamente em equil\'ibrio,
-0,96$\times$). Na rajada mais dif\'icil, o par de veredictos
+\emph{pool} de linguagem --- precificando o intervalo coberto de 5,60
+dias a
+0,62$\times$ o tempo de \emph{workers} da menor frota est\'atica vi\'avel
+de codificadores (agenda de linguagem Chronos-p90 praticamente em
+equil\'ibrio: 0,965$\times$ uma refer\^encia est\'atica TP2$\times$2 no
+mesmo intervalo). Na rajada mais dif\'icil, o par de veredictos
 p90-versus-reativo do \emph{pool} de linguagem se reproduz atrav\'es do
-plano de controle real do Dynamo com \emph{engines} simulados; o modelo
+plano de controle real do Dynamo com \emph{engines} simulados (uma
+execu\c{c}\~ao ao vivo por pol\'itica); o modelo
 de custo do codificador \'e ancorado separadamente em sil\'icio RTX~5090,
 e a economia em escala semanal \'e simulada.
 

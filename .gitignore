@@ -114,3 +114,4 @@ defense/anim/data/**/*.log
 provenance/.ro_credentials
 provenance/.picolo_credentials
 provenance/.goku_credentials
+review/tools/.pw

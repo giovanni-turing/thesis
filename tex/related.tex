@@ -96,8 +96,9 @@ SLO-aware autoscaling predates LLMs. In general-purpose orchestration
 the reactive loop is standardized infrastructure: Kubernetes' Horizontal
 Pod Autoscaler scales on aggregate utilization or custom metrics, KEDA
 generalizes the trigger to event sources, and Knative's KPA regulates on
-request concurrency~\cite{K8sAutoscalers}. All watch the one
-request stream, the inheritance this thesis interrogates. A pre-LLM ML-serving line established SLO-aware provisioning itself
+request concurrency~\cite{K8sAutoscalers}. In their default
+model-serving configurations, all watch the one
+request stream --- the inheritance this thesis interrogates. A pre-LLM ML-serving line established SLO-aware provisioning itself
 (Swayam's SLA-derived rules, MArk's proactive--reactive mix, Clockwork's
 predictable workers, INFaaS's model-variant scaling, AlpaServe's
 multiplexed model
@@ -155,7 +156,8 @@ two pools on per-stage token-velocity signals rather than the request
 rate~\cite{Lai2025TokenScale} --- per-stage signals, for a two-stage
 \emph{text} pipeline whose stages are fed by the same token stream.
 
-Two gaps remain. First, every system above watches or forecasts signals
+Two gaps remain. First, the model-serving systems above watch or
+forecast signals
 derived from the request/token stream of a text-only fleet --- even the
 disaggregated autoscalers' per-stage token velocities are that one
 stream split by phase, carrying almost no information about the vision
@@ -280,7 +282,8 @@ predictive structure at exactly the horizons provisioning requires ---
 despite the largest per-bin error
 (Chapters~\ref{cap:trace-eda} and~\ref{cap:predictors}). That inversion
 makes per-pool predictive provisioning both necessary and feasible in
-modality-disaggregated serving, a property no prior work states or tests.
+modality-disaggregated serving --- a property that, to our knowledge, no
+prior work states or tests.
 
 No ingredient is claimed as novel here: modality disaggregation,
 forecast-aware scaling, pretrained time-series forecasters, and
