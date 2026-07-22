@@ -158,7 +158,7 @@ must_exist() { grep -rqF "$2" tex/*.tex 2>/dev/null && ok "intact: $1" || bad "M
 must_exist "tab:sim-poly-aic poly cell 67.3 / 248"  "67.3 / 248"
 must_exist "twopool 'were not priced' (R26)"        "were not priced"
 must_exist "live-vs-sim band 1.1--6.8% (R1)"        "1.1--6.8"
-must_exist "235B ITL p99 87.7 ms (wheel-consistent)" "87.7"
+must_exist "235B ITL p99 86.2 ms (s=1 head2k, is_current; corrected from stale 87.7)" "86.2"
 # ---- DERIVED-VALUE RECOMPUTATION (protocol R-A, added 2026-07-21) ----------
 # Every printed headline ratio is recomputed from RAW operands (artifact files
 # where they exist, provenance-commented operand pairs otherwise) and the
