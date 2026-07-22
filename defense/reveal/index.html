@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defense — Predictive Per-Pool Provisioning</title>
+<link rel="stylesheet" href="vendor/dist/reset.css">
+<link rel="stylesheet" href="vendor/dist/reveal.css">
+<link rel="stylesheet" href="vendor/dist/theme/white.css">
+<style>
+  :root {
+    --ink: #0b0b0b;
+    --ink-2: #3c3c3c;
+    --muted: #6f6f6f;
+    --grid: #ececec;
+    --green: #008300;      /* requests */
+    --blue: #2a78d6;       /* images */
+    --critical: #d03b3b;
+    --good: #0ca30c;
+    --fc: #2a78d6;         /* forecast lane */
+    --re: #eb6834;         /* reactive lane */
+    --violet: #4a3aa7;     /* language pool */
+  }
+  .reveal { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+  .reveal h1, .reveal h2, .reveal h3 { font-family: inherit; color: var(--ink);
+    text-transform: none; letter-spacing: -0.01em; font-weight: 750; }
+  .reveal h2 { font-size: 1.35em; }
+  .reveal .slides section { text-align: left; }
+
+  /* title slide */
+  .titleslide { text-align: center !important; }
+  .titleslide h1 { font-size: 1.55em; line-height: 1.2; margin-bottom: 0.5em; }
+  .titleslide .who { font-size: 0.62em; color: var(--ink-2); line-height: 1.7; }
+  .titleslide .who b { font-weight: 700; }
+  .titleslide .badge { display: inline-block; margin-top: 1.4em; font-size: 0.42em;
+    color: var(--muted); border: 1px solid var(--grid); border-radius: 999px;
+    padding: 4px 14px; }
+  .cover-kicker { font-size: 0.5em; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--blue); margin-bottom: 1.6em; }
+  .cover-rule { width: 120px; height: 4px; border-radius: 2px; margin: 1.1em auto 1.1em;
+    background: linear-gradient(90deg, var(--green) 0 33%, var(--blue) 33% 66%, var(--re) 66% 100%); }
+  .titleslide .inst { font-size: 0.5em; color: var(--muted); line-height: 1.65; margin-top: 1.1em; }
+  .titleslide .logos { display: flex; justify-content: center; align-items: center;
+    gap: 48px; margin-top: 1.3em; }
+  .titleslide .logos img { height: 92px; width: auto; }
+
+  /* narrative slide primitives */
+  .kicker { font-size: 0.46em; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 0.4em; }
+  .reveal p.lead { font-size: 0.72em; color: var(--ink-2); line-height: 1.5; }
+  .numrow { display: flex; gap: 18px; margin-top: 0.8em; }
+  .numtile { flex: 1; border: 1px solid var(--grid); border-radius: 10px;
+    padding: 14px 16px; background: #fff; box-shadow: 0 1px 2px rgba(11,11,11,0.05); }
+  .numtile .k { font-size: 0.4em; font-weight: 650; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.05em; }
+  .numtile .v { font-size: 0.85em; font-weight: 750; margin-top: 2px; }
+  .numtile.ok   { border-top: 4px solid var(--good); }
+  .numtile.bad  { border-top: 4px solid var(--critical); }
+  .numtile.info { border-top: 4px solid var(--blue); }
+  .numtile .v .u { font-size: 0.6em; font-weight: 600; color: var(--muted); }
+
+  /* pipeline diagram (context slide) */
+  .pipe { display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin: 34px 0 8px; }
+  .pcard { border: 1px solid var(--grid); border-radius: 12px; background: #fff;
+    box-shadow: 0 1px 3px rgba(11,11,11,0.06); padding: 14px 16px; text-align: center; }
+  .pcard .pk { font-size: 13.5px; font-weight: 750; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-2); }
+  .pcard .psub { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+  .pcard .pmeta { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+  .preq { border-top: 4px solid var(--green); min-width: 170px; }
+  .reqbar { margin: 12px auto 4px; width: 78%; height: 10px; border-radius: 4px;
+    background: var(--green); opacity: 0.85; }
+  .reqcap { font-size: 12px; color: var(--muted); font-weight: 650; margin-bottom: 9px; }
+  .reqimgs { display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .reqimgs i { width: 14px; height: 14px; border-radius: 3px; background: var(--blue); }
+  .reqimgs span { font-size: 12px; color: var(--ink-2); font-weight: 650; margin-left: 4px; }
+  .pool { border-top: 4px solid var(--pc); min-width: 250px; }
+  .pool .pk { color: var(--pc); }
+  .reps { display: flex; justify-content: center; gap: 6px; margin-top: 11px; }
+  .reps b, .reps u { width: 26px; height: 26px; border-radius: 6px; display: flex;
+    align-items: center; justify-content: center; }
+  .reps b { background: var(--pc); }
+  .reps u { border: 2px dashed #b9b9b9; text-decoration: none; color: var(--muted);
+    font-size: 14px; font-weight: 700; }
+  .knob { margin-top: 9px; display: inline-block; font-size: 12.5px; font-weight: 700;
+    color: var(--pc); border: 1.5px solid var(--pc); border-radius: 999px; padding: 3px 12px; }
+  .pout { border-top: 4px solid var(--ink); min-width: 165px; }
+  .slabig { font-size: 21px; font-weight: 800; margin-top: 8px; }
+  .parr { display: flex; flex-direction: column; align-items: center; gap: 5px;
+    min-width: 68px; }
+  .parr .lbl { font-size: 12px; color: var(--muted); font-weight: 650; white-space: nowrap; }
+  .parr .ln { width: 62px; height: 2px; background: #c2c2c2; position: relative; }
+  .parr .ln.dashed { background: repeating-linear-gradient(90deg, #c2c2c2 0 6px, transparent 6px 11px); }
+  .parr .ln::after { content: ""; position: absolute; right: -1px; top: -4px;
+    border-left: 8px solid #c2c2c2; border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent; }
+  .numtile.viol { border-top: 4px solid var(--violet); }
+  .numtile.grn { border-top: 4px solid var(--green); }
+  .herostrip { display: flex; align-items: center; justify-content: space-between;
+    margin: 30px 6px 6px; }
+  .hero .hv { font-size: 1.05em; font-weight: 800; letter-spacing: -0.01em; }
+  .hero .hk { font-size: 0.4em; color: var(--muted); font-weight: 650; margin-top: 2px; }
+  .herosep { width: 1px; height: 58px; background: var(--grid); }
+  .numtile.warn { border-top: 4px solid var(--re); }
+  .numtile .d { font-size: 0.44em; color: var(--ink-2); line-height: 1.5; margin-top: 5px; }
+  .handoff { margin-top: 0.85em; font-size: 0.6em !important; }
+  .chartcap { font-size: 13.5px; color: var(--muted); margin: 4px 2px 0; }
+
+  /* policy rows (economics slide) */
+  .polrow { display: flex; align-items: center; gap: 16px; padding: 9px 14px;
+    border: 1px solid var(--grid); border-radius: 10px; margin-top: 9px; background: #fff;
+    box-shadow: 0 1px 2px rgba(11,11,11,0.05); }
+  .polrow.winner { border: 1.5px solid var(--blue); background: #f4f9ff; }
+  .polname { width: 300px; line-height: 1.25; }
+  .polname b { font-size: 17px; display: block; }
+  .polname span { font-size: 12.5px; color: var(--muted); }
+  .polbar { flex: 1; background: var(--grid); border-radius: 6px; height: 26px;
+    overflow: hidden; }
+  .polbar .bar { height: 100%; border-radius: 6px 0 0 6px; color: #fff; font-size: 13px;
+    font-weight: 750; display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 8px; min-width: 52px; }
+  .polp99 { width: 118px; text-align: center; font-size: 15px; font-weight: 750;
+    border-radius: 8px; padding: 4px 0; }
+  .polp99.ok { color: #266e26; background: #eef7ec; }
+  .polp99.bad { color: #b03030; background: #fdf0ee; }
+  .poleps { display: flex; gap: 5px; }
+  .ep { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 9px;
+    white-space: nowrap; }
+  .ep.ok { color: #266e26; background: #eef7ec; }
+  .ep.bad { color: #b03030; background: #fdf0ee; }
+
+  /* language-pool verdict matrix */
+  .lmat { display: grid; grid-template-columns: 215px 1fr 1fr; gap: 7px 10px;
+    margin-top: 14px; align-items: stretch; }
+  .lhead { font-size: 13px; font-weight: 750; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 0 4px 2px; }
+  .lwin { font-size: 16.5px; font-weight: 750; display: flex; align-items: center; gap: 8px; }
+  .lwin span { font-size: 12px; font-weight: 650; color: var(--muted); }
+  .lcell { font-size: 14.5px; font-weight: 700; border-radius: 9px; padding: 8px 13px;
+    display: flex; align-items: center; gap: 8px; }
+  .lcell i { font-style: normal; font-weight: 600; font-size: 12px; opacity: 0.75;
+    margin-left: auto; }
+  .lcell.ok { color: #266e26; background: #eef7ec; border-left: 4px solid var(--fc); }
+  .lcell.bad { color: #b03030; background: #fdf0ee; border-left: 4px solid var(--re); }
+  .disclose { font-size: 0.5em !important; color: var(--ink-2); line-height: 1.5;
+    border-left: 4px solid var(--critical); background: #fdf6f5; border-radius: 0 8px 8px 0;
+    padding: 10px 14px; margin-top: 0.7em; }
+
+  /* full-bleed animation slide */
+  section.animslide { padding: 0 !important; }
+  section.animslide iframe { width: 100%; border: 0; background: #fff; }
+</style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- 1 · cover -->
+    <section class="titleslide">
+      <div class="cover-kicker">Master's Defense</div>
+      <h1>Predictive Per-Pool Provisioning for Modality-Disaggregated Multimodal Model Serving</h1>
+      <div class="cover-rule"></div>
+      <div class="who">
+        <b>Giovanni Oliveira</b><br>
+        Advisor: Prof. Dr. Fabio Kon &nbsp;·&nbsp; Co-advisor: Prof. Dr. Emílio Francesquini
+      </div>
+      <div class="inst">
+        Programa de Pós-Graduação em Ciência da Computação<br>
+        Instituto de Matemática e Estatística — Universidade de São Paulo, São Paulo, Brasil
+      </div>
+      <div class="logos">
+        <img src="assets/holysee.svg" alt="Emblem of the Holy See">
+        <img src="assets/usp.svg" alt="Universidade de São Paulo">
+        <img src="assets/ime.svg" alt="Instituto de Matemática e Estatística — USP">
+      </div>
+      <div class="badge">live deck — every number on screen is ledger-verified simulator output</div>
+    </section>
+
+    <!-- 2 · context: the two-pool problem -->
+    <section>
+      <div class="kicker">Context</div>
+      <h2>Serving a multimodal model is a <span style="color:var(--blue)">two-pool</span> provisioning problem</h2>
+
+      <div class="pipe">
+        <div class="pcard preq">
+          <div class="pk" style="color:var(--green)">request</div>
+          <div class="reqbar"></div>
+          <div class="reqcap">text prompt</div>
+          <div class="reqimgs">
+            <i></i><i></i><i></i><i></i><span>+ k images</span>
+          </div>
+          <div class="pmeta">k = 0 … 100+</div>
+        </div>
+
+        <div class="parr"><span class="lbl">images</span><span class="ln"></span></div>
+
+        <div class="pcard pool" style="--pc: var(--blue)">
+          <div class="pk">vision encoder pool</div>
+          <div class="psub">ViT replicas — consume images</div>
+          <div class="reps">
+            <b></b><b></b><b></b><u>?</u><u>?</u>
+          </div>
+          <div class="pmeta">cold start 15–165 s</div>
+          <div class="knob">how many, and when?</div>
+        </div>
+
+        <div class="parr"><span class="lbl" style="color:var(--blue)">seam · embeddings</span><span class="ln dashed"></span></div>
+
+        <div class="pcard pool" style="--pc: var(--violet)">
+          <div class="pk">language pool</div>
+          <div class="psub">prefill + decode (TP2) — consume tokens</div>
+          <div class="reps">
+            <b></b><b></b><b></b><u>?</u><u>?</u>
+          </div>
+          <div class="pmeta">cold start 60–300 s</div>
+          <div class="knob">how many, and when?</div>
+        </div>
+
+        <div class="parr"><span class="lbl">tokens</span><span class="ln"></span></div>
+
+        <div class="pcard pout">
+          <div class="pk">objective</div>
+          <div class="slabig">tail SLA</div>
+          <div class="pmeta">p99, not the mean —<br>late capacity = breach</div>
+        </div>
+      </div>
+
+      <div class="numrow">
+        <div class="numtile info fragment fade-up">
+          <div class="k">1 · disaggregated by modality</div>
+          <div class="d">Dynamo-class stacks split the VLM into pools that scale
+            <b>independently</b> — one provisioning decision per pool.</div>
+        </div>
+        <div class="numtile viol fragment fade-up">
+          <div class="k">2 · capacity must exist early</div>
+          <div class="d">Replica cold-starts run <b>15 s – 5 min</b>; a p99 objective is
+            breached <b>before</b> a late scale-up lands.</div>
+        </div>
+        <div class="numtile warn fragment fade-up">
+          <div class="k">3 · pool demand ≠ request rate</div>
+          <div class="d">One request carries 0…100+ images; <b>72.5%</b> of all prefill
+            tokens arrive with images.</div>
+        </div>
+      </div>
+
+      <p class="lead handoff fragment fade-up">Standard practice: <b style="color:var(--re)">reactive autoscaling</b>
+        on the signals operators watch — request rate, utilization.
+        <span style="color:var(--muted)">Next: what that dashboard sees during the largest burst of the trace. →</span></p>
+    </section>
+
+    <!-- 3 · the problem, stated -->
+    <section>
+      <div class="kicker">The problem</div>
+      <h2>The failure is invisible in the signal everyone watches</h2>
+      <p class="lead">Multimodal bursts arrive as <b style="color:var(--blue)">images per second</b>,
+        not requests per second. The largest burst in the trace peaks at
+        <b>374 img/s offered</b> while the request rate never leaves
+        <b style="color:var(--green)">&lt; 4.5 req/s</b> — a dashboard watching requests
+        and GPU utilization sees a healthy system while the encoder queue floods.</p>
+      <div class="numrow">
+        <div class="numtile ok"><div class="k">dashboard verdict</div><div class="v">HEALTHY <span class="u">all day ✓</span></div></div>
+        <div class="numtile bad"><div class="k">encoder-delay p99</div><div class="v">5,013 ms <span class="u">5× the SLA ✗</span></div></div>
+        <div class="numtile info"><div class="k">peak backlog</div><div class="v">4,701 <span class="u">images queued</span></div></div>
+      </div>
+      <p class="lead" style="margin-top:0.9em; color:var(--muted); font-size:0.55em">
+        Next slide: the same window replayed second-by-second — dashboard view vs. reality, live. →</p>
+    </section>
+
+    <!-- 3 · A1 live -->
+    <section class="animslide">
+      <iframe class="r-stretch" data-src="../anim/a1_invisible_failure.html#t=0" allow="fullscreen"></iframe>
+    </section>
+
+    <!-- 5 · the dataset -->
+    <section>
+      <div class="kicker">The data</div>
+      <h2>The workload: a production multimodal trace</h2>
+      <p class="lead">Microsoft's <b>AzureLMMInferenceDataset2025</b> — a production trace of a
+        multimodal-model inference cluster, released with the ModServe paper (Qiu et al., 2025).</p>
+
+      <div class="herostrip">
+        <div class="hero"><div class="hv">1M</div><div class="hk">requests</div></div>
+        <div class="herosep"></div>
+        <div class="hero"><div class="hv">7 days</div><div class="hk">2024-10-15 → 22 UTC</div></div>
+        <div class="herosep"></div>
+        <div class="hero"><div class="hv">4 fields</div><div class="hk">arrival ms · images · ctx · gen tokens</div></div>
+        <div class="herosep"></div>
+        <div class="hero"><div class="hv">312 ms</div><div class="hk">median inter-arrival · largest gap 39 s</div></div>
+      </div>
+
+      <div class="numrow">
+        <div class="numtile grn fragment fade-up">
+          <div class="k">1 · half is text-only</div>
+          <div class="d">Exactly <b>50.0%</b> of requests carry no image — a by-construction
+            split. The other half carries all the vision load.</div>
+        </div>
+        <div class="numtile info fragment fade-up">
+          <div class="k">2 · images arrive as k×k grids</div>
+          <div class="d">71 perfect-square counts cover <b>99.99%</b> of image-bearing
+            requests — up to <b>97² = 9,409 images in one request</b>. Bulk batches,
+            not single images.</div>
+        </div>
+        <div class="numtile viol fragment fade-up">
+          <div class="k">3 · context embeds vision tokens</div>
+          <div class="d">≈<b>277</b> tokens/image at k=1, falling to ≈<b>66</b> at k=529 —
+            no clean text/vision decomposition exists.</div>
+        </div>
+      </div>
+
+      <p class="lead handoff fragment fade-up"><span style="color:var(--muted)">That's the anatomy
+        on paper — here it is as a landscape: all 1M requests as a density over
+        (context, generation), sliced by image count. →</span></p>
+    </section>
+
+    <!-- 6 · A9 live -->
+    <section class="animslide">
+      <iframe class="r-stretch" data-src="../anim/a9_dataset_kde.html" allow="fullscreen"></iframe>
+    </section>
+
+    <!-- 7 · the signal: a week of bursts -->
+    <section>
+      <div class="kicker">The constraint</div>
+      <h2>A week of bursts — too fast to react to</h2>
+      <canvas id="weekStrip" style="width:100%; height:250px;"></canvas>
+      <div class="chartcap"><b>episode</b> = contiguous minutes above the p99 image rate
+        (224 img/s), extended to the surrounding median crossings → <b>18 episodes</b> ·
+        <b>onset</b> = baseline → peak ramp time</div>
+      <canvas id="onsetStrip" style="width:100%; height:215px; margin-top:10px;"></canvas>
+      <p class="lead handoff"><span class="fragment fade-up">Median onset <b>6 min</b>, fastest <b>1 min</b> —
+        inside a single observation lag. Cold starts run <b>15 s – 5 min</b>: for the fast half,
+        the budget <i>onset − cold-start</i> ≤ 0. At L=30 s reactive control fails
+        <b style="color:var(--critical)">9 of 18</b> episodes.</span>
+        <span class="fragment fade-up" style="color:var(--muted)"> The only way out: capacity that exists
+        <b>before</b> the burst — which requires predicting the image rate. →</span></p>
+    </section>
+
+    <!-- 8 · the method: forecast → lead → capacity -->
+    <section>
+      <div class="kicker">The bet</div>
+      <h2>Forecast the image rate — spend the lead building capacity</h2>
+      <canvas id="methodStrip" style="width:100%; height:330px;"></canvas>
+      <div class="chartcap">burst3 (1-min onset) at lead L = 30 s — ledger-verified schedules from the
+        converter runs; capacity = workers × ρ (15 img/s per worker); demand at the scheduler's
+        15-s resolution</div>
+      <div class="numrow">
+        <div class="numtile info fragment fade-up">
+          <div class="k">1 · zero-shot foundation forecasters</div>
+          <div class="d"><b>Chronos-2 · Toto-2 · TimesFM-2.0</b> forecast the 15-s image rate;
+            the <b>p90 quantile path</b> is the planning signal — empirically calibrated
+            (coverage 0.88–0.90).</div>
+        </div>
+        <div class="numtile viol fragment fade-up">
+          <div class="k">2 · issue-time honesty</div>
+          <div class="d">A forecast for time t is usable only if <b>issued ≥ L s earlier</b> —
+            L = the replica cold start. No hindsight anywhere in the loop.</div>
+        </div>
+        <div class="numtile warn fragment fade-up">
+          <div class="k">3 · one law, two information sets</div>
+          <div class="d">C = ceil(demand / ρ), 3-min hysteresis — <b>identical for both
+            policies</b>. Forecast sees ahead; reactive sees the trailing bin. That is the
+            entire difference.</div>
+        </div>
+      </div>
+      <p class="lead handoff fragment fade-up"><span style="color:var(--muted)">Every episode,
+        every lead, all three forecasters — live, with queues and running p99. →</span></p>
+    </section>
+
+    <!-- 9 · A2 live -->
+    <section class="animslide">
+      <iframe class="r-stretch" data-src="../anim/a2_the_race.html#w=burst3&L=30" allow="fullscreen"></iframe>
+    </section>
+
+    <!-- 10 · the economics -->
+    <section>
+      <div class="kicker">The economics</div>
+      <h2>A full week: the tail held at <span style="color:var(--blue)">0.62×</span> the always-on cost</h2>
+      <p class="lead" style="margin-bottom:0.4em">Five policies over the 5.60-day evaluation span —
+        749,601 requests, Toto-2 as forecaster, L = 30 s. Cost = provisioned worker-time
+        vs. always-on static C8. <b>Every endpoint reproduces the ledgered week numbers.</b></p>
+
+      <div class="polrow fragment fade-up">
+        <div class="polname"><b>static C8</b><span>always-on · the gold standard</span></div>
+        <div class="polbar"><div class="bar" style="width:100%; background:#9a9a9a">1.00×</div></div>
+        <div class="polp99 ok">644 ms ✓</div>
+        <div class="poleps">
+          <span class="ep ok">b3 ✓</span><span class="ep ok">b5 ✓</span><span class="ep ok">b4 ✓</span>
+          <span class="ep ok">calm ✓</span><span class="ep ok">b1 ✓</span>
+        </div>
+      </div>
+      <div class="polrow fragment fade-up">
+        <div class="polname"><b>static C2</b><span>always-on, sized cheap</span></div>
+        <div class="polbar"><div class="bar" style="width:25%; background:#9a9a9a">0.25×</div></div>
+        <div class="polp99 bad">2.95 s ✗</div>
+        <div class="poleps">
+          <span class="ep bad">b3 ✗</span><span class="ep bad">b5 ✗</span><span class="ep bad">b4 ✗</span>
+          <span class="ep ok">calm ✓</span><span class="ep bad">b1 ✗</span>
+        </div>
+      </div>
+      <div class="polrow fragment fade-up">
+        <div class="polname"><b>Toto-2 p50</b><span>forecast the median — thrift trap</span></div>
+        <div class="polbar"><div class="bar" style="width:26%; background:var(--violet)">0.26×</div></div>
+        <div class="polp99 bad">1.94 s ✗</div>
+        <div class="poleps">
+          <span class="ep bad">b3 ✗</span><span class="ep ok">b5 ✓</span><span class="ep ok">b4 ✓</span>
+          <span class="ep bad">calm ✗</span><span class="ep ok">b1 ✓</span>
+        </div>
+      </div>
+      <div class="polrow fragment fade-up">
+        <div class="polname"><b>reactive</b><span>the trap: the aggregate looks green</span></div>
+        <div class="polbar"><div class="bar" style="width:67%; background:var(--re)">0.67×</div></div>
+        <div class="polp99 ok">588 ms ✓</div>
+        <div class="poleps">
+          <span class="ep bad">b3 ✗ 16.1 s</span><span class="ep ok">b5 ✓</span><span class="ep ok">b4 ✓</span>
+          <span class="ep ok">calm ✓</span><span class="ep ok">b1 ✓</span>
+        </div>
+      </div>
+      <div class="polrow winner fragment fade-up">
+        <div class="polname"><b>Toto-2 p90</b><span>forecast the tail — this thesis</span></div>
+        <div class="polbar"><div class="bar" style="width:62%; background:var(--blue)">0.62×</div></div>
+        <div class="polp99 ok">588 ms ✓</div>
+        <div class="poleps">
+          <span class="ep ok">b3 ✓</span><span class="ep ok">b5 ✓</span><span class="ep ok">b4 ✓</span>
+          <span class="ep ok">calm ✓</span><span class="ep ok">b1 ✓</span>
+        </div>
+      </div>
+
+      <p class="lead handoff fragment fade-up">Reactive spends <b>more</b> than the forecast (0.67× vs 0.62×)
+        and still ships a 16-second burst3 — the week-level p99 hides it.
+        <span style="color:var(--muted)">Watch the week unfold with live odometers and verdict chips. →</span></p>
+
+      <p class="disclose fragment fade-up"><b>Where the forecast loses:</b> the grading set is the six
+        largest episodes + the calm day (b2/b6 predate forecast coverage). Inside this same week sits
+        <b>e13</b> — a rank-13, 7-min-onset burst that the p90 path misses at <i>every</i> lead. The
+        aggregate absorbs it, exactly as it absorbs reactive's b3. Only always-on C8 passes e13;
+        it is graded head-on in the boundary-case act. ⚠</p>
+    </section>
+
+    <!-- 11 · A6 live -->
+    <section class="animslide">
+      <iframe class="r-stretch" data-src="../anim/a6_the_week.html#t=0" allow="fullscreen"></iframe>
+    </section>
+
+    <!-- 12 · the language pool -->
+    <section>
+      <div class="kicker">The other pool</div>
+      <h2>Language pool, real planner — same mechanism, same verdict</h2>
+      <p class="lead" style="margin-bottom:0.5em">Both policies replayed through <b>Dynamo's actual
+        planner</b> on the composed trace: forecast = p90 path + tail-aware conversion; reactive =
+        the stock SLA planner (ARIMA, mean targets). TP2 replicas · <b>52 planner replays</b>,
+        every L=60 anchor reproducing its ledgered twin. SLA: TTFT p99 &lt; 1 s, ITL p99 &lt; 100 ms.</p>
+
+      <div class="lmat">
+        <div class="lhead"></div>
+        <div class="lhead" style="color:var(--fc)">forecast — worst cell across 3 models × 3 leads (week: L=60)</div>
+        <div class="lhead" style="color:var(--re)">reactive — best cell across leads</div>
+
+        <div class="lwin">burst3 <span>1-min onset</span></div>
+        <div class="lcell ok">TTFT 651–692 ms ✓ · ITL ≤ 6 ms ✓ <i>9/9 cells</i></div>
+        <div class="lcell bad">TTFT 3.49 s ✗ · ITL 160 ms ✗ <i>every lead</i></div>
+
+        <div class="lwin">burst5 <span>35-min</span></div>
+        <div class="lcell ok">651 ms ✓ · ITL ≤ 6 ms ✓ <i>9/9</i></div>
+        <div class="lcell bad">2.15 s ✗ · ITL 146 ms ✗</div>
+
+        <div class="lwin">burst4 <span>60-min</span></div>
+        <div class="lcell ok">651–669 ms ✓ · ITL ≤ 6 ms ✓ <i>9/9</i></div>
+        <div class="lcell bad">2.56 s ✗ · ITL 149 ms ✗</div>
+
+        <div class="lwin">burst1 <span>220-min</span></div>
+        <div class="lcell ok">651–680 ms ✓ · ITL ≤ 6 ms ✓ <i>9/9</i></div>
+        <div class="lcell bad">1.59 s ✗ · ITL 123 ms ✗</div>
+
+        <div class="lwin">full week <span>5.60 days</span></div>
+        <div class="lcell ok">651 ms ✓ · ITL ≤ 7 ms ✓ <i>3/3 models · L=60 only</i></div>
+        <div class="lcell bad">1.19 s ✗ <i>L=60 · at 0.44× the spend</i></div>
+      </div>
+
+      <div class="numrow">
+        <div class="numtile viol fragment fade-up">
+          <div class="k">lead- and model-invariant</div>
+          <div class="d"><b>651 ms</b> at L = 60, 120 <i>and</i> 300 s — Chronos, Toto, TimesFM alike.
+            The mechanism wins, not one lucky forecast.</div>
+        </div>
+        <div class="numtile warn fragment fade-up">
+          <div class="k">the mean-law alibi</div>
+          <div class="d">Reactive <b>meets its own window-mean targets</b> while the tail breaks —
+            a double violation (TTFT and ITL) on every burst. Its ½ spend buys the breach.</div>
+        </div>
+      </div>
+
+      <p class="lead handoff fragment fade-up"><span style="color:var(--muted)">The race again — now with
+        the TP2-replica staircase, running TTFT/ITL p99 and GPU-h odometers. →</span></p>
+    </section>
+
+    <!-- 13 · A11 live -->
+    <section class="animslide">
+      <iframe class="r-stretch" data-src="../anim/a11_llm_race.html#w=burst3&m=toto&L=60" allow="fullscreen"></iframe>
+    </section>
+
+  </div>
+</div>
+<script src="vendor/dist/reveal.js"></script>
+<script src="vendor/plugin/notes/notes.js"></script>
+<script src="assets/week_data.js"></script>
+<script src="assets/method_data.js"></script>
+<script>
+// ---- inline charts for the "week of bursts" slide (data: assets/week_data.js) ----
+function drawWeekCharts() {
+  const css = getComputedStyle(document.documentElement);
+  const C = n => css.getPropertyValue(n).trim();
+  const setup = id => {
+    const cv = document.getElementById(id);
+    const w = cv.clientWidth || 1470, h = cv.clientHeight || 200;
+    cv.width = w * 2; cv.height = h * 2;
+    const ctx = cv.getContext("2d");
+    ctx.scale(2, 2);
+    return [ctx, w, h];
+  };
+
+  { // -- week strip: img-rate panel + thin req-rate lane, shared time axis --
+    const [ctx, W, H] = setup("weekStrip");
+    const PAD = { l: 46, r: 10, t: 12, b: 18 }, LANE = 44, GAP = 20;
+    const ih = H - PAD.t - PAD.b - LANE - GAP;           // image panel height
+    const iy0 = PAD.t + ih, ry0 = H - PAD.b;             // baselines
+    const IMAX = 400, RMAX = 8;
+    const x = m => PAD.l + (m / WEEK.total_min) * (W - PAD.l - PAD.r);
+    const yi = v => iy0 - (v / IMAX) * ih;
+    const yr = v => ry0 - (v / RMAX) * LANE;
+
+    for (const e of WEEK.episodes) {                     // episode washes
+      ctx.fillStyle = "rgba(42,120,214,0.10)";
+      ctx.fillRect(x(e.s), PAD.t, Math.max(x(e.e) - x(e.s), 2.5), ih);
+    }
+    ctx.strokeStyle = C("--grid"); ctx.lineWidth = 1;    // day grid + labels
+    ctx.fillStyle = C("--muted"); ctx.font = "600 11px system-ui"; ctx.textAlign = "center";
+    for (let d = 0; d <= 7; d++) {
+      const m = d * 1440; if (m > WEEK.total_min) break;
+      ctx.beginPath(); ctx.moveTo(x(m), PAD.t); ctx.lineTo(x(m), ry0); ctx.stroke();
+      if (d < 7) ctx.fillText("Oct " + (15 + d), x(m + 720), H - 4);
+    }
+    ctx.setLineDash([6, 4]); ctx.strokeStyle = C("--critical"); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(PAD.l, yi(WEEK.p99)); ctx.lineTo(W - PAD.r, yi(WEEK.p99)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = C("--blue"); ctx.lineWidth = 1.6;  // image rate
+    ctx.beginPath();
+    WEEK.img.forEach((v, i) => { const px = x(i * WEEK.bucket_min), py = yi(Math.min(v, IMAX));
+      i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+    ctx.stroke();
+    ctx.strokeStyle = C("--green"); ctx.lineWidth = 1.3; // request lane
+    ctx.beginPath();
+    WEEK.req.forEach((v, i) => { const px = x(i * WEEK.bucket_min), py = yr(Math.min(v, RMAX));
+      i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+    ctx.stroke();
+    ctx.fillStyle = C("--ink-2"); ctx.font = "650 11.5px system-ui"; ctx.textAlign = "left";
+    ctx.fillText("image rate (img/s, 1-min)", PAD.l + 216, PAD.t + 12);
+    ctx.fillStyle = C("--critical");
+    ctx.fillText("p99 = 224 img/s", W - PAD.r - 106, yi(WEEK.p99) - 5);
+    ctx.fillStyle = C("--green");
+    ctx.fillText("request rate (req/s) — flat while the blue line burns", PAD.l + 6, ry0 - LANE + 1);
+    ctx.fillStyle = C("--muted"); ctx.font = "600 10.5px system-ui"; ctx.textAlign = "right";
+    [[0, "0"], [224, "224"], [400, "400"]].forEach(([v, t]) => ctx.fillText(t, PAD.l - 6, yi(v) + 4));
+    ctx.fillText("8", PAD.l - 6, yr(8) + 4); ctx.fillText("0", PAD.l - 6, yr(0) + 4);
+    ctx.textAlign = "left";
+    for (const e of WEEK.episodes) {                     // label the 6 named bursts
+      if (!e.key.startsWith("burst")) continue;
+      ctx.fillStyle = C("--blue"); ctx.font = "700 11px system-ui";
+      ctx.fillText(e.label, x((e.s + e.e) / 2) - 7, yi(Math.min(e.peak, IMAX)) - 6);
+    }
+  }
+
+  { // -- onset strip: 18 episodes, onset (log x) vs peak, cold-start band --
+    const [ctx, W, H] = setup("onsetStrip");
+    const PAD = { l: 46, r: 10, t: 24, b: 30 };
+    const XMIN = 0.8, XMAX = 300, YMAX = 400;
+    const x = m => PAD.l + (Math.log10(Math.max(m, XMIN) / XMIN) / Math.log10(XMAX / XMIN)) * (W - PAD.l - PAD.r);
+    const y = v => H - PAD.b - (v / YMAX) * (H - PAD.t - PAD.b);
+    const csL = x(0.25) < PAD.l ? PAD.l : x(0.25), csR = x(5);
+    let g = ctx.createLinearGradient(PAD.l, 0, csR, 0); // cold-start dead zone
+    g.addColorStop(0, "rgba(208,59,59,0.13)"); g.addColorStop(1, "rgba(208,59,59,0.03)");
+    ctx.fillStyle = g; ctx.fillRect(PAD.l, PAD.t, csR - PAD.l, H - PAD.t - PAD.b);
+    ctx.strokeStyle = C("--grid"); ctx.lineWidth = 1;
+    ctx.fillStyle = C("--muted"); ctx.font = "600 10.5px system-ui"; ctx.textAlign = "center";
+    for (const t of [1, 2, 5, 10, 30, 60, 120, 220]) {
+      ctx.beginPath(); ctx.moveTo(x(t), PAD.t); ctx.lineTo(x(t), H - PAD.b); ctx.stroke();
+      ctx.fillText(t, x(t), H - PAD.b + 14);
+    }
+    ctx.setLineDash([5, 4]); ctx.strokeStyle = C("--ink-2"); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(x(6), PAD.t); ctx.lineTo(x(6), H - PAD.b); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = C("--ink-2"); ctx.font = "650 11.5px system-ui";
+    ctx.fillText("median onset 6 min", x(6), PAD.t - 7);
+    ctx.fillStyle = "rgba(176,48,48,0.9)"; ctx.textAlign = "left";
+    ctx.fillText("cold-start range 15 s – 5 min: the reactive-dead zone", PAD.l + 6, H - PAD.b - 10);
+    ctx.fillStyle = C("--muted"); ctx.textAlign = "right"; ctx.font = "600 10.5px system-ui";
+    [[0, "0"], [224, "224"], [400, "400"]].forEach(([v, t]) => ctx.fillText(t, PAD.l - 6, y(v) + 4));
+    ctx.textAlign = "center";
+    ctx.fillText("onset: baseline → peak (minutes, log)", (PAD.l + W - PAD.r) / 2, H - 3);
+    ctx.save(); ctx.translate(12, (PAD.t + H - PAD.b) / 2); ctx.rotate(-Math.PI / 2);
+    ctx.fillText("peak (img/s)", 0, 0); ctx.restore();
+    const seen = {};
+    for (const e of WEEK.episodes) {
+      const inBand = e.onset <= 5;
+      seen[e.onset] = (seen[e.onset] || 0) + 1;
+      const ex = x(e.onset) + (seen[e.onset] - 1) * 11, ey = y(Math.min(e.peak, YMAX));
+      ctx.beginPath(); ctx.arc(ex, ey, 7, 0, 2 * Math.PI);
+      ctx.fillStyle = inBand ? C("--critical") : C("--blue"); ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = "#fff"; ctx.stroke();
+      if (e.key.startsWith("burst")) {
+        ctx.fillStyle = C("--ink-2"); ctx.font = "700 11px system-ui";
+        ctx.fillText(e.label, ex, ey - 11);
+      }
+    }
+  }
+
+  if (document.getElementById("methodStrip")) { // -- method: demand vs the two capacity paths --
+    const [ctx, W, H] = setup("methodStrip");
+    const PAD = { l: 46, r: 12, t: 20, b: 26 };
+    const SPAN = METHOD.span_s, YMAX = 570;
+    const x = t => PAD.l + (t / SPAN) * (W - PAD.l - PAD.r);
+    const y = v => H - PAD.b - (Math.min(v, YMAX) / YMAX) * (H - PAD.t - PAD.b);
+    ctx.strokeStyle = C("--grid"); ctx.lineWidth = 1;
+    ctx.fillStyle = C("--muted"); ctx.font = "600 10.5px system-ui"; ctx.textAlign = "center";
+    for (let m = 0; m <= 25; m += 5) {
+      ctx.beginPath(); ctx.moveTo(x(m * 60), PAD.t); ctx.lineTo(x(m * 60), H - PAD.b); ctx.stroke();
+      ctx.fillText(m + " min", x(m * 60), H - PAD.b + 15);
+    }
+    ctx.textAlign = "right";
+    [[0, "0"], [224, "224"], [450, "450"]].forEach(([v, t]) => ctx.fillText(t, PAD.l - 6, y(v) + 4));
+    ctx.fillStyle = "rgba(42,120,214,0.18)";           // offered demand (15-s mean)
+    ctx.beginPath(); ctx.moveTo(x(0), y(0));
+    METHOD.offered15.forEach((v, i) => ctx.lineTo(x(i * 15 + 7.5), y(v)));
+    ctx.lineTo(x(SPAN), y(0)); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "rgba(42,120,214,0.45)"; ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    METHOD.offered15.forEach((v, i) => { const px = x(i * 15 + 7.5), py = y(v);
+      i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+    ctx.stroke();
+    const step = (sched, color, wdt) => {               // capacity staircases
+      ctx.strokeStyle = color; ctx.lineWidth = wdt; ctx.beginPath();
+      let px = x(0), py = y(sched[0][1] * METHOD.rho);
+      ctx.moveTo(px, py);
+      for (let i = 1; i < sched.length; i++) {
+        const nx = x(sched[i][0]), ny = y(sched[i][1] * METHOD.rho);
+        ctx.lineTo(nx, py); ctx.lineTo(nx, ny); py = ny;
+      }
+      ctx.lineTo(x(SPAN), py); ctx.stroke();
+    };
+    step(METHOD.re, C("--re"), 2.6);
+    step(METHOD.fc, C("--fc"), 2.6);
+    ctx.font = "700 12px system-ui"; ctx.textAlign = "left";
+    ctx.fillStyle = C("--fc");
+    ctx.fillText("forecast capacity — walks in provisioned: 19 workers at t=0", x(15), y(21 * 15) - 14);
+    ctx.fillStyle = C("--re");
+    ctx.fillText("reactive — starts at 1, sees demand a bin late,", x(760), y(555));
+    ctx.fillText("waits out the cold start, then overshoots", x(760), y(555) + 15);
+    ctx.fillStyle = "rgba(42,120,214,0.9)"; ctx.font = "650 11.5px system-ui";
+    ctx.fillText("offered image load (15-s mean)", x(370), y(60));
+    ctx.fillStyle = C("--muted"); ctx.font = "600 10.5px system-ui";
+    ctx.save(); ctx.translate(12, (PAD.t + H - PAD.b) / 2); ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = "center"; ctx.fillText("img/s · capacity = workers × 15", 0, 0); ctx.restore();
+  }
+}
+</script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    width: 1600, height: 1000,
+    margin: 0.04,
+    transition: "fade",
+    transitionSpeed: "fast",
+    preloadIframes: false,          // heavy canvas pages load only when adjacent
+    viewDistance: 2,
+    plugins: [ RevealNotes ],
+  }).then(drawWeekCharts);
+</script>
+</body>
+</html>

@@ -365,5 +365,29 @@
   "gpu_h": 556.88,
   "ledger_expected": 651.1,
   "requests": 749601
+ },
+ "week_fc_chronos_L120": {
+  "error": "replay rc=127 (see week_fc_chronos_L120.log)"
+ },
+ "week_fc_chronos_L300": {
+  "error": "replay rc=127 (see week_fc_chronos_L300.log)"
+ },
+ "week_fc_toto_L120": {
+  "error": "replay rc=127 (see week_fc_toto_L120.log)"
+ },
+ "week_fc_toto_L300": {
+  "error": "replay rc=127 (see week_fc_toto_L300.log)"
+ },
+ "week_reactive_L120": {
+  "error": "replay rc=127 (see week_reactive_L120.log)"
+ },
+ "week_reactive_L300": {
+  "error": "replay rc=127 (see week_reactive_L300.log)"
+ },
+ "week_fc_timesfm_L120": {
+  "error": "replay rc=127 (see week_fc_timesfm_L120.log)"
+ },
+ "week_fc_timesfm_L300": {
+  "error": "replay rc=127 (see week_fc_timesfm_L300.log)"
  }
 }

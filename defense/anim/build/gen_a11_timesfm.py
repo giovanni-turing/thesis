@@ -86,9 +86,15 @@ def run_cell(window: str, policy: str, lead: int) -> tuple[str, dict]:
 
 def main() -> None:
     only = sys.argv[1:] or None
-    cells = [(w, p, l) for w in WINDOWS for p in ("fc_timesfm",)
-             for l in ([60] if w == "week" else LEADS)
-             if only is None or f"{w}_{p}_L{l}" in only]
+    if only:  # explicit tags run as-is (incl. cells outside the base grid, e.g. week L>60)
+        cells = []
+        for tag in only:
+            w, rest = tag.split("_", 1)
+            p, l = rest.rsplit("_L", 1)
+            cells.append((w, p, int(l)))
+    else:
+        cells = [(w, p, l) for w in WINDOWS for p in ("fc_timesfm",)
+                 for l in ([60] if w == "week" else LEADS)]
     results = {}
     if (OUT / "verification.json").exists():
         results = json.load(open(OUT / "verification.json"))
