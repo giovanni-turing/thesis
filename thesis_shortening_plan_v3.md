@@ -6,6 +6,9 @@ sentence trimming." Author approved this plan 2026-07-26.
 
 Targets: **55–65 numbered main-text pages, 80–95 total PDF pages** (from 96 main / 135
 total). Achieved by relocation and restructure, not evidence deletion.
+OUTCOME (author-accepted 2026-07-26): **84 main / 119 total** at commit 3c56418 —
+evidence completeness won over page count per §9; Ch6 carries the full empirical
+payload (baselines + closed loop + comparator frontier). No further compression.
 
 ## 0. Novelty-claims policy (author directive, 2026-07-26)
 

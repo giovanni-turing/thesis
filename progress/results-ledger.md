@@ -2674,3 +2674,12 @@ caveats:    (1) PAGE BUDGET MISSED (above). Plan section 9 rules that evidence c
             odd page, so page 94 is a blank verso before the bibliography; that is the twoside
             convention and is Phase 4's to decide.
 commit:     uncommitted (working tree; HEAD 4babe1c)
+
+## Page-budget decision — 119pp accepted (2026-07-26)
+date:       2026-07-26
+decision:   author accepted 84 main / 119 total (targets were 55-65/80-95 estimates);
+            evidence completeness prioritized per plan v3 §9. Restructured state committed
+            3c56418; reviewer re-review in flight via review/bridge/. Remaining: reviewer
+            findings -> Phase 3.5 Fable style pass (immutability harness) -> Phase 4
+            (institutional template, D1 draft-note removal, reveal-deck sync).
+commit:     3c56418
