@@ -80,6 +80,12 @@ _DIR_EXP_SPECIFIC = [
     # the 5 pre-mapping 'misc:*' rows are renamed by schema/32_scope_misc_runids.sql.
     ("/encoder_hybrid/", "encoder_hybrid", True),
     ("/lang_qsweep/", "lang_qsweep", True),
+    # --- decisive comparator-frontier experiment (shortening plan v3 §8.2, commit
+    # 4babe1c, 2026-07-26): 725 files fell through to 'misc' (selftest B) and 313 runs
+    # landed as 'misc:<stem>' (DB check C306). scoped=True is required: stems repeat
+    # across calib/, eval/, eval_family/ and adversarial/. The 313 pre-mapping rows are
+    # renamed by schema/36_scope_comparator_frontier_runids.sql.
+    ("/comparator_frontier/", "comparator_frontier", True),
 ]
 
 # Directory names that hold a run's artifacts BY KIND rather than identifying a run:

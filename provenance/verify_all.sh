@@ -139,24 +139,57 @@ if [ $WANT_THESIS -eq 1 ]; then
 hdr "GATE B — thesis verified against the data"
 
 # B1 build
+# GUARD-PATH UPDATE 2026-07-26 (restructure gates adjudication, plan v3 §6). The old form read
+# its verdict off latexmk's OWN stdout, which is wrong in both directions and was observed to be
+# wrong in both directions on this tree:
+#   - already-built tree: latexmk exits 0 printing "All targets are up-to-date" and writes NO
+#     pages and NO warnings, so E=0/U=0/P="" and the gate printed PASS for a build it never
+#     evaluated -- exactly the unevaluated-gate-printing-green failure line 11 forbids;
+#   - built from a cleaned aux: the stdout accumulates EVERY pass, so pass-1's not-yet-resolved
+#     \ref/\cite warnings (432 of them on the 2026-07-26 restructured tree) are counted even
+#     though passes 2--3 resolve all of them -- a false FAIL on a converged document.
+# tex/tese.log is the log of the FINAL pdflatex pass only, so it answers both correctly. latexmk
+# still runs (its exit status is still the build verdict); only the parse target moves, and a
+# missing page count is now a FAIL instead of a silent "? pages" pass. Thresholds unchanged:
+# 0 errors, 0 undefined.
 if (cd "$TESE/tex" && latexmk -pdf -interaction=nonstopmode tese.tex >"$TMP/build.log" 2>&1); then
-  E=$(grep -cE '^! ' "$TMP/build.log"); U=$(grep -c 'undefined' "$TMP/build.log")
-  P=$(grep -oE '\([0-9]+ pages' "$TMP/build.log" | tail -1 | tr -dc 0-9)
-  if [ "${E:-1}" = "0" ] && [ "${U:-1}" = "0" ]; then ok "thesis builds: 0 errors, 0 undefined refs, ${P:-?} pages"
-  else bad "build has $E errors / $U undefined refs"; fi
+  BLOG="$TESE/tex/tese.log"
+  E=$(grep -cE '^! ' "$BLOG" 2>/dev/null); U=$(grep -c 'undefined' "$BLOG" 2>/dev/null)
+  P=$(grep -oE '\([0-9]+ pages' "$BLOG" 2>/dev/null | tail -1 | tr -dc 0-9)
+  if [ -z "${P:-}" ]; then bad "build gate NOT EVALUABLE: no page count in $BLOG"
+  elif [ "${E:-1}" = "0" ] && [ "${U:-1}" = "0" ]; then ok "thesis builds: 0 errors, 0 undefined refs, ${P} pages (final pass, tex/tese.log)"
+  else bad "build has $E errors / $U undefined refs (final pass)"
+       grep -E "Reference \`|Citation \`" "$BLOG" | grep undefined | head -5 | sed 's/^/        /'; fi
 else bad "latexmk exited non-zero"; grep -E '^! ' "$TMP/build.log" | head -3 | sed 's/^/        /'; fi
 
-# B2 rejected-fix audit -- these were overturned for cause and must never reappear
 cd "$TESE"
+# B0 built-chapter set -- GUARD-PATH UPDATE 2026-07-26 (restructure, plan v3 §2/§6).
+# The chapter merge left tex/{aiconfigurator,twopool,validation,baselines,apendice_ecosystem}.tex
+# ON DISK as frozen pre-merge sources that tese.tex no longer \include{}s. Every gate below that
+# globbed tex/*.tex was therefore reading text that IS NOT IN THE THESIS, and wrong in both
+# directions: must_exist could go green on a string surviving only in a dead file (false green --
+# e.g. "were not priced" and "67.3 / 248" exist in BOTH metodologia.tex and the dead twopool.tex),
+# and the rejected-fix / overclaim scans could go red on dead text (false red). TEXSET is derived
+# from tese.tex's own \include list so it cannot go stale at the next restructure; the count
+# assertion fails CLOSED if that parse ever breaks, since an empty set would make every grep
+# below vacuous. No pattern and no threshold is changed -- only which files they are read from.
+TEXSET=$( { echo tex/tese.tex
+            grep -oE '^[[:space:]]*\\include\{[A-Za-z0-9_-]+\}' tex/tese.tex \
+              | sed -E 's/.*\{([A-Za-z0-9_-]+)\}/tex\/\1.tex/'; } | sort -u )
+NTEX=$(printf '%s\n' $TEXSET | grep -c .)
+if [ "${NTEX:-0}" -ge 7 ]; then ok "built chapter set resolved from tese.tex: $NTEX files ($(printf '%s ' $TEXSET | sed 's|tex/||g'))"
+else bad "built chapter set UNRESOLVABLE from tese.tex ($NTEX files) -- every tex gate below would be vacuous"; fi
+
+# B2 rejected-fix audit -- these were overturned for cause and must never reappear
 declare -A MUST_BE=( ["882"]=0 ["783"]=0 )
 for pat in "${!MUST_BE[@]}"; do
-  n=$(grep -rho "$pat" tex/*.tex 2>/dev/null | wc -l)
+  n=$(grep -rho "$pat" $TEXSET 2>/dev/null | wc -l)
   [ "$n" -eq "${MUST_BE[$pat]}" ] && ok "rejected fix absent: '$pat' ($n occurrences)" \
                                   || bad "REJECTED FIX PRESENT: '$pat' appears $n time(s)"
 done
-must_exist() { grep -rqF "$2" tex/*.tex 2>/dev/null && ok "intact: $1" || bad "MISSING (was rejected-for-cause): $1"; }
+must_exist() { grep -rqF "$2" $TEXSET 2>/dev/null && ok "intact: $1" || bad "MISSING (was rejected-for-cause): $1"; }
 must_exist "tab:sim-poly-aic poly cell 67.3 / 248"  "67.3 / 248"
-must_exist "twopool 'were not priced' (R26)"        "were not priced"
+must_exist "'were not priced' (R26; twopool.tex -> metodologia.tex 2026-07-26)" "were not priced"
 must_exist "live-vs-sim band 1.1--6.8% (R1)"        "1.1--6.8"
 must_exist "235B ITL p99 87.7 ms (s=1 head2k; artifact llm_head2k_aic235btp8_s1.json=87.72; 86.2 was a spurious revert, no artifact)" "\SI{87.7}{\milli\second}"
 # ---- DERIVED-VALUE RECOMPUTATION (protocol R-A, added 2026-07-21) ----------
@@ -241,6 +274,31 @@ try:
     chk('537.4 GPU-h static denom', static_lang, 537.4, 1)
 except Exception as e:
     print(f"FAIL language week artifact unreadable: {e}"); fails.append('lang_week')
+# [8] comparator frontier (plan §8.2, commit 4babe1c; gated 2026-07-26): the five
+# printed arm ratios + the cheapest all-passing warm floor READ FROM the experiment
+# summary, and its static reference must equal the same store-read static C8
+# denominator used by [2]/[6] -- one denominator across every encoder headline.
+try:
+    fr = json.load(open('simulation/results/comparator_frontier/frontier_summary.json'))
+    arms = fr['arms']
+    chk('0.623x frontier forecast', arms['1_forecast_p90_issue_time']['vs_static'], 0.623, 3)
+    chk('0.675x frontier reactive', arms['2_reactive_react_point']['vs_static'], 0.675, 3)
+    chk('0.863x frontier floor M4', arms['3_reactive_plus_warm_floor_M4']['vs_static'], 0.863, 3)
+    chk('0.292x frontier oracle', arms['5_perfect_future_oracle_H0']['vs_static'], 0.292, 3)
+    env = fr['warm_floor_family_envelope']
+    if env['cheapest_member_passing_all_episodes'] != 'warm_floor_M6':
+        print('FAIL frontier cheapest all-passing floor is no longer M6'); fails.append('frontier_m6')
+    m6 = env['members']['warm_floor_M6']
+    chk('1.042x cheapest all-passing floor', m6['cost_worker_s_eval_span'] / fr['static_reference_worker_s'], 1.042, 3)
+    if m6['episodes_failed'] != 0:
+        print('FAIL frontier M6 no longer passes all episodes'); fails.append('frontier_m6_pass')
+    if enc_static and abs(fr['static_reference_worker_s'] - float(enc_static)) > 0.5:
+        print(f"FAIL frontier static reference {fr['static_reference_worker_s']} != store static C8 {enc_static}")
+        fails.append('frontier_static')
+    else:
+        print('PASS frontier static reference == store-read static C8 denominator')
+except Exception as e:
+    print(f"FAIL frontier summary unreadable: {e}"); fails.append('frontier')
 sys.exit(1 if fails else 0)
 PYEOF
 )
@@ -249,7 +307,7 @@ while IFS= read -r line; do
   case "$line" in PASS*) ok "derived: ${line#PASS }";; FAIL*) bad "derived: ${line#FAIL }";; esac
 done <<< "$DERIVED"
 # verb-convention regression (protocol R-C)
-BILLMISUSE=$(grep -rcE "billed at (forecast-)?issue" tex/*.tex | grep -v ':0' | wc -l)
+BILLMISUSE=$(grep -rcE "billed at (forecast-)?issue" $TEXSET | grep -v ':0' | wc -l)
 [ "$BILLMISUSE" -eq 0 ] && ok "no billing-verb misuse (billed-at-issue: 0; R-C)" || bad "billing-verb misuse present (R-C)"
 
 # R18 AMENDED 2026-07-21: raw operands 518.6063/537.4029 = 0.96502 -> printed
@@ -258,13 +316,13 @@ BILLMISUSE=$(grep -rcE "billed at (forecast-)?issue" tex/*.tex | grep -v ':0' | 
 # FLOOR LOWERED 4->2 2026-07-26: the convergence de-hedge consolidated cost framing
 # into canonical closedloop loci, intentionally removing 2 of the 4 mentions
 # (certified by the R5 cost-framing consistency gate across all 10 loci).
-N96=$(grep -rho '0[.,]965' tex/*.tex 2>/dev/null | wc -l)
+N96=$(grep -rho '0[.,]965' $TEXSET 2>/dev/null | wc -l)
 [ "$N96" -ge 2 ] && ok "0.965x intact at $N96 sites (R18-amended)" || bad "0.965x present at only $N96 sites (expected >=2)"
 # PATTERN NARROWED 2026-07-26 (finalize pass): the review-F10 repair inserted the
 # legitimate p90/s6 fold-ratio list "(0.96, 0.69, ...)" (91.9538/95.795 = 0.9599 -> 0.96),
 # which the old bare '0[.,]96[^5]' pattern false-flagged. The forbidden stale form was the
 # week ratio printed AS A x-RATIO (0.96$\times$ / 0.96x); match exactly that.
-N96OLD=$(grep -rhoE '0[.,]96(\$?\\times|x)' tex/*.tex 2>/dev/null | wc -l)
+N96OLD=$(grep -rhoE '0[.,]96(\$?\\times|x)' $TEXSET 2>/dev/null | wc -l)
 [ "$N96OLD" -eq 0 ] && ok "no stale 0.96x remains (all amended to 0.965x)" || bad "stale 0.96x still present at $N96OLD site(s)"
 
 # B3 containment -- post-manuscript defence material must not be ADDED as a thesis result.
@@ -283,7 +341,23 @@ _FIXWANT='kept line
 +kept plusline'
 _FIXGOT=$(printf '+++ b/tex/x.tex\n+kept line\n++kept plusline\n-removed\n context\n' | _added_lines)
 [ "$_FIXGOT" = "$_FIXWANT" ] || bad "containment-gate parser self-test FAILED (regression)"
-ADDED=$(git diff HEAD -- tex/closedloop.tex tex/twopool.tex tex/baselines.tex 2>/dev/null | _added_lines)
+# GUARD-PATH UPDATE 2026-07-26 (restructure, plan v3 §2/§6): the watched file list is re-pointed
+# at the CURRENT results/methodology chapters. twopool.tex and baselines.tex were merged away
+# (-> metodologia.tex and closedloop.tex) and are now frozen, un-\include{}d pre-merge sources:
+# diffing them watches nothing, while the chapters that actually carry results (trace-eda.tex,
+# predictors.tex, and the new metodologia.tex) were unwatched. metodologia.tex is untracked at
+# HEAD, so `git diff HEAD --` emits nothing for it; it is diffed against /dev/null instead, i.e.
+# EVERY line counts as added -- the strictest possible reading, and it currently yields zero hits
+# on all ten patterns. No forbidden pattern is dropped and no value assertion is touched.
+CONTAIN_FILES="tex/closedloop.tex tex/trace-eda.tex tex/predictors.tex tex/metodologia.tex"
+_chapter_diff() {
+  for f in $CONTAIN_FILES; do
+    [ -f "$f" ] || continue
+    if git ls-files --error-unmatch "$f" >/dev/null 2>&1; then git diff HEAD -- "$f"
+    else git diff --no-index -- /dev/null "$f"; fi
+  done
+}
+ADDED=$(_chapter_diff 2>/dev/null | _added_lines)
 # ADJUDICATED 2026-07-26: 'fold-robust' removed from the forbidden list -- the hybrid /
 # fold-robust result was deliberately promoted into closedloop.tex by the author-approved
 # reframe (ledger "Iterative fix+review convergence" entry); its addition is intended.
@@ -304,11 +378,13 @@ done
 # control plane); B4a asserts that class can never reappear, B4b surfaces new near-misses.
 cd "$TESE"
 # B4a HARD -- the caught defect and its per-line siblings. Each must be 0 or the gate FAILS.
+# Scope moved tex/*.tex -> $TEXSET 2026-07-26 (see B0): the frozen pre-merge sources are not in
+# the thesis, so an overclaim surviving there is not a thesis overclaim (and would be a false red).
 for pat in \
     'real H100 silicon' 'real H100 GPU' 'real H100s' 'on real H100' 'H100 silicon' \
     'mocker[^.]*on[^.]*silicon' 'mock(ed|er)[^.]*on real[^.]*GPU' \
     'live[- ]valid[a-z]*[^.]*on real[^.]*GPU' 'live[- ]valid[a-z]*[^.]*on silicon'; do
-  hits=$(grep -rniE "$pat" tex/*.tex 2>/dev/null)
+  hits=$(grep -rniE "$pat" $TEXSET 2>/dev/null)
   n=$(printf '%s' "$hits" | grep -c .)
   if [ "$n" -eq 0 ]; then ok "no methodological overclaim matching /$pat/"
   else bad "METHODOLOGICAL OVERCLAIM (hard): /$pat/ -- $n line(s)"
@@ -324,7 +400,7 @@ NEAR=0
 while IFS= read -r line; do
   [ -n "$line" ] && { warn "manual-review (silicon/GPU phrase <=3 lines from a sim/mocker/live cue): $line"; NEAR=$((NEAR+1)); }
 done < <(
-  for f in tex/*.tex; do
+  for f in $TEXSET; do
     awk -v S="$SIL" -v C="$CUE" -v F="$f" '
       { L[NR]=$0 }
       END { for (i=1;i<=NR;i++) if (L[i] ~ S)

@@ -1,134 +1,179 @@
 %!TeX root=./tese.tex
 % Conclusions. Numbers quoted here are established in the body chapters
 % and ledgered in progress/results-ledger.md.
+% Restructured 2026-07-26 (thesis_shortening_plan_v3): answers organised by
+% the three RQs of §1; §8.4 reusable systems rule added as sec:conc-regimes.
 \chapter{Conclusions}
 \label{cap:conclusion}
 
-This thesis asked how the pools of a modality-disaggregated
-multimodal serving system should be scaled, and defended a specific
-answer: each pool on its own demand signal --- the vision pool
-forecast-anticipated (its signal forecastable but not
-rate-visible), the language pool tail-aware converted. The four
-research questions of Chapter~\ref{cap:intro} can now be answered from
-evidence.
+This thesis asked how the vision pool of a modality-disaggregated multimodal
+serving system should be sized over time, and defended a specific answer:
+on its own demand signal, with standing capacity placed ahead of the load by
+a probabilistic forecast. The three research questions of
+Chapter~\ref{cap:intro} can now be answered from evidence.
 
-\paragraph{RQ1 --- Signal sufficiency: no.} The request-rate signal a
-conventional autoscaler watches does not carry the vision pool's demand:
-the two pools' demands decouple statistically and saturate an order of
-magnitude apart on steady traffic, with the encoder pool failing its
-tail bound at the trace's own recorded rate --- invisibly to rate- and
-utilization-based monitors. Correcting the missizing needs more encoder
-workers and, on the language pool, a tensor-parallel shape change that
-no replica scaler can perform.
+\paragraph{RQ1 --- Demand adequacy: request rate misrepresents vision
+demand, and structure remains.} A constant-fraction model explains
+$R^2=\num{0.123}$ of the image-rate series against \num{0.654} of the decode
+series; the two signals' extreme minutes are essentially disjoint, and
+minute-resolution monitoring erases most of the image peak. The
+misrepresentation is mechanical as well as statistical: the two pools
+saturate an order of magnitude apart, and the encoder pool misses its tail
+bound at the trace's own recorded rate, invisibly to rate- and
+utilization-based monitors. Forecastable structure nevertheless survives,
+concentrated in that same vision-borne signal --- an autocorrelation
+half-life of \SI{69}{\minute} against \SI{9}{\minute} for requests, over a
+burst population of 18 episodes whose median onset, \SI{6.5}{\minute},
+competes directly with replica startup.
 
-\paragraph{RQ2 --- Forecastability: yes, zero-shot.} Three pretrained
-time-series foundation models beat every tested fixed-parameter
-classical baseline in all
-twenty (resolution, signal) cells under one rolling-origin protocol;
-accuracy degrades only marginally across a twelve-step horizon covering
-the median burst onset, covariates are nearly irrelevant at
-provisioning cadence, and the p90 band edge is empirically calibrated
-(coverage 0.88--0.90) --- what later converts forecasts into
-provisionable headroom.
+\paragraph{RQ2 --- Operational forecastability: yes, with a bounded
+meaning.} The quantity a provisioning controller consumes is an upper band
+edge, and it is empirically calibrated: p90 coverage $0.88$--$0.90$, holding
+across the full twelve-step horizon and inside burst episodes, so it covers
+the tested \SIrange{15}{300}{\second} startup leads, while the
+under-provision events it concedes are short and bounded. Underneath that,
+zero-shot foundation models beat the fixed-parameter classical baselines in
+every cell of the $5{\times}4$ grid, with inter-model margins and covariate
+effects small enough that engineering considerations can decide the choice
+--- accuracy underwrites the operating point without deciding it.
 
-\paragraph{RQ3 --- Platform validity: yes, with measured fidelity.} The
-encoder cost model was collected on real silicon for this thesis (and
-contributed upstream), and a composed forward matches vLLM's own vision
-tower to within $12.8\%$ --- the earlier ${\approx}1.4\text{--}1.6\times$
-gap being HuggingFace execution overhead, not model error
-(Appendix~\ref{app:engine-sensitivity}). The language pool runs under
-calibrated engine timing (a Dynamo discrete-event simulation on AIC
-H100 timing, not real H100) whose delta against the simulator's default
-polynomial is quantified, including a burst-window SLA violation the
-polynomial misses. The control loop itself is anchored to the live
-Dynamo stack: on the fastest-onset burst, the winning policy and the
-reactive baseline reproduce their simulated verdicts through the real
-control plane with mocked engines --- validating the control loop, not
-silicon.
+\paragraph{RQ3 --- Control payoff: a trade-off with an identified failure
+mode, not universal superiority.} On four of the five composed evaluation
+episodes the forecast and reactive tail latencies \emph{tie exactly}; the
+latency advantage lives in the one-minute onset, which the identically
+informed reactive controller loses at every lead. What forecasting buys at
+week scale is resource-time at equal compliance. Under one frozen five-arm
+protocol (Section~\ref{sec:cl-frontier}), the p90 forecast arm holds the
+encoder bound in every episode at \textbf{0.623$\times$} the deployable
+static fleet's provisioned worker-time with zero failed episodes; a reactive
+controller granted a minimum warm floor calibrated on the calibration split
+\emph{fails} held-out burst3, and the cheapest all-passing member of that
+floor family --- identifiable only after the fact --- costs
+\textbf{1.042$\times$} static. Equalising the two readiness models in both
+directions leaves the ordering intact, so forecast-informed placement is
+\textbf{1.20--1.69$\times$} cheaper than the best warm-floor reactive at
+equal compliance; the single figure 1.67$\times$ must never be quoted alone.
+A perfect-future oracle bounds what any forecast could buy at
+\textbf{0.292$\times$}, so the forecast arm captures 53\% of the achievable
+saving. The headline schedule prices the covered span at \textbf{0.62 times
+the deployable static encoder fleet's worker-time}, with the finer
+daily-fold grain surfacing the one missed covered onset (e13), recovered at
+0.76$\times$ by a hybrid forecast--reactive schedule designed post hoc on
+the failing fold. On the language pool --- a secondary result, and a
+same-input \emph{conversion} test rather than a second anticipation
+experiment --- the forecast passes bursts under realistic replica leads only
+when combined with a tail-aware capacity conversion; fed through the
+planner's native mean-based conversion it fails like the reactive baseline,
+so the defect is the conversion, not loop tuning. That pool sits near
+break-even against static, and which side of unity it falls on is decided by
+the denominator (Section~\ref{sec:cl-ledger-cost}).
 
-\paragraph{RQ4 --- Closed-loop payoff: yes, with the mechanism
-identified.} On the encoder pool, the p90-forecast schedule meets the
-tail SLA on all five forecast-covered windows at all four issued leads
-(15--\SI{165}{\second}), including the one-minute-onset burst that
-defeats an identically
-informed reactive controller at every lead. It does so because the p90 band holds
-graduated headroom already standing before the spike: it matures within
-the issued lead where one exists, and on the one-minute onset that has
-none it rests on that standing headroom, leaving the no-queue service
-plateau intact. The
-forecaster is load-bearing but its \emph{accuracy} is second-order: a
-cheap forward forecaster (EWMA) at a calibrated quantile, driven through
-the same loop, either misses the fast onsets or over-provisions --- so
-it is the calibrated band \emph{shape} that carries the result. On the
-language pool --- a same-input \emph{conversion} test, not a second
-anticipation experiment --- the forecast passes bursts under realistic
-replica leads only when combined with a tail-aware capacity conversion
-(a measured belief-to-knee ratio); fed through the planner's native
-mean-based conversion it fails like the reactive baseline, so the defect
-is the conversion, not loop tuning. Over the covered 5.60-day span the
-policy holds the SLA in aggregate and inside all four in-span burst
-episodes, and prices
-that span at \textbf{0.62$\times$ the deployable static encoder fleet's
-provisioned worker-time} --- a week-scale saving: inside individual
-burst windows every autoscaling arm costs \emph{more} than static
-(issue-time actuation, warm-pool readiness; 0.59--0.62$\times$ under
-strict re-warm). A hybrid forecast--reactive schedule --- designed post
-hoc on the failing fold F6 and replayed on all seven daily folds,
-degenerating to the reactive arm on the pre-coverage fold F1 --- recovers
-at 0.76$\times$ the single daily-fold onset (e13) the pure forecast drops
-at a finer grain than the burst episodes; the language pool's
-per-denominator cost frontier --- a near-break-even edge and a modest
-post-hoc e13-robust saving --- is catalogued in
-Section~\ref{sec:cl-ledger-cost}. The reactive controller's apparent
-aggregate pass, by contrast, dissolves under per-episode grading.
+\section{When this should be expected to transfer}
+\label{sec:conc-regimes}
 
-\paragraph{The thesis statement, revisited.} Every clause is now
-backed: the pools' demands decouple and saturate far apart (RQ1),
-the least visible signal is the most persistent and forecastable
-zero-shot at provisioning horizons (RQ2), and scaling the vision pool on
-those forecasts --- with the language pool on its own forecast's tail-aware
-conversion --- holds the tail objective through the onsets that defeat reactive control
-at every tested lead and, over the covered week, at 0.62$\times$
-the best static encoder fleet's worker-time --- 0.76$\times$ for the
-post-hoc hybrid that also recovers e13 (RQ4).
+The measurements above are one trace, one pool pair and one week. What can
+be carried elsewhere is not the ratios but the regime conditions that
+produced them: four quantities decide whether a forecast-informed schedule,
+a standing warm floor, or nothing at all is the right instrument.
+Table~\ref{tab:conc-regimes} states them, each grounded in the measured
+instance from which it was read, and offers them as design conditions to
+test rather than as externally validated law.
+
+\begin{table}[htbp]
+\centering
+\caption[Regime conditions for forecast-informed pool
+provisioning]{Regime conditions for forecast-informed pool provisioning.
+$L$ is the replica startup lead, $T$ the burst onset time, $\pi$ the ratio
+of episode peak demand to the capacity standing between episodes, and
+$\kappa$ the fraction of the span spent outside episodes. Each row names the
+measured instance it was read from; all instances come from the single trace
+of Chapter~\ref{cap:trace-eda}, so these are design hypotheses to test, not
+validated law.}
+\label{tab:conc-regimes}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}p{0.155\linewidth}p{0.235\linewidth}p{0.29\linewidth}p{0.235\linewidth}@{}}
+\toprule
+Regime & Condition & Measured instance & Provisioning rule \\
+\midrule
+\textbf{Forecast anticipation} &
+$L < T$, signal coupled to the pool's own work &
+burst4: \SI{60}{\minute} onset against a \SI{345}{\second} usable issue
+lead; capacity in place before the ramp &
+Schedule from the forecast; the lead is real and is the mechanism \\
+\addlinespace
+\textbf{Headroom placement} &
+$L \geq T$ (no usable lead), but the predictive band has already widened
+before the spike &
+burst3: one-minute onset; the p90 band already holds ${\approx}21$ workers
+pre-spike and passes where reactive fails at every lead &
+Schedule from the band's \emph{upper edge}, not from onset detection \\
+\addlinespace
+\textbf{Warm floor suffices} &
+$\pi$ small, or $\kappa$ small enough that carrying the floor between
+episodes is cheap &
+floor family $M{=}1\ldots32$: $M{=}2$ passes at 0.746$\times$ static under
+warm-pool readiness &
+Stand a fixed floor; a forecast adds cost, not compliance \\
+\addlinespace
+\textbf{Forecast beats floor} &
+$\kappa$ large: a floor sized for the worst episode is carried through every
+calm hour &
+the calm day costs the $M{=}6$ floor \SI{518710}{} worker-s against the
+forecast arm's \SI{162326}{} &
+Place headroom where the uncertainty is, not everywhere \\
+\addlinespace
+\textbf{Nothing responds} &
+$L \geq T$ \emph{and} the watched signal is decoupled from the pool's work &
+aggregate-signal control: the encoder pool misses its bound at the trace's
+own recorded rate, invisibly to rate monitors &
+Fix the signal or the shape first; no scaler recovers this \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The rule that generalises is therefore narrower than ``forecasting helps'':
+a forecast is worth its complexity when the pool's own demand signal is
+decoupled from the aggregate one, when onsets are fast relative to replica
+startup, and when the span is mostly calm --- so that standing capacity
+sized for the worst episode is paid for continuously while a predictive band
+is paid for episodically. Where any of those fails, the cheaper instrument
+is a fixed floor, and this thesis measured a case of that too, on the
+language pool.
 
 \paragraph{What bounds these claims.} The evidence is one seven-day
 production trace with an offered-work upper bound on decode demand
-(faithful in total volume but temporally displaced, licensing no
-pointwise provisioning claim); the inter-pool handoff is an analytic
-single-stream bound, so the \SI{588}{\milli\second} observed all-request
-no-queue plateau and the cost ratio assume an embedding-only handoff or
-a ${\geq}100$\,Gbps fabric;
-and the vision-pool control loop is exercised in simulation against the
-measured silicon cost (validated to $12.8\%$;
-Appendix~\ref{app:engine-sensitivity}), not yet as a live serving loop.
-These limits do not invalidate the stated 5.60-day aggregate --- the
-encoder cost model in particular is validated rather than conservatively
-biased --- but cost direction is denominator- and fold-sensitive (under
-request-matched normalization the published language point, p90 at
-conversion scale 8, reads 1.03$\times$ and the e13-robust p90/scale-6
-point 0.87$\times$; one daily fold misses the encoder bound), so no
-directional claim
-extends beyond the tested span, model, and denominator
-(Chapters~\ref{cap:closedloop} and \ref{cap:twopool} detail them).
+(faithful in total volume but temporally displaced, licensing no pointwise
+provisioning claim); the inter-pool handoff is an analytic single-stream
+bound, so the \SI{588}{\milli\second} observed all-request no-queue plateau
+and the cost ratio assume an embedding-only handoff or a ${\geq}100$\,Gbps
+fabric; and the vision-pool control loop is exercised in simulation against
+the measured silicon cost (validated to $12.8\%$;
+Appendix~\ref{app:engine-sensitivity}), not yet as a live serving loop ---
+the live anchor covers the control plane with mocked engines. Cost direction
+is denominator- and fold-sensitive: under request-matched normalization the
+published language point (p90 at conversion scale 8) reads 1.03$\times$ and
+the e13-robust p90/scale-6 point 0.87$\times$, and one daily fold misses the
+encoder bound. No directional claim extends beyond the tested span, model
+and denominator.
 
 \section{Future work}
 \label{sec:conc-future}
 
 Three extensions remain. \emph{Completing the physical encoder anchor}:
-Chapter~\ref{cap:aiconfigurator} reports a dense whole-tower sweep on the
-5090 whose measured $f(N)$ matches the AIC composition across the serving
-regime. What remains is one real encoder worker serving a burst replay
-end to end and, beyond it, the full closed loop on a real GPU serving
-cluster --- the complement to the mocked-engine control-loop anchor of
-Chapter~\ref{cap:validation}, and the evaluation modality the systems of
-Chapter~\ref{cap:related} already bring. (A structural prefill-decomposition predictor was tested and closed ---
-it buys nothing even at onsets; Chapter~\ref{cap:predictors}.) \emph{The seam as a preview channel}: in a
-modality-disaggregated system the vision pool's admitted work is an
-exact, short-horizon preview of language-pool arrivals
-(horizon $\approx$ encoder sojourn); useless for replica lead, but free
-information at scheduling timescales (chunked-prefill planning, KV
-pre-allocation), a natural planner extension. \emph{Workload
+Chapter~\ref{cap:metodologia} reports a dense whole-tower sweep on the 5090
+whose measured $f(N)$ matches the AIC composition across the serving regime.
+What remains is one real encoder worker serving a burst replay end to end
+and, beyond it, the full closed loop on a real GPU serving cluster --- the
+complement to the mocked-engine control-loop anchor, and the evaluation
+modality the systems of Chapter~\ref{cap:related} already bring. \emph{The
+seam as a preview channel}: the vision pool's admitted work is an exact,
+short-horizon preview of language-pool arrivals (horizon $\approx$ encoder
+sojourn); useless for replica lead, but free information at scheduling
+timescales (chunked-prefill planning, KV pre-allocation). \emph{Workload
 breadth}: image-size-aware encoder costing when a trace with size
 information becomes available, the intermediate model family members,
-and fine-tuned forecasters as the forecasting-side upper bound.
+fine-tuned forecasters as the forecasting-side upper bound, and above all a
+second trace, against which the post-hoc points of
+Chapter~\ref{cap:closedloop} could be upgraded from robustness sensitivities
+to held-out results.

@@ -2564,3 +2564,113 @@ caveats:    the 1.67x headline is NOT robust -- it collapses to 1.20x once the r
             not swept here. Not ingested to the provenance DB (encoder stats are converter
             .stats.json, not llm_run_summary).
 commit:     uncommitted (working tree)
+
+### RESTRUCTURE CAMPAIGN close-out — 11 chapters -> 7, four sources retired, verification wave applied  (2026-07-26)
+artifact:   tex/metodologia.tex (NEW: absorbs aiconfigurator.tex + twopool.tex + validation.tex);
+            tex/closedloop.tex (absorbs baselines.tex); tex/{intro,related,trace-eda,predictors,
+            conclusion,apendice,tese}.tex (RQ restructure, compression, approved title of plan
+            section 8.7); tex/{aiconfigurator,twopool,validation,baselines}.tex DELETED (git rm,
+            staged, uncommitted); supplementary/SUPPLEMENTARY.md (S6 displacement record);
+            provenance/verify_all.sh (B0 TEXSET + B1 build-gate parse + B3 containment file list);
+            provenance/loader/runid.py + provenance/schema/36_scope_comparator_frontier_runids.sql
+            (NEW); tex/tese.pdf (119 pp)
+command:    cd tex && rm -f *.aux *.log *.toc *.lof *.lot *.out *.fls *.fdb_latexmk &&
+              latexmk -pdf -interaction=nonstopmode tese.tex ;
+            psql -h localhost -p 5433 -U goku -d postgres -v ON_ERROR_STOP=1 \
+              -f provenance/schema/36_scope_comparator_frontier_runids.sql ;
+            python3 provenance/loader/selftest.py ;
+            bash provenance/verify_all.sh
+result:     PLAN-V3 PHASE 2 + PHASE 3 LANDED. Structure, labels, gates and provenance are green; the
+            PAGE BUDGET IS MISSED and is the campaign's one open item.
+            GATES: 44 passed / 0 failed / 5 warnings -- DELIVERY-READY. (Was 43/1/5 before this
+              close-out; the single FAIL was A5 loader-selftest B dir coverage.) The 5 warnings are
+              1 x check_all (4 warn-level checks C107/C207/C214/C302, each carrying an adjudicated
+              KNOWN-FAILING note) + 4 x manual-review near-misses in conclusion.tex:167 and
+              related.tex:286-289, all of which read correctly. C002 remains the one error-level
+              check, documented ACCEPTED. Store at close-out: 3,665 runs / 22,394,918 rows / 45 GB
+              / 5,021 files.
+            BUILD: 0 errors, 0 LaTeX warnings of any kind (0 undefined refs, 0 undefined citations,
+              0 multiply-defined labels, 0 missing graphics), 3 passes converged. 119 PDF pages.
+            LABEL GRAPH: 128 labels, 0 duplicates, 0 dangling refs. All 35 labels of the four
+              retired chapter sources travelled with their content and still resolve
+              (cap:aiconfigurator / cap:twopool / cap:validation are aliases on cap:metodologia,
+              Ch. 3; cap:baselines is an alias on cap:closedloop, Ch. 6). The deletion was gated on
+              a mechanically verified empty orphan list, not on inspection.
+            CAPTIONS: 42/42 \caption[short]{long} across the eight built chapter files.
+            TYPESETTING: overfull hboxes 27 -> 16, worst 94.49pt -> 15.47pt. The 94.49pt box was
+              tab:cl-frontier overrunning the 390pt text block; fixed by shortening arm labels and
+              moving their qualifiers into the caption -- no printed value changed. Three long
+              section titles given short forms, removing the 68.9 / 66.5 / 44.1pt running-head
+              boxes; section 6.5 retitled "The comparator frontier at week scale".
+            PROVENANCE: loader selftest ALL GREEN (3/3) -- 92 directories, 4,006 files, 0 'misc'
+              (was 725 files / 313 runs under 'misc', opened by the section-8.2 frontier
+              experiment and reported as DB check C306). loader/runid.py gains
+              ("/comparator_frontier/", "comparator_frontier", True); schema/36 renames the 313
+              pre-mapping rows (worker_schedule 84,955 + encoder_run_summary 313 rows and 625
+              ingest_log references repointed; 125 FK child columns verified clean before the
+              delete). The delete suppresses RI triggers for that one statement, deliberately and
+              with the reason recorded in the migration: 313 rows x ~130 FK children, eight of them
+              multi-GB with no index on run_id, made the default path hours long.
+            PAGE BUDGET -- MISS. front matter 18 | Ch.1 8 (target 6) | Ch.2 6 (5) | Ch.3 18 (13) |
+              Ch.4 10 (9) | Ch.5 10 (7) | Ch.6 28 (16) | Ch.7 4 (3) | MAIN TEXT 84 (target 55-65) |
+              Appendix A 10 (3-4) | bibliography 7 | TOTAL 119 (target 80-95). Delta from the
+              141-page pre-campaign build: -22 total, -12 main. Ch.6 (+12) and Ch.3 (+5) carry
+              almost all of the overrun; closedloop.tex alone is 10,644 source words. Closing the
+              gap needs another structural pass, not sentence trimming; the two candidates that do
+              not delete evidence are (a) relocating appendix A.5 (engine sensitivity) and A.6
+              (supplementary forecasting figures) into the supplementary archive, ~4 pp, AUTHOR
+              DECISION because they are evidence the thesis currently shows, and (b) a second
+              compression pass on Ch. 6.
+            DEFECTS CLEARED from the three verifier reports: 6 sites rendering "Chapters 6 and 6"
+              and 2 consecutive same-chapter references in related.tex, rewritten to a single
+              chapter or a section reference; 4 tense-broken Chapter-\ref{cap:validation} sites in
+              closedloop.tex re-pointed at Section~\ref{sec:val-results} (Ch. 3 is now earlier than
+              Ch. 6); the plateau-not-a-physical-floor disclaimer restored to the tab:cl-frontier
+              caption (adversarial Finding 6); the "even with instant workers" qualifier restored
+              to sec:base-summary (Finding 5); the oracle row of tab:cl-frontier marked with a
+              dagger footnote disclosing that it is the boundary-clamp-released variant (as
+              shipped it misses burst3 at 1978.6 ms at the same 1.13 Mworker-s); Appendix A's
+              completeness claim made true by adding rows for fig:cl-frontier, tab:pred-coverage,
+              tab:cl-ledger-llm and tab:conc-regimes and scoping the claim to Chapters 1-7 plus
+              A.5; the intro's vague "tie on most episodes" restored to "tie exactly on four of
+              the five composed evaluation episodes"; the 1-minute model-win split restored to
+              predictors.tex, recomputed from the bold marks of tab:pred-wape (Chronos-2 two of
+              four, Toto-2 one, TimesFM one). The reported duplicated line in the EN abstract was
+              NOT reproducible -- the sentence occurs exactly once.
+            PRESERVATION CONTRACT: re-swept the built set. Zero hits for detects-every-onset,
+              unqualified seven-fold-robust, deployable-hybrid, p50-served-adequately,
+              matches-Chronos, 5.31, 245 s, bare 92%. All 20 "0.62" sites are encoder-scoped; the
+              language p70/s6 point is 0.61x at every site including both abstracts. "seven-fold"
+              appears once, correctly qualified.
+feeds:      the whole manuscript. The chapter map, the 3-RQ structure and the retitled document are
+            now the manuscript's actual shape.
+supersedes: tex/{aiconfigurator,twopool,validation,baselines}.tex as manuscript sources -- their
+            text lives on inside metodologia.tex and closedloop.tex, and their full pre-merge form
+            is recoverable at the manuscript baseline commit 67bd44a. Every displacement is
+            recorded in supplementary/SUPPLEMENTARY.md section S6 (one subsection per compression
+            agent, plus S6.8 on how to read the pre-restructure tex/ pointers still embedded in
+            frontier_summary.json, the schema comments and the loader docstrings).
+caveats:    (1) PAGE BUDGET MISSED (above). Plan section 9 rules that evidence completeness wins
+            over page count when they conflict, and it did conflict; the miss is a recorded
+            decision, not an oversight.
+            (2) NOT COMMITTED -- working tree only. HEAD 4babe1c remains the rollback point; the
+            four file deletions are staged via git rm but uncommitted, and tex/metodologia.tex is
+            still untracked.
+            (3) The alias labels are deliberate and load-bearing: cap:baselines and cap:closedloop
+            both resolve to Chapter 6, cap:aiconfigurator / cap:twopool / cap:validation all to
+            Chapter 3. Every prose site that co-referenced two of them was rewritten; the labels
+            stay defined so no external record breaks. 40-plus labels are now defined but
+            unreferenced, which is inert.
+            (4) tab:cl-frontier and fig:cl-frontier are still UNGATED. Every value in them
+            recomputes exactly from simulation/results/comparator_frontier/frontier_summary.json
+            (verified by hand twice: agent V3 and this pass), but verify_all.sh asserts none of
+            them. The drafted fix is a [8] block in the DERIVED heredoc reading frontier_summary
+            .json and asserting 0.623 / 0.675 / 0.863 / 0.292 / 1.042 plus
+            static_reference_worker_s == ENC_STATIC_WS. Not applied here: adding a value assertion
+            mid-verification would have invalidated the gate run it was meant to protect.
+            (5) Phase 3.5 (style) and Phase 4 (institutional template, draft-note removal,
+            blank-page policy, deck sync) are NOT done. The draft note D1 is still in the document
+            by design -- plan section 4 removes it only in Phase 4. Appendix A currently ends on an
+            odd page, so page 94 is a blank verso before the bibliography; that is the twoside
+            convention and is Phase 4's to decide.
+commit:     uncommitted (working tree; HEAD 4babe1c)

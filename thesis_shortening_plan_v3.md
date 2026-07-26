@@ -128,9 +128,21 @@ gates (0.62/0.76/0.82) are count-independent and must stay green throughout.
   relocation, short-caption pass. File-partitioned agents; no two agents share a file.
 - **Phase 3:** verification wave on the shortened build — full gates with adjudicated
   guard re-floors + fresh adversarial pass against the preservation contract.
+- **Phase 3.5 (style, Fable-driven):** readability/style pass on the verified
+  restructured text — sentence flow, transitions, redundancy, register, PT prose —
+  under a hard immutability harness: (a) pre-extracted per-chapter multiset of ALL
+  numeric tokens + \ref/\label/\cite must be byte-identical after; (b) guard-matched
+  strings, §8.1 vocabulary, and the 34 corrected-claim sentences untouchable;
+  (c) followed by the preservation verifier re-run + full gates + clean build.
+  Per-chapter with reviewable diffs, never a wholesale rewrite. Rationale: style
+  edits are the most regression-prone class observed (convergence R2-R4); the
+  harness makes drift mechanically detectable.
 - **Phase 4:** institutional template (ABNT/IME front matter, biblatex), draft-note
-  removal, blank-page policy, Lists check, **defense-deck sync** (renumbering breaks
-  deck references: reveal deck only; beamer slides retired, defense-qa.tex unmaintained per author 2026-07-26).
+  removal, blank-page policy, Lists check, **defense-deck sync — Fable-driven**
+  (author directive 2026-07-26: the reveal-deck update is done by Fable directly, like
+  the Phase-3.5 style pass, not delegated; scope = reveal deck only — beamer slides
+  retired, defense-qa.tex unmaintained. Sync targets: new title, 3-RQ structure,
+  frontier result slide, §8.1 vocabulary, renumbered references).
 
 ## 8. Additional author directives (2026-07-26, second batch)
 

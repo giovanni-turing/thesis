@@ -1,66 +1,55 @@
 %!TeX root=./tese.tex
 % Introduction. Quantitative claims quoted here are established in the body
 % chapters and reproducible from the workspace's versioned scripts
-% (analysis/trace_eda, predictors, collector_artifacts, simulation).
-% No placeholders remain (last one resolved by the validation chapter,
-% 2026-07-09); provenance for every number is in progress/results-ledger.md.
+% (analysis/trace_eda, predictors, collector_artifacts, simulation);
+% provenance for every number is in progress/results-ledger.md.
+% Restructured 2026-07-26 (thesis_shortening_plan_v3 §1, §0): three RQs,
+% questions only; contributions = one primary chain + an enabling tier.
 \chapter{Introduction}
 \label{cap:intro}
 
 Large language models are served interactively, under explicit latency
 targets, from GPU fleets whose cost dominates the service's economics.
-Serving systems decompose inference into stages of distinct
-computational character, each provisioned separately: prefill and decode
-run in dedicated worker
-pools~\cite{Zhong2024DistServe,Patel2024Splitwise,Qin2025Mooncake}, above
-engines that batch and schedule
-tokens~\cite{Kwon2023vLLM,Agrawal2024SarathiServe}, under
-datacenter-scale orchestration frameworks~\cite{Dynamo2025}. Multimodal
-models add one stage: a vision encoder converts the request's images
-into the embedding tokens the language model consumes, and
-modality-disaggregated architectures give
-that encoder a pool of its own~\cite{Qiu2025ModServe}. Disaggregation
-makes each stage efficient, but it also multiplies the provisioning problem: a
-monolithic deployment asked one sizing question; a disaggregated one asks
-one per pool, continuously, under load that moves by the minute.
+Serving systems decompose inference into stages of distinct computational
+character, each provisioned separately: prefill and decode in dedicated
+worker pools~\cite{Zhong2024DistServe,Patel2024Splitwise,Qin2025Mooncake},
+above engines that batch and schedule
+tokens~\cite{Kwon2023vLLM,Agrawal2024SarathiServe}, under datacenter-scale
+orchestration frameworks~\cite{Dynamo2025}. Multimodal models add one stage:
+a vision encoder converts the request's images into the embedding tokens the
+language model consumes, and modality-disaggregated architectures give that
+encoder a pool of its own~\cite{Qiu2025ModServe}. Disaggregation makes each
+stage efficient, but it multiplies the provisioning problem: a monolithic
+deployment asked one sizing question; a disaggregated one asks one per pool,
+continuously, under load that moves by the minute.
 
-This thesis studies how the pools of a modality-disaggregated multimodal
-serving system should be scaled, and defends a specific answer: each pool
-must be provisioned on \emph{its own} demand signal --- the vision pool,
-not rate-visible, on a \emph{forecast} of it; the language pool,
-rate-visible, on a tail-aware \emph{conversion} of it. In a production
-trace vision demand decouples from the request rate a conventional
-autoscaler watches, yet the burstiest signal is also the most
-\emph{persistent}, forecastable zero-shot by pretrained time-series models
-(Chapters~\ref{cap:trace-eda} and~\ref{cap:predictors}). A
-silicon-collected vision cost model (Chapter~\ref{cap:aiconfigurator})
-composed with a calibrated simulation of the language pool reproduces the
-decoupling as saturation knees an order of magnitude apart
-(Chapter~\ref{cap:twopool}); closing the loop, per-pool provisioning holds
-the tail latency objective through burst onsets that defeat an identically
-informed reactive controller, at a fraction of the deployable static
-encoder fleet's GPU-time
-(Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}).
+This thesis studies how the vision pool of such a system should be sized
+over time, and defends a specific answer: on \emph{its own} demand signal,
+placed ahead of the load by a probabilistic forecast, because that signal is
+invisible to the aggregate monitors reactive autoscalers watch and moves
+faster than a replica can start. The
+contribution is not any single ingredient but the complete operational
+chain --- encoder-specific signal, provisioning-horizon forecast, replica
+schedule under startup delay, episode-level SLA and resource grading ---
+built once and measured end to end against the controls a practitioner would
+actually deploy.
 
 \section{Context: serving multimodal models by disaggregation}
 \label{sec:intro-context}
 
 An LLM answers a request in two phases of opposite character: a
-\emph{prefill} pass over the whole prompt, compute-bound and parallel,
-and a \emph{decode} loop generating one token at a time, bound by memory
-bandwidth and exposed as inter-token latency. Service quality is specified
-against this anatomy: bounds on time to first token (TTFT, dominated by
-queueing and prefill) and time per output token (TPOT, decode; reported
-here as the equivalent per-gap inter-token latency, ITL). Such bounds are
+\emph{prefill} pass over the whole prompt, compute-bound and parallel, and a
+\emph{decode} loop emitting one token at a time, bound by memory bandwidth.
+Service quality is specified against this anatomy: bounds on time to first
+token (TTFT, dominated by
+queueing and prefill) and time per output token (TPOT, decode; reported here
+as the equivalent per-gap inter-token latency, ITL). Such bounds are
 service-level \emph{objectives} (SLOs); following serving-systems usage,
 this document writes ``the evaluation SLA'' for the specific tail bounds it
 grades every policy against, and SLO for the general concept. Meeting them
-economically on shared GPU fleets pushed serving from replicated monoliths
-toward disaggregation: prefill and decode in separate pools sized to their
-own bottlenecks~\cite{Zhong2024DistServe,Patel2024Splitwise}, a split now
-operated at production scale~\cite{Qin2025Mooncake}. Datacenter-scale
-frameworks route requests, move KV caches between pools, and scale workers
-as load shifts~\cite{Dynamo2025}.
+economically on shared GPU fleets is what pushed serving from replicated
+monoliths toward disaggregated pools sized to their own
+bottlenecks~\cite{Qin2025Mooncake}.
 
 A multimodal request adds a third phase preceding both: a vision encoder,
 in current practice a Vision Transformer~\cite{Dosovitskiy2021ViT}, ingests
@@ -70,31 +59,26 @@ and carries no KV cache, its cost scales with image count and resolution
 rather than conversation length, and its work arrives in bulk, as $k\times
 k$ tile and frame grids of up to $97^2=\num{9409}$ images in a single
 request. These properties invite \emph{modality disaggregation}: run the
-encoder as its own pool, on its own hardware class, scaled independently.
-The pattern is demonstrated by ModServe~\cite{Qiu2025ModServe} and pursued
-by fully disaggregated~\cite{vLLMOmni2026} and
-elastic~\cite{Liu2025ElasticMM} multimodal runtimes; this thesis adopts
-that system model and extends it on the control side.
+encoder as its own pool, on its own hardware class, scaled independently ---
+demonstrated by ModServe~\cite{Qiu2025ModServe} and pursued by fully
+disaggregated~\cite{vLLMOmni2026} and elastic~\cite{Liu2025ElasticMM}
+multimodal runtimes. This thesis adopts that system model and extends it on
+the control side.
 
-Independent pools require independent provisioning. The prevailing
-practice, inherited from stateless web serving, is \emph{reactive}: watch
-an aggregate load signal (request rate or a utilization average) and add or
-remove replicas at a threshold. Two assumptions hide in that loop --- that
-the watched signal carries each pool's demand, and that new replicas arrive
-faster than the load changes. The second is optimistic for GPU serving,
+Independent pools require independent provisioning. The prevailing practice,
+inherited from stateless web serving, is \emph{reactive}: watch an aggregate
+load signal and add or remove replicas at a threshold. Two assumptions hide
+in that loop --- that the watched signal carries each pool's demand, and
+that new replicas arrive faster than the load changes. The second is
+optimistic for GPU serving,
 where bringing up a replica (scheduling, weight loading, warmup) takes tens
-of seconds to minutes~\cite{Fu2024ServerlessLLM}.\footnote{The lead is pool-specific:
-the encoder's model-side load is a few seconds, so its lead is
-orchestration-bound (pod scheduling, image pull, node acquisition), while
-language-pool workers, with an order of magnitude more weights plus engine
-and KV-cache initialization, sit in the tens-of-seconds-and-up regime ---
-so the evaluation sweeps per-pool leads.} Prediction-driven capacity management
-has appeared for text-only LLM fleets --- forecast-aware fleet
-planning~\cite{Jaiswal2025SageServe}, prewarming GPUs against forecast peak
-load~\cite{WarmServe2025} --- but watches aggregate, request-level signals;
-which signal a predictor should watch in a modality-disaggregated system is
-exactly what is at issue. This thesis tests both assumptions against
-production multimodal traffic; for the vision pool, both fail.
+of seconds to minutes~\cite{Fu2024ServerlessLLM}.\footnote{The lead is
+pool-specific --- the encoder's is orchestration-bound at a few seconds,
+the language pool's tens of seconds and up --- so the evaluation sweeps
+per-pool leads.} Prediction-driven capacity management has appeared for
+text-only LLM fleets~\cite{Jaiswal2025SageServe,WarmServe2025}, but watches
+aggregate, request-level signals; which signal a predictor should watch in a
+modality-disaggregated system is exactly what is at issue.
 
 \section{The provisioning gap}
 \label{sec:intro-gap}
@@ -107,59 +91,47 @@ timestamp, an image count, and context- and generated-token counts. Exactly
 half the requests are text-only; image-bearing requests carry $k\times k$
 grids, and the \emph{frames} class of video-like requests (grids larger than
 $10\times10$, only 2.7\% of all requests) accounts for 81.1\% of all image
-volume. The trace's four demand signals (requests, images, context tokens,
-and generated tokens per second) are the trace-derived \emph{offered-work}
-signals a scaling policy can watch, and map onto the pools directly: images
-drive the vision pool, context tokens the language pool's prefill, generated
-tokens its decode. (A deployed controller also consumes system state ---
-queue depths, utilization, observed latency --- but those are consequences
-of the offered work: necessary demand features, not a complete control
-state.)
+volume. Its four \emph{offered-work} signals (requests, images, context
+tokens and generated tokens per second) map onto the pools directly: images
+drive the vision pool, context tokens prefill, generated tokens decode.
 
-Chapter~\ref{cap:trace-eda} establishes that these signals are not
-interchangeable. A constant-fraction model (vision work as a fixed
-multiple of request rate) explains only $R^2=\num{0.123}$ of the
-image-rate series but $R^2=\num{0.654}$ of decode demand (offered-work
-stamped at arrival --- Chapter~\ref{cap:trace-eda}). The image signal is
-also an order of magnitude burstier, and its extremes almost never
+They are not interchangeable. A constant-fraction model --- vision work as a
+fixed multiple of request rate --- explains only $R^2=\num{0.123}$ of the
+image-rate series but $R^2=\num{0.654}$ of decode demand. The image signal
+is also an order of magnitude burstier, and its extremes almost never
 co-occur with the request signal's: the week's largest burst drives image
 load to nearly sixteen times its weekly mean while the request rate rises
 only modestly (to ${\sim}2.7\times$ its weekly mean, still far below its own
-weekly maximum), leaving the two signals' top-percentile minutes
-essentially disjoint (five shared minutes in the week). Each major burst is a near-pure flood of the frames class.
-Yet the load is knowable: every request declares its image count at
-admission, so watching the right signal needs no new instrumentation, only
-aggregating what the request stream already contains.
+weekly maximum), leaving the two signals' top-percentile minutes essentially
+disjoint (five shared minutes in the week). Each major burst is a near-pure
+flood of the frames class. Yet the load is knowable: every request declares
+its image count at admission, so watching the right signal needs no new
+instrumentation, only aggregating what the stream already carries.
 
 Nor would watching the right signal reactively suffice. Onsets ramp from
-baseline to peak in a median of six and a half minutes; against replica cold starts
-of tens of seconds to minutes, a third of the bursts arrive too fast for a
-policy that waits to observe them. Aggregation does not rescue the
+baseline to peak in a median of six and a half minutes; against replica cold
+starts of tens of seconds to minutes, a third of the bursts arrive too fast
+for a policy that waits to observe them. Aggregation does not rescue the
 reactive loop: the arrival process is overdispersed at every tested
-operational scale (the Fano factor grows nearly three orders of
-magnitude with the
-counting window), so no tested averaging window makes the signal safe for a threshold rule --- the
-scale-free burstiness long documented for network and Web
-traffic~\cite{Leland1994,Crovella1997} reappearing in a serving system's
-demand signals. The failure is also invisible to the dashboards reactive
-systems watch. In the two-pool simulation of Chapter~\ref{cap:twopool},
-the encoder pool violates its tail-latency target \emph{at the trace's own
-recorded rate}: p99 encoder delay reaches \SI{5.0}{\second} at 29\% mean
-utilization, chunked frames-class requests inducing episodic
-head-of-line blocking behind the pool's FIFO, while a monitor watching
-request rate, mean utilization, or any minute-averaged series sees a
-healthy pool all day.
+operational scale (the Fano factor grows nearly three orders of magnitude
+with the counting window), so no tested averaging window makes the signal
+safe for a threshold rule --- the scale-free burstiness long documented for
+network and Web traffic~\cite{Leland1994,Crovella1997} reappearing in a
+serving system's demand signals. The failure is also invisible to the
+dashboards reactive systems watch: in simulation the encoder pool violates
+its tail-latency target \emph{at the trace's own recorded rate} --- p99
+encoder delay reaching \SI{5.0}{\second} at 29\% mean utilization, chunked
+frames-class requests inducing episodic head-of-line blocking behind the
+pool's FIFO --- while a rate- or utilization-based monitor sees a healthy
+pool all day.
 
-The signals that carry the vision pool's load are not only the burstiest
-but the most persistent: the image signal's autocorrelation half-life is
-69 minutes against 9 for requests, and its spectral-slope
-long-range-dependence proxy is the strongest of the four (Hurst
-${\approx}0.93$ versus $0.83$ for requests). The signal most dangerous to reactive scaling thus retains
-the most predictive structure at exactly the horizons provisioning needs
---- minutes to tens of minutes, the scale of burst onsets and replica
-cold starts. The
-provisioning gap is a lead-time problem, and the lead time is available ---
-to a forecaster.
+The signal that carries the vision pool's load is not only the burstiest but
+the most persistent: its autocorrelation half-life is 69 minutes against 9
+for requests, and its spectral-slope long-range-dependence proxy is the
+strongest of the four (Hurst ${\approx}0.93$ versus $0.83$ for requests).
+The signal most dangerous to reactive scaling thus retains the most
+predictive structure at exactly the horizons provisioning needs. The gap is
+a lead-time problem, and the lead time is available: to a forecaster.
 
 \section{Thesis statement and research questions}
 \label{sec:intro-thesis}
@@ -169,56 +141,38 @@ The position this document defends, stated compactly:
 \begin{quote}
 \itshape In a modality-disaggregated multimodal serving system, no single
 load signal can size every pool: the pools' demands originate in different
-request properties, decouple in time, and saturate their pools at offered
-loads far apart. Each pool must therefore be provisioned on its own demand
-signal, and can be provisioned \emph{predictively}, because the signal
-least visible to conventional autoscaling is also the most persistent:
-pretrained time-series models forecast it, zero-shot, at the horizons
-provisioning requires. Scaling on these forecasts holds the tail latency
-objective through the burst onsets that defeat reactive control at every
-tested cold-start lead time and, over the evaluated week, at a fraction
-of the best static \emph{encoder}
-fleet's GPU-hours; the language pool, separately provisioned on its own
-hardware, is near-break-even.
+request properties, decouple in time, and saturate at offered loads far
+apart. The vision pool must therefore be provisioned on its own demand
+signal --- which, being the least visible to conventional autoscaling and
+also the most persistent, is forecastable zero-shot at the horizons
+provisioning requires. Placing standing capacity from those forecasts buys,
+at equal tail-SLA compliance, a better resource-time frontier than reactive
+control given the same signal and the standing capacity it was denied.
 \end{quote}
 
-Four research questions structure the work.
+Three research questions structure the work. They are stated here as
+questions; their answers are the body chapters', and are collected in
+Chapter~\ref{cap:conclusion}.
 
-\begin{description}
-\item[RQ1 --- Signal sufficiency.] Does the request-rate signal, the input
-of conventional autoscalers, carry the information needed to provision
-each pool? Chapters~\ref{cap:trace-eda} and~\ref{cap:twopool} answer no for
-the vision pool --- statistically (the $R^2$ gap above) and mechanically
-(the saturation-knee and invisible-failure results below) --- and largely
-yes for decode, on the offered-work reading of its signal.
+\begin{description}\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
+\item[RQ1 --- Demand adequacy.] How strongly does request rate misrepresent
+vision-encoder demand, and what forecastable structure remains?
+(Chapter~\ref{cap:trace-eda}.)
 
-\item[RQ2 --- Forecastability.] Are the per-pool signals forecastable at
-provisioning horizons, zero-shot, by pretrained time-series models?
-Chapter~\ref{cap:predictors} answers yes: the foundation models beat
-every tested
-classical baseline, accuracy decays only marginally across the horizon
-covering the median burst onset, and covariates are nearly irrelevant at
-provisioning cadence (the forecasting-side echo of RQ1's decoupling).
+\item[RQ2 --- Operational forecastability.] Can encoder demand be forecast
+with usable uncertainty at replica-startup horizons?
+(Chapter~\ref{cap:predictors}.)
 
-\item[RQ3 --- Platform validity.] Can the two-pool system be simulated
-defensibly enough to carry autoscaling conclusions? Chapters~\ref{cap:aiconfigurator}
-and~\ref{cap:twopool} build that platform: the collected encoder operator
-agrees with physical measurement, a matched-engine check validates the
-composed forward against the serving engine's own vision tower (vLLM;
-Appendix~\ref{app:engine-sensitivity}), and the language pool's calibrated
-timing exposes the tails the simulator's default polynomial flattens.
-
-\item[RQ4 --- Closed-loop payoff.] Does provisioning each pool on its own
-signal --- a \emph{forecast} for vision, a tail-aware \emph{conversion} for
-language --- hold tail-SLA compliance through burst episodes that defeat
-a reactive planner, and reduce GPU-hours against the best static
-configuration over the evaluation span?
-Chapters~\ref{cap:baselines} and~\ref{cap:closedloop} answer yes and locate
-\emph{why}: anticipatory headroom, not signal choice, carries the
-encoder pool, and a measured tail-aware conversion --- not loop tuning
---- repairs the mean-based sizing defect every reactive configuration
-shares (numbers in Contribution~5).
+\item[RQ3 --- Control payoff.] Does forecast-driven vision provisioning
+improve the episode-level tail-SLA/resource trade-off over matched reactive
+and static controls? (Chapter~\ref{cap:closedloop}.)
 \end{description}
+
+Whether the two-pool system can be simulated defensibly enough to carry
+these answers is not a research question but a methodological obligation, and
+is discharged as such: the encoder cost model, the composed simulator and
+the live-runtime anchor are presented together in
+Chapter~\ref{cap:metodologia}, as methodology supporting all three RQs.
 
 {\renewcommand{\sectionmark}[1]{}%
 \section[Approach: trace-driven simulation, anchored in
@@ -226,34 +180,26 @@ silicon]{Approach: trace-driven simulation,\protect\\ anchored in silicon}%
 \label{sec:intro-approach}}
 \sectionmark{Approach}
 
-These are systems questions, but they cannot be answered responsibly on a
-production cluster: the experiments sweep offered load past saturation,
-replay the same week under many configurations and policies, and require
-counterfactuals (same trace, same arrivals, different scaler). The
-methodology is therefore trace-driven discrete-event simulation, the
-established instrument at this scale in LLM serving~\cite{Agrawal2024Vidur},
-with fidelity a measured obligation: every timing model is either collected
-on silicon and validated physically, or compared against its alternative so
-its effect on the conclusions is known.
+These questions cannot be answered responsibly on a production cluster: the
+experiments sweep offered load past saturation and require counterfactuals
+(same trace, same arrivals, different scaler). The methodology is therefore
+trace-driven discrete-event simulation~\cite{Agrawal2024Vidur}, with
+fidelity a measured obligation --- every timing model is either collected on
+silicon and validated physically, or compared against its alternative.
 
-The platform prices each pool on the hardware class it targets. The
-\emph{vision pool} is an event-driven FIFO of encoder workers costed by
-\textit{aiconfigurator} (AIC), NVIDIA's offline planner, over performance
-data collected for this thesis on an NVIDIA GeForce RTX~5090 --- a
-cost-effective class for the 576M-parameter tower. No encoder-timing data
-existed for any consumer GPU, and AIC has no usable fallback (its
-speed-of-light bound is ${\approx}5.9\times$ optimistic), so the dominant
-operator families (non-causal attention and bf16 GEMM) were collected at
-locked clocks in the pinned production container and upstreamed
-(Chapter~\ref{cap:aiconfigurator}). The \emph{language pool} is simulated
-by Dynamo's discrete-event engine (\texttt{dynamo.replay} with a
-KV-aware router)~\cite{Dynamo2025} under AIC-calibrated H100 timing,
-the decoder-pool platform this architecture targets. The pools compose
-through the trace itself: each request's encoder delay (queue wait,
-service, handoff transfer) is folded into its language-pool arrival
-timestamp, a seam that keeps per-pool saturation attributable (either
-pool can run in isolation on the same workload).
-Figure~\ref{fig:intro-arch} sketches the system.
+The platform prices each pool on the hardware class it targets
+(Figure~\ref{fig:intro-arch}). The \emph{vision pool} is an event-driven
+FIFO of encoder workers costed by \textit{aiconfigurator} (AIC), NVIDIA's
+offline planner, over performance data collected for this thesis on an
+NVIDIA GeForce RTX~5090, a cost-effective class for the 576M-parameter
+tower. No encoder-timing data existed for any consumer GPU and AIC has no
+usable fallback, so the dominant operator families were collected at locked
+clocks and upstreamed. The \emph{language pool} is simulated by Dynamo's
+discrete-event engine (\texttt{dynamo.replay} with a KV-aware
+router)~\cite{Dynamo2025} under AIC-calibrated H100 timing. The pools
+compose through the trace itself: each request's encoder delay is folded
+into its language-pool arrival timestamp, a seam that keeps per-pool
+saturation attributable (Chapter~\ref{cap:metodologia}).
 
 \begin{figure}[htbp]
 \centering
@@ -282,7 +228,7 @@ Figure~\ref{fig:intro-arch} sketches the system.
   \scriptsize ITL p99 $<$ 100 ms};
 \node[ctrl, above=1.25cm of $(vis.north)!0.5!(llm.north)$] (fc)
   {\textbf{Per-pool provisioner} (zero-shot TSFM)\\
-  \scriptsize image rate $\to C(t)$: forecast (anticipatory)\\
+  \scriptsize image rate $\to C(t)$: forecast-informed placement\\
   \scriptsize token rates $\to N(t)$: tail-aware conversion (held cursor)\\
   \scriptsize quantile headroom, cold-start lead};
 \draw[arr] (trace) -- node[lbl, above] {requests} (vis);
@@ -293,164 +239,117 @@ Figure~\ref{fig:intro-arch} sketches the system.
 \draw[arr, dashed] (trace.north) |- node[lbl, above, pos=0.72]
   {demand signals:\\req/s, img/s, ctx tok/s, gen tok/s} (fc.west);
 \end{tikzpicture}}
-\caption{The two-pool system under study. The trace drives an
-AIC-costed encoder pool composed with Dynamo's discrete-event language
-pool through a timestamp-shift seam; a per-pool provisioner maps each
-pool's own demand signal to its worker schedule under cold-start lead
-times --- the vision pool by \emph{forecast} (anticipatory), the language
-pool by tail-aware \emph{conversion} of a held signal. Solid arrows carry requests; the dashed arrow carries the
+\caption[The two-pool system under study]{The two-pool system under study.
+The trace drives an AIC-costed encoder pool composed with Dynamo's
+discrete-event language pool through a timestamp-shift seam; a per-pool
+provisioner maps each pool's own demand signal to its worker schedule under
+cold-start lead times --- the vision pool by forecast-informed capacity
+placement, the language pool by a tail-aware \emph{conversion} of a held
+signal. Solid arrows carry requests; the dashed arrow carries the
 materialized demand signals the controller consumes.}
 \label{fig:intro-arch}
 \end{figure}
 
-The model under study is the Qwen3-VL family~\cite{Qwen3VL2025}: the 8B,
-32B, and 235B variants share one vision tower, so the calibrated encoder
-model and burst-saturation result transfer across the family, and a
-235B-TP8 spot-check finds its saturation knee below the 8B's --- decoder
-scale shrinks only the language pool's envelope, leaving the vision pool
-untouched. Forecasting uses three
-pretrained time-series foundation models
+The model under study is the Qwen3-VL family~\cite{Qwen3VL2025}: the 8B, 32B
+and 235B variants share one vision tower, so the calibrated encoder model
+transfers across the family, and a 235B-TP8 spot-check finds its saturation
+knee below the 8B's --- decoder scale shrinks only the language pool's
+envelope. Forecasting uses three pretrained time-series foundation models
 (TimesFM-2.0~\cite{Das2024TimesFM}, Chronos-2~\cite{Ansari2025Chronos2},
-and Toto-2.0~\cite{Khwaja2026Toto2}) against naive,
-exponential-smoothing, and Holt--Winters baselines, under one
+Toto-2.0~\cite{Khwaja2026Toto2}) against classical baselines, under one
 rolling-origin protocol whose stitched forecasts tile the timeline as a
-scaler would consume them.
-
-One commitment runs throughout: every number is generated by a versioned
-script over archived inputs, every phase leaves an audit artifact, and
-corrections are recorded in the affected chapters rather than silently
-absorbed.
+scaler would consume them. Throughout, every number is generated by a
+versioned script over archived inputs, and corrections are recorded in the
+affected chapters rather than silently absorbed.
 
 \section{Contributions}
 \label{sec:intro-contrib}
 
-\begin{enumerate}
-\item \textbf{A characterization of production multimodal inference
-traffic as per-pool demand signals} (Chapter~\ref{cap:trace-eda}): the
-per-modality independence and burstiness of this trace are already noted
-qualitatively (ModServe), but this thesis is, to our knowledge, the first
-to \emph{quantify} the decoupling ($R^2{=}0.12$) and to frame the per-pool
-signals as \emph{forecasting targets} --- benchmarked zero-shot and
-consumed by a closed-loop per-pool scaler --- rather than as a reactive
-load signal (prior work scales the image pool reactively on observed token
-load; Chapter~\ref{cap:related}). Scripted, GPU-accelerated analysis
-establishes the decoupling, burst anatomy, and persistence contrast of
-Section~\ref{sec:intro-gap}, plus the workload facts any converter must
-honor ($k^2$ grids, 50\% text-only, vision tokens embedded
-non-constantly in the context-token field).
+The primary contribution is a single result with a single claim of novelty:
+\textbf{one complete operational chain for vision-pool provisioning,
+measured end to end.} An encoder-specific demand signal taken from the
+request stream itself; a provisioning-horizon probabilistic forecast of it,
+zero-shot, with an empirically calibrated upper band edge; a replica
+schedule derived from that band under an explicit startup delay; and an
+episode-level grading of the resulting tail-SLA and resource-time against
+the controls a practitioner would deploy --- the best static fleet, an
+identically informed reactive controller, that controller with a warm floor
+calibrated outside the evaluation span, and a perfect-future oracle. The
+chain is graded under one frozen protocol, and the result is reported as
+what it is: a trade-off with an identified failure mode, in which forecast
+and reactive tails tie exactly on four of the five composed evaluation
+episodes and the payoff is resource-time at equal compliance
+(Chapter~\ref{cap:closedloop}).
 
-\item \textbf{A zero-shot benchmark of time-series foundation models on
-serving demand signals} (Chapter~\ref{cap:predictors}), to our
-knowledge the first \emph{provisioning-framed, rolling-origin} zero-shot
-evaluation of such models on a production multimodal trace's per-pool
-signals, scored as an autoscaler would consume them, not on accuracy
-alone (prior work benchmarks such forecasters on cloud demand for scaling;
-Chapter~\ref{cap:related}): three foundation models against three
-classical baselines, four signals at five resolutions. The foundation
-models win all twenty cells; twelve steps of lead cost only ${\approx}2$
-WAPE points for the image signal at one-minute resolution; and no fixed
-quantile materially improves on a point forecast that is already the
-median --- the band is
-headroom, its p90 edge empirically
-calibrated at provisioning cadence (coverage 0.88--0.90). The full forecast
-set is archived with the metric tables (Appendix~\ref{ap:artifacts}).
+No ingredient of that chain is claimed as novel; modality disaggregation,
+image volume as the encoder's load signal, predictive and cold-start-aware
+autoscaling, quantile headroom and time-series foundation models are all
+prior art (Chapter~\ref{cap:related}). Four \emph{enabling} contributions
+made the chain measurable and are of independent use:
 
-\item \textbf{A silicon-calibrated cost model for consumer-GPU vision
-encoding} (Chapter~\ref{cap:aiconfigurator}): the planner's first
-encoder performance dataset for any non-datacenter GPU, a gap its own
-query modes turn into hard errors. The RTX~5090 onboarded as a new AIC
-system; encoder-attention and bf16-GEMM datasets collected at locked
-clocks in the production container and upstreamed (draft PR
-ai-dynamo/aiconfigurator~\#1312); the kernel-time ledger closed
-against a physical measurement of the same network on the same silicon
-(collected attention operator within ${\approx}3\%$, the GEMM stratum ${\approx}6\%$);
-and two findings of independent value: AIC has no usable
-encoder-timing fallback, so
-support-matrix ``PASS'' entries on uncollected systems certify text-only
-costing, and unlocked consumer-GPU clocks silently inflate collected
-data by ${\approx}17\%$ while leaving validation ratios unchanged.
-
-\item \textbf{A calibrated two-pool simulation platform, and the
-saturation-knee result} (Chapter~\ref{cap:twopool}). The AIC-costed
-encoder pool and Dynamo's discrete-event language pool composed through the
-timestamp-shift seam with per-pool attribution; a probe-verified exact
-batching law (encoder cost depends only on total images per forward) with
-an analytic handoff bound; the quantified calibrated-versus-polynomial
-timing delta; and the central result --- saturation knees an order of
-magnitude apart on steady traffic, the largest burst breaking the two pools
-in structurally different ways (a shape-fixable prefill floor in the
-language pool; in the encoder pool, the invisible episodic queueing of
-Section~\ref{sec:intro-gap}, fixable only by capacity). The decoupling of
-Chapter~\ref{cap:trace-eda}, reproduced as system behavior.
-
-\item \textbf{Baselines and the closed predictive-scaling loop}
-(Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}): the
-static-optimal worker-grid frontier per window, the reactive SLA-planner
-baseline that satisfies its own window-mean control law while violating
-the tail SLA, and the contribution proper --- the vision pool's forecast
-driving its encoder worker schedules under cold-start lead. The
-p90-forecast policy holds the SLA over the aggregate and every declared
-in-span burst episode at every forecast-issued lead, pricing the covered
-week at 0.62$\times$ the deployable static encoder fleet's worker-time --- a
-post-hoc hybrid forecast--reactive schedule (designed on the failing
-fold, replayed on all seven) recovers the one daily-fold onset (e13)
-the pure forecast drops, at 0.76$\times$ (Section~\ref{sec:cl-aggregate})
---- while the
-reactive controller on the \emph{same}
-signal loses the fastest-onset burst at every lead; the language pool
-needs a derived tail-aware conversion as the second necessary
-ingredient, and a calibrated-EWMA control shows the band \emph{shape}
---- supplied zero-shot by the foundation models --- to be load-bearing,
-not point-forecast accuracy alone.
+\begin{enumerate}\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
+\item \textbf{A silicon-calibrated encoder cost model}
+(Chapter~\ref{cap:metodologia}): encoder performance data for a GPU class
+the planner's per-operator database did not cover --- RTX~5090 onboarded as
+an AIC system, encoder-attention and bf16-GEMM data collected at locked
+clocks and upstreamed (draft PR ai-dynamo/aiconfigurator~\#1312), the
+kernel-time ledger closed against physical measurement of the same network
+on the same silicon, and the composed forward validated against the serving
+engine's own vision tower.
+\item \textbf{A composed two-pool simulation platform with measured
+fidelity} (Chapter~\ref{cap:metodologia}): the two pools joined through the
+timestamp-shift seam with per-pool attribution, a probe-verified exact
+batching law, the quantified calibrated-versus-polynomial timing delta, and
+a live-runtime anchor replaying two policies through Dynamo's real control
+plane.
+\item \textbf{The demand and forecastability characterization} of this trace
+as \emph{per-pool} signals (Chapters~\ref{cap:trace-eda}
+and~\ref{cap:predictors}): decoupling, burst anatomy and persistence
+contrast, and a provisioning-framed rolling-origin zero-shot forecaster
+evaluation scored on what a scaler consumes.
+\item \textbf{A language-pool conversion result and the provenance
+infrastructure} (Chapter~\ref{cap:closedloop}, Appendix~\ref{ap:artifacts}):
+the tail-aware capacity conversion the rate-visible pool needs, kept as a
+secondary result; and the artifact-to-claim store, checks and manifest that
+make every number here retractable.
 \end{enumerate}
 
 \section{Scope and limitations}
 \label{sec:intro-scope}
 
-The claims are scoped by their evidence. The workload is one seven-day
-production trace with a by-construction 50/50 modality split and
-arrival-side information only; the stamped decode series is faithful in
-total volume but temporally displaced, licensing no pointwise
-provisioning claim in either direction (quantified in
-Chapter~\ref{cap:trace-eda}). The trace records image counts, not sizes,
-so the encoder pool assumes a uniform $448^2$ image; its cost model is
-validated against the serving engine's own vision tower within
-$12.8\%$ across the serving regime, the earlier
-${\approx}1.4$--$1.6\times$ figure being execution-stack-specific
-(Appendix~\ref{app:engine-sensitivity}). The inter-pool handoff is
-priced single-stream: at Qwen3-VL's full DeepStack payload the
-observed \SI{588}{\milli\second} all-request plateau and the 0.62$\times$
-result assume an
-embedding-only handoff or a ${\geq}100$\,Gbps fabric
-(Chapter~\ref{cap:closedloop}) --- a fabric requirement, not a policy
-weakness. The simulation is open-loop and deterministic, with no
-speculative encoder--prefill overlap; the evaluation SLA's bounds are a
-design choice whose sensitivity Chapter~\ref{cap:twopool} quantifies;
+The workload is one seven-day production trace with a by-construction 50/50
+modality split and arrival-side information only; the stamped decode series
+is faithful in total volume but temporally displaced, licensing no pointwise
+provisioning claim in either direction (Chapter~\ref{cap:trace-eda}). The trace records
+image counts, not sizes, so the encoder pool assumes a uniform $448^2$
+image; its cost model is validated against the serving engine's own vision
+tower within $12.8\%$ across the serving regime, the larger gap against a
+research execution stack being stack-specific (Appendix~\ref{app:engine-sensitivity}). The inter-pool handoff is priced
+single-stream: at Qwen3-VL's full DeepStack payload the observed
+\SI{588}{\milli\second} all-request plateau and the encoder cost ratio
+assume an embedding-only handoff or a ${\geq}100$\,Gbps fabric
+(Chapter~\ref{cap:closedloop}). The simulation is open-loop and
+deterministic, and the evaluation SLA's bounds are a design
+choice whose sensitivity Chapter~\ref{cap:metodologia} quantifies. The
 language-pool results characterize the 8B at TP1 but deploy it at
-TP2$\times$2, with a 235B-TP8 spot-check, intermediate family members
-unpriced --- and the burst-window language \emph{pass} at TP2 is
-token-accounting-convention-dependent while the TP1 prefill floor and
-the vision-pool verdict are not (Chapter~\ref{cap:twopool}). Forecasts
-are zero-shot, the conservative reading of the foundation models'
-capability. Finally, the control loop is anchored to the real stack:
-both policies, replayed against the live Dynamo runtime (real control
-plane, mocked engines) on the fastest-onset burst, reproduce the
-simulated verdicts in both directions --- TTFT p99 within 1.1--6.8\%,
-provisioned replica-time within 8\% (Chapter~\ref{cap:validation}); the
-physical encoder-worker anchor remains future work.
+TP2$\times$2, intermediate family members unpriced --- and the burst-window
+language \emph{pass} at TP2 is token-accounting-convention-dependent, while
+the TP1 prefill plateau and the vision-pool verdict are not. Finally, both
+policies,
+replayed against the live Dynamo runtime (real control plane, mocked
+engines) on the fastest-onset burst, reproduce the simulated verdicts in
+both directions --- TTFT p99 within 1.1--6.8\%, provisioned replica-time
+within 8\% (Chapter~\ref{cap:metodologia}); the physical encoder-worker
+anchor remains future work.
 
 \section{Organization}
 \label{sec:intro-org}
 
-Chapter~\ref{cap:related} situates the thesis in the six literatures it
-borders. Chapter~\ref{cap:trace-eda} characterizes the trace;
-Chapter~\ref{cap:predictors} benchmarks the forecasters on its demand
-signals. Chapter~\ref{cap:aiconfigurator} builds and physically validates
-the vision pool's cost model; Chapter~\ref{cap:twopool} composes the
-two-pool simulation and locates the saturation knees;
-Chapter~\ref{cap:baselines} establishes the static-optimal and reactive
-reference policies; Chapter~\ref{cap:closedloop} closes the forecast-driven
-loop with ablations over lead, quantile, model, and capacity rating;
-Chapter~\ref{cap:validation} replays the winning and reactive policies
-through the live Dynamo control plane against their offline twins.
-Chapter~\ref{cap:conclusion} concludes.
+Chapter~\ref{cap:related} situates the thesis in the literatures it borders;
+Chapter~\ref{cap:metodologia} builds the evaluation platform and states its
+measured fidelity (encoder cost model, composed simulator, live-runtime
+anchor). The three RQ chapters follow --- Chapters~\ref{cap:trace-eda},
+\ref{cap:predictors} and~\ref{cap:closedloop} --- and
+Chapter~\ref{cap:conclusion} answers the three questions and states the
+regime conditions for transfer. Appendix~\ref{ap:artifacts} maps every
+figure and table to its script, artifact and run identifier.
