@@ -13,11 +13,14 @@ out = {
     "rho": 15, "lead": 30,
     "offered15": [round(sum(w["offered"][i:i + 15]) / 15.0, 1)
                   for i in range(0, len(w["offered"]) - 14, 15)],
+    "offered5": [round(sum(w["offered"][i:i + 5]) / 5.0, 1)
+                 for i in range(0, len(w["offered"]) - 4, 5)],
     "fc": w["runs"]["forecast_L30"]["sched"],
     "re": w["runs"]["reactive_L30"]["sched"],
     "provenance": "burst3 window of a2_data.json (ledger-verified); "
-                  "offered15 = 15-s mean of the 1-s offered series (scheduler "
-                  "resolution); sched = [t_s, workers], capacity = workers x rho",
+                  "offered15/offered5 = 15-s/5-s means of the 1-s offered series "
+                  "(scheduler consumes the 15-s means; 5-s is the display series); "
+                  "sched = [t_s, workers], capacity = workers x rho",
 }
 p = ROOT / "defense/reveal/assets/method_data.js"
 p.write_text("const METHOD = " + json.dumps(out) + ";\n")

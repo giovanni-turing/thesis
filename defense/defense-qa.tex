@@ -420,7 +420,7 @@ KV-modeling detail.
 \A The mixing is the architecture, not an accident: modality disaggregation
 exists precisely so each pool runs on its own hardware class, and I never
 sum GPU-time across classes --- the headline is two separate per-class
-ratios ($0.62\times$ encoder, $0.96\times$ language). The
+ratios ($0.62\times$ encoder, $0.965\times$ language). The
 ``order-of-magnitude apart'' knee result is not a raw GPU-time comparison
 either: it grades each pool's saturation against the \emph{same}
 \SI{1}{\second} tail budget on the same offered-load axis, and the
@@ -1059,7 +1059,7 @@ plus the 14\% margin; own the two-window scope.}
 savings one. The decisive per-pool economics are on the encoder side; the
 language pool's dynamic saving is structurally small because replica scaling
 cannot morph a burst-required TP2 shape into a calm-day TP1 one, and the
-$0.96\times$ is explicitly Chronos-specific (the pass/fail \emph{verdict} is
+$0.965\times$ is explicitly Chronos-specific (the pass/fail \emph{verdict} is
 model-independent, the cost is not). What the language pool establishes is
 that the \emph{conversion} generalizes across pools: fed the planner's
 native mean-based conversion, the same forecast \emph{fails} the pool
@@ -1498,7 +1498,7 @@ me more than five seconds in rehearsal, drill it again.
 \item \textbf{Cost units:} encoder in RTX-5090-class \emph{worker}-seconds
   (one worker $=$ one 5090-class GPU at TP1, 1:1), language in H100
   GPU-hours; never summed --- no single all-in system-cost number exists,
-  only two per-class ratios ($0.62\times$ enc, $0.96\times$ lang).
+  only two per-class ratios ($0.62\times$ enc, $0.965\times$ lang).
 \item \textbf{Batching law:} encoder cost depends only on total
   images/forward (no cross-image attention; verified to the microsecond
   across $(1,64)/(2,32)/(64,1)$); $f(1){=}8.16$, $f(64){=}316.4$\,ms;
@@ -1766,7 +1766,7 @@ claim from ``anticipation enables the SLA'' to ``anticipation makes the same
 SLA cheaper,'' still true but weaker, and offer the fixed-floor run as a
 one-line addition.}
 
-\Q{You report 0.62$\times$ on the encoder pool and 0.96$\times$ on the language pool and never add them. The encoder runs cheap consumer 5090s; the language pool runs H100s that dominate real spend. Priced end-to-end in one currency, is your headline not a small cut on the cheap line while the expensive line is break-even --- or 1.16--1.19$\times$ with Toto or TimesFM?}
+\Q{You report 0.62$\times$ on the encoder pool and 0.965$\times$ on the language pool and never add them. The encoder runs cheap consumer 5090s; the language pool runs H100s that dominate real spend. Priced end-to-end in one currency, is your headline not a small cut on the cheap line while the expensive line is break-even --- or 1.16--1.19$\times$ with Toto or TimesFM?}
 \A The two pools carry two different claims, and the language one was never
 cost. The encoder claim is cost (2.41M vs 3.87M worker-seconds, 0.62$\times$).
 The language claim is \emph{correctness at parity cost}: the reactive planner
@@ -1778,7 +1778,7 @@ units stay separate and the thesis statement says so.
 \Concede{There is no end-to-end TCO figure, and ``language near-break-even''
 is Chronos-specific --- with Toto/TimesFM it is 1.16--1.19$\times$, a net
 loss. Concede the economic headline is scoped to the encoder pool's
-worker-time, and state ``0.96$\times$ (Chronos); 1.16--1.19$\times$ under
+worker-time, and state ``0.965$\times$ (Chronos); 1.16--1.19$\times$ under
 other forecasters'' rather than let it be extracted.}
 
 \Q{Your deployable static fleet --- 8 cheap 5090s --- already \emph{passes} the SLA at 1.00$\times$. So the naive operator buys 8 cards and never thinks again. Your machinery saves ${\approx}3$ average consumer cards. Is a foundation-model pipeline solving a problem anyone would pay to solve?}
@@ -1849,7 +1849,7 @@ Also concede $n{=}1$ die: I cannot error-bar another 5090, a contended run
 swung the ratio $2\times$, and the clock-invariant \emph{ratio} protects
 against boost differences, not bin or thermal ones.}
 
-\Q{Your one-breath says ``validated on a live control plane.'' That plane covers only the language pool --- and the language result is \emph{not} anticipation (a held-cursor conversion test), is break-even-to-loss (0.96--1.19$\times$), and its burst pass is token-convention-dependent. So the only pool you carried live is the weakest, and the vision pool the thesis rests on is never live-validated. Is your live anchor attached to everything except the contribution?}
+\Q{Your one-breath says ``validated on a live control plane.'' That plane covers only the language pool --- and the language result is \emph{not} anticipation (a held-cursor conversion test), is break-even-to-loss (0.965--1.19$\times$), and its burst pass is token-convention-dependent. So the only pool you carried live is the weakest, and the vision pool the thesis rests on is never live-validated. Is your live anchor attached to everything except the contribution?}
 \A The split is by necessity: the language pool is the only pool with a
 \emph{production} control path (Dynamo's SLA planner), so it is the only one
 that \emph{can} be live-validated on this stack; the vision encoder pool has
@@ -1986,7 +1986,7 @@ its peaks do not even coincide. So the encoder needs its own signal. But it
 cannot be watched reactively: bursts peak in minutes against cold starts of
 minutes. The escape is that the same signal is the most \emph{persistent} of
 the four, so a pretrained forecaster reads it zero-shot --- and provisioning
-on that forecast holds the tail SLA through every onset a reactive
+on that forecast holds the tail SLA through the burst onsets a reactive
 controller loses, at 0.62 times the static fleet.'' Then stop.
 \Trap{Do not front-load the $0.62\times$. Open on the decoupling; the
 economics are the payoff, not the hook.}

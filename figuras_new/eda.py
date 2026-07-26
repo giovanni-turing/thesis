@@ -256,7 +256,7 @@ def fig_burst_onsets():
     onsets, peaks = _episodes()
     p10, p50 = np.percentile(onsets, 10), np.percentile(onsets, 50)
     fig = make_subplots(rows=1, cols=2, horizontal_spacing=0.11,
-        subplot_titles=(f"Onset time ECDF — p10 {p10:.0f} min, p50 {p50:.0f} min "
+        subplot_titles=(f"Onset time ECDF — p10 {p10:.0f} min, p50 {p50:.1f} min "
                         f"({len(onsets)} episodes)", "Fast-onset bursts are not small"))
     # left: ECDF (better than a 25-bin histogram over ~18 points)
     xs = np.sort(onsets)
@@ -276,7 +276,7 @@ def fig_burst_onsets():
                              hovertemplate="onset %{x:.0f} min<br>peak %{y:.0f} img/s<extra></extra>"),
                   row=1, col=2)
     import math
-    lr = [math.log10(0.8), math.log10(300)]
+    lr = [math.log10(0.8), math.log10(500)]  # include the 404-min merged episode
     fig.update_xaxes(type="log", range=lr, dtick=1,
                      title_text="onset time, baseline→peak (min)", row=1, col=1)
     fig.update_yaxes(title_text="fraction of episodes", range=[0, 1.05], row=1, col=1)

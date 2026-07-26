@@ -339,10 +339,11 @@
     <section>
       <div class="kicker">The bet</div>
       <h2>Forecast the image rate — spend the lead building capacity</h2>
-      <canvas id="methodStrip" style="width:100%; height:330px;"></canvas>
+      <div id="methodStrip" style="width:100%; height:340px;"></div>
       <div class="chartcap">burst3 (1-min onset) at lead L = 30 s — ledger-verified schedules from the
-        converter runs; capacity = workers × ρ (15 img/s per worker); demand at the scheduler's
-        15-s resolution</div>
+        converter runs; capacity = workers × ρ (15 img/s per worker); demand shown at 5-s
+        resolution (the scheduler consumes its 15-s means) ·
+        <span style="color:#9a9a9a">hover for workers &amp; rates</span></div>
       <div class="numrow">
         <div class="numtile info fragment fade-up">
           <div class="k">1 · zero-shot foundation forecasters</div>
@@ -429,11 +430,6 @@
         and still ships a 16-second burst3 — the week-level p99 hides it.
         <span style="color:var(--muted)">Watch the week unfold with live odometers and verdict chips. →</span></p>
 
-      <p class="disclose fragment fade-up"><b>Where the forecast loses:</b> the grading set is the six
-        largest episodes + the calm day (b2/b6 predate forecast coverage). Inside this same week sits
-        <b>e13</b> — a rank-13, 7-min-onset burst that the p90 path misses at <i>every</i> lead. The
-        aggregate absorbs it, exactly as it absorbs reactive's b3. Only always-on C8 passes e13;
-        it is graded head-on in the boundary-case act. ⚠</p>
     </section>
 
     <!-- 11 · A6 live -->
@@ -498,12 +494,72 @@
       <iframe class="r-stretch" data-src="../anim/a11_llm_race.html#w=burst3&m=toto&L=60" allow="fullscreen"></iframe>
     </section>
 
+    <!-- 14 · conclusion -->
+    <section>
+      <div class="kicker">Conclusion</div>
+      <h2>Forecast the pool's own signal — spend the lead, hold the tail</h2>
+
+      <div class="herostrip" style="margin-top:22px">
+        <div class="hero"><div class="hv" style="color:var(--blue)">0.62×</div><div class="hk">the always-on cost, tail held</div></div>
+        <div class="herosep"></div>
+        <div class="hero"><div class="hv">588 ms</div><div class="hk">p99 floor — every covered window</div></div>
+        <div class="herosep"></div>
+        <div class="hero"><div class="hv">60/60</div><div class="hk">issue-time factorial cells pass</div></div>
+        <div class="herosep"></div>
+        <div class="hero"><div class="hv">52</div><div class="hk">planner replays — language pool</div></div>
+      </div>
+
+      <div class="numrow" style="margin-top:0.9em">
+        <div class="numtile grn fragment fade-up">
+          <div class="k">1 · the characterization</div>
+          <div class="d">First to <b>quantify</b> the modality decoupling (R² = 0.12) and frame
+            per-pool demand as <b>forecasting targets</b> — not a reactive load signal.</div>
+        </div>
+        <div class="numtile info fragment fade-up">
+          <div class="k">2 · the forecast benchmark</div>
+          <div class="d">First provisioning-framed zero-shot TSFM benchmark on a production
+            multimodal trace: foundation models win <b>20/20 cells</b>; the p90 edge calibrates
+            to 0.88–0.90 at provisioning cadence.</div>
+        </div>
+        <div class="numtile warn fragment fade-up">
+          <div class="k">3 · the silicon anchor</div>
+          <div class="d">AIC's first consumer-GPU encoder dataset (RTX 5090, locked clocks,
+            PR #1312) — kernel ledger closed against physical measurement to <b>≈3%</b>.</div>
+        </div>
+      </div>
+      <div class="numrow">
+        <div class="numtile viol fragment fade-up">
+          <div class="k">4 · the platform + the knee</div>
+          <div class="d">A calibrated two-pool simulator with per-pool attribution: saturation
+            knees <b>an order of magnitude apart</b>; the largest burst breaks each pool in a
+            structurally different way.</div>
+        </div>
+        <div class="numtile ok fragment fade-up">
+          <div class="k">5 · the closed loop — the contribution proper</div>
+          <div class="d">The p90 path holds the SLA on <b>every covered window at every issued
+            lead</b>, at 0.62× the deployable static fleet — and the calibrated-EWMA control shows
+            the band <b>shape</b> is load-bearing, not point accuracy.</div>
+        </div>
+      </div>
+
+      <p class="disclose fragment fade-up" style="border-left-color:var(--blue); background:#f4f9ff">
+        <b>Scope, stated plainly:</b> simulation-derived, one production trace, one infrastructure
+        model; cost = provisioned worker-time under symmetric warm-up accounting; the p90 band is
+        calibrated to ~90% coverage. Every number in this deck re-derives from the
+        provenance database.</p>
+
+      <p class="lead fragment fade-up" style="text-align:center; margin-top:0.9em; font-size:0.8em">
+        <b>Obrigado.</b> <span style="color:var(--muted)">— questions welcome; every act has a live
+        replay behind it.</span></p>
+    </section>
+
   </div>
 </div>
 <script src="vendor/dist/reveal.js"></script>
 <script src="vendor/plugin/notes/notes.js"></script>
+<script src="vendor/plotly.min.js"></script>
 <script src="assets/week_data.js"></script>
-<script src="assets/method_data.js"></script>
+<script src="assets/method_data.js?v=5s"></script>
 <script>
 // ---- inline charts for the "week of bursts" slide (data: assets/week_data.js) ----
 function drawWeekCharts() {
@@ -613,53 +669,68 @@ function drawWeekCharts() {
     }
   }
 
-  if (document.getElementById("methodStrip")) { // -- method: demand vs the two capacity paths --
-    const [ctx, W, H] = setup("methodStrip");
-    const PAD = { l: 46, r: 12, t: 20, b: 26 };
-    const SPAN = METHOD.span_s, YMAX = 570;
-    const x = t => PAD.l + (t / SPAN) * (W - PAD.l - PAD.r);
-    const y = v => H - PAD.b - (Math.min(v, YMAX) / YMAX) * (H - PAD.t - PAD.b);
-    ctx.strokeStyle = C("--grid"); ctx.lineWidth = 1;
-    ctx.fillStyle = C("--muted"); ctx.font = "600 10.5px system-ui"; ctx.textAlign = "center";
-    for (let m = 0; m <= 25; m += 5) {
-      ctx.beginPath(); ctx.moveTo(x(m * 60), PAD.t); ctx.lineTo(x(m * 60), H - PAD.b); ctx.stroke();
-      ctx.fillText(m + " min", x(m * 60), H - PAD.b + 15);
-    }
-    ctx.textAlign = "right";
-    [[0, "0"], [224, "224"], [450, "450"]].forEach(([v, t]) => ctx.fillText(t, PAD.l - 6, y(v) + 4));
-    ctx.fillStyle = "rgba(42,120,214,0.18)";           // offered demand (15-s mean)
-    ctx.beginPath(); ctx.moveTo(x(0), y(0));
-    METHOD.offered15.forEach((v, i) => ctx.lineTo(x(i * 15 + 7.5), y(v)));
-    ctx.lineTo(x(SPAN), y(0)); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = "rgba(42,120,214,0.45)"; ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    METHOD.offered15.forEach((v, i) => { const px = x(i * 15 + 7.5), py = y(v);
-      i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
-    ctx.stroke();
-    const step = (sched, color, wdt) => {               // capacity staircases
-      ctx.strokeStyle = color; ctx.lineWidth = wdt; ctx.beginPath();
-      let px = x(0), py = y(sched[0][1] * METHOD.rho);
-      ctx.moveTo(px, py);
-      for (let i = 1; i < sched.length; i++) {
-        const nx = x(sched[i][0]), ny = y(sched[i][1] * METHOD.rho);
-        ctx.lineTo(nx, py); ctx.lineTo(nx, ny); py = ny;
-      }
-      ctx.lineTo(x(SPAN), py); ctx.stroke();
-    };
-    step(METHOD.re, C("--re"), 2.6);
-    step(METHOD.fc, C("--fc"), 2.6);
-    ctx.font = "700 12px system-ui"; ctx.textAlign = "left";
-    ctx.fillStyle = C("--fc");
-    ctx.fillText("forecast capacity — walks in provisioned: 19 workers at t=0", x(15), y(21 * 15) - 14);
-    ctx.fillStyle = C("--re");
-    ctx.fillText("reactive — starts at 1, sees demand a bin late,", x(760), y(555));
-    ctx.fillText("waits out the cold start, then overshoots", x(760), y(555) + 15);
-    ctx.fillStyle = "rgba(42,120,214,0.9)"; ctx.font = "650 11.5px system-ui";
-    ctx.fillText("offered image load (15-s mean)", x(370), y(60));
-    ctx.fillStyle = C("--muted"); ctx.font = "600 10.5px system-ui";
-    ctx.save(); ctx.translate(12, (PAD.t + H - PAD.b) / 2); ctx.rotate(-Math.PI / 2);
-    ctx.textAlign = "center"; ctx.fillText("img/s · capacity = workers × 15", 0, 0); ctx.restore();
-  }
+  if (document.getElementById("methodStrip")) drawMethodStrip();
+}
+
+// ---- method slide: interactive Plotly — demand vs the two capacity staircases ----
+function drawMethodStrip() {
+  const css = getComputedStyle(document.documentElement);
+  const C = n => css.getPropertyValue(n).trim();
+  const FC = C("--fc"), RE = C("--re"), MUTED = C("--muted");
+  const min = t => t / 60;                                 // x in minutes
+  // demand: 5-s means plotted at bin midpoints (display series; the scheduler
+  // consumes the 15-s means). Falls back to 15-s if a stale cache lacks offered5.
+  const dS = METHOD.offered5 ? 5 : 15;
+  const dSeries = METHOD.offered5 || METHOD.offered15;
+  const dX = dSeries.map((_, i) => min(i * dS + dS / 2));
+  const dY = dSeries;
+  // staircase: [t, workers] -> hv steps, held to span end; hover carries workers
+  const stair = sched => {
+    const X = sched.map(([t]) => min(t)).concat([min(METHOD.span_s)]);
+    const W = sched.map(([, w]) => w).concat([sched[sched.length - 1][1]]);
+    return { X, W, Y: W.map(w => w * METHOD.rho) };
+  };
+  const fc = stair(METHOD.fc), re = stair(METHOD.re);
+  const data = [
+    { x: dX, y: dY, name: `offered image load (${dS}-s mean)`, mode: "lines",
+      line: { color: "rgba(42,120,214,0.45)", width: 1.2 },
+      fill: "tozeroy", fillcolor: "rgba(42,120,214,0.15)",
+      hovertemplate: "offered %{y:.1f} img/s<extra></extra>" },
+    { x: re.X, y: re.Y, name: "reactive capacity", mode: "lines",
+      line: { color: RE, width: 2.6, shape: "hv" },
+      customdata: re.W,
+      hovertemplate: "reactive %{y:.0f} img/s · %{customdata} workers<extra></extra>" },
+    { x: fc.X, y: fc.Y, name: "forecast capacity", mode: "lines",
+      line: { color: FC, width: 2.6, shape: "hv" },
+      customdata: fc.W,
+      hovertemplate: "forecast %{y:.0f} img/s · %{customdata} workers<extra></extra>" },
+  ];
+  const layout = {
+    margin: { l: 50, r: 6, t: 8, b: 40 },
+    width: 1472, height: 340,       // fixed: sections are display:none off-slide,
+                                    // so clientWidth is 0 when this first draws
+    font: { family: "system-ui, -apple-system, 'Segoe UI', sans-serif", size: 12.5,
+            color: C("--ink-2") },
+    paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+    xaxis: { title: { text: "minutes into the window", font: { size: 11.5, color: MUTED } },
+             range: [0, min(METHOD.span_s)], ticksuffix: " min", dtick: 5,
+             gridcolor: C("--grid"), zeroline: false },
+    yaxis: { title: { text: "img/s · capacity = workers × 15", font: { size: 11.5, color: MUTED } },
+             range: [0, 1000], gridcolor: C("--grid"), zeroline: false },
+    hovermode: "x unified",
+    hoverlabel: { bgcolor: "#fff", bordercolor: C("--grid"),
+                  font: { size: 12.5, color: C("--ink") } },
+    legend: { orientation: "h", x: 0, y: 1.14, font: { size: 12 } },
+    annotations: [
+      { x: min(340), y: 450, xanchor: "left", yanchor: "middle",
+        text: "<b>forecast — walks in provisioned: 19 workers at t = 0</b>",
+        font: { size: 12, color: FC }, showarrow: false },
+      { x: min(790), y: 610, xanchor: "left", yanchor: "bottom",
+        text: "<b>reactive — starts at 1, sees demand a bin late,<br>waits out the cold start, then overshoots</b>",
+        align: "left", font: { size: 12, color: RE }, showarrow: false },
+    ],
+  };
+  Plotly.newPlot("methodStrip", data, layout, { displayModeBar: false });
 }
 </script>
 <script>

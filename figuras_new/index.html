@@ -1,0 +1,243 @@
+<!doctype html><html><head><meta charset="utf-8">
+<title>Thesis figures — redesign review</title>
+<style>
+  :root{color-scheme:light dark}
+  body{font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    max-width:1500px;margin:0 auto;padding:24px;color:#111;background:#fafafa}
+  h1{font-size:24px;margin:0 0 4px}
+  .lead{color:#555;margin:0 0 24px}
+  .fig{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px 18px;
+    margin:0 0 20px}
+  .fig h2{font-size:17px;margin:0 0 4px}
+  .fn{font:12px ui-monospace,monospace;color:#888;font-weight:400}
+  .change{color:#374151;margin:0 0 12px;max-width:110ch}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  figure{margin:0}
+  figcaption{font-size:12px;color:#6b7280;margin:0 0 4px}
+  img{width:100%;height:auto;border:1px solid #eee;border-radius:6px;background:#fff}
+  a{color:#2a78d6}
+  @media (max-width:900px){.pair{grid-template-columns:1fr}}
+</style></head><body>
+<h1>Thesis figures — redesign review</h1>
+<p class="lead">18 figures, each rendered fresh in plotly from the same underlying data
+(no GPU; CPU-reproduced the few GPU-only derivations). Left = current thesis figure,
+right = proposed replacement. Nothing in <code>figuras/</code> was touched.
+PDFs + interactive HTML are alongside each PNG in <code>figuras_new/</code>.</p>
+
+    <section class="fig">
+      <h2>Context tokens vs image count <span class="fn">eda_a_context_vs_numimages</span></h2>
+      <p class="change">Added a two-level uncertainty band (p10–p90 + p25–p75) and an explicit ≈64-tokens/image reference line so the slope claim is visible on-chart; hover exposes the sample count n behind each image-count bin.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/eda/eda_a_context_vs_numimages.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="eda_a_context_vs_numimages.html" target="_blank">interactive ↗</a> &middot;
+          <a href="eda_a_context_vs_numimages.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="eda_a_context_vs_numimages.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Seven-day arrival signals <span class="fn">eda_c_seven_day_signals</span></h2>
+      <p class="change">Shared-x zoomable panels with midnight day-boundary gridlines and a filled vision area so the diurnal rhythm and burst envelope are legible; p99 line kept.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/eda/eda_c_seven_day_signals.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="eda_c_seven_day_signals.html" target="_blank">interactive ↗</a> &middot;
+          <a href="eda_c_seven_day_signals.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="eda_c_seven_day_signals.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Demand-signal autocorrelation <span class="fn">eda_d_acf</span></h2>
+      <p class="change">Marked the actual half-life crossings (9 vs 69 min) with droplines + labels — the scientific payload — instead of only the generic 0.5 line.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/eda/eda_d_acf.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="eda_d_acf.html" target="_blank">interactive ↗</a> &middot;
+          <a href="eda_d_acf.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="eda_d_acf.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Images vs request rate <span class="fn">eda_d_img_vs_req_scatter</span></h2>
+      <p class="change">Replaced a 10k-point overplotted scatter with a 2-D density heatmap: the mass concentration near the origin and the weak trend are now both readable; R² called out.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/eda/eda_d_img_vs_req_scatter.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="eda_d_img_vs_req_scatter.html" target="_blank">interactive ↗</a> &middot;
+          <a href="eda_d_img_vs_req_scatter.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="eda_d_img_vs_req_scatter.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Arrival process (non-Poisson) <span class="fn">eda_e_arrival_process</span></h2>
+      <p class="change">Faithful 3-panel port with interactive log axes and hover; cleaner Poisson-vs-empirical marker contrast.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/eda/eda_e_arrival_process.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="eda_e_arrival_process.html" target="_blank">interactive ↗</a> &middot;
+          <a href="eda_e_arrival_process.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="eda_e_arrival_process.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Burst onset times <span class="fn">eda_i_burst_onsets</span></h2>
+      <p class="change">Replaced a 25-bin histogram over ~18 episodes (mostly empty bins) with an ECDF that reads p10/p50 directly; kept the peak-vs-onset scatter.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/eda/eda_i_burst_onsets.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="eda_i_burst_onsets.html" target="_blank">interactive ↗</a> &middot;
+          <a href="eda_i_burst_onsets.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="eda_i_burst_onsets.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Semantic request clusters <span class="fn">eda_l_request_clusters</span></h2>
+      <p class="change">Kept the WebGL cluster scatter but replaced the redundant second scatter with a request-share vs image-share bar — surfacing the headline stat (3.4% of requests = 86% of images) as its own mark.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/eda/eda_l_request_clusters.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="eda_l_request_clusters.html" target="_blank">interactive ↗</a> &middot;
+          <a href="eda_l_request_clusters.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="eda_l_request_clusters.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Burstiness vs binning window <span class="fn">eda_q_multires</span></h2>
+      <p class="change">Faithful port; added faint guide lines at common monitoring windows (1/15/60 s) and percent-formatted attenuation axis; interactive hover per signal.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/eda/eda_q_multires.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="eda_q_multires.html" target="_blank">interactive ↗</a> &middot;
+          <a href="eda_q_multires.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="eda_q_multires.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Stratified evaluation harness <span class="fn">eda_eval_windows</span></h2>
+      <p class="change">Same timeline; staggered the burst labels onto two rows to stop b2/b6 and b4/b5 collisions; hover reveals each window.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/eda/eda_eval_windows.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="eda_eval_windows.html" target="_blank">interactive ↗</a> &middot;
+          <a href="eda_eval_windows.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="eda_eval_windows.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Point-forecast error vs horizon <span class="fn">pred_horizon_wape</span></h2>
+      <p class="change">Collapsed the three near-identical foundation-model lines into a min–max envelope (honest: the band is thin because they agree) and kept the baselines as distinct dashes — 6 lines → 1 band + 3 lines per panel.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/pred/pred_horizon_wape.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="pred_horizon_wape.html" target="_blank">interactive ↗</a> &middot;
+          <a href="pred_horizon_wape.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="pred_horizon_wape.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Forecast band over the burst <span class="fn">pred_forecast_band</span></h2>
+      <p class="change">Faithful port with on-chart coverage callout (p90 pierced by ~8% of bins) and interactive zoom into the regime collapse.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/pred/pred_forecast_band.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="pred_forecast_band.html" target="_blank">interactive ↗</a> &middot;
+          <a href="pred_forecast_band.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="pred_forecast_band.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>WAPE heatmap (all cells) <span class="fn">pred_wape_heatmap</span></h2>
+      <p class="change">Faceted into 4 target panels (cleaner than white separators), bold = column-best, shared ÷column-best colorbar.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/pred/pred_wape_heatmap.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="pred_wape_heatmap.html" target="_blank">interactive ↗</a> &middot;
+          <a href="pred_wape_heatmap.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="pred_wape_heatmap.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Framework comparison (3 panels) <span class="fn">pred_framework_diff</span></h2>
+      <p class="change">Panel (a) now starts at 0 instead of 0.50 — the truncated baseline exaggerated differences and undercut the &#x27;accuracy is nearly identical&#x27; message; value labels preserve the ranking detail. SLA lines kept.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/pred/pred_framework_diff.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="pred_framework_diff.html" target="_blank">interactive ↗</a> &middot;
+          <a href="pred_framework_diff.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="pred_framework_diff.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Three models over the burst <span class="fn">pred_models_burst</span></h2>
+      <p class="change">Faithful port; observed demoted to a thin grey reference so the three coincident model paths read as the subject; interactive.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/pred/pred_models_burst.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="pred_models_burst.html" target="_blank">interactive ↗</a> &middot;
+          <a href="pred_models_burst.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="pred_models_burst.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Saturation knees per pool <span class="fn">sim_knees</span></h2>
+      <p class="change">Faithful two-panel port with ringed knee markers, de-duplicated legend, and hover on every swept point.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/sim/sim_knees.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="sim_knees.html" target="_blank">interactive ↗</a> &middot;
+          <a href="sim_knees.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="sim_knees.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Vision-pool burst queue <span class="fn">sim_burst_queue</span></h2>
+      <p class="change">Faithful port; peak backlog marked with a labelled point; utilization folded into the panel titles to sharpen the &#x27;low util yet 4,701 queued&#x27; contrast.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/sim/sim_burst_queue.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="sim_burst_queue.html" target="_blank">interactive ↗</a> &middot;
+          <a href="sim_burst_queue.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="sim_burst_queue.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Encoder f(N): AIC vs silicon <span class="fn">aic_fn</span></h2>
+      <p class="change">Reproduced the (script-less) thesis figure from its data; ratio labels kept, and the kernel ledger now uses proper hatching for out-of-graph categories so the growing elementwise/gather overhead is legible.</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <img loading="lazy" src="../figuras/aic/aic_fn.png"></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="aic_fn.html" target="_blank">interactive ↗</a> &middot;
+          <a href="aic_fn.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="aic_fn.png"></figure>
+      </div>
+    </section>
+    <section class="fig">
+      <h2>Encoder f(N) across engines (appendix) <span class="fn">aic_fn_engines</span></h2>
+      <p class="change">Faithful port of the multi-engine comparison + ratio panel; palette-consistent colours, the ±12.8% band and N=64 FIFO-cap line kept, interactive hover. (Original is a PDF, shown as a link.)</p>
+      <div class="pair">
+        <figure><figcaption>original (matplotlib)</figcaption>
+          <a href="../figuras/aic/aic_fn_engines.pdf" target="_blank">open original PDF ↗</a></figure>
+        <figure><figcaption>new (plotly) &middot;
+          <a href="aic_fn_engines.html" target="_blank">interactive ↗</a> &middot;
+          <a href="aic_fn_engines.pdf" target="_blank">pdf</a></figcaption>
+          <img loading="lazy" src="aic_fn_engines.png"></figure>
+      </div>
+    </section>
+</body></html>

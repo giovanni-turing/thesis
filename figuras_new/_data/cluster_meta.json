@@ -1,0 +1,50 @@
+{
+ "0": {
+  "n": 514632,
+  "req_share": 0.514632,
+  "img_share": 0.013139392011119041,
+  "ctx_share": 0.2393697907116785,
+  "img_p50": 0.0,
+  "ctx_p50": 1062.0,
+  "gen_p50": 201.0,
+  "semantic_name": "text: conversational generation"
+ },
+ "1": {
+  "n": 141196,
+  "req_share": 0.141196,
+  "img_share": 0.11898868070920175,
+  "ctx_share": 0.3348357227874961,
+  "img_p50": 9.0,
+  "ctx_p50": 4879.0,
+  "gen_p50": 124.0,
+  "semantic_name": "vision: doc/tiled understanding"
+ },
+ "2": {
+  "n": 310211,
+  "req_share": 0.310211,
+  "img_share": 0.0108096680404991,
+  "ctx_share": 0.09643939765414966,
+  "img_p50": 0.0,
+  "ctx_p50": 738.0,
+  "gen_p50": 22.0,
+  "semantic_name": "text: short-answer / extraction"
+ },
+ "3": {
+  "n": 33961,
+  "req_share": 0.033961,
+  "img_share": 0.8570622592391801,
+  "ctx_share": 0.32935508884667575,
+  "img_p50": 400.0,
+  "ctx_p50": 31512.0,
+  "gen_p50": 56.0,
+  "semantic_name": "vision: video/frame analysis"
+ },
+ "silhouette": {
+  "3": 0.37841254570771365,
+  "4": 0.38918983234962784,
+  "5": 0.3349587704031344,
+  "6": 0.3543652287396577,
+  "7": 0.37037909596476215
+ },
+ "best_k": 4
+}
