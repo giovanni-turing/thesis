@@ -1,0 +1,32 @@
+[
+ {
+  "name": "eda_a_context_vs_numimages",
+  "path": "/home/gio/tese-review-frozen/figuras/eda/eda_a_context_vs_numimages.png",
+  "exists": true
+ },
+ {
+  "name": "eda_c_seven_day_signals",
+  "path": "/home/gio/tese-review-frozen/figuras/eda/eda_c_seven_day_signals.png",
+  "exists": true
+ },
+ {
+  "name": "eda_d_acf",
+  "path": "/home/gio/tese-review-frozen/figuras/eda/eda_d_acf.png",
+  "exists": true
+ },
+ {
+  "name": "eda_d_img_vs_req_scatter",
+  "path": "/home/gio/tese-review-frozen/figuras/eda/eda_d_img_vs_req_scatter.png",
+  "exists": true
+ },
+ {
+  "name": "eda_e_arrival_process",
+  "path": "/home/gio/tese-review-frozen/figuras/eda/eda_e_arrival_process.png",
+  "exists": true
+ },
+ {
+  "name": "eda_eval_windows",
+  "path": "/home/gio/tese-review-frozen/figuras/eda/eda_eval_windows.png",
+  "exists": true
+ }
+]

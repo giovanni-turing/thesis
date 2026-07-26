@@ -1,0 +1,10 @@
+{
+ "claim_id": "closedloop-0460",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "The policy misses the bound on the fold containing the e13 onset (encoder-delay p99 1,262 ms), where a static C=5 fleet passes for only 3% more worker-time.",
+ "claim_text": "Policy fails on e13 onset fold (p99=1,262ms); static C=5 passes for 3% more worker-time.",
+ "expected_backing": "v_infraction",
+ "adjudication": [],
+ "reason": "no-adjudicator"
+}

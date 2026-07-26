@@ -1,0 +1,29 @@
+{
+ "claim_id": "conclusion-0101",
+ "chapter": "conclusion",
+ "claim_type": "numeric",
+ "anchor": "The encoder cost model was collected on real silicon for this thesis (and contributed upstream), and a composed forward matches vLLM's own vision tower to within $12.8\\%$",
+ "claim_text": "The encoder cost model matches vLLM's vision tower performance within 12.8%.",
+ "expected_backing": "measured_request/vllm_*, collector_encoder_fn",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "12.71% max error for 448 px serving regime; 25.17% max error for multi-resolution (at 224 px, 1 image)",
+   "evidence": "The 12.8% bound holds for the 448 px serving regime (max error 12.71% at N=52), but does not hold globally across all resolutions where the max error is 25.17% (at 224 px, 1 image).",
+   "severity": "minor",
+   "fix": "Qualify the claim to the 448 px serving regime (where the maximum error is 12.71% at N=52) or report the full multi-resolution maximum error of 25.17% (occurring at 224 px, 1 image).",
+   "query": "SELECT (WITH v AS (SELECT n_images, mean_ms FROM provenance.collector_encoder_fn WHERE engine = 'vllm' AND image_px = 448 AND source_path LIKE '%vllm_eager_dense%'), a AS (SELECT n_images, aic_ms FROM provenance.collector_fn WHERE engine = 'aic_postinfill' AND image_px = 448) SELECT MAX(ABS(v.mean_ms / a.aic_ms - 1.0) * 100.0) FROM v JOIN a USING (n_images) WHERE n_images <= 64) AS serving_regime_max_error, (WITH a AS (SELECT image_px, n_images, mean_ms FROM provenance.collector_encoder_fn WHERE source_path = '/home/gio/tese/collector_artifacts/phaseE_physical_anchor/aic_multires.json' AND is_valid), v AS (SELECT image_px, n_images, mean_ms FROM provenance.collector_encoder_fn WHERE source_path = '/home/gio/tese/collector_artifacts/phaseE_physical_anchor/vllm_multires.json' AND is_valid), paired AS (SELECT 100.0 * ABS(a.mean_ms - v.mean_ms) / v.mean_ms AS pct_error FROM a JOIN v USING (image_px, n_images)) SELECT MAX(pct_error) FROM paired) AS multires_max_error;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "supported",
+   "observed": "66 comparable points; maximum deviation 12.709398118975933% of composed time at N=52 (257.094 ms composed, 289.7691 ms vLLM); 0 points exceed 12.8%.",
+   "evidence": "Both collector sources are valid, and the complete 66-point composed-model domain has a 12.709398118975933% maximum deviation, below 12.8%.",
+   "severity": "minor",
+   "fix": "",
+   "query": "WITH valid_sources AS (SELECT source_path FROM provenance.collector_bench_run WHERE is_valid = true AND source_path IN ('/home/gio/tese/collector_artifacts/phaseE_physical_anchor/anchor_dense_sdpa_2400.json','/home/gio/tese/collector_artifacts/phaseE_physical_anchor/vllm_eager_dense.json')), composed AS (SELECT image_px, n_images, aic_pred_ms AS composed_ms FROM provenance.collector_encoder_fn WHERE source_path = '/home/gio/tese/collector_artifacts/phaseE_physical_anchor/anchor_dense_sdpa_2400.json' AND source_path IN (SELECT source_path FROM valid_sources) AND engine = 'sdpa' AND is_valid = true AND aic_pred_ms IS NOT NULL), vllm AS (SELECT image_px, n_images, mean_ms AS vllm_ms FROM provenance.collector_encoder_fn WHERE source_path = '/home/gio/tese/collector_artifacts/phaseE_physical_anchor/vllm_eager_dense.json' AND source_path IN (SELECT source_path FROM valid_sources) AND engine = 'vllm' AND is_valid = true), errors AS (SELECT image_px, n_images, composed_ms, vllm_ms, abs(vllm_ms-composed_ms)/composed_ms*100.0 AS pct_of_composed, abs(vllm_ms-composed_ms)/vllm_ms*100.0 AS pct_of_vllm FROM composed JOIN vllm USING (image_px,n_images)) SELECT count(*) AS comparable_points, (SELECT count(*) FROM composed) AS composed_points, (SELECT count(*) FROM vllm) AS vllm_points, max(pct_of_composed) AS max_pct_of_composed, max(pct_of_vllm) AS max_pct_of_vllm, (array_agg(n_images ORDER BY pct_of_composed DESC))[1] AS worst_n, (array_agg(composed_ms ORDER BY pct_of_composed DESC))[1] AS worst_composed_ms, (array_agg(vllm_ms ORDER BY pct_of_composed DESC))[1] AS worst_vllm_ms, count(*) FILTER (WHERE pct_of_composed > 12.8) AS points_over_12_8 FROM errors;"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

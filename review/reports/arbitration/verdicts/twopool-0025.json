@@ -1,0 +1,11 @@
+{
+  "claim_id": "twopool-0025",
+  "verdict": "overclaimed",
+  "observed": "At the trace's own rate (s=1, head2k, is_current) 235B-TP8 ITL p99 = 86.15 ms (not 87.7 ms). Decode-latency ratio to 8B-TP1 is 1.89x on mean TPOT (1.81x on mean ITL) at s=1, but ranges 1.17x-3.86x across the matched sweep (1.2x at low load, ~3.9x at s=2-3), so it is NOT ~2x 'throughout'. Coarse-grid ITL knee (<=100 ms): 235B passes s=1 (86.2) and fails s=1.5 (147.6) -> knee s=1; 8B-TP1 passes s=2 (59.4) and fails s=3 (108.5) -> knee s=2; envelope halving (s=1 vs s=2) holds.",
+  "claimed": "~2x decode latency throughout; ITL p99 87.7 ms at trace rate; knee drops to s=1 vs 8B's s=2, halving the language pool envelope.",
+  "evidence": "v_pool_latency + llm_run_summary (g3_32b, is_current). 235b_tp8_s1 ITL p99 = 86.15097699995385 ms; 8b_tp1_s1 = 22.62208. Mean TPOT s=1: 14.70/7.76 = 1.89x; ratio varies 1.17x-3.86x over scales 0.125-16. Knee s=1 (235B) vs s=2 (8B-TP1) confirmed on the coarse integer grid.",
+  "severity": "major",
+  "fix": "Correct 87.7 ms -> 86.2 ms; replace '~2x ... throughout' with '~1.9x mean decode latency at the trace rate (varying 1.2x-3.9x across the sweep)'. Knee-halving (s=1 vs s=2) and the lower 235B envelope are fine.",
+  "confidence": 0.85,
+  "query": "SELECT scale, mean_tpot 235/8 ratio, p99_itl 235=86.15@s1 vs claimed 87.7; ratio ranges 1.17-3.86 over g3_32b:235b_tp8_* vs 8b_tp1_* is_current"
+}

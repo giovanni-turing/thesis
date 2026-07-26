@@ -1,0 +1,10 @@
+{
+ "claim_id": "closedloop-0459",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "The encoder cost ratio against the deployed C=8 fleet ranges 0.47-1.10x over the five burst-bearing folds, rho=15 is feasible in six of seven folds but cheapest in none.",
+ "claim_text": "Encoder cost ratio across folds: 0.47-1.10x; rho=15 feasible in 6/7 folds, cheapest in 0.",
+ "expected_backing": "v_cost_ratio",
+ "adjudication": [],
+ "reason": "no-adjudicator"
+}

@@ -1,0 +1,1 @@
+{"claim_id":"intro-0194","type":"existence","verdict":"supported","evidence":"provenance.v_pool_latency carries a pool column (encoder/both/decode) with per-pool p99 latency, evidencing separately-provisioned prefill/decode/encoder pools; v_cost_ratio prices per-pool worker-seconds. Anchor intro.tex.","fix":"","confidence":0.85}

@@ -1,0 +1,29 @@
+{
+ "claim_id": "closedloop-0408",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "Driving the identical encoder loop with a forward EWMA point path --- its p90 calibrated on the 1.4-day context to the same 0.88-0.90 coverage by three standard schemes --- exposes a coverage-versus-cost bind.",
+ "claim_text": "Forward EWMA with p90 calibrated to 0.88-0.90 coverage on 1.4-day context shows coverage-cost tradeoff.",
+ "expected_backing": "forecast_metrics",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "add eval=0.901, mult eval=0.878, wsc eval=0.877 (nominal target=0.90); n_calib=6144 at 15s resolution yields calib_days=1.0667",
+   "evidence": "Four of five claim elements hold: nominal p90, three schemes (add/mult/wsc), eval coverage in [0.877, 0.901], and a clear coverage-cost bind. However, calibration context is 1.067 days (6144 points @ 15s), not 1.4 days (the first 1.4 days represent the forecast context split, not the calibration set).",
+   "severity": "minor",
+   "fix": "Replace 'on the 1.4-day context' with 'on a ~1.1-day context' (25.6 hours), or clarify that 1.4 days refers to the temporal split offset before evaluation begins, rather than the calibration context itself.",
+   "query": "SELECT m.method, m.split, m.coverage, m.nominal, (c.n_calib::numeric * 15 / 86400) AS calib_days FROM provenance.ewma_cal_coverage m JOIN provenance.ewma_cal_manifest c ON c.manifest_id = m.manifest_id WHERE m.method IN ('add','mult','wsc') ORDER BY m.method, m.split"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Current, non-superseded calibration uses 6144 samples at 15s = 1.0666666666666667 days; the 1928-point EWMA context at that resolution is 0.3347222222222222 days. Eval coverage is add=0.9012529462845801, mult=0.8783339536037712, wsc=0.8765971963776207. Aggregate-window p90 cost ratios span add=0.4308-0.988, mult=0.8301-1.3184, and wsc=0.3595-0.8063. forecast_metrics has no coverage, is_current, or effective column.",
+   "evidence": "The three schemes and differing p90 costs support the bind, but neither the calibration denominator nor the EWMA context at the manifest's 15s resolution is 1.4 days, and the unrounded eval coverages extend outside 0.88-0.90.",
+   "severity": "major",
+   "fix": "Replace the 1.4-day statement with the actual calibration basis: 6144 15s samples (1.0666666666666667 days), and report eval coverage explicitly as add 0.9012529462845801, mult 0.8783339536037712, and wsc 0.8765971963776207; retain the coverage-cost tradeoff with its window scope.",
+   "query": "WITH current_ewma AS (\n  SELECT model, bool_and(is_current) AS all_current,\n         count(*) FILTER (WHERE superseded_by IS NOT NULL) AS superseded_rows,\n         max((config->>'context_length')::int) FILTER (WHERE run_id = 'predictors:ewma_images') AS context_points\n  FROM provenance.current_runs\n  WHERE run_id IN ('predictors:ewma_images','predictors:ewma_cal_add_images','predictors:ewma_cal_mult_images','predictors:ewma_cal_wsc_images')\n  GROUP BY model\n), cov AS (\n  SELECT method, split, coverage, nominal\n  FROM provenance.ewma_cal_coverage\n  WHERE method IN ('add','mult','wsc')\n), costs AS (\n  SELECT model, window_name,\n         count(*) AS n_p90_cells,\n         count(*) FILTER (WHERE is_valid) AS n_valid,\n         count(*) FILTER (WHERE is_valid AND feasible) AS n_feasible,\n         min(ratio_vs_static_derived) FILTER (WHERE is_valid) AS min_cost_ratio,\n         max(ratio_vs_static_derived) FILTER (WHERE is_valid) AS max_cost_ratio,\n         min(p99_ms) FILTER (WHERE is_valid) AS min_p99_ms,\n         max(p99_ms) FILTER (WHERE is_valid) AS max_p99_ms\n  FROM provenance.v_ewma_ablation_ratio\n  WHERE model IN ('ewma-add','ewma-mult','ewma-wsc') AND quantile = 'p90'\n  GROUP BY model, window_name\n), fm_schema AS (\n  SELECT bool_or(column_name = 'coverage') AS has_coverage,\n         bool_or(column_name = 'is_current') AS has_is_current,\n         bool_or(column_name ILIKE '%effective%') AS has_effective\n  FROM information_schema.columns\n  WHERE table_schema = 'provenance' AND table_name = 'forecast_metrics'\n)\nSELECT m.manifest_id, m.resolution, m.n_calib, m.n_eval,\n       m.n_calib * 15.0 / 86400 AS calibration_days,\n       ce.context_points,\n       ce.context_points * 15.0 / 86400 AS context_days_at_manifest_resolution,\n       ce.all_current, ce.superseded_rows,\n       fs.has_coverage AS forecast_metrics_has_coverage,\n       fs.has_is_current AS forecast_metrics_has_is_current,\n       fs.has_effective AS forecast_metrics_has_effective,\n       (SELECT jsonb_agg(to_jsonb(c) ORDER BY c.method, c.split) FROM cov c) AS coverage_by_scheme_split,\n       (SELECT jsonb_agg(to_jsonb(x) ORDER BY x.model, x.window_name) FROM costs x) AS p90_cost_by_scheme_window\nFROM provenance.ewma_cal_manifest m\nCROSS JOIN current_ewma ce\nCROSS JOIN fm_schema fs\nWHERE m.manifest_id = 'ewma:cal_manifest'\nGROUP BY m.manifest_id, m.resolution, m.n_calib, m.n_eval, ce.context_points,\n         ce.all_current, ce.superseded_rows, fs.has_coverage, fs.has_is_current, fs.has_effective"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

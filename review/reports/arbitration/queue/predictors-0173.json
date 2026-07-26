@@ -1,0 +1,29 @@
+{
+ "claim_id": "predictors-0173",
+ "chapter": "predictors",
+ "claim_type": "comparative",
+ "anchor": "Toto-2 (usually with covariates) takes the fine-bin cells and Chronos-2 most of the coarse ones",
+ "claim_text": "Toto-2 (often with covariates) wins fine bins; Chronos-2 wins coarse bins",
+ "expected_backing": "predictors/results/metrics/model_wins_by_resolution",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "contradicted",
+   "observed": "Each resolution has 8 cells. Toto wins 8/8 at 1s, 8/8 at 15s, 7/8 at 30s. At coarse 1min, Toto-2 wins 3/8 cells (37.5%), Chronos-2 wins 2/8 (25.0%), EWMA wins 2/8 (25.0%), and TimesFM wins 1/8 (12.5%).",
+   "evidence": "Toto-2 dominates fine resolutions but Chronos-2 wins only 2/8 coarse cells (25.0%), fewer than Toto-2's 3 wins (37.5%) and tied with EWMA.",
+   "severity": "major",
+   "fix": "Replace with: 'Toto-2 (usually with covariates) takes nearly all fine-bin cells (23 of 24), while at the coarse 1min resolution, Toto-2 still leads with 3 wins, and Chronos-2 wins only 2 of 8 cells.'",
+   "query": "SELECT resolution, model, count(*) AS wins, count(*) FILTER (WHERE mode = 'cov') AS cov_wins FROM provenance.v_forecast_best GROUP BY resolution, model ORDER BY CASE resolution WHEN '1s' THEN 1 WHEN '15s' THEN 2 WHEN '30s' THEN 3 WHEN '45s' THEN 4 WHEN '1min' THEN 5 ELSE 6 END, wins DESC;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "Each resolution has 8 cells. Toto wins 8/8 at 1s, 8/8 at 15s, and 7/8 at 30s. At 45s, TimesFM wins 4/8, Toto 3/8, and Chronos 1/8. At 1min, Toto wins 3/8, Chronos 2/8, EWMA 2/8, and TimesFM 1/8. There are 41 current predictor runs and 0 current rows with superseded_by set.",
+   "evidence": "The fine-bin portion holds, but Chronos leads neither coarse resolution: TimesFM leads at 45s and Toto leads at 1min.",
+   "severity": "major",
+   "fix": "Replace with: \"Toto-2 takes nearly all 1s-30s cells; at 45s TimesFM leads, while at 1min Toto-2 has the most wins, with Chronos-2 and EWMA tied behind it.\"",
+   "query": "WITH current_predictor_runs AS (\n  SELECT run_id, superseded_by\n  FROM provenance.v_dim\n  WHERE is_current = true AND experiment = 'predictors'\n), wins AS (\n  SELECT resolution, mode, variate, model\n  FROM provenance.v_forecast_best\n), counts AS (\n  SELECT resolution, model, count(*) AS wins,\n         count(*) FILTER (WHERE mode = 'cov') AS cov_wins,\n         count(*) FILTER (WHERE mode = 'uni') AS uni_wins\n  FROM wins\n  GROUP BY resolution, model\n), denominators AS (\n  SELECT resolution, count(*) AS total_cells\n  FROM wins\n  GROUP BY resolution\n)\nSELECT c.resolution, d.total_cells, c.model, c.wins,\n       round(100.0 * c.wins / d.total_cells, 1) AS win_pct,\n       c.cov_wins, c.uni_wins,\n       (SELECT count(*) FROM current_predictor_runs) AS current_predictor_runs,\n       (SELECT count(*) FROM current_predictor_runs WHERE superseded_by IS NOT NULL) AS current_rows_with_superseded_by\nFROM counts c\nJOIN denominators d USING (resolution)\nORDER BY CASE c.resolution WHEN '1s' THEN 1 WHEN '15s' THEN 2 WHEN '30s' THEN 3 WHEN '45s' THEN 4 WHEN '1min' THEN 5 ELSE 6 END,\n         c.wins DESC, c.model"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

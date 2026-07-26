@@ -1,0 +1,29 @@
+{
+ "claim_id": "predictors-0072",
+ "chapter": "predictors",
+ "claim_type": "comparative",
+ "anchor": "the foundation models beat every baseline in all twenty cells",
+ "claim_text": "Foundation models outperform every baseline in all twenty resolution-signal cells.",
+ "expected_backing": "forecast_metrics",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "EWMA baseline outperforms all foundation models in 2 cells: ctx/1min (ewma 0.3827355809461447 vs best FM toto 0.38482784156650457) and images/1min (ewma 0.47926549309674765 vs best FM timesfm 0.4826379762334363) when evaluating individual forecast horizons in forecast_metrics. Under the restricted point-forecast aggregate over horizons (h = -1, span = 'common', candidate = 'point'), foundation models win in all 20 cells.",
+   "evidence": "EWMA baseline achieves a lower WAPE than the best foundation model in the ctx/1min and images/1min cells at shorter horizons.",
+   "severity": "major",
+   "fix": "Qualify the claim to specify that it holds for aggregate point forecasts (h = -1, span = 'common', candidate = 'point'), or amend the text to state that foundation models outperform every baseline in 18 of the 20 cells, with EWMA slightly leading at the coarser 1-minute resolution.",
+   "query": "SELECT variate, resolution, MIN(wape) FILTER (WHERE model IN ('naive', 'ewma', 'holt_winters')) AS best_baseline_wape, MIN(wape) FILTER (WHERE model IN ('chronos', 'timesfm', 'toto')) AS best_fm_wape FROM provenance.forecast_metrics GROUP BY variate, resolution HAVING MIN(wape) FILTER (WHERE model IN ('naive', 'ewma', 'holt_winters')) < MIN(wape) FILTER (WHERE model IN ('chronos', 'timesfm', 'toto')) ORDER BY variate, resolution;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "supported",
+   "observed": "20 denominator cells; 20 winning cells; 0 exceptions. Each of the 5 foundation-model/mode configurations wins 20 of 20 common-span aggregate point-WAPE cells. There are 41 current predictor sources and 0 current sources marked superseded; forecast_metrics has no is_current, is_superseded, or effective column.",
+   "evidence": "On common-span aggregate point WAPE (h=-1), every foundation-model configuration is below the best of naive, EWMA, and Holt-Winters in all 20 resolution-signal cells.",
+   "severity": "minor",
+   "fix": "",
+   "query": "WITH current_predictors AS (\n  SELECT count(*) AS n_current,\n         count(*) FILTER (WHERE superseded_by IS NOT NULL) AS n_current_superseded\n  FROM provenance.v_dim\n  WHERE is_current = true AND experiment = 'predictors'\n), control_columns AS (\n  SELECT count(*) FILTER (WHERE column_name = 'is_current') AS has_is_current,\n         count(*) FILTER (WHERE column_name = 'is_superseded') AS has_is_superseded,\n         count(*) FILTER (WHERE column_name LIKE '%effective%') AS has_effective\n  FROM information_schema.columns\n  WHERE table_schema = 'provenance' AND table_name = 'forecast_metrics'\n), baseline AS (\n  SELECT span, h, resolution, variate, min(wape) AS best_baseline_wape\n  FROM provenance.forecast_metrics\n  WHERE candidate = 'point' AND mode = 'uni'\n    AND model IN ('naive','ewma','holt_winters')\n  GROUP BY span, h, resolution, variate\n), fm_rows AS (\n  SELECT f.span, f.h, f.resolution, f.variate, f.model, f.mode, f.wape,\n         b.best_baseline_wape\n  FROM provenance.forecast_metrics f\n  JOIN baseline b USING (span, h, resolution, variate)\n  WHERE f.candidate = 'point'\n    AND f.model IN ('chronos','timesfm','toto')\n), headline_cells AS (\n  SELECT resolution, variate,\n         min(wape) AS best_fm_wape,\n         min(best_baseline_wape) AS best_baseline_wape\n  FROM fm_rows\n  WHERE span = 'common' AND h = -1\n  GROUP BY resolution, variate\n), config_breakdown AS (\n  SELECT model, mode, count(*) AS cells,\n         count(*) FILTER (WHERE wape < best_baseline_wape) AS wins\n  FROM fm_rows\n  WHERE span = 'common' AND h = -1\n  GROUP BY model, mode\n), span_h_breakdown AS (\n  SELECT span, h, count(*) AS cells,\n         count(*) FILTER (WHERE best_fm_wape < best_baseline_wape) AS wins\n  FROM (\n    SELECT span, h, resolution, variate,\n           min(wape) AS best_fm_wape,\n           min(best_baseline_wape) AS best_baseline_wape\n    FROM fm_rows\n    GROUP BY span, h, resolution, variate\n  ) x\n  GROUP BY span, h\n)\nSELECT p.n_current, p.n_current_superseded,\n       c.has_is_current, c.has_is_superseded, c.has_effective,\n       (SELECT count(*) FROM headline_cells) AS denominator_cells,\n       (SELECT count(*) FROM headline_cells WHERE best_fm_wape < best_baseline_wape) AS winning_cells,\n       (SELECT count(*) FROM headline_cells WHERE best_fm_wape >= best_baseline_wape) AS exceptions,\n       (SELECT jsonb_agg(to_jsonb(x) ORDER BY model, mode) FROM config_breakdown x) AS per_model_mode,\n       (SELECT jsonb_agg(to_jsonb(x) ORDER BY span, h) FROM span_h_breakdown x) AS per_span_horizon\nFROM current_predictors p CROSS JOIN control_columns c"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

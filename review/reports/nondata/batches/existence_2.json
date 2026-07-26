@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "conclusion-0104",
+  "chapter": "conclusion",
+  "claim_type": "existence",
+  "anchor": "a cheap forward forecaster (EWMA) at a calibrated quantile, driven through the same loop, either misses the fast onsets or over-provisions",
+  "claim_text": "A cheap forward forecaster (EWMA) at a calibrated quantile either misses fast onsets or over-provisions.",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "conclusion-0105",
+  "chapter": "conclusion",
+  "claim_type": "existence",
+  "anchor": "the forecast passes bursts under realistic replica leads only when combined with a tail-aware capacity conversion",
+  "claim_text": "The forecast passes bursts under realistic replica leads only with tail-aware capacity conversion.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "conclusion-0106",
+  "chapter": "conclusion",
+  "claim_type": "existence",
+  "anchor": "Over the covered 5.60-day span the policy holds the SLA in aggregate and inside all four in-span burst episodes",
+  "claim_text": "Over a 5.60-day span, the policy holds the SLA in aggregate and during all four in-span burst episodes.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "conclusion-0108",
+  "chapter": "conclusion",
+  "claim_type": "existence",
+  "anchor": "the reactive controller's apparent aggregate pass dissolves under per-episode grading",
+  "claim_text": "The reactive controller's apparent aggregate pass dissolves under per-episode grading.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "closedloop-0112",
+  "chapter": "closedloop",
+  "claim_type": "existence",
+  "anchor": "All three foundation models pass all 60 p90/\u03c115 cells, consistent with the small cross-model spreads of Chapter 4",
+  "claim_text": "All three foundation models pass all 60 p90/\u03c115 cells",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "closedloop-0115",
+  "chapter": "closedloop",
+  "claim_type": "existence",
+  "anchor": "the language-pool result is best read as a synthetic sampled-signal experiment",
+  "claim_text": "The language-pool result is a synthetic sampled-signal experiment",
+  "expected_backing": "simulation/results/results_44.jsonl"
+ },
+ {
+  "claim_id": "apendice-0136",
+  "chapter": "apendice",
+  "claim_type": "existence",
+  "anchor": "All three foundation models over the same burst (univariate point paths, 1 minute bins): the paths are nearly coincident --- riding the plateau, ignoring single-bin spikes, and releasing the regime within about one tile of its collapse",
+  "claim_text": "Three foundation models' forecast paths nearly coincident over burst: riding plateau, ignoring single-bin spikes, releasing regime within ~1 tile of collapse",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "apendice-0142",
+  "chapter": "apendice",
+  "claim_type": "existence",
+  "anchor": "vLLM's own vision tower through its FlashAttention backend is the like-for-like anchor --- AIC's collected operators are vLLM's kernels (attention kernel_source=vllm_vit_flash_attn, GEMMs vLLM RowParallelLinear) --- and matches the composition across the table's anchor shapes.",
+  "claim_text": "vLLM's vision tower via FA backend is like-for-like anchor; AIC collected operators are vLLM kernels (attention kernel_source=vllm_vit_flash_attn, GEMMs vLLM RowParallelLinear); matches composition at anchor shapes",
+  "expected_backing": "collector_encoder_fn"
+ }
+]

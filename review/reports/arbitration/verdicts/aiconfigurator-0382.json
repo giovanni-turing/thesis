@@ -1,0 +1,11 @@
+{
+  "claim_id": "aiconfigurator-0382",
+  "verdict": "inconsistent",
+  "observed": "collector_encoder_fn 448px/784 patches, 4 valid current rows: mean_ms 11.217-11.333, ci95 0.0115-0.0803, aic_pred_ms=8.162 (all), ratio 1.3743-1.3885. encoder_factoring_probe 'aic448:n1:b1x1' note: 7.822 ms was 'the contemporaneous note recorded under the earlier AIC data version'; current published value is 8.162.",
+  "claimed": "Validation table row: 448^2 (784 patches): measured 11.360 +/- 0.006 ms, predicted 7.822 ms, ratio 1.45.",
+  "evidence": "The table's predicted value (7.822) and ratio (1.45) are the SUPERSEDED earlier AIC data version; current provenance is 8.162 ms / ~1.39. Measured 11.360 also exceeds the current max valid mean (11.333). The thesis discloses the version difference (line 172: '1.45 differs ... because both the slice and the measurement protocol moved') and the direction is conservative (published 1.45 > current 1.39), but the three published numbers are not reproducible from the current DB. Expected_backing 'v_pool_latency' cannot represent per-patch encoder validation; the correct table is collector_encoder_fn.",
+  "severity": "major",
+  "fix": "Update the row to current collector_encoder_fn values (measured 11.333 +/- 0.024 ms, predicted 8.162 ms, ratio 1.39) or annotate it explicitly as the earlier raw-slice AIC version; correct expected backing to collector_encoder_fn.",
+  "confidence": 0.72,
+  "query": "SELECT mean_ms, ci95_ms, aic_pred_ms, ratio_meas_over_aic FROM collector_encoder_fn WHERE image_px=448 AND patches=784 AND is_valid; SELECT predicted_ms, note FROM encoder_factoring_probe WHERE probe_id='aic448:n1:b1x1';"
+}

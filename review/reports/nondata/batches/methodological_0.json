@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "validation-0000",
+  "chapter": "validation",
+  "claim_type": "methodological",
+  "anchor": "The client synthesizes each request at its trace timestamp with its exact token counts and prefix-sharing structure, and measures TTFT/ITL client-side.",
+  "claim_text": "The load client synthesizes each request at its exact trace timestamp with exact token counts and prefix-sharing structure, and measures TTFT and ITL client-side.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "validation-0001",
+  "chapter": "validation",
+  "claim_type": "methodological",
+  "anchor": "Engine timing is identical to the offline runs by construction: live mocker workers load the same AIC latency model, engine arguments, and KV-block capacity --- one TP2 replica per OS process, so replicas die independently.",
+  "claim_text": "Engine timing matches offline runs: live mocker workers load same AIC latency model, engine arguments, KV-block capacity; one TP2 replica per OS process, replicas die independently.",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "validation-0003",
+  "chapter": "validation",
+  "claim_type": "methodological",
+  "anchor": "Each live run is compared against an offline twin --- identical trace, planner configuration, capacity mapping, lead, and budget --- re-run through the replay platform of the preceding chapters.",
+  "claim_text": "Each live run compared against an offline twin with identical trace, planner configuration, capacity mapping, lead, and budget, re-run through the replay platform.",
+  "expected_backing": "v_grid_static_effective"
+ },
+ {
+  "claim_id": "validation-0007",
+  "chapter": "validation",
+  "claim_type": "methodological",
+  "anchor": "The anchor covers one window (the hardest), two policies (the contribution and the baseline it beats), the language pool (the pool with a production control path; the encoder pool's controller exists only in simulation), and mocked engine execution.",
+  "claim_text": "Anchor scope: one window (hardest), two policies (contribution and baseline), language pool (production control path; encoder pool controller only in simulation), mocked engine execution.",
+  "expected_backing": "v_grid_static_effective"
+ },
+ {
+  "claim_id": "twopool-0015",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "Dynamo's discrete-event worker simulator (the mocker) models text token processing only, so the vision stage cannot live inside it. The composition instead runs the vision pool as an event-driven FIFO of C encoder workers inside the workload converter, costed per forward by AIC's encoder graph on the collected rtx_5090 data, and hands the language pool to dynamo.replay.",
+  "claim_text": "Simulation architecture: vision pool as event-driven FIFO of C encoder workers costed via AIC encoder graph on RTX 5090 data; language pool handled by dynamo.replay.",
+  "expected_backing": "collector_encoder_fn, measured_request/vllm_*"
+ },
+ {
+  "claim_id": "twopool-0016",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "The seam is the trace itself: for an open-loop request, d milliseconds spent in the vision pool equals arriving at the language pool d milliseconds later, so the converter folds each request's encoder delay (queue wait + service + handoff transfer) into its emitted arrival timestamp.",
+  "claim_text": "Trace seam: vision pool encoder delay (queue wait + service + handoff) folded into language pool arrival timestamps.",
+  "expected_backing": "eda_metric, v_pool_latency"
+ },
+ {
+  "claim_id": "twopool-0017",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "A --no-encoder-shift mode emits raw arrivals instead (the language pool in isolation), enabling the per-pool attribution in the load sweeps below.",
+  "claim_text": "--no-encoder-shift mode emits raw arrivals for language pool isolation, enabling per-pool attribution in load sweeps.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "twopool-0018",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "The language pool runs offline with a KV-aware router across two simulated workers; per-request prefill and decode times come either from the mocker's default polynomial or from AIC's calibrated h100_sxm/vLLM 0.22.0 database (the locked decoder-pool platform), selected per run.",
+  "claim_text": "Language pool uses KV-aware router across 2 simulated workers; prefill/decode times from mocker polynomial or AIC calibrated h100_sxm/vLLM 0.22.0 database.",
+  "expected_backing": "measured_request/vllm_*, collector_encoder_fn"
+ }
+]

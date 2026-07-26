@@ -1,0 +1,47 @@
+{
+ "claim_id": "aiconfigurator-0383",
+ "chapter": "aiconfigurator",
+ "claim_type": "numeric",
+ "anchor": "$896^2$  & 3136  & $36.421 \\pm 0.010$  & 31.973 & 1.14 \\\\",
+ "claim_text": "At 896\u00b2 (3136 patches): measured 36.421\u00b10.010 ms, predicted 31.973 ms, ratio 1.14.",
+ "expected_backing": "v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "contradicted",
+   "observed": "patches=3136: image_px=448, n_images=4, mean_ms=30.599 (ci95_ms=0.028), aic_pred_ms=23.127, ratio_meas_over_aic=1.323; image_px=896: n_images=1, mean_ms=30.088 (ci95_ms=0.017), aic_pred_ms=null",
+   "evidence": "No row in the database matches measured 36.421 ms, predicted 31.973 ms, or ratio 1.14; for patches=3136, DB records 4x448\u00b2 (30.599 ms / 23.127 ms / ratio 1.323).",
+   "severity": "blocking",
+   "fix": "Cite the offline validation artifact collector_artifacts/phaseA_validation/result.txt where these exact numbers reside, or ingest the single-image 896\u00b2 bench_vit_real.py results into the collector_encoder_fn database table.",
+   "query": "SELECT image_px, n_images, patches, mean_ms, ci95_ms, aic_pred_ms, ratio_meas_over_aic FROM provenance.collector_encoder_fn WHERE patches = 3136 OR image_px = 896;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "unverifiable",
+   "observed": "The 896-tagged current rows have per-window row denominators of 8 for burst3, burst4, burst5, and steady24h; exact_measured_matches=0, current_superseded_rows=0, is_superseded_rows=0, and rows_with_effective_column=rows_with_mean_ms=rows_with_aic_pred_ms=rows_with_ratio=0.",
+   "evidence": "v_pool_latency contains no current 896-tagged row matching 36.421 and exposes no mean, prediction, ratio, or _effective fields capable of backing the numeric table entry.",
+   "severity": "blocking",
+   "fix": "Remove the row or provide provenance in an owning view containing patch count, measured mean and uncertainty, AIC prediction, and measured-to-predicted ratio.",
+   "query": "WITH d AS (SELECT run_id, window_name, superseded_by FROM provenance.v_dim WHERE is_current = true AND (run_id ILIKE '%u896%' OR source_path ILIKE '%896%')), p AS (SELECT vp.* FROM provenance.v_pool_latency vp JOIN d USING (run_id) WHERE vp.is_current = true), breakdown AS (SELECT window_name, source_relation, COUNT(*) AS row_denominator, SUM(n_requests) AS request_denominator, MIN(p50_ms) AS min_p50_ms, MAX(p50_ms) AS max_p50_ms, MIN(p90_ms) AS min_p90_ms, MAX(p90_ms) AS max_p90_ms, MIN(p99_ms) AS min_p99_ms, MAX(p99_ms) AS max_p99_ms, MIN(max_ms) AS min_max_ms, MAX(max_ms) AS max_max_ms FROM p GROUP BY window_name, source_relation) SELECT b.*, (SELECT COUNT(*) FROM p WHERE p50_ms = 36.421 OR p90_ms = 36.421 OR p99_ms = 36.421 OR max_ms = 36.421) AS exact_measured_matches, (SELECT COUNT(*) FROM d WHERE superseded_by IS NOT NULL) AS current_superseded_rows, (SELECT COUNT(*) FROM p WHERE (to_jsonb(p)->>'is_superseded')::boolean IS TRUE) AS is_superseded_rows, (SELECT COUNT(*) FROM p WHERE to_jsonb(p) ? '_effective') AS rows_with_effective_column, (SELECT COUNT(*) FROM p WHERE to_jsonb(p) ? 'mean_ms') AS rows_with_mean_ms, (SELECT COUNT(*) FROM p WHERE to_jsonb(p) ? 'aic_pred_ms') AS rows_with_aic_pred_ms, (SELECT COUNT(*) FROM p WHERE to_jsonb(p) ? 'ratio_meas_over_aic') AS rows_with_ratio FROM breakdown b ORDER BY b.window_name, b.source_relation"
+  },
+  {
+   "model": "glm-5.2",
+   "verdict": "contradicted",
+   "observed": "collector_encoder_fn(536 rows): mean_ms\u224836.421=0 rows, aic_pred_ms\u224831.973=0 rows, ratio\u22481.14=0 rows, (patches=3136 AND image_px=896)=0 rows. patches=3136 exists only as image_px=448/n_images=4 (4\u00d7448\u00b2): mean_ms=30.5988/30.7096/30.7272, aic_pred_ms=23.127, ratio=1.3231/1.3279/1.3286. image_px=896 exists only as vllm with patches=null, aic_pred_ms=null. v_pool_latency has no mean_ms/aic_pred_ms/patches/image_px columns at all.",
+   "evidence": "None of the three claimed numbers (36.421, 31.973, 1.14) appear in any of the 536 collector_encoder_fn rows; the 3136-patch measurement is 4\u00d7448\u00b2 with 30.60ms/23.127ms/1.32, and expected backing v_pool_latency lacks the relevant columns entirely.",
+   "severity": "blocking",
+   "fix": "Replace with DB reality: '4\u00d7448\u00b2 (3136 patches) & 30.599\u00b10.028 ms & 23.127 & 1.32' (sdpa, anchor_sdpa_5x50.json). If a single 896\u00d7896 image was intended, that measurement does not exist in the provenance store (image_px=896 rows are vllm-only with null patches/aic_pred/ratio). Also fix the expected-backing tag: v_pool_latency cannot source mean_ms/aic_pred_ms \u2014 should be collector_encoder_fn.",
+   "query": "SELECT COUNT(*) AS total_rows, COUNT(*) FILTER (WHERE mean_ms BETWEEN 36.411 AND 36.431) AS mean_near_36_421, COUNT(*) FILTER (WHERE aic_pred_ms BETWEEN 31.963 AND 31.983) AS aic_near_31_973, COUNT(*) FILTER (WHERE ratio_meas_over_aic BETWEEN 1.13 AND 1.15) AS ratio_near_1_14, COUNT(*) FILTER (WHERE patches = 3136 AND image_px = 896) AS patches3136_and_896 FROM provenance.collector_encoder_fn"
+  },
+  {
+   "model": "kimi-k3",
+   "verdict": "contradicted",
+   "observed": "patches=3136 -> 3 rows, all 4x448px sdpa: mean_ms 30.5988-30.7272, aic_pred_ms=23.127, ratio 1.3231-1.3286; image_px=896 (vllm, 1 img): 30.0881 ms, no aic_pred; no row anywhere contains 36.421 / 31.973 / 1.14; v_pool_latency has no patches/aic_pred columns",
+   "evidence": "Patch count 3136 exists in DB but with materially different numbers (30.60/23.13/1.32); claimed measured/predicted/ratio triple has zero backing rows in the provenance store and the named backing view v_pool_latency lacks the required columns.",
+   "severity": "blocking",
+   "fix": "Replace the row with the recorded values for patches=3136 (4x448^2, sdpa): 30.599\u00b10.028 ms measured, 23.127 ms AIC-predicted, ratio 1.32 \u2014 or, if a single 896^2 image is intended, cite the vllm_multires row 30.088\u00b10.017 ms with no AIC prediction; also correct EXPECTED BACKING from v_pool_latency to collector_encoder_fn.",
+   "query": "SELECT image_px,n_images,patches,mean_ms,ci95_ms,aic_pred_ms,ratio_meas_over_aic FROM provenance.collector_encoder_fn WHERE patches=3136; -- plus scan of v_pool_latency, collector_fn, collector_bench_run, collector_vit_op_breakdown, encoder_factoring_probe, sweep_point for 36.421/31.973/1.14"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

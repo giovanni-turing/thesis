@@ -1,0 +1,47 @@
+{
+ "claim_id": "aiconfigurator-0264",
+ "chapter": "aiconfigurator",
+ "claim_type": "numeric",
+ "anchor": "Measured wall-clock latency for 448\u00b2 image: 11.360 \u00b1 0.006 ms",
+ "claim_text": "The measured wall-clock latency for a 448\u00b2 image is 11.360 \u00b1 0.006 ms.",
+ "expected_backing": "v_pool_latency, measurement results",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "unverifiable",
+   "observed": "exact_mean_count=0, single_image_exact_ci_count=0, 448px n_images=1 means span 7.9738-12.567 ms (closest non-compiled is 11.3238 ms), with tightest single-image ci95_ms=0.009 (no 0.006)",
+   "evidence": "The exact measurement 11.360 \u00b1 0.006 ms is completely missing from all DB views/tables; it exists only in the uningested text file collector_artifacts/phaseA_validation/result.txt.",
+   "severity": "major",
+   "fix": "Ingest collector_artifacts/phaseA_validation/result.txt into collector_encoder_fn, or restate using ingested data (e.g., '11.324 \u00b1 0.022 ms' from sdpa anchor_sdpa_locked2400) and point the expected backing at collector_encoder_fn instead of v_pool_latency.",
+   "query": "SELECT (SELECT COUNT(*) FROM provenance.collector_encoder_fn WHERE mean_ms = 11.360) AS exact_mean_count, (SELECT COUNT(*) FROM provenance.collector_encoder_fn WHERE ci95_ms = 0.006 AND n_images = 1) AS single_image_exact_ci_count, (SELECT MIN(mean_ms) FROM provenance.collector_encoder_fn WHERE image_px = 448 AND n_images = 1 AND is_valid = true) AS min_measured_ms, (SELECT MAX(mean_ms) FROM provenance.collector_encoder_fn WHERE image_px = 448 AND n_images = 1 AND is_valid = true) AS max_measured_ms, (SELECT MIN(ci95_ms) FROM provenance.collector_encoder_fn WHERE image_px = 448 AND n_images = 1 AND is_valid = true) AS min_ci95_ms;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "unverifiable",
+   "observed": "0 current v_pool_latency rows equal 11.360 ms and 0 of 18 valid 448px single-image measurements contain the exact 11.360 \u00b1 0.006 ms pair; recorded means span 7.9738\u201312.567 ms and non-NULL ci95 values span 0.009\u20130.0803 ms.",
+   "evidence": "The current owning view and valid measurement records contain no exact backing pair, and collector_encoder_fn has no fold/window or current/effective fields supporting a preferred aggregation.",
+   "severity": "major",
+   "fix": "Ingest the cited wall-clock result into the provenance DB with its configuration and uncertainty definition, or replace the claim with a clearly identified DB-backed measurement and its recorded ci95_ms.",
+   "query": "WITH pool AS (SELECT pl.* FROM provenance.v_pool_latency pl JOIN provenance.v_dim d USING (run_id) WHERE d.is_current = true AND pl.is_current = true), measurements AS (SELECT source_path, engine, attn, n_images, patches, mean_ms, ci95_ms FROM provenance.collector_encoder_fn WHERE image_px = 448 AND n_images = 1 AND is_valid = true), exact_pair AS (SELECT * FROM measurements WHERE mean_ms = 11.360 AND ci95_ms = 0.006) SELECT (SELECT COUNT(*) FROM pool WHERE p50_ms = 11.360 OR p90_ms = 11.360 OR p99_ms = 11.360 OR max_ms = 11.360) AS current_pool_exact_value_rows, (SELECT COUNT(*) FROM exact_pair) AS exact_measurement_pair_rows, (SELECT COUNT(*) FROM measurements) AS measurement_denominator, (SELECT MIN(mean_ms) FROM measurements) AS min_mean_ms, (SELECT MAX(mean_ms) FROM measurements) AS max_mean_ms, (SELECT MIN(ci95_ms) FROM measurements) AS min_ci95_ms, (SELECT MAX(ci95_ms) FROM measurements) AS max_ci95_ms, (SELECT jsonb_agg(to_jsonb(m) ORDER BY source_path, engine, attn) FROM measurements m WHERE mean_ms BETWEEN 11.0 AND 11.7) AS relevant_breakdown"
+  },
+  {
+   "model": "glm-5.2",
+   "verdict": "overclaimed",
+   "observed": "448px n_images=1 encoder-forward means 11.217-11.492 ms, ci95 0.009-0.080 ms; NO row with mean_ms=11.360; NO single-image ci95=0.006 (only multi-image batched runs have ci95~0.006); v_pool_latency has 0 rows for 448 (no image_px column); no phaseA_validation source ingested",
+   "evidence": "collector_encoder_fn image_px=448 n_images=1: stored means 11.217/11.2181/11.291/11.304/11.3238/11.333/11.3333/11.385/11.492 ms; ci95 0.009/0.0115/0.0216/0.0242/0.030/0.0803; tightest single-image ci95=0.009 (eager fn_repro mean 11.492); no mean_ms=11.360 and no single-image ci95=0.006 anywhere; expected view v_pool_latency has no image_px/448 data",
+   "severity": "major",
+   "fix": "Replace with an actually-stored measurement, e.g. 'compiled fn_repro: 11.304 \u00b1 0.030 ms' or 'sdpa anchor_dense_sdpa_2400: 11.333 \u00b1 0.024 ms' (ci95 from collector_encoder_fn). The stated 11.360 is within the measured 11.217-11.492 cluster but is not a stored mean, and \u00b10.006 is ~1.5-5x tighter than any single-image ci95 (tightest=0.009). If 11.360\u00b10.006 derives from collector_artifacts/phaseA_validation/result.txt, that artifact is not ingested into provenance DB views and must be ingested and reconciled with collector_encoder_fn before the claim can be 'supported'.",
+   "query": "SELECT source_path, engine, attn, n_images, patches, mean_ms, ci95_ms, p50_ms, p99_ms, ms_per_img, is_valid FROM provenance.collector_encoder_fn WHERE image_px = 448 AND mean_ms BETWEEN 11.0 AND 11.7 ORDER BY mean_ms; [plus exact-match counts: round(mean_ms::numeric,3)=11.360 -> 0 rows; round(ci95_ms::numeric,3)=0.006 on n_images=1 -> 0 rows; v_pool_latency 448-related -> 0 rows]"
+  },
+  {
+   "model": "kimi-k3",
+   "verdict": "unverifiable",
+   "observed": "No stored 11.360 \u00b1 0.006: 448px means are 11.217\u201311.492 ms (ci95 0.009\u20130.080); closest 11.304\u00b10.030 (fn_repro, compiled) / 11.3333\u00b10.0242 (anchor_dense_sdpa_2400); ci95=0.006 exists only at mean 50.677 ms (n=8). v_pool_latency has no image_px/mean/ci95 columns (queue-delay percentiles only). phaseA_validation/result.txt not in ingest_log.",
+   "evidence": "Exact value absent from every ingested measurement table; cited phaseA artifact never ingested; expected backing view v_pool_latency structurally cannot hold encoder wall-clock latency.",
+   "severity": "major",
+   "fix": "Either ingest collector_artifacts/phaseA_validation/result.txt into collector_encoder_fn, or restate from ingested data, e.g. '11.304 \u00b1 0.030 ms (compiled, phaseE fn_repro)' or phaseB measured 11.299 ms (5x50), and point expected backing at collector_encoder_fn, not v_pool_latency.",
+   "query": "SELECT source_path, engine, attn, n_images, mean_ms, ci95_ms FROM provenance.collector_encoder_fn WHERE image_px = 448 AND mean_ms BETWEEN 11.2 AND 11.6 ORDER BY mean_ms; SELECT file_path FROM provenance.ingest_log WHERE file_path ILIKE '%phaseA%';"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

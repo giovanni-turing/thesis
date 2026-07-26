@@ -1,0 +1,11 @@
+{
+  "claim_id": "aiconfigurator-0265",
+  "verdict": "supported",
+  "observed": "collector_kernel_ledger (N=1, entry_kind='category'): unmodeled kernels patch_embed_conv=0.495 ms + gather_cat=0.257 ms = 0.752 ms (~0.7). Modeled kernels gemm+attention+elementwise+norm=8.77 ms measured vs AIC-predicted 7.822 (~12%, matching 'AIC-comparable work within ~12%'); total_kernel_ms=9.542, +15.3% dispatch gaps -> ~11.36 ms measured wall.",
+  "claimed": "The analytical model matched the empirical test, with a ~0.7 ms remainder (a kernel-level profile accounts for the measured-vs-predicted gap term by term, except ~0.7 ms).",
+  "evidence": "FLAG IS SPURIOUS: all four adjudicators computed the RAW model-vs-empirical gap (mean_ms - aic_pred_ms = 3-337 ms) and declared 0.7 ms wrong. But the thesis never claims that gap is 0.7 ms - it openly reports the 1.45x ratio in the table above and states the gap is accounted for TERM BY TERM by a kernel-level profile, leaving a ~0.7 ms remainder. That remainder is precisely the unmodeled kernel categories patch_embed_conv+gather_cat=0.752 ms from the ledger, which the adjudicators themselves confirmed. The decomposition is internally coherent (modeled kernels within ~12%, unmodeled = 0.75 ms, +15.3% dispatch = wall).",
+  "severity": "minor",
+  "fix": "None required. The ~0.7 ms remainder is the DB-backed sum of unmodeled kernels (patch_embed_conv 0.495 + gather_cat 0.257). Wording could add 'unmodeled-kernel remainder' for clarity but the claim is correct.",
+  "confidence": 0.85,
+  "query": "SELECT entry_name, ms FROM collector_kernel_ledger WHERE n_images=1 AND entry_kind='category' AND entry_name IN ('patch_embed_conv','gather_cat');"
+}

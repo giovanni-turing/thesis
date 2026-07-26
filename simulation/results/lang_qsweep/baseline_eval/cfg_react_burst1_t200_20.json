@@ -1,0 +1,5 @@
+{"mode":"agg","environment":"virtual","namespace":"be_burst1","backend":"vllm",
+ "optimization_target":"sla","ttft_ms":200.0,"itl_ms":20.0,
+ "enable_throughput_scaling":true,"enable_load_scaling":true,"load_predictor":"arima",
+ "throughput_adjustment_interval_seconds":60,"load_adjustment_interval_seconds":15,
+ "advisory":true,"max_gpu_budget":8,"min_endpoint":1}

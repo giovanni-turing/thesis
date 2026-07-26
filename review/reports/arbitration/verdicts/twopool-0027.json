@@ -1,0 +1,11 @@
+{
+ "claim_id": "twopool-0027",
+ "verdict": "holds",
+ "observed": "encoder_factoring_probe: N=64 has all 7 factorings (1,64),(2,32),(4,16),(8,8),(16,4),(32,2),(64,1) returning predicted_ms=316.369 with delta_vs_ref_ms=0 (identical to the microsecond); N=1 has only (1,1)=8.162. The named example ((1,64) and (64,1)) is confirmed exactly at delta 0.",
+ "claimed": "AIC encoder-graph latency depends only on total images, not batch/images-per-request factoring; identical to the microsecond, illustrated by (1,64) vs (64,1).",
+ "evidence": "The claim's explicit example is N=64, and the DB confirms all 7 factorings of N=64 return 316.369 ms to the microsecond (delta 0). N=1 trivially has a single factoring. The universal quantifier 'every factoring of N images' has multi-factoring evidence only at N=64, but the invariance is a structural property of the analytic AIC graph, which the sentence itself explains (attention at batch x images, other ops at total token count); it is a deterministic cost model, so the N=64 sweep across the full factoring range is a faithful demonstration, not a sampling estimate.",
+ "severity": "minor",
+ "fix": "Optional: note that the factoring-invariance sweep was exhaustive at N=64 (all 7 factorings, delta 0), the generalization following from the analytic graph structure. No numeric change required.",
+ "confidence": 0.72,
+ "query": "SELECT probe_id,batch_size,images_per_request,total_images,predicted_ms,delta_vs_ref_ms FROM provenance.encoder_factoring_probe ORDER BY total_images,batch_size; -> N=64: 7 rows all 316.369/delta0; N=1: (1,1)=8.162"
+}

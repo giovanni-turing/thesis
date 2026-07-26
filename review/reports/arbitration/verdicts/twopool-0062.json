@@ -1,0 +1,11 @@
+{
+ "claim_id": "twopool-0062",
+ "verdict": "overclaimed",
+ "observed": "On steady24h (bound=1000ms encoder_delay p99), 672^2 on the faster fabric g100 PASSES under fcAware (842.492ms) and under the deployable static_C8 reference (842.492ms); it misses on both fabrics only under the plain forecast fc_L30 (g100 1927.455, g25 1972.454) and fc_L30_cap28 (g100 1943.981, g25 1976.051). fcAware g25 misses at 1012.432. Burst-window 672^2 forecast g100 = 938.734 (thin, 61ms under bound), g25 = 1397.399.",
+ "claimed": "On the sustained 24h window 672^2 misses the bound on BOTH fabrics (unqualified).",
+ "evidence": "The 'misses on both fabrics at 24h' statement is policy-dependent: true for fc_L30/fc_L30_cap28 but false for fcAware and for the deployable static_C8 baseline, both of which hold the faster fabric (g100) at 842.492ms < 1000ms (16% margin). The thin burst-window g100 margin (938.734) is a forecast-policy property (static fails burst at 2272-3414ms), so the caveat is about the forecast schedule; within that family the forecast-AWARE variant still meets the bound on g100 at 24h. The unqualified 'both fabrics' overgeneralizes across forecast variants.",
+ "severity": "minor",
+ "fix": "Name the forecast variant: under the plain forecast schedule (fc_L30 / fc_L30_cap28) 672^2 misses the 24h bound on both fabrics; the forecast-aware variant and the deployable static_C8 reference still meet it on the faster fabric (g100, 842.492ms).",
+ "confidence": 0.72,
+ "query": "SELECT run_id, round(p99_ms::numeric,3) p99 FROM v_pool_latency WHERE is_current AND experiment='g6' AND run_id LIKE 'g6:%672%steady24h%' ORDER BY run_id; -- bound=1000 from v_sla_bound(encoder_delay)"
+}

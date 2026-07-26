@@ -1,0 +1,12 @@
+{
+ "model": "gpt-5.6-sol",
+ "status": "active",
+ "cal_recall": "7/7",
+ "cal_fab": 1,
+ "cal_latency_s": 37,
+ "valid_json_rate": 1.0,
+ "grounding_rate": null,
+ "fabrication_rate": 0.14285714285714285,
+ "units_done": 0,
+ "disabled": false
+}

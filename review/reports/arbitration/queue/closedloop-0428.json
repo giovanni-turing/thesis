@@ -1,0 +1,29 @@
+{
+ "claim_id": "closedloop-0428",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "The table quotes Chronos-2 deliberately: at 120M parameters it is the smallest of the three (Toto-2.0 is 20x larger), so the headline rests on the cheapest forecaster, not the most accurate.",
+ "claim_text": "Chronos-2 (120M params) is smallest; Toto-2.0 is 20x larger; headline uses cheapest forecaster.",
+ "expected_backing": "v_cost_ratio",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "Chronos-2 is 120M params, Toto-2.0 is 2.5B params (20.8x larger). On common 15s point forecasts, Toto/cov has WAPE 0.54677, beating Chronos/cov (WAPE 0.55180).",
+   "evidence": "Ledger 978 and v_cost_ratio confirm Chronos-2 is the cheapest forecaster computationally (120M params vs Toto's 2.5B params, or 20.8x larger), and forecast_metrics confirms Toto is more accurate (0.54677 vs 0.55180 WAPE).",
+   "severity": "minor",
+   "fix": "",
+   "query": "WITH ledger AS (SELECT id, feeds, raw FROM provenance.ledger_entry WHERE id = 978), accuracy AS (SELECT model, mode, AVG(wape) AS avg_wape FROM provenance.forecast_metrics WHERE span = 'common' AND candidate = 'point' AND resolution = '15s' AND model IN ('chronos', 'toto') GROUP BY model, mode) SELECT (SELECT feeds FROM ledger) AS ledger_feeds, (SELECT json_object_agg(model || '/' || mode, ROUND(avg_wape::numeric, 5)) FROM accuracy) AS accuracies"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Chronos is cheapest on burst2 (124293.4 worker-seconds versus Toto 125253.7), but Toto is cheapest on burst6 (85032.9 versus Chronos 88374.4) and across both comparable windows (210286.6 versus Chronos 212667.8).",
+   "evidence": "The current, denominator-matched per-window breakdown does not establish Chronos as the cheapest forecaster; parameter count alone cannot support that causal cost characterization.",
+   "severity": "minor",
+   "fix": "Replace \"cheapest forecaster\" with \"smallest forecaster by parameter count\" and avoid inferring realized cost from model size.",
+   "query": "WITH comparable AS (SELECT DISTINCT window_name, forecast_model, numerator_worker_seconds, denominator_worker_seconds FROM provenance.v_cost_ratio WHERE is_current = TRUE AND experiment = 'g1' AND policy = 'forecast' AND lead_s = 30 AND forecast_model IN ('chronos','toto','timesfm') AND denominator_kind = 'deployable_static_c8' AND denominator_window_mismatch = FALSE), per_window AS (SELECT window_name AS scope, MAX(numerator_worker_seconds) FILTER (WHERE forecast_model='chronos') AS chronos_ws, MAX(numerator_worker_seconds) FILTER (WHERE forecast_model='toto') AS toto_ws, MAX(numerator_worker_seconds) FILTER (WHERE forecast_model='timesfm') AS timesfm_ws, MAX(denominator_worker_seconds) AS denominator_ws FROM comparable GROUP BY window_name), breakdown AS (SELECT scope, chronos_ws, toto_ws, timesfm_ws, denominator_ws, CASE WHEN chronos_ws = LEAST(chronos_ws,toto_ws,timesfm_ws) THEN 'chronos' WHEN toto_ws = LEAST(chronos_ws,toto_ws,timesfm_ws) THEN 'toto' ELSE 'timesfm' END AS cheapest FROM per_window UNION ALL SELECT 'all_comparable_windows', SUM(chronos_ws), SUM(toto_ws), SUM(timesfm_ws), SUM(denominator_ws), CASE WHEN SUM(chronos_ws) = LEAST(SUM(chronos_ws),SUM(toto_ws),SUM(timesfm_ws)) THEN 'chronos' WHEN SUM(toto_ws) = LEAST(SUM(chronos_ws),SUM(toto_ws),SUM(timesfm_ws)) THEN 'toto' ELSE 'timesfm' END FROM per_window) SELECT scope, chronos_ws, toto_ws, timesfm_ws, denominator_ws, cheapest FROM breakdown ORDER BY CASE scope WHEN 'burst2' THEN 1 WHEN 'burst6' THEN 2 ELSE 3 END"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

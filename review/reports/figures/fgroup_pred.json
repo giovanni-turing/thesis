@@ -1,0 +1,27 @@
+[
+ {
+  "name": "pred_forecast_band",
+  "path": "/home/gio/tese-review-frozen/figuras/pred/pred_forecast_band.png",
+  "exists": true
+ },
+ {
+  "name": "pred_framework_diff",
+  "path": "/home/gio/tese-review-frozen/figuras/pred/pred_framework_diff.png",
+  "exists": true
+ },
+ {
+  "name": "pred_horizon_wape",
+  "path": "/home/gio/tese-review-frozen/figuras/pred/pred_horizon_wape.png",
+  "exists": true
+ },
+ {
+  "name": "pred_models_burst",
+  "path": "/home/gio/tese-review-frozen/figuras/pred/pred_models_burst.png",
+  "exists": true
+ },
+ {
+  "name": "pred_wape_heatmap",
+  "path": "/home/gio/tese-review-frozen/figuras/pred/pred_wape_heatmap.png",
+  "exists": true
+ }
+]

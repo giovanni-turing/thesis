@@ -1,0 +1,33 @@
+[
+  {"id":"c1_supported_count","claim_text":"The provenance store archives 2,461 current experiment runs.",
+   "anchor":"the provenance store archives 2,461 current experiment runs","chapter":"canary","claim_type":"numeric",
+   "expected_backing":"v_dim","known_verdict":"supported","backing_view":"v_dim"},
+
+  {"id":"c2_contradicted_total","claim_text":"The store contains 2,461 total runs across all experiments.",
+   "anchor":"the store contains 2,461 total runs across all experiments","chapter":"canary","claim_type":"numeric",
+   "expected_backing":"v_dim (total vs is_current)","known_verdict":"contradicted","backing_view":"v_dim",
+   "_truth":"total is 3147; 2461 is the is_current count — a total-vs-current confusion"},
+
+  {"id":"c3_supported_ttft","claim_text":"In the head2k window the TTFT p99 is 113 ms.",
+   "anchor":"in the head2k window the TTFT p99 is 113 ms","chapter":"canary","claim_type":"numeric",
+   "expected_backing":"v_pool_latency (sla_metric=ttft, window_name=head2k)","known_verdict":"supported","backing_view":"v_pool_latency"},
+
+  {"id":"c4_contradicted_ttft","claim_text":"In the head2k window the TTFT p99 is 88 ms.",
+   "anchor":"in the head2k window the TTFT p99 is 88 ms","chapter":"canary","claim_type":"numeric",
+   "expected_backing":"v_pool_latency (sla_metric=ttft, window_name=head2k)","known_verdict":"contradicted","backing_view":"v_pool_latency",
+   "_truth":"real value is 113 ms, not 88 ms"},
+
+  {"id":"c5_overclaimed_cost","claim_text":"Predictive provisioning is cheaper than static on both the encoder and language pools.",
+   "anchor":"predictive provisioning is cheaper than static on both pools","chapter":"canary","claim_type":"comparative",
+   "expected_backing":"v_cost_ratio + CLAIM-STRUCTURE.md TIER-3","known_verdict":"overclaimed","backing_view":"v_cost_ratio",
+   "_truth":"CLAIM-STRUCTURE TIER-3 do-not-claim: language pool is DEARER in 6/7 folds; only vs the deployed encoder fleet on the covered span"},
+
+  {"id":"c6_unverifiable_causal","claim_text":"Because the ViT encoder is memory-bound, disaggregation necessarily reduces p99 latency.",
+   "anchor":"because the ViT encoder is memory-bound, disaggregation necessarily reduces p99 latency","chapter":"canary","claim_type":"causal",
+   "expected_backing":"none — causal necessity not derivable from the data","known_verdict":"unverifiable","backing_view":null,
+   "_truth":"a causal 'necessarily' cannot be verified from observational run data"},
+
+  {"id":"c7_supported_wape","claim_text":"The best forecast accuracy achieved is a WAPE of about 0.285 (28.5%).",
+   "anchor":"the best forecast accuracy achieved is a WAPE of about 0.285","chapter":"canary","claim_type":"numeric",
+   "expected_backing":"forecast_metrics (min wape)","known_verdict":"supported","backing_view":"forecast_metrics"}
+]

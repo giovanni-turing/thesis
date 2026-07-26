@@ -837,16 +837,16 @@ $$SELECT (a+b+c) = 0, format('logical partition-key mismatches -- llm=%s compose
 $$SELECT (a+b+c) = 0, format('physical misfiles -- llm=%s composed=%s encoder=%s', a,b,c)
     FROM (SELECT (SELECT count(*) FROM provenance.llm_request x
                    WHERE x.tableoid::regclass::text NOT LIKE '%\_default'
-                     AND x.experiment <> replace(x.tableoid::regclass::text,
-                                                 'provenance.llm_request_','')) a,
+                     AND x.experiment <> regexp_replace(x.tableoid::regclass::text,
+                                                 '^(provenance\.)?llm_request_','')) a,
                  (SELECT count(*) FROM provenance.composed_request x
                    WHERE x.tableoid::regclass::text NOT LIKE '%\_default'
-                     AND x.experiment <> replace(x.tableoid::regclass::text,
-                                                 'provenance.composed_request_','')) b,
+                     AND x.experiment <> regexp_replace(x.tableoid::regclass::text,
+                                                 '^(provenance\.)?composed_request_','')) b,
                  (SELECT count(*) FROM provenance.encoder_series x
                    WHERE x.tableoid::regclass::text NOT LIKE '%\_default'
-                     AND x.experiment <> replace(x.tableoid::regclass::text,
-                                                 'provenance.encoder_series_','')) c) q$$),
+                     AND x.experiment <> regexp_replace(x.tableoid::regclass::text,
+                                                 '^(provenance\.)?encoder_series_','')) c) q$$),
 
 ('C306', 'the misc default partition is not growing', 'warn', 'cheap',
  'No run should be filed under experiment = misc; misc is the loader''s unmapped-directory '

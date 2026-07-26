@@ -1,0 +1,29 @@
+{
+ "claim_id": "conclusion-0097",
+ "chapter": "conclusion",
+ "claim_type": "comparative",
+ "anchor": "Three pretrained time-series foundation models beat every tested fixed-parameter classical baseline in all twenty (resolution, signal) cells",
+ "claim_text": "Three pretrained time-series foundation models outperform all tested fixed-parameter classical baselines across all twenty (resolution, signal) cells.",
+ "expected_backing": "forecast_metrics",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "contradicted",
+   "observed": "16 of 60 (3 models x 20 cells) comparisons fail; e.g., in ctx/1min cell, best classical (ewma) wape = 0.3827355809461447 is lower than all FMs (toto: 0.38482784156650457, timesfm: 0.3853833427978712, chronos: 0.38928496938744) and in images/1min cell, ewma wape = 0.47926549309674765 is lower than all FMs (timesfm: 0.4826379762334363, toto: 0.49102008566400124, chronos: 0.4936827245990212)",
+   "evidence": "In univariate mode, the best classical baseline achieved lower WAPE than the foundation models in 16 of the 60 comparisons (3 models across 20 cells). EWMA beats all three FMs in both the ctx/1min and images/1min cells.",
+   "severity": "major",
+   "fix": "Rephrase the claim to acknowledge that classical baselines like EWMA outperform the foundation models in certain configurations, such as the 1-minute resolution cells for context (ctx) and image (images) signals, where EWMA achieves lower WAPE.",
+   "query": "WITH fm AS (SELECT variate, resolution, model, MIN(wape) AS wape FROM provenance.forecast_metrics WHERE mode = 'uni' AND model IN ('chronos', 'timesfm', 'toto') GROUP BY variate, resolution, model), classical AS (SELECT variate, resolution, MIN(wape) AS wape FROM provenance.forecast_metrics WHERE mode = 'uni' AND model IN ('naive', 'ewma', 'holt_winters') GROUP BY variate, resolution) SELECT COUNT(CASE WHEN fm.wape >= classical.wape THEN 1 END) AS failed_comparisons, COUNT(*) AS total_comparisons FROM fm JOIN classical ON fm.variate = classical.variate AND fm.resolution = classical.resolution;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "44 of 60 model-cell comparisons succeed and 16 fail; all three models win in 11 of 20 cells, while 9 cells have at least one failure and 2 cells have all three fail.",
+   "evidence": "forecast_metrics contains 20 cells, but 16 of 60 comparisons fail; for example, at 1min/ctx the best classical WAPE is 0.3827355809461447 versus 0.38928496938744 for Chronos, 0.3853833427978712 for TimesFM, and 0.38482784156650457 for Toto.",
+   "severity": "blocking",
+   "fix": "Replace the universal claim with: \"The three pretrained models collectively beat every tested fixed-parameter classical baseline in 44 of 60 model-cell comparisons, with all three doing so in 11 of 20 cells.\"",
+   "query": "WITH per_model_cell AS (SELECT resolution, variate, model, MIN(wape) AS best_wape FROM provenance.forecast_metrics WHERE model IN ('chronos','timesfm','toto','naive','ewma','holt_winters') GROUP BY resolution, variate, model), classical AS (SELECT resolution, variate, MIN(best_wape) AS best_classical_wape FROM per_model_cell WHERE model IN ('naive','ewma','holt_winters') GROUP BY resolution, variate), comparisons AS (SELECT f.resolution, f.variate, f.model, f.best_wape, c.best_classical_wape, f.best_wape < c.best_classical_wape AS beats_every_classical FROM per_model_cell f JOIN classical c USING (resolution, variate) WHERE f.model IN ('chronos','timesfm','toto')), cell_summary AS (SELECT resolution, variate, COUNT(*) FILTER (WHERE beats_every_classical) AS fm_wins, COUNT(*) FILTER (WHERE NOT beats_every_classical) AS fm_failures FROM comparisons GROUP BY resolution, variate) SELECT (SELECT COUNT(*) FROM comparisons) AS comparison_denominator, (SELECT COUNT(DISTINCT (resolution, variate)) FROM comparisons) AS cell_denominator, (SELECT COUNT(*) FILTER (WHERE beats_every_classical) FROM comparisons) AS supported_comparisons, (SELECT COUNT(*) FILTER (WHERE NOT beats_every_classical) FROM comparisons) AS failed_comparisons, (SELECT COUNT(*) FILTER (WHERE fm_failures = 0) FROM cell_summary) AS cells_all_three_win, (SELECT COUNT(*) FILTER (WHERE fm_failures > 0) FROM cell_summary) AS cells_with_any_failure, (SELECT COUNT(*) FILTER (WHERE fm_failures = 3) FROM cell_summary) AS cells_all_three_fail, (SELECT jsonb_agg(jsonb_build_object('resolution', resolution, 'comparisons', n, 'failures', failures) ORDER BY resolution) FROM (SELECT resolution, COUNT(*) AS n, COUNT(*) FILTER (WHERE NOT beats_every_classical) AS failures FROM comparisons GROUP BY resolution) r) AS per_resolution, (SELECT jsonb_agg(jsonb_build_object('resolution', resolution, 'variate', variate, 'model', model, 'fm_wape', best_wape, 'best_classical_wape', best_classical_wape) ORDER BY resolution, variate, model) FROM comparisons WHERE NOT beats_every_classical) AS failures"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

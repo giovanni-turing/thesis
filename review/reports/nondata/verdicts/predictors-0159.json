@@ -1,0 +1,1 @@
+{"claim_id":"predictors-0159","type":"existence","verdict":"supported","evidence":"predictors/benchmark.py line 24: 'TimesFM and the baselines have no covariate path — uni only.' The cov mode (line 20+) is native to chronos/toto only; TimesFM runs univariate-per-signal, confirming it is the strict univariate control with no covariate interface.","fix":"","confidence":0.97}

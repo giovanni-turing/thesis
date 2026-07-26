@@ -1,0 +1,25 @@
+{
+ "claim_id": "apendice-0139",
+ "chapter": "apendice",
+ "claim_type": "comparative",
+ "anchor": "vLLM stays inside the band across the serving regime; HuggingFace-SDPA climbs to 1.69x by N=512, torch.compile between.",
+ "claim_text": "vLLM stays within \u00b112.8% band across serving regime; HuggingFace-SDPA climbs to 1.69x by N=512; torch.compile in between",
+ "expected_backing": "collector_encoder_fn",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "holds",
+   "observed": "max_vllm_aic_dev_pct = 12.71%, sdpa_ratio_at_512 = 1.69x (4208.52ms / 2491.47ms), torch.compile between vLLM and SDPA (e.g., 370.65ms vs 333.61ms and 511.57ms at N=64)",
+   "evidence": "vLLM has a maximum deviation of 12.71% (within the 12.8% band) for N<=64; HF-SDPA reaches 1.69x (4208.52ms / 2491.47ms) at N=512 compared to the composed AIC model from aic_fn_engines_aiccurve.csv; torch.compile is consistently between vLLM and SDPA.",
+   "severity": ""
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "unverifiable",
+   "observed": "vLLM maximum absolute deviation is 12.709398118975933% over 66 denominator-backed rows (N=1..128); SDPA's stored ratio peaks at 1.6208 at N=63, is 1.4305 at N=128, and has NULL denominator and ratio at N=512 despite mean_ms=4208.5209; compiled lies between vLLM and SDPA in all 13 overlapping rows.",
+   "evidence": "The vLLM band and torch.compile ordering are supported, but collector_encoder_fn contains no denominator-backed SDPA ratio at N=512 and therefore cannot support 1.69x.",
+   "severity": "major"
+  }
+ ],
+ "reason": "split-adjudicators"
+}

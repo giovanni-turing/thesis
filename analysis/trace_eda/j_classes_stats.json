@@ -1,9 +1,9 @@
 {
  "classes": {
   "text": {
-   "requests": 500017,
-   "request_share": 0.500017,
-   "image_share": 2.3722855645725666e-06,
+   "requests": 500000,
+   "request_share": 0.5,
+   "image_share": 0.0,
    "ctx_p50": 792.0,
    "gen_p50": 147.0
   },
@@ -16,32 +16,41 @@
    "img_rate_cv2": 1.0913565287216773,
    "img_rate_mean": 0.5456828703703704
   },
+  "nonsquare": {
+   "requests": 53,
+   "request_share": 5.3e-05,
+   "image_share": 0.0006826600577581761,
+   "ctx_p50": 4785.0,
+   "gen_p50": 135.0,
+   "img_rate_cv2": 1573.9984115001614,
+   "img_rate_mean": 0.016177248677248676
+  },
   "tiled_small": {
-   "requests": 131351,
-   "request_share": 0.131351,
-   "image_share": 0.10578272515606499,
+   "requests": 131335,
+   "request_share": 0.131335,
+   "image_share": 0.10576249095566129,
    "ctx_p50": 4558.0,
    "gen_p50": 126.0,
-   "img_rate_cv2": 1.1172994269982859,
-   "img_rate_mean": 2.5067724867724865
+   "img_rate_cv2": 1.1171721929086083,
+   "img_rate_mean": 2.5062929894179895
   },
   "tiled_large": {
-   "requests": 11420,
-   "request_share": 0.01142,
-   "image_share": 0.05925013448765958,
+   "requests": 11414,
+   "request_share": 0.011414,
+   "image_share": 0.05921580612007812,
    "ctx_p50": 13747.0,
    "gen_p50": 107.0,
-   "img_rate_cv2": 15.64468175914532,
-   "img_rate_mean": 1.4040724206349207
+   "img_rate_cv2": 15.628143121512474,
+   "img_rate_mean": 1.4032589285714285
   },
   "frames": {
-   "requests": 27183,
-   "request_share": 0.027183,
-   "image_share": 0.8119376200533485,
+   "requests": 27169,
+   "request_share": 0.027169,
+   "image_share": 0.8113118948491401,
    "ctx_p50": 33722.0,
    "gen_p50": 54.0,
-   "img_rate_cv2": 5.384211353337801,
-   "img_rate_mean": 19.24078703703704
+   "img_rate_cv2": 5.388489032308457,
+   "img_rate_mean": 19.225958994708993
   }
  },
  "burst_attribution_top6": [
@@ -49,12 +58,13 @@
    "peak": "2024-10-21 19:53:00",
    "peak_img_per_s": 370.18333333333334,
    "dominant_class": "frames",
-   "dominant_share": 0.962143400100809,
+   "dominant_share": 0.9618744987200993,
    "shares": {
     "single": 0.008006218489938316,
-    "tiled_small": 0.02253504157494724,
-    "tiled_large": 0.007315339834305531,
-    "frames": 0.962143400100809
+    "nonsquare": 0.00026890138070964354,
+    "tiled_small": 0.022535041574947238,
+    "tiled_large": 0.00731533983430553,
+    "frames": 0.9618744987200993
    }
   },
   {
@@ -64,6 +74,7 @@
    "dominant_share": 0.9642656785805838,
    "shares": {
     "single": 0.005723931159263246,
+    "nonsquare": 0.0,
     "tiled_small": 0.019982984246186008,
     "tiled_large": 0.010027406013966789,
     "frames": 0.9642656785805838
@@ -76,6 +87,7 @@
    "dominant_share": 0.9477440669844392,
    "shares": {
     "single": 0.004060427227560465,
+    "nonsquare": 0.0,
     "tiled_small": 0.03525762275856851,
     "tiled_large": 0.012937883029431795,
     "frames": 0.9477440669844392
@@ -85,24 +97,26 @@
    "peak": "2024-10-18 16:47:00",
    "peak_img_per_s": 350.3833333333333,
    "dominant_class": "frames",
-   "dominant_share": 0.9306214356362716,
+   "dominant_share": 0.9306214356362718,
    "shares": {
-    "single": 0.004213753095253126,
-    "tiled_small": 0.04211157642206276,
-    "tiled_large": 0.02305323484641231,
-    "frames": 0.9306214356362716
+    "single": 0.004213753095253127,
+    "nonsquare": 0.0,
+    "tiled_small": 0.042111576422062764,
+    "tiled_large": 0.023053234846412314,
+    "frames": 0.9306214356362718
    }
   },
   {
    "peak": "2024-10-18 15:17:00",
    "peak_img_per_s": 343.4166666666667,
    "dominant_class": "frames",
-   "dominant_share": 0.9270905204103561,
+   "dominant_share": 0.9245930936195721,
    "shares": {
-    "single": 0.003130832136272636,
-    "tiled_small": 0.03571275067582089,
-    "tiled_large": 0.03406589677755031,
-    "frames": 0.9270905204103561
+    "single": 0.0031308321362726356,
+    "nonsquare": 0.002497426790783952,
+    "tiled_small": 0.03571275067582088,
+    "tiled_large": 0.0340658967775503,
+    "frames": 0.9245930936195721
    }
   },
   {
@@ -112,6 +126,7 @@
    "dominant_share": 0.9460543251814599,
    "shares": {
     "single": 0.005222860630830271,
+    "nonsquare": 0.0,
     "tiled_small": 0.026899855362853463,
     "tiled_large": 0.021822958824856357,
     "frames": 0.9460543251814599

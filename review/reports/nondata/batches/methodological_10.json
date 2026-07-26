@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "baselines-0353",
+  "chapter": "baselines",
+  "claim_type": "methodological",
+  "anchor": "Close-out checks confirm the optima are robust to the router's tuning knobs (35 corner re-runs; no frontier movement).",
+  "claim_text": "Close-out checks (35 corner re-runs) confirm optima are robust to router tuning knobs with no frontier movement.",
+  "expected_backing": "v_grid_static_effective"
+ },
+ {
+  "claim_id": "baselines-0356",
+  "chapter": "baselines",
+  "claim_type": "methodological",
+  "anchor": "run through the same replay path in both its shipped load-based variant (A) and its SLA-target variant (B, ARIMA-driven throughput loop plus load loop).",
+  "claim_text": "The reactive baseline has two variants: load-based (A) and SLA-target (B, ARIMA-driven throughput loop plus load loop).",
+  "expected_backing": "v_grid_static_effective"
+ },
+ {
+  "claim_id": "baselines-0362",
+  "chapter": "baselines",
+  "claim_type": "methodological",
+  "anchor": "the fair strawman is identically informed with the next chapter's predictive policy: the same worker-mapping law (workers = ceil(demand / \u03c1) at per-worker capacity rating \u03c1 img/s, hysteresis 3 minutes, lead L), fed by the trailing window of the observed image rate --- the correct per-pool signal, observed not forecast.",
+  "claim_text": "The reactive encoder strawman uses the same worker-mapping law as the predictive policy: workers = ceil(demand / \u03c1) with \u03c1=15 img/s, 3-minute hysteresis, lead L, fed by trailing window of observed image rate (observed, not forecast).",
+  "expected_backing": "v_grid_static_effective"
+ },
+ {
+  "claim_id": "aiconfigurator-0381",
+  "chapter": "aiconfigurator",
+  "claim_type": "methodological",
+  "anchor": "Measurement uses CUDA events around the full forward pass (patch input resident on GPU), bf16, 5 replications of 50 timed iterations each",
+  "claim_text": "Measurement protocol: CUDA events, bf16, 5 replications \u00d7 50 iterations.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0391",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "The controller is deliberately minimal, so any advantage traces to the information source, not control sophistication.",
+  "claim_text": "The controller design is minimal to ensure any advantage comes from the forecast information source rather than control sophistication.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0392",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "The raw head-to-head therefore bundles anticipation with headroom, and the two dials are separated by the p50-forecast, lead-invariance, and reactive-with-headroom ablations below.",
+  "claim_text": "The forecast vs reactive comparison bundles anticipation and headroom; these are separated via p50-forecast, lead-invariance, and reactive-with-headroom ablations.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0393",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "The trace's first 1.4 days are consumed as forecast context --- the zero-shot models' rolling history before their first usable 15-second forecast --- and never graded; the remaining 5.60 days form the evaluation span.",
+  "claim_text": "Trace split: first 1.4 days used as forecast context (not graded), remaining 5.60 days form evaluation span.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0432",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "The ledger is built on the five windows with a request-linked composed replay (aggregate, burst1, burst3, burst4, burst5), each with four policy arms (reactive and the three foundation-model forecasts), joined back to its run by exact artifact path --- 20 arms in total.",
+  "claim_text": "Ledger: 5 windows x 4 policy arms = 20 request-linked composed arms.",
+  "expected_backing": "v_pool_latency"
+ }
+]

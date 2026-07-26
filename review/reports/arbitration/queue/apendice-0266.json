@@ -1,0 +1,29 @@
+{
+ "claim_id": "apendice-0266",
+ "chapter": "apendice",
+ "claim_type": "comparative",
+ "anchor": "Holt--Winters is the worst model in every column --- worse than naive persistence",
+ "claim_text": "Holt--Winters model performs worse than naive persistence in every column.",
+ "expected_backing": "v_wape_holt_winters",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "contradicted",
+   "observed": "15s resolution: holt_winters=0.9917, naive=0.7638; 1min resolution: holt_winters=0.5946, naive=0.618",
+   "evidence": "At 1min resolution, Holt-Winters (0.5946) beats naive (0.618) with a lower WAPE, directly contradicting the claim of being worse in every column.",
+   "severity": "major",
+   "fix": "Qualify the comparison to state that Holt-Winters performs worse than naive persistence at 15s resolution but performs better at 1min resolution.",
+   "query": "SELECT predictor, resolution, wape FROM provenance.forecast_eval WHERE predictor IN ('holt_winters', 'naive') ORDER BY resolution, predictor;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "Across 2 valid matched resolution columns, Holt--Winters is worse in 1 and better in 1: at 15s, 0.9917 versus 0.7638; at 1min, 0.5946 versus 0.618. Both models have 4 current and 0 superseded runs; fold/window-origin fields are null.",
+   "evidence": "The 1min column is a direct counterexample because Holt--Winters has lower WAPE than naive persistence, 0.5946 versus 0.618.",
+   "severity": "major",
+   "fix": "Replace the universal statement with: \"Holt--Winters is worse than naive persistence at 15s but better at 1min.\"",
+   "query": "WITH current_dim AS (\n  SELECT run_id, forecast_model, superseded_by\n  FROM provenance.v_dim\n  WHERE is_current = true\n    AND forecast_model IN ('holt_winters', 'naive')\n), scoped AS (\n  SELECT family, predictor, resolution, signal, horizon_h, metric, wape,\n         n_origins_available, n_origins_used,\n         common_span_first_origin, common_span_last_origin\n  FROM provenance.forecast_eval\n  WHERE predictor IN ('holt_winters', 'naive')\n    AND is_valid = true\n    AND EXISTS (SELECT 1 FROM current_dim)\n), paired AS (\n  SELECT h.family, h.resolution, h.signal, h.horizon_h, h.metric,\n         h.wape AS holt_winters_wape, n.wape AS naive_wape,\n         h.n_origins_available, h.n_origins_used,\n         h.common_span_first_origin, h.common_span_last_origin\n  FROM scoped AS h\n  JOIN scoped AS n\n    ON n.family = h.family\n   AND n.resolution = h.resolution\n   AND n.signal = h.signal\n   AND n.horizon_h = h.horizon_h\n   AND n.metric = h.metric\n  WHERE h.predictor = 'holt_winters'\n    AND n.predictor = 'naive'\n), lifecycle AS (\n  SELECT COUNT(*) FILTER (WHERE column_name = 'is_current') AS is_current_columns,\n         COUNT(*) FILTER (WHERE column_name = 'is_superseded') AS is_superseded_columns,\n         COUNT(*) FILTER (WHERE column_name LIKE '%\\_effective' ESCAPE '\\') AS effective_columns\n  FROM information_schema.columns\n  WHERE table_schema = 'provenance'\n    AND table_name = 'forecast_eval'\n)\nSELECT COUNT(*) AS compared_columns,\n       COUNT(*) FILTER (WHERE holt_winters_wape > naive_wape) AS holt_winters_worse,\n       COUNT(*) FILTER (WHERE holt_winters_wape = naive_wape) AS tied,\n       COUNT(*) FILTER (WHERE holt_winters_wape < naive_wape) AS holt_winters_better,\n       jsonb_agg(jsonb_build_object(\n         'resolution', resolution,\n         'holt_winters_wape', holt_winters_wape,\n         'naive_wape', naive_wape,\n         'relation', CASE WHEN holt_winters_wape > naive_wape THEN 'worse'\n                          WHEN holt_winters_wape < naive_wape THEN 'better'\n                          ELSE 'tied' END,\n         'n_origins_available', n_origins_available,\n         'n_origins_used', n_origins_used,\n         'common_span_first_origin', common_span_first_origin,\n         'common_span_last_origin', common_span_last_origin\n       ) ORDER BY resolution) AS per_resolution,\n       (SELECT jsonb_object_agg(forecast_model, jsonb_build_object(\n          'current_runs', runs, 'current_superseded_runs', superseded_runs))\n        FROM (\n          SELECT forecast_model, COUNT(*) AS runs,\n                 COUNT(*) FILTER (WHERE superseded_by IS NOT NULL) AS superseded_runs\n          FROM current_dim GROUP BY forecast_model\n        ) AS s) AS dimension_state,\n       (SELECT jsonb_build_object(\n          'is_current_columns', is_current_columns,\n          'is_superseded_columns', is_superseded_columns,\n          'effective_columns', effective_columns)\n        FROM lifecycle) AS forecast_eval_lifecycle_columns\nFROM paired"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

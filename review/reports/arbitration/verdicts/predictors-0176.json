@@ -1,0 +1,11 @@
+{
+  "claim_id": "predictors-0176",
+  "verdict": "overclaimed",
+  "observed": "Dynamo predictors (results_dynamo/consolidated.json) vs baselines (forecast_metrics, images, span=common, candidate=point, h=1). 1min: arima=0.5213, prophet=0.5264, kalman=0.5399, constant=0.618; best classical ewma=0.5217; best foundation toto=0.5153. 15s: arima=0.6675, prophet=0.7328, constant=0.7638, kalman=0.8111; best classical naive=0.7638, ewma=0.7736, holt_winters=0.9917; foundation toto=0.6374, chronos=0.6674, timesfm=0.7026.",
+  "claimed": "All four Dynamo predictors sit at or below the classical frontier and none reaches the foundation-model level (image signal, shipped defaults).",
+  "evidence": "Holds at the 1min resolution the claim quantifies: arima (0.5213) ties best classical ewma (0.5217) and trails best foundation toto (0.5153) by ~0.6 WAPE pt, others worse; and constant reproduces naive exactly (constant_1min=0.618=naive_1min, constant_15s=0.7638=naive_15s). But the UNIVERSAL statement breaks at 15s: arima (0.6675) and prophet (0.7328) both beat the best classical baseline naive (0.7638) -- so not 'all four at/below the classical frontier' -- and arima (0.6675) matches the chronos foundation model (0.6674) and beats timesfm (0.7026), contradicting 'none reaches the foundation-model level'. gpt-5.6-sol's 'no data / unverifiable' is a wrong-scope artifact: the four predictors are absent from the K10 DB corpus but their numbers live in predictors/results_dynamo/consolidated.json and back fig_framework_diff. gemini's substantive finding (arima/prophet beat classical at 15s) is correct.",
+  "severity": "major",
+  "fix": "Scope the claim to 1min (where it holds), or state that at 15s ARIMA and Prophet beat the classical baselines and ARIMA matches a foundation model (chronos); drop the universal 'all four' / 'none reaches' framing, since the gap only widens toward the BEST foundation model, not toward the classical frontier.",
+  "confidence": 0.72,
+  "query": "SELECT resolution,model,mode,wape FROM provenance.forecast_metrics WHERE variate='images' AND span='common' AND candidate='point' AND h=1 AND resolution IN ('15s','1min') ORDER BY resolution,wape; -- dynamo predictor wapes from predictors/results_dynamo/consolidated.json"
+}

@@ -1,0 +1,1 @@
+{"claim_id":"validation-0011","type":"existence","verdict":"supported","evidence":"/home/gio/tese/simulation/live51/runs/live_fc/planner.log (archived forecast run): 25 throughput_agg ticks, all ~60s cadence except exactly one 120.0s gap (maxgap 120.0s, exactly one gap >=100s). Matches 'one ~120-second stall in the archived run'.","fix":"","confidence":0.95}

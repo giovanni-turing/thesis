@@ -106,7 +106,7 @@ seven days of a multimodal inference cluster, each row carrying an arrival
 timestamp, an image count, and context- and generated-token counts. Exactly
 half the requests are text-only; image-bearing requests carry $k\times k$
 grids, and the \emph{frames} class of video-like requests (grids larger than
-$10\times10$, only 2.7\% of all requests) accounts for 81.2\% of all image
+$10\times10$, only 2.7\% of all requests) accounts for 81.1\% of all image
 volume. The trace's four demand signals (requests, images, context tokens,
 and generated tokens per second) are the trace-derived \emph{offered-work}
 signals a scaling policy can watch, and map onto the pools directly: images
@@ -121,18 +121,18 @@ interchangeable. A constant-fraction model (vision work as a fixed
 multiple of request rate) explains only $R^2=\num{0.123}$ of the
 image-rate series but $R^2=\num{0.654}$ of decode demand (offered-work
 stamped at arrival --- Chapter~\ref{cap:trace-eda}). The image signal is
-also an order of magnitude burstier, and its extremes do not co-occur
-with the request signal's: the week's largest burst drives image load to
-nearly sixteen times its weekly mean while the request rate rises only
-modestly (to ${\sim}2.7\times$ its weekly mean, still far below its own weekly
-maximum), leaving the two signals' top-percentile minutes essentially
-disjoint. Each major burst is a near-pure flood of the frames class.
+also an order of magnitude burstier, and its extremes almost never
+co-occur with the request signal's: the week's largest burst drives image
+load to nearly sixteen times its weekly mean while the request rate rises
+only modestly (to ${\sim}2.7\times$ its weekly mean, still far below its own
+weekly maximum), leaving the two signals' top-percentile minutes
+essentially disjoint (five shared minutes in the week). Each major burst is a near-pure flood of the frames class.
 Yet the load is knowable: every request declares its image count at
 admission, so watching the right signal needs no new instrumentation, only
 aggregating what the request stream already contains.
 
 Nor would watching the right signal reactively suffice. Onsets ramp from
-baseline to peak in a median of six minutes; against replica cold starts
+baseline to peak in a median of six and a half minutes; against replica cold starts
 of tens of seconds to minutes, a third of the bursts arrive too fast for a
 policy that waits to observe them. Aggregation does not rescue the
 reactive loop: the arrival process is overdispersed at every tested
@@ -151,9 +151,10 @@ request rate, mean utilization, or any minute-averaged series sees a
 healthy pool all day.
 
 The signals that carry the vision pool's load are not only the burstiest
-but the most persistent: the image signal's long-range-dependence exponent
-is the strongest of the four (Hurst ${\approx}0.93$ versus $0.83$ for
-requests). The signal most dangerous to reactive scaling thus retains
+but the most persistent: the image signal's autocorrelation half-life is
+69 minutes against 9 for requests, and its spectral-slope
+long-range-dependence proxy is the strongest of the four (Hurst
+${\approx}0.93$ versus $0.83$ for requests). The signal most dangerous to reactive scaling thus retains
 the most predictive structure at exactly the horizons provisioning needs
 --- minutes to tens of minutes, the scale of burst onsets and replica
 cold starts. The
@@ -347,8 +348,10 @@ alone (prior work benchmarks such forecasters on cloud demand for scaling;
 Chapter~\ref{cap:related}): three foundation models against three
 classical baselines, four signals at five resolutions. The foundation
 models win all twenty cells; twelve steps of lead cost only ${\approx}2$
-WAPE points at one-minute resolution; and no fixed quantile beats a median
-point forecast --- the band is headroom, its p90 edge empirically
+WAPE points for the image signal at one-minute resolution; and no fixed
+quantile materially improves on a point forecast that is already the
+median --- the band is
+headroom, its p90 edge empirically
 calibrated at provisioning cadence (coverage 0.88--0.90). The full forecast
 set is archived with the metric tables (Appendix~\ref{ap:artifacts}).
 
@@ -386,10 +389,14 @@ static-optimal worker-grid frontier per window, the reactive SLA-planner
 baseline that satisfies its own window-mean control law while violating
 the tail SLA, and the contribution proper --- the vision pool's forecast
 driving its encoder worker schedules under cold-start lead. The
-p90-forecast policy holds the SLA on every forecast-covered window at
-every forecast-issued lead, and prices the covered week at 0.62$\times$
-the deployable static encoder fleet's worker-time, while the reactive
-controller on the \emph{same}
+p90-forecast policy holds the SLA over the aggregate and every declared
+in-span burst episode at every forecast-issued lead, pricing the covered
+week at 0.62$\times$ the deployable static encoder fleet's worker-time --- a
+post-hoc hybrid forecast--reactive schedule (designed on the failing
+fold, replayed on all seven) recovers the one daily-fold onset (e13)
+the pure forecast drops, at 0.76$\times$ (Section~\ref{sec:cl-aggregate})
+--- while the
+reactive controller on the \emph{same}
 signal loses the fastest-onset burst at every lead; the language pool
 needs a derived tail-aware conversion as the second necessary
 ingredient, and a calibrated-EWMA control shows the band \emph{shape}
@@ -412,7 +419,8 @@ $12.8\%$ across the serving regime, the earlier
 ${\approx}1.4$--$1.6\times$ figure being execution-stack-specific
 (Appendix~\ref{app:engine-sensitivity}). The inter-pool handoff is
 priced single-stream: at Qwen3-VL's full DeepStack payload the
-\SI{588}{\milli\second} floor and the 0.62$\times$ result assume an
+observed \SI{588}{\milli\second} all-request plateau and the 0.62$\times$
+result assume an
 embedding-only handoff or a ${\geq}100$\,Gbps fabric
 (Chapter~\ref{cap:closedloop}) --- a fabric requirement, not a policy
 weakness. The simulation is open-loop and deterministic, with no

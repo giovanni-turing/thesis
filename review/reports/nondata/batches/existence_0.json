@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "validation-0009",
+  "chapter": "validation",
+  "claim_type": "existence",
+  "anchor": "The demand path is byte-identical: for the first twelve planner ticks the live and offline planners log the same predicted demand to the second decimal.",
+  "claim_text": "The demand path is byte-identical for the first twelve planner ticks.",
+  "expected_backing": "live_runs/live_fc,live_re"
+ },
+ {
+  "claim_id": "validation-0011",
+  "chapter": "validation",
+  "claim_type": "existence",
+  "anchor": "Tick cadence stretches under stall, with one ~120-second stall in the archived run.",
+  "claim_text": "Tick cadence stretches under stall, with one ~120-second stall observed in the archived run.",
+  "expected_backing": "live_runs/live_fc,live_re"
+ },
+ {
+  "claim_id": "twopool-0013",
+  "chapter": "twopool",
+  "claim_type": "existence",
+  "anchor": "Three results follow. First, calibrated per-request timing exposes language-pool latency tails that the simulator's default polynomial flattens. Second, the vision pool's cost model admits an exact batching law, grounding a realistic cross-request batching policy and an analytic bound on the inter-pool handoff. Third, and centrally, arrival-speedup sweeps locate each pool's saturation knee: on steady traffic the knees sit an order of magnitude apart.",
+  "claim_text": "Three main results: (1) calibrated timing reveals language-pool latency tails hidden by polynomial model; (2) vision pool cost model yields exact batching law and analytic handoff bound; (3) arrival-speedup sweeps show saturation knees an order of magnitude apart on steady traffic.",
+  "expected_backing": "v_pool_latency, v_cost_ratio, v_grid_static_effective"
+ },
+ {
+  "claim_id": "twopool-0026",
+  "chapter": "twopool",
+  "claim_type": "existence",
+  "anchor": "The vision side needs no such caveat: the ViT and its 4096-dimensional projector output are identical between the 8B and the 235B, so the encoder cost model, batching law, burst-saturation result, and handoff bound all transfer to the flagship unchanged.",
+  "claim_text": "Vision encoder cost model, batching law, burst-saturation result, handoff bound identical between 8B and 235B models.",
+  "expected_backing": "collector_encoder_fn, v_cost_ratio"
+ },
+ {
+  "claim_id": "twopool-0063",
+  "chapter": "twopool",
+  "claim_type": "existence",
+  "anchor": "The dispatch cap is not the source of the burst verdict (verified across caps 32/64/128).",
+  "claim_text": "Dispatch cap not source of burst verdict (verified across caps 32, 64, 128).",
+  "expected_backing": "v_pool_latency, v_grid_static_effective"
+ },
+ {
+  "claim_id": "trace-eda-0075",
+  "chapter": "trace-eda",
+  "claim_type": "existence",
+  "anchor": "four fields per request: arrival timestamp (millisecond precision), image count, context tokens, and generated tokens",
+  "claim_text": "Each request has four fields: arrival timestamp with millisecond precision, image count, context tokens, and generated tokens.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "trace-eda-0077",
+  "chapter": "trace-eda",
+  "claim_type": "existence",
+  "anchor": "no clean additive decomposition into text and vision tokens exists",
+  "claim_text": "There is no clean additive decomposition of context tokens into text and vision components.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "trace-eda-0081",
+  "chapter": "trace-eda",
+  "claim_type": "existence",
+  "anchor": "clustering the 18 episodes on shape and composition features isolates a single mixed-composition outlier against an otherwise uniform population",
+  "claim_text": "Clustering the 18 burst episodes on shape and composition features isolates a single mixed-composition outlier; the rest are uniform.",
+  "expected_backing": "eda_metric"
+ }
+]

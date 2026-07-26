@@ -1,0 +1,29 @@
+{
+ "claim_id": "predictors-0166",
+ "chapter": "predictors",
+ "claim_type": "comparative",
+ "anchor": "a foundation-model forecaster is a GPU-resident 120M--2.5B-parameter service, EWMA a few lines of arithmetic",
+ "claim_text": "Foundation models are GPU-resident 120M-2.5B parameter services; EWMA is few lines of arithmetic",
+ "expected_backing": "model parameter counts; predictors/ewma.py",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "Chronos is 120M, Toto is 2.5B, both are PyTorch models with GPU/CUDA targeting, and EWMA is 93 lines of pure stdlib arithmetic with no weights.",
+   "evidence": "Ledger 978 raw states: 'Chronos quoted as the SMALLEST model (120M vs Toto 2.5B)'; predictors/chronos2.py, timesfm_hf.py, and toto.py establish GPU-residency via CUDA torch mapping; predictors/ewma.py is 93 lines of pure stdlib arithmetic.",
+   "severity": "minor",
+   "fix": "",
+   "query": "SELECT id, raw FROM provenance.ledger_entry WHERE id = 978;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Ledger 978 records Chronos 120M and Toto 2.5B, but across 941 current Chronos/TimesFM/Toto rows GPU is populated in 0 and residency is mentioned in 0; the predictors experiment has 9/8/9 current rows respectively, all with null windows and 0 GPU/residency evidence; the ledger has 0 predictors/ewma.py mentions and 0 'few lines' mentions.",
+   "evidence": "The parameter endpoints are backed, but GPU residency, service status, and the specific EWMA implementation characterization are not established by the provenance DB.",
+   "severity": "major",
+   "fix": "Retain the 120M--2.5B parameter comparison, but remove 'GPU-resident service' and 'few lines of arithmetic' unless GPU deployment provenance and predictors/ewma.py source evidence are added.",
+   "query": "WITH fm AS (SELECT model, COUNT(*) AS current_runs, COUNT(gpu) AS gpu_populated, COUNT(NULLIF(command,'')) AS command_populated, COUNT(*) FILTER (WHERE config::text ILIKE '%gpu%' OR config::text ILIKE '%cuda%' OR COALESCE(command,'') ILIKE '%gpu%' OR COALESCE(command,'') ILIKE '%cuda%') AS residency_mentions FROM provenance.runs WHERE is_current = true AND lower(model) IN ('chronos','timesfm','toto') GROUP BY model), status AS (SELECT COUNT(*) AS all_rows, COUNT(*) FILTER (WHERE is_current) AS current_rows, COUNT(*) FILTER (WHERE NOT is_current) AS noncurrent_rows, COUNT(*) FILTER (WHERE superseded_by IS NOT NULL) AS superseded_rows FROM provenance.runs WHERE lower(model) IN ('chronos','timesfm','toto')), predictor_windows AS (SELECT model, window_name, COUNT(*) AS current_runs, COUNT(gpu) AS gpu_populated, COUNT(*) FILTER (WHERE config::text ILIKE '%gpu%' OR config::text ILIKE '%cuda%' OR COALESCE(command,'') ILIKE '%gpu%' OR COALESCE(command,'') ILIKE '%cuda%') AS residency_mentions FROM provenance.runs WHERE is_current = true AND experiment = 'predictors' AND lower(model) IN ('chronos','timesfm','toto') GROUP BY model, window_name), ledger AS (SELECT id, substr(raw, GREATEST(strpos(lower(raw),'120m')-200,1), 700) AS parameter_excerpt, strpos(lower(raw),'gpu') AS gpu_position FROM provenance.ledger_entry WHERE id = 978), ewma_backing AS (SELECT COUNT(*) FILTER (WHERE lower(raw) LIKE '%predictors/ewma.py%') AS ewma_path_mentions, COUNT(*) FILTER (WHERE lower(raw) LIKE '%few lines%') AS few_lines_mentions, COUNT(*) FILTER (WHERE lower(raw) LIKE '%ewma%' AND lower(raw) LIKE '%arithmetic%') AS ewma_arithmetic_mentions FROM provenance.ledger_entry) SELECT (SELECT row_to_json(status) FROM status) AS row_status, (SELECT json_agg(fm ORDER BY model) FROM fm) AS current_model_breakdown, (SELECT json_agg(predictor_windows ORDER BY model, window_name) FROM predictor_windows) AS predictor_window_breakdown, (SELECT row_to_json(ledger) FROM ledger) AS parameter_ledger, (SELECT row_to_json(ewma_backing) FROM ewma_backing) AS ewma_db_backing"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

@@ -1,0 +1,5 @@
+{"mode":"agg","environment":"virtual","namespace":"lc_burst2_p80_3","backend":"vllm",
+ "ttft_ms":500.0,"itl_ms":50.0,"load_predictor":"forecast_file",
+ "enable_throughput_scaling":true,"enable_load_scaling":false,
+ "throughput_adjustment_interval_seconds":60,"max_gpu_budget":8,
+ "min_endpoint":1,"advisory":true,"optimization_target":"sla"}

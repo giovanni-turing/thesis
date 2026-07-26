@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "intro-0247",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "Intermediate family members unpriced.",
+  "claim_text": "Intermediate Qwen3-VL family members not priced",
+  "expected_backing": "v_cost_ratio; v_grid_static_effective"
+ },
+ {
+  "claim_id": "aiconfigurator-0250",
+  "chapter": "aiconfigurator",
+  "claim_type": "existence",
+  "anchor": "NVIDIA GeForce RTX~5090",
+  "claim_text": "The NVIDIA GeForce RTX 5090 is used as the target consumer GPU for silicon data collection.",
+  "expected_backing": "v_pool_latency, v_cost_ratio, system file in AIC"
+ },
+ {
+  "claim_id": "aiconfigurator-0253",
+  "chapter": "aiconfigurator",
+  "claim_type": "existence",
+  "anchor": "SILICON mode raises a hard PerfDataNotAvailableError",
+  "claim_text": "The SILICON mode raises a PerfDataNotAvailableError on systems without encoder data.",
+  "expected_backing": "AIC error handling"
+ },
+ {
+  "claim_id": "aiconfigurator-0263",
+  "chapter": "aiconfigurator",
+  "claim_type": "existence",
+  "anchor": "Qwen/Qwen3-VL-8B-Instruct vision encoder has 27 blocks, hidden size 1152, 16 heads",
+  "claim_text": "The Qwen/Qwen3-VL-8B-Instruct vision encoder has 27 blocks, a hidden size of 1152, and 16 heads.",
+  "expected_backing": "model configuration"
+ },
+ {
+  "claim_id": "apendice-0269",
+  "chapter": "apendice",
+  "claim_type": "existence",
+  "anchor": "Second, the perf tables blanked the ViT's large-batch shapes",
+  "claim_text": "The performance tables initially lacked large-batch shapes for the ViT model.",
+  "expected_backing": "v_vit_shapes_omission"
+ },
+ {
+  "claim_id": "baselines-0271",
+  "chapter": "baselines",
+  "claim_type": "existence",
+  "anchor": "Language-pool GPU-hours bill from instance order, not readiness",
+  "claim_text": "Language-pool GPU-hours are billed from instance order, not readiness, integrating provisioned worker count including starting-up and draining instances.",
+  "expected_backing": "v_cost_ratio"
+ },
+ {
+  "claim_id": "baselines-0272",
+  "chapter": "baselines",
+  "claim_type": "existence",
+  "anchor": "encoder pool bills from readiness, its cold-start reported separately",
+  "claim_text": "Encoder pool billing starts from readiness, with cold-start reported separately.",
+  "expected_backing": "v_cost_ratio"
+ },
+ {
+  "claim_id": "baselines-0276",
+  "chapter": "baselines",
+  "claim_type": "existence",
+  "anchor": "The reactive baseline is Dynamo's SLA planner... All fourteen configurations satisfy the planner's own control law while violating the tail SLA",
+  "claim_text": "All 14 reactive configurations (Dynamo's SLA planner variants A and B) meet the planner's window-mean control law but violate the tail SLA (TTFT p99 up to 3,495 ms).",
+  "expected_backing": "v_infraction"
+ }
+]

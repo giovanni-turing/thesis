@@ -1,0 +1,1 @@
+{"claim_id":"apendice-0122","type":"methodological","verdict":"supported","evidence":"collector_artifacts/phase2_system_metadata/rtx_5090.yaml comment: 'Observed on this node (driver 595.71.05, CUDA 13.2): 32607 MiB VRAM ...' on NVIDIA GeForce RTX 5090 (GB202, SM 12.0). Driver 595.71.05 / CUDA 13.2 / RTX 5090 all match apendice.tex:35.","fix":"","confidence":0.97}

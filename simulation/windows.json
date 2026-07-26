@@ -2,7 +2,7 @@
  "burst1": {
   "offset": 843072,
   "max_requests": 64804,
-  "note": "episode 1 of top6_by_peak +/-10min pad: [2024-10-21 12:59:00 .. 2024-10-21 21:18:00) UTC, peak 370.2 img/s @ 2024-10-21 19:53:00, onset 220 min",
+  "note": "episode 1 of top6_by_peak +/-10min pad: [2024-10-21 12:59:00 .. 2024-10-21 21:18:00) UTC, peak 370.2 img/s @ 2024-10-21 19:53:00, onset 404 min",
   "requests": 64804,
   "span_s": 29939.3,
   "mean_req_per_s": 2.165,
@@ -57,7 +57,7 @@
  "burst6": {
   "offset": 93867,
   "max_requests": 9821,
-  "note": "episode 6 of top6_by_peak +/-10min pad: [2024-10-15 23:26:00 .. 2024-10-16 00:48:00) UTC, peak 337.2 img/s @ 2024-10-16 00:29:00, onset 1 min",
+  "note": "episode 6 of top6_by_peak +/-10min pad: [2024-10-15 23:26:00 .. 2024-10-16 00:48:00) UTC, peak 337.2 img/s @ 2024-10-16 00:29:00, onset 53 min",
   "requests": 9821,
   "span_s": 4919.3,
   "mean_req_per_s": 1.996,
@@ -82,5 +82,54 @@
   "note": "4.4 weekly aggregate: full 15-s-forecast-covered span [2024-10-16 21:39:00 .. trace end], 749601 requests [2024-10-16 21:39:00.118000 .. 2024-10-22 11:59:59.964000]",
   "requests": 749601,
   "span_s": 483659.8
+ },
+ "F6": {
+  "offset": 751286,
+  "max_requests": 84329,
+  "requests": 84329,
+  "span_s": 86393.3,
+  "note": "G4 temporal fold F6: [2024-10-20 12:00:00 .. 2024-10-21 12:00:00) UTC, 84329 req"
+ },
+ "F1": {
+  "offset": 401,
+  "max_requests": 173057,
+  "requests": 173057,
+  "span_s": 86215.8,
+  "note": "G4 temporal fold F1: [2024-10-15 12:00:00 .. 2024-10-16 12:00:00) UTC, 173057 re"
+ },
+ "F2": {
+  "offset": 173458,
+  "max_requests": 183285,
+  "requests": 183285,
+  "span_s": 86398.0,
+  "note": "G4 temporal fold F2: [2024-10-16 12:00:00 .. 2024-10-17 12:00:00) UTC, 183285 re"
+ },
+ "F3": {
+  "offset": 356743,
+  "max_requests": 186359,
+  "requests": 186359,
+  "span_s": 86399.9,
+  "note": "G4 temporal fold F3: [2024-10-17 12:00:00 .. 2024-10-18 12:00:00) UTC, 186359 re"
+ },
+ "F4": {
+  "offset": 543102,
+  "max_requests": 135637,
+  "requests": 135637,
+  "span_s": 86396.5,
+  "note": "G4 temporal fold F4: [2024-10-18 12:00:00 .. 2024-10-19 12:00:00) UTC, 135637 re"
+ },
+ "F5": {
+  "offset": 678739,
+  "max_requests": 72547,
+  "requests": 72547,
+  "span_s": 86395.8,
+  "note": "G4 temporal fold F5: [2024-10-19 12:00:00 .. 2024-10-20 12:00:00) UTC, 72547 req"
+ },
+ "F7": {
+  "offset": 835615,
+  "max_requests": 164385,
+  "requests": 164385,
+  "span_s": 86399.5,
+  "note": "G4 temporal fold F7: [2024-10-21 12:00:00 .. 2024-10-22 12:00:00) UTC, 164385 re"
  }
 }

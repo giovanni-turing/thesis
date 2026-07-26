@@ -1,0 +1,29 @@
+{
+ "claim_id": "twopool-0045",
+ "chapter": "twopool",
+ "claim_type": "comparative",
+ "anchor": "On the burst window (green) both calibrated curves start above their bounds at the episode's own recorded rate: the language pool at 1.9\u00d7 its TTFT bound (the TP1 prefill floor; the polynomial model, 9% under the bound at the same point, misses this failure entirely), the vision pool at 5\u00d7 its delay bound.",
+ "claim_text": "Burst window: calibrated language pool at 1.9\u00d7 TTFT bound (TP1 prefill floor), polynomial 9% under bound; vision pool at 5\u00d7 delay bound.",
+ "expected_backing": "v_pool_latency, v_infraction",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "vision_ratio=5.013x, lang_calibrated_ratio=1.868x (1868.03ms / 1000ms SLA bound), lang_poly_ratio=0.910x (8.97% under SLA bound), tp1_prefill_floor=1285.08ms (lang_calibrated / tp1_prefill_floor ratio = 1.453x)",
+   "evidence": "Calibrated language p99 TTFT (1868.03ms) is 1.868x the 1000ms SLA bound (rounds to 1.9x), but the parenthetical 'the TP1 prefill floor' is incorrect because the actual TP1 prefill floor is 1285.08ms (which yields a ratio of 1.45x, not 1.9x).",
+   "severity": "minor",
+   "fix": "Either drop the parenthetical '(the TP1 prefill floor)' or correct the wording to clarify that the 1.9x multiple is relative to the 1000ms SLA bound rather than the prefill floor itself (e.g., 'the language pool at 1.9x its TTFT bound; the physical TP1 prefill floor for this window is 1285 ms...').",
+   "query": "SELECT 'infraction' AS source, run_id, achieved_p99_ms AS val_ms, bound_ms, (achieved_p99_ms/bound_ms) AS ratio FROM provenance.v_infraction WHERE is_current AND experiment='sweeps' AND window_name='burst1' AND sla_metric IN ('ttft','encoder_delay') AND run_id IN ('sweeps:llm_burst1_aic_s1','sweeps:llm_burst1_poly_s1','sweeps:vision_burst1_s1') UNION ALL SELECT 'prefill_floor' AS source, grid_run_id AS run_id, MIN(ttft_p99_ms) AS val_ms, 1000 AS bound_ms, MIN(ttft_p99_ms)/1000 AS ratio FROM provenance.grid_llm_point WHERE window_name = 'burst1' AND tp = 1 GROUP BY grid_run_id;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "burst1, 64804 requests: language calibrated TTFT p99 1868.0272179999156 ms / 1000 ms = 1.8680272179999156\u00d7 (violation); polynomial 910.3347259946167 ms = 8.966527400538325% under (no violation); vision encoder-delay p99 5013.37 ms / 1000 ms = 5.01337\u00d7 (violation). All rows are current and unsuperseded; tp is NULL for all three.",
+   "evidence": "The three rounded comparisons are supported on the same burst1 denominator, but the provenance dimension records tp=NULL, so identifying the language result as the TP1 prefill floor is unbacked.",
+   "severity": "minor",
+   "fix": "Remove \u201cthe TP1 prefill floor\u201d or add provenance that establishes TP=1; retain the rounded 1.9\u00d7, 9%, and 5\u00d7 comparisons.",
+   "query": "WITH targets(run_id, series) AS (VALUES ('sweeps:llm_burst1_aic_s1'::text, 'language calibrated'::text), ('sweeps:llm_burst1_poly_s1'::text, 'language polynomial'::text), ('sweeps:vision_burst1_s1'::text, 'vision calibrated'::text)) SELECT t.series, d.run_id, d.window_name, d.window_span_s, d.window_requests, d.tp, d.is_current AS dim_is_current, d.superseded_by, p.sla_metric, p.p99_ms, p.n_requests AS latency_requests, p.queue_divergent, p.is_current AS latency_is_current, i.bound_stat, i.bound_ms, i.achieved_p99_ms, i.achieved_p99_ms / i.bound_ms AS bound_multiple, (i.bound_ms - i.achieved_p99_ms) * 100.0 / i.bound_ms AS percent_under_bound, i.is_violation, i.has_raw_backing, i.is_current AS infraction_is_current FROM targets t JOIN provenance.v_dim d ON d.run_id = t.run_id AND d.is_current = true JOIN provenance.v_pool_latency p ON p.run_id = t.run_id AND p.is_current = true JOIN provenance.v_infraction i ON i.run_id = p.run_id AND i.sla_metric = p.sla_metric AND i.is_current = true WHERE (t.series IN ('language calibrated', 'language polynomial') AND p.sla_metric = 'ttft') OR (t.series = 'vision calibrated' AND p.sla_metric = 'encoder_delay') ORDER BY t.series"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

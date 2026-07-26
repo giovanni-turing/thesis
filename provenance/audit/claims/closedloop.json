@@ -2050,6 +2050,77 @@
       "assertion": "Cost is lead-invariant under warm-pool and 0.59-0.62x under strict re-warm.",
       "db_check": "provenance.v_cost_frontier_dual: ratio range grouped by readiness for quantile='p90', rho=15",
       "criticality": "headline"
+    },
+    {
+      "line": 325,
+      "anchor": "sec:cl-llm (The operating point, honestly calibrated)",
+      "quote": "A cost-optimal point sits near \\textbf{0.62$\\times$}\\nstatic (330.4 GPU-hours) but \\emph{drops the e13 onset} per-episode",
+      "numbers": [
+        "0.62",
+        "330.4"
+      ],
+      "metric": "lang_cost_optimal_gpu_hours",
+      "subject": "language pool cost-optimal (aggressive) operating point p70/s6",
+      "assertion": "The cost-optimal language operating point (p70 quantile, conversion scale 6) costs 330.4 GPU-hours, near 0.62x the time-matched static fleet, but drops the e13 fold onset.",
+      "db_check": "artifact simulation/results/lang_qsweep/eval_p70_s6/week.report.json: gpu_hours; ratio vs 4 GPU x duration_ms span",
+      "criticality": "headline",
+      "added": "2026-07-26"
+    },
+    {
+      "line": 331,
+      "anchor": "sec:cl-llm (The operating point, honestly calibrated)",
+      "quote": "costs\\n\\textbf{440.0 GPU-hours, 0.82$\\times$ static time-matched\\n(0.87$\\times$ request-matched)}, passing every daily fold",
+      "numbers": [
+        "440.0",
+        "0.82",
+        "0.87"
+      ],
+      "metric": "lang_e13robust_cost_ratio",
+      "subject": "language pool e13-robust operating point p90/s6",
+      "assertion": "The cheapest e13-clearing language point (p90 quantile, leaner conversion scale 6) costs 440.0 GPU-hours = 0.82x static time-matched and 0.87x request-matched.",
+      "db_check": "artifact simulation/results/lang_qsweep/eval_p90_s6/week.report.json: gpu_hours over 4 GPU x duration_ms span (time-matched) and over the 503.7 GPU-h request-matched static",
+      "criticality": "headline",
+      "added": "2026-07-26"
+    },
+    {
+      "line": 493,
+      "anchor": "sec:cl-limits (A finer grain, and the fold-robust point)",
+      "quote": "It costs \\textbf{0.76$\\times$} static\\nover the aggregate (0.79$\\times$ on F6).",
+      "numbers": [
+        "0.76",
+        "0.79"
+      ],
+      "metric": "hybrid_cost_ratio",
+      "subject": "encoder hybrid schedule max(C_fc, C_re) over the aggregate span",
+      "assertion": "The hybrid encoder schedule C_hyb(t)=max(C_fc(t),C_re(t)) costs 0.76x the static C8 fleet over the aggregate span.",
+      "db_check": "artifact simulation/results/encoder_hybrid/hybrid.jsonl.stats.json provisioned_worker_seconds over provenance.encoder_run_summary a6:static_C8 provisioned_worker_seconds",
+      "criticality": "headline",
+      "added": "2026-07-26"
+    },
+    {
+      "line": 500,
+      "anchor": "sec:cl-limits (A finer grain, and the fold-robust point)",
+      "quote": "\\textbf{0.62$\\times$} aggressive,\\ndropping the single fold-scale onset, to \\textbf{0.76$\\times$} fold-robust.",
+      "numbers": [
+        "0.62",
+        "0.76"
+      ],
+      "metric": "encoder_cost_frontier",
+      "subject": "encoder cost/robustness frontier (aggressive vs fold-robust)",
+      "assertion": "The encoder pool spans 0.62x static (aggressive, drops the e13-scale fold onset) to 0.76x static (fold-robust hybrid).",
+      "db_check": "provenance.encoder_run_summary: aggregate44:fc_p90_L30_issuetime and a6:static_C8; hybrid artifact as above",
+      "criticality": "headline",
+      "added": "2026-07-26"
     }
-  ]
+  ],
+  "addendum": {
+    "date": "2026-07-26",
+    "reason": "Adversarial review Finding 4: the corpus (2026-07-19) predated the 2026-07-24/25 results and contained no 0.76, 0.82, hybrid, 440.0 or 330.4 claim. Appended manually following the existing schema (the corpus is agent-authored; no generator exists). New entries carry added=\"2026-07-26\".",
+    "lines": [
+      325,
+      331,
+      493,
+      500
+    ]
+  }
 }

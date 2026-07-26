@@ -1,0 +1,11 @@
+{
+  "claim_id": "apendice-0149",
+  "verdict": "holds",
+  "observed": "Language week (aggregate, language, ttft, n=749601): planner:week_fc_p90 (Chronos p90) TTFT p99 = 651.14ms, gpu_hours = 518.61 (v_pool_cost). This is exactly the section cl-llm headline. Other arms: p50 (planner:week_fc_p50) p99=827.81ms / 319.91 GPU-h; Toto p90 625.27 GPU-h; TimesFM p90 641.08 GPU-h; reactive p99=1191-1197ms / 281.8 GPU-h. All p90 forecast arms share p99 651.14ms; p50 of the p90 runs is ~22.5ms.",
+  "claimed": "Language-pool week replay (651 ms / 518.6 GPU-h; p50, Toto, TimesFM, reactive arms)",
+  "evidence": "This is a provenance/artifacts appendix row (claim->script->result-file mapping). '651 ms / 518.6 GPU-h' is the exact section cl-llm Chronos-p90 headline (planner:week_fc_p90: 651.14ms p99, 518.61 GPU-h), both DB-traceable. The trailing 'p50, Toto, TimesFM, reactive arms' is a report-inventory enumeration matching the listed report files week_{fc_p90,fc_p90_toto,fc_p90_timesfm,fc_p50,re}.report.json, not a numeric attribution. Both adjudicators parsed it as '651ms at p50' and read the numbers off the TimesFM/p50 arms; under the row's inventory semantics the headline is p90 and both numbers are exact.",
+  "severity": "minor",
+  "fix": "No data fix required. Optional clarity: label the pair explicitly, e.g. '651 ms p99 / 518.6 GPU-h (p90 base); arms: p50, Toto, TimesFM, reactive' so the p90 provenance of the headline is unambiguous and p50 is not read as its quantile.",
+  "confidence": 0.78,
+  "query": "SELECT run_id,policy,forecast_model,quantile,p99_ms FROM v_pool_latency WHERE is_current AND pool='language' AND window_name='aggregate' AND sla_metric='ttft'; SELECT run_id,forecast_model,quantile,gpu_hours FROM v_pool_cost WHERE is_current AND pool='language' AND window_name='aggregate' AND run_id ILIKE 'planner:week%';"
+}

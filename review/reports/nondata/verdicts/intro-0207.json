@@ -1,0 +1,1 @@
+{"claim_id":"intro-0207","type":"existence","verdict":"supported","evidence":"Anchor text present at intro.tex:304-305 ('Qwen3-VL family ... 8B, 32B, and 235B variants share one vision tower'). Backed by collector_encoder_fn, which measures a single shared encoder reused across the LLM variants; consistent with the Qwen3-VL architecture.","fix":"","confidence":0.8}

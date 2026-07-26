@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "twopool-0064",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "The handoff term remains the bandwidth-only, DeepStack-undercounting bound, not a measured NIXL curve.",
+  "claim_text": "Handoff bound is bandwidth-only, undercounts DeepStack, not a measured NIXL curve.",
+  "expected_backing": "v_cost_ratio, collector_encoder_fn"
+ },
+ {
+  "claim_id": "twopool-0065",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "Request ingress (image fetch/decode, preprocessing, tokenization, front-end queueing) is not simulated; the boundary is accelerator-side service and queueing.",
+  "claim_text": "Request ingress (fetch, decode, preprocessing, tokenization, front-end queueing) not simulated; boundary is accelerator-side service and queueing.",
+  "expected_backing": "eda_metric, v_pool_latency"
+ },
+ {
+  "claim_id": "twopool-0066",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "Encoder delays fold into language-pool arrivals through the trace seam, which serializes the pools per request (no speculative overlap of encoder and prefill work); this is conservative for composed TTFT (overlap could only lower it).",
+  "claim_text": "Trace seam serializes pools per request (no speculative encoder/prefill overlap); conservative for composed TTFT.",
+  "expected_backing": "v_pool_latency, eda_metric"
+ },
+ {
+  "claim_id": "twopool-0067",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "Per-pool knees were measured with the other pool absent (isolation trace / converter-only), making them attributable; composed-system claims are made only where composed runs exist (the baseline chapter's grid, which re-derives per-window optima across all six burst windows and a 24-hour steady window).",
+  "claim_text": "Per-pool knees measured in isolation (other pool absent); composed claims only from composed runs (baseline grid across 6 burst windows + 24h steady).",
+  "expected_backing": "v_grid_static_effective, v_pool_latency"
+ },
+ {
+  "claim_id": "predictors-0071",
+  "chapter": "predictors",
+  "claim_type": "methodological",
+  "anchor": "The context budget $C$ is each model's maximum context minus its forecast tokens; the baselines take the TimesFM budget",
+  "claim_text": "The context budget is determined by each model's maximum context minus its forecast tokens, with baselines using TimesFM's budget.",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "trace-eda-0091",
+  "chapter": "trace-eda",
+  "claim_type": "methodological",
+  "anchor": "Its seven-day window supports diurnal but not weekly periodicity claims",
+  "claim_text": "The seven-day trace supports diurnal periodicity claims but not weekly periodicity claims.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "trace-eda-0092",
+  "chapter": "trace-eda",
+  "claim_type": "methodological",
+  "anchor": "The 50/50 modality split is by construction",
+  "claim_text": "The 50/50 text vs multimodal split is by construction.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "trace-eda-0093",
+  "chapter": "trace-eda",
+  "claim_type": "methodological",
+  "anchor": "All analyses ran on GPU (cuDF, cuML, CuPy; RTX~5090)",
+  "claim_text": "All analyses were run on GPU using cuDF, cuML, CuPy on RTX 5090.",
+  "expected_backing": "eda_metric"
+ }
+]

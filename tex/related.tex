@@ -33,7 +33,8 @@ where and when, not how many workers should exist.
 A second line disaggregates the two phases of LLM inference themselves.
 Splitwise~\cite{Patel2024Splitwise} and DistServe~\cite{Zhong2024DistServe}
 place prefill and decode on separate pools sized to their own
-bottlenecks, with goodput-per-GPU gains; Mooncake operates the split in
+bottlenecks, with per-GPU efficiency gains (goodput, in DistServe's
+terms); Mooncake operates the split in
 production, with prediction-based early rejection under
 overload~\cite{Qin2025Mooncake}; DynaServe generalizes it into an
 elastic spectrum between aggregated and disaggregated
@@ -141,13 +142,15 @@ request rate and mean sequence lengths with classical models (ARIMA,
 Kalman, Prophet) to set replica floors under the reactive
 loop~\cite{Dynamo2025}.\footnote{Planner
 behavior is version-specific: it follows the Dynamo 1.x planner design
-documentation and inspection of the source tree at the commit used for
-this thesis's simulations (v1.3.0 source build; accessed 2026-07-07).
-See Appendix~\ref{ap:artifacts}.} Its
-reactive SLA loop is this thesis's baseline (run unmodified,
-planner-in-the-loop, Chapter~\ref{cap:baselines}); its predictive loop
-still watches a single averaged text-side stream, a limitation its own
-design notes state.
+documentation and inspection of the v1.3.0 source tree (accessed
+2026-07-07) --- the build behind every calibrated run from the load
+sweeps onward; the Phase-2 baseline runs use the pinned 1.2.1 wheel
+(Appendix~\ref{ap:artifacts}).} Both its
+shipped reactive loop and the SLA-target variant that adds the ARIMA
+throughput-loop floor above are run as this thesis's baseline (unmodified,
+planner-in-the-loop, Chapter~\ref{cap:baselines}), and they fail alike;
+the predictive floor still watches a single averaged text-side stream, a
+limitation its own design notes state.
 Autoscalers purpose-built for \emph{disaggregated} LLM serving are the
 closest neighbors: ByteDance's
 HeteroScale coordinates scaling of heterogeneous prefill and decode
@@ -189,7 +192,7 @@ Splitwise~\cite{Patel2024Splitwise} and refreshed with
 DynamoLLM~\cite{Stojkovic2025DynamoLLM}; BurstGPT's 213-day trace and
 arrival-burstiness analysis~\cite{Wang2024BurstGPT}; ServeGen's
 generative modeling of Alibaba production workloads, which notes that
-realistic workloads must be composed per category rather than as one
+realistic workloads must be composed per client rather than as one
 stream~\cite{Xiang2025ServeGen}; and Aegaeon's multi-month view of
 bursty multi-model traffic at Alibaba~\cite{Xiang2025Aegaeon}. All but ServeGen are text-centric:
 their request descriptors are token counts and timestamps (ServeGen models
@@ -223,7 +226,8 @@ demand signals), released with the BOOM observability
 benchmark~\cite{Cohen2024Toto,Cohen2025BOOM} and scaled up in
 Toto-2~\cite{Khwaja2026Toto2}. Public benchmarks such as GIFT-Eval
 compare these models across broad corpora~\cite{Aksu2024GIFTEval}, but
-their domains (energy, retail, weather, cloud telemetry) do not include
+their domains (finance, energy, healthcare, nature, sales, transport, and
+web/cloud telemetry) do not include
 inference-serving demand, and the deployment-relevant questions
 (accuracy at a specific provisioning cadence, lead-time degradation,
 cross-signal covariate value) are not posed in autoscaling terms. The
@@ -275,8 +279,11 @@ its platform from parts and quantifies the fidelity of each seam
 
 What separates this thesis from the landscape above is not an ingredient
 but a finding. The demand signal most dangerous to reactive scaling is
-the vision pool's image rate: the burstiest of the four, nearly
-invisible in the request \emph{rate} a conventional autoscaler watches,
+the vision pool's image rate: the burstiest of the four, largely
+decoupled from the request \emph{rate} a conventional autoscaler
+watches --- the two signals share only five top-percentile minutes, and
+at the largest image burst ($15.6\times$ the image mean) the request
+rate reaches just $2.7\times$ its own mean, barely above its p99 ---
 and ramping to peak within replica cold-start times in its fastest
 bursts. That same signal is also the most persistent, retaining usable
 predictive structure at exactly the horizons provisioning requires ---

@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "intro-0302",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "Such bounds are service-level objectives (SLOs); following serving-systems usage, this document writes 'the evaluation SLA' for the specific tail bounds it grades every policy against, and SLO for the general concept.",
+  "claim_text": "Service-level objectives (SLOs) are general bounds; the evaluation SLA refers to specific tail bounds graded against policies.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "intro-0303",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "Meeting them economically on shared GPU fleets pushed serving from replicated monoliths toward disaggregation: prefill and decode in separate pools sized to their own bottlenecks",
+  "claim_text": "Economically meeting SLOs on shared GPU fleets pushed serving toward disaggregation with prefill and decode in separate pools.",
+  "expected_backing": "v_cost_ratio"
+ },
+ {
+  "claim_id": "intro-0304",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "A multimodal request adds a third phase preceding both: a vision encoder, in current practice a Vision Transformer, ingests the request's images as grids of patches and emits embedding tokens.",
+  "claim_text": "A multimodal request adds a vision encoder phase that ingests images as grids of patches and emits embedding tokens.",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "intro-0305",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "These properties invite modality disaggregation: run the encoder as its own pool, on its own hardware class, scaled independently.",
+  "claim_text": "Modality disaggregation runs the encoder as its own pool on its own hardware class, scaled independently.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "intro-0306",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "The prevailing practice, inherited from stateless web serving, is reactive: watch an aggregate load signal (request rate or a utilization average) and add or remove replicas at a threshold.",
+  "claim_text": "The prevailing practice for scaling is reactive, watching an aggregate load signal and adding or removing replicas at a threshold.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "intro-0307",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "Two assumptions hide in that loop \u2014 that the watched signal carries each pool's demand, and that new replicas arrive faster than the load changes.",
+  "claim_text": "Reactive scaling assumes the watched signal carries each pool's demand and that new replicas arrive faster than load changes.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "intro-0309",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "Prediction-driven capacity management has appeared for text-only LLM fleets \u2014 forecast-aware fleet planning, prewarming GPUs against forecast peak load \u2014 but watches aggregate, request-level signals",
+  "claim_text": "Prediction-driven capacity management for text-only LLM fleets watches aggregate, request-level signals.",
+  "expected_backing": "v_cost_ratio"
+ },
+ {
+  "claim_id": "intro-0311",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "The position this document defends, stated compactly: In a modality-disaggregated multimodal serving system, no single load signal can size every pool",
+  "claim_text": "In a modality-disaggregated multimodal serving system, no single load signal can size every pool.",
+  "expected_backing": "v_infraction"
+ }
+]

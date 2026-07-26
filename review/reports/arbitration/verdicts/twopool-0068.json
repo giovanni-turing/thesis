@@ -1,0 +1,11 @@
+{
+  "claim_id": "twopool-0068",
+  "verdict": "overclaimed",
+  "observed": "windows table (is_current): head2k=2.8785 img/req, steady24h=5.3258 img/req; eda_metric numimages.mean_images_per_request_overall (trace)=14.33217.",
+  "claimed": "The steady head is vision-lean (2.9 img/req vs trace ~14), 'which the 24-hour steady window corrects.'",
+  "evidence": "The 24h steady window raises the rate from 2.879 to 5.326 img/req, still only 37% of the trace-wide 14.332. It moves toward the trace but does not restore/correct representativeness; the verb 'corrects' overstates a partial mitigation. The two operand numbers (2.9, ~14) are correct.",
+  "severity": "minor",
+  "fix": "Replace 'corrects' with 'partly mitigates, raising the rate to 5.33 images/request, still well below the trace-wide 14.33.'",
+  "confidence": 0.85,
+  "query": "SELECT window_name, mean_img_per_s/NULLIF(mean_req_per_s,0) AS img_per_req FROM windows WHERE window_name IN ('head2k','steady24h'); SELECT value_num FROM eda_metric WHERE metric_path='numimages.mean_images_per_request_overall';"
+}

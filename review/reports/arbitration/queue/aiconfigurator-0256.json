@@ -1,0 +1,38 @@
+{
+ "claim_id": "aiconfigurator-0256",
+ "chapter": "aiconfigurator",
+ "claim_type": "numeric",
+ "anchor": "initial collection at unlocked clocks ran \u224817% faster than the final dataset",
+ "claim_text": "An initial data collection at unlocked GPU clocks ran approximately 17% faster than the final dataset.",
+ "expected_backing": "v_cost_ratio, clock control comparison",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "1.1647 (16.47% average speedup)",
+   "evidence": "Pairing unlocked (burst_anchor: 2887 MHz) with locked (fn_repro: 2377-2400 MHz) data points in collector_encoder_fn yields an average speedup ratio of 1.1647 (16.5% faster), confirming the claimed \u224817% speedup.",
+   "severity": null,
+   "fix": "",
+   "query": "SELECT ROUND(AVG(b.mean_ms / a.mean_ms)::numeric, 4) AS speedup_ratio FROM provenance.collector_encoder_fn a JOIN provenance.collector_encoder_fn b USING (engine, image_px, n_images) WHERE a.source_path LIKE '%burst_anchor%' AND b.source_path LIKE '%fn_repro%';"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "Across 8 matched configurations, the initial collection averaged 0.20692819648370775% faster; individual differences ranged from -0.14151352459339517% to 0.8749218819748217%, with measured clocks of 2385-2400 MHz rather than a materially higher unlocked-clock regime.",
+   "evidence": "The matched initial/final latency comparison is near parity at every configuration and does not support either the 17% magnitude or its attribution to unlocked clocks.",
+   "severity": "major",
+   "fix": "Replace with: \"The initial and final collections had effectively equivalent latency across the eight matched configurations (mean difference approximately 0.21%).\" Remove the unlocked-clock attribution.",
+   "query": "WITH initial AS (SELECT image_px,n_images,mean_ms,sm_clock_mhz FROM provenance.collector_fn WHERE source_path='/home/gio/tese/collector_artifacts/phaseB_batch_validation/measured_f_n.csv' AND mean_ms IS NOT NULL), final AS (SELECT image_px,n_images,mean_ms,sm_clock_mhz FROM provenance.collector_fn WHERE source_path='/home/gio/tese/collector_artifacts/phaseB_batch_validation/measured_f_n_5x50.csv' AND mean_ms IS NOT NULL), pairs AS (SELECT i.image_px,i.n_images,i.mean_ms initial_mean_ms,f.mean_ms final_mean_ms,i.sm_clock_mhz initial_clock_mhz,f.sm_clock_mhz final_clock_mhz,100*(f.mean_ms/i.mean_ms-1) AS initial_faster_pct FROM initial i JOIN final f USING(image_px,n_images)) SELECT image_px,n_images,initial_mean_ms,final_mean_ms,initial_clock_mhz,final_clock_mhz,initial_faster_pct,AVG(initial_faster_pct) OVER () AS mean_pct,MIN(initial_faster_pct) OVER () AS min_pct,MAX(initial_faster_pct) OVER () AS max_pct,COUNT(*) OVER () AS denominator_pairs FROM pairs ORDER BY image_px,n_images;"
+  },
+  {
+   "model": "qwen3.7-max",
+   "verdict": "overclaimed",
+   "observed": "Unlocked (2887 MHz) vs locked (2392 MHz) speedup ranges 10.05%\u201318.08% across 6 workload points (compiled+eager \u00d7 N=4,16,64 at 448px); mean = 14.1%",
+   "evidence": "DB's only unlocked-vs-locked clock pair (burst_anchor_all @ 2887 MHz vs fn_multires @ 2392 MHz) yields 14.1% mean speedup; 17% is ~3pp above the observed mean and sits at the high end of the 10\u201318% range.",
+   "severity": "minor",
+   "fix": "Rewrite as '\u224814% faster (range 10\u201318% across workloads)' or cite a specific workload point that approaches 17% (e.g., compiled N=16 at 16.5%).",
+   "query": "WITH unlocked AS (SELECT engine, n_images, mean_ms AS unlocked_ms FROM provenance.collector_encoder_fn WHERE source_path LIKE '%burst_anchor_all%' AND image_px = 448 AND n_images IN (4, 16, 64)), locked AS (SELECT engine, n_images, mean_ms AS locked_ms FROM provenance.collector_encoder_fn WHERE source_path LIKE '%fn_multires%' AND image_px = 448 AND n_images IN (4, 16, 64)) SELECT u.engine, u.n_images, u.unlocked_ms, l.locked_ms, ROUND(((1 - u.unlocked_ms / l.locked_ms) * 100)::numeric, 2) AS pct_faster_at_unlocked FROM unlocked u JOIN locked l ON u.engine = l.engine AND u.n_images = l.n_images ORDER BY u.engine, u.n_images"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

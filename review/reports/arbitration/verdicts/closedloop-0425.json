@@ -1,0 +1,11 @@
+{
+ "claim_id": "closedloop-0425",
+ "verdict": "overclaimed",
+ "observed": "Across the 11 current, unsuperseded, denominator-matched a2x archive episodes (deployable_static_c8), the aggregate forecast cost ratio declines monotonically with issued lead: 2.3001 (L=15), 2.2912 (L=30), 2.2819 (L=45), 2.1617 (L=165); per-window mean 2.2391 -> 2.0857. Endpoint drop ~6.0% aggregate (~6.8% mean), monotonic across every window.",
+ "claimed": "Forecast policy cost is essentially lead-invariant across the archive's realizable 15-165s issued-lead range.",
+ "evidence": "Over the exact scope the claim names (the a2x archive episodes, leads 15-165s), cost is not invariant: it falls monotonically ~6% from L=15 to L=165. The decline is small and in the favorable (cheaper) direction, and the 'essentially' hedge plus the table showing the two tabulated leads (L=30, L=165) as visually equal (2.41 Mworker-s) soften it -- but a systematic monotonic trend across all 11 windows is not 'invariant'. Both adjudicators independently derived the same decline from correct current data; the flag's numbers hold.",
+ "severity": "minor",
+ "fix": "Soften to e.g. 'cost varies modestly but declines systematically (~6-7%) from L=15 to 165s' rather than 'essentially lead-invariant'.",
+ "confidence": 0.6,
+ "query": "SELECT c.lead_s, SUM(c.numerator_worker_seconds)/SUM(c.denominator_worker_seconds) agg_ratio, AVG(c.cost_ratio) mean_win FROM v_dim d JOIN v_cost_ratio c ON c.run_id=d.run_id WHERE d.is_current AND c.is_current AND c.experiment='a2x' AND c.policy='forecast' AND c.denominator_kind='deployable_static_c8' AND c.denominator_window_mismatch=false GROUP BY c.lead_s ORDER BY c.lead_s;"
+}

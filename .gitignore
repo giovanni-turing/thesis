@@ -109,9 +109,22 @@ defense/anim/data/**/*.requests.jsonl
 defense/anim/data/**/*.series.json
 defense/anim/data/**/*.jsonl
 defense/anim/data/**/*.log
+# defense-qa doc: keep defense-qa.tex, drop compiled deck + aux
+defense/defense-qa.pdf
+defense/defense-qa.aux
+defense/defense-qa.log
+defense/defense-qa.toc
+defense/defense-qa.out
+defense/defense-qa.fls
+defense/defense-qa.fdb_latexmk
 # timestamped figure backup (throwaway copy)
 /figuras_backup_1784438929/
 provenance/.ro_credentials
 provenance/.picolo_credentials
 provenance/.goku_credentials
 review/tools/.pw
+
+# raw replay outputs (zstd-compressed 2026-07-26; re-derivable, curves snapshotted)
+simulation/results/lang_qsweep/**/*.zst
+simulation/results/encoder_hybrid/**/*.zst
+figuras_new/_data/*.parquet

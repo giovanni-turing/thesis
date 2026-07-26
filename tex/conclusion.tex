@@ -52,8 +52,10 @@ tail SLA on all five forecast-covered windows at all four issued leads
 (15--\SI{165}{\second}), including the one-minute-onset burst that
 defeats an identically
 informed reactive controller at every lead. It does so because the p90 band holds
-anticipatory headroom that matures within the cold-start lead, standing
-capacity up before the spike and leaving the service floor intact. The
+graduated headroom already standing before the spike: it matures within
+the issued lead where one exists, and on the one-minute onset that has
+none it rests on that standing headroom, leaving the no-queue service
+plateau intact. The
 forecaster is load-bearing but its \emph{accuracy} is second-order: a
 cheap forward forecaster (EWMA) at a calibrated quantile, driven through
 the same loop, either misses the fast onsets or over-provisions --- so
@@ -70,34 +72,43 @@ that span at \textbf{0.62$\times$ the deployable static encoder fleet's
 provisioned worker-time} --- a week-scale saving: inside individual
 burst windows every autoscaling arm costs \emph{more} than static
 (issue-time actuation, warm-pool readiness; 0.59--0.62$\times$ under
-strict re-warm; the Chronos-p90 language schedule passes at
-0.965$\times$ a time-matched static TP2$\times$2 reference) --- while
-the reactive controller's apparent
-aggregate pass dissolves under per-episode grading.
+strict re-warm). A hybrid forecast--reactive schedule --- designed post
+hoc on the failing fold F6 and replayed on all seven daily folds,
+degenerating to the reactive arm on the pre-coverage fold F1 --- recovers
+at 0.76$\times$ the single daily-fold onset (e13) the pure forecast drops
+at a finer grain than the burst episodes; the language pool's
+per-denominator cost frontier --- a near-break-even edge and a modest
+post-hoc e13-robust saving --- is catalogued in
+Section~\ref{sec:cl-ledger-cost}. The reactive controller's apparent
+aggregate pass, by contrast, dissolves under per-episode grading.
 
 \paragraph{The thesis statement, revisited.} Every clause is now
 backed: the pools' demands decouple and saturate far apart (RQ1),
 the least visible signal is the most persistent and forecastable
 zero-shot at provisioning horizons (RQ2), and scaling the vision pool on
-those forecasts --- with the language pool on their tail-aware conversion
---- holds the tail objective through the onsets that defeat reactive control
-at every tested lead and, over the covered week, at roughly two-thirds
-of the best static encoder fleet's GPU-time (RQ4).
+those forecasts --- with the language pool on its own forecast's tail-aware
+conversion --- holds the tail objective through the onsets that defeat reactive control
+at every tested lead and, over the covered week, at 0.62$\times$
+the best static encoder fleet's worker-time --- 0.76$\times$ for the
+post-hoc hybrid that also recovers e13 (RQ4).
 
 \paragraph{What bounds these claims.} The evidence is one seven-day
 production trace with an offered-work upper bound on decode demand
 (faithful in total volume but temporally displaced, licensing no
 pointwise provisioning claim); the inter-pool handoff is an analytic
-single-stream bound, so the \SI{588}{\milli\second} floor and the cost
-ratio assume an embedding-only handoff or a ${\geq}100$\,Gbps fabric;
+single-stream bound, so the \SI{588}{\milli\second} observed all-request
+no-queue plateau and the cost ratio assume an embedding-only handoff or
+a ${\geq}100$\,Gbps fabric;
 and the vision-pool control loop is exercised in simulation against the
 measured silicon cost (validated to $12.8\%$;
 Appendix~\ref{app:engine-sensitivity}), not yet as a live serving loop.
 These limits do not invalidate the stated 5.60-day aggregate --- the
 encoder cost model in particular is validated rather than conservatively
-biased --- but cost direction is denominator- and fold-sensitive (the
-language ratio reads 1.03$\times$ under request-matched normalization,
-and one daily fold misses the encoder bound), so no directional claim
+biased --- but cost direction is denominator- and fold-sensitive (under
+request-matched normalization the published language point, p90 at
+conversion scale 8, reads 1.03$\times$ and the e13-robust p90/scale-6
+point 0.87$\times$; one daily fold misses the encoder bound), so no
+directional claim
 extends beyond the tested span, model, and denominator
 (Chapters~\ref{cap:closedloop} and \ref{cap:twopool} detail them).
 

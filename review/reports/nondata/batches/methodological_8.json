@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "intro-0248",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "The workload is one seven-day production trace with a by-construction 50/50 modality split and arrival-side information only.",
+  "claim_text": "Workload: 7-day trace, 50/50 modality split, arrival-side info only",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "aiconfigurator-0254",
+  "chapter": "aiconfigurator",
+  "claim_type": "methodological",
+  "anchor": "vLLM encoder-attention collector hard-codes no kernel choice",
+  "claim_text": "The vLLM encoder-attention collector does not hard-code kernel choice; it uses vLLM's backend selector.",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "aiconfigurator-0255",
+  "chapter": "aiconfigurator",
+  "claim_type": "methodological",
+  "anchor": "Collection ran inside the pinned production container (vllm/vllm-openai:v0.22.0)",
+  "claim_text": "Data collection was performed inside the pinned production container vllm/vllm-openai:v0.22.0.",
+  "expected_backing": "collector_encoder_fn, version control"
+ },
+ {
+  "claim_id": "aiconfigurator-0259",
+  "chapter": "aiconfigurator",
+  "claim_type": "methodological",
+  "anchor": "AIC's estimate for one encoder forward is an arithmetic composition over an operator graph",
+  "claim_text": "AIC's encoder latency estimate is an arithmetic composition over an operator graph.",
+  "expected_backing": "AIC composition rules"
+ },
+ {
+  "claim_id": "apendice-0268",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "The AIC curve is the postinfill snapshot for $N\\le128$ and the composed model beyond",
+  "claim_text": "The AIC curve represents the postinfill snapshot for batch sizes up to 128 and the composed model for larger batch sizes.",
+  "expected_backing": "v_aic_curve_definition"
+ },
+ {
+  "claim_id": "baselines-0270",
+  "chapter": "baselines",
+  "claim_type": "methodological",
+  "anchor": "scored on provisioned GPU-time per hardware class (RTX~5090-class worker-seconds for the encoder pool, H100 GPU-hours for the language pool; never summed across classes).",
+  "claim_text": "Scoring for provisioned GPU-time is done separately per hardware class: RTX 5090-class worker-seconds for the encoder pool and H100 GPU-hours for the language pool; values are never summed across classes.",
+  "expected_backing": "v_cost_ratio"
+ },
+ {
+  "claim_id": "baselines-0273",
+  "chapter": "baselines",
+  "claim_type": "methodological",
+  "anchor": "Each burst window brackets its episode with a $\\pm$10-minute calm margin",
+  "claim_text": "Each burst window includes a \u00b110-minute calm margin around its episode.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "baselines-0274",
+  "chapter": "baselines",
+  "claim_type": "methodological",
+  "anchor": "Scale-downs take effect immediately, guarded by a 3-minute hysteresis.",
+  "claim_text": "Scale-downs take effect immediately with a 3-minute hysteresis guard.",
+  "expected_backing": "v_pool_latency"
+ }
+]

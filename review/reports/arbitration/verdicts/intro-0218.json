@@ -1,0 +1,11 @@
+{
+ "claim_id": "intro-0218",
+ "verdict": "holds",
+ "observed": "eda_metric: numimages.share_text_only=0.5 (=50%); classes.frames.request_share=0.027183 (=2.7%); classes.frames.image_share=0.8119376 (=81.2%). eda_request_class frames row: requests=27183, request_share=0.027183, image_share=0.8119376. numimages.all_perfect_squares=false.",
+ "claimed": "Exactly 50% text-only; frames class (>10x10 grids, 2.7% of requests) accounts for 81.2% of image volume; image-bearing requests carry k x k grids.",
+ "evidence": "All three headline numbers are exact: 50.0%, 2.7%, 81.2%. The only wrinkle both adjudicators raised is the universal 'k x k grids' clause: all_perfect_squares=false, with ~53 non-square image-bearing requests (~0.01% of the ~500k image-bearing population). That is a negligible over-generalization that does not touch the load-bearing statistics. The flag on the numbers is spurious; the k x k universal could optionally be softened to 'almost all'.",
+ "severity": "minor",
+ "fix": "Optional: soften 'image-bearing requests carry k x k grids' to 'almost all image-bearing requests carry k x k grids' (53 non-square exceptions, ~0.01%). Numbers unchanged.",
+ "confidence": 0.9,
+ "query": "SELECT metric_path,value_num,value_bool FROM provenance.eda_metric WHERE metric_path IN ('numimages.share_text_only','numimages.all_perfect_squares','classes.frames.request_share','classes.frames.image_share'); SELECT * FROM provenance.eda_request_class WHERE class_name='frames';"
+}

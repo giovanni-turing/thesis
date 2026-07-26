@@ -1,0 +1,11 @@
+{
+ "claim_id": "aiconfigurator-0378",
+ "verdict": "holds",
+ "observed": "Over 64 paired N (1..64), HF-eager (fn_repro) / vLLM (vllm_eager_dense) mean_ms ratio spans 1.3659-1.5914, mean 1.4566; 3 points below 1.4 (N=2:1.3659, N=6:1.3987, N=8:1.3971), 0 points above 1.6.",
+ "claimed": "HuggingFace forward is 1.4-1.6x slower than vLLM over N<=64.",
+ "evidence": "At the thesis's one-decimal working precision the measured 1.366-1.591 range rounds to exactly 1.4-1.6 (all three sub-1.4 points round to 1.4; max 1.591 rounds to 1.6). The load-bearing bound is the UPPER one (guarding against AIC under-pricing vLLM): 0 of 64 points exceed 1.6, so 'stays within that bound' holds exactly. The thesis is self-consistent -- its own table reports the endpoints as 1.36-1.62 and line 358 labels the figure '~1.4-1.6x'. The low-end excursions to 1.37 are benign (HF closer to vLLM). The adjudicators' numbers are correct but the flag over-weights a one-decimal rounding.",
+ "severity": "minor",
+ "fix": "Optional exactness: state '~1.37-1.59x' or keep the existing '~' hedge on the 1.4-1.6x figure; no substantive change needed since the upper bound holds with zero violations.",
+ "confidence": 0.6,
+ "query": "WITH hf AS (SELECT n_images,mean_ms FROM collector_encoder_fn WHERE source_path LIKE '%fn_repro.json' AND engine='eager' AND is_valid AND n_images<=64), vl AS (SELECT n_images,mean_ms FROM collector_encoder_fn WHERE source_path LIKE '%vllm_eager_dense.json' AND engine='vllm' AND is_valid AND n_images<=64), r AS (SELECT hf.mean_ms/vl.mean_ms ratio FROM hf JOIN vl USING(n_images)) SELECT count(*), min(ratio), max(ratio), avg(ratio), count(*) FILTER(WHERE ratio<1.4), count(*) FILTER(WHERE ratio>1.6) FROM r;"
+}

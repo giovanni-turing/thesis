@@ -1,0 +1,1 @@
+{"claim_id":"aiconfigurator-0263","type":"existence","verdict":"supported","evidence":"models/Qwen3-VL-8B/config.json vision_config: depth=27, hidden_size=1152, num_heads=16 — exactly matching '27 blocks, hidden size 1152, 16 heads'.","fix":"","confidence":0.98}

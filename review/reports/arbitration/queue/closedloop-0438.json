@@ -1,0 +1,29 @@
+{
+ "claim_id": "closedloop-0438",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "Over the 7-day trace the reactive controller reaches 0.687x the deployable C=8 fleet while holding the encoder bound at 588 ms.",
+ "claim_text": "Full trace reactive: 0.687x static C=8, encoder p99=588ms.",
+ "expected_backing": "v_cost_ratio",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "cost_ratio=0.6868367948925901, encoder_delay_p99_ms=588.37",
+   "evidence": "Run a13:ft_reactive_L30 achieves a cost ratio of 0.6868x (rounds to 0.687x) relative to the C=8 baseline (a13:ft_static_C8) over the full 7-day trace while holding encoder p99 at 588.37 ms (rounds to 588 ms). gpt-5.6-sol incorrectly referenced weekly aggregate runs instead of full-trace ones.",
+   "severity": "minor",
+   "fix": "",
+   "query": "SELECT r.run_id, r.encoder_delay_p99_ms, r.provisioned_worker_seconds, c8.provisioned_worker_seconds AS c8_seconds, (r.provisioned_worker_seconds / c8.provisioned_worker_seconds) AS cost_ratio FROM provenance.encoder_run_summary r JOIN provenance.encoder_run_summary c8 ON c8.run_id = 'a13:ft_static_C8' WHERE r.run_id = 'a13:ft_reactive_L30'"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "Current aggregate cost ratios are 0.6169327851932288, 0.5859812775426033, and 0.5661907656993614 against deployable static C=8; each has aggregate encoder p99 588.37 ms.",
+   "evidence": "The encoder p99 rounds to 588 ms, but no current aggregate L30 variant has the claimed 0.687 cost ratio; all use the matched deployable_static_c8 denominator without window mismatch.",
+   "severity": "major",
+   "fix": "Replace 0.687x with the current ratio for the intended W120, W240, or W480 variant and identify that variant explicitly.",
+   "query": "SELECT c.run_id, c.window_name, c.quantile, c.lead_s, c.numerator_worker_seconds, c.denominator_kind, c.denominator_run, c.denominator_worker_seconds, c.denominator_workers, c.denominator_window, c.denominator_window_mismatch, c.cost_ratio, l.p99_ms AS encoder_p99_ms, l.n_requests, c.is_current FROM provenance.v_cost_ratio AS c LEFT JOIN provenance.v_pool_latency AS l ON l.run_id = c.run_id AND l.window_name = c.window_name AND l.pool = 'encoder' AND l.is_current = true WHERE c.is_current = true AND c.run_id ~ '^rerun_verify:react_p90_W(120|240|480)_.+_L30$' AND c.denominator_kind = 'deployable_static_c8' ORDER BY c.window_name, c.run_id;"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

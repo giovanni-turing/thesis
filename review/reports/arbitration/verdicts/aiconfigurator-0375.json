@@ -1,0 +1,11 @@
+{
+ "claim_id": "aiconfigurator-0375",
+ "verdict": "supported",
+ "observed": "provenance.collector_fn, n_images=16: measured (engine='measured_5x50') mean_ms=123.387 -> 123.39; composed (engine='aic_postinfill') aic_ms=82.217 -> 82.22; ratio 123.387/82.217 = 1.500748 -> 1.50. The entire tab:aic-fn table reproduces from collector_fn (measured_5x50 + aic_postinfill): N=1 11.30/8.16/1.38, N=6 43.58/31.79/1.37, N=8 58.65/43.13/1.36, N=16 123.39/82.22/1.50, N=32 253.33/160.20/1.58, N=64 511.23/316.37/1.62 -- all six rows match the tex exactly.",
+ "claimed": "At N=16: measured 123.39 ms, composed 82.22 ms, ratio 1.50.",
+ "evidence": "expected_backing metadata (v_pool_latency) is wrong -- that view holds pool encoder-delay/ttft/itl percentiles, not the phase-B batch-validation grid. The correct owner is collector_fn. 'Composed' = the post-infill AIC prediction (engine='aic_postinfill', 82.217), consistent with the surrounding tex which describes a post-infill snapshot; the pre-infill aic value is 83.783. 'Measured' = the 5x50-iteration HuggingFace-eager run (123.387), matching the caption. Both operands and the derived ratio round exactly to the claimed values. gpt-5.6-sol's 'unverifiable' came from querying v_pool_latency, which genuinely lacks these operands -- absence from the wrong view, not refutation. gemini-3.5-flash located collector_fn correctly.",
+ "severity": "minor",
+ "fix": "None required to the thesis. Correct the claim's expected_backing pointer from v_pool_latency to collector_fn (n_images=16, engine in {measured_5x50, aic_postinfill}).",
+ "confidence": 0.98,
+ "query": "SELECT m.n_images, round(m.mean_ms::numeric,2), round(a.aic_ms::numeric,2), round((m.mean_ms/a.aic_ms)::numeric,2) FROM collector_fn m JOIN collector_fn a USING(n_images) WHERE m.engine='measured_5x50' AND a.engine='aic_postinfill' AND m.n_images=16; -- 16 | 123.39 | 82.22 | 1.50"
+}

@@ -1,0 +1,11 @@
+{
+  "claim_id": "twopool-0024",
+  "verdict": "supported",
+  "observed": "cost_model_variant head2k_src (published, is_current): poly mean_output_tok_per_user=160.6331738 -> 160.6; aic=141.9531569 -> 142.0; each over 2000 completed requests, window_name='head2k', runtime='srcbuild'.",
+  "claimed": "Output tok/s per user (avg) 160.6 (Polynomial) vs 142.0 (AIC h100).",
+  "evidence": "Both table numbers round exactly from the published cost_model_variant head2k_src rows (160.633->160.6, 141.953->142.0). The 'h100' qualifier is the AIC calibration profile per the caption ('AIC h100_sxm, vLLM 0.22.0'), not a GPU-provenance claim. The unanimous 'inconsistent' flag targets only the packet's expected_backing field (it named v_pool_latency, which holds ITL/TTFT rows, not this rate) -- a metadata error in the arbitration packet, not a defect in the thesis claim. The claimed values are correct and backed.",
+  "severity": "minor",
+  "fix": "No thesis change needed. Correct the arbitration expected_backing from v_pool_latency to cost_model_variant (family head2k_src).",
+  "confidence": 0.92,
+  "query": "SELECT family, converter, mean_output_tok_per_user, ROUND(mean_output_tok_per_user::numeric,1) r, completed_requests, is_published, window_name, runtime FROM cost_model_variant WHERE family='head2k_src' AND converter IN ('poly','aic');"
+}

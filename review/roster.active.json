@@ -1,0 +1,273 @@
+{
+ "_note": "Phase-1 generator roster (13 approved). route = opencode provider/model, run under review/tools/opencode-reviewer.jsonc. tool_mode default agentic; harness flips to injected on 0-MCP-call detection.",
+ "generators": {
+  "minimax-m3": {
+   "route": "minimax/MiniMax-M3",
+   "trust": "T1",
+   "tool_mode": "agentic",
+   "cap_lat_s": 26,
+   "verify": {
+    "verdict_exact": "2/7",
+    "polarity": "4/7",
+    "evidence": "6/6"
+   },
+   "role": "dropped-verifier"
+  },
+  "hy3": {
+   "route": "openrouter/tencent/hy3",
+   "trust": "T1",
+   "tool_mode": "agentic",
+   "cap_lat_s": 76,
+   "verify": {
+    "verdict_exact": "7/7",
+    "polarity": "7/7",
+    "evidence": "6/6"
+   },
+   "role": "verifier",
+   "route_failover_from": "novita/tencent/hy3"
+  },
+  "glm-5.2": {
+   "route": "openrouter/z-ai/glm-5.2",
+   "trust": "T1",
+   "tool_mode": "agentic",
+   "cap_lat_s": 92,
+   "verify": {
+    "verdict_exact": "5/7",
+    "polarity": "6/7",
+    "evidence": "6/6"
+   },
+   "role": "verifier",
+   "route_failover_from": "novita/zai-org/glm-5.2"
+  },
+  "kimi-k3": {
+   "route": "openrouter/moonshotai/kimi-k3",
+   "trust": "T1",
+   "tool_mode": "agentic",
+   "cap_lat_s": 91,
+   "verify": {
+    "verdict_exact": "6/7",
+    "polarity": "6/7",
+    "evidence": "6/6"
+   },
+   "role": "verifier",
+   "route_failover_from": "novita/moonshotai/kimi-k3"
+  },
+  "gemini-3.5-flash": {
+   "route": "google/gemini-3.5-flash",
+   "trust": "T1",
+   "tool_mode": "agentic",
+   "cap_lat_s": 17,
+   "verify": {
+    "verdict_exact": "7/7",
+    "polarity": "7/7",
+    "evidence": "6/6"
+   },
+   "role": "verifier"
+  },
+  "step-3.7-flash": {
+   "route": "novita/stepfun/step-3.7-flash",
+   "trust": "T1",
+   "tool_mode": "agentic",
+   "cap_lat_s": 46,
+   "verify": {
+    "verdict_exact": "4/7",
+    "polarity": "4/7",
+    "evidence": "6/6"
+   },
+   "role": "dropped-verifier"
+  },
+  "gpt-5.6-sol": {
+   "route": "openai/gpt-5.6-sol",
+   "trust": "T2",
+   "tool_mode": "agentic",
+   "cap_lat_s": 37,
+   "verify": {
+    "verdict_exact": "6/7",
+    "polarity": "6/7",
+    "evidence": "6/6"
+   },
+   "role": "verifier"
+  },
+  "qwen3.7-max": {
+   "route": "openrouter/qwen/qwen3.7-max",
+   "trust": "T2",
+   "tool_mode": "agentic",
+   "cap_lat_s": 92,
+   "verify": {
+    "verdict_exact": "4/7",
+    "polarity": "6/7",
+    "evidence": "6/6"
+   },
+   "role": "verifier",
+   "route_failover_from": "novita/qwen/qwen3.7-max"
+  },
+  "ernie-4.5-424b": {
+   "route": "openrouter/baidu/ernie-4.5-vl-424b-a47b",
+   "trust": "T2",
+   "tool_mode": "injected",
+   "cap_lat_s": 15,
+   "verify": {
+    "verdict_exact": "0/7",
+    "polarity": "0/7",
+    "evidence": "0/6"
+   },
+   "role": "injected-retest"
+  },
+  "nemotron-3-ultra": {
+   "route": "openrouter/nvidia/nemotron-3-ultra-550b-a55b",
+   "trust": "T2",
+   "tool_mode": "agentic",
+   "cap_lat_s": 20,
+   "verify": {
+    "verdict_exact": "4/7",
+    "polarity": "4/7",
+    "evidence": "5/6"
+   },
+   "role": "dropped-verifier"
+  },
+  "deepseek-v4-pro": {
+   "route": "openrouter/deepseek/deepseek-v4-pro",
+   "trust": "T2",
+   "tool_mode": "agentic",
+   "cap_lat_s": 39,
+   "verify": {
+    "verdict_exact": "5/7",
+    "polarity": "5/7",
+    "evidence": "6/6"
+   },
+   "role": "verifier",
+   "route_failover_from": "novita/deepseek/deepseek-v4-pro"
+  },
+  "command-a": {
+   "route": "openrouter/cohere/command-a",
+   "trust": "T3",
+   "tool_mode": "injected",
+   "cap_lat_s": 7,
+   "verify": {
+    "verdict_exact": "0/7",
+    "polarity": "0/7",
+    "evidence": "0/6"
+   },
+   "role": "injected-retest"
+  },
+  "mimo-v2.5": {
+   "route": "openrouter/xiaomi/mimo-v2.5",
+   "trust": "T3",
+   "tool_mode": "agentic",
+   "cap_lat_s": 36,
+   "verify": {
+    "verdict_exact": "5/7",
+    "polarity": "6/7",
+    "evidence": "5/6"
+   },
+   "role": "verifier",
+   "route_failover_from": "novita/xiaomimimo/mimo-v2.5"
+  }
+ },
+ "runtime": {
+  "max_tokens": "model-max",
+  "reasoning_effort": "high",
+  "timeout_s": 1000,
+  "concurrency": 8
+ },
+ "reviewer_config": "/home/gio/tese/review/tools/opencode-reviewer.jsonc",
+ "chapters": {
+  "core": [
+   "predictors",
+   "aiconfigurator",
+   "twopool",
+   "baselines",
+   "closedloop",
+   "validation"
+  ],
+  "context": [
+   "intro",
+   "related",
+   "trace-eda",
+   "conclusion",
+   "apendice"
+  ]
+ },
+ "lenses": {
+  "L1": "statistical-validity (n, CIs, significance, overfit, seed/run counts)",
+  "L2": "systems/measurement (warmup, variance, hardware confound, benchmark method, units)",
+  "L3": "novelty/related-work (prior art that refutes/precedes)",
+  "L4": "internal-consistency (text vs tables vs figures vs ledger vs provenance DB)",
+  "L5": "claim-strength vs CLAIM-STRUCTURE.md (overclaim beyond tier / do-not-claim violations)",
+  "L6": "reproducibility (seeds, versions, configs, artifact paths)",
+  "L7": "threats-to-validity / generalization",
+  "L8": "logic-gaps (non-sequitur, undefined terms, unsupported clearly/obviously/therefore)"
+ },
+ "assignment": {
+  "L1": [
+   "nemotron-3-ultra",
+   "deepseek-v4-pro",
+   "glm-5.2"
+  ],
+  "L2": [
+   "gpt-5.6-sol",
+   "ernie-4.5-424b",
+   "qwen3.7-max"
+  ],
+  "L3": [
+   "gemini-3.5-flash",
+   "command-a",
+   "kimi-k3"
+  ],
+  "L4": [
+   "minimax-m3",
+   "hy3"
+  ],
+  "L5": [
+   "gpt-5.6-sol",
+   "glm-5.2",
+   "kimi-k3"
+  ],
+  "L6": [
+   "ernie-4.5-424b",
+   "mimo-v2.5"
+  ],
+  "L7": [
+   "deepseek-v4-pro",
+   "gemini-3.5-flash",
+   "step-3.7-flash"
+  ],
+  "L8": [
+   "minimax-m3",
+   "command-a",
+   "qwen3.7-max"
+  ]
+ },
+ "context_lenses": [
+  "L4",
+  "L5",
+  "L8"
+ ],
+ "verifier_pool": [
+  "hy3",
+  "gemini-3.5-flash",
+  "kimi-k3",
+  "gpt-5.6-sol",
+  "glm-5.2",
+  "mimo-v2.5",
+  "deepseek-v4-pro",
+  "qwen3.7-max"
+ ],
+ "verifier_anchors": [
+  "hy3",
+  "gemini-3.5-flash",
+  "kimi-k3",
+  "gpt-5.6-sol"
+ ],
+ "injected_retest": [
+  "ernie-4.5-424b",
+  "command-a"
+ ],
+ "dropped_verifiers": [
+  "nemotron-3-ultra",
+  "minimax-m3",
+  "step-3.7-flash"
+ ],
+ "_verify_calibration_note": "polarity>=0.7 AND evidence>=0.6. Adversarial roster is NOT the verification roster.",
+ "_reroute_note": "2026-07-21: novita out of balance mid-run; novita-routed models failed over to openrouter (same weights, calibration preserved). minimax/google/openai unchanged."
+}

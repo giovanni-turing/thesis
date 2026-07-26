@@ -1,0 +1,12 @@
+{
+ "model": "kimi-k3",
+ "status": "active",
+ "cal_recall": "7/7",
+ "cal_fab": 0,
+ "cal_latency_s": 91,
+ "valid_json_rate": 1.0,
+ "grounding_rate": null,
+ "fabrication_rate": 0.0,
+ "units_done": 0,
+ "disabled": false
+}

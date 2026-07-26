@@ -1,0 +1,11 @@
+{
+  "claim_id": "intro-0296",
+  "verdict": "holds",
+  "observed": "v_cost_ratio current rows carry only pools 'both' and 'encoder' with min window_span_s=1379s; but window_span_s is the EVALUATION-window length, not the load-change cadence. Trace dynamics (eda_metric): request ACF half-life 9 min, image ACF half-life 69 min; the thesis forecasts/provisions on 1-second-to-1-minute bins with a 1-minute provisioning cadence.",
+  "claimed": "Disaggregation multiplies the provisioning problem: one sizing question per pool, continuously, under load that moves by the minute.",
+  "evidence": "This is a qualitative architectural framing sentence in the intro, cited to prior work (DistServe, Splitwise, Mooncake, ModServe), not a v_cost_ratio-backed numeric claim. Both adjudicators conflated v_cost_ratio.window_span_s (23-min analysis windows) with the cadence of load change - a wrong operand. 'One per pool' describes the disaggregated architecture (encoder pool + language pool); v_cost_ratio's 'both'/'encoder' encoding is the cost-comparison basis, not an enumeration of deployment pools. 'Moves by the minute' is supported by minute-scale burst dynamics (req ACF half-life 9 min) and the thesis's 1-minute provisioning cadence.",
+  "severity": "minor",
+  "fix": "No change. v_cost_ratio is the wrong backing for a qualitative intro-framing sentence; the minute-scale claim is backed by trace ACF/burst structure.",
+  "confidence": 0.82,
+  "query": "SELECT metric_path, value_num FROM eda_metric WHERE metric_path IN('acf_1min.req_halflife_minutes','acf_1min.img_halflife_minutes'); -- req 9 min, img 69 min | SELECT DISTINCT pool FROM v_cost_ratio WHERE is_current; -- both, encoder"
+}

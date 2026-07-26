@@ -43,15 +43,24 @@ replica lead is enforced by the simulator's native worker-startup delay.
 \paragraph{Temporal split.} The trace's
 first 1.4 days are consumed as forecast \emph{context} --- the
 zero-shot models' rolling history before their first usable
-15-second forecast --- and never graded; the remaining 5.60 days
+15-second forecast --- and never graded as evaluation results; the
+remaining 5.60 days
 form the evaluation span, on which every closed-loop verdict is
-scored (episodes burst1/3/4/5 and the calm day; the two
-pre-coverage episodes are graded only by forecast-free policies,
-Chapter~\ref{cap:baselines}). No information flows backward across the
+scored (episodes burst1/3/4/5 and the calm day). The two
+pre-coverage episodes (burst2/6) enter \emph{results} grading only
+through the forecast-free policies of Chapter~\ref{cap:baselines};
+forecast policies do replay them, using the expanding-context archive,
+but solely as the \emph{calibration} split for the language operating
+point (Section~\ref{sec:cl-llm}), never as evaluation results. No
+information flows backward across the
 split or within it: every forecast value is issued at or before the
 bin it predicts --- issue time $=$ target $-\,(h{-}1){\cdot}15$\,s, so
 the $h{=}1$ nowcast carries zero usable lead and longer horizons
-strictly precede (rolling origin, Chapter~\ref{cap:predictors}) --- and
+strictly precede (rolling origin, Chapter~\ref{cap:predictors}) --- and,
+with two disclosed exceptions (the language operating point re-selected
+after a fold result was inspected, Section~\ref{sec:cl-llm}, and the
+hybrid combiner designed after the F6 fold failure was observed,
+Section~\ref{sec:cl-aggregate}),
 no policy constant is \emph{tuned} on the evaluation span. Each
 is either derived from capacity measurement (the encoder cost model,
 the belief-to-knee conversion) or swept with all values reported; the
@@ -71,23 +80,29 @@ issued leads $\{15,30,45,165\}$\,s, each a two-pool replay under
 \emph{issue-time} actuation --- and \textbf{meets the SLA in all 60 of its
 cells: every window, every model, every lead}, under \emph{both} a
 warm-pool and a strict re-warm readiness model (the four burst windows
-pinned at the \SI{588}{\milli\second} service floor; the calm day
+pinned at the \SI{588}{\milli\second} no-queue plateau; the calm day
 548--\SI{734}{\milli\second}). The broader exploratory grid that located
 this operating point (adding p50, the reactive baseline, four capacity
 ratings, and a non-realizable \SI{300}{\second} target-time lead) is
 superseded for the forecast headline: the H=12 15-second archive supplies
 at most $(12{-}1)\times15 = \SI{165}{\second}$ of forecast-issued lead,
-and the \SI{300}{\second} cell reached the floor only by target-time
+and the \SI{300}{\second} cell reached the plateau only by target-time
 indexing --- an upper bound, not an issued lead. By contrast, the
 identically informed reactive controller loses burst3 at every lead and
 burst5 beyond 45 seconds, though burst4 still passes at $L{=}\SI{165}{\second}$
 (\SI{904.7}{\milli\second}) (Table~\ref{tab:base-react-enc}). On the
 burst windows the p90 schedule's p99 encoder delay is pinned at
-\SI{588}{\milli\second}, the platform's zero-queueing
-service floor: a full-batch forward ($f(64) =$
-\SI{316.4}{\milli\second}) plus the p99 handoff transfer
-(\SI{272}{\milli\second}). Anticipated capacity removes
-queueing entirely, and what remains is physics.
+\SI{588}{\milli\second}, the \emph{observed no-queue plateau} this
+harness reproduces whenever provisioned capacity keeps the queue
+empty; the ``service floor'' shorthand throughout this chapter names
+this observed plateau. Two scope notes keep it honest. The percentile
+is computed over \emph{all} requests, text-only requests contributing
+zero encoder delay (350{,}168 of the span's 749{,}601 requests bear
+images), so it is a population statistic, not a per-image bound. And
+it is not a physical lower bound: a same-harness static $C{=}16$ run
+over the same span reads \SI{565.2}{\milli\second}, below it.
+Anticipated capacity removes queueing entirely; what remains is the
+no-queue operating point of this batch-and-handoff configuration.
 
 The ablations locate why, and what each dial buys:
 
@@ -197,10 +212,11 @@ per-episode. (This harness's replay normalization reads the shared floor
 \SI{1}{\milli\second} above the main issue-time artifacts'
 \SI{588}{\milli\second}; it is the same floor.)}
 \label{tab:cl-ewma}
-\small
+\footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lrrrrrrl@{}}
 \toprule
-Forecaster (p90) & burst1 & burst3 & burst4 & burst5 & steady & agg &
+Forecaster (p90) & b1 & b3 & b4 & b5 & steady & agg &
 per-episode \\
  & \multicolumn{5}{c}{encoder-delay p99 (\si{\milli\second})} &
 $\times$static & verdict \\
@@ -256,7 +272,11 @@ Forecast, tail-aware conversion & 736.3 & 6.3 & PASS \\
 \end{tabular}
 \end{table}
 
-The tail-aware conversion is derived, not tuned. The planner sizes
+The tail-aware conversion is derived from capacity measurement at
+this operating point --- though its \emph{scale} is later swept
+directly in the calibration of the operating-point selection below,
+so ``derived, not tuned'' applies to the knee ratio here, not to the
+swept variants. The planner sizes
 replicas as $\lceil \hat{d} / \hat{r} \rceil$ where $\hat{r}$ is its
 belief about per-replica throughput (measured in-loop: median
 \SI{10.07}{req/s} per TP2 replica); the SLA-relevant capacity is instead
@@ -292,7 +312,7 @@ carried to the live-stack validation of Chapter~\ref{cap:validation}.)
 The verdict is not particular to burst3: replaying every
 forecast-covered burst episode
 end-to-end, the p90 forecast passes each one at the service floor
-(TTFT p99 651--706\,\si{\milli\second} across onsets of 1--220 minutes)
+(TTFT p99 651--706\,\si{\milli\second} across onsets of 1--404 minutes)
 while the reactive planner fails all four
 (1{,}615--3{,}495\,\si{\milli\second}).
 
@@ -314,15 +334,70 @@ model-independent among the foundation models. The reactive planner
 while spending 281.8 GPU-hours: half the budget, and the wrong tail. At
 week scale as at window scale, spend is not the defect.
 
-The quantile matters less here than on the encoder pool, and the
-contrast is diagnostic. The p50 forecast also \textbf{passes the week}
-on the language pool (TTFT p99 \SI{828}{\milli\second}, 319.9
-GPU-hours: 38\% cheaper than p90), whereas on the encoder pool p50 fails
-every one of its 48 week-scale cells --- the burstiness gap: image
-demand floods the encoder FIFO under median sizing while the smoother
-context-token demand is served adequately even at p50. What is universal
-is the \emph{conversion}; what is pool-specific is how much the
-\emph{quantile} adds --- most where the signal is burstiest.
+\paragraph{The operating point, re-selected --- and its evidential
+status.} The p90 point above
+is the calibrated band \emph{edge}, not a cost-optimized one. Re-selecting
+the operating point --- forecast quantile crossed with the tail-aware
+conversion scale --- on the trace's first 1.4 days alone (the
+forecast-context windows burst2 and burst6, onsets 48 and 53 minutes,
+replayed by forecast policies for this calibration only)
+selects p70 at conversion scale 6 and shows the p90 edge
+over-provisioned: moving to the calibration-selected point removes
+36.3\% of the p90-edge spend (518.6 GPU-hours), because the edge stacks
+a high quantile \emph{and} a high scale where the fast-onset feasibility
+threshold needs only one. Two points then bracket a deployment frontier
+over the 5.60-day span. The calibration-selected p70/s6 point costs
+\textbf{0.61$\times$} static (330.4 GPU-hours) but \emph{drops the e13
+onset} per-episode (a
+daily fold, TTFT p99 \SI{1134}{\milli\second}) --- masked in the aggregate
+exactly as Section~\ref{sec:cl-aggregate}'s dashboard-masking predicts, the
+same onset the encoder headline also drops. The cheapest swept point that
+clears e13 with margin --- the p90 quantile at conversion scale 6 --- costs
+\textbf{440.0 GPU-hours, 0.82$\times$ static time-matched
+(0.87$\times$ request-matched)}, passing every daily fold (e13
+\SI{886}{\milli\second}) and removing 15.2\% of the p90-edge spend. The
+two points' evidential status differs, and must be stated plainly:
+p70/s6 is the point the context-split calibration selects; p90/s6 was
+chosen \emph{after} p70/s6's e13 failure was inspected, so it is a
+post-hoc robustness sensitivity on this trace, not an independently
+held-out selection --- calling it held-out or deployment-validated
+would require an untouched trace or window, or a nested validation,
+which this thesis does not have. So the calibration sweep lifts the
+language pool from the p90-edge's break-even to a modest saving ---
+aggressive (0.61$\times$, e13-failing) or e13-robust (0.82$\times$,
+post-hoc) --- leaving the encoder headline untouched. That saving is the \emph{conversion}, not the
+forecaster or the horizon: with the Chronos-p90 forecast held fixed, the
+planner's native \emph{mean} conversion fails byte-identically to the
+reactive baseline (burst3 TTFT p99 \SI{3495}{\milli\second} for both) while
+the tail-aware conversion passes (\SI{651}{\milli\second}), and the reactive
+failure is predictor-independent (constant, ARIMA, Kalman and Prophet within
+\SI{8}{\milli\second} of one another). The language forecast enters as a
+held cursor (Section~\ref{sec:cl-controller}) and the result is
+lead-invariant, so anticipation is neutralized by construction and only the
+capacity conversion --- mean per-replica throughput replaced by the
+tail-knee rate --- is at work. All three arms are calibrated on the same
+context split (static minimal-feasible at TP2$\times$2 there, TP1$\times$4
+failing; the reactive planner failing at every window-mean target), so the
+comparison at the calibration-selected point is symmetric; the post-hoc
+p90/s6 sensitivity is the disclosed exception.
+
+The p50 quantile does not survive per-episode grading on this pool
+either. The p50 forecast at scale 8 clears the week-scale
+\emph{aggregate} (TTFT p99 \SI{819}{\milli\second} in the current
+rerun, \SI{828}{\milli\second} in the original week artifact, at 318--320
+GPU-hours) --- but under the joint aggregate-plus-episode gate this
+thesis applies everywhere else it \textbf{fails burst3} (TTFT p99
+\SI{2164}{\milli\second}, ITL p99 \SI{137}{\milli\second}) \textbf{and
+burst5} (\SI{1679}{\milli\second}, \SI{120}{\milli\second}). The
+aggregate pass is a calibration false positive: the dashboard-masking of
+Section~\ref{sec:cl-aggregate}, reproduced inside the evaluation
+protocol itself the moment only the aggregate is read. Its apparent
+cheapness is therefore not evidence that the quantile matters less on
+the smoother context-token signal; the valid language frontier is the
+p70/s6 and p90/s6 pair above. On the encoder pool the same defect is
+merely more visible: p50 fails every one of its 48 week-scale cells.
+What is universal is the \emph{conversion}; the \emph{quantile} dial
+binds on both pools --- most visibly where the signal is burstiest.
 
 \begin{figure}[htbp]
 \centering
@@ -364,10 +439,12 @@ modestly across the archive's
 realizable 15--\SI{165}{\second} issued-lead range, declining systematically by
 ${\sim}6$--7\% from $L{=}15$ to \SI{165}{\second} (see text). The three
 rows reading \SI{588}{\milli\second} are distinct runs that coincide at
-the zero-queueing service floor (Section~\ref{sec:cl-matrix}); rows above
-it carry queueing on top of that floor.}
+the observed all-request no-queue plateau of
+Section~\ref{sec:cl-matrix} (not a physical floor); rows above
+it carry queueing on top of that plateau.}
 \label{tab:cl-aggregate}
-\small
+\footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lrrrl@{}}
 \toprule
 Policy & p99 (ms) & Mworker-s & vs.\ static & Episodes \\
@@ -388,9 +465,12 @@ burst3} \\
 \end{table}
 
 The headline: \textbf{the p90-forecast schedule meets the tail SLA over
-the aggregate \emph{and} inside every in-span episode at 0.62
+the aggregate \emph{and} inside every declared in-span burst episode at 0.62
 times the deployable static encoder fleet's provisioned worker-time}
-(Table~\ref{tab:cl-aggregate}). Actuated on forecast issue time, the cost
+(Table~\ref{tab:cl-aggregate}); the finer daily-fold grain surfaces one
+missed covered onset, e13, recovered by the hybrid schedule below
+(a second whole-fold forecast failure there, F2, is a coverage
+artifact, not an onset miss). Actuated on forecast issue time, the cost
 is essentially lead-invariant across the archive's realizable
 15--\SI{165}{\second} issued-lead range (indexing by target time is an
 optimistic bound no issue-time schedule realizes). This flatness assumes
@@ -437,6 +517,55 @@ itself, and is why this thesis grades aggregate \emph{and} per-episode
 compliance jointly. The p50 row completes the symmetry: an excellent
 \emph{cost} policy (0.25$\times$) that fails the SLA outright.
 
+\paragraph{A finer grain, and the hybrid recovery.} Grading finer than
+the in-span burst episodes --- across the seven daily folds of the full
+seven-day trace (Section~\ref{sec:cl-limits}) --- shows the pure
+forecast failing two whole calendar folds, for different reasons. On
+fold~F2, which the issue-time archive covers only partially, the
+under-covered forecast schedule reads \SI{1319}{\milli\second} where the
+reactive arm passes at \SI{369}{\milli\second} --- a coverage failure,
+not an onset miss. And fold~F6 contains the one onset the
+burst-episode and aggregate views both miss: \textbf{e13} (a
+sharp fold-scale spike, 7-minute onset with a 1-minute peak), where the
+p90 schedule reads \SI{1264}{\milli\second}\footnote{Fixed-context
+issue-time archive; the expanding-context fold analysis of
+Section~\ref{sec:cl-limits} reads \SI{1262}{\milli\second} on the same
+fold --- a ${\sim}2$-ms harness offset, as with the
+\SI{588}{}/\SI{589}{\milli\second} floor.}, over the bound. Its peak of
+\SI{263}{img/s} needs ${\approx}18$ workers at $\rho{=}15$; the p90 band
+places 16 and, holding ${\approx}17$ afterward, drains the resulting
+backlog slowly, while the reactive controller --- 11 at the spike, late
+as ever on a sub-minute jump, then surging to 21 just after --- runs the
+larger deficit exactly when it matters (\SI{1229}{\milli\second}). A
+\emph{hybrid} schedule $C_{\text{hyb}}(t)=\max\!\bigl(C_{\text{fc}}(t),
+C_{\text{re}}(t)\bigr)$ --- designed \emph{after} the F6 failure was
+inspected, a post-hoc repair rather than a pre-registered controller ---
+clears e13 at \SI{679}{\milli\second}: taking the
+higher arm at every instant, it keeps the forecast's spike capacity
+\emph{and} inherits the reactive arm's post-spike surge, draining the
+backlog neither arm clears alone. It costs \textbf{0.76$\times$} static
+over the aggregate (0.79$\times$ on F6), under warm-pool readiness.
+Replayed on all seven daily folds, the hybrid passes every fold
+(encoder-delay p99 369--679\,\si{\milli\second}); on F1, which no
+archived forecast covers, it degenerates to the reactive arm by
+construction, so the seven-fold replay is six informative folds plus one
+designed fallback --- no-regression evidence for a controller designed
+on F6, not independent workload validation. The decomposition
+$\max(fc,re)=fc+(re-fc)^{+}$ makes the premium over the pure forecast
+exactly the forecast-error correction --- paid only where observed load
+outruns the band (35\% of the span; 13.8\% of static in worker-time) and
+shrinking as the forecast improves, to zero at a perfect forecast. The
+encoder thus carries the same cost/robustness trade-off as the language
+pool (Section~\ref{sec:cl-llm}): \textbf{0.62$\times$} aggressive,
+dropping the single fold-scale onset, to \textbf{0.76$\times$} with the
+fold-recovering hybrid. A
+sweep of the combiner on F6 shows the point cost-minimal among the
+tested F6 max-combiner settings --- a leaner
+forecast quantile reopens e13, and compensating with a more aggressive
+reactive arm costs more (0.83--0.97$\times$) --- because forecast
+anticipation is cheaper standing capacity than reactive
+over-provisioning.
+
 \section{The complete improvement ledger}
 \label{sec:cl-ledger}
 
@@ -457,9 +586,11 @@ stated once and never worked around: there is \textbf{no request-linked
 composed replay for steady24h, burst2, burst6, the full trace, or any
 static arm}, so no composed number is reported for those cells; and the
 full-trace family carries static and reactive arms only, so it has no
-forecast comparator. Of the experiment families still generating at the
-time of writing (a16, g2, g3\_32b, g6), none contributes a number to any
-table here; one quantity from outside that set is admitted in prose below
+forecast comparator. Four experiment families (a16, g2, g3\_32b, g6)
+are excluded from every table here, an exclusion fixed at the
+2026-07-26 manuscript snapshot because their run populations were still
+growing when the chapter's tables were frozen; one quantity from
+outside that set is admitted in prose below
 --- the controller's own inference charge --- reported as a sensitivity on
 the cost ratio, never as a headline.
 
@@ -525,10 +656,10 @@ columns are trustworthy for the Chronos and reactive arms only.}
 a window, the reactive and forecast arms share \emph{identical} p50, p90
 and p99 on aggregate, burst1, burst4 and burst5. This is not a
 duplication artifact --- the arms are distinct runs with distinct
-worker-time and worst cases --- it is the physics of
+worker-time and worst cases --- it is the mechanism of
 Section~\ref{sec:cl-matrix}: at 2.2--3.2\% encoder utilisation the
 queue is empty for essentially every request, so delay collapses
-onto the deterministic \SI{588}{\milli\second} floor every
+onto the observed \SI{588}{\milli\second} no-queue plateau every
 adequately provisioned policy reaches. \textbf{On the graded
 encoder statistic, forecasting does not beat reactive control on four of
 the five composed windows --- they tie exactly, at the floor. The whole
@@ -643,10 +774,13 @@ pool. That is not a defect: reactive is cheap precisely because it
 under-provisions decode capacity, which is why it fails the tail on every
 window, so the apparent saving \emph{is} the violation and must never be
 quoted as a win. The defensible language-pool cost statement is the one
-in Section~\ref{sec:cl-llm}, against the burst-sized static shape, and it
-is a break-even, not a saving. The division of labour is asymmetric:
-\textbf{on the encoder pool forecasting buys savings;
-on the language pool it buys compliance.}
+in Section~\ref{sec:cl-llm}, against the burst-sized static shape: a
+break-even at the p90 band edge, lifted to a modest, e13-robust saving
+(0.82$\times$) by the post-hoc p90/s6 sensitivity. The division of labour is one of
+\emph{degree}: \textbf{the encoder pool's forecasting saving is
+substantial; the language pool's is modest, and there forecasting's first
+job is compliance --- holding the tail where the cheaper reactive baseline
+fails it.}
 
 \subsection{The joint result, and why it is not a sum}
 \label{sec:cl-ledger-joint}
@@ -765,11 +899,17 @@ nor contradicts the per-episode result.
 Section~\ref{sec:cl-llm} is 518.6 H100 GPU-hours against a static
 TP2$\times$2 shape \emph{time-scaled} to the same span (537.4\,GPU-hours).
 But scaling the static reference by \emph{request count} rather than time
-gives 503.7\,GPU-hours and 1.03$\times$ --- the forecast policy
+gives 503.7\,GPU-hours and 1.03$\times$ for that same p90/s8 edge ---
+the forecast policy
 slightly \emph{more} expensive. The comparison is genuinely at
 break-even, and which side of unity it falls on is decided by the
 denominator, not the policy; the time-matched denominator is the one
-quoted, and must be quoted \emph{with} the ratio.
+quoted, and must be quoted \emph{with} the ratio. The calibration sweep
+of Section~\ref{sec:cl-llm} improves on this break-even:
+0.61$\times$ static for the calibration-selected p70/s6 point, which
+drops the single e13 onset, or 0.82$\times$/0.87$\times$ static
+(time-/request-matched) for the e13-robust --- but post-hoc ---
+p90/s6 sensitivity.
 \end{itemize}
 
 Two further honesty points close the cost account. Forecasting is
@@ -798,10 +938,15 @@ Appendix~\ref{ap:artifacts}). The controller actually replayed, at
 \subsection{The volume of evidence}
 \label{sec:cl-ledger-scale}
 
-The results of this chapter are not a handful of runs: the provenance
-store behind every number above held \num{2060} simulation runs across
-the committed families, validated by 44 automated consistency checks,
-against which the composed arm set resolves to exactly 20 request-linked
+The results of this chapter are not a handful of runs: at the
+2026-07-26 snapshot the provenance
+store behind every number above held \num{2666} current run records ---
+mostly simulation replays, plus 41 forecasting, 16 EDA, and 10
+live-validation records --- and is exercised by 75 defined automated
+consistency checks, 74 of them enabled, of which 69 passed and five
+failed at that snapshot (one error-level, four warn-level, each
+carrying a documented note in the check registry); against this store the
+composed arm set resolves to exactly 20 request-linked
 arms matched one-to-one by artifact path. The aggregate window replays
 \num{749601} requests \emph{per pool} and the full trace \num{1000000},
 backed by tens of millions of per-request rows and the rolling-origin
@@ -814,8 +959,9 @@ AIC timing model: the live anchor validates the control loop, not
 silicon. One caveat keeps that volume from being over-read: scale is not
 independence --- the runs replay a \emph{single} production trace, and
 the limits of Section~\ref{sec:cl-limits} apply undiminished (the
-still-generating families a16, g2, g3\_32b, g6 are excluded from every
-table above).
+a16, g2, g3\_32b, and g6 families are excluded from every table above,
+an exclusion fixed at the 2026-07-26 snapshot because their run
+populations were not yet frozen).
 
 \section{Limitations}
 \label{sec:cl-limits}
@@ -852,13 +998,15 @@ alone). This is a fabric requirement, not a policy weakness: at the
 $4\times$ payload \emph{every} policy violates the bound, including the
 deployable static fleet, because the
 1{,}087\,\si{\milli\second} handoff floor is common to all. The
-\SI{588}{\milli\second} floor therefore assumes an
+\SI{588}{\milli\second} plateau therefore assumes an
 embedding-only handoff or a ${\geq}100$\,Gbps inter-pool fabric, which
 restores the quoted numbers for every policy exactly. Per-pool leads
 are swept as constants, not stochastic; and the two
-out-of-span episodes (burst2/6) are graded only by the forecast-free
-baselines of Chapter~\ref{cap:baselines}, never by a \emph{forecast}
-policy --- a hole a deployed system entering the week with prior history
+out-of-span episodes (burst2/6) enter results grading only through the
+forecast-free baselines of Chapter~\ref{cap:baselines} --- forecast
+policies replay them solely as the language calibration split
+(Section~\ref{sec:cl-llm}), never as evaluation results --- a hole a
+deployed system entering the week with prior history
 would not have. Replay-level p99 noise is ${\approx}4\%$;
 no quoted \emph{policy} contrast is within that band --- the within-noise
 agreements quoted above (the vLLM reprice; the cross-model cost spread
@@ -892,9 +1040,13 @@ ranges 0.47--1.10$\times$ over the five burst-bearing folds, $\rho{=}15$
 is feasible in six of seven folds but cheapest in none, and the policy
 misses the bound on the fold containing the e13 onset (encoder-delay p99
 \SI{1262}{\milli\second}), where a static $C{=}5$ fleet passes for only
-$3\%$ more worker-time. The language pool's fold ratios run
+$3\%$ more worker-time. The language pool's fold economics depend on
+the policy vintage: the original p90/s8 edge runs
 0.93--3.81$\times$ against the same-fold static comparator --- above
-parity in six of seven folds, since short folds amortize nothing --- and
+parity in six of seven folds, since short folds amortize nothing ---
+while the e13-robust p90/s6 point runs 0.66--1.68$\times$ on the same
+folds (0.96, 0.69, 0.73, 1.42, 0.66, 0.71, 1.68 on F1--F7), above
+parity in two of seven, 0.87$\times$ request-matched in aggregate; and
 the fixed $C{=}8$ encoder denominator is an accounting reference, not
 per-fold re-optimized (one truncated fold's $C{=}8$ row ends with a
 non-empty queue and is marked infeasible). Three limits travel with that qualification: the
@@ -918,13 +1070,16 @@ p90 edge holds the tail SLA at every forecast-issued lead, including
 the one-minute onset that defeats an identically informed reactive
 controller at \emph{every} lead, because the band's graduated standing
 headroom --- not clean onset detection --- stands capacity up before the
-peak, leaving only the service-time floor. On the
-language pool the same forecast passes bursts under realistic replica
+peak, leaving only the observed no-queue service plateau. On the
+language pool, its own forecast passes bursts under realistic replica
 leads only through the tail-aware capacity conversion --- a measured
 belief-to-knee ratio, tested under a held forecast cursor rather than a
 second anticipation test --- which repairs the mean-based sizing defect
 shared by every reactive configuration tested. Priced over the covered
-week, the policy meets the SLA in aggregate and per-episode at
+week, the policy meets the SLA in aggregate and in each of the four
+declared in-span burst windows at
 \textbf{0.62 times the deployable static encoder fleet's worker-time}
 --- a week-scale figure (per burst window, every arm costs more than
-static) --- the thesis statement's economic clause, now number-backed.
+static); the finer daily-fold grain surfaces the one missed covered
+onset, e13, recovered at 0.76$\times$ by the post-hoc hybrid --- the
+thesis statement's economic clause, now number-backed.

@@ -1,0 +1,11 @@
+{
+  "claim_id": "predictors-0191",
+  "verdict": "holds",
+  "observed": "Inter-FM spread (worst-best foundation model, span=common/point/h=-1) is <=2 WAPE points in 14 of 20 cells and <=0.5 pts at 1min (ctx 0.14, requests 0.10, gen 0.35, images 0.41 pts). It only grows large at the 1-second no-skill regime (images 21.71 pts, ctx 9.61 pts), where the thesis itself states nothing forecasts single bins.",
+  "claimed": "Inter-model margins are small enough that engineering considerations can drive the choice.",
+  "evidence": "The anchor sits in an all-foundation-model summary paragraph (predictors.tex:344-355); 'inter-model' = among the three FMs one chooses between (Toto/Chronos/TimesFM), not FM-vs-baseline. Both adjudicators computed an ALL-PREDICTOR spread (0.6374-0.9917, 55.6%) that mixes in the classical baselines - the wrong scope; that FM-vs-baseline gap is the SEPARATE 'beat every baseline' claim. Their own FM-only figures (4.71% at 15s, 1.11% at 1min) are small and support the claim. At provisioning cadence (30s-1min, the operative regime) spreads are <2 WAPE pts; where FMs diverge most (1s) the thesis already declares the no-skill floor, so accuracy cannot differentiate the choice either.",
+  "severity": "minor",
+  "fix": "No change required; optionally add 'at provisioning cadence' for precision, but claim is defensible as written.",
+  "confidence": 0.8,
+  "query": "SELECT resolution,variate, ((MAX(wape)-MIN(wape))*100) AS spread_wape_pts FROM forecast_metrics WHERE mode='uni' AND span='common' AND candidate='point' AND h=-1 AND model IN('chronos','timesfm','toto') GROUP BY resolution,variate ORDER BY 3 DESC; -- 1s/images 21.71, 1min cells 0.10-0.41 pts"
+}

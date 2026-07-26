@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "related-0288",
+  "chapter": "related",
+  "claim_type": "methodological",
+  "anchor": "Planner behavior is version-specific: it follows the Dynamo 1.x planner design documentation and inspection of the source tree at the commit used for this thesis's simulations (v1.3.0 source build; accessed 2026-07-07).",
+  "claim_text": "Dynamo planner behavior follows Dynamo 1.x design documentation and source tree at commit used for simulations (v1.3.0 source build, accessed 2026-07-07).",
+  "expected_backing": "chapter_4"
+ },
+ {
+  "claim_id": "intro-0314",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "The methodology is therefore trace-driven discrete-event simulation, the established instrument at this scale in LLM serving",
+  "claim_text": "The methodology is trace-driven discrete-event simulation.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "intro-0315",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "The platform prices each pool on the hardware class it targets. The vision pool is an event-driven FIFO of encoder workers costed by aiconfigurator (AIC), NVIDIA's offline planner, over performance data collected for this thesis on an NVIDIA GeForce RTX 5090",
+  "claim_text": "The vision pool is priced on an NVIDIA GeForce RTX 5090 using aiconfigurator.",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "intro-0316",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "The language pool is simulated by Dynamo's discrete-event engine under AIC-calibrated H100 timing",
+  "claim_text": "The language pool is simulated by Dynamo's discrete-event engine under AIC-calibrated H100 timing.",
+  "expected_backing": "vllm_request"
+ },
+ {
+  "claim_id": "conclusion-0332",
+  "chapter": "conclusion",
+  "claim_type": "methodological",
+  "anchor": "Correcting the missizing needs more encoder workers and, on the language pool, a tensor-parallel shape change that no replica scaler can perform",
+  "claim_text": "Fixing encoder undersizing requires adding encoder workers; language pool requires tensor-parallel shape change impossible for replica-only autoscalers",
+  "expected_backing": "v_grid_static_effective or collector_encoder_fn showing required config changes"
+ },
+ {
+  "claim_id": "baselines-0335",
+  "chapter": "baselines",
+  "claim_type": "methodological",
+  "anchor": "Language-pool GPU-hours bill from instance order, not readiness: the discrete-event mocker integrates the provisioned worker count --- active, starting-up and draining alike --- so the startup ramp and scale-down drain tail are already inside every reported language GPU-hour, and no cold-start surcharge may be added to it.",
+  "claim_text": "Language pool GPU-hours bill from instance order (not readiness), including startup ramp and scale-down drain tail; no cold-start surcharge added.",
+  "expected_backing": "v_cost_ratio"
+ },
+ {
+  "claim_id": "baselines-0336",
+  "chapter": "baselines",
+  "claim_type": "methodological",
+  "anchor": "Mixing the two conventions is a second reason, beyond hardware class, the classes are never summed",
+  "claim_text": "The two hardware classes are never summed due to different billing conventions (order-time vs readiness).",
+  "expected_backing": "v_cost_ratio"
+ },
+ {
+  "claim_id": "baselines-0337",
+  "chapter": "baselines",
+  "claim_type": "methodological",
+  "anchor": "Each policy produces, per window, a worker schedule for the encoder pool (C(t) workers) and a configuration or replica schedule for the language pool (TP\u00d7N H100 workers), graded on the two-pool replay.",
+  "claim_text": "Each policy produces per-window worker schedule for encoder pool (C(t)) and language pool (TP\u00d7N H100 workers), graded on two-pool replay.",
+  "expected_backing": "v_grid_static_effective"
+ }
+]

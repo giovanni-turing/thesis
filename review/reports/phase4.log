@@ -1,0 +1,4 @@
+Phase 4: 77 FAIL claims -> 154 validation units
+per-model: {'gpt-5.6-sol': 29, 'gemini-3.5-flash': 37, 'deepseek-v4-pro': 33, 'qwen3.7-max': 21, 'hy3': 21, 'kimi-k3': 13}
+[ok     ] gpt-5.6-sol      validation-0004
+[ok     ] gemini-3.5-flash validation-0004

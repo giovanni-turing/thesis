@@ -1,0 +1,29 @@
+{
+ "claim_id": "closedloop-0121",
+ "chapter": "closedloop",
+ "claim_type": "comparative",
+ "anchor": "the p50 forecast also passes the week on the language pool (TTFT p99 828 ms, 319.9 GPU-hours: 38% cheaper than p90)",
+ "claim_text": "The p50 forecast passes the week on the language pool at TTFT p99 828 ms using 319.9 GPU-hours (38% cheaper than p90)",
+ "expected_backing": "v_infraction,v_cost_ratio",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "planner:week_fc_p50 (gpu_hours=319.91, TTFT p99=827.81ms, is_violation=false), planner:week_fc_p90 (gpu_hours=518.61, TTFT p99=651.14ms); savings = (518.61 - 319.91) / 518.61 = 38.31%",
+   "evidence": "v_pool_cost and v_infraction confirm planner:week_fc_p50 achieves 319.91 H100 GPU-hours and TTFT p99 of 827.81 ms with no violation, representing a 38.31% savings over planner:week_fc_p90 (518.61 H100 GPU-hours). Prior verifier deepseek-v4-pro incorrectly queried the factorial-based v_closedloop_frontier under 'steady24h' rather than the week-scale 'planner' replay runs.",
+   "severity": "minor",
+   "fix": "",
+   "query": "SELECT run_id, gpu_hours, achieved_p99_ms, is_violation, v_pool_cost.is_current FROM provenance.v_pool_cost JOIN provenance.v_infraction USING (run_id) WHERE run_id IN ('planner:week_fc_p50', 'planner:week_fc_p90') AND sla_metric='ttft';"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "inconsistent",
+   "observed": "Current unsuperseded planner rows give p50 TTFT p99 827.8129093647003 ms against 1000 ms, 319.9097385157993 GPU-hours versus p90 518.6063450234815, and savings ratio 0.383135702858949; however v_cost_ratio has 0 backing rows, while v_closedloop_frontier marks p50 aggregate infeasible (worst p99 range 1514.36-3411.61 ms) and steady24h infeasible at 1073.139 ms.",
+   "evidence": "The quoted aggregate numbers reproduce, but the pass claim conflicts with every p50 aggregate frontier row and the expected cost-ratio backing is absent.",
+   "severity": "blocking",
+   "fix": "Do not state that p50 passes the week until the planner report and closed-loop frontier are reconciled; if retaining the arithmetic, label it explicitly as the aggregate planner-report result and add a backed p50-to-p90 denominator row.",
+   "query": "WITH current_runs AS (SELECT run_id, quantile, window_span_s, window_requests, superseded_by FROM provenance.v_dim WHERE is_current = true AND experiment = 'planner' AND pool = 'language' AND window_name = 'aggregate' AND policy = 'forecast' AND forecast_model IS NULL AND quantile IN ('p50','p90')), report AS (SELECT c.quantile, c.window_span_s, c.window_requests, c.superseded_by, pc.provisioned_worker_seconds, pc.gpu_hours, i.achieved_p99_ms, i.bound_ms, i.is_violation, i.has_raw_backing FROM current_runs c JOIN provenance.v_pool_cost pc ON pc.run_id = c.run_id AND pc.is_current = true JOIN provenance.v_infraction i ON i.run_id = c.run_id AND i.is_current = true AND i.sla_metric = 'ttft' AND i.bound_stat = 'p99'), pivot AS (SELECT MAX(gpu_hours) FILTER (WHERE quantile='p50') AS p50_gpu_hours, MAX(gpu_hours) FILTER (WHERE quantile='p90') AS p90_gpu_hours, MAX(provisioned_worker_seconds) FILTER (WHERE quantile='p50') AS p50_worker_seconds, MAX(provisioned_worker_seconds) FILTER (WHERE quantile='p90') AS p90_worker_seconds, MAX(achieved_p99_ms) FILTER (WHERE quantile='p50') AS p50_ttft_p99_ms, MAX(bound_ms) FILTER (WHERE quantile='p50') AS p50_bound_ms, BOOL_OR(is_violation) FILTER (WHERE quantile='p50') AS p50_is_violation, BOOL_AND(has_raw_backing) FILTER (WHERE quantile='p50') AS p50_has_raw_backing, MIN(window_span_s) AS min_span_s, MAX(window_span_s) AS max_span_s, MIN(window_requests) AS min_requests, MAX(window_requests) AS max_requests, COUNT(*) AS current_report_rows, COUNT(*) FILTER (WHERE superseded_by IS NOT NULL) AS superseded_report_rows FROM report), ratio_backing AS (SELECT COUNT(*) AS current_cost_ratio_rows FROM provenance.v_cost_ratio WHERE is_current = true AND experiment='planner' AND pool='language' AND window_name='aggregate' AND policy='forecast' AND quantile IN ('p50','p90')), frontier AS (SELECT window_name, COUNT(*) FILTER (WHERE quantile='p50') AS p50_rows, BOOL_AND(all_feasible) FILTER (WHERE quantile='p50') AS all_p50_feasible, MIN(worst_p99_ms) FILTER (WHERE quantile='p50') AS min_p50_worst_p99_ms, MAX(worst_p99_ms) FILTER (WHERE quantile='p50') AS max_p50_worst_p99_ms FROM provenance.v_closedloop_frontier WHERE window_name IN ('aggregate','steady24h','burst1','burst3','burst4','burst5') GROUP BY window_name) SELECT p.*, (p.p90_gpu_hours-p.p50_gpu_hours)/p.p90_gpu_hours AS p50_savings_vs_p90, r.current_cost_ratio_rows, (SELECT jsonb_agg(to_jsonb(f) ORDER BY f.window_name) FROM frontier f) AS frontier_breakdown FROM pivot p CROSS JOIN ratio_backing r"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

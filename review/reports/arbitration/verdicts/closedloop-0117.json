@@ -1,0 +1,11 @@
+{
+ "claim_id": "closedloop-0117",
+ "verdict": "supported",
+ "observed": "llm_run_summary/v_dim run planner:week_fc_p90 (window=aggregate, policy=forecast, quantile=p90, pool=language, is_current, completed_requests=749601): gpu_hours=518.606, p99_ttft_ms=651.14, p99_itl_ms=6.406. Denominator: static TP2x2 = 4 GPUs time-scaled over aggregate span_s=483,659.8 => 4*483659.8/3600 = 537.3998 GPU-hours. Ratio = 518.606/537.3998 = 0.96503.",
+ "claimed": "p90-forecast passes the week at TTFT p99 651 ms (ITL p99 6.4 ms) for 518.6 GPU-hours vs burst-sized static TP2x2 537.4 for the same span (0.965x).",
+ "evidence": "Numerator (518.6 GPU-h, 651 ms TTFT p99, 6.4 ms ITL p99) is a stored is_current row in llm_run_summary for planner:week_fc_p90. Denominator 537.4 is the thesis's explicitly 'time-scaled' analytical static TP2x2 (4-GPU) baseline over the aggregate span; span_s=483,659.8 in windows() gives 537.3998 exactly, and the ratio 0.96503 rounds to 0.965. v_cost_ratio (the listed expected backing) is the encoder cost-ratio view (source_relation='encoder_run_summary') and correctly holds no row for this language-pool comparison; that absence is not a refutation.",
+ "severity": "minor",
+ "fix": "None required. All three stated figures and the ratio reproduce to stated precision.",
+ "confidence": 0.94,
+ "query": "SELECT s.run_id, d.window_name, d.policy, d.quantile, d.pool, s.gpu_hours, s.p99_ttft_ms, s.p99_itl_ms, s.completed_requests FROM llm_run_summary s JOIN v_dim d USING(run_id) WHERE s.gpu_hours BETWEEN 515 AND 522 AND d.is_current; SELECT span_s FROM windows WHERE window_name='aggregate';"
+}

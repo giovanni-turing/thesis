@@ -1,0 +1,22 @@
+Phase 2: 227 claims -> 454 verify units | pool=['hy3', 'gemini-3.5-flash', 'gpt-5.6-sol', 'mimo-v2.5', 'deepseek-v4-pro']
+[skip   ] hy3              CONFIRM validation-0002
+[skip   ] gemini-3.5-flash REFUTE  validation-0002
+[skip   ] gemini-3.5-flash CONFIRM validation-0004
+[skip   ] gpt-5.6-sol      REFUTE  validation-0004
+[skip   ] gpt-5.6-sol      CONFIRM validation-0005
+[skip   ] mimo-v2.5        REFUTE  validation-0005
+[skip   ] hy3              CONFIRM validation-0006
+[skip   ] deepseek-v4-pro  REFUTE  validation-0006
+[ok     ] deepseek-v4-pro  CONFIRM validation-0012
+[skip   ] hy3              REFUTE  validation-0012
+[skip   ] hy3              CONFIRM twopool-0020
+[skip   ] gemini-3.5-flash REFUTE  twopool-0020
+[skip   ] gemini-3.5-flash CONFIRM twopool-0021
+[skip   ] gpt-5.6-sol      REFUTE  twopool-0021
+[skip   ] gpt-5.6-sol      CONFIRM twopool-0022
+[skip   ] mimo-v2.5        REFUTE  twopool-0022
+[skip   ] gpt-5.6-sol      CONFIRM twopool-0023
+[skip   ] deepseek-v4-pro  REFUTE  twopool-0023
+[skip   ] deepseek-v4-pro  CONFIRM twopool-0024
+[ok     ] hy3              REFUTE  twopool-0024
+[skip   ] hy3              CONFIRM twopool-0025

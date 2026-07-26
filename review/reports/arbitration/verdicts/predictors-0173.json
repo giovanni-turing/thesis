@@ -1,0 +1,11 @@
+{
+  "claim_id": "predictors-0173",
+  "verdict": "contradicted",
+  "observed": "v_forecast_best (best model per variate x mode, 8 cells/resolution): fine 1s Toto 8/8, 15s Toto 8/8, 30s Toto 7/8 (TimesFM 1); coarse 45s TimesFM 4/8 leads (Toto 3, Chronos 1), 1min Toto 3/8 leads (Chronos 2, EWMA 2, TimesFM 1). forecast_metrics has no lifecycle columns; no staleness.",
+  "claimed": "Toto-2 takes the fine-bin cells and Chronos-2 takes most of the coarse ones.",
+  "evidence": "The Toto-2 fine-bin half holds (23/24 across 1s-30s). But Chronos-2 leads NEITHER coarse resolution: TimesFM leads 45s and Toto leads 1min. Chronos wins only 3 of 16 coarse cells (18.75%) and never the plurality, so it does not take 'most of the coarse ones.'",
+  "severity": "major",
+  "fix": "Replace with: 'Toto-2 takes nearly all 1s-30s cells; at 45s TimesFM leads, and at 1min Toto-2 has the most wins with Chronos-2 and EWMA tied behind it.'",
+  "confidence": 0.95,
+  "query": "SELECT resolution, model, count(*) wins FROM v_forecast_best GROUP BY resolution, model ORDER BY CASE resolution WHEN '1s' THEN 1 WHEN '15s' THEN 2 WHEN '30s' THEN 3 WHEN '45s' THEN 4 WHEN '1min' THEN 5 END, wins DESC;"
+}

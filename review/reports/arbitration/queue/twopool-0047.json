@@ -1,0 +1,29 @@
+{
+ "claim_id": "twopool-0047",
+ "chapter": "twopool",
+ "claim_type": "comparative",
+ "anchor": "On the steady head the separation is an order of magnitude: the vision pool is uncrossed at 32\u00d7 the trace rate while the language knee sits at s=3 (polynomial) or s=2 (calibrated). Since the sweep is octave-spaced above s=4, the separation is a factor >10 under calibrated timing, so sizing both pools off one signal would overprovision the encoder fleet by that factor in calm traffic.",
+ "claim_text": "Steady traffic saturation knees separated by >10\u00d7 under calibrated timing (vision uncrossed at 32\u00d7, language knee at s=2); sizing off one signal overprovisions encoder fleet >10\u00d7.",
+ "expected_backing": "v_pool_latency, v_grid_static_effective",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "vision_aic_s32: p99=787.18ms; llm_aic_s2: ttft=418.23ms, itl_p99=67.33ms; llm_poly_s3: ttft=374.39ms, itl_p99=94.34ms",
+   "evidence": "Knee separation is >10\u00d7 (32/2 = 16\u00d7 calibrated, 32/3 = 10.67\u00d7 polynomial). The overprovisioning statement is a subjunctive theoretical claim ('would overprovision... by that factor'), not a static fleet baseline.",
+   "severity": "",
+   "fix": "",
+   "query": "SELECT pool, timing, speedup, sla_metric_p99_ms, itl_p99_ms, over_threshold FROM provenance.sweep_point WHERE source_path LIKE '%head2k%' AND ((pool = 'vision' AND timing = 'aic' AND speedup = 32) OR (pool = 'llm' AND timing = 'aic' AND speedup IN (2, 3)) OR (pool = 'llm' AND timing = 'poly' AND speedup IN (3, 4))) ORDER BY pool, timing, speedup;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Current sweep rows show vision s=32 p99=787.18 ms, calibrated language s=2 p99 TTFT=418.2260329989949 ms, and polynomial language s=3 p99 TTFT=374.39063533254375 ms. However, the corrected static encoder fleet is 8 workers, not the superseded 16; steady24h c_star_effective=2, giving effective overprovision_vision_x=4, while 8 is explicitly superseded. Effective per-window encoder overprovision ranges from 1 to 4.",
+   "evidence": "The current sweep supports the large knee separation, but the effective steady24h fleet denominator is 8/2 and the owning effective view reports 4\u00d7, so the claimed >10\u00d7 calm-traffic fleet overprovision does not follow and is contradicted by corrected evidence.",
+   "severity": "major",
+   "fix": "Retain the >10\u00d7 knee-separation statement, but replace the fleet-sizing conclusion with: under the corrected effective grid, calm-traffic encoder overprovision is 4\u00d7; do not equate saturation-knee separation with realized fleet overprovision.",
+   "query": "WITH sweep AS (\n  SELECT run_id, pool, sla_metric, p99_ms, n_requests, queue_divergent, is_current\n  FROM provenance.v_pool_latency\n  WHERE is_current\n    AND experiment = 'sweeps'\n    AND (run_id LIKE 'sweeps:vision_head2k_s%'\n         OR run_id LIKE 'sweeps:llm_head2k_aic_s%'\n         OR run_id LIKE 'sweeps:llm_head2k_poly_s%')\n), static_effective AS (\n  SELECT static_encoder_workers_effective, binding_window_effective,\n         static_as_ingested, binding_as_ingested\n  FROM provenance.v_grid_static_effective\n), windows AS (\n  SELECT grid_run_id, window_name, span_h,\n         c_star_as_ingested, c_star_effective, is_superseded,\n         overprovision_vision_x_as_ingested,\n         overprovision_vision_x_effective,\n         overprovision_vision_x_is_superseded,\n         overprovision_llm_x, correction_source\n  FROM provenance.grid_window_effective\n)\nSELECT\n  (SELECT jsonb_agg(to_jsonb(s) ORDER BY run_id, sla_metric) FROM sweep s) AS current_sweep_rows,\n  (SELECT jsonb_agg(to_jsonb(e)) FROM static_effective e) AS static_effective_rows,\n  (SELECT jsonb_agg(to_jsonb(w) ORDER BY window_name) FROM windows w) AS per_window_effective_rows;"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

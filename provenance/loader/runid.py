@@ -74,6 +74,12 @@ _DIR_EXP_SPECIFIC = [
     # onto 'live:manager'. Experiment stays 'live' so the seven already-loaded live51
     # twin_*.report.json run_ids (which sit ABOVE live_runs/) are untouched.
     ("/live51/live_runs/", "live", True),
+    # --- reframe-thread families (2026-07-26): previously fell through to 'misc'
+    # (selftest B: 21 unmapped dirs; C: 9 stem collisions). Files already ingested by
+    # the dedicated langcalib loader stay file-gated in ingest_log and are not re-read;
+    # the 5 pre-mapping 'misc:*' rows are renamed by schema/32_scope_misc_runids.sql.
+    ("/encoder_hybrid/", "encoder_hybrid", True),
+    ("/lang_qsweep/", "lang_qsweep", True),
 ]
 
 # Directory names that hold a run's artifacts BY KIND rather than identifying a run:

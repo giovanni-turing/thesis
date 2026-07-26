@@ -1,7 +1,7 @@
 # Second thesis shortening and evidence-preservation audit
 
 Date: 2026-07-20  
-Reviewed source: current working-tree manuscript at HEAD 2fd4e76 plus the latest uncommitted corrections in tex/tese.tex, tex/intro.tex, tex/closedloop.tex, tex/validation.tex, and tex/conclusion.tex  
+Review snapshot: working-tree manuscript built at 2026-07-20 23:37 -03, based on HEAD 2fd4e76 plus the then-current uncommitted corrections in tex/tese.tex, tex/intro.tex, tex/closedloop.tex, tex/validation.tex, and tex/conclusion.tex\
 Built artifact checked: tex/tese.pdf, 133 pages, generated 2026-07-20 23:37 -03, with no undefined-reference or citation warnings in tex/tese.log  
 Scope: analysis only; no thesis source was modified
 
@@ -260,11 +260,16 @@ Either name that population or report the canonical Chronos-p90, rho=15, L=30 wa
 
 A promoted numerical range without its arm population is not evidence-complete.
 
-### P1.5 — Predictor claims lose cadence and comparator qualifiers when promoted
+### P1.5 — Coverage at both provisioning cadences is supported; retain only the comparator qualifiers
 
-The exact p90 coverage 0.88–0.90 is established at one-minute resolution (tex/predictors.tex:253-265), but the Summary, Introduction, and Conclusion call this “provisioning cadence.” The closed loop consumes 15-second forecasts, so that phrase is ambiguous. Say “at one-minute cadence.”
+**Post-review adjudication: the earlier recommendation to narrow p90 coverage to one-minute cadence is refuted.** predictors/results/metrics/quantile_coverage.json contains all evaluated model/mode and signal combinations at both operational cadences:
 
-The common one-minute evaluation span is only the final 33.4 hours and is burst-heavy (tex/predictors.tex:45-57). The classical baselines are fixed-parameter and context-capped (tex/predictors.tex:323-326). Promoted claims that TSFMs beat “every classical baseline” in all 20 cells should therefore read:
+- at 15-second bins, p90 coverage ranges from 0.881 to 0.901;
+- at one-minute bins, p90 coverage ranges from 0.880 to 0.898.
+
+The phrase “at provisioning cadences” is therefore grounded when it means the 15-second and one-minute bins. The current manuscript states that scope explicitly at tex/predictors.tex:255-267 and :333-337. Do not narrow the claim to one minute.
+
+The separate comparator qualifications still matter. The common one-minute accuracy-evaluation span is only the final 33.4 hours and is burst-heavy (tex/predictors.tex:45-57). The classical baselines are fixed-parameter and context-capped (tex/predictors.tex:323-329). Promoted claims that TSFMs beat “every classical baseline” in all 20 accuracy cells should therefore read:
 
 > all tested fixed-parameter classical baselines on their common evaluation spans.
 
@@ -300,7 +305,7 @@ The thesis can be much shorter if each research question retains one canonical c
 | RQ | Core claim | Canonical evidence to keep in the main text | Qualification that must remain |
 |---|---|---|---|
 | RQ1 | request rate poorly carries vision demand; the pools saturate differently | R² 0.123 versus 0.654; persistence/CV² table; extreme Jaccard 0.02; tab:sim-knees | one seven-day trace; arrival-stamped generated tokens are offered work; tested-scale and topology boundaries |
-| RQ2 | zero-shot TSFMs retain a modest edge and usable lead; p90 supplies headroom | causal rolling-origin/common-span protocol; tab:pred-wape; horizon result; one-minute p90 coverage | fixed-parameter baselines; 33.4-hour burst-heavy one-minute common span; image has worst absolute per-bin error; lower band is not calibrated |
+| RQ2 | zero-shot TSFMs retain a modest edge and usable lead; p90 supplies headroom | causal rolling-origin/common-span protocol; tab:pred-wape; horizon result; 15-second and one-minute p90 coverage | fixed-parameter baselines; 33.4-hour burst-heavy one-minute common span; image has worst absolute per-bin error; lower band is not calibrated |
 | RQ3 | encoder timing is silicon-anchored; timing-model sensitivity is quantified; live control reproduces offline verdicts | matched vLLM N≤64 bound; tab:sim-poly-aic; tab:val-anchor with success/error counts | standalone forward only; H100 timing not independently measured; mocked engines; one hardest window, two policies, one live run each |
 | RQ4 comparator | static and reactive baselines share mechanics and expose different failure modes | tab:base-grid; compact reactive encoder table; reactive language result | pool-specific hardware/accounting; order-time language billing versus readiness-time encoder billing; repair base-tp provenance |
 | RQ4 encoder mechanism | p90 passes the five-window/four-lead issue-time factorial where p50 and same-signal reactive fail | compact factorial summary; compact EWMA/headroom ablation; tab:cl-aggregate | issued leads 15–165 s; warm versus strict re-warm; standing headroom, not clean onset detection |
@@ -351,7 +356,7 @@ Targets: Related Work about 5 pages; Trace EDA about 7–8.
 
 Target: remove about 400–600 words.
 
-- keep causal rolling-origin evaluation, common-span bias, tab:pred-wape, horizon persistence, one-minute p90 calibration, and the operational forecast figure;
+- keep causal rolling-origin evaluation, common-span bias, tab:pred-wape, horizon persistence, 15-second and one-minute p90 calibration, and the operational forecast figure;
 - move model-registry catalogs, detailed Dynamo per-config results, full covariate table, and additive-decomposition cells after direct manifest mapping;
 - retain one exact sentence for the ±0.4% covariate finding and one for the failed additive decomposition;
 - state fixed-parameter/common-span qualifiers once;
@@ -497,7 +502,7 @@ These facts bound the headline more efficiently than many pages of favorable cel
 - Abstract and Resumo are semantic mirrors and keep the same live/physical boundaries.
 - Every retained quantitative table/figure has a direct manifest row and primary artifact.
 - base-tp burst5 either has a C=8 rerun or is relabeled as C=16 archived context.
-- Predictor promotions retain one-minute/common-span/fixed-baseline qualifiers.
+- Predictor promotions retain both-cadence calibration evidence and the separate common-span/fixed-baseline qualifiers.
 - Validation retains scheduled, successful, and failed request populations.
 - Fold limitations report both pools and identify fixed C=8 as an accounting denominator.
 - No RTX-5090 worker-time is summed with H100 GPU-hours.

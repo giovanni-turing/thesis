@@ -1,0 +1,1 @@
+{"figure":"eda_d_acf","status":"ok","caption_match":true,"data_match":true,"issues":"none","evidence":"Two ACF curves vs lag(min); images(blue) crosses ACF=0.5 at ~69 min, requests(green) at ~9 min, both annotated on-plot. DB d_signals.acf_1min.img_halflife_minutes=69, req_halflife_minutes=9. Title '8x longer' = 69/9 ~= 7.7, consistent.","severity":"none"}

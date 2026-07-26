@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "closedloop-0433",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "Where a static row appears it is the deployable C=8 fleet of Chapter 4 over the same span.",
+  "claim_text": "Static baseline is deployable C=8 fleet from Chapter 4.",
+  "expected_backing": "v_grid_static_effective"
+ },
+ {
+  "claim_id": "closedloop-0434",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "There is no request-linked composed replay for steady24h, burst2, burst6, the full trace, or any static arm, so no composed number is reported for those cells.",
+  "claim_text": "No composed replay for steady24h, burst2, burst6, full trace, or static arms.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0435",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "Of the experiment families still generating at the time of writing (a16, g2, g3_32b, g6), none contributes a number to any table here.",
+  "claim_text": "Experiment families a16, g2, g3_32b, g6 excluded from all tables.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0443",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "The controller actually replayed, at 180 s stride-12 tiling, makes every CPU cell feasible.",
+  "claim_text": "Replayed controller at 180s stride-12 tiling makes all CPU cells feasible.",
+  "expected_backing": "v_cost_ratio"
+ },
+ {
+  "claim_id": "closedloop-0445",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "The composed arm set resolves to exactly 20 request-linked arms matched one-to-one by artifact path.",
+  "claim_text": "Composed arm set: exactly 20 request-linked arms matched by artifact path.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0447",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "The live validation of Chapter 6 adds the one layer none of this simulates, running burst3 through Dynamo's real control plane in real time, twice --- 3,093 scheduled requests per policy, on mocker workers under the shared AIC timing model.",
+  "claim_text": "Live validation: burst3, 2 runs, 3,093 requests/policy, mocker workers, shared AIC timing.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0448",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "A deployed controller would re-forecast on drift, and its inference cost is not charged to the fleet (charging it changes nothing).",
+  "claim_text": "Deployed controller would re-forecast on drift; inference cost not charged (charging changes nothing).",
+  "expected_backing": "v_cost_ratio"
+ },
+ {
+  "claim_id": "closedloop-0449",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "The per-worker capacity rating rho is a swept control knob, not a first-principles derivation; its feasible settings sit far below the encoder's raw throughput because the binding constraint is the tail bound under bursty within-bin arrivals, not mean throughput.",
+  "claim_text": "rho is swept control knob, not first-principles; feasible settings far below raw throughput due to tail bound under bursty arrivals.",
+  "expected_backing": "v_pool_latency"
+ }
+]

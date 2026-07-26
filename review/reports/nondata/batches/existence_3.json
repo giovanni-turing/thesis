@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "apendice-0146",
+  "chapter": "apendice",
+  "claim_type": "existence",
+  "anchor": "A live-worker confirmation over the full serving path (with weight-loaded provenance) remains future work.",
+  "claim_text": "Live-worker confirmation over full serving path with weight-loaded provenance remains future work",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "apendice-0147",
+  "chapter": "apendice",
+  "claim_type": "existence",
+  "anchor": "First, the operator graph omitted the pixel-to-hidden patch-embedding GEMM; a subsequent branch added a guarded encoder_patch_embed_gemm (approx 0.3% of the forward at N=64; the DeepStack mergers were already modelled). This addition postdates the load-bearing simulation snapshot of the main text, in which the operator is absent, so the two are consistent.",
+  "claim_text": "Operator graph omitted pixel-to-hidden patch-embedding GEMM; subsequent branch added encoder_patch_embed_gemm (~0.3% of forward at N=64); DeepStack mergers already modeled; addition postdates main text snapshot",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "apendice-0148",
+  "chapter": "apendice",
+  "claim_type": "existence",
+  "anchor": "Second, the perf tables blanked the ViT's large-batch shapes --- the GEMM and attention grids stopped well short of the shapes the ViT queries, so past N approx 42 the model extrapolated beyond the grid; ViT-shape rows at large m and attention rows to batch 512 were collected on the 5090 (with a collector out-of-memory fix for a 32 GB card).",
+  "claim_text": "Perf tables blanked ViT large-batch shapes; GEMM/attention grids stopped short of ViT queries; past N\u224842 model extrapolated beyond grid; ViT-shape rows at large m and attention rows to batch 512 collected on 5090 with OOM fix for 32GB card",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "apendice-0151",
+  "chapter": "apendice",
+  "claim_type": "existence",
+  "anchor": "LLM lead sweep + capacity mapping (Section 4.3)",
+  "claim_text": "LLM lead sweep and capacity mapping performed",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "apendice-0152",
+  "chapter": "apendice",
+  "claim_type": "existence",
+  "anchor": "Physical encoder anchor (Section 3.2; collected, reported in Appendix B)",
+  "claim_text": "Physical encoder anchor collected and reported in Appendix B",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "apendice-0153",
+  "chapter": "apendice",
+  "claim_type": "existence",
+  "anchor": "Matched-engine vLLM dense sweep + queue replay (Figure B.1, Appendix B)",
+  "claim_text": "Matched-engine vLLM dense sweep and queue replay in Figure B.1, Appendix B",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "predictors-0159",
+  "chapter": "predictors",
+  "claim_type": "existence",
+  "anchor": "TimesFM has no covariate interface and is the strict univariate-per-signal control",
+  "claim_text": "TimesFM lacks covariate interface, serves as univariate-only control",
+  "expected_backing": "predictors/benchmark.py TimesFM covariate support"
+ },
+ {
+  "claim_id": "predictors-0175",
+  "chapter": "predictors",
+  "claim_type": "existence",
+  "anchor": "Dynamo's SLA planner selects a load predictor from a fixed registry (ARIMA, Kalman, Prophet, or constant)",
+  "claim_text": "Dynamo's SLA planner uses predictor registry: ARIMA, Kalman, Prophet, constant",
+  "expected_backing": "Dynamo planner config / citation"
+ }
+]

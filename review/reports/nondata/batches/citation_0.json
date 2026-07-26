@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "apendice-0154",
+  "chapter": "apendice",
+  "claim_type": "citation",
+  "anchor": "Collected AIC datasets were contributed upstream as draft PR ai-dynamo/aiconfigurator#1312 (campaign through commit b55dd0b7, pushed and open on the draft PR)",
+  "claim_text": "Collected AIC datasets contributed upstream as draft PR ai-dynamo/aiconfigurator#1312 through commit b55dd0b7",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "predictors-0186",
+  "chapter": "predictors",
+  "claim_type": "citation",
+  "anchor": "Chronos-2 and Toto-2 postdate the trace's 2025 public release, so their pretraining corpora could in principle contain series derived from it",
+  "claim_text": "Chronos-2 and Toto-2 postdate trace's 2025 release; pretraining may contain trace-derived series",
+  "expected_backing": "model release dates vs trace release date"
+ },
+ {
+  "claim_id": "related-0283",
+  "chapter": "related",
+  "claim_type": "citation",
+  "anchor": "its own design calls short-term per-stream arrivals ``difficult to predict''",
+  "claim_text": "ElasticMM's design calls short-term per-stream arrivals 'difficult to predict'.",
+  "expected_backing": "paper_library"
+ },
+ {
+  "claim_id": "baselines-0355",
+  "chapter": "baselines",
+  "claim_type": "citation",
+  "anchor": "The reactive baseline is Dynamo's SLA planner, the production controller of the platform this thesis targets",
+  "claim_text": "The reactive baseline is Dynamo's SLA planner, the production controller of the target platform.",
+  "expected_backing": "v_grid_static_effective"
+ },
+ {
+  "claim_id": "aiconfigurator-0387",
+  "chapter": "aiconfigurator",
+  "claim_type": "citation",
+  "anchor": "ai-dynamo/aiconfigurator \\#1312",
+  "claim_text": "Dataset, system file, and registration contributed upstream as draft PR ai-dynamo/aiconfigurator #1312.",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "aiconfigurator-0388",
+  "chapter": "aiconfigurator",
+  "claim_type": "citation",
+  "anchor": "NVIDIA5090Specs",
+  "claim_text": "RTX 5090 specs cross-checked against NVIDIA published specification.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "aiconfigurator-0389",
+  "chapter": "aiconfigurator",
+  "claim_type": "citation",
+  "anchor": "Dao2023FlashAttention2",
+  "claim_text": "FlashAttention kernel used for encoder attention on CC 12.0 under vLLM 0.22.0.",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "aiconfigurator-0390",
+  "chapter": "aiconfigurator",
+  "claim_type": "citation",
+  "anchor": "Qwen3VL2025",
+  "claim_text": "Qwen3-VL family shares vision tower across 8B, 32B, 235B variants.",
+  "expected_backing": "v_pool_latency"
+ }
+]

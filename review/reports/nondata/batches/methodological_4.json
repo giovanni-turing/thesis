@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "apendice-0128",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "PyTorch / transformers & 2.12.1 / 5.13.0 & TSFM benchmark + encoder bench",
+  "claim_text": "PyTorch 2.12.1 and transformers 5.13.0 used for TSFM benchmark and encoder bench",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "apendice-0129",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "chronos-forecasting & 2.3.1 & Chronos-2",
+  "claim_text": "chronos-forecasting 2.3.1 used for Chronos-2",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "apendice-0130",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "matplotlib & 3.11.0 & all figures",
+  "claim_text": "matplotlib 3.11.0 used for all figures",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "apendice-0131",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "nvidia-smi -lgc 2400,2400 -lmc 14001 (delivered SM 2377--2400 MHz, MEM 13801 MHz; the AIC cost model itself is parameterised at the 2407 MHz boost reference)",
+  "claim_text": "GPU clocks pinned via nvidia-smi -lgc 2400,2400 -lmc 14001 delivering SM 2377-2400 MHz and MEM 13801 MHz; AIC cost model parameterized at 2407 MHz boost reference",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "apendice-0132",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "phase-E physical encoder anchor ran single-tenant persistence-mode (delivered SM 2377--2400 MHz, not a hard lock)",
+  "claim_text": "Phase-E physical encoder anchor ran single-tenant persistence-mode delivering SM 2377-2400 MHz, not a hard lock",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "apendice-0133",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "the pinned 1.2.1 wheel is the Phase-2 baseline; the 1.3.0 source build runs AIC timing predictions in-core (Rust) and is used for every calibrated run from the load sweeps onward",
+  "claim_text": "ai-dynamo 1.2.1 wheel is Phase-2 baseline; 1.3.0 source build runs AIC timing predictions in-core (Rust) used for all calibrated runs from load sweeps onward",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "apendice-0135",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "encoder campaign runs on draft PR #1312 through commit b55dd0b7",
+  "claim_text": "Encoder campaign runs on draft PR #1312 through commit b55dd0b7",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "apendice-0140",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "The AIC curve is the postinfill snapshot for N<=128 and the composed model beyond (aic_fn_engines_aiccurve.csv).",
+  "claim_text": "AIC curve uses postinfill snapshot for N\u2264128 and composed model beyond (aic_fn_engines_aiccurve.csv)",
+  "expected_backing": "collector_encoder_fn"
+ }
+]

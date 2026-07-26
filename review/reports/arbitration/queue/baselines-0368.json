@@ -1,0 +1,29 @@
+{
+ "claim_id": "baselines-0368",
+ "chapter": "baselines",
+ "claim_type": "numeric",
+ "anchor": "The static optimum is burst-shaped: deployable only as 8 encoders + TP2\u00d72, i.e. 4\u00d7/2\u00d7 calm-day overprovisioning plus a TP-shape change no replica scaler performs",
+ "claim_text": "The static optimum is burst-shaped, deployable only as 8 encoders + TP2\u00d72, which overprovisions calm day by 4\u00d7 (vision) and 2\u00d7 (language) and includes a TP-shape change that no replica scaler can perform.",
+ "expected_backing": "v_grid_static_effective",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "static_encoder_workers_effective=8, static_llm_tp=2, static_llm_gpus=4; steady24h: c_star_effective=2, tp_star=1, n_star=2, overprovision_vision_x_effective=4, overprovision_llm_x=2",
+   "evidence": "Effective views confirm the 8-encoder static fleet with TP2x2 (4 GPUs) overprovisions the 2-encoder TP1 (2 GPUs) steady24h (calm day) optimum by 4.0x (vision) and 2.0x (language), requiring a TP-shape change (TP1 -> TP2).",
+   "severity": "minor",
+   "fix": "None (claim is fully supported by the database)",
+   "query": "SELECT s.static_encoder_workers_effective, s.static_llm_tp, s.static_llm_workers, s.static_llm_gpus, w.window_name, w.c_star_effective, w.tp_star, w.n_star, w.overprovision_vision_x_effective, w.overprovision_llm_x FROM provenance.grid_run_summary_effective s JOIN provenance.grid_window_effective w ON s.grid_run_id = w.grid_run_id WHERE w.window_name = 'steady24h';"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Effective static encoders=8, effective binding window=burst2, static LLM TP=2 with 2 workers (4 GPUs); steady24h optimum has 2 encoders, TP=1 with 2 workers, yielding effective overprovisioning 4\u00d7 vision and 2\u00d7 language. TP2\u00d72 is tested/feasible on 6/6 burst windows, not all 7 windows.",
+   "evidence": "The effective numeric configuration, calm-window ratios, and TP contrast hold, but the DB does not establish uniqueness across all 7 windows or the capability claim about replica scalers; CLAIM-STRUCTURE also disallows calling the deployed fleet static-optimal.",
+   "severity": "major",
+   "fix": "Write: \"The effective deployable static configuration is 8 encoders + TP2\u00d72; against the steady24h optimum it provisions 4\u00d7 the vision capacity and 2\u00d7 the language GPUs, with TP=2 rather than TP=1.\" Remove \"only,\" \"static optimum,\" and the unsupported replica-scaler assertion.",
+   "query": "WITH static_effective AS (\n  SELECT static_encoder_workers_effective, binding_window_effective,\n         static_as_ingested, binding_as_ingested\n  FROM provenance.v_grid_static_effective\n), summary AS (\n  SELECT grid_run_id, n_windows, static_encoder_workers_as_ingested,\n         static_encoder_workers_effective,\n         static_encoder_workers_is_superseded, static_llm_tp,\n         static_llm_workers, static_llm_gpus, static_binding_window, is_valid\n  FROM provenance.grid_run_summary_effective\n  WHERE is_valid = true\n), windows AS (\n  SELECT grid_run_id, COUNT(*) AS observed_windows,\n         jsonb_agg(\n           jsonb_build_object(\n             'window', window_name,\n             'c_star_effective', c_star_effective,\n             'is_superseded', is_superseded,\n             'tp_star', tp_star,\n             'n_star', n_star,\n             'vision_overprovision_effective', overprovision_vision_x_effective,\n             'llm_overprovision', overprovision_llm_x\n           ) ORDER BY window_name\n         ) AS per_window\n  FROM provenance.grid_window_effective\n  GROUP BY grid_run_id\n), llm_coverage AS (\n  SELECT tp, llm_workers,\n         COUNT(DISTINCT window_name) FILTER (WHERE is_valid = true) AS tested_windows,\n         COUNT(DISTINCT window_name) FILTER (WHERE is_valid = true AND feasible = true) AS feasible_windows\n  FROM provenance.grid_llm_point\n  GROUP BY tp, llm_workers\n)\nSELECT se.static_encoder_workers_effective,\n       se.binding_window_effective,\n       se.static_as_ingested,\n       se.binding_as_ingested,\n       s.n_windows,\n       w.observed_windows,\n       s.static_encoder_workers_is_superseded,\n       s.static_llm_tp,\n       s.static_llm_workers,\n       s.static_llm_gpus,\n       s.static_binding_window,\n       w.per_window,\n       (SELECT jsonb_agg(jsonb_build_object('tp', tp, 'llm_workers', llm_workers, 'tested_windows', tested_windows, 'feasible_windows', feasible_windows) ORDER BY tp, llm_workers) FROM llm_coverage) AS llm_configuration_coverage\nFROM static_effective se\nCROSS JOIN summary s\nJOIN windows w ON w.grid_run_id = s.grid_run_id;"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

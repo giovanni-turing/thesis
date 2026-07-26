@@ -1,0 +1,50 @@
+[
+ {
+  "claim_id": "closedloop-0450",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "Language-pool closed-loop evidence covers the largest burst (all leads, both conversions), the fastest onset (carried live in Chapter 6), the binding mix, every forecast-covered burst episode end-to-end, and the full evaluation span; burst2/6 (uncovered) and the calm day are priced by the grid and the knee formula rather than replayed end-to-end.",
+  "claim_text": "Language pool evidence covers: largest burst (all leads/conversions), fastest onset (live Ch6), binding mix, all forecast-covered bursts, full eval span; burst2/6 and calm day priced by grid/knee formula.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0451",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "The replay is open-loop: arrivals follow the trace regardless of experienced latency, so overload cannot shed or defer demand as clients would.",
+  "claim_text": "Replay is open-loop: arrivals follow trace regardless of latency; no client shedding/backpressure modeled.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0453",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "Per-pool leads are swept as constants, not stochastic.",
+  "claim_text": "Per-pool leads swept as constants, not stochastic.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0454",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "The two out-of-span episodes (burst2/6) are graded only by the forecast-free baselines of Chapter 4, never by a forecast policy.",
+  "claim_text": "Burst2/6 graded only by forecast-free baselines (Ch4), never by forecast policy.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "closedloop-0463",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "The folds are disjoint test windows but not training-independent, each forecast conditioned on its predecessors.",
+  "claim_text": "Folds are disjoint test windows but not training-independent (forecasts conditioned on predecessors).",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "closedloop-0464",
+  "chapter": "closedloop",
+  "claim_type": "methodological",
+  "anchor": "They share one trace's tenant mix, size distribution and hardware calibration, differing only in time --- evidence about temporal variability within one trace and nothing else.",
+  "claim_text": "Folds share tenant mix, size distribution, hardware calibration; only time differs.",
+  "expected_backing": "v_pool_latency"
+ }
+]

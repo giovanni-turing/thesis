@@ -1,0 +1,29 @@
+{
+ "claim_id": "twopool-0020",
+ "chapter": "twopool",
+ "claim_type": "comparative",
+ "anchor": "The calibrated model is moderately slower on averages and markedly heavier in the tails: TTFT p99 grows 1.24\u00d7 and the maximum TTFT and inter-token latency roughly double (1.8\u00d7 and 1.9\u00d7).",
+ "claim_text": "Calibrated model vs polynomial: TTFT p99 1.24\u00d7 higher, max TTFT 1.8\u00d7 higher, max inter-token latency 1.9\u00d7 higher.",
+ "expected_backing": "v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "ttft_p99_ratio=1.237, ttft_max_ratio=1.779, itl_max_ratio=1.924",
+   "evidence": "The metrics JSONB of llm_run_summary for 'srcbuild:llm_head2k_aic_src' and 'srcbuild:llm_head2k_poly_src' shows TTFT p99 ratio of 1.237x, max TTFT ratio of 1.779x, and max ITL ratio of 1.924x, which round exactly to 1.24x, 1.8x, and 1.9x respectively.",
+   "severity": "",
+   "fix": "",
+   "query": "SELECT round((a.p99_ttft_ms / b.p99_ttft_ms)::numeric, 3) AS ttft_p99_ratio, round((a.max_ttft_ms / b.max_ttft_ms)::numeric, 3) AS ttft_max_ratio, round(((a.metrics->>'max_itl_ms')::double precision / (b.metrics->>'max_itl_ms')::double precision)::numeric, 3) AS itl_max_ratio FROM provenance.llm_run_summary a, provenance.llm_run_summary b WHERE a.run_id = 'srcbuild:llm_head2k_aic_src' AND b.run_id = 'srcbuild:llm_head2k_poly_src';"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "For the sole head2k window, both arms have n=2000 current requests. TTFT p99 is 307.36447700019926/248.46453200333053=1.237055746033318\u00d7 and TTFT max is 4517.568278000195/2539.913656001503=1.7786306504261427\u00d7. Both ITL max_ms values and their ratio are NULL; ITL p99 is 22.635453999973834/29.695217000029515=0.7622592554198656\u00d7.",
+   "evidence": "The two TTFT ratios are supported after current-row and equal-denominator filtering, but the owning view provides no ITL maximum for either arm, so the 1.9\u00d7 component is not backed there.",
+   "severity": "major",
+   "fix": "Retain the TTFT p99 and maximum-TTFT comparisons, but remove the 1.9\u00d7 maximum-ITL statement unless v_pool_latency is extended with a validated ITL maximum.",
+   "query": "WITH compared AS ( SELECT window_name, sla_metric, is_current, source_relation, n_requests, CASE run_id WHEN 'srcbuild:llm_head2k_aic_src' THEN 'calibrated' WHEN 'srcbuild:llm_head2k_poly_src' THEN 'polynomial' END AS model, p99_ms, max_ms FROM provenance.v_pool_latency WHERE run_id IN ('srcbuild:llm_head2k_aic_src', 'srcbuild:llm_head2k_poly_src') ) SELECT window_name, sla_metric, COUNT(*) AS rows_total, COUNT(*) FILTER (WHERE is_current) AS rows_current, MAX(n_requests) FILTER (WHERE is_current AND model = 'calibrated') AS calibrated_n, MAX(n_requests) FILTER (WHERE is_current AND model = 'polynomial') AS polynomial_n, MAX(p99_ms) FILTER (WHERE is_current AND model = 'calibrated') AS calibrated_p99_ms, MAX(p99_ms) FILTER (WHERE is_current AND model = 'polynomial') AS polynomial_p99_ms, MAX(p99_ms) FILTER (WHERE is_current AND model = 'calibrated') / NULLIF(MAX(p99_ms) FILTER (WHERE is_current AND model = 'polynomial'), 0) AS p99_ratio, MAX(max_ms) FILTER (WHERE is_current AND model = 'calibrated') AS calibrated_max_ms, MAX(max_ms) FILTER (WHERE is_current AND model = 'polynomial') AS polynomial_max_ms, MAX(max_ms) FILTER (WHERE is_current AND model = 'calibrated') / NULLIF(MAX(max_ms) FILTER (WHERE is_current AND model = 'polynomial'), 0) AS max_ratio, STRING_AGG(DISTINCT source_relation, ', ' ORDER BY source_relation) AS source_relations FROM compared GROUP BY window_name, sla_metric ORDER BY window_name, sla_metric"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

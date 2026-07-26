@@ -1,0 +1,11 @@
+{
+  "claim_id": "intro-0203",
+  "verdict": "supported",
+  "observed": "235B-TP8 saturation knee is below both measured 8B configs (head2k, is_current). ITL knee (<=100 ms): 235B max passing scale 1.14 vs 8B-TP1 2.82 vs 8B-TP2 6.05. TTFT knee (<=1000 ms): 235B 2.45 vs 8B-TP1 4.90 vs 8B-TP2 11.41. So the empirical knee claim holds against both 8B arms. Experiment g3_32b has 0 vision/encoder-pool runs, so 'leaving the vision pool untouched' is not a co-measured latency result -- but it is a correct architectural entailment of pool disaggregation (decoder/TP scaling changes only the language-pool deployment; the encoder pool is a separate deployment), not a measurement claim.",
+  "claimed": "235B-TP8 knee below 8B; decoder scale shrinks only the language pool envelope, leaving the vision pool untouched.",
+  "evidence": "v_pool_latency joined v_dim (g3_32b, is_current, superseded_by IS NULL). 235B ITL knee 1.14 / TTFT knee 2.45, both below 8B-TP1 (2.82/4.90) and 8B-TP2 (6.05/11.41). v_grid_static_effective static encoder allocation = 8 workers. The vision-pool clause is a disaggregation invariant, not an over-reach.",
+  "severity": "minor",
+  "fix": "Empirical knee claim needs no change. If maximally strict, 'leaving the vision pool untouched' could be marked as an architectural consequence of disaggregation rather than a co-measured result; but it is not a defect.",
+  "confidence": 0.72,
+  "query": "knees from g3_32b v_pool_latency: 235B ITL 1.14/TTFT 2.45 vs 8B-TP1 2.82/4.90 vs 8B-TP2 6.05/11.41; vision runs in g3_32b = 0 (architectural clause)"
+}

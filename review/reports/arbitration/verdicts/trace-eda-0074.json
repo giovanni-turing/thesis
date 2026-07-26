@@ -1,0 +1,11 @@
+{
+  "claim_id": "trace-eda-0074",
+  "verdict": "holds",
+  "observed": "eda:a_quality: rows=1000000; t_start=2024-10-15 12:00:00.269; t_end=2024-10-22 11:59:59.964; duration_hours=167.99991527 (span=604799.695s, 0.305s short of 604800s).",
+  "claimed": "The trace covers exactly seven days (2024-10-15 to 2024-10-22, UTC) and one million requests.",
+  "evidence": "Request count is exactly 1,000,000 (rows=1000000) and the calendar range 2024-10-15 to 2024-10-22 is precisely seven days. The only basis for both flags is that the measured timestamp span is 604799.695s rather than 604800s -- a 0.305s (5e-7 relative) shortfall because the last request arrived at 11:59:59.964 instead of 12:00:00.269. 'Exactly seven days' is a description of the calendar range in the parenthetical (15th to 22nd), which is exact; the sub-second shortfall is immaterial and does not make the statement false at any reasonable precision. The UTC objection is not DB-checkable (timestamps store no tz) and does not falsify the claim.",
+  "severity": "minor",
+  "fix": "No change required. If maximal literalness is desired, 'seven days' (without 'exactly') removes the 0.305s pedantic gap; UTC should be confirmed from the dataset's source doc.",
+  "confidence": 0.78,
+  "query": "SELECT metric_path, value_num, value_text FROM provenance.eda_metric WHERE run_id='eda:a_quality' AND metric_path IN ('rows','t_start','t_end','duration_hours');"
+}

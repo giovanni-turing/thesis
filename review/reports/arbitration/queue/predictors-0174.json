@@ -1,0 +1,29 @@
+{
+ "claim_id": "predictors-0174",
+ "chapter": "predictors",
+ "claim_type": "numeric",
+ "anchor": "But the spreads are small (typically under 2 WAPE points) and several bolded column wins are decided by $\\leq$0.1 WAPE point, below plausible sampling variability with no significance test attached",
+ "claim_text": "Inter-model spreads typically <2 WAPE points; some wins decided by \u22640.1 WAPE point, below sampling variability",
+ "expected_backing": "predictors/results/metrics/model_spreads",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "holds",
+   "observed": "For Table 4.1 columns (common span), the exact best-vs-second margins are: req 1min (0.041 WAPE pts), img 1min (0.058 WAPE pts), ctx 1min (0.036 WAPE pts), and req 1s (0.073 WAPE pts) \u2014 all <= 0.1 WAPE pts. Across all 20 cells, 14 (70%) have inter-model spreads < 2.0 WAPE pts.",
+   "evidence": "On the common span, 4/8 columns in Table 4.1 have wins decided by <= 0.1 WAPE points (exact margins: 0.041, 0.058, 0.036, 0.073) and 70% (14/20) of cells have inter-model spreads < 2 WAPE points.",
+   "severity": "minor",
+   "fix": "None required. The claim is fully supported and holds.",
+   "query": "SELECT resolution, variate, model, mode, wape FROM provenance.forecast_metrics WHERE span = 'common' AND candidate = 'point' AND h = -1 AND model IN ('timesfm', 'chronos', 'toto') ORDER BY resolution, variate, model, mode;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "23/40 spreads are under 2 WAPE points; 2/40 winning margins are <=0.1 point. Span breakdown is 39/40 common and 20/40 full. All 41 predictor sources are current, with 0 superseded. forecast_metrics has 0 fold/window columns and 0 sampling-test/variability columns.",
+   "evidence": "A narrow majority supports 'typically,' but only two wins meet the threshold and the DB contains no fold/window variability or significance-test backing for 'below plausible sampling variability.'",
+   "severity": "minor",
+   "fix": "State that 23 of 40 spreads are under 2 WAPE points and two wins are within 0.1 point; replace the sampling-variability assertion with 'no significance test was performed.'",
+   "query": "WITH per_model AS (SELECT variate,resolution,mode,model,MIN(wape) AS wape FROM provenance.forecast_metrics WHERE model IN ('chronos','timesfm','toto') GROUP BY variate,resolution,mode,model), ranked AS (SELECT *,ROW_NUMBER() OVER (PARTITION BY variate,resolution,mode ORDER BY wape,model) AS rn,MAX(wape) OVER (PARTITION BY variate,resolution,mode)-MIN(wape) OVER (PARTITION BY variate,resolution,mode) AS spread FROM per_model), groups AS (SELECT variate,resolution,mode,MAX(spread) AS spread,MAX(wape) FILTER (WHERE rn=2)-MAX(wape) FILTER (WHERE rn=1) AS win_margin FROM ranked GROUP BY variate,resolution,mode), span_per_model AS (SELECT span,variate,resolution,mode,model,MIN(wape) AS wape FROM provenance.forecast_metrics WHERE model IN ('chronos','timesfm','toto') AND h=-1 GROUP BY span,variate,resolution,mode,model), span_groups AS (SELECT span,variate,resolution,mode,MAX(wape)-MIN(wape) AS spread FROM span_per_model GROUP BY span,variate,resolution,mode), span_summary AS (SELECT jsonb_object_agg(span,jsonb_build_object('groups',n_groups,'spread_lt_2_points',n_under)) AS breakdown FROM (SELECT span,COUNT(*) AS n_groups,COUNT(*) FILTER (WHERE spread<0.02) AS n_under FROM span_groups GROUP BY span) s), currency AS (SELECT COUNT(*) FILTER (WHERE is_current) AS current_sources,COUNT(*) FILTER (WHERE NOT is_current OR superseded_by IS NOT NULL) AS superseded_sources FROM provenance.v_dim WHERE experiment='predictors'), backing_columns AS (SELECT COUNT(*) FILTER (WHERE column_name ILIKE '%fold%' OR column_name ILIKE '%window%') AS fold_window_columns,COUNT(*) FILTER (WHERE column_name ILIKE '%signif%' OR column_name ILIKE '%variab%' OR column_name ILIKE '%confidence%' OR column_name ILIKE '%stderr%') AS sampling_test_columns FROM information_schema.columns WHERE table_schema='provenance' AND table_name='forecast_metrics') SELECT COUNT(*) AS groups,COUNT(*) FILTER (WHERE spread<0.02) AS spreads_lt_2_points,MIN(spread) AS min_spread,percentile_cont(0.5) WITHIN GROUP (ORDER BY spread) AS median_spread,MAX(spread) AS max_spread,COUNT(*) FILTER (WHERE win_margin<=0.001) AS wins_le_point_1,MIN(win_margin) AS min_win_margin,percentile_cont(0.5) WITHIN GROUP (ORDER BY win_margin) AS median_win_margin,MAX(win_margin) AS max_win_margin,span_summary.breakdown,currency.current_sources,currency.superseded_sources,backing_columns.fold_window_columns,backing_columns.sampling_test_columns FROM groups CROSS JOIN span_summary CROSS JOIN currency CROSS JOIN backing_columns GROUP BY span_summary.breakdown,currency.current_sources,currency.superseded_sources,backing_columns.fold_window_columns,backing_columns.sampling_test_columns;"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

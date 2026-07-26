@@ -1,0 +1,11 @@
+{
+ "claim_id": "twopool-0034",
+ "verdict": "supported",
+ "observed": "sweep_point (source vision_head2k_aic_s1, window head2k, image_px=448, is_current): handoff_p50_ms=0.714, handoff_max_ms=62.37 at 121-image max. Main projector = 196x4096 bf16 = 1,605,632 B ~= 1.6 MB/image; at 25 Gbps (3.125e9 B/s) per image = 0.5138 ms, +0.2 ms RTT => 62.37 ms at 121 images (back-out: (62.37-0.2)/0.5138 = 121.0). DeepStack adds 3 more equal-shape projection tensors => x4 payload = 6.408 MB/image; latency = 4*(62.37-0.2)+0.2 = 248.88 ms ~= 250 ms.",
+ "claimed": "DeepStack projections quadruple payload to ~6.4 MB/image (~250 ms) at 121-image max on default 25 Gbps link.",
+ "evidence": "The base measurement is DB-backed: sweep_point for vision_head2k on the steady window carries handoff_max_ms=62.37 (121-image max), handoff_p50_ms=0.714 (thesis '0.71 ms at median'), image_px=448 (uniform 448^2 assumption). The 6.4 MB and 250 ms are an explicitly-labelled analytical caveat ('must also ship the three DeepStack projections... quadrupling the payload'), and the x4 arithmetic reproduces exactly (6.4 MB, 248.88 ms). The thesis frames it as a known undercount, not a measured DeepStack row.",
+ "severity": "minor",
+ "fix": "None required. Optionally note 248.9 ms rather than rounding to 250 ms, but '~250 ms' is stated as approximate.",
+ "confidence": 0.93,
+ "query": "SELECT report_run_id, window_name, image_px, requests, handoff_p50_ms, handoff_max_ms, source_path FROM sweep_point WHERE window_name='head2k' AND source_path LIKE '%vision_head2k%';"
+}

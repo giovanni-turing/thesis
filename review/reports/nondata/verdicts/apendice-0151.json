@@ -1,0 +1,1 @@
+{"claim_id":"apendice-0151","type":"existence","verdict":"supported","evidence":"apendice.tex line 298 lists 'LLM lead sweep + capacity mapping (\\S\\ref{sec:cl-llm})' as a provenance table row. DB view provenance.v_pool_latency exists with 2337 rows backing the LLM pool latency/capacity sweep.","fix":"","confidence":0.9}

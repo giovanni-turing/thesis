@@ -1,0 +1,29 @@
+{
+ "claim_id": "twopool-0025",
+ "chapter": "twopool",
+ "claim_type": "numeric",
+ "anchor": "A spot-check prices the family flagship, Qwen3-VL-235B-A22B at TP8, on the same shipped H100 data, window, and topology: ~2\u00d7 the 8B's decode latency throughout, with ITL p99 already 87.7 ms at the trace's own rate, so the decode bound moves and its knee drops to s=1 against the 8B's s=2 --- decoder scale halves the language pool's operating envelope.",
+ "claim_text": "Qwen3-VL-235B-A22B at TP8: ~2\u00d7 decode latency of 8B, ITL p99 87.7 ms at trace rate, knee drops to s=1 vs 8B's s=2, halving operating envelope.",
+ "expected_backing": "v_pool_latency, collector_encoder_fn",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "235b_tp8_s1 ITL p99 = 86.15 ms (not 87.7 ms), 8b_tp1_s1 ITL p99 = 22.62 ms, ITL ratio = 3.81x; Mean TPOT ratio is 1.89x. Knee at s=1 (235b) vs s=2 (8b) holds.",
+   "evidence": "v_pool_latency/llm_run_summary (g3_32b, is_current=true): Qwen3-VL-235B-TP8 at s=1 has ITL p99 = 86.15 ms (not 87.7 ms, ratio to 8B is 3.81x), while its mean TPOT ratio to 8B is 1.89x. The knee shift (s=1 vs s=2) holds.",
+   "severity": "major",
+   "fix": "Correct the ITL p99 value at trace rate (s=1) to 86.2 ms, and clarify that the ~2x ratio refers to mean decode latency (TPOT) rather than the ITL tail (which is 3.8x).",
+   "query": "SELECT a.run_id AS run_235b, a.p99_itl_ms AS itl_p99_235b, b.run_id AS run_8b, b.p99_itl_ms AS itl_p99_8b, (a.p99_itl_ms / b.p99_itl_ms) AS itl_p99_ratio, a.mean_tpot_ms AS tpot_mean_235b, b.mean_tpot_ms AS tpot_mean_8b, (a.mean_tpot_ms / b.mean_tpot_ms) AS tpot_mean_ratio FROM llm_run_summary a JOIN llm_run_summary b ON REPLACE(a.run_id, '235b_tp8', '8b_tp1') = b.run_id WHERE a.run_id = 'g3_32b:235b_tp8_s1';"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "At s=1, 235B-TP8 ITL p99 is 86.15097699995385 ms versus 22.62208100000862 ms for 8B-TP1, a 3.808269318809398x ratio. Across matched scales the ratio ranges from 1.2055205122353965x to 5.41491707265909x. Maximum passing scales under the 100 ms bound are 1.1351 and 2.8158, ratio 0.40311811918460116. Evidence covers one 721.072 s window with 2000 requests; collector_encoder_fn has 0 Qwen rows and v_dim supplies 0 non-null GPU values.",
+   "evidence": "Current, unsuperseded v_pool_latency rows contradict the latency figures and precise knees; the direction of a lower 235B envelope holds, but neither collector_encoder_fn nor v_dim backs the Qwen/H100 attribution or causal decoder-scale wording.",
+   "severity": "major",
+   "fix": "Describe this as a scoped head2k spot-check: ITL p99 86.2 ms at s=1, 3.81x the 8B control there, with 100 ms knees near s=1.1 versus s=2.8. Remove '~2x throughout,' '87.7 ms,' and the causal 'decoder scale halves' wording; do not call the data H100-backed without separate provenance.",
+   "query": "WITH x AS ( SELECT CASE WHEN p.run_id LIKE 'g3_32b:235b_tp8_%' THEN '235B-TP8' ELSE '8B-TP1' END AS arm, replace(substring(p.run_id FROM '_s(.*)$'), 'p', '.')::numeric AS scale, p.p99_ms, p.n_requests, d.window_name, d.window_span_s, d.window_requests, d.gpu, d.tp FROM provenance.v_pool_latency p JOIN provenance.v_dim d USING (run_id) WHERE p.is_current = true AND d.is_current = true AND d.superseded_by IS NULL AND p.experiment = 'g3_32b' AND p.sla_metric = 'itl' AND (p.run_id LIKE 'g3_32b:235b_tp8_%' OR p.run_id LIKE 'g3_32b:8b_tp1_%') ), paired AS ( SELECT scale, max(p99_ms) FILTER (WHERE arm = '235B-TP8') AS p235, max(p99_ms) FILTER (WHERE arm = '8B-TP1') AS p8 FROM x GROUP BY scale HAVING count(DISTINCT arm) = 2 ), knees AS ( SELECT arm, max(scale) FILTER (WHERE p99_ms <= 100) AS max_passing_scale FROM x GROUP BY arm ) SELECT (SELECT p99_ms FROM x WHERE arm = '235B-TP8' AND scale = 1) AS p235_trace_p99_ms, (SELECT p99_ms FROM x WHERE arm = '8B-TP1' AND scale = 1) AS p8_trace_p99_ms, (SELECT p235 / p8 FROM paired WHERE scale = 1) AS trace_ratio, (SELECT min(p235 / p8) FROM paired) AS matched_ratio_min, (SELECT max(p235 / p8) FROM paired) AS matched_ratio_max, (SELECT max_passing_scale FROM knees WHERE arm = '235B-TP8') AS p235_knee, (SELECT max_passing_scale FROM knees WHERE arm = '8B-TP1') AS p8_knee, (SELECT max_passing_scale FROM knees WHERE arm = '235B-TP8') / (SELECT max_passing_scale FROM knees WHERE arm = '8B-TP1') AS knee_ratio, (SELECT count(DISTINCT window_name) FROM x) AS windows, (SELECT min(window_span_s) FROM x) AS window_span_s, (SELECT min(window_requests) FROM x) AS denominator_requests, (SELECT count(*) FROM provenance.collector_encoder_fn WHERE source_path ILIKE '%qwen%' OR engine ILIKE '%qwen%' OR note ILIKE '%qwen%') AS collector_qwen_rows, (SELECT count(gpu) FROM x) AS rows_with_gpu_value"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

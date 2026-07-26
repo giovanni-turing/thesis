@@ -1,0 +1,11 @@
+{
+  "claim_id": "twopool-0045",
+  "verdict": "holds",
+  "observed": "burst1 (n=64804, current): language calibrated TTFT p99 1868.03ms / 1000ms bound = 1.868x (rounds 1.9x, is_violation=t); polynomial 910.33ms = 8.97% under bound (no violation); vision encoder_delay p99 5013.37ms / 1000ms = 5.013x (rounds 5x). grid_llm_point burst window TP1 prefill floor asymptotes to 1285.08ms (8-16 workers) and 1314-1331ms at 4 workers, matching the body text's 'pinned near 1.3s from 4 through 16 TP1 workers'.",
+  "claimed": "language pool at 1.9x its TTFT bound (the TP1 prefill floor); polynomial 9% under bound; vision pool at 5x delay bound.",
+  "evidence": "All three headline numbers are DB-exact. The parenthetical '(the TP1 prefill floor)' is a correct mechanistic LABEL for the language pool's failure, not a numeric equality with the bound or the 1.9x multiple. The body text (twopool.tex:291-294) explicitly states the floor is ~1.3s and the sweep is on the naive TP1 2x2 topology; grid_llm_point confirms a TP1 prefill floor of 1285ms. Both adjudicators misread the appositive as claiming bound=floor (Gemini) or as unbacked TP1 attribution (GPT, tp NULL in v_pool_latency dimension) — but TP1 is documented by the topology description and independently backed by the grid.",
+  "severity": "minor",
+  "fix": "No data fix required. Optional clarity: reword to 'the language pool at 1.9x its TTFT bound (driven by the TP1 prefill floor, ~1.3s)' to prevent misreading the appositive as bound=floor.",
+  "confidence": 0.86,
+  "query": "SELECT run_id,sla_metric,bound_ms,achieved_p99_ms,achieved_p99_ms/bound_ms AS ratio,is_violation FROM v_infraction WHERE is_current AND run_id IN ('sweeps:llm_burst1_aic_s1','sweeps:llm_burst1_poly_s1','sweeps:vision_burst1_s1'); SELECT grid_run_id,window_name,tp,llm_workers,ttft_p99_ms FROM grid_llm_point WHERE window_name ILIKE '%burst%' AND tp=1 ORDER BY llm_workers,ttft_p99_ms;"
+}

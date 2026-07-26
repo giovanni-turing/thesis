@@ -1,0 +1,29 @@
+{
+ "claim_id": "conclusion-0100",
+ "chapter": "conclusion",
+ "claim_type": "numeric",
+ "anchor": "the p90 band edge is empirically calibrated (coverage 0.88--0.90)",
+ "claim_text": "The p90 band edge is empirically calibrated with coverage between 0.88 and 0.90.",
+ "expected_backing": "forecast_metrics",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "range [0.880, 0.898]",
+   "evidence": "At 1-minute cadence, the empirical p90 coverage across all 20 model-signal combinations ranges from 0.880 to 0.898, and at 15-second cadence from 0.881 to 0.901; both provisioning cadences round exactly to the claimed [0.88, 0.90] range. Prior verifier hy3 incorrectly included the 1-second cadence (which reaches 0.913 but is not a provisioning cadence) in its scope.",
+   "severity": "minor",
+   "fix": "No fix required since the claim is supported; minor text polish to add the cadence qualifier '(at provisioning cadence)' in the conclusion to prevent over-scoping to 1-second cadence.",
+   "query": "SELECT MIN((detail->'1min'->>'cov90')::double precision) AS min_cov90, MAX((detail->'1min'->>'cov90')::double precision) AS max_cov90 FROM provenance.quantile_coverage;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Across 60 model/signal/resolution cells, cov90 ranges 0.880-0.913; 4 cells exceed 0.900. By resolution: 1s 0.884-0.913 (n=596724 per cell), 15s 0.881-0.901 (n=32244), and 1min 0.880-0.898 (n=2004).",
+   "evidence": "quantile_coverage, not forecast_metrics, owns coverage; forecast_metrics has 0 coverage columns, and the unqualified range excludes observed values up to 0.913.",
+   "severity": "minor",
+   "fix": "Qualify the statement as applying to the 1-minute cadence, or widen the all-resolution range to 0.880--0.913 and cite quantile_coverage.",
+   "query": "WITH current_dim AS (SELECT * FROM provenance.v_dim WHERE is_current = true), coverage_cells AS (SELECT q.model, q.signal, e.key AS resolution, (e.value->>'n')::bigint AS denominator_n, (e.value->>'cov90')::double precision AS cov90 FROM provenance.quantile_coverage q CROSS JOIN LATERAL jsonb_each(q.detail) AS e), per_resolution AS (SELECT resolution, COUNT(*) AS cells, MIN(denominator_n) AS min_denominator_n, MAX(denominator_n) AS max_denominator_n, MIN(cov90) AS min_cov90, MAX(cov90) AS max_cov90, AVG(cov90) AS mean_cov90, COUNT(*) FILTER (WHERE cov90 < 0.88 OR cov90 > 0.90) AS cells_outside_claim FROM coverage_cells GROUP BY resolution), outside_cells AS (SELECT model, signal, resolution, denominator_n, cov90 FROM coverage_cells WHERE cov90 < 0.88 OR cov90 > 0.90), owner_schema AS (SELECT COUNT(*) FILTER (WHERE table_name='quantile_coverage' AND column_name IN ('is_current','is_superseded')) AS owner_status_columns, COUNT(*) FILTER (WHERE table_name='quantile_coverage' AND column_name ILIKE '%effective%') AS owner_effective_columns, COUNT(*) FILTER (WHERE table_name='forecast_metrics' AND (column_name ILIKE '%coverage%' OR column_name ILIKE '%cov90%')) AS expected_backing_coverage_columns FROM information_schema.columns WHERE table_schema='provenance' AND table_name IN ('quantile_coverage','forecast_metrics')) SELECT (SELECT COUNT(*) FROM current_dim) AS current_dim_rows, (SELECT COUNT(*) FROM current_dim WHERE superseded_by IS NOT NULL) AS current_dim_rows_with_superseded_by, (SELECT owner_status_columns FROM owner_schema) AS owner_status_columns, (SELECT owner_effective_columns FROM owner_schema) AS owner_effective_columns, (SELECT expected_backing_coverage_columns FROM owner_schema) AS expected_backing_coverage_columns, (SELECT MIN(cov90) FROM coverage_cells) AS overall_min_cov90, (SELECT MAX(cov90) FROM coverage_cells) AS overall_max_cov90, (SELECT AVG(cov90) FROM coverage_cells) AS overall_mean_cov90, (SELECT COUNT(*) FROM coverage_cells) AS total_cells, (SELECT COUNT(*) FROM coverage_cells WHERE cov90 < 0.88 OR cov90 > 0.90) AS total_cells_outside_claim, (SELECT jsonb_agg(to_jsonb(p) ORDER BY CASE p.resolution WHEN '1s' THEN 1 WHEN '15s' THEN 2 WHEN '1min' THEN 3 ELSE 4 END) FROM per_resolution p) AS per_resolution, (SELECT jsonb_agg(to_jsonb(o) ORDER BY o.resolution, o.model, o.signal) FROM outside_cells o) AS outside_cells"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

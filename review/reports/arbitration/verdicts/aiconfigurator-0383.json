@@ -1,0 +1,11 @@
+{
+  "claim_id": "aiconfigurator-0383",
+  "verdict": "supported",
+  "observed": "Exact triple present in collector_artifacts/phaseA_validation/result.txt lines 16-18: '896x896  3136  36.421 +/- 0.010 ms  31.973 ms  1.14x  2392' (and 448^2->11.360/7.822/1.45, 1344^2->103.824/89.347/1.16), a single-image resolution sweep matching the table's 'Image size 896^2' exactly. DB collector_encoder_fn patches=3136 rows are all 4x448^2 batches (sdpa): mean 30.599/30.710/30.727, aic_pred 23.127, ratio ~1.32; image_px=896 rows are vllm-only, n_images 1..64, patches/aic_pred null (single 896^2 sdpa mean=none; vllm 1-img=30.088).",
+  "claimed": "At 896^2 (3136 patches): measured 36.421+/-0.010 ms, predicted 31.973 ms, ratio 1.14.",
+  "evidence": "All three numbers are correct and traceable to the measurement artifact phaseA_validation/result.txt (single 896^2 image, clock-locked 2392 MHz), the exact configuration the table row names. The four flags all compared against the DB's patches=3136 rows (30.60/23.13/1.32) -- but those are 4x448^2 BATCHES, a genuinely different config (4 images, 784 patches each) whose within-image attention pattern differs from one 896^2 image. So the 'contradicted' verdicts are wrong-config artifacts. The real (minor) issues: (a) the phaseA resolution sweep was never ingested into collector_encoder_fn, and (b) expected_backing is mis-tagged v_pool_latency, which has no mean/pred/patch columns.",
+  "severity": "minor",
+  "fix": "No change to the table numbers -- they are correct. Fix provenance metadata: retag backing from v_pool_latency to collector_encoder_fn / collector_artifacts/phaseA_validation/result.txt, and ingest the single-image resolution sweep into collector_encoder_fn so the row is DB-queryable.",
+  "confidence": 0.72,
+  "query": "SELECT image_px,n_images,patches,engine,mean_ms,aic_pred_ms,ratio_meas_over_aic FROM provenance.collector_encoder_fn WHERE patches=3136 OR image_px=896; -- shows 3136-patch rows are 4x448^2 batch, not single 896^2; exact triple only in phaseA_validation/result.txt"
+}

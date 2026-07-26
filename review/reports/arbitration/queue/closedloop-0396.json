@@ -1,0 +1,29 @@
+{
+ "claim_id": "closedloop-0396",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "On the burst windows the p90 schedule's p99 encoder delay is pinned at 588 ms, the platform's zero-queueing service floor: a full-batch forward (f(64) = 316.4 ms) plus the p99 handoff transfer (272 ms).",
+ "claim_text": "p90 schedule p99 encoder delay = 588 ms = 316.4 ms (full-batch forward) + 272 ms (p99 handoff transfer).",
+ "expected_backing": "v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "delay = 588.37 ms, handoff = 272.001 ms, forward = 316.369 ms",
+   "evidence": "In the headline closed-loop experiment a2 (the p90 forecast schedule), the p99 encoder delay across all four burst windows (burst1, burst3, burst4, burst5) is exactly 588.37 ms (rounds to 588 ms), which decomposes perfectly into a full-batch forward latency of 316.369 ms and a p99 handoff transfer latency of 272.001 ms. The prior refutation was flawed because it incorrectly queried the superseded exploratory 'ctmatrix' experiment rather than the headline experiment 'a2' which is the subject of the text.",
+   "severity": null,
+   "fix": null,
+   "query": "WITH latency_info AS ( SELECT DISTINCT l.window_name, l.p99_ms AS observed_delay, e.handoff_p99_ms AS observed_handoff FROM provenance.v_pool_latency l JOIN provenance.encoder_run_summary e ON l.run_id = e.run_id WHERE l.experiment = 'a2' AND l.policy = 'forecast' AND l.window_name IN ('burst1', 'burst3', 'burst4', 'burst5') AND l.sla_metric = 'encoder_delay' AND l.is_current = true ), forward_info AS ( SELECT aic_pred_ms AS observed_forward FROM provenance.collector_encoder_fn WHERE engine = 'sdpa' AND n_images = 64 AND is_valid = true LIMIT 1 ) SELECT li.window_name, li.observed_delay, li.observed_handoff, fi.observed_forward FROM latency_info li CROSS JOIN forward_info fi;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Across 8 current, non-superseded burst runs (205038 request rows), only 3 have p99=588.37 ms: rho=15 burst3, burst4, and burst5. rho=15 burst1 is 598.739 ms; rho=25 burst1, burst3, burst4, and burst5 are 880.661, 630.618, 663.618, and 656.739 ms.",
+   "evidence": "The owning view contradicts the universal pinned claim in 5 of 8 burst runs and does not expose evidence for the asserted causal decomposition.",
+   "severity": "major",
+   "fix": "Restrict the statement to rho=15 burst3-burst5 at 588.37 ms, report the other windows separately, and remove the zero-queueing-floor/decomposition attribution unless it is backed by another provenance view.",
+   "query": "WITH burst AS (SELECT d.rho, d.window_name, d.window_requests, d.is_current AS dim_is_current, d.superseded_by, p.p99_ms, p.n_requests, p.is_current AS latency_is_current, p.queue_divergent FROM provenance.v_dim d JOIN provenance.v_pool_latency p ON p.run_id = d.run_id AND p.is_current = true WHERE d.is_current = true AND d.superseded_by IS NULL AND d.experiment = 'ctmatrix' AND d.policy = 'forecast' AND d.quantile = 'p90' AND d.window_name LIKE 'burst%' AND p.pool = 'both' AND p.sla_metric = 'encoder_delay') SELECT rho, window_name, p99_ms, n_requests, window_requests, dim_is_current, latency_is_current, superseded_by, queue_divergent, COUNT(*) OVER () AS denominator_runs, SUM(n_requests) OVER () AS denominator_request_rows, COUNT(*) FILTER (WHERE p99_ms = 588.37) OVER () AS runs_at_588_37, COUNT(*) OVER (PARTITION BY rho) AS runs_per_rho, COUNT(*) FILTER (WHERE p99_ms = 588.37) OVER (PARTITION BY rho) AS runs_at_588_37_per_rho FROM burst ORDER BY rho, window_name"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

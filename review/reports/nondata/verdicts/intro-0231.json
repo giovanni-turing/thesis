@@ -1,0 +1,1 @@
+{"claim_id":"intro-0231","type":"existence","verdict":"supported","evidence":"provenance.forecast_metrics table exists with 41,600 rows (columns: model, mode, span, resolution, variate, candidate, mae, rmse, wape, h) — the full archived forecast corpus. Also exposed via v_forecast_thesis_corpus.","fix":"","confidence":0.9}

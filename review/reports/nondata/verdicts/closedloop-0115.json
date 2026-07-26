@@ -1,0 +1,1 @@
+{"claim_id":"closedloop-0115","type":"existence","verdict":"supported","evidence":"simulation/results/results_44.jsonl exists (560 rows; the 44-cell language-pool sweep over forecast/quantile/rho/model). The language-pool result artifact it frames exists; 'synthetic sampled-signal' is an interpretive framing of that existing sweep.","fix":"","confidence":0.72}

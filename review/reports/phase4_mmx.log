@@ -1,0 +1,4 @@
+Phase 4: 85 FAIL claims -> 85 validation units
+per-model: {'minimax-m3': 85}
+concurrency=32
+[skip   ] minimax-m3       validation-0004

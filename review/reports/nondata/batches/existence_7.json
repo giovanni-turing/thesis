@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "related-0280",
+  "chapter": "related",
+  "claim_type": "existence",
+  "anchor": "Encoder disaggregation has also reached the mainstream engines: vLLM and SGLang now ship encoder-separated serving modes with elastic encoder scaling.",
+  "claim_text": "vLLM and SGLang now ship encoder-separated serving modes with elastic encoder scaling.",
+  "expected_backing": "paper_library"
+ },
+ {
+  "claim_id": "related-0281",
+  "chapter": "related",
+  "claim_type": "existence",
+  "anchor": "These systems settle the architecture question: the encoder pool exists, separately deployed and scaled, shipping in mainstream engines",
+  "claim_text": "Encoder pool exists, separately deployed and scaled, shipping in mainstream engines.",
+  "expected_backing": "paper_library"
+ },
+ {
+  "claim_id": "related-0293",
+  "chapter": "related",
+  "claim_type": "existence",
+  "anchor": "vLLM and SGLang now ship encoder-separated serving modes with elastic encoder scaling",
+  "claim_text": "vLLM and SGLang now support encoder-separated serving modes with elastic encoder scaling.",
+  "expected_backing": "v_web_search_2026-07-07"
+ },
+ {
+  "claim_id": "related-0295",
+  "chapter": "related",
+  "claim_type": "existence",
+  "anchor": "the first work to measure that the vision pool's arrival signal is nearly decoupled from request rate",
+  "claim_text": "This thesis is the first to quantify the near-decoupling of the vision pool's arrival signal from request rate.",
+  "expected_backing": "v_paper_output"
+ },
+ {
+  "claim_id": "intro-0297",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "This thesis studies how the pools of a modality-disaggregated multimodal serving system should be scaled, and defends a specific answer: each pool must be provisioned on its own demand signal",
+  "claim_text": "Each pool in a modality-disaggregated multimodal serving system must be provisioned on its own demand signal.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "intro-0298",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "In a production trace vision demand decouples from the request rate a conventional autoscaler watches, yet the burstiest signal is also the most persistent, forecastable zero-shot by pretrained time-series models",
+  "claim_text": "Vision demand decouples from request rate and is the burstiest but most persistent signal, forecastable by pretrained time-series models.",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "intro-0299",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "A silicon-collected vision cost model composed with a calibrated simulation of the language pool reproduces the decoupling as saturation knees an order of magnitude apart",
+  "claim_text": "A silicon-collected vision cost model and calibrated simulation reproduce decoupling as saturation knees an order of magnitude apart.",
+  "expected_backing": "v_grid_static_effective"
+ },
+ {
+  "claim_id": "intro-0301",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "Service quality is specified against this anatomy: bounds on time to first token (TTFT, dominated by queueing and prefill) and time per output token (TPOT, decode; reported here as the equivalent per-gap inter-token latency, ITL).",
+  "claim_text": "Service quality is specified by bounds on TTFT (dominated by queueing and prefill) and TPOT (decode, reported as ITL).",
+  "expected_backing": "v_infraction"
+ }
+]

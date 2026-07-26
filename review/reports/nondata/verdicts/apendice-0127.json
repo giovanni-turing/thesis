@@ -1,0 +1,1 @@
+{"claim_id":"apendice-0127","type":"methodological","verdict":"supported","evidence":"Live imports in the EDA GPU env: cudf.__version__ = 26.06.00, cuml.__version__ = 26.06.00, cupy.__version__ = 14.1.1. REPORT.md header also states 'cuDF/cuML/CuPy 26.06, RTX 5090'. Matches apendice.tex:40 '26.06 / 26.06 / 14.1.1' for trace EDA on GPU.","fix":"","confidence":0.97}

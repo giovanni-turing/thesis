@@ -35,7 +35,11 @@ for i, flag in enumerate(above):
 if start is not None:
     runs.append((start, len(above) - 1))
 
-episodes = []
+# extend each run to its surrounding p50 crossings, then MERGE overlapping
+# spans FIRST and only afterwards compute peak/onset/ramp/jump/decay from the
+# final merged span (same order as k_episode_clusters.py — computing episode
+# stats before merging kept a stale onset from the sub-episode whose peak won).
+raw_spans = []
 for a, b in runs:
     lo = a
     while lo > 0 and img[lo] > p50:
@@ -43,33 +47,31 @@ for a, b in runs:
     hi = b
     while hi < len(img) - 1 and img[hi] > p50:
         hi += 1
-    peak_i = a + int(np.argmax(img[a:b + 1]))
-    onset_min = peak_i - lo                    # baseline -> peak
+    raw_spans.append((lo, hi))
+
+spans = []
+for lo, hi in raw_spans:
+    if spans and lo <= spans[-1][1]:
+        spans[-1] = (spans[-1][0], max(hi, spans[-1][1]))
+    else:
+        spans.append((lo, hi))
+
+merged = []
+for lo, hi in spans:
+    peak_i = lo + int(np.argmax(img[lo:hi + 1]))
+    onset_min = max(peak_i - lo, 1)            # baseline -> peak
     decay_min = hi - peak_i                    # peak -> baseline
     ramp_rate = (img[peak_i] - img[lo]) / max(onset_min, 1)  # img/s per minute
     # steepest single-minute jump during onset (worst case for reaction)
     seg = img[lo:peak_i + 1]
     steepest = float(np.max(np.diff(seg))) if len(seg) > 1 else 0.0
-    episodes.append({
+    merged.append({
         "start_baseline": str(idx[lo]), "peak": str(idx[peak_i]), "end_baseline": str(idx[hi]),
         "peak_img_per_s": float(img[peak_i]),
         "onset_minutes": int(onset_min), "decay_minutes": int(decay_min),
         "ramp_img_per_s_per_min": float(ramp_rate),
         "steepest_1min_jump_img_per_s": steepest,
     })
-
-# merge episodes sharing the same extended window (overlapping p50 spans)
-merged = []
-for e in sorted(episodes, key=lambda x: x["start_baseline"]):
-    if merged and e["start_baseline"] <= merged[-1]["end_baseline"]:
-        if e["peak_img_per_s"] > merged[-1]["peak_img_per_s"]:
-            merged[-1].update({k: e[k] for k in
-                               ["peak", "peak_img_per_s", "onset_minutes",
-                                "ramp_img_per_s_per_min", "steepest_1min_jump_img_per_s"]})
-        merged[-1]["end_baseline"] = max(merged[-1]["end_baseline"], e["end_baseline"])
-        merged[-1]["decay_minutes"] = None  # recomputed below if needed
-    else:
-        merged.append(dict(e))
 
 onsets = np.array([e["onset_minutes"] for e in merged], dtype=float)
 ramps = np.array([e["ramp_img_per_s_per_min"] for e in merged])
@@ -78,7 +80,7 @@ peaks = np.array([e["peak_img_per_s"] for e in merged])
 
 stats = {
     "thresholds": {"p50_img_per_s": p50, "p99_img_per_s": p99},
-    "n_raw_episodes": len(episodes), "n_merged_episodes": len(merged),
+    "n_raw_episodes": len(raw_spans), "n_merged_episodes": len(merged),
     "onset_minutes": {"p10": float(np.quantile(onsets, 0.1)), "p50": float(np.quantile(onsets, 0.5)),
                       "p90": float(np.quantile(onsets, 0.9)), "min": float(onsets.min())},
     "ramp_img_per_s_per_min": {"p50": float(np.quantile(ramps, 0.5)), "p90": float(np.quantile(ramps, 0.9)),
@@ -96,7 +98,7 @@ axes[0].hist(onsets, bins=np.logspace(0, np.log10(max(onsets.max(), 2)), 25),
 axes[0].set_xscale("log")
 axes[0].set_xlabel("onset time, baseline→peak (minutes)")
 axes[0].set_ylabel("episodes")
-axes[0].set_title(f"Burst onset — p50 {np.quantile(onsets,0.5):.0f} min, "
+axes[0].set_title(f"Burst onset — p50 {np.quantile(onsets,0.5):.1f} min, "
                   f"p10 {np.quantile(onsets,0.1):.0f} min")
 axes[1].plot(onsets, peaks, "o", color=C_BLUE, markersize=5, alpha=0.75)
 axes[1].set_xscale("log")
@@ -122,8 +124,8 @@ ax.set_title("Top-6 burst episodes, peak-aligned (±2 h)")
 save_fig(fig, "i_burst_aligned.png")
 
 print("\nKey readout:")
-print(f"{len(merged)} merged episodes (from {len(episodes)} raw)")
-print(f"onset minutes: p10={np.quantile(onsets,0.1):.0f} p50={np.quantile(onsets,0.5):.0f} "
-      f"p90={np.quantile(onsets,0.9):.0f} min={onsets.min():.0f}")
+print(f"{len(merged)} merged episodes (from {len(raw_spans)} raw)")
+print(f"onset minutes: p10={np.quantile(onsets,0.1):.1f} p50={np.quantile(onsets,0.5):.1f} "
+      f"p90={np.quantile(onsets,0.9):.1f} min={onsets.min():.0f}")
 print(f"ramp img/s/min: p50={np.quantile(ramps,0.5):.1f} max={ramps.max():.1f}")
 print(f"steepest 1-min jump: p50={np.quantile(jumps,0.5):.0f} max={jumps.max():.0f} img/s")

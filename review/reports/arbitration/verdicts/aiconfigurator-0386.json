@@ -1,0 +1,11 @@
+{
+  "claim_id": "aiconfigurator-0386",
+  "verdict": "supported",
+  "observed": "The claim's operands are Table tab:aic-validation, sourced exactly from collector_artifacts/phaseA_validation/result.txt: 448x448 measured 11.360ms / aic_pred 7.822ms = 1.45x; 896x896 36.421 / 31.973 = 1.14x; 1344x1344 103.824 / 89.347 = 1.16x. The claim faithfully restates these (1.45x -> 1.14-1.16x).",
+  "claimed": "The prediction-measurement gap shrinks from 1.45x at 448-squared to 1.14-1.16x at larger images.",
+  "evidence": "The DB does NOT hold the validation-table operands: collector_encoder_fn contains the phaseE physical-anchor experiment (sizes 448/672, note 'aiconfigurator analytic prediction', giving 448 eager 11.333 / aic 8.186 = 1.384) - a DIFFERENT experiment with a different prediction path and different image sizes than tab:aic-validation's raw-slice predictions. Both adjudicators queried this wrong experiment (and the expected_backing v_pool_latency has no prediction field at all). The 896/1344 rows they call 'missing' are the raw-slice validation set, which I verified line-for-line in phaseA_validation/result.txt. Ratios 11.360/7.822=1.452, 36.421/31.973=1.139, 103.824/89.347=1.162 match the claim.",
+  "severity": "minor",
+  "fix": "No change to the numbers. Flag is a wrong-experiment/wrong-view artifact; optionally the provenance manifest could ingest phaseA_validation so the table is DB-queryable.",
+  "confidence": 0.9,
+  "query": "SELECT image_px,engine,mean_ms,right(source_path,40) FROM collector_encoder_fn WHERE image_px IN(448,896,1344) AND n_images=1; -- DB holds phaseE anchor (448/672,672 in fn_multires), NOT the 448/896/1344 raw-slice validation set; table verified in phaseA_validation/result.txt lines 16-18"
+}

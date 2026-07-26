@@ -1,0 +1,29 @@
+{
+ "claim_id": "baselines-0364",
+ "chapter": "baselines",
+ "claim_type": "numeric",
+ "anchor": "medium onsets survive only sub-minute leads (L*=45 s, below what pod-scheduled GPU workers realistically offer).",
+ "claim_text": "Medium onsets survive only sub-minute leads (L*=45 s), below what pod-scheduled GPU workers realistically offer.",
+ "expected_backing": "v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "contradicted",
+   "observed": "For burst4 (onset 60 min), reactive p99_ms is 904.739 ms at lead_s = 165 s (passes the 1000 ms SLA target); for burst2 (onset 48 min) and burst5 (onset 35 min) the p99_ms at lead_s = 165 s is 1065.045 ms and 3250.164 ms respectively (violating SLA).",
+   "evidence": "For the medium-onset window burst4, the SLA (1000 ms target) holds at lead_s = 165 s (904.739 ms <= 1000 ms), meaning its actual L* is 165 s (a multi-minute lead) rather than 45 s, contradicting the universal 'only sub-minute leads (L*=45 s)' claim.",
+   "severity": "major",
+   "fix": "Correct the L* of burst4 to 165 s in the relevant tables and qualify the claim to say that medium onsets survive sub-minute to short multi-minute leads (L* of 45 s to 165 s).",
+   "query": "SELECT window_name, lead_s, p99_ms FROM provenance.v_pool_latency WHERE is_current AND (window_name = 'burst2' OR window_name = 'burst4' OR window_name = 'burst5') AND policy = 'reactive' AND sla_metric = 'encoder_delay' ORDER BY window_name, lead_s;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "Across 3 current medium-onset windows, burst2 and burst5 have L*=45 s, but burst4 has L*=165 s because its p99 is 904.739 ms at 165 s; request denominators are 13,870, 25,639, and 8,983 respectively.",
+   "evidence": "The current per-window breakdown refutes the universal L*=45 s statement: 1 of 3 medium onsets passes at 165 s, while v_pool_latency supplies no pod-scheduling-latency measurement.",
+   "severity": "major",
+   "fix": "State that medium-onset L* ranges from 45 to 165 s, with 2 of 3 windows limited to 45 s; separately cite measured pod-scheduling latency or remove that operational comparison.",
+   "query": "WITH medium AS (SELECT 'burst' || e.rank_by_peak AS window_name, e.onset_min FROM provenance.eda_burst_episode AS e JOIN provenance.v_dim AS ed ON ed.run_id = e.run_id WHERE e.run_id = 'eda:i_burst_anatomy' AND ed.is_current = true AND ed.superseded_by IS NULL AND e.onset_min BETWEEN 35 AND 60), current_latency AS (SELECT v.run_id, v.window_name, v.lead_s, v.p99_ms, v.n_requests FROM provenance.v_pool_latency AS v JOIN provenance.v_dim AS d USING (run_id) WHERE v.is_current = true AND d.is_current = true AND d.superseded_by IS NULL AND v.experiment IN ('a2','a2x') AND v.policy = 'reactive' AND v.sla_metric = 'encoder_delay') SELECT m.window_name, m.onset_min, COUNT(c.run_id) AS tested_leads, COUNT(*) FILTER (WHERE c.p99_ms <= 1000.0) AS sla_passing_leads, MAX(c.lead_s) FILTER (WHERE c.p99_ms <= 1000.0) AS l_star_s, JSON_AGG(JSON_BUILD_OBJECT('lead_s', c.lead_s, 'p99_ms', c.p99_ms, 'n_requests', c.n_requests, 'passes_1000ms', c.p99_ms <= 1000.0) ORDER BY c.lead_s) AS per_lead FROM medium AS m JOIN current_latency AS c USING (window_name) GROUP BY m.window_name, m.onset_min ORDER BY m.window_name"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

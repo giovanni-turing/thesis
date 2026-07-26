@@ -1,0 +1,11 @@
+{
+  "claim_id": "closedloop-0420",
+  "verdict": "supported",
+  "observed": "burst3 end-to-end 'twin' replay (live experiment, pool=language, n_requests=3093, is_current, ttft): live:twin_re p99=3494.73ms (rounds 3,495); live:twin_fc p99=2164.19ms (rounds 2,164, the base/p50 forecast); live:twin_fc_p90 p99=651.14ms (rounds 651, PASS). All three share n=3093 = burst3 request count.",
+  "claimed": "Burst3 language pool end-to-end: reactive TTFT p99=3,495ms, p50 forecast=2,164ms, p90 forecast=651ms (PASS).",
+  "evidence": "All three numbers are DB-exact and come from the live:twin_* family, which IS the burst3 end-to-end replay — closedloop.tex:289-290 states 'this burst3 configuration is also the policy pair carried to the live-stack validation', and n_requests=3093 confirms burst3. live:twin_fc (base forecast = p50 band) = 2164.19ms; live:twin_fc_p90 = 651.14ms. The GPT adjudicator searched a11:burst3_* (per-window lead-sweep runs that have no p50 variant), found reactive=3495 and p90=651 there, and dismissed live:twin_fc=2164 because window_name is NULL — but n=3093 and the anchor's 'end-to-end / tail-aware / language mirror / live-stack' wording all identify the twin family as the backing. Wrong-scope flag.",
+  "severity": "minor",
+  "fix": "None. All three values are backed by the burst3 end-to-end twin replay (live:twin_re, live:twin_fc, live:twin_fc_p90). Optionally cite run_ids live:twin_{re,fc,fc_p90} to make provenance explicit (window_name is NULL on twin rows though n=3093 fixes the window).",
+  "confidence": 0.9,
+  "query": "SELECT run_id,pool,window_name,policy,forecast_model,quantile,p99_ms,n_requests,is_current FROM v_pool_latency WHERE run_id ILIKE '%twin%' AND sla_metric='ttft' ORDER BY run_id;"
+}

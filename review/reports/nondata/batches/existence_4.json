@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "predictors-0183",
+  "chapter": "predictors",
+  "claim_type": "existence",
+  "anchor": "upper-quantile headroom is trustworthy at provisioning cadence; band-width and lower-edge semantics are not",
+  "claim_text": "Upper quantile headroom trustworthy at provisioning cadence; band-width and lower-edge semantics not",
+  "expected_backing": "predictors/results/metrics/quantile_calibration_summary"
+ },
+ {
+  "claim_id": "predictors-0187",
+  "chapter": "predictors",
+  "claim_type": "existence",
+  "anchor": "Chronos-2 occasionally emits locally crossed quantiles (its head does not enforce monotonicity); values are recorded as produced apart from the nonnegativity floor",
+  "claim_text": "Chronos-2 occasionally emits crossed quantiles (no monotonicity enforcement); recorded as-produced except nonnegativity floor",
+  "expected_backing": "predictors/results/metrics/chronos2_crossed_quantiles"
+ },
+ {
+  "claim_id": "predictors-0190",
+  "chapter": "predictors",
+  "claim_type": "existence",
+  "anchor": "covariates are nearly irrelevant there, and for median-point models no fixed quantile improves on the point path --- the band is headroom, not correction",
+  "claim_text": "Covariates nearly irrelevant at provisioning cadence; for median-point models no quantile improves point path; band is headroom not correction",
+  "expected_backing": "predictors/results/metrics/covariate_effect_provisioning + quantile_vs_point_median_models"
+ },
+ {
+  "claim_id": "intro-0193",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "Large language models are served interactively, under explicit latency targets, from GPU fleets whose cost dominates the service's economics.",
+  "claim_text": "LLM serving is interactive with explicit latency targets and GPU fleet cost dominates economics",
+  "expected_backing": "v_pool_latency; v_cost_ratio"
+ },
+ {
+  "claim_id": "intro-0194",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "Serving systems decompose inference into stages of distinct computational character, each provisioned separately: prefill and decode run in dedicated worker pools, above engines that batch and schedule tokens, under datacenter-scale orchestration frameworks.",
+  "claim_text": "Serving systems decompose into prefill/decode pools with separate provisioning, token batching/scheduling engines, and datacenter orchestration",
+  "expected_backing": "v_pool_latency; v_cost_ratio"
+ },
+ {
+  "claim_id": "intro-0195",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "Multimodal models add one stage: a vision encoder converts the request's images into the embedding tokens the language model consumes, and modality-disaggregated architectures give that encoder a pool of its own.",
+  "claim_text": "Multimodal models add vision encoder stage; modality-disaggregated architectures give encoder its own pool",
+  "expected_backing": "collector_encoder_fn; v_pool_latency"
+ },
+ {
+  "claim_id": "intro-0207",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "The model under study is the Qwen3-VL family: the 8B, 32B, and 235B variants share one vision tower.",
+  "claim_text": "Qwen3-VL 8B/32B/235B share vision tower",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "intro-0216",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "The physical encoder-worker anchor remains future work.",
+  "claim_text": "Physical encoder-worker validation is future work",
+  "expected_backing": "collector_encoder_fn; v_pool_latency"
+ }
+]

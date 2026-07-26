@@ -1,0 +1,29 @@
+{
+ "claim_id": "trace-eda-0074",
+ "chapter": "trace-eda",
+ "claim_type": "numeric",
+ "anchor": "The trace covers exactly seven days (2024-10-15 to 2024-10-22, UTC) and one million requests",
+ "claim_text": "The dataset spans seven days from 2024-10-15 to 2024-10-22 UTC and contains one million requests.",
+ "expected_backing": "eda_metric",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "requests=1000000, t_start=2024-10-15 12:00:00.269000, t_end=2024-10-22 11:59:59.964000, duration_hours=167.99991527777777, span_seconds=604799.695",
+   "evidence": "The 1,000,000 request count and calendar dates are correct, but the span of 604,799.695 s (167.9999 hours) is 0.305 s short of exactly 7 days (604,800 s).",
+   "severity": "minor",
+   "fix": "Replace 'exactly seven days' with 'approximately seven days' or simply 'seven days'.",
+   "query": "SELECT (SELECT value_text FROM provenance.eda_metric WHERE metric_path = 't_start' AND run_id = 'eda:a_quality') AS t_start, (SELECT value_text FROM provenance.eda_metric WHERE metric_path = 't_end' AND run_id = 'eda:a_quality') AS t_end, (SELECT value_num FROM provenance.eda_metric WHERE metric_path = 'duration_hours' AND run_id = 'eda:a_quality') AS duration_hours, (SELECT value_num FROM provenance.eda_metric WHERE metric_path = 'rows' AND run_id = 'eda:a_quality') AS requests;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "requests=1000000; t_start=2024-10-15 12:00:00.269000; t_end=2024-10-22 11:59:59.964000; measured_span_seconds=604799.695; duration_hours=167.99991527777777; 14 current non-superseded EDA runs share 1 window with window_span_s=604799.7 and window_requests=1000000",
+   "evidence": "The request count and endpoint dates hold, but the measured timestamp span is 604799.695 seconds rather than exactly seven days, and the stored timestamps contain no UTC designation.",
+   "severity": "minor",
+   "fix": "Replace \u201cexactly seven days\u201d with \u201capproximately seven days\u201d and only state UTC if supported by another provenance source.",
+   "query": "WITH current_eda AS (SELECT run_id, window_name, window_span_s, window_requests FROM provenance.v_dim WHERE is_current = true AND superseded_by IS NULL AND run_id LIKE 'eda:%'), quality AS (SELECT e.metric_path, e.value_num, e.value_text FROM current_eda d JOIN provenance.eda_metric e ON e.run_id = d.run_id WHERE d.run_id = 'eda:a_quality' AND e.metric_path IN ('rows','t_start','t_end','duration_hours')), pivoted AS (SELECT max(value_num) FILTER (WHERE metric_path = 'rows') AS requests, max(value_text) FILTER (WHERE metric_path = 't_start') AS t_start, max(value_text) FILTER (WHERE metric_path = 't_end') AS t_end, max(value_num) FILTER (WHERE metric_path = 'duration_hours') AS duration_hours FROM quality), windows AS (SELECT count(*) AS current_run_count, count(DISTINCT window_name) AS distinct_windows, min(window_span_s) AS min_window_span_s, max(window_span_s) AS max_window_span_s, min(window_requests) AS min_window_requests, max(window_requests) AS max_window_requests FROM current_eda) SELECT p.requests, p.t_start, p.t_end, extract(epoch FROM (p.t_end::timestamp - p.t_start::timestamp)) AS measured_span_seconds, p.duration_hours, w.current_run_count, w.distinct_windows, w.min_window_span_s, w.max_window_span_s, w.min_window_requests, w.max_window_requests FROM pivoted p CROSS JOIN windows w"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

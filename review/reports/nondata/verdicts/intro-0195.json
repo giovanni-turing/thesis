@@ -1,0 +1,1 @@
+{"claim_id":"intro-0195","type":"existence","verdict":"supported","evidence":"provenance.collector_encoder_fn exists (536 rows: engines eager/sdpa/vllm/compiled/aic/flash_attention_2 producing post_merge_tokens from image_px/n_images) capturing the vision-encoder stage; v_pool_latency exposes pool='encoder' as its own pool. Anchor intro.tex:205.","fix":"","confidence":0.9}

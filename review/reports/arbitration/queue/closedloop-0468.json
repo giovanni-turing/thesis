@@ -1,0 +1,29 @@
+{
+ "claim_id": "closedloop-0468",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "Priced over the covered week, the policy meets the SLA in aggregate and per-episode at 0.62 times the deployable static encoder fleet's worker-time --- a week-scale figure (per burst window, every arm costs more than static).",
+ "claim_text": "Week-scale: policy meets SLA aggregate and per-episode at 0.62x static encoder worker-time; per burst window all arms cost more than static.",
+ "expected_backing": "v_cost_ratio",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "aggregate: 0.6231 (feasible: true); burst1: 3.0072; burst3: 2.8425; burst4: 3.0006; burst5: 1.1425",
+   "evidence": "v_ewma_ablation_ratio shows the Chronos p90 rho=15 warm readiness L=30 policy is feasible (feasible=true) at 0.6231x static, and v_window_cost_ratio confirms it costs > 1.0x static in all burst windows (1.14x - 3.01x).",
+   "severity": "minor",
+   "fix": "",
+   "query": "SELECT r.window_name, r.ratio_vs_static, w.ratio_a2_lead30_vs_static, r.feasible FROM provenance.v_ewma_ablation_ratio r LEFT JOIN provenance.v_window_cost_ratio w ON r.window_name = w.window_name WHERE r.model = 'chronos' AND r.quantile = 'p90' AND r.rho = 15 AND r.readiness = 'warm' AND r.lead_s = 30 ORDER BY r.window_name;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Aggregate cost ratio 0.6169327851932288 (2387084.7/3869278.4 worker-s) over 483659.8 s against effective static C=8; aggregate SLA passes at p99 588.37 ms versus 1000 ms, but burst3 fails at 4291.701 ms. Burst1 has 10/10 arms above static, while burst3 has only 9/10, with minimum ratio 0.7705979502376984.",
+   "evidence": "The Tier-2 0.62x aggregate cost result holds only on the covered span; per-episode SLA and the universal per-burst arm claim are directly false in current, effective-backed rows.",
+   "severity": "major",
+   "fix": "State that the encoder policy costs 0.62x the deployable static C=8 fleet over the covered 483659.8-second span and meets the aggregate SLA; remove the per-episode SLA and 'every arm' assertions.",
+   "query": "WITH target AS ( SELECT d.run_id, d.window_name, d.window_span_s, d.is_current, d.superseded_by, c.numerator_worker_seconds, c.denominator_worker_seconds, c.denominator_workers, c.denominator_kind, c.denominator_basis, c.denominator_window_mismatch, c.cost_ratio FROM provenance.v_dim d JOIN provenance.v_cost_ratio c USING (run_id) WHERE d.is_current = true AND c.is_current = true AND d.run_id LIKE 'rerun_verify:react_p90_W120_%_L30' AND c.denominator_kind = 'deployable_static_c8' ), sla AS ( SELECT i.run_id, i.window_name, i.bound_ms, i.achieved_p99_ms, i.is_violation, i.has_raw_backing FROM provenance.v_infraction i JOIN target t USING (run_id, window_name) WHERE i.is_current = true AND i.sla_metric = 'encoder_delay' ), burst_arms AS ( SELECT c.window_name, COUNT(*) AS arms, COUNT(*) FILTER (WHERE c.cost_ratio > 1) AS arms_over_static, MIN(c.cost_ratio) AS min_ratio, MAX(c.cost_ratio) AS max_ratio FROM provenance.v_cost_ratio c WHERE c.is_current = true AND c.experiment = 'rerun_verify' AND c.pool = 'encoder' AND c.denominator_kind = 'deployable_static_c8' AND c.window_name <> 'aggregate' GROUP BY c.window_name ), static_effective AS ( SELECT static_encoder_workers_effective, binding_window_effective, static_as_ingested FROM provenance.v_grid_static_effective ) SELECT t.run_id, t.window_name, t.window_span_s, t.numerator_worker_seconds, t.denominator_worker_seconds, t.denominator_workers, t.denominator_kind, t.denominator_basis, t.denominator_window_mismatch, t.cost_ratio, s.bound_ms, s.achieved_p99_ms, s.is_violation, s.has_raw_backing, b.arms, b.arms_over_static, b.min_ratio, b.max_ratio, e.static_encoder_workers_effective, e.binding_window_effective, e.static_as_ingested FROM target t LEFT JOIN sla s USING (run_id, window_name) LEFT JOIN burst_arms b USING (window_name) CROSS JOIN static_effective e ORDER BY t.window_name"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

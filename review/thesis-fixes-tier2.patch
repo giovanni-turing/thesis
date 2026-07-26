@@ -1,0 +1,29 @@
+# Tier-2 thesis fixes -- 2 caption corrections (git apply review/thesis-fixes-tier2.patch)
+#   eda_l_request_clusters: caption color names (text blue+pink, vision green+orange)
+#   sim_knees: disambiguate the 'steady' 2000-req head (head2k) from the 24h steady window
+--- a/tex/trace-eda.tex
++++ b/tex/trace-eda.tex
+@@ -103,7 +103,7 @@
+ \includegraphics[width=\linewidth]{figuras/eda/eda_l_request_clusters}
+ \caption{Unsupervised $k$-means archetypes ($k{=}4$ by silhouette). Left:
+ requests in the (context, generation) plane; the two text archetypes (blue,
+-orange) separate by output length, the two vision archetypes (green) by scale.
++pink) separate by output length, the two vision archetypes (green, orange) by scale.
+ Right: the same groups in image-count space, where the video/frame archetype
+ occupies the high-\texttt{NumImages} tail.}
+ \label{fig:eda-clusters}
+--- a/tex/twopool.tex
++++ b/tex/twopool.tex
+@@ -258,9 +258,9 @@
+ (log--log), swept by arrival speedup at the fixed 2$\times$2-worker
+ topology; knee markers apply the full evaluation SLA, so the steady-window
+ language knees sit \emph{below} the TTFT line: they are set by the
+-inter-token bound (``ITL-bound''), which crosses first. On the steady
+-window (blue) the language knee sits at $s{=}3$ (polynomial) and $s{=}2$
+-(calibrated) while the vision pool remains under its bound through
++inter-token bound (``ITL-bound''), which crosses first. On the 2{,}000-request steady head (blue, labelled \texttt{head2k} in the
++figure --- distinct from the 24-hour steady window) the language knee sits at
++$s{=}3$ (polynomial) and $s{=}2$ (calibrated) while the vision pool remains under its bound through
+ $s{=}32$; at the calibrated language knee the encoder idles at 4.5\%
+ utilization. On the burst window (green) both calibrated curves start
+ \emph{above} their bounds at the episode's own recorded rate: the

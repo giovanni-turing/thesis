@@ -1,0 +1,29 @@
+{
+ "claim_id": "twopool-0039",
+ "chapter": "twopool",
+ "claim_type": "numeric",
+ "anchor": "Summing the two stage budgets gives \u22482 seconds to first token at roughly the p98 level (a union bound over two p99s, not an end-to-end p99 guarantee); a modelled reconstruction on the composed run puts the ingress-to-first-token p99 at \u22481.3 seconds, which the measured request-linked join of Chapter 5 (Table 2) confirms.",
+ "claim_text": "Sum of stage budgets ~2s to first token at ~p98 (union bound); composed run ingress-to-first-token p99 ~1.3s, confirmed by measured join in Chapter 5.",
+ "expected_backing": "v_infraction, v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "bound_ms = 1000 ms each for encoder_delay and ttft; e2e_p99_ms = 1239.5 ms (Chronos) and 1259.2 ms (Toto)",
+   "evidence": "v_infraction confirms p99 budgets are 1000 ms each (sum = 2 s union bound); v_joint_e2e shows request-linked join E2E p99 of 1239.5 ms to 1259.2 ms (\u22481.24s\u20131.26s, matching the \u22481.3s reconstruction)",
+   "severity": "minor",
+   "fix": "",
+   "query": "SELECT DISTINCT sla_metric, bound_ms FROM provenance.v_infraction WHERE pool IN ('encoder', 'language') AND bound_stat = 'p99'; SELECT arm, e2e_p99_ms FROM provenance.v_joint_e2e WHERE arm IN ('fc_toto', 'fc_chronos', 'fc_timesfm');"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "The two current, non-superseded p99 budgets sum to 2000 ms; aggregate encoder and TTFT p99s are 588.37 and 651.1395369768143 ms over 749601 requests, while the request-linked aggregate E2E p99 is 1239.5 ms and is labelled coincides_with_sum.",
+   "evidence": "The 2000 ms union-bound budget is supported, but the DB supplies a 1239.5 ms request-linked join and labels its equality with the stage-p99 sum as coincidence, not independent confirmation of a separate modelled reconstruction.",
+   "severity": "major",
+   "fix": "State that two 1000 ms p99 stage budgets yield a 2000 ms p98 union-bound budget, and that the measured request-linked aggregate E2E p99 is 1239.5 ms; remove the unsupported modelled-confirmation framing.",
+   "query": "WITH stage AS (SELECT i.run_id, i.sla_metric, i.bound_ms, i.bound_stat, i.achieved_p99_ms, i.n_requests, p.p99_ms FROM provenance.v_infraction i JOIN provenance.v_dim d ON d.run_id=i.run_id AND d.pool IS NOT DISTINCT FROM i.pool AND d.window_name IS NOT DISTINCT FROM i.window_name JOIN provenance.v_pool_latency p ON p.run_id=i.run_id AND p.sla_metric=i.sla_metric WHERE i.is_current AND p.is_current AND d.is_current AND d.superseded_by IS NULL AND i.sla_metric IN ('encoder_delay','ttft') AND i.run_id IN ('a14:chronos_composed','a14:chronos_e2e')), windows AS (SELECT window_name, n_requests, encoder_delay_p99_ms, ttft_p99_ms, e2e_p99_ms, e2e_p99_is_request_linked, e2e_vs_sum_evidence FROM provenance.v_joint_e2e WHERE arm='fc_chronos') SELECT sum(bound_ms) AS summed_stage_budget_ms, min(bound_stat) AS stage_bound_stat, jsonb_agg(jsonb_build_object('run_id',run_id,'metric',sla_metric,'bound_ms',bound_ms,'p99_ms',p99_ms,'n_requests',n_requests) ORDER BY sla_metric) AS stages, (SELECT jsonb_agg(jsonb_build_object('window',window_name,'n_requests',n_requests,'encoder_p99_ms',encoder_delay_p99_ms,'ttft_p99_ms',ttft_p99_ms,'e2e_p99_ms',e2e_p99_ms,'request_linked',e2e_p99_is_request_linked,'sum_evidence',e2e_vs_sum_evidence) ORDER BY window_name) FROM windows) AS per_window FROM stage"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

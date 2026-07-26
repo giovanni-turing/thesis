@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "twopool-0019",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "The entire pipeline is CPU-only and deterministic given a trace window.",
+  "claim_text": "Pipeline is CPU-only and deterministic for a given trace window.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "twopool-0030",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "Dispatch is greedy FIFO: a freed worker takes whole queued requests, in order, up to a 64-image cap (the collected batch range, so no extrapolation); a request exceeding the cap alone (the trace reaches 97^2 = 9409 images) is chunked into \u226464-image forwards that enter the FIFO as independent units, so several free workers drain one oversized request concurrently.",
+  "claim_text": "Greedy FIFO dispatch with 64-image cap; oversized requests (up to 9409 images) chunked into \u226464-image units processed concurrently.",
+  "expected_backing": "eda_metric, v_pool_latency"
+ },
+ {
+  "claim_id": "twopool-0031",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "Chunk-parallel dispatch is a simulator policy assumption: consistent with encoder-disaggregated runtimes that route image groups independently across encoder instances, physically grounded (images are independent in the encoder), but not a property of the trace.",
+  "claim_text": "Chunk-parallel dispatch is a simulator policy assumption, not a trace property.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "twopool-0035",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "Second, the bound is bandwidth-only: contention, serialization points, NIC/PCIe placement, and cross-node topology are not modeled, so it is a lower bound on transfer latency, not a tail estimate; it is charged to request latency but not to the worker (asynchronous DMA/NIC), optimistic for encoder throughput, and a measured NIXL curve can later replace it.",
+  "claim_text": "Handoff bound is bandwidth-only lower bound, not a tail estimate; charged to request latency not worker; optimistic for encoder throughput.",
+  "expected_backing": "v_cost_ratio, collector_encoder_fn"
+ },
+ {
+  "claim_id": "twopool-0037",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "The language pool must hold TTFT p99 < 1 second and inter-token latency (ITL) p99 < 100 ms; the vision pool must hold encoder delay p99 < 1 second, matching the language TTFT budget.",
+  "claim_text": "Evaluation SLA: language pool TTFT p99 < 1s, ITL p99 < 100ms; vision pool encoder delay p99 < 1s.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "twopool-0038",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "This encoder percentile is taken over all requests --- a text-only request incurs zero encoder delay, so it is a user-population tail, not a vision-pool-conditional one; the stage-conditional (image-bearing) variant is reported alongside it where the distinction matters.",
+  "claim_text": "Encoder delay p99 computed over all requests (including text-only with zero delay), not conditional on image-bearing requests.",
+  "expected_backing": "v_infraction, eda_metric"
+ },
+ {
+  "claim_id": "twopool-0040",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "The specific bounds double Dynamo's default planner targets (500/50 ms, window-mean) applied as tail bounds, consistent with common practice in disaggregated-serving evaluations.",
+  "claim_text": "Evaluation SLA bounds double Dynamo's default planner targets (500ms/50ms window-mean) as tail bounds.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "twopool-0059",
+  "chapter": "twopool",
+  "claim_type": "methodological",
+  "anchor": "All encoder timing derives from a single RTX 5090 node (locked clocks); cross-unit silicon variance is unquantified.",
+  "claim_text": "Encoder timing from single RTX 5090 node (locked clocks); cross-unit variance unquantified.",
+  "expected_backing": "collector_encoder_fn"
+ }
+]

@@ -1,0 +1,29 @@
+{
+ "claim_id": "closedloop-0403",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "The reactive policy, by contrast, is insensitive to rho (13-14 of 20 cells at every rating).",
+ "claim_text": "Reactive policy passes only 13-14 of 20 cells regardless of rho value.",
+ "expected_backing": "v_infraction",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "rho 10: 14/20 passes; rho 15: 14/20 passes; rho 20: 13/20 passes; rho 25: 13/20 passes",
+   "evidence": "In factorial_cell, the reactive policy (excluding aggregate) has exactly 20 unique (window, lead) cells at each of the four rho values; feasible cells are exactly 14/20 for rho=10, 14/20 for rho=15, 13/20 for rho=20, and 13/20 for rho=25. Prior verifier GPT-5.6-sol erred by blindly filtering on runs.is_current, which excluded target-time reactive runs (which are marked is_current=false to isolate issue-time forecast runs in current_factorial).",
+   "severity": "",
+   "fix": "",
+   "query": "SELECT fc.rho, count(distinct (fc.window_name, fc.lead_s)) FILTER (WHERE fc.feasible = true) as passes, count(distinct (fc.window_name, fc.lead_s)) as total FROM provenance.factorial_cell fc WHERE fc.policy = 'reactive' AND fc.window_name != 'aggregate' AND fc.lead_s IN (15, 30, 45, 300) GROUP BY fc.rho ORDER BY fc.rho;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Current rows: rho=10: 0 cells; rho=15: 4/5 passes; rho=20: 0 cells; rho=25: 3/5 passes. Each available denominator comprises five named windows.",
+   "evidence": "Current v_dim/v_infraction rows provide only five cells each at rho=15 and rho=25, with 4 and 3 passes respectively, and no current cells at rho=10 or rho=20; therefore neither the 20-cell denominator nor every-rating scope is backed.",
+   "severity": "major",
+   "fix": "Restrict the statement to the current evidence: \"The reactive policy passes 4 of 5 cells at rho=15 and 3 of 5 at rho=25; current data are unavailable at rho=10 and rho=20.\"",
+   "query": "WITH expected_rho(rho) AS (VALUES (10::numeric), (15::numeric), (20::numeric), (25::numeric)), current_dim AS (SELECT d.run_id, d.rho, d.window_name, d.superseded_by FROM provenance.v_dim d WHERE d.is_current = true AND d.policy = 'reactive' AND d.rho IN (10,15,20,25)), current_cells AS (SELECT d.rho, d.run_id, d.window_name, i.is_violation FROM current_dim d JOIN provenance.v_infraction i ON i.run_id = d.run_id AND i.is_current = true), totals AS (SELECT rho, COUNT(*) AS cells, COUNT(*) FILTER (WHERE is_violation = false) AS passes, COUNT(*) FILTER (WHERE is_violation = true) AS violations FROM current_cells GROUP BY rho), windows AS (SELECT rho, jsonb_agg(jsonb_build_object('window', window_name, 'passes', CASE WHEN is_violation = false THEN 1 ELSE 0 END, 'cells', 1) ORDER BY window_name) AS per_window FROM current_cells GROUP BY rho), superseded AS (SELECT d.rho, COUNT(*) AS noncurrent_rows, COUNT(*) FILTER (WHERE d.superseded_by IS NOT NULL) AS rows_with_superseded_by FROM provenance.v_dim d WHERE d.is_current = false AND d.policy = 'reactive' AND d.rho IN (10,15,20,25) GROUP BY d.rho) SELECT e.rho, COALESCE(t.passes,0) AS passes, COALESCE(t.cells,0) AS cells, COALESCE(t.violations,0) AS violations, w.per_window, COALESCE(s.noncurrent_rows,0) AS noncurrent_dim_rows, COALESCE(s.rows_with_superseded_by,0) AS noncurrent_rows_with_superseded_by FROM expected_rho e LEFT JOIN totals t USING (rho) LEFT JOIN windows w USING (rho) LEFT JOIN superseded s USING (rho) ORDER BY e.rho"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

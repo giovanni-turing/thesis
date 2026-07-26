@@ -1,0 +1,1 @@
+{"claim_id":"intro-0318","type":"existence","verdict":"supported","evidence":"forecast_metrics (41600 rows) plus TS foundation-model tables forecast_timesfm, forecast_chronos, forecast_moirai, forecast_toto exist -- zero-shot benchmark of TS foundation models on serving demand signals.","fix":"","confidence":0.95}

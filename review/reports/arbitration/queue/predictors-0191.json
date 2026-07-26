@@ -1,0 +1,29 @@
+{
+ "claim_id": "predictors-0191",
+ "chapter": "predictors",
+ "claim_type": "comparative",
+ "anchor": "Inter-model margins are small enough that engineering considerations can drive the choice",
+ "claim_text": "Inter-model margins small; engineering considerations can drive model choice",
+ "expected_backing": "predictors/results/metrics/model_wape_spreads",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "Across all predictors, WAPE spans 0.6374-0.9917 at 15s (55.59% spread) and 0.5153-0.6180 at 1min (19.93% spread). Foundation-model-only spreads are 4.71% at 15s and 1.11% at 1min.",
+   "evidence": "The unqualified all-predictor spread reaches 55.59% at 15s, showing margins are not universally small; they cluster tightly (<=4.71% spread) only within the foundation-model subset.",
+   "severity": "minor",
+   "fix": "Qualify the claim: \"Among evaluated foundation models, WAPE margins are small enough that engineering considerations can drive model choice.\"",
+   "query": "SELECT resolution, MIN(wape) AS best_wape, MAX(wape) AS worst_wape, (MAX(wape)-MIN(wape))/MIN(wape)*100 AS spread_pct, MIN(wape) FILTER (WHERE family='fm') AS best_fm_wape, MAX(wape) FILTER (WHERE family='fm') AS worst_fm_wape, (MAX(wape) FILTER (WHERE family='fm')-MIN(wape) FILTER (WHERE family='fm'))/MIN(wape) FILTER (WHERE family='fm')*100 AS fm_spread_pct FROM provenance.forecast_eval WHERE is_valid=true AND signal='images' AND horizon_h=1 GROUP BY resolution ORDER BY resolution"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Across all predictors, WAPE spans 0.6374\u20130.9917 at 15s (55.5852% of best; origins used 300\u20132687) and 0.5153\u20130.6180001710164152 at 1min (19.9302%; 167 origins). Foundation-model-only spreads are 4.7066% and 1.1062%, respectively.",
+   "evidence": "Margins are small only within the foundation-model subset; the unqualified all-predictor spread reaches 55.5852%, and the 15s denominator varies from 300 to 2687 origins.",
+   "severity": "minor",
+   "fix": "Qualify the claim: \"Among the evaluated foundation models, WAPE margins are small enough that engineering considerations can drive model choice.\"",
+   "query": "WITH anchor AS (SELECT 1 FROM provenance.v_dim WHERE is_current=true AND superseded_by IS NULL LIMIT 1), e AS (SELECT f.* FROM anchor CROSS JOIN provenance.forecast_eval f WHERE f.is_valid=true AND f.signal='images' AND f.horizon_h=1) SELECT resolution, COUNT(*) AS n_predictors, MIN(wape) AS best_wape, MAX(wape) AS worst_wape, MAX(wape)-MIN(wape) AS spread_abs, (MAX(wape)-MIN(wape))/MIN(wape)*100 AS spread_pct_of_best, MIN(wape) FILTER (WHERE family='fm') AS best_fm_wape, MAX(wape) FILTER (WHERE family='fm') AS worst_fm_wape, (MAX(wape) FILTER (WHERE family='fm')-MIN(wape) FILTER (WHERE family='fm'))/MIN(wape) FILTER (WHERE family='fm')*100 AS fm_spread_pct_of_best, MIN(n_origins_used) FILTER (WHERE n_origins_used IS NOT NULL) AS min_origins_used, MAX(n_origins_used) FILTER (WHERE n_origins_used IS NOT NULL) AS max_origins_used, jsonb_object_agg(predictor,wape ORDER BY wape) AS predictor_wape FROM e GROUP BY resolution ORDER BY resolution"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

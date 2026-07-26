@@ -1,0 +1,11 @@
+{
+  "claim_id": "closedloop-0119",
+  "verdict": "supported",
+  "observed": "EWMA-ablation Chronos control (ewma_ablation_cell, model=chronos p90 rho15 warm, is_current): burst1/3/4/5 p99=589.30 ms at every lead L in {15,30,45,165}; steady24h 681.12/688.63; aggregate ratio_vs_static 0.6220-0.6231. Committed main issue-time figures: 588.37 ms floor and 0.6231 (0.62x). Reproduction gap: 589.30 vs 588.37 = 0.16%; 0.6231 = committed exactly.",
+  "claimed": "The Chronos control reproduces the committed figures to within run noise (<1%).",
+  "evidence": "The anchor at closedloop.tex:183 is a DISTINCT sentence from the live-validation sentence at lines 338-339 ('within 1.1-6.8%; a single live run per policy, not a repeated-trial noise band'), which is the one ledger entry 1006 corrected and which the adjudicators' evidence (results_44.jsonl live_fc/verify_flag arms) actually addresses. Both adjudicators flagged the wrong sentence: results_44.jsonl and live_arm belong to the live-Dynamo validation, already correctly worded. The line-183 claim concerns the EWMA-ablation harness Chronos control (Table tab:cl-ewma), whose values are backed by current ewma_ablation_cell rows: 589.30 ms vs committed 588.37 = 0.16% and ratio 0.6231 = committed 0.62x, both <1%. The caption itself discloses this harness reads the floor 1 ms above the main artifacts.",
+  "severity": "minor",
+  "fix": "No thesis change needed for the line-183 sentence. The ledger-1006 correction was already applied to the separate live-validation sentence (lines 338-339). Arbitration flag is a wrong-scope artifact.",
+  "confidence": 0.88,
+  "query": "SELECT model,window_name,lead_s,ROUND(p99_ms::numeric,2) p99,ROUND(ratio_vs_static::numeric,4) ratio FROM ewma_ablation_cell WHERE model='chronos' AND quantile='p90' AND rho=15 AND readiness='warm' ORDER BY window_name,lead_s;"
+}

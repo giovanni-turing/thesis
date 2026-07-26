@@ -95,7 +95,7 @@ commit:     this entry closes the gap found while writing the ledger
 ### Kernel ledgers N=1/N=64  (2026-07-08)
 artifact:   collector_artifacts/phaseB_batch_validation/kernel_ledger_N{1,64}.json
 command:    eda/.venv/bin/python collector_artifacts/phaseB_batch_validation/profile_vit_kernels.py --n 1 64
-feeds:      tex/aiconfigurator.tex §5.3.1 attribution ¶ (attention 1.300→1.306 ms/img; GEMM 6.03→3.69; unmodeled 168.6 ms = 92% of 182 ms gap; dispatch 15.3%→2.5%)
+feeds:      tex/aiconfigurator.tex §5.3.1 attribution ¶ (attention 1.300→1.306 ms/img; GEMM 6.03→3.69; unmodeled 168.6 ms = 92.6% of 182 ms gap, thesis rounds 93% — corrected 2026-07-26, was mis-rounded 92%; dispatch 15.3%→2.5%)
 supersedes: new (closes the growth attribution promised by the section)
 commit:     70b8a5a
 
@@ -263,14 +263,14 @@ commit:     0eb7323
 ### 5.1 validation anchor — live Dynamo stack vs offline twins  (2026-07-09)
 artifact:   simulation/results/live51/live_runs/{live_fc,live_re,verify_flag}/{profile_export_aiperf.json,manager.jsonl,planner.log.gz}; twins twin_fc_p90_cap4/twin_re_cap4 (budget-matched); harness simulation/live51/ (run_live.sh, worker_manager.py, planner_live*.py, configs)
 command:    bash simulation/live51/run_live.sh {fc,re} grid_burst3_C7.jsonl <rundir> 59 2  (etcd+NATS dev compose, prom51 :9090 w/ per-run dynamo_namespace label, aiperf fixed-schedule mooncake replay, FORECAST_QUANTILE=p90)
-feeds:      tex/validation.tex Tab. val-anchor + chapter; intro scope ¶ (placeholder resolved); conclusion RQ3 — VERDICT AGREEMENT both directions: fc-p90 PASS live 695 vs twin 651 ms (+6.8%); reactive FAIL live 3,531 vs 3,495 ms (+1.0%); replica-seconds within 8%; demand path byte-identical 12 ticks (live tick1 29.86 rps/5.31 engine_rps = twin 29.86/5.30); spawn-to-ready measured 1.0 s → spawn-delay 59 s = 60 s lead
+feeds:      tex/validation.tex Tab. val-anchor + chapter; intro scope ¶ (placeholder resolved); conclusion RQ3 — VERDICT AGREEMENT both directions: fc-p90 PASS live 695 vs twin 651 ms (+6.8%); reactive FAIL live 3,531 vs 3,495 ms (+1.0%); replica-seconds within 8%; demand path byte-identical 12 ticks (live tick1 29.86 rps/5.71 engine_rps = twin 29.86/5.30; corrected 2026-07-26, was mis-transcribed 5.31 — see adjudication P1-10); spawn-to-ready measured 1.0 s → spawn-delay 59 s = 60 s lead
 supersedes: the intro's last placeholder (validation anchors)
 commit:     0eb7323
 
 ### Live-path divergences + upstream fix fpm_observation_mode  (2026-07-09)
 artifact:   ai-dynamo/dynamo branch fix/planner-live-fpm-observation-mode commit 33a9babe01 (LOCAL — push awaits user); verification simulation/results/live51/live_runs/verify_flag/
 command:    (fix) PlannerConfig.fpm_observation_mode 'all': recv-mode drain → observe_fpm_extra via add_observations, 68 unit tests pass; (verify) SKIP_PARITY_PATCH=1 PLANNER_CFG_OVERRIDE=planner_fc_flag.json run_live.sh fc smoke_b3head — in-tree drain, Agg tick1 29.86/5.48=6, no monkeypatch
-feeds:      tex/validation.tex §val-findings — 4 findings: (1) live startup_time INVERTS offline semantics (registers immediately, stalls requests → routable-but-dead window; leads modeled by delayed spawn); (2) tracking-mode FPM sampling starves agg capacity model at calm load (0 mixed samples in 5 min @2 rps; offline ready tick 1) → fixed via flag; (3) live tick cadence can stall (one 245 s gap; forecast feed realigns to wall time); (4) budget-unit inconsistency (offline replay caps replicas at max_gpu_budget; live divides by decode_engine_num_gpu) — anchor twins budget-matched via max_gpu_budget=4, thesis offline results unaffected (budgets never bind)
+feeds:      tex/validation.tex §val-findings — 4 findings: (1) live startup_time INVERTS offline semantics (registers immediately, stalls requests → routable-but-dead window; leads modeled by delayed spawn); (2) tracking-mode FPM sampling starves agg capacity model at calm load (0 mixed samples in 5 min @2 rps; offline ready tick 1) → fixed via flag; (3) live tick cadence can stall (one ~120 s gap — corrected 2026-07-26, was 245 s from Agg-line under-logging, true max tick gap 120.041 s per adjudication P1-11; forecast feed realigns to wall time); (4) budget-unit inconsistency (offline replay caps replicas at max_gpu_budget; live divides by decode_engine_num_gpu) — anchor twins budget-matched via max_gpu_budget=4, thesis offline results unaffected (budgets never bind)
 supersedes: new
 commit:     0eb7323 (dynamo-side 33a9babe01 local)
 
@@ -1778,4 +1778,658 @@ result:     5 parallel agents verified every on-screen number against provenance
             3.49s x3 lead-invariant FAIL), clickable, verdict-glyphed. A9 blank-WebGL in
             headless shots = chromium flag artifact, not a page defect.
 feeds:      defense presentation only (no thesis text touched); supersedes nothing ledgered
+commit:     uncommitted (working tree)
+
+================================================================================
+date:       2026-07-21
+artifact:   review/final-verdicts.jsonl (pending finalize); review/reports/{*/p2.*,adjudication/*/p3.*}.jsonl;
+            harnesses review/tools/run_phase2.py, run_phase3.py, run_phase4.py, finalize.py
+command:    OPENCODE_CONFIG=review/tools/opencode-reviewer.jsonc python3 tools/run_phase{2,3}.py
+            (multi-agent claim verification; review-db RO MCP sandbox; 8 calibrated verifiers +
+            6 cross-family adjudicators; reasoning=high, timeout=1000s, model-max output)
+result:     VERIFICATION PIPELINE (in progress). Phase 1: 469 anchor-verified claims (610 raw,
+            127 hallucinated anchors dropped); 227 data-verifiable (164 numeric + 63 comparative).
+            Phase 2 verification COMPLETE, 227/227 covered (CONFIRM+REFUTE, >=1 anchor, E2 db_query
+            gate): 89 pass, 112 flagged, 17 unverifiable, 9 no-verdict. Phase 3 adjudication RUNNING
+            (121 flagged/no-verdict claims x2 fresh cross-family re-derivers). Phase 4 (cross-family
+            validation of FAILs) + Phase 5 ledger/FAILURES pending.
+feeds:      standing verification-of-record for tex/*.tex claims; will produce
+            review/VERIFICATION-LEDGER.md + review/FAILURES.md (fixes for confirmed overclaims/
+            contradictions). No thesis text touched yet (read-only phase).
+commit:     uncommitted (working tree, branch thesis-verification-and-provenance-db)
+
+================================================================================
+date:       2026-07-21
+artifact:   review/VERIFICATION-LEDGER.md (227 claims), review/FAILURES.md (10 defects+fixes),
+            review/final-verdicts.v2.jsonl; review/reports/arbitration/verdicts/*.json (85 opus rulings)
+command:    Phase1 extract -> Phase2 CONFIRM/REFUTE (gemini+gpt-sol, review-db RO) -> Phase3 adjudicate
+            -> Phase4a minimax + Phase4b 85 opus arbiters (psql RO, re-derive from scratch) -> finalize2
+result:     DEFINITIVE data-claim verification. 227 data-verifiable claims: 173 PASS + 26 PASS-UNVER
+            (=199 clean, 88%), 12 UNVERIFIABLE (causal/no-backing), 6 SPLIT (pending), 10 FAIL (4.4%).
+            The aggressive fast pass flagged 85; opus re-derivation from the DB overturned 75 as
+            reviewer wrong-view/scope/superseded artifacts, confirming 10 real defects. Headline
+            0.62x cost ratio held exactly (confirmed by multiple arbiters). 10 defects (all localized
+            wording/precision, no blocking): 3 contradicted (baselines-0364 & closedloop-0395 = same
+            L*=45->165s error where burst4 passes at 904.7ms; predictors-0173 fine/coarse forecaster
+            attribution), 1 inconsistent (aiconfigurator-0382 superseded AIC table row), 6 overclaimed
+            (twopool-0025 ITL 87.7->86.2ms+"throughout"; predictors-0176 15s-scope; closedloop-0425
+            "lead-invariant" vs ~6% trend; intro-0197 "barely moves"; twopool-0062/0068 wording).
+            Data note: apendice-0138 = DB loader ingested a contended-invalid row (thesis 232.0 correct).
+feeds:      tex/{baselines,closedloop,predictors,aiconfigurator,twopool,intro}.tex — see FAILURES.md
+            for exact per-claim fixes. No thesis text edited yet (verification is read-only).
+commit:     uncommitted (working tree)
+
+================================================================================
+date:       2026-07-21
+artifact:   review/FIGURES.md (18 figures), review/EVIDENTIAL-INTEGRITY.md (Phase-7 trialogue),
+            review/EVIDENCE-PACK.md, review/reports/figures/verdicts/*.json (18),
+            review/reports/evidential/proposer_draft.md
+command:    Phase6: 4 opus VLM agents view figures + cross-check vs DB. Phase7: fable-5 proposer ->
+            gpt-5.6-sol critic (review-db RO) -> opus chair synthesis
+result:     PHASES 6-7 COMPLETE. Figures: 15/18 OK, 3 flagged (all caption/label cosmetics, data
+            reconciles) - eda_l_request_clusters color-legend, pred_framework_diff panel-(a) untracked
+            source flips HW-vs-naive ranking (only displayed-data<->DB mismatch, non-load-bearing),
+            sim_knees "steady"vs"head2k" legend. Minimax (3rd lab) corroborated 8/10 data defects,
+            0 overturns. Phase-7 evidential-integrity verdict (chair): CONDITIONALLY DEFENSIBLE - no
+            chapter conclusion shown false, headline 0.62x survived re-derivation in 7/8 scopes, but
+            conditions: fix 10 defects + resolve 3 unbacked measured-looking numbers (0264/0436/0439)
+            + repair panel-(a) provenance + DB-loader validity audit + explicitly scope 0.62x as
+            simulation-derived/single-trace/infrastructure-conditional with cost-accounting boundary
+            (provisioned vs from-order worker-sec, symmetric warm-up; reactive warm-up fractions to
+            0.35 in v_pool_cost). Non-blocking: displayed formula defs (WAPE/cost-ratio/L*/infraction),
+            ship claim->query ledger as reproducibility appendix.
+feeds:      thesis revision plan; all fixes read-only-identified. No tex edited.
+commit:     uncommitted (working tree)
+
+================================================================================
+date:       2026-07-21
+artifact:   review/NONDATA-LEDGER.md; review/reports/nondata/verdicts/*.json (242)
+command:    33 opus subagents verify non-data claims vs code/artifacts/DB/git/papers_cited PDFs
+            (methodological->code/configs; existence->fs/DB/git; causal->mechanism+ablation;
+            citation->opened PDFs+bibitems+gh; behavioral->code+cited papers)
+result:     NON-DATA VERIFICATION COMPLETE. 242 claims (102 methodological, 91 existence, 36 causal,
+            8 citation, 5 behavioral): 238 supported (98.3%), 2 unverifiable (matplotlib/chronos pkg
+            versions unrecorded - trivial), 1 overclaimed, 1 contradicted. Two real defects:
+            (1) closedloop-0402 CONTRADICTED - predictor-invariance result attributed to "fast onset,
+            burst3" but that burst3 run was discarded invalid; actual experiment ran on burst4 (slow
+            onset)+steady24h -> fix: burst3->burst4, drop "fast onset". (2) related-0292 OVERCLAIMED -
+            "all prior traces carry only token counts+timestamps" fails for ServeGen (has multimodal
+            descriptors) -> weaken quantifier, treat ServeGen separately. Citations all check out
+            against opened PDFs (FlashAttention-2, ElasticMM verbatim quote) + PR #1312 OPEN draft.
+            Causal claims backed by ablations (necessity shown by counterfactual, not asserted).
+feeds:      tex/{closedloop,related}.tex (2 fixes); see NONDATA-LEDGER.md.
+also:       brought the mmrag embedding stack back up (qwen-embed 0.62 / qwen-rerank 0.24 / nginx
+            router, on mmrag_default net, no host ports); RAG /search verified HTTP 200 end-to-end.
+commit:     uncommitted (working tree)
+
+================================================================================
+date:       2026-07-22
+artifact:   provenance/schema/31_route_a_validation_backfill.sql (new, idempotent, applied +
+            re-applied to live store); collector_encoder_fn +3 rows; COMMENTs on
+            v_ewma_ablation_ratio + v_cost_ratio
+command:    psql -U goku -f provenance/schema/31_route_a_validation_backfill.sql
+result:     DB fixes for the 2 verification "unverifiable-backing" items.
+            0264 (REAL gap, FIXED): the Route-A HF reference validation
+            (phaseA_validation/result.txt: 11.360/36.421/103.824 ms measured, 7.822/31.973/
+            89.347 raw-slice AIC pred, locked clocks) was never ingested. Now 3 rows in
+            collector_encoder_fn (engine='hf', n_images=1) -> tab:aic-validation is
+            DB-re-derivable (11.360/7.822/1.45x etc.). Distinct source_path, does not disturb
+            the composed phaseE anchors (aic 8.162).
+            0436 (NOT a gap): the headline Chronos p90 rho=15 L30 warm aggregate = 0.6231
+            (0.62x) is CURRENT + is_valid in v_ewma_ablation_ratio. The reviewer's
+            "unverifiable" was a view-scoping miss (queried v_cost_ratio, whose factorial
+            forecast_p90_chronos_rho15_L30 = 0.6140 is the cold-start sweep, correctly
+            superseded). No data change; added discoverability COMMENTs on both views.
+feeds:      the provenance store (verification oracle); makes tab:aic-validation auditable and
+            steers headline-cost-ratio queries to the right view. No thesis text change.
+commit:     provenance/schema/31_route_a_validation_backfill.sql
+
+================================================================================
+date:       2026-07-22
+artifact:   defense/reveal/index.html (slides 14-16 NEW: boundary-case act + conclusion);
+            defense/reveal/shots/{s14_boundary,s15_a2_e13,s16_conclusion}.png
+command:    hand-authored sections; rendered via chromium --headless against python http.server;
+            e13 numbers from ledger entry "A2 extra burst episodes" (2026-07-19) + a2x_runs stats
+result:     Deck completed 13 -> 16 slides. (14) e13 boundary claim slide — in-week aggregate
+            grading: C8 882 ms PASS (only pass), reactive 2.89 s, forecast p90 4.55 s, C2 7.9 s,
+            p50 16.1 s all FAIL; bars linearly scaled to 16.1 s; tiles: model-independence
+            (Chronos/Toto byte-identical 5.3-6.8 s), ~0.90-coverage contract, scorecard 1/18 vs
+            9/18 at L30; handoff bridges in-week (4.55) vs isolated-replay (6.09 at L30) numbers.
+            (15) animslide a2_the_race.html#w=e13&L=30 (tab + chips verified in shot). (16)
+            conclusion — hero strip 0.62x / 588 ms / 60/60 / 17/18, the 5 intro.tex contributions
+            compressed to tiles, scope box (simulation-derived, single trace, symmetric warm-up,
+            e13 bound, DB re-derivable), obrigado line. Resolves the previously dangling
+            "boundary-case act" promise in slide 10's disclosure.
+feeds:      defense deck (defense/reveal/); no thesis text change
+note:       title-slide emblems confirmed intentional by user: Holy See = personal faith;
+            the other two are the official USP and IME brands. Not an open item.
+addendum:   (same date) e13 boundary-case act REMOVED per user decision — deck back to 14 slides
+            (13 + conclusion). Removed: slides 14-15, the slide-10 "Where the forecast loses"
+            disclosure box, the 17/18 hero (-> 52 planner replays), the scope-box e13 clause
+            (-> "the p90 band is calibrated to ~90% coverage"). Zero e13/boundary refs remain;
+            s10/conclusion shots re-rendered; s14_boundary/s15_a2_e13 shots deleted. The e13
+            finding itself stays ledgered (2026-07-19 entry) and in a2/a8 anims for Q&A.
+addendum2:  (same date) slide-8 method strip: hand-drawn canvas REPLACED with interactive Plotly.
+            build_method_strip.py now also emits offered5 (5-s means, 323 pts, max 969.2) as the
+            display series (scheduler still consumes 15-s means; caption states both). hv
+            staircases with per-step worker counts in unified hover, y-range 0-1000, direct
+            labels + legend, modebar off. Fixed layout width 1472 (off-slide sections are
+            display:none -> clientWidth 0 at draw time; responsive sizing rendered 700px).
+            vendor/plotly.min.js added (4.7 MB, copied from eda venv = same build the anims
+            inline). Palette #2a78d6/#eb6834 validated (CVD dE 24.7, normal 33.6, all checks
+            pass). s8_method.png re-rendered. Also exported defense/reveal/method_strip.html
+            (4.9 MB single-file: plotly.min.js + METHOD data inlined, works from file://,
+            responsive full-window) — standalone twin of the slide-8 chart.
+addendum3:  (same date) WHOLE DECK exported single-file: defense/deck_single.html (23.1 MB),
+            builder defense/reveal/build_single_deck.py. Inlines vendor CSS (font @import
+            stripped), reveal/notes/plotly JS, data JS, SVG logos as data: URIs; the 5 anim
+            pages embedded as JS strings -> Blob-URL iframes hydrated at slide distance <=1,
+            dehydrated >2 (replicates reveal data-src viewDistance), hash fragments preserved
+            (verified: a2 opens burst3/L30 inside the bundle). Three build traps fixed:
+            (1) script-content escapes must cover <script and <!-- (HTML escaped-state), not
+            just </script; (2) loader spliced at rindex anchor, not str.replace — notes.js's
+            speaker template contains a literal </body> (first build inserted 16 MB twice,
+            mid-script); (3) loader must parse before Reveal.initialize's .then references it.
+            Verified from file:// (title) + http (s8 plotly, s9 anim), zero console errors.
+commit:     uncommitted (working tree)
+
+## Language-pool operating point: honest held-out quantile+scale calibration (2026-07-24)
+date:       2026-07-24
+artifact:   simulation/run_lang_calib.sh (calib sweep) + analyze_lang_calib.py;
+            simulation/run_lang_calib_eval.sh (held-out) + analyze_lang_eval.py;
+            simulation/results/lang_qsweep/{burst2,burst6}_{p50,p60,p70,p80,p90}_s{2,4,6,8}.report.json (40 calib cells);
+            .../eval_{p70_s6,p90_s4}/{burst1,burst3,burst4,burst5,week}.report.json (10 held-out cells)
+command:    bash simulation/run_lang_calib.sh; python simulation/analyze_lang_calib.py;
+            EVAL_Q=p70 EVAL_S=6 bash simulation/run_lang_calib_eval.sh (and p90/s4).
+            Calib windows use FORECAST_SUFFIX=_expctx (expanding-context archive, first bin 2024-10-15 12:03);
+            eval uses the production fixed-context archive. Chronos, 15s bins, TP2, STARTUP_TIME=60, max_gpu_budget=8.
+result:     Closes the "language quantile picked-not-optimized (fixed at p90) + tail-aware conversion scale (r_tail)
+            calibrated on EVAL windows burst1/burst4" gap. Operating point SELECTED on the 1.4-day forecast-context
+            split ONLY (burst2 + burst6 -- both inside the first 1.4 days, forecastable via the expanding-context
+            archive; burst6 is a 1-min onset = the fast-onset stressor), then EVALUATED HELD-OUT on the eval span.
+            Calibration (both calib windows must pass TTFT p99<1000 AND ITL p99<100): 9/20 (quantile,scale) cells
+            pass; the published p90/scale8 is NEAR THE MOST EXPENSIVE passing cell (29.8 calib GPU-h); cheapest
+            passing = p70/scale6 (17.4). Frontier is a plateau -- p70/s6 (17.4) ~ p50/s8 (17.8) ~ p90/s4 (18.3),
+            within replay noise -- so quantile and scale are interchangeable headroom dials (low-q needs high scale,
+            high-q needs low scale). HELD-OUT (p70/s6, production archive): all four eval bursts PASS including
+            burst3 at 786.1 ms (the 1-min onset where the cheap p50 fails at 2164 ms), and the WEEK passes at
+            TTFT p99 757.6 ms / ITL p99 12.53 ms / 330.4 GPU-h = 0.637x p90 (518.6) = 0.615x static-time (537.4)
+            = 0.656x static-req (503.7) -- BELOW static under BOTH denominators, far outside ~4% replay noise.
+            p90/s4 frontier point: week 702.6 ms / 337.4 GPU-h (0.628x static-time) -- plateau confirmed at week
+            scale. Physically sane: 330.4 GPU-h / 134.35 h span = 2.46 GPU avg (floor 2 = one TP2 replica; static
+            holds 4 constant); the 16-GPU budget cap never binds.
+feeds:      PROPOSED language-pool revision, NOT YET APPLIED to any tex. Touches: tex/closedloop.tex S:cl-llm
+            (quantile+conversion selection, week cost), the "encoder buys savings, language buys compliance"
+            framing (now both buy savings), tex/tese.tex abstract "near-break-even" language, tex/conclusion.tex
+            RQ4 language clause. REVISITS provenance/audit/DELIVERY_RULING.md S5.2 ("a forecast-free static fleet
+            meets the language SLA more cheaply than forecasting -- no language cost advantage may be claimed"):
+            that ruling was on the UN-optimized p90 point; under honest held-out calibration the language pool
+            clears static under both time- and request-matched denominators. Requires provenance-DB ingestion +
+            a S5.2 re-run before any manuscript edit.
+caveats:    single trace / span-average (language fold-invariance untested, cf. encoder 0.47-1.10x across folds);
+            week ITL p99 margin shrank 6.4 -> 12.5 ms (still << 100 ms bound); calib archive = expctx, eval archive
+            = fixed-context (the operating point is a policy constant, not a forecaster -- it generalized cleanly,
+            but state it); r_tail not separately re-measured -- the conversion scale was swept directly via
+            FORECAST_REQ_SCALE, which subsumes the belief/knee calibration on the calibration windows.
+addendum:   (same day) FRONTIER REFINEMENT + week-floor triangulation, and a held-out FALSE-POSITIVE that
+            validates the per-episode gate. Scale sweep extended to {3,5,7} (full 5x7 calib grid, 15/35
+            passing); cheapest-by-calib is STILL p70/s6 (17.4). The knee is SHARP: p70/s5, p90/s3, p50/s7 all
+            just miss on burst6 TTFT (~1010-1100 ms), while every passing cell pins burst6 TTFT at ~675 ms =
+            service floor -- so headroom beyond the threshold buys cost, not latency (why the published
+            p90/s8 at 29.8 calib GPU-h was ~40% wasteful). Held-out week (full 749,601 req / 5.60 d) for the
+            three cheapest calib corners: p70/s6 = 330.4 GPU-h (0.615x static-t / 0.656x static-req), PASS all
+            four eval bursts per-episode + week; p90/s4 = 337.4 (0.628x), PASS all; p50/s8 = 318.1 week-
+            AGGREGATE PASS (819 ms) but FAILS burst3 (2164 ms) AND burst5 (1679 ms) PER-EPISODE -- a
+            CALIBRATION FALSE-POSITIVE (passed burst2+burst6 incl. burst6's 1-min onset, yet fails burst3's).
+            This reproduces the thesis's own dashboard-masking (the 5.60-d aggregate hides ~12k-req per-episode
+            failures) INSIDE the experiment and validates the held-out per-episode gate: the low-quantile p50
+            corner is masked-failing, so the valid frontier is the p70-p90 region, NOT a uniform plateau.
+            PINNED held-out, per-episode-valid language floor = p70/s6 = 330.4 GPU-h = 0.62x static(time) /
+            0.66x static(req) over the full 5.60-day span (749,601 req), TTFT p99 757.6 / ITL p99 12.53 ms.
+            p50/s8's cheaper aggregate MUST NOT be quoted -- the saving IS the violation (same rule as reactive).
+            Artifacts: lang_qsweep/eval_{p70_s6,p90_s4,p50_s8}/{burst1,burst3,burst4,burst5,week}.report.json;
+            calib scales {2,3,4,5,6,7,8} x {p50..p90} in lang_qsweep/{burst2,burst6}_*.report.json.
+addendum2:  (same day) LANGUAGE FOLD-INVARIANCE at p70/s6 (simulation/run_lang_folds.sh), reusing the g4
+            per-fold composed traces (defense/anim/data/g4_folds/F*_enc_fc_rho15.jsonl) + expctx archive +
+            static (~96 GPU-h/fold = TP2x2) denominator; only quantile p90->p70, scale 8->6 changed.
+            COST is strongly fold-invariant AND dominant: p70/s6 = 0.52-0.80x static in ALL 7 folds
+            (F1 0.69 / F2 0.54 / F3 0.55 / F4 0.73 / F5 0.52 / F6 0.54 / F7 0.80), mean 0.62x = the week
+            headline, 0/7 above parity -- TIGHTER and LOWER than the published p90/s8 (0.93-3.81x, 6/7 above
+            parity) AND than the encoder headline (0.47-1.10x). The calibration specifically kills the quiet-
+            fold over-provisioning that blew p90/s8 up (F5 3.81x -> 0.52x). So the 0.62x language cost is a
+            ROBUST span-average, not a lucky aggregate. CAVEAT -- SLA is NOT fold-invariant: p70/s6 FAILS
+            fold F6 (TTFT p99 1134 ms, ITL 12.0 fine) -- the fold containing the e13 onset, the SAME onset the
+            encoder rho15 headline also misses (1262 ms), already a stated limitation in cl-limits. So the
+            aggressive 0.62x point (both pools) sacrifices the e13 fold SYMMETRICALLY; the conservative p90/s8
+            passes F6 (687 ms) at fold-variant cost. The fold-ROBUST language floor (cheapest point passing
+            ALL 7 incl. F6 -- analogue of the encoder's "static C=5 passes e13 for 3% more") is NOT yet pinned.
+            Artifacts: lang_qsweep/folds_p70_s6/F{1..7}_lang_p70_s6.report.json.
+addendum3:  (2026-07-25) WEEK-SCALE reconciliation + CORRECTION of two earlier over-claims. (i) The initial
+            "clean 0.62x language win" was WRONG: p70/s6's 5.60-day aggregate (757.6 ms) MASKS a per-episode
+            e13 failure (fold F6 = 1134 ms; e13 is in the span but its ~843 slow reqs are 0.11% of 749,601,
+            below the 1% p99). (ii) addendum2's "0.98x / no win / confirms S5.2" was ALSO off: that is the
+            UNWEIGHTED fold-mean (over-weights small quiet folds + the two big burst folds F4 1.42x / F7
+            1.68x); the correct cost metric is the request-weighted 5.60-day span (standard archive = thesis
+            methodology). Settled full-week (749,601 req) numbers:
+              p70/s6 aggressive : 330.4 GPU-h = 0.615x static-t / 0.656x static-req -- valid ONLY if e13 is
+                                  dropped (masked), symmetric with the encoder rho15 headline's e13 caveat.
+              p90/s6 e13-robust : 440.0 GPU-h = 0.819x static-t / 0.874x static-req, TTFT p99 651 / ITL 7.3,
+                                  passes EVERY fold incl e13 (F6 886 ms); day-to-day fold-VARIANT 0.66-1.68x.
+                                  THE defensible per-episode-valid language floor.
+              published p90/s8  : 518.6 = 0.965x static-t / 1.030x static-req (the thesis's ~break-even).
+            SETTLED read: honest calibration does NOT give a clean 0.62x language win. It gives a MODEST,
+            e13-robust, per-episode-valid win at ~0.82-0.87x static (p90/s6) -- improving on the published
+            ~break-even and modestly beating static under BOTH denominators (S5.2 modestly overturned in the
+            robust regime, advantage small + fold-variant) -- plus an aggressive 0.62x (p70/s6) that drops the
+            e13 fold. The real deliverable: scale-8 is wasteful; scale-6 at p90 is the e13-robust floor (~0.85x).
+            Artifacts: lang_qsweep/eval_p90_s6/week.report.json, folds_p90_s6/F{1..7}_lang_p90_s6.report.json.
+addendum4:  (2026-07-25) DB INGESTION DONE + S5.2 reconciliation. provenance/loader/load_langcalib.py ingested
+            86 langcalib runs (16 eval-span + 70 burst2/burst6 calib grid) into runs + llm_run_summary,
+            experiment='langcalib', pool=language, policy=forecast, model=chronos. The real quantile is in
+            config->>'forecast_quantile' (typed `quantile` column kept NULL for p60/p70/p80 to preserve the
+            runs_quantile_vocab CHECK {p50,p90,obs} -- no schema change); scale in config->>'forecast_req_scale'.
+            Idempotent (ON CONFLICT), atomic (BEGIN/COMMIT). VERIFIED: v_pool_latency returns the committed tails
+            (eval-week TTFT p99 p70/s6 757.6 / p90/s6 651.1 / p90/s4 702.6 / p50/s8 819.5) and gpu_hours
+            (330.4/440.0/337.4/318.1); orphans unchanged (worker_schedule 0, verification 314, ingest_log 306).
+            Fold runs (F1-F7) DEFERRED: those window names are not in windows(); left as artifacts. Access: direct
+            psql goku@localhost:5433 via the loaders (db.py) -- the technonous MCP is DOWN (HTTP 502) so MCP-SQL
+            was not the path. S5.2 reconciliation written: provenance/audit/S5_2_LANG_RECONCILE.md (now DB-backed).
+            FLAG (pre-existing, NOT this load): check C305 (physical-partition misfile, error) fails store-wide on
+            llm_request/composed_request/encoder_series (70M rows this load never wrote -- langcalib has 0 rows in
+            all three); C304 (logical) passes 0/0/0 and default partitions are empty, so data is correctly
+            partitioned -- C305 is a tableoid-check artifact, likely from the postgres container being recreated
+            this session. Separate from the ingestion; worth the user's attention.
+addendum5:  (2026-07-25) C305 ROOT-CAUSED + FIXED (the addendum4 "container recreation" guess was WRONG). C305's
+            SQL used replace(tableoid::regclass::text,'provenance.<t>_','') which strips the schema prefix ONLY
+            when regclass renders QUALIFIED -- i.e. only when provenance is NOT in search_path. With provenance in
+            search_path (the check runner's + SCHEMA_GUIDE's connect context) regclass renders unqualified
+            (llm_request_a11), the replace no-ops, every row false-flags -> full-count false positive
+            (18.87M/41.1M/10.34M). Data was always clean (C304 logical passes 0/0/0, defaults empty; 0 real
+            misfiles when regclass qualifies). check_all() pins no search_path (empty proconfig), so it inherits
+            the caller's -- hence the fragility. FIX: replace() -> regexp_replace(...,'^(provenance\.)?<t>_','')
+            in all three sub-selects -- search_path-robust (0/0/0 under both paths) and still catches real
+            misfiles (fake-mismatch sanity = full count). Applied to BOTH the live check_definition.sql_text(C305)
+            and schema/21_checks.sql. Verified: C305 passes; failing set back to the adjudicated 5 (C002 err +
+            C107/C207/C214/C302 warn); no cascade. Store is at its clean audited baseline.
+addendum6:  (2026-07-25) NO-ECONOMIZE BATCH: symmetric baselines + predictor-independence + conversion-lever
+            + complete fold table + full DB ingestion. Drivers: run_lang_baseline_calib.sh (reactive ladder +
+            static TP on burst2/burst6), run_lang_baseline_eval.sh (calibrated arms held-out), 
+            run_lang_reactive_predsweep.sh (constant/kalman/prophet), run_lang_calib_eval.sh EVAL_S=1 (mean-conv),
+            run_lang_folds.sh (p90/s4, p50/s8, p90/s5).
+            (1) SYMMETRIC BASELINES calibrated on the 1.4-day split (burst2+burst6): static TP1x4 FAILS
+            (1225/1223 ms), TP2x2 PASSES (745/697) -> TP2x2 is minimal-feasible calibrated-on-1.4d, NOT oracle
+            (fills the burst2/burst6 rows the thesis iso-cost TP table skipped). Reactive fails at EVERY target
+            (400/40..200/20; TTFT 1515-1701, ITL 138-141) -> mean-conversion defect structural, held-out. So
+            all three arms are now calibrated on the same data; held-out eval unchanged (static passes /
+            reactive fails / forecast passes).
+            (2) REACTIVE FAILURE IS PREDICTOR-INDEPENDENT: {constant(forecast-free),arima,kalman,prophet} fail
+            at tails identical to <=8 ms on every eval burst (burst3/4/5 byte-identical). Answers "why arima" =
+            the predictor doesn't decide it.
+            (3) CONVERSION IS THE LEVER (held Chronos p90 fixed, flipped only the conversion): Chronos + MEAN
+            (scale=1) FAILS byte-identically to reactive (burst1 1626, burst3 3495, burst4 2784, burst5 2152);
+            Chronos + TAIL (scale=6) PASSES (651-672). So the TSFM through the mean conversion fails like
+            reactive; only the tail-aware (r_hat->r_tail, ~8x replica headroom) passes. NOT horizon (language =
+            held cursor, lead-invariant) and NOT the forecaster -- the capacity conversion.
+            (4) COMPLETE FOLD TABLE (4 points x 7 folds vs static ~96 GPU-h/fold): aggressive band p70/s6 /
+            p90/s4 / p50/s8 all fold-cost-invariant (0.52-0.80x, means 0.61-0.65x) but ALL FAIL e13/F6
+            (1033-1218 ms); p90/s6 is the ONLY all-7-pass point (e13 886 ms), fold range 0.66-1.68x, mean 0.98x
+            (0.82x request-weighted span). p90/s5 clears e13 only at the bound (995 ms, knife-edge) -> p90/s6
+            stays the robust floor. Frontier: aggressive ~0.62x (drops e13) <-> e13-robust p90/s6 ~0.82x.
+            (5) DB: load_langcalib.py rewritten to ingest the whole batch -> experiment='langcalib' now 157 runs
+            (125 forecast + 24 reactive + 8 static). F1-F7 registered in windows() (base-table INSERT) so fold
+            runs close C209. Verified: cheap failure set = adjudicated {C107,C207,C214,C302}; C209 + C305 PASS;
+            orphans unchanged (ws 0 / verification 314 / ingest_log 306); spot-checks via v_pool_latency correct.
+addendum7:  (2026-07-25) MANUSCRIPT ADOPTED (option 1, frontier framing), each number DB-verified
+            (experiment='langcalib'). tex/closedloop.tex S:cl-llm gains a "The operating point, honestly
+            calibrated" paragraph -- the 0.62x-aggressive (drops e13) / 0.82x-e13-robust (440.0 GPU-h,
+            0.82x/0.87x) frontier + the conversion-lever mechanism (Chronos+mean fails byte-identically to
+            reactive [burst3 3495 both], tail-aware passes [651]; predictor-independent [constant/arima/kalman/
+            prophet within 8 ms]; held cursor -> lead-invariant; symmetric baselines) -- plus the cost bullet in
+            S:cl-ledger-cost. tex/tese.tex abstract + tex/conclusion.tex RQ4 clause updated (0.965x edge -> add
+            0.82x e13-robust). provenance/audit/DELIVERY_RULING.md S5.2 scope-amended (not retracted). Draft +
+            per-number DB verification: verification/lang_pool_revision_draft.md. Build: latexmk -pdf clean,
+            133->135 pp, 0 undefined refs, exit 0. CAVEAT: this ADDS an audited claim -- re-run the
+            review/verification pipeline (claim-extract + multi-model verify) over the new cl-llm paragraph
+            before final submission.
+feeds:      tex/{closedloop,tese,conclusion}.tex + provenance/audit/DELIVERY_RULING.md; supersedes the bare
+            "language near-break-even 0.965x" framing (now the conservative edge of a documented frontier).
+
+## Encoder HYBRID controller (forecast + current-observed-load) over 5.60 days (2026-07-25)
+date:       2026-07-25
+artifact:   simulation/run_encoder_hybrid.sh + simulation/combine_schedules.py (max of two [[t,workers]]
+            schedules); simulation/results/encoder_hybrid/{fc,re,hybrid,F6_fc,F6_re,F6_hybrid}.jsonl.stats.json;
+            windows.json gains F6 (offset 751286, 84329 req, e13 fold, Oct 20 12:00).
+command:    forecast_schedule_issuetime.py (p90/rho15/L30) + reactive_quantile_schedule.py (react_point/rho15/L30)
+            -> combine_schedules.py max -> trace_to_two_pool.py --worker-schedule (dynamo venv imports
+            aiconfigurator; the ai-dynamo/aiconfigurator/.venv/bin/python path is dead).
+result:     Closes the "no 5.60-day sim scaling on current load AND forecast" gap (user-flagged). The encoder
+            forecast policy was PURE forecast (C(t)=ceil(y_p90/rho)); the reactive was PURE observed; no hybrid
+            existed. Built C(t)=max(forecast, reactive). AGGREGATE (5.60d, 749,601 req): all three PASS at the
+            589.3 ms service floor (encoder idle ~2% util), costs fc 0.623x / re 0.675x / HYBRID 0.761x static-C8
+            -- the hybrid's 22% premium buys NOTHING on the aggregate (dashboard-masking again). But PER-EPISODE
+            (F6/e13 fold, peak 262.9 img/s): pure forecast FAILS (enc-delay p99 1264 ms, 0.61x), pure reactive
+            FAILS (1229 ms, 0.68x), and the HYBRID PASSES (679 ms, 0.79x) -- it catches e13 where BOTH pure
+            policies miss, because max() has the forecast's early anticipatory capacity AND the reactive's later
+            catch-up. So the robust deployment encoder controller is max(forecast,reactive) at ~0.76-0.79x
+            static, e13-robust -- the same aggressive(0.62x, drops e13) vs robust(~0.78x) frontier the language
+            pool has. NOT yet in the thesis (the thesis compares pure-forecast vs pure-reactive only).
+feeds:      PROPOSED thesis addition (tex/closedloop.tex / tex/twopool.tex): the hybrid as the e13-robust
+            encoder controller. Pending author decision + review-pipeline verification. NOT ingested to DB yet
+            (encoder stats are converter .stats.json, not llm_run_summary; needs the encoder ingest path).
+caveats:    single trace; rho=15/L=30 for both arms (not swept); react_point signal (last-bin observed);
+            aggregate masks e13 so the hybrid's value is per-episode only; F6 is one fold (the e13-bearing one).
+commit:     uncommitted (working tree)
+
+## Encoder hybrid PER-FOLD sweep F1..F7 -- the definitive robustness table (2026-07-25)
+date:       2026-07-25
+artifact:   simulation/run_encoder_hybrid_folds.sh; simulation/results/encoder_hybrid/folds/{F1..F7}_{fc,re,hybrid}.jsonl.stats.json;
+            windows.json gains F1..F7 (merged from defense/anim/data/g4_folds/windows_folds.json).
+command:    per fold: forecast_schedule_issuetime.py p90/rho15/L30 + reactive_quantile_schedule.py react_point/rho15/L30
+            -> combine_schedules.py max -> trace_to_two_pool.py --worker-schedule (dynamo venv). Folds parallel.
+result:     Per-day enc-delay p99 (service floor 1000 ms), 3-way, cost xC8 static:
+              F1 10-15 (pk 364): fc N/A (forecaster cold-start, archive begins 10-15 14:14) | re 589 (0.82x) | hyb->reactive
+              F2 10-16 (pk 112): fc 1319 FAIL (0.22x) | re 369 (0.43x) | HYB 369 PASS (0.46x)  <- forecast warmup miss
+              F3 10-17 (pk 356): fc 544 | re 544 | hyb 523  (all pass)
+              F4 10-18 (pk 350): fc 589 | re 589 | hyb 589  (all pass)
+              F5 10-19 (pk 61) : fc 736 | re 665 | hyb 441  (all pass; hyb best)
+              F6 10-20 (pk 263): fc 1264 FAIL (0.61x) | re 1229 FAIL (0.68x) | HYB 679 PASS (0.79x)  <- e13, BOTH fail
+              F7 10-21 (pk 370): fc 589 | re 613 | hyb 589  (all pass)
+            VERDICT: pure forecast FAILS 2/7 days (F2 warmup, F6 e13); pure reactive FAILS 1/7 (F6); the HYBRID
+            fails NONE -- passes all 6 forecast-defined folds and degenerates safely to reactive on the cold-start
+            day (F1). Two distinct failure modes (F2 = forecast under-provisions -> reactive component of max fills
+            in; F6 = forecast late/short AND reactive late but at different instants -> max covers the whole onset).
+            The 5.60d AGGREGATE (589 ms, all-pass) MASKS both failure days -- dashboard-masking at day granularity.
+            So max(forecast,reactive) is the ONLY deployment-safe encoder controller; pure-forecast's 0.62x headline
+            silently drops 2 of 7 days. Cost premium of the hybrid over the better pure arm: ~1.03-1.18x per fold,
+            0.76x static on the aggregate.
+feeds:      PRIMARY EVIDENCE for the thesis reframe (author-approved once all results ready): the hybrid as the
+            deployable e13-robust encoder controller. Pairs with the language quantile+conversion frontier.
+caveats:    single trace; rho=15/L=30 not swept; react_point last-bin signal; F1 forecast cold-start is a real
+            edge (forecaster needs ~2h warmup context) not a bug; service floor = 1000 ms enc-delay p99.
+commit:     uncommitted (working tree)
+
+## Encoder hybrid COMBINATION sweep -- is max(p90,react_point/rho15) optimal? (2026-07-25)
+date:       2026-07-25
+artifact:   simulation/run_encoder_hybrid_combos.sh; simulation/results/encoder_hybrid/combos/*.jsonl.stats.json
+command:    F6 (e13 breaker) sweep: forecast quantile {p50,p70,p90} x pointwise-max x reactive; plus the p70
+            near-miss vs 3 more-aggressive reactive arms {react_quantile p90/240s, react_point rho12, rho10}.
+            SEQUENTIAL, converter-only, peak RSS 400-457 MB (NOT the 16GB dynamo.replay -- different tool).
+result:     Answers user "did u try which combination?" -- yes now. The shipped hybrid is OPTIMAL on the swept
+            axes. F6, 1000 ms floor:
+              max(p50,re rho15) 1229 ms 0.68x FAIL (=reactive; p50 never exceeds it, max collapses)
+              max(p70,re rho15) 1016 ms 0.69x FAIL (just misses)
+              max(p90,re rho15)  679 ms 0.79x PASS  <-- COST-MINIMAL PASSING
+              max(p70,react_quantile p90/240s) 1224 ms 0.57x FAIL (windowed smooths the fast onset)
+              max(p70,re rho12)  907 ms 0.83x PASS (dearer than p90-hybrid)
+              max(p70,re rho10)  840 ms 0.97x PASS (much dearer)
+            The forecast arm MUST be p90 -- cheaper quantiles fail, and compensating with a more-aggressive
+            reactive arm costs MORE (0.83-0.97x) than just using p90 forecast. MECHANISM: forecast anticipation
+            is a cheaper source of just-in-time capacity than reactive over-provisioning (p90-forecast alone is
+            0.61x and provisions precisely ahead; reactive lacks foresight so must over-provision broadly). The
+            efficient hybrid loads anticipation on the cheap targeted forecast arm + a LIGHT reactive top-up.
+            So max(p90, react_point rho15) at 0.79x is not arbitrary -- it's the efficient-frontier combination.
+caveats:    max combiner only (weighted blends alpha*fc+(1-a)*re are <= max pointwise -> fail where max barely
+            passes, untested but dominated); F6-scoped (max(p90,re) already passed all F1-F7 in the fold sweep);
+            reactive quantile/window not exhaustively swept.
+commit:     uncommitted (working tree)
+
+## Language week-scale completeness batch (conversion-lever + model-independence + symmetric baselines) (2026-07-25)
+date:       2026-07-25
+artifact:   simulation/results/lang_qsweep/{baseline_week/{react_aggregate_t200_20,static_aggregate_tp2x2},
+            extra_week/{week_chronos_p90_s1_meanconv,week_toto_p90_s6,week_timesfm_p90_s6}}.report.json;
+            ingested to provenance langcalib (162 runs total: 128 fc / 25 re / 9 static) via extended
+            load_langcalib.py (new bweek_*/week_* discovery blocks). Loader/DB creds: db=postgres, pw in
+            provenance/.goku_credentials (goku pw rotated 2026-07-20; docker inspect stale; MCP down).
+command:    run_lang_baseline_week.sh (react SLA planner 200/20 + static TP2x2) + run_lang_extra_week.sh
+            (Chronos p90 MEAN-conv s1 + Toto p90/s6 + TimesFM p90/s6), all on aggregate44 749,601-req trace,
+            standard archive T0=2024-10-16 21:39. dynamo venv. NOTE: ran 4 in parallel -> ~64GB peak, box swapped;
+            week replays buffer all records (~16GB RSS each) -> run sequentially next time (see memory).
+result:     Two claims MEASURED (not argued), grounding the two-pool reframe's language side:
+            (1) CONVERSION-LEVER: forecast Chronos p90 + MEAN conversion (s=1) = p99 6987 ms / 268.8 gpu-h vs
+                reactive SLA planner 200/20 = p99 6899 ms / 281.5 gpu-h -- within 1.3% p99, 2.5% ttft, 4.5% gpu-h.
+                Forecast-through-mean IS reactive. So a language hybrid max(fc,re) collapses to reactive -> buys
+                nothing; the lever is conversion, not combination. Tail-aware p90/s6 = 5327 ms / 440 gpu-h (0.82x
+                static 537) is the separate robust point. This is the mechanistic WHY the encoder needs a hybrid
+                but the language pool does not (asymmetric reframe).
+            (2) MODEL-INDEPENDENCE (scoped): robust point p90/s6 e13-robustness (p99 latency) is model-independent
+                -- Chronos 5327 / Toto 5487 / TimesFM 5279 ms (~4% spread). But COST is NOT: Toto 426 gpu-h (0.79x),
+                Chronos 440 (0.82x), TimesFM 531 (0.99x, ~no savings). Honest claim: the operating point delivers
+                robustness across forecasters; its cost-efficiency depends on forecaster accuracy (TimesFM
+                over-provisions). 0.82x is Chronos-specific, not universal.
+feeds:      Language-side evidence for the two-pool reframe (tex/closedloop.tex frontier paragraph; abstract;
+            conclusion RQ4). Supports "each pool's robust point via its own lever (encoder hybrid / language
+            conversion)". NOT yet written to tex -- pending author greenlight on (a) draft-from-measured vs
+            (b) run confirmatory language-hybrid replay first.
+caveats:    single trace; aggregate p99 (~5-7s) masks e13 -- the e13-robustness claim is per-episode, not this
+            aggregate number; TimesFM cost caveat above; react=Dynamo SLA planner variant B (ARIMA slot).
+commit:     uncommitted (working tree)
+
+## Two-pool DOLLAR cost model (gpus.io prices, snapshotted as evidence) (2026-07-25)
+date:       2026-07-25
+artifact:   provenance/audit/evidence/gpu_pricing/{README.md, gpus_io_rtx5090_2026-07-25.png,
+            gpus_io_h100_2026-07-25.png}. Full-page screenshots (headless chromium + Firefox UA;
+            direct WebFetch was 403 bot-walled) + urllib cross-check + WebSearch, all agree.
+command:    prices RTX5090 $0.52/h median, H100 $2.99/h median (gpus.io on-demand, per GPU-h, 2026-07-25);
+            multiply by provenance accelerator-hours (encoder worker-h on 5090, language gpu_hours on H100).
+result:     Answers "isnt the langpool cost higher?" -- YES, decisively, with real prices. H100 = 5.75x RTX5090
+            per hour (median). System dollar cost over the 5.60d trace:
+              encoder static-C8   1075 wk-h  $559   | hybrid(robust)   818 wk-h  $425
+              language static-TP2x2 537 gpu-h $1607  | p90/s6(robust)   440 gpu-h $1316
+              all-static $2166 -> robust-both (enc hybrid + lang robust) $1741 = 0.80x.
+            LANGUAGE POOL = 74% of the bill (76% at robust), 3.1x the encoder pool. Encoder hybrid saves $134;
+            language robust saves $291 (language saves MORE absolute $ despite smaller ratio, H100 pricier).
+            IMPLICATION for reframe cost story: don't lead with the encoder hybrid ($134 = 6% of a $2166 bill) --
+            it's the interesting/robustness result on the CHEAP pool; the money (and the modest 0.82x/reactive-tied
+            win) is in the language pool. System headline: robust-both ~= 0.80x of all-static, dominated by language.
+feeds:      Optional explicit dollar model for the thesis (one cited price assumption). Thesis natively costs each
+            pool in accelerator-hours; this layers $ on top for the "language dominates the bill" statement. Pending
+            author decision whether to put the $ model in the tex or keep it as ledger/evidence backing.
+caveats:    cloud prices volatile (RTX5090 90d -5.5%, H100 90d +11.2%) + provider/region/commitment-dependent;
+            median is the fair typical; single trace; TP2 language so a replica=2 H100 (gpu_hours already totals GPUs).
+commit:     uncommitted (working tree)
+
+## EXACT week-wide cost<->violation curves, per-request (both pools) (2026-07-26)
+date:       2026-07-26
+artifact:   simulation/results/lang_qsweep/perreq/{9 points}.perreq.jsonl (749,601 per-request records each:
+            ttft/ttst/e2e/itl + timestamps + terminal_status); simulation/compute_violation_curves.py;
+            encoder exact via encoder_delay_violations added to workload/trace_to_two_pool.py stats.
+command:    run_lang_perreq_rerun.sh -- sequential (memory-safe, peak 13-19GB each, no swap), each full-week
+            replay with --report-jsonl (Rust-streamed per-request; NO code change -- the flag works on all
+            paths, validated #satisfying==native goodput_completed_requests exactly). ~8h wall (22:07->05:59).
+result:     Closes the "no per-request tracked -> estimates only" gap the user flagged. NO estimate now.
+            LANGUAGE (H100 $2.99/h), exact requests violating ttft>200ms (of 749,601), sorted by cost:
+              fc p90 mean $804: 65,482 | reactive $842: 64,063 | p50/s8 $952: 49,264 | p70/s6 $984: 46,741
+              | p90/s4 $1027: 44,198 | toto p90/s6 $1244: 40,720 | chronos p90/s6 $1325: 37,639
+              | static $1607: 33,220 | timesfm p90/s6 $1670: 36,975
+            Findings (all confirm prior work at per-request granularity): (1) MONOTONE cost<->violation frontier;
+            (2) fc-mean == reactive EXACTLY (65,482 vs 64,063) -> no language hybrid; (3) reactive->robust p90/s6
+            cuts ttft>200 -41% (64,063->37,639) and severe ttft>1s -75% (10,910->2,765) for +$483, near static at
+            0.82x; (4) MODEL-INDEP violation reduction (toto/chronos/timesfm 37-41k) but cost varies ($1244-1670)
+            -- TimesFM p90/s6 is PARETO-DOMINATED by static (costs ~same $1670 vs $1607, MORE violations 36,975 vs
+            33,220); chronos p90/s6 is the sweet spot. ENCODER (exact, RTX5090 $0.52/h) enc-delay>2s: reactive
+            1,414 | forecast 1,005 | hybrid 630 (hybrid -55% vs reactive). Language dominates affected requests
+            (tens of thousands vs encoder's hundreds).
+feeds:      verification/two_pool_reframe_draft.md §6 (now complete). Records EVERYTHING (per-request) so any
+            future threshold is answerable with no rerun. Also fixes the memory issue (Rust-streamed, not Python
+            buffered) for future language runs -- use --report-jsonl.
+caveats:    single trace; SLO thresholds are deployment choices (ttft200/itl20 = planner target); goodput native
+            SLA requires --planner-config (static uses per-request only); ~16-19GB/run so keep runs SEQUENTIAL.
+commit:     uncommitted (working tree)
+
+## Reframe APPLIED to the manuscript (2026-07-26)
+date:       2026-07-26
+artifact:   tex/closedloop.tex (+67, new \paragraph{A finer grain, and the fold-robust point} in
+            sec:cl-aggregate), tex/tese.tex (abstract clause), tex/conclusion.tex (RQ4 clause).
+            Draft basis: verification/two_pool_reframe_draft.md.
+command:    latexmk -pdf tese.tex -> exit 0, 135 pages, no undefined refs. All inserted numbers
+            self-verified vs simulation/results/encoder_hybrid data (e13 fc 1264 / re 1229 / hyb 679 ms;
+            hybrid 0.76x, forecast 0.62x static-C8).
+result:     Encoder now carries the same aggressive<->robust frontier as the language pool: 0.62x
+            (drops the single cold daily-fold onset e13) -> 0.76x fold-robust via hybrid max(fc,re).
+            Cohesive with the existing text: built on the thesis's own graduated-headroom mechanism
+            (e13 = the cold onset lacking burst3's pre-spike ambient lift), does NOT contradict
+            "passes all in-span burst episodes" (e13 is a finer daily-fold grain). Premium decomposition
+            (re-fc)+ = forecast error, 35% of span / 13.8% static, in the prose. Held OUT of the tex
+            (offered separately): the dollar model, the exact per-request violation tables.
+feeds:      THESIS (working tree, uncommitted). Pending: verification/review pass over the new prose;
+            author decision on committing; housekeeping triage of the thread's artifacts.
+commit:     uncommitted (working tree)
+
+## Verification pass over the reframe prose -- caught a fabricated mechanism (2026-07-26)
+date:       2026-07-26
+artifact:   tex/{closedloop,tese,conclusion}.tex (corrected); build clean 135 pages.
+result:     Adversarial recompute-from-raw pass over the new prose. CAUGHT + FIXED two false mechanism
+            claims I had asserted for cohesion: (1) "e13 is the one fast onset WITHOUT pre-spike ambient
+            lift (contrast burst3)" -- FALSE: the forecast held ~22 workers 2min pre-spike (like burst3's
+            ~21); (2) "the two arms fall short at DIFFERENT instants, union covers the onset" -- FALSE:
+            min-by-min, BOTH fc and re are short only at the single peak minute. REAL mechanism (verified
+            min-by-min on F6): e13 peak 263 img/s needs ~18 workers @rho15; fc places 16 and drains slowly
+            (~17 after), re is 11 at spike (worse) but surges to 21 just after; the hybrid keeps fc's spike
+            capacity AND inherits re's post-spike surge, draining the backlog neither clears alone. Replaced
+            the prose accordingly; removed "cold" onset in all 3 files. All numbers re-verified from raw
+            (fc/re/hyb 1264/1229/679; 0.76x agg / 0.79x F6 / 0.62x fc; worker counts 16/17/18/11/21; premium
+            35%/13.8%; combo 0.83-0.97x). Lesson reinforced: [[verify-derivations-not-transcriptions]] --
+            a plausible mechanism asserted for narrative cohesion was wrong; only the min-by-min recompute
+            exposed it.
+commit:     uncommitted (working tree)
+
+## Multi-agent per-chapter correctness review + fix pass (2026-07-26)
+date:       2026-07-26
+artifact:   12 review agents (one/chapter, Opus for results chapters, Sonnet for prose); findings in
+            scratchpad/review_findings.md. Fixes across tex/{intro,related,trace-eda,predictors,
+            aiconfigurator,twopool,baselines,closedloop,validation,conclusion,tese,apendice}.tex.
+command:    each agent read its chapter comprehensively + verified every numerical/causal claim vs
+            results-ledger + provenance DB (psql) + raw trace + results files; "verify derivations not
+            transcriptions" (the fabricated-mechanism example given explicitly). latexmk clean 135pp after fixes.
+result:     THESIS FUNDAMENTALLY SOUND -- every chapter's headline numbers recomputed EXACT from raw; NO wrong
+            results; the rewritten hybrid mechanism independently re-verified minute-by-minute (16/17/18/11/21
+            + max identity). Found 2 HIGH + ~11 MED + ~20 LOW, ALL framing/labeling/transcription. FIXED:
+            2 HIGH: intro C5 "every window at 0.62x" e13-overclaim (added hybrid/0.76x caveat + scoped);
+                    baselines burst4 L*=45(table) vs 165(prose) -> table now 165 w/ sub-grid footnote (904.7ms).
+            Theme A (e13 caveat propagated + hybrid foregrounded across intro/abstract/conclusion/closedloop:424;
+                    closedloop:474 "covered span"->7-day trace [MY error]; :476 "one-minute"->"7-min onset 1-min peak").
+            2 fabricated-BECAUSE beyond mine: baselines burst3 "high-volume onset/diverge by volume" (burst3 has
+                    3x FEWER images) -> rewrote to "thinner request stream"; (mine already fixed pre-review).
+            Contradictions: predictors win-attribution vs Table 4.1 (45s "TimesFM leads"->wins 0); predictors
+                    "ARIMA absent" vs sec4.2 -> scoped. Numbers: twopool 86.2->87.7 (artifact=87.72; a
+                    documented-but-undone revert, guard 7420b39 was wrong); closedloop run count 2060/44->2623/73
+                    (live DB, grew w/ this effort's runs); appendix engine-table 4-cell drift; PT Resumo synced.
+                    +~15 LOW (rounding, ServeGen per-client, GIFT-Eval domains, "same forecast"->its own, etc.).
+            LEFT (with reason): appendix sweep_grid 35-run linkage (agent couldn't confirm); ecosystem appendix
+                    (intentional draft, not wired); commit b55dd0b7 (tex correct, ledger-gap only); intro:86 footnote
+                    (plausible motivation). Ledger-only errors to fix separately: 5.71 not 5.31; 120s not 245s stall.
+commit:     uncommitted (working tree)
+
+## Iterative fix+review convergence — thesis CONVERGED (2026-07-26)
+date:       2026-07-26
+artifact:   tex/*.tex + provenance/verify_all.sh (working tree); full findings in
+            scratchpad/review_findings.md. Build: latexmk clean, 135 pp, 0 errors, 0 undefined
+            (87 refs -> 117 labels, 67 cites -> 67 bibitems).
+process:    5 rounds of adversarial multi-agent review; each fix wave triggered a fresh review;
+            batched fixes + rebuilt each round; looped until a round found ZERO confirmed issues.
+            R1 (12 agents, whole thesis): thesis FUNDAMENTALLY SOUND -- 2 HIGH + ~11 MED + ~20 LOW,
+                almost all framing/labeling/transcription; every headline number recomputed exact.
+            R2 (5 agents, re-verify fixes): only regressions in R1 edits (PT time-matched qualifier,
+                burst3 over-correction, minor) -- fixed.
+            R3 (3 agents): my de-hedge scope error (0.82x "near break-even against reactive" -- wrong
+                comparator+figure), burst3 mis-round (356->355), + 1 PRE-EXISTING stale framing my
+                earlier reframe missed (closedloop:713 "buys compliance/not a saving") -- fixed.
+            R4 (2 agents): misdirected \ref (intro C5 -> sec:cl-aggregate), conclusion flow, abstract
+                over-correction (modest-saving attached to as-deployed p90) -- all mine, fixed.
+            R5 (2 agents): cost-framing CONSISTENCY GATE (all 10 loci) = CONVERGED; broad sweep = CLEAN.
+                ZERO confirmed issues -> loop terminates.
+result:     Thesis is in a converged state: fully consistent, DB-verified, builds clean. The de-hedge
+            (nested quartet -> canonical §cl-ledger-cost + crisp abstract) + the reframe are in. Also
+            fixed the delivery-gate guard (verify_all.sh:161 asserted retracted 86.2, green for wrong
+            reason -> now asserts \SI{87.7}{\milli\second} = twopool:76). All uncommitted (working tree).
+caveats:    a few LOW provenance/ledger-only residuals left (stale 92% in an artifact README; ledger's
+            5.31/245s vs chapter-correct 5.71/120s) -- reconcile separately, not thesis defects. Author
+            decision on committing + the housekeeping triage remain open.
+commit:     uncommitted (working tree)
+
+## Residual cleanup + housekeeping triage + reboot incident (2026-07-26)
+date:       2026-07-26 (afternoon session, after PC shutdown lost the morning session)
+artifact:   ledger corrections in place (lines: live tick1 5.31->5.71 per P1-10; 245s->120s stall per
+            P1-11 adjudication, both re-verified against raw planner.log.gz); phaseB README 92%->92.6%
+            (thesis rounds 93%); simulation/results/lang_qsweep/violation_curves_2026-07-26.txt
+            (durable exact cost<->violation snapshot, verified against the 2026-07-26 09:01 table);
+            verification/two_pool_reframe_draft.md status banner DRAFT->APPLIED.
+command:    python3 simulation/compute_violation_curves.py > .../violation_curves_2026-07-26.txt;
+            zstd -q --rm -T0 over *.jsonl/*.log >10MB in lang_qsweep + encoder_hybrid
+housekeep:  lang_qsweep 14G->1.4G, encoder_hybrid ~1G->183M (lossless zstd, in place; zstd -d to
+            re-read; report.json/stats.json left uncompressed). /home free 4.5G->18G. KEEP decisions:
+            evidence/gpu_pricing (thesis dollar evidence), the 6 rerun/curve scripts (reproduction
+            commands), all 7 ledger addenda (append-only discipline; convergence entry summarizes).
+            extraction_notes.md 92% left as-is: frozen audit-time snapshot, editing would falsify it.
+incident:   reboot did NOT remount nvme1n1 (label ssd2, UUID d2ce7f88) at /media/gio/ssd21; docker
+            started anyway -> postgres initdb'd a FRESH EMPTY instance into a shadow dir on the root
+            fs (init password active again, rotated one failing, provenance schema absent). Real DB
+            data intact on the unmounted disk. Same shadowing hit mq/redis/rustfs/vault volumes; and
+            docker data-root /media/gio/ssd2/docker has been a root-fs shadow since Jul 22 (root fs
+            97%). Recovery (stop containers, mv shadow aside, mount disk, restart) needs sudo --
+            awaiting user. PENDING on mount: DB 2623/73 re-verification, verify_all.sh, 162-row triage.
+commit:     uncommitted (working tree)
+
+## Verification restored green — guards + loader fixed post-recovery (2026-07-26)
+date:       2026-07-26
+artifact:   provenance/verify_all.sh (0.965x floor 4->2: the convergence de-hedge intentionally
+            removed 2 of 4 mentions, R5 cost-framing gate certified; same stale-guard genus as the
+            morning's 86.2 fix); provenance/loader/runid.py (+2 scoped families encoder_hybrid,
+            lang_qsweep -- 21 dirs no longer fall to 'misc', 9 stem collisions resolved);
+            provenance/schema/32_scope_misc_runids.sql (renamed the 5 pre-mapping 'misc:*' runs to
+            scoped ids; 1438 worker_schedule + 1 llm_run_summary + 4 encoder_run_summary rows
+            repointed, 9 ingest_log rows fixed, 0 misc remain; runs total 3314 unchanged).
+command:    psql -f schema/32_scope_misc_runids.sql; python3 loader/selftest.py (ALL GREEN 3/3);
+            python3 loader/main.py (settled, no new ingestion -- family ingest stays deliberate,
+            langcalib already carries the thread's 162 rows); bash verify_all.sh
+result:     39 passed / 0 failed / 6 warnings (the known silicon-phrase manual-review near-misses)
+            -> DELIVERY-READY. DB recovered intact after the reboot shadow-mount incident (disk
+            remounted at /media/gio/ssd21, fstab entry added by user; rotated password active again).
+caveats:    docker data-root still shadowed on / at /media/gio/ssd2/docker since Jul 22 (root fs
+            97%) -- deliberate migration pending, user's call. Working tree still uncommitted.
+commit:     uncommitted (working tree)
+
+## Defense-deck sync with converged manuscript (2026-07-26)
+date:       2026-07-26
+artifact:   defense/defense-qa.tex (86.2->87.7 ms x3 [235B@TP8 s=1 ITL p99, artifact 87.72];
+            0.96->0.965 x6 [R18-amended form]; one-breath "every onset"->"the burst onsets" per the
+            graduated-headroom correction), rebuilt defense-qa.pdf 42pp clean; slides/slides.tex
+            (0.96->0.965 x2), rebuilt slides.pdf 32pp clean.
+checked-ok: reveal/index.html + deck_single.html carry none of the corrected claims (suspicious hits
+            = data arrays/SVG/minified plotly; the 45 s hit is the lead-toggle correctly paired with
+            165 s); qa's 0.27-0.31 mentions are intentional headline-history Q&A; 1.16-1.19 model
+            spread is ledger-backed (review round, line ~522) and retained.
+commit:     uncommitted (working tree)
+
+## Adversarial-review resolution campaign — 34/34 items dispositioned (2026-07-26)
+date:       2026-07-26 (evening finalize pass)
+artifact:   verification/adversarial_review_resolution.md (per-item disposition of all 34 review
+            items: Findings 1-26, R1-R6, D1, D2 -- 32 FIXED / 1 PARTIAL (F4: git-versioning awaits
+            author commit) / 1 DOCUMENTED-OPEN (D1: draft note deliberately kept)). Campaign
+            artifacts: F1 hybrid fold replay (simulation/results/encoder_hybrid/folds/F1_hybrid.*,
+            degenerate=reactive by construction, p99 589.301 ms); provenance loaders
+            load_encoder_hybrid.py (33 runs) + load_lang_qsweep.py (10 runs) + schema/33_fulltrace_
+            window_backfill.sql (IC004); regenerated EDA artifacts i_burst_anatomy_stats.json
+            (onset p50 6.5 min; ranks 1/6 = 404/53 min) + j_classes_stats.json (text 500,000;
+            nonsquare 53; frames share 81.1%); predictors/matched_origin_rescore_2026-07-26.json
+            (ARIMA 66.75% vs Chronos/cov 66.12% on matched 300 origins, paired-bootstrap CIs);
+            forecast fact tables now run_id-linked (22,003,500/22,003,500) with current-only views;
+            verify_all.sh containment gate structurally parsed + fixtured (R1), derived-value gates
+            extended to 0.62/0.76/0.82/440.0/537.4, N96OLD guard narrowed (F10 fold-ratio 0.96 is
+            legitimate); tex edits across closedloop/tese/intro/conclusion/baselines/trace-eda/
+            predictors/twopool/aiconfigurator/related/apendice per the resolution doc.
+command:    cd tex && latexmk -pdf -interaction=nonstopmode -halt-on-error tese.tex;
+            bash provenance/verify_all.sh; python3 provenance/loader/selftest.py
+result:     build 0 errors / 0 undefined refs, 141 pp; review's 50.3/45.5/41.0 pt table overflows
+            gone (worst remaining overfull 12.5 pt, cosmetic). verify_all: 43 passed / 0 failed /
+            6 warnings -> DELIVERY-READY (an interim run failed 1 gate on the N96OLD false positive,
+            repaired + fixture-tested, rerun green). Loader selftest ALL GREEN (3/3). Registered DB
+            suite: 74 evaluated, 69 pass / 5 documented failures (C002 error accepted w/ note;
+            C107/C207/C214/C302 warn; C214 regression repaired 69->17 unresolved). DB census
+            2,666 current / 3,352 total runs; manuscript census sentence now timestamped and exact.
+caveats:    residual-risk list in the resolution doc: worktree still uncommitted (F4.1, author's
+            call); reactive language baseline relabeled zero-startup lower bound, not rerun (F5);
+            hybrid strict-rewarm / bill-from-order / untouched-trace validation absent ("deployable"
+            removed, not re-earned); p90/s6 stays a post-hoc sensitivity absent a second trace;
+            slides/ + defense/ decks still carry pre-campaign 81.2% / 93-96% (sync before defense).
 commit:     uncommitted (working tree)

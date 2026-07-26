@@ -1,0 +1,26 @@
+[
+ {
+  "claim_id": "closedloop-0429",
+  "chapter": "closedloop",
+  "claim_type": "existence",
+  "anchor": "The p50-forecast policy, by contrast, fails at week scale --- the echo of the mean-sizing defect, consistent with its factorial clearing only 23-24 of 60 cells.",
+  "claim_text": "p50 forecast fails week scale; factorial passes only 23-24 of 60 cells.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "closedloop-0442",
+  "chapter": "closedloop",
+  "claim_type": "existence",
+  "anchor": "Only Toto on CPU at a 15 s tick fails, and on feasibility --- a per-tick forward of 29-32 s cannot hold a 15 s period --- not on cost.",
+  "claim_text": "Toto on CPU at 15s tick fails feasibility (29-32s forward > 15s period).",
+  "expected_backing": "v_cost_ratio"
+ },
+ {
+  "claim_id": "closedloop-0465",
+  "chapter": "closedloop",
+  "claim_type": "existence",
+  "anchor": "Generalization to other workloads, models, and datacenters remains unaddressed.",
+  "claim_text": "Generalization to other workloads/models/datacenters unaddressed.",
+  "expected_backing": "v_pool_latency"
+ }
+]

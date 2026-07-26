@@ -1,0 +1,1 @@
+{"claim_id":"intro-0321","type":"existence","verdict":"supported","evidence":"v_cost_ratio view (2388 rows) and collector_closedloop_window (4 windows) exist -- baselines and closed predictive-scaling loop materialized in provenance DB.","fix":"","confidence":0.9}

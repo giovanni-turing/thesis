@@ -215,7 +215,7 @@ behave exactly as composed (attention linear per image, per-image GEMM time
 \emph{falling} as larger $m$ improves efficiency), while what grows is what
 the HuggingFace forward carries \emph{around} those kernels --- unfused
 elementwise work, the DeepStack gather, and the patch-embedding
-convolution, which together account for \textbf{92\%} of the
+convolution, which together account for \textbf{93\%} of the
 composition-vs-HuggingFace kernel-time difference at $N{=}64$ (per-cell
 figures in Appendix~\ref{ap:artifacts}).
 
@@ -228,12 +228,13 @@ forward. Measured directly, vLLM's complete Qwen3-VL vision tower matches
 the composition to within \textbf{12.8\%} across the whole $N\le64$ serving
 regime, whereas the HuggingFace forward is $1.4$--$1.6\times$ slower over
 the same range --- so the larger HuggingFace ratio measures the execution
-stack, not an AIC error. A dense sweep ($N{=}1$--$512$) confirms every batch
+stack, not an AIC error. A dense $N{=}1$--$64$ sweep plus five off-cap
+probes ($N\in\{96,128,192,256,512\}$) confirms every batch
 up to the FIFO cap stays within that bound; beyond the cap the composition
 under-prices vLLM, a regime the pool never batches into. The check is
 forward compute on synthetic inputs, not the full serving path; the
 four-engine sweep is in Appendix~\ref{app:engine-sensitivity}. Batching
-benefit saturates by $N{\approx}6$--$8$ on both stacks (per-image cost
+benefit saturates by $N{\approx}6$--$8$ on both measured engines (per-image cost
 bottoms ${\approx}1.57\times$ below single-image, then drifts back up),
 bounding the useful dispatch batch; the batching \emph{law} (cost depends
 only on total images) is established in Chapter~\ref{cap:twopool}.
@@ -285,8 +286,8 @@ $t$-intervals across the five replications.
 \begin{table}[htbp]
 \centering
 \caption{Vision-encoder forward latency: measurement vs.\ AIC prediction
-(RTX~5090, bf16, batch 1, SM clock locked via \texttt{nvidia-smi -lgc 2400,2400},
-delivered 2377--2400\,\si{\mega\hertz}).
+(RTX~5090, bf16, batch 1, SM clock locked,
+delivered 2385--2392\,\si{\mega\hertz} across the validation rows).
 Predictions from the \emph{raw slice} (Section~\ref{sec:aic-collection}).}
 \label{tab:aic-validation}
 \begin{tabular}{lrrrr}

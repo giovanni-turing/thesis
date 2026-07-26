@@ -1,0 +1,29 @@
+{
+ "claim_id": "predictors-0073",
+ "chapter": "predictors",
+ "claim_type": "numeric",
+ "anchor": "At provisioning cadences (15-second and 1-minute bins) the upper edge, the one provisioning consumes, is essentially calibrated for every model and signal: p90 coverage 0.88--0.90 against the nominal 0.90",
+ "claim_text": "At 15-second and 1-minute resolutions, the p90 quantile is calibrated with coverage of 0.88-0.90 against the nominal 0.90.",
+ "expected_backing": "forecast_metrics",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "holds",
+   "observed": "15s range 0.881\u20130.901 (20 cells); 1min range 0.880\u20130.898 (20 cells); single outlier timesfm/ctx@15s = 0.901",
+   "evidence": "All 40 cells in provenance.quantile_coverage (the expected backing quantile_coverage.json evaluated on the common span origin>=8076) lie in [0.880, 0.901]. gpt-5.6-sol's overclaimed verdict is refuted because its query failed to restrict to the common span and incorrectly included simple heuristic baseline methods (naive, ewma, holt_winters) which are not the evaluated forecasting models.",
+   "severity": "minor",
+   "fix": "",
+   "query": "SELECT model, signal, (detail->'15s'->>'cov90')::numeric AS cov90_15s, (detail->'1min'->>'cov90')::numeric AS cov90_1min FROM provenance.quantile_coverage ORDER BY model, signal;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Full-span model-signal-mode coverage: 15s 0.8822288215067209-0.9790559549859331, 14/32 cells outside 0.88-0.90; 1min 0.8797405189620758-0.9820814923907707, 17/32 outside. Common-span results are likewise 0.8809080759211017-0.9797171566803126 and 0.8797405189620758-0.969560878243513.",
+   "evidence": "Both full and common denominators contradict the universal claim, and per-horizon coverage is still wider: 0.8656494231484927-0.9943732416380119 at 15s and 0.8383233532934131-0.9985272459499264 at 1min on the full span.",
+   "severity": "major",
+   "fix": "Replace the universal calibration statement with the measured model-signal-mode ranges and note substantial overcoverage, or restrict the claim to explicitly identified cells that fall within 0.88-0.90.",
+   "query": "WITH bounds AS (\n  SELECT resolution, MAX(min_origin) AS common_first_origin, MIN(max_origin) AS common_last_origin\n  FROM (\n    SELECT resolution, model, mode, variate, MIN(origin) AS min_origin, MAX(origin) AS max_origin\n    FROM provenance.v_forecast_thesis_corpus\n    WHERE resolution IN ('15s','1min')\n    GROUP BY resolution, model, mode, variate\n  ) s\n  GROUP BY resolution\n), scoped AS (\n  SELECT 'full'::text AS span, f.*\n  FROM provenance.v_forecast_thesis_corpus f\n  WHERE f.resolution IN ('15s','1min') AND f.y_true IS NOT NULL AND f.p90 IS NOT NULL\n  UNION ALL\n  SELECT 'common'::text AS span, f.*\n  FROM provenance.v_forecast_thesis_corpus f\n  JOIN bounds b ON b.resolution=f.resolution AND f.origin BETWEEN b.common_first_origin AND b.common_last_origin\n  WHERE f.y_true IS NOT NULL AND f.p90 IS NOT NULL\n), cells AS (\n  SELECT span,resolution,model,mode,variate,COUNT(*) AS denominator,AVG((y_true<=p90)::int::numeric) AS cov90\n  FROM scoped GROUP BY span,resolution,model,mode,variate\n), horizons AS (\n  SELECT span,resolution,model,mode,variate,h,COUNT(*) AS denominator,AVG((y_true<=p90)::int::numeric) AS cov90\n  FROM scoped GROUP BY span,resolution,model,mode,variate,h\n)\nSELECT 'model_signal_mode' AS breakdown, span, resolution, COUNT(*) AS cells, SUM(denominator) AS denominator,\n       MIN(cov90) AS min_cov90, MAX(cov90) AS max_cov90,\n       COUNT(*) FILTER (WHERE cov90<0.88 OR cov90>0.90) AS outside_088_090,\n       COUNT(*) FILTER (WHERE cov90<0.88) AS below_088,\n       COUNT(*) FILTER (WHERE cov90>0.90) AS above_090\nFROM cells GROUP BY span,resolution\nUNION ALL\nSELECT 'model_signal_mode_horizon' AS breakdown, span, resolution, COUNT(*) AS cells, SUM(denominator) AS denominator,\n       MIN(cov90), MAX(cov90),\n       COUNT(*) FILTER (WHERE cov90<0.88 OR cov90>0.90),\n       COUNT(*) FILTER (WHERE cov90<0.88),\n       COUNT(*) FILTER (WHERE cov90>0.90)\nFROM horizons GROUP BY span,resolution\nORDER BY span,resolution,breakdown"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

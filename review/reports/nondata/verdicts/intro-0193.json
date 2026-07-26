@@ -1,0 +1,1 @@
+{"claim_id":"intro-0193","type":"existence","verdict":"supported","evidence":"provenance.v_pool_latency exists (2337 rows, sla_metric=encoder_delay with p99 latency targets) and provenance.v_cost_ratio exists (2388 rows, worker-seconds cost ratios vs static baselines) — backing latency-target serving and GPU-fleet cost economics. Anchor intro.tex.","fix":"","confidence":0.9}

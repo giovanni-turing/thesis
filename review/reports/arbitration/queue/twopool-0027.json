@@ -1,0 +1,29 @@
+{
+ "claim_id": "twopool-0027",
+ "chapter": "twopool",
+ "claim_type": "numeric",
+ "anchor": "AIC's encoder graph prices a forward exactly by its total images: every factoring of N images into (batch, images-per-request) --- (1,64) or (64,1) --- returns the same latency to the microsecond, because attention is evaluated at the product batch\u00d7images and every other operator at the total token count.",
+ "claim_text": "Encoder graph latency depends only on total images, not batch/images-per-request factoring; latency identical to microsecond.",
+ "expected_backing": "collector_encoder_fn, v_cost_ratio",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "Only N=64 has multiple factorizations: 7 tested, all predicted_ms = 316.369 ms with delta_vs_ref_ms = 0; N=1 has only one row at 8.162 ms.",
+   "evidence": "The database contains empirical backing only for multiple factorizations of N=64. The universal claim for 'every factoring of N images' is overclaimed as no other values of N are evaluated under multiple configurations.",
+   "severity": "minor",
+   "fix": "Scope the claim specifically to N=64 images under the AIC cost model: all 7 tested factorizations produce exactly 316.369 ms with zero delta.",
+   "query": "SELECT probe_id, batch_size, images_per_request, total_images, predicted_ms, delta_vs_ref_ms FROM provenance.encoder_factoring_probe ORDER BY total_images, batch_size;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "The probe has 8 rows across 2 totals; only N=64 has multiple factorizations: 7 pairs from (1,64) through (64,1), all 316.369 ms with maximum absolute delta 0 ms. N=1 has only (1,1) at 8.162 ms. Neither backing relation exposes current, superseded, or effective lifecycle columns.",
+   "evidence": "The DB establishes exact invariance only for the 7 tested factorizations of N=64; it does not establish the universal claim across N or the stated operator-level causal mechanism.",
+   "severity": "major",
+   "fix": "Scope the sentence to the probe: \"For N=64 at 448 px, all seven tested factorizations from (1,64) to (64,1) returned the same AIC prediction, 316.369 ms (delta 0 ms).\" Remove the causal explanation unless separately backed by implementation evidence.",
+   "query": "WITH per_total AS (\n  SELECT total_images,\n         COUNT(*) AS tested_factorings,\n         COUNT(DISTINCT (batch_size, images_per_request)) AS distinct_factorings,\n         MIN(predicted_ms) AS min_predicted_ms,\n         MAX(predicted_ms) AS max_predicted_ms,\n         MAX(ABS(delta_vs_ref_ms)) AS max_abs_delta_ms,\n         ARRAY_AGG('(' || batch_size || ',' || images_per_request || ')' ORDER BY batch_size) AS tested_pairs\n  FROM provenance.encoder_factoring_probe\n  GROUP BY total_images\n), coverage AS (\n  SELECT COUNT(*) AS tested_totals,\n         COUNT(*) FILTER (WHERE distinct_factorings > 1) AS totals_with_multiple_factorings,\n         SUM(tested_factorings) AS probe_rows\n  FROM per_total\n), collector AS (\n  SELECT COUNT(*) FILTER (WHERE is_valid) AS valid_rows,\n         MIN(aic_pred_ms) FILTER (WHERE is_valid) AS min_aic_pred_ms,\n         MAX(aic_pred_ms) FILTER (WHERE is_valid) AS max_aic_pred_ms\n  FROM provenance.collector_encoder_fn\n  WHERE image_px = 448 AND n_images = 64\n), lifecycle AS (\n  SELECT table_name,\n         ARRAY_AGG(column_name ORDER BY ordinal_position) FILTER (\n           WHERE column_name IN ('is_current','is_superseded','superseded_by')\n              OR column_name LIKE '%effective%'\n         ) AS lifecycle_columns\n  FROM information_schema.columns\n  WHERE table_schema = 'provenance'\n    AND table_name IN ('encoder_factoring_probe','collector_encoder_fn')\n  GROUP BY table_name\n)\nSELECT p.total_images, p.tested_factorings, p.distinct_factorings,\n       p.min_predicted_ms, p.max_predicted_ms, p.max_abs_delta_ms, p.tested_pairs,\n       c.tested_totals, c.totals_with_multiple_factorings, c.probe_rows,\n       e.valid_rows AS collector_valid_rows_n64,\n       e.min_aic_pred_ms AS collector_min_aic_pred_ms_n64,\n       e.max_aic_pred_ms AS collector_max_aic_pred_ms_n64,\n       (SELECT lifecycle_columns FROM lifecycle WHERE table_name = 'encoder_factoring_probe') AS probe_lifecycle_columns,\n       (SELECT lifecycle_columns FROM lifecycle WHERE table_name = 'collector_encoder_fn') AS collector_lifecycle_columns\nFROM per_total p CROSS JOIN coverage c CROSS JOIN collector e\nORDER BY p.total_images"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

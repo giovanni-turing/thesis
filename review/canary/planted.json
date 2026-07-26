@@ -1,0 +1,17 @@
+{
+  "planted_defects": {
+    "D1": "arithmetic — '4.1x gain' but 1240/520 = 2.38x",
+    "D2": "overclaim — 'proves optimal for all multimodal workloads'",
+    "D3": "unsupported causal — 'memory-bound ... necessarily reduces p99'",
+    "D4": "internal inconsistency — TTFT 82 ms (text) vs 128 ms (Table 3)",
+    "D5": "missing baseline — 'sole baseline is static colocation'",
+    "D6": "stale/unprovenanced — 'encoder utilization 91% (earlier run)'",
+    "D7": "statistical weakness — 'averaged over 3 runs', no CI"
+  },
+  "gold_clean": {
+    "G1": "1:3 GPU ratio (2 enc / 6 dec) — internally consistent",
+    "G2": "WAPE-vs-MAPE justification — correct methodological choice",
+    "G3": "vLLM 0.6.3 + RTX 5090 + provenance-DB repro line"
+  },
+  "gate": "approve if recall>=4/7 AND fabrication<=1 AND valid_findings>=4"
+}

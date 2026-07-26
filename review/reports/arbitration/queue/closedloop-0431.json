@@ -1,0 +1,10 @@
+{
+ "claim_id": "closedloop-0431",
+ "chapter": "closedloop",
+ "claim_type": "comparative",
+ "anchor": "The p50 row completes the symmetry: an excellent cost policy (0.25x) that fails the SLA outright.",
+ "claim_text": "p50 policy costs 0.25x static but fails SLA.",
+ "expected_backing": "v_cost_ratio",
+ "adjudication": [],
+ "reason": "no-adjudicator"
+}

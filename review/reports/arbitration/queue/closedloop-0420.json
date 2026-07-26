@@ -1,0 +1,20 @@
+{
+ "claim_id": "closedloop-0420",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "Replaying burst3 end-to-end (60-second replica lead, tail-aware conversion throughout) yields the language-pool mirror of the encoder matrix's quantile result: reactive fails at TTFT p99 3,495 ms; the p50 forecast fails at 2,164 ms; and the p90 forecast passes at 651 ms.",
+ "claim_text": "Burst3 language pool: reactive TTFT p99=3,495ms, p50 forecast=2,164ms, p90 forecast=651ms (PASS).",
+ "expected_backing": "v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Current burst3/L60 records (n_requests=3093, superseded_by=NULL) give reactive p99=3494.725887 ms and each forecast-model p99=651.139537 ms; the only current 2164-ms record is live:twin_fc at 2164.189976 ms, with window_name=NULL, lead_s=NULL, quantile=NULL, and no burst3 provenance.",
+   "evidence": "The reactive and 651-ms values round correctly, but 2,164 ms belongs to live:twin_fc rather than a burst3/L60 run, while all candidate quantile fields are NULL.",
+   "severity": "major",
+   "fix": "Remove the p50 forecast clause or replace it with a current v_pool_latency record explicitly dimensioned as language/burst3/L60/p50; do not attribute live:twin_fc to burst3.",
+   "query": "SELECT p.run_id, p.experiment, p.pool, p.window_name, p.policy, p.forecast_model, p.lead_s, p.quantile, p.sla_metric, p.p99_ms, p.n_requests, p.is_current, d.window_name_raw, d.superseded_by, d.source_path FROM provenance.v_pool_latency AS p JOIN provenance.v_dim AS d USING (run_id) WHERE p.is_current = true AND p.sla_metric = 'ttft' AND p.run_id IN ('live:twin_fc','a11:burst3_reactive_L60','a11:burst3_fc_chronos_L60','a11:burst3_fc_timesfm_L60','a11:burst3_fc_toto_L60') ORDER BY p.run_id"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

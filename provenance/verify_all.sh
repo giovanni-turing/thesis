@@ -158,12 +158,20 @@ must_exist() { grep -rqF "$2" tex/*.tex 2>/dev/null && ok "intact: $1" || bad "M
 must_exist "tab:sim-poly-aic poly cell 67.3 / 248"  "67.3 / 248"
 must_exist "twopool 'were not priced' (R26)"        "were not priced"
 must_exist "live-vs-sim band 1.1--6.8% (R1)"        "1.1--6.8"
-must_exist "235B ITL p99 86.2 ms (s=1 head2k, is_current; corrected from stale 87.7)" "86.2"
+must_exist "235B ITL p99 87.7 ms (s=1 head2k; artifact llm_head2k_aic235btp8_s1.json=87.72; 86.2 was a spurious revert, no artifact)" "\SI{87.7}{\milli\second}"
 # ---- DERIVED-VALUE RECOMPUTATION (protocol R-A, added 2026-07-21) ----------
 # Every printed headline ratio is recomputed from RAW operands (artifact files
 # where they exist, provenance-commented operand pairs otherwise) and the
 # printed value must be the correct rounding. Transcription-only checking is
 # what let 0.96x survive four passes. See provenance/audit/REVIEW_PROTOCOL.md.
+# R1 FIX 2026-07-26 (adversarial review): the encoder 0.62x check hard-coded
+# rounded operands (2410800/3869300) and could not detect drift in the source
+# artifacts; and neither new headline (0.76x hybrid, 0.82x language) was gated
+# at all. Both encoder operands now come from the store (encoder_run_summary),
+# and the hybrid/language ratios are recomputed from their artifacts below.
+ENC_FC_WS=$(Q "select provisioned_worker_seconds from provenance.encoder_run_summary where run_id='aggregate44:fc_p90_L30_issuetime'")
+ENC_STATIC_WS=$(Q "select provisioned_worker_seconds from provenance.encoder_run_summary where run_id='a6:static_C8'")
+export ENC_FC_WS ENC_STATIC_WS
 DERIVED=$(python3 - <<'PYEOF'
 import json, sys
 fails = []
@@ -182,8 +190,19 @@ if fc is not None:
     static = 4 * span_s / 3600
     chk('0.965x language week', fc / static, 0.965, 3)
     chk('1.03x request-matched', fc / 503.7, 1.03, 2)
-# [2] encoder week 0.62x (operands: tab:cl-aggregate, aggregate44 fc_p90_L30 / static C8)
-chk('0.62x encoder week', 2410800.0 / 3869300.0, 0.62, 2)
+# [2] encoder week 0.62x -- operands READ FROM THE STORE (R1 fix 2026-07-26):
+# encoder_run_summary aggregate44:fc_p90_L30_issuetime (issue-time fc) over
+# a6:static_C8. Previously hard-coded 2410800/3869300; the store carries
+# 2410754.7/3869278.8, so artifact drift is now detectable.
+import os
+enc_fc = os.environ.get('ENC_FC_WS', '')
+enc_static = os.environ.get('ENC_STATIC_WS', '')
+if enc_fc and enc_static:
+    chk('0.62x encoder week', float(enc_fc) / float(enc_static), 0.62, 2)
+else:
+    print('FAIL 0.62x encoder operands unreadable from DB '
+          f'(ENC_FC_WS={enc_fc!r}, ENC_STATIC_WS={enc_static!r})')
+    fails.append('enc_db_operands')
 # [3] full-trace reactive 0.687x (tab:cl-ledger-enc full-trace block)
 chk('0.687x full trace', 3323200.0 / 4838400.0, 0.687, 3)
 # [4] burst3 naive-sum error +21.9% (tab:cl-ledger-joint)
@@ -198,6 +217,30 @@ try:
         if not ok: fails.append(run)
 except Exception as e:
     print(f"FAIL live artifacts unreadable: {e}"); fails.append('live')
+# [6] hybrid 0.76x (R1/Finding-4 fix 2026-07-26): numerator READ FROM ARTIFACT
+# (encoder_hybrid provisioned_worker_seconds), denominator the SAME store-read
+# static C8 as [2] -- the encoder and hybrid headlines share one denominator.
+try:
+    hyb = json.load(open('simulation/results/encoder_hybrid/hybrid.jsonl.stats.json'))['provisioned_worker_seconds']
+    if enc_static:
+        chk('0.76x hybrid week', hyb / float(enc_static), 0.76, 2)
+    else:
+        print('FAIL 0.76x hybrid: static C8 denominator unreadable from DB')
+        fails.append('hybrid_static')
+except Exception as e:
+    print(f"FAIL hybrid artifact unreadable: {e}"); fails.append('hybrid')
+# [7] language 0.82x e13-robust (R1/Finding-4 fix 2026-07-26): BOTH sides read
+# from the eval_p90_s6 week report -- gpu_hours over the static TP2x2 fleet
+# time-scaled to the report's own span (4 GPUs x duration_ms/1000/3600 =
+# 537.409 GPU-h; closedloop.tex prints 537.4). Also gates the printed 440.0.
+try:
+    wk = json.load(open('simulation/results/lang_qsweep/eval_p90_s6/week.report.json'))
+    static_lang = 4.0 * (wk['duration_ms'] / 1000.0) / 3600.0
+    chk('0.82x language e13-robust', wk['gpu_hours'] / static_lang, 0.82, 2)
+    chk('440.0 GPU-h e13-robust', wk['gpu_hours'], 440.0, 1)
+    chk('537.4 GPU-h static denom', static_lang, 537.4, 1)
+except Exception as e:
+    print(f"FAIL language week artifact unreadable: {e}"); fails.append('lang_week')
 sys.exit(1 if fails else 0)
 PYEOF
 )
@@ -212,9 +255,16 @@ BILLMISUSE=$(grep -rcE "billed at (forecast-)?issue" tex/*.tex | grep -v ':0' | 
 # R18 AMENDED 2026-07-21: raw operands 518.6063/537.4029 = 0.96502 -> printed
 # ratio corrected 0.96x -> 0.965x at all sites (reviewer-caught mis-rounding;
 # 2-dp rounding of 0.965 would be 0.97, so the 3-dp form with operands is used).
+# FLOOR LOWERED 4->2 2026-07-26: the convergence de-hedge consolidated cost framing
+# into canonical closedloop loci, intentionally removing 2 of the 4 mentions
+# (certified by the R5 cost-framing consistency gate across all 10 loci).
 N96=$(grep -rho '0[.,]965' tex/*.tex 2>/dev/null | wc -l)
-[ "$N96" -ge 4 ] && ok "0.965x intact at $N96 sites (R18-amended)" || bad "0.965x present at only $N96 sites (expected >=4)"
-N96OLD=$(grep -rho '0[.,]96[^5]' tex/*.tex 2>/dev/null | grep -vc '0[.,]965' || true)
+[ "$N96" -ge 2 ] && ok "0.965x intact at $N96 sites (R18-amended)" || bad "0.965x present at only $N96 sites (expected >=2)"
+# PATTERN NARROWED 2026-07-26 (finalize pass): the review-F10 repair inserted the
+# legitimate p90/s6 fold-ratio list "(0.96, 0.69, ...)" (91.9538/95.795 = 0.9599 -> 0.96),
+# which the old bare '0[.,]96[^5]' pattern false-flagged. The forbidden stale form was the
+# week ratio printed AS A x-RATIO (0.96$\times$ / 0.96x); match exactly that.
+N96OLD=$(grep -rhoE '0[.,]96(\$?\\times|x)' tex/*.tex 2>/dev/null | wc -l)
 [ "$N96OLD" -eq 0 ] && ok "no stale 0.96x remains (all amended to 0.965x)" || bad "stale 0.96x still present at $N96OLD site(s)"
 
 # B3 containment -- post-manuscript defence material must not be ADDED as a thesis result.
@@ -223,11 +273,23 @@ N96OLD=$(grep -rho '0[.,]96[^5]' tex/*.tex 2>/dev/null | grep -vc '0[.,]965' || 
 # happen is this working tree ADDING the post-manuscript RESULT to a results chapter. So the
 # test is on newly-added lines only, not on presence.
 CONTAIN=0
-ADDED=$(git diff HEAD -- tex/closedloop.tex tex/twopool.tex tex/baselines.tex 2>/dev/null \
-        | grep -E '^\+' | grep -v '^\+\+\+')
+# R1 FIX 2026-07-26 (adversarial review): the old pipeline's second stage was BASIC-regex
+# grep -v '^\+\+\+', where \+ is a repetition operator -- it matched EVERY added line and
+# silently emptied $ADDED, making this gate false-green. Structural awk parse instead:
+# drop the '+++' file header by prefix, keep '+' hunk lines (incl. '++x'), strip the '+'.
+_added_lines() { awk '/^\+\+\+ /{next} /^\+/{print substr($0,2)}'; }
+# parser regression fixture -- header excluded, added lines kept, leading '+' preserved
+_FIXWANT='kept line
++kept plusline'
+_FIXGOT=$(printf '+++ b/tex/x.tex\n+kept line\n++kept plusline\n-removed\n context\n' | _added_lines)
+[ "$_FIXGOT" = "$_FIXWANT" ] || bad "containment-gate parser self-test FAILED (regression)"
+ADDED=$(git diff HEAD -- tex/closedloop.tex tex/twopool.tex tex/baselines.tex 2>/dev/null | _added_lines)
+# ADJUDICATED 2026-07-26: 'fold-robust' removed from the forbidden list -- the hybrid /
+# fold-robust result was deliberately promoted into closedloop.tex by the author-approved
+# reframe (ledger "Iterative fix+review convergence" entry); its addition is intended.
 for pat in 'limit cycle' 'mean-field' 'period-2' 'retry fraction' \
            '2\.3 (offered )?req/s' '7\.2.?x at equal GPU' '17 of 18' '0 of 6' \
-           'fold-robust' 'C\^?\*?=5' '0\.980'; do
+           'C\^?\*?=5' '0\.980'; do
   if printf '%s' "$ADDED" | grep -Eqi "$pat"; then
     bad "post-manuscript material ADDED to a results chapter: '$pat'"; CONTAIN=1
   fi

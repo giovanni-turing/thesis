@@ -63,13 +63,18 @@ shape-fixable prefill floor; episodic encoder queueing invisible to rate-
 and utilization-based monitors). Closing the loop, forecast-driven per-pool
 schedules hold the tail-latency SLA through burst onsets that defeat an
 identically informed reactive controller --- anticipatory on the encoder
-pool, a tail-aware \emph{conversion} of the same forecast on the
-language pool --- pricing the 5.60-day forecast-covered span at
-0.62$\times$ the deployable static encoder fleet's worker-time (the
-Chronos-p90 language schedule near break-even at 0.965$\times$ a
-time-matched static TP2$\times$2 reference). The language-pool
+pool, a tail-aware \emph{conversion} of its own forecast on the
+language pool. Over the 5.60-day covered span this prices the encoder pool
+at 0.62$\times$ the deployable static encoder fleet's worker-time, or 0.76$\times$
+for a post-hoc hybrid forecast--reactive schedule that also recovers the
+hardest daily-fold onset (e13); on the language pool the same conversion holds the SLA
+where the reactive baseline fails it, near break-even against static ---
+calibration selects an aggressive point that drops e13, and a post-hoc
+robustness variant recovers it at 0.82$\times$, a modest saving.
+Chapter~\ref{cap:closedloop} quantifies the full cost frontier and its
+per-pool levers. The language-pool
 p90-versus-reactive
-verdict reproduces on the hardest burst through Dynamo's real control
+verdict reproduces on the fastest-onset burst through Dynamo's real control
 plane with mocked engines (one live run per policy);
 the encoder cost model is anchored separately on RTX~5090 silicon, and the
 week-scale economics are simulated.
@@ -111,13 +116,19 @@ monitores de taxa e utiliza\c{c}\~ao). Fechando o la\c{c}o, o escalonamento
 preditivo por \emph{pool} sustenta a SLA de lat\^encia de cauda em in\'icios
 de rajada que derrotam um controlador reativo igualmente informado ---
 por provisionamento antecipat\'orio no \emph{pool} codificador e por uma
-\emph{convers\~ao} ciente de cauda da mesma previs\~ao no
-\emph{pool} de linguagem --- precificando o intervalo coberto de 5,60
-dias a
-0,62$\times$ o tempo de \emph{workers} da menor frota est\'atica vi\'avel
-de codificadores (agenda de linguagem Chronos-p90 praticamente em
-equil\'ibrio: 0,965$\times$ uma refer\^encia est\'atica TP2$\times$2 no
-mesmo intervalo). Na rajada mais dif\'icil, o par de veredictos
+\emph{convers\~ao} ciente de cauda de sua pr\'opria previs\~ao no
+\emph{pool} de linguagem. No intervalo coberto de 5,60 dias, isso
+precifica o \emph{pool} codificador a
+0,62$\times$ o tempo de \emph{workers} da menor frota est\'atica vi\'avel de
+codificadores, ou 0,76$\times$ para um cronograma h\'ibrido
+previs\~ao--reativo \emph{post hoc} que tamb\'em recupera o in\'icio de
+dobra di\'aria mais dif\'icil (e13); no \emph{pool} de linguagem, a mesma convers\~ao sustenta a
+SLA onde o \emph{baseline} reativo falha, perto do equil\'ibrio face ao
+est\'atico --- a calibra\c{c}\~ao seleciona um ponto agressivo que perde e13,
+e uma variante \emph{post hoc} de robustez o recupera a 0,82$\times$, uma
+economia modesta. O
+Cap\'itulo~\ref{cap:closedloop} quantifica a fronteira de custo completa e
+suas alavancas por \emph{pool}. Na rajada de in\'icio mais r\'apido, o par de veredictos
 p90-versus-reativo do \emph{pool} de linguagem se reproduz atrav\'es do
 plano de controle real do Dynamo com \emph{engines} simulados (uma
 execu\c{c}\~ao ao vivo por pol\'itica); o modelo
@@ -259,7 +270,9 @@ NVIDIA.
 Framework}. 2025.
 \url{https://github.com/ai-dynamo/dynamo}; planner design documentation
 at \url{https://docs.dynamo.nvidia.com}. Accessed 2026-07-07 (v1.x
-line; simulations use the v1.3.0 source build).
+line; calibrated runs from the load sweeps onward use the v1.3.0 source
+build, Phase-2 baseline runs the pinned 1.2.1 wheel;
+Appendix~\ref{ap:artifacts}).
 \bibitem{Leland1994}
 W.~E. Leland, M.~S. Taqqu, W.~Willinger, D.~V. Wilson.
 \emph{On the Self-Similar Nature of Ethernet Traffic (Extended Version)}.

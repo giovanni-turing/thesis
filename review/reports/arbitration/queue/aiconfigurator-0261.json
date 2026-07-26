@@ -1,0 +1,38 @@
+{
+ "claim_id": "aiconfigurator-0261",
+ "chapter": "aiconfigurator",
+ "claim_type": "comparative",
+ "anchor": "HuggingFace forward is 1.4\u20131.6\u00d7 slower over the same range",
+ "claim_text": "The HuggingFace forward is 1.4\u20131.6 times slower than the AIC composition over the same range.",
+ "expected_backing": "v_cost_ratio, HuggingFace measurement",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "1.3599\u20131.6159\u00d7 (rounds to 1.4\u20131.6\u00d7)",
+   "evidence": "Over the standard 448px serving regime (N <= 64) in provenance.collector_fn, the ratio of measured HuggingFace eager (measured_5x50) to the AIC composition (aic_postinfill) is 1.3599 (at N=8) to 1.6159 (at N=64). The exact ratios match the preceding sentence in the thesis text ('grows with N, from approx 1.37 to 1.62') and round to 1.4\u20131.6\u00d7 at standard one-decimal precision.",
+   "severity": "minor",
+   "fix": "No change needed since the thesis text is transparent about the exact unrounded bounds, but for extreme precision, the text could be qualified to '1.36\u20131.62\u00d7 slower' or '1.4\u20131.6\u00d7 slower (rounded)'.",
+   "query": "SELECT MIN(m.mean_ms / a.aic_ms) AS min_ratio, MAX(m.mean_ms / a.aic_ms) AS max_ratio, AVG(m.mean_ms / a.aic_ms) AS mean_ratio FROM (SELECT n_images, mean_ms FROM provenance.collector_fn WHERE engine = 'measured_5x50' AND n_images <= 64) m JOIN (SELECT n_images, aic_ms FROM provenance.collector_fn WHERE engine = 'aic_postinfill' AND n_images <= 64) a ON m.n_images = a.n_images"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "supported",
+   "observed": "8 matched RTX 5090/448px pairs over N=1\u2013128: ratio 1.3599220887631593\u20131.615916856582029 (mean 1.4654744772166317); 0 pairs fall outside 1.4\u20131.6 after one-decimal rounding.",
+   "evidence": "The owning measurement relation pairs measured_5x50 HuggingFace means with aic_postinfill denominators at identical GPU, resolution, and N; the exact endpoints round to the claimed one-decimal range.",
+   "severity": "minor",
+   "fix": "",
+   "query": "WITH hf AS (SELECT gpu, image_px, n_images, mean_ms AS hf_mean_ms FROM provenance.collector_fn WHERE engine = 'measured_5x50'), aic AS (SELECT gpu, image_px, n_images, aic_ms FROM provenance.collector_fn WHERE engine = 'aic_postinfill'), pairs AS (SELECT hf.gpu, hf.image_px, hf.n_images, hf.hf_mean_ms, aic.aic_ms, hf.hf_mean_ms / NULLIF(aic.aic_ms, 0) AS ratio FROM hf JOIN aic USING (gpu, image_px, n_images)) SELECT gpu, image_px, COUNT(*) AS denominator_pairs, MIN(n_images) AS min_n_images, MAX(n_images) AS max_n_images, MIN(ratio) AS min_ratio, MAX(ratio) AS max_ratio, AVG(ratio) AS mean_ratio, COUNT(*) FILTER (WHERE ratio < 1.4 OR ratio > 1.6) AS exact_outside_count, COUNT(*) FILTER (WHERE ROUND(ratio::numeric, 1) < 1.4 OR ROUND(ratio::numeric, 1) > 1.6) AS rounded_1dp_outside_count, JSONB_AGG(JSONB_BUILD_OBJECT('n_images', n_images, 'hf_mean_ms', hf_mean_ms, 'aic_ms', aic_ms, 'ratio', ratio) ORDER BY n_images) AS per_n_breakdown FROM pairs GROUP BY gpu, image_px"
+  },
+  {
+   "model": "kimi-k3",
+   "verdict": "overclaimed",
+   "observed": "eager/AIC ratio spans 1.1876\u20131.7877 over 30 (px,N) pairs; per-px: 224px 1.59\u20131.79 (avg 1.67, 9/10 above band), 448px 1.32\u20131.61 (avg 1.47), 672px 1.19\u20131.59 (avg 1.45); 18/30 pairs outside [1.4,1.6]",
+   "evidence": "collector_encoder_fn eager(fn_multires)/aic(aic_multires) join gives 1.19\u20131.79, not 1.4\u20131.6; band breaks systematically at 224px (\u22651.59) and at low N for 448/672px (<1.4)",
+   "severity": "major",
+   "fix": "Restate as per-resolution band or widen: e.g. 'HuggingFace eager forward is 1.2\u20131.8\u00d7 slower than the AIC composition (224px: ~1.6\u20131.8\u00d7, 448px: ~1.3\u20131.6\u00d7, 672px: ~1.2\u20131.6\u00d7)'",
+   "query": "WITH hf AS (SELECT image_px,n_images,mean_ms FROM provenance.collector_encoder_fn WHERE engine='eager' AND source_path LIKE '%fn_multires%' AND is_valid), aic AS (SELECT image_px,n_images,mean_ms FROM provenance.collector_encoder_fn WHERE engine='aic' AND source_path LIKE '%aic_multires%' AND is_valid) SELECT hf.image_px, hf.n_images, (hf.mean_ms/aic.mean_ms)::numeric(10,4) AS ratio FROM hf JOIN aic USING (image_px,n_images) ORDER BY 1,2"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

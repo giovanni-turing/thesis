@@ -1,0 +1,29 @@
+{
+ "claim_id": "closedloop-0407",
+ "chapter": "closedloop",
+ "claim_type": "comparative",
+ "anchor": "Running the reactive controller with the tail-aware headroom it was denied --- the trailing-window p90 of the observed image rate at the same rho=15 and lead, but still no forecast --- passes the slow onset (burst1) and week scale but fails the one-minute onset (burst3, p99 1,973-11,568 ms against the forecast's 588 ms).",
+ "claim_text": "Reactive with trailing-window p90 headroom passes burst1 but fails burst3 (p99 1,973-11,568 ms vs forecast's 588 ms).",
+ "expected_backing": "v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "burst1 p99: 637.70-904.74 ms (passes), aggregate (week scale) p99: 588.37-784.48 ms (passes), burst3 p99: 1,973.29-11,567.99 ms (fails) vs forecast burst3 p99: 588.37 ms",
+   "evidence": "The ablation runner script (run_ablation.sh) proves the react_p90_W* runs were executed at --rho 15; rho=NULL in runs/v_dim is a database-ingest parsing artifact for the rerun_verify experiment. Latency metrics match perfectly.",
+   "severity": "minor",
+   "fix": "",
+   "query": "SELECT window_name, MIN(p99_ms) AS min_p99, MAX(p99_ms) AS max_p99 FROM provenance.v_pool_latency WHERE run_id LIKE 'rerun_verify:react_p90_W%' AND window_name IN ('burst1', 'burst3', 'aggregate') AND is_current GROUP BY window_name;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "All selected rows are current and none are superseded. The trailing-p90 reactive runs have rho=NULL: across 3 runs per lead/window, burst1 p99 is 637.695-712.101 ms at lead 30 and 741.524-904.739 ms at lead 300 (64,804 requests each); aggregate is 588.37 ms at lead 30 and 700.694-784.483 ms at lead 300 (749,601 requests each); burst3 is 1,973.291-4,291.701 ms at lead 30 and 11,567.99 ms at lead 300 (3,093 requests each). Forecast-p90 burst3 is 588.37 ms at both leads. The explicit rho=15 reactive rows instead have lead=NULL and quantile=NULL, with burst1 p99 825.072 ms and burst3 p99 38,339.05 ms.",
+   "evidence": "The pass/fail pattern and rounded range are backed only by trailing-p90 runs whose rho is NULL; no row combines trailing p90, rho=15, and a lead, while the separately recorded rho=15 burst3 result is 38,339.05 ms.",
+   "severity": "major",
+   "fix": "Remove \u201cat the same rho=15\u201d and state that rho is unrecorded for these trailing-p90 runs, or add a genuinely matched trailing-p90 rho=15 experiment before retaining that control claim.",
+   "query": "WITH selected AS (\n  SELECT\n    CASE\n      WHEN l.experiment = 'rerun_verify' AND l.run_id LIKE '%react_p90%' THEN 'trailing_p90_reactive'\n      WHEN l.experiment = 'rerun_verify' AND l.run_id LIKE '%fc_p90%' THEN 'forecast_p90'\n      WHEN l.experiment = 'reactive' AND d.rho = 15 THEN 'observed_rate_reactive_rho15'\n    END AS arm,\n    l.run_id, l.window_name, l.lead_s, l.quantile, d.rho,\n    l.p99_ms, l.n_requests, l.queue_divergent,\n    l.is_current AS latency_is_current, d.is_current AS dim_is_current,\n    d.superseded_by\n  FROM provenance.v_pool_latency AS l\n  JOIN provenance.v_dim AS d USING (run_id)\n  WHERE l.is_current = true\n    AND d.is_current = true\n    AND l.source_relation = 'encoder_run_summary'\n    AND (\n      (l.experiment = 'rerun_verify' AND l.run_id LIKE '%react_p90%'\n       AND l.window_name IN ('aggregate', 'burst1', 'burst3'))\n      OR\n      (l.experiment = 'rerun_verify' AND l.run_id LIKE '%fc_p90%'\n       AND l.window_name = 'burst3')\n      OR\n      (l.experiment = 'reactive' AND d.rho = 15\n       AND l.window_name IN ('burst1', 'burst3'))\n    )\n)\nSELECT\n  arm, window_name, lead_s, quantile, rho,\n  COUNT(*) AS run_count,\n  MIN(p99_ms) AS min_p99_ms,\n  MAX(p99_ms) AS max_p99_ms,\n  MIN(n_requests) AS min_n_requests,\n  MAX(n_requests) AS max_n_requests,\n  BOOL_AND(latency_is_current AND dim_is_current) AS all_current,\n  COUNT(*) FILTER (WHERE superseded_by IS NOT NULL) AS superseded_count,\n  BOOL_OR(queue_divergent) AS any_queue_divergent\nFROM selected\nGROUP BY arm, window_name, lead_s, quantile, rho\nORDER BY arm, window_name, lead_s NULLS FIRST"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

@@ -69,14 +69,18 @@ and inflated the extreme tail --- an instrumentation artifact to guard
 against when a timing hook is slower than the events it prices.
 
 \paragraph{Family transfer.} The language-pool numbers in this chapter are
-for Qwen3-VL-8B at TP1. A spot-check prices the family flagship,
-Qwen3-VL-235B-A22B at TP8, on the same shipped H100 data, window,
-and topology: ${\sim}1.9\times$ the 8B's mean decode latency at the trace's own rate
-(1.2--3.9$\times$ across the sweep), with ITL
-p99 \SI{86.2}{\milli\second} at that rate, so the decode
-bound moves and its knee drops to $s{=}1$ against the 8B's $s{=}2$ ---
+for Qwen3-VL-8B at TP1. Two run vintages price the family flagship,
+Qwen3-VL-235B-A22B at TP8, on the same shipped H100 data, window, and
+topology. The committed wheel-era spot check (scales $s\in\{1,4,16\}$
+only) measures ${\sim}1.9\times$ the 8B's mean decode latency at the
+trace's own rate (1.3--3.8$\times$ across its three scales), with ITL
+p99 \SI{87.7}{\milli\second} at that rate; the later source-built 1.3.0
+sweep reproduces that operating point (\SI{86.2}{\milli\second}) and is
+the series that pins the knee, failing at $s{=}2$
+(\SI{210.6}{\milli\second}). The decode bound thus moves and the
+flagship's knee drops to $s{=}1$ against the 8B's $s{=}2$ ---
 decoder scale halves the language pool's operating envelope (per-metric
-numbers in Appendix~\ref{ap:artifacts}). The vision
+numbers and both vintages' artifacts in Appendix~\ref{ap:artifacts}). The vision
 side needs no such caveat: the ViT \emph{and} its 4096-dimensional projector
 output are identical between the 8B and the 235B
 (Chapter~\ref{cap:aiconfigurator}), so the encoder cost model, batching
@@ -136,7 +140,7 @@ alternative (chunks chained on one worker, retained behind a converter flag)
 the largest requests carry an intrinsic multi-second service floor that no
 worker count removes (delay p99 plateaus at \SI{2.9}{\second} from 4 through
 32 workers), making every frames-heavy window statically infeasible by
-construction. The largest request costs ${\approx}\SI{46}{\second}$ of
+construction. The largest request costs ${\approx}\SI{46.5}{\second}$ of
 kernel time regardless, spread across whatever workers are free. Under low load the policy
 changes nothing (steady-head percentiles identical to three decimals);
 it matters inside bursts.
@@ -310,7 +314,9 @@ encoder workers, $3\times$ this topology, are needed at the trace's own
 rate).
 
 Figure~\ref{fig:sim-burst-queue} exposes the mechanism in the vision
-pool. The window's 7{,}716 frames-class requests (${>}64$ images each)
+pool. The window's 7{,}716 requests above the 64-image dispatch cap ---
+the chunked population, 7{,}643 of them in the canonical frames class
+($k{>}10$ grids) ---
 decompose into chunk units of at most 64 images that, with smaller requests
 batched behind them, drive 83{,}376 forwards over the window; arrivals
 clump, the worst second landing 2{,}726 images at once. Behind a strict

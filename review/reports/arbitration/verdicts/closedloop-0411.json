@@ -1,0 +1,11 @@
+{
+ "claim_id": "closedloop-0411",
+ "verdict": "holds",
+ "observed": "Chronos control through the closedloop/EWMA harness (ewma_ablation_cell, model=chronos, aggregate, p90, rho=15, warm, L=30): p99=589.301 ms, ratio_vs_static=0.6231. Committed main issue-time floor=588.370 ms (v_pool_latency chronos encoder_delay). Reproduction error = (589.301-588.370)/588.370 = 0.158%; cost ratio 0.6231 = the committed 0.62x headline exactly. collector_closedloop_window (physical anchor) chronos aic_p99=588.4 ms across bursts.",
+ "claimed": "The Chronos control reproduces the committed figures to within run noise (<1%).",
+ "evidence": "Both adjudicators flagged this using wrong-scope experiments. gemini compared a11 vs a12 (defense-animation runs, not committed thesis data); gpt compared a12 (animation) as 'committed' against g2 as 'control' -- but closedloop.tex line 815 EXPLICITLY excludes g2 (and a16/g3_32b/g6) from every committed table, and a12 is animation, so their 6/25 and 9/25 '<1% failures' (max 3.87% / 11.31%) are artifacts of comparing unrelated families. The real reproduction, per the tab:cl-ewma harness whose caption states its replay floor sits 1 ms above the main 588 ms artifact, is 589.301 vs 588.370 = 0.158%, with cost ratio reproduced exactly at 0.6231. Within <1%.",
+ "severity": "major",
+ "fix": "None. The claim holds; the flags are wrong-scope (a11/a12 animation, g2 excluded per line 815).",
+ "confidence": 0.85,
+ "query": "SELECT p99_ms,ratio_vs_static FROM provenance.ewma_ablation_cell WHERE model='chronos' AND window_name='aggregate' AND quantile='p90' AND rho=15 AND readiness='warm' AND lead_s=30; -> 589.301,0.6231 vs committed floor 588.370 = 0.158%"
+}

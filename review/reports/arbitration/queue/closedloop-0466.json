@@ -1,0 +1,10 @@
+{
+ "claim_id": "closedloop-0466",
+ "chapter": "closedloop",
+ "claim_type": "comparative",
+ "anchor": "On the encoder pool, forecasting the pool's own signal at the calibrated p90 edge holds the tail SLA at every forecast-issued lead, including the one-minute onset that defeats an identically informed reactive controller at every lead.",
+ "claim_text": "Encoder pool: p90 forecast holds SLA at all leads including 1-min onset; reactive fails at all leads.",
+ "expected_backing": "v_infraction",
+ "adjudication": [],
+ "reason": "no-adjudicator"
+}

@@ -1,0 +1,29 @@
+{
+ "claim_id": "intro-0308",
+ "chapter": "intro",
+ "claim_type": "numeric",
+ "anchor": "The second is optimistic for GPU serving, where bringing up a replica (scheduling, weight loading, warmup) takes tens of seconds to minutes",
+ "claim_text": "Bringing up a GPU replica takes tens of seconds to minutes.",
+ "expected_backing": "vllm_request",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "1 current vLLM/H100 run: overall loading 23.726728601999998 s; weight loading 4.899571997 s; warmup 0.279725078 s; 0 scheduling spans",
+   "evidence": "The sole current run supports tens of seconds, but provides no minute-scale observation and omits scheduling, so it cannot establish the full generalized range.",
+   "severity": "major",
+   "fix": "Narrow the text to \"about 24 seconds in our measured vLLM/H100 startup\" or add current, comparable replica-start measurements including scheduling that demonstrate minute-scale cases.",
+   "query": "WITH current_runs AS (SELECT run_id, engine, gpu, tp, window_name, superseded_by FROM provenance.v_dim WHERE is_current = true), startup AS (SELECT d.run_id, d.engine, d.gpu, d.tp, d.window_name, d.superseded_by, s.span_name, s.duration_ms / 1000.0 AS duration_s FROM current_runs d JOIN provenance.vllm_otlp_startup s USING (run_id)) SELECT COUNT(DISTINCT run_id) AS current_run_denominator, COUNT(*) FILTER (WHERE span_name = 'Overall Loading') AS overall_observations, MIN(duration_s) FILTER (WHERE span_name = 'Overall Loading') AS overall_loading_min_s, MAX(duration_s) FILTER (WHERE span_name = 'Load weights') AS load_weights_s, MAX(duration_s) FILTER (WHERE span_name = 'Warmup (GPU)') AS warmup_s, COUNT(*) FILTER (WHERE span_name ILIKE '%schedul%') AS scheduling_spans FROM startup"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "1 current, non-superseded run in the fulltrace window: overall loading 23.726728601999998 s, weight loading 4.899571997 s, warmup 0.279725078 s; 0 minute-scale observations and 0 scheduling observations.",
+   "evidence": "The sole current observation supports a tens-of-seconds startup only; it does not support minute-scale startup, scheduling time, or an unscoped generalization.",
+   "severity": "major",
+   "fix": "Scope the statement to the measured vLLM/H100 run: overall startup took 23.726728601999998 s, including 4.899571997 s of weight loading and 0.279725078 s of GPU warmup; omit scheduling and the minutes claim.",
+   "query": "WITH current_runs AS (\n  SELECT run_id, engine, gpu, tp, window_name, superseded_by\n  FROM provenance.v_dim\n  WHERE is_current = true\n), startup AS (\n  SELECT d.run_id, d.engine, d.gpu, d.tp, d.window_name, d.superseded_by,\n         s.span_name, s.duration_ms / 1000.0 AS duration_s\n  FROM current_runs d\n  JOIN provenance.vllm_otlp_startup s USING (run_id)\n), per_window AS (\n  SELECT COALESCE(window_name, '<none>') AS window_name,\n         COUNT(DISTINCT run_id) AS runs,\n         COUNT(*) FILTER (WHERE span_name = 'Overall Loading') AS overall_observations,\n         MIN(duration_s) FILTER (WHERE span_name = 'Overall Loading') AS min_overall_s,\n         MAX(duration_s) FILTER (WHERE span_name = 'Overall Loading') AS max_overall_s\n  FROM startup\n  GROUP BY COALESCE(window_name, '<none>')\n)\nSELECT\n  COUNT(DISTINCT run_id) AS current_run_denominator,\n  COUNT(*) AS current_span_rows,\n  COUNT(DISTINCT run_id) FILTER (WHERE superseded_by IS NOT NULL) AS superseded_current_runs,\n  COUNT(*) FILTER (WHERE span_name = 'Overall Loading') AS overall_observations,\n  MIN(duration_s) FILTER (WHERE span_name = 'Overall Loading') AS min_overall_s,\n  MAX(duration_s) FILTER (WHERE span_name = 'Overall Loading') AS max_overall_s,\n  COUNT(*) FILTER (WHERE span_name = 'Overall Loading' AND duration_s >= 60) AS minute_scale_observations,\n  MAX(duration_s) FILTER (WHERE span_name = 'Load weights') AS load_weights_s,\n  MAX(duration_s) FILTER (WHERE span_name = 'Warmup (GPU)') AS warmup_gpu_s,\n  COUNT(*) FILTER (WHERE span_name ILIKE '%schedul%') AS scheduling_observations,\n  (SELECT json_agg(per_window ORDER BY window_name) FROM per_window) AS per_window_breakdown\nFROM startup"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

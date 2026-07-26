@@ -1,0 +1,29 @@
+{
+ "claim_id": "closedloop-0425",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "Actuated on forecast issue time, the cost is essentially lead-invariant across the archive's realizable 15-165 s issued-lead range.",
+ "claim_text": "Forecast policy cost lead-invariant across 15-165s issued leads.",
+ "expected_backing": "v_cost_ratio",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "Aggregate cost ratio declines from 2.3000537850024174 at 15 s to 2.1617232564851223 at 165 s; across 11 paired windows, cost ratio systematically decreases with a mean relative drop of 7.72% (min: 2.91% in e7, max: 18.36% in e16).",
+   "evidence": "Every single one of the 11 paired windows demonstrates a cost reduction as lead time increases, contradicting the assertion of lead invariance.",
+   "severity": "minor",
+   "fix": "Soften the wording from 'essentially lead-invariant' to 'exhibiting a mild, systematic lead-dependent drop in cost (averaging ~7.7% from L=15 to 165 s)'.",
+   "query": "SELECT c.lead_s, SUM(c.numerator_worker_seconds) / SUM(c.denominator_worker_seconds) AS aggregate_cost_ratio FROM provenance.v_dim d JOIN provenance.v_cost_ratio c ON c.run_id = d.run_id WHERE d.is_current = TRUE AND c.is_current = TRUE AND d.experiment = 'a2x' AND c.experiment = 'a2x' AND c.policy = 'forecast' AND c.lead_s IN (15, 30, 45, 165) AND c.denominator_kind = 'deployable_static_c8' AND c.denominator_window_mismatch = FALSE GROUP BY c.lead_s ORDER BY c.lead_s;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Across 11 current, unsuperseded, denominator-matched a2x windows, aggregate cost ratio decreases from 2.3000537850024174 at 15 s to 2.2911989370434362 at 30 s, 2.281922429657837 at 45 s, and 2.161723256485122 at 165 s; every window decreases from 15 s to 165 s, with endpoint deltas from -0.2197143016572738 to -0.07262303604436227 and mean delta -0.15337143432352163.",
+   "evidence": "The four issued leads exhibit a monotonic aggregate decline, and all 11 paired windows decline at 165 s, so strict lead-invariance is unsupported even though the variation is modest.",
+   "severity": "minor",
+   "fix": "Replace with: \"Actuated on forecast issue time, cost varies modestly but declines systematically across the archive's four realizable issued leads from 15 s to 165 s.\"",
+   "query": "WITH scoped AS ( SELECT c.run_id, c.window_name, c.lead_s, c.numerator_worker_seconds, c.denominator_worker_seconds, c.cost_ratio, c.denominator_kind, c.denominator_window_mismatch, c.is_current, d.superseded_by FROM provenance.v_cost_ratio c JOIN provenance.v_dim d USING (run_id) WHERE c.experiment = 'a2x' AND c.policy = 'forecast' AND c.denominator_kind = 'deployable_static_c8' AND c.lead_s IN (15,30,45,165) AND c.is_current = TRUE AND d.is_current = TRUE ), by_lead AS ( SELECT lead_s, COUNT(*) AS n_windows, SUM(numerator_worker_seconds) / NULLIF(SUM(denominator_worker_seconds),0) AS aggregate_cost_ratio, AVG(cost_ratio) AS mean_window_cost_ratio FROM scoped GROUP BY lead_s ), endpoints AS ( SELECT lo.window_name, lo.cost_ratio AS ratio_15, hi.cost_ratio AS ratio_165, hi.cost_ratio-lo.cost_ratio AS delta FROM scoped lo JOIN scoped hi USING (window_name) WHERE lo.lead_s=15 AND hi.lead_s=165 ) SELECT 'lead' AS row_type, lead_s::text AS item, n_windows, aggregate_cost_ratio AS value_1, mean_window_cost_ratio AS value_2, NULL::double precision AS value_3, NULL::boolean AS flag FROM by_lead UNION ALL SELECT 'endpoint_summary', '15_to_165', COUNT(*), MIN(delta), AVG(delta), MAX(delta), BOOL_AND(delta < 0) FROM endpoints UNION ALL SELECT 'scope_checks', 'current_unsuperseded_matching_denominator', COUNT(*), COUNT(*) FILTER (WHERE superseded_by IS NOT NULL)::double precision, COUNT(*) FILTER (WHERE denominator_window_mismatch)::double precision, NULL::double precision, BOOL_AND(is_current AND superseded_by IS NULL AND NOT denominator_window_mismatch) FROM scoped ORDER BY row_type, item"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

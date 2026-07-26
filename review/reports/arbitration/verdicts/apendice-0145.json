@@ -1,0 +1,11 @@
+{
+ "claim_id": "apendice-0145",
+ "verdict": "holds",
+ "observed": "Per-resolution measured-vs-AIC ratios ARE archived in the cited artifacts: fn_multires.json (silicon eager+compiled at 224/448/672) and aic_multires.json (AIC at 224/336/448/672); vllm_multires.json (flash-attn) spans 224/320/448/640/896. silicon/AIC>1 everywhere (eager 1.19-1.79, compiled 1.13-1.55) and vLLM-flash/AIC reaches 1.11-1.14 at 448 N=48-64 -> AIC under-prices the larger forwards. The collector_encoder_fn.ratio_meas_over_aic column mirrors only 448 (85 rows).",
+ "claimed": "Agreement generalises across resolution 224^2-896^2, within 15.5% at the two largest, AIC slightly under-prices largest forwards (beyond-cap drift); per-resolution ratios archived.",
+ "evidence": "Both adjudicators flagged this by querying collector_encoder_fn.ratio_meas_over_aic (a DB mirror populated only at 448) and concluding no multi-resolution backing exists. That is a wrong-scope / absence-not-refutation artifact: the sentence explicitly says 'per-resolution ratios are archived' and names the artifacts (vllm_multires.{py,json}), which contain the full 224-896 measured sweep and 224-672 AIC comparison (make_multires_fig.py plots silicon/AIC per resolution). The under-pricing direction is confirmed (all measured/AIC>1 at large N). I could not independently reproduce the exact 15.5% bound from the raw forward-ratio artifacts (it is a serving/composition-level metric, analogous to the 12.8% at 448), so that specific figure is not re-certified, but the adjudicators' stated basis for the flag is factually refuted.",
+ "severity": "minor",
+ "fix": "None required for the flagged concern (ratios are archived). If desired, the exact 15.5% composition-residual computation for the two largest resolutions could be surfaced in the artifact set alongside the raw ratios.",
+ "confidence": 0.72,
+ "query": "collector_encoder_fn per image_px: ratio populated only at 448; artifacts fn_multires.json+aic_multires.json cover 224/336/448/672, vllm_multires.json to 896; silicon/AIC & vllm/AIC ratios all >1 at large N (AIC under-prices)."
+}

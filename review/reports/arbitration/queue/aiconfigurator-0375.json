@@ -1,0 +1,25 @@
+{
+ "claim_id": "aiconfigurator-0375",
+ "chapter": "aiconfigurator",
+ "claim_type": "numeric",
+ "anchor": "16  & 123.39 & 82.22  & 1.50 \\\\",
+ "claim_text": "At N=16: measured 123.39 ms, composed 82.22 ms, ratio 1.50.",
+ "expected_backing": "v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "measured_ms=123.387, composed_ms=82.217, ratio=1.500748",
+   "evidence": "The collector_fn table contains the exact batch validation data where N=16 measured is 123.387 ms and composed (aic_ms) is 82.217 ms, yielding a ratio of 1.500748; these values round exactly to the claimed 123.39 ms, 82.22 ms, and 1.50 respectively.",
+   "severity": "minor"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "unverifiable",
+   "observed": "9 current N=16 encoder-delay rows and 0 rounded matches for 123.39 or 82.22; the view has no measured, composed, ratio, is_superseded, or _effective columns.",
+   "evidence": "v_pool_latency cannot supply either ratio operand or its denominator, and none of its current N=16 encoder-delay percentile values matches the claimed latency values.",
+   "severity": "blocking"
+  }
+ ],
+ "reason": "split-adjudicators"
+}

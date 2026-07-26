@@ -1,0 +1,25 @@
+{
+ "claim_id": "baselines-0369",
+ "chapter": "baselines",
+ "claim_type": "comparative",
+ "anchor": "The reactive alternative fails on both pools for one structural reason --- information arriving too late and converted through means: the fourteen language-pool configurations meet their own window-mean law while violating the tail SLA, spend cannot buy the tail back under lead, and even the correct encoder signal read reactively loses every window whose onset is faster than the lead.",
+ "claim_text": "Reactive control fails on both pools: 14 language-pool configs meet window-mean law but violate tail SLA; increased spend cannot buy tail back under lead; reactive encoder control loses every window where onset is faster than lead.",
+ "expected_backing": "v_infraction",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "lang_configs_count = 14, lang_ranges = (126.4-322.2ms mean TTFT, 6.9-9.3ms mean ITL, 1079.2-3494.7ms p99 TTFT), riders_ladder = spend: 18.64 to 20.38 GPU-h, p99 TTFT: 1615.5 to 1619.6 ms, enc_loses = count: 5, all_violate: true, p99_delay: 4606.1-54169.5 ms",
+   "evidence": "The claim is fully supported. Prior refuter DeepSeek-v4-pro erroneously filtered on policy='reactive' under v_infraction, missing the 14 configurations under experiment='reactive' (which have policy as NULL in runs and v_infraction). Gemini-3.5-flash's original confirmation is correct across all three clauses.",
+   "severity": "minor"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "unverifiable",
+   "observed": "Current unsuperseded denominator: 44 reactive language runs, 41 TTFT violations and 7 TTFT-fail/ITL-pass runs; all 4 spend-ladder configurations violate a tail bound; encoder has 12 violations among 34 runs, including 8 of 8 burst3 runs.",
+   "evidence": "v_infraction verifies tail outcomes but contains neither window-mean-law nor onset-speed evidence; the finite 4-configuration spend ladder cannot establish the universal causal 'cannot' claim.",
+   "severity": "blocking"
+  }
+ ],
+ "reason": "split-adjudicators"
+}

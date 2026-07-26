@@ -1,0 +1,29 @@
+{
+ "claim_id": "twopool-0327",
+ "chapter": "twopool",
+ "claim_type": "numeric",
+ "anchor": "TTFT p99 grows $1.24\\times$ and the maximum TTFT and inter-token latency roughly double ($1.8\\times$ and $1.9\\times$)",
+ "claim_text": "Under calibrated timing, TTFT p99 increases by 1.24 times, maximum TTFT increases by 1.8 times, and inter-token latency increases by 1.9 times compared to the polynomial timing model.",
+ "expected_backing": "v_pool_latency, Table tab:sim-poly-aic, progress/phase2-simulation.md",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "TTFT p99 ratio = 1.24x (307.36ms vs 248.46ms), TTFT max ratio = 1.78x (4517.57ms vs 2539.91ms), ITL max ratio = 1.92x (347.73ms vs 180.70ms)",
+   "evidence": "The claim is fully supported by comparing calibrated timing (aic) and polynomial timing (poly) in llm_run_summary. Metrics align exactly: TTFT p99 grows 1.24x (307.36/248.46 = 1.237), TTFT max grows 1.78x \u2248 1.8x (4517.57/2539.91 = 1.779), and max ITL grows 1.92x \u2248 1.9x (347.73/180.70 = 1.924). Prior verifiers mistakenly evaluated mean_itl (1.13x) or p99_itl (0.76x) instead of max_itl (ITL max).",
+   "severity": "",
+   "fix": "",
+   "query": "WITH poly AS (SELECT p99_ttft_ms, max_ttft_ms, (metrics->>'max_itl_ms')::double precision AS max_itl_ms FROM provenance.llm_run_summary WHERE run_id = 'srcbuild:llm_head2k_poly_src'), aic AS (SELECT p99_ttft_ms, max_ttft_ms, (metrics->>'max_itl_ms')::double precision AS max_itl_ms FROM provenance.llm_run_summary WHERE run_id = 'srcbuild:llm_head2k_aic_src') SELECT (aic.p99_ttft_ms / poly.p99_ttft_ms) AS ttft_p99_ratio, (aic.max_ttft_ms / poly.max_ttft_ms) AS ttft_max_ratio, (aic.max_itl_ms / poly.max_itl_ms) AS itl_max_ratio FROM poly, aic;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "For 2000 requests per timing model, effective AIC/poly ratios are TTFT p99 1.237055746033318, maximum TTFT 1.7786306504261427, and mean ITL 1.1305977871112747; p99 ITL is 0.7622592554198656.",
+   "evidence": "The effective current, unsuperseded srcbuild rows support the TTFT multipliers but not 1.9x ITL: mean ITL is 7.671204805927105/6.785087405422364 = 1.1305977871112747, while p99 ITL is 22.635453999973834/29.695217000029515 = 0.7622592554198656.",
+   "severity": "major",
+   "fix": "Replace the ITL multiplier with 1.13x and avoid saying both metrics roughly double: \u201cTTFT p99 grows 1.24x, maximum TTFT grows 1.8x, and mean inter-token latency grows 1.13x.\u201d",
+   "query": "WITH dim AS (\n  SELECT run_id, window_name, is_current, superseded_by\n  FROM provenance.v_dim\n  WHERE is_current = TRUE\n    AND run_id ~ '^(srcbuild:llm_head2k_(aic|poly)_src|sweeps:llm_head2k_(aic|poly)_s[0-9]+)$'\n), effective AS (\n  SELECT e.*\n  FROM dim d\n  JOIN provenance.llm_head2k_poly_aic_effective e\n    ON e.srcbuild_run_id = d.run_id\n  WHERE d.superseded_by IS NULL\n), latency AS (\n  SELECT d.run_id, d.window_name, d.is_current, d.superseded_by,\n         p.sla_metric, p.p99_ms, p.max_ms, p.n_requests\n  FROM dim d\n  JOIN provenance.v_pool_latency p USING (run_id)\n  WHERE d.superseded_by IS NULL\n), overall AS (\n  SELECT\n    MAX(CASE WHEN e.timing = 'aic' THEN e.srcbuild_run_id END) AS aic_run_id,\n    MAX(CASE WHEN e.timing = 'poly' THEN e.srcbuild_run_id END) AS poly_run_id,\n    MAX(CASE WHEN e.timing = 'aic' THEN e.effective_build END) AS aic_effective_build,\n    MAX(CASE WHEN e.timing = 'poly' THEN e.effective_build END) AS poly_effective_build,\n    MAX(CASE WHEN e.timing = 'aic' THEN e.effective_p99_ttft_ms END) AS aic_p99_ttft_ms,\n    MAX(CASE WHEN e.timing = 'poly' THEN e.effective_p99_ttft_ms END) AS poly_p99_ttft_ms,\n    MAX(CASE WHEN e.timing = 'aic' THEN e.effective_max_ttft_ms END) AS aic_max_ttft_ms,\n    MAX(CASE WHEN e.timing = 'poly' THEN e.effective_max_ttft_ms END) AS poly_max_ttft_ms,\n    MAX(CASE WHEN e.timing = 'aic' THEN e.srcbuild_mean_itl_ms END) AS aic_mean_itl_ms,\n    MAX(CASE WHEN e.timing = 'poly' THEN e.srcbuild_mean_itl_ms END) AS poly_mean_itl_ms\n  FROM effective e\n), pool_overall AS (\n  SELECT\n    MAX(CASE WHEN run_id = 'srcbuild:llm_head2k_aic_src' AND sla_metric = 'ttft' THEN n_requests END) AS aic_n_requests,\n    MAX(CASE WHEN run_id = 'srcbuild:llm_head2k_poly_src' AND sla_metric = 'ttft' THEN n_requests END) AS poly_n_requests,\n    MAX(CASE WHEN run_id = 'srcbuild:llm_head2k_aic_src' AND sla_metric = 'itl' THEN p99_ms END) AS aic_p99_itl_ms,\n    MAX(CASE WHEN run_id = 'srcbuild:llm_head2k_poly_src' AND sla_metric = 'itl' THEN p99_ms END) AS poly_p99_itl_ms\n  FROM latency\n), sweep_breakdown AS (\n  SELECT jsonb_agg(\n           jsonb_build_object(\n             'run_id', run_id,\n             'window_name', window_name,\n             'is_current', is_current,\n             'superseded_by', superseded_by,\n             'sla_metric', sla_metric,\n             'p99_ms', p99_ms,\n             'max_ms', max_ms,\n             'n_requests', n_requests\n           ) ORDER BY run_id, sla_metric\n         ) AS current_unsuperseded_rows\n  FROM latency\n  WHERE run_id LIKE 'sweeps:%'\n)\nSELECT o.*, p.aic_n_requests, p.poly_n_requests,\n       o.aic_p99_ttft_ms / o.poly_p99_ttft_ms AS p99_ttft_ratio,\n       o.aic_max_ttft_ms / o.poly_max_ttft_ms AS max_ttft_ratio,\n       o.aic_mean_itl_ms / o.poly_mean_itl_ms AS mean_itl_ratio,\n       p.aic_p99_itl_ms, p.poly_p99_itl_ms,\n       p.aic_p99_itl_ms / p.poly_p99_itl_ms AS p99_itl_ratio,\n       s.current_unsuperseded_rows AS sweep_breakdown\nFROM overall o\nCROSS JOIN pool_overall p\nCROSS JOIN sweep_breakdown s"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

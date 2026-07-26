@@ -1,0 +1,11 @@
+{
+ "claim_id": "intro-0310",
+ "verdict": "holds",
+ "observed": "eda_burst_episode (source_script=k_episode_clusters, episode_kind=merged): n=18 current episodes; median onset = 6.0 min (percentile_disc) / 6.5 min (percentile_cont); 6 of 18 (33.3%, exactly one third) have onset_min<=2. Current cold starts span 15/30/45/165 s.",
+ "claimed": "Onsets ramp baseline->peak in a median of six minutes; a third of bursts arrive too fast for a policy that waits to observe them.",
+ "evidence": "The discrete median onset is exactly 6 minutes (continuous 6.5); the fast-onset fraction is exactly one third (6/18=33.3%). Both headline numbers hold. The 'too fast for a reactive policy' juxtaposition is sound: onset<=2 min (120 s) against a detection-plus-cold-start budget reaching 165 s, and it is independently corroborated by the closedloop chapter's reactive burst3 failures (p99 1973-11568 ms vs the 588 ms forecast). gpt-5.6's demand for reactive/cold-start rows in v_infraction is a wrong-backing artifact (onset lives in eda_burst_episode; the expected_backing v_infraction is misassigned). gemini's 6-vs-6.5 is a rounding quibble.",
+ "severity": "minor",
+ "fix": "Optional: state 'median onset six minutes (6.5 by continuous median)'. No substantive change; the one-third and cold-start-mismatch framing hold.",
+ "confidence": 0.82,
+ "query": "SELECT source_script,episode_kind,count(*),percentile_cont(0.5) WITHIN GROUP(ORDER BY onset_min),percentile_disc(0.5) WITHIN GROUP(ORDER BY onset_min),count(*) FILTER(WHERE onset_min<=2) FROM provenance.eda_burst_episode WHERE onset_min IS NOT NULL GROUP BY 1,2; -> k_episode_clusters/merged: 18, 6.5, 6, 6 (33.3%)"
+}

@@ -1,0 +1,11 @@
+{
+ "claim_id": "aiconfigurator-0264",
+ "verdict": "unverifiable",
+ "observed": "No 448px single-image row in collector_encoder_fn has mean_ms rounding to 11.360, and none has ci95_ms=0.006 (tightest single-image ci95 is 0.0090). The clock-locked (2400 MHz) measurements nearest the table are sdpa anchor_dense_sdpa_2400 = 11.3333 +/- 0.0242 ms and anchor_sdpa_locked2400 = 11.3238 +/- 0.0216 ms. collector_artifacts/phaseA_validation is not in ingest_log. The expected-backing view v_pool_latency holds queue-delay percentiles, not encoder wall-clock, and returns 0 rows for 448.",
+ "claimed": "Measured wall-clock latency for a 448^2 image = 11.360 +/- 0.006 ms.",
+ "evidence": "The exact value 11.360 +/- 0.006 ms is absent from every ingested measurement table; it lives only in the uningested phaseA_validation artifact. 11.360 falls inside the measured 448px single-image cluster (11.217-11.492 ms) but is not a stored mean, and +/-0.006 is tighter than any ingested single-image CI (>=0.009). So the claim cannot be verified against the provenance DB.",
+ "severity": "major",
+ "fix": "Ingest collector_artifacts/phaseA_validation/result.txt into collector_encoder_fn (with config + CI definition), or restate from ingested data (e.g. sdpa anchor_dense_sdpa_2400: 11.333 +/- 0.024 ms) and point expected_backing at collector_encoder_fn, not v_pool_latency.",
+ "confidence": 0.85,
+ "query": "SELECT source_path,engine,round(mean_ms::numeric,4),round(ci95_ms::numeric,4) FROM collector_encoder_fn WHERE image_px=448 AND n_images=1 ORDER BY mean_ms; SELECT count(*) FROM collector_encoder_fn WHERE round(mean_ms::numeric,3)=11.360; SELECT count(*) FROM collector_encoder_fn WHERE round(ci95_ms::numeric,3)=0.006 AND n_images=1; SELECT file_path FROM ingest_log WHERE file_path ILIKE '%phaseA%';"
+}

@@ -1,6 +1,6 @@
 {
  "chapter": "closedloop",
- "n_claims": 136,
+ "n_claims": 140,
  "claims": [
   {
    "line": 50,
@@ -1769,6 +1769,72 @@
    "delta": "<0.005",
    "reasoning": "Exact.",
    "proposed_fix": ""
+  },
+  {
+   "line": 325,
+   "quote": "A cost-optimal point sits near \\textbf{0.62$\\times$}\\nstatic (330.4 GPU-hours) but \\emph{drops the e13 onset} per-episode",
+   "metric": "lang_cost_optimal_gpu_hours",
+   "criticality": "headline",
+   "thesis_value": "330.4 GPU-hours, near 0.62x static",
+   "db_value": "gpu_hours = 330.3500529171122 -> 330.4 (1 dp); ratio = 330.35005/537.40942 = 0.61471 (537.40942 = 4 x duration_ms/1000/3600, duration_ms = 483,668,478.9)",
+   "sql": "artifact: python3 json.load('simulation/results/lang_qsweep/eval_p70_s6/week.report.json')['gpu_hours']; span denominator from eval_p90_s6/week.report.json duration_ms (same replayed span)",
+   "verdict": "CONFIRMED",
+   "delta": "0.05 GPU-h (rounding)",
+   "reasoning": "Recomputed 2026-07-26: eval_p70_s6 week gpu_hours = 330.35005 rounds to the printed 330.4. The exact time-matched ratio is 0.615x; the prose says \"near 0.62x\", which is a stated approximation (the ledger entry for this point records 0.615x static-time). The 330.4 operand itself is exact.",
+   "proposed_fix": "",
+   "added": "2026-07-26"
+  },
+  {
+   "line": 331,
+   "quote": "costs\\n\\textbf{440.0 GPU-hours, 0.82$\\times$ static time-matched\\n(0.87$\\times$ request-matched)}, passing every daily fold",
+   "metric": "lang_e13robust_cost_ratio",
+   "criticality": "headline",
+   "thesis_value": "440.0 GPU-hours; 0.82x time-matched; 0.87x request-matched",
+   "db_value": "gpu_hours = 440.04147968089126 -> 440.0; 440.04148/537.40942 = 0.81882 -> 0.82; 440.04148/503.7 = 0.87362 -> 0.87",
+   "sql": "artifact: simulation/results/lang_qsweep/eval_p90_s6/week.report.json gpu_hours and duration_ms; static time-matched = 4 x duration_ms/1000/3600 = 537.40942; request-matched denominator 503.7 GPU-h per the R-A protocol operand (verify_all.sh [1])",
+   "verdict": "CONFIRMED",
+   "delta": "<0.05 at each rounding",
+   "reasoning": "Recomputed 2026-07-26 from the week report artifact, both sides: numerator gpu_hours read directly; time-matched denominator derived from the reports own span; all three printed values are the correct roundings. Gated continuously by verify_all.sh derived checks [7] since 2026-07-26.",
+   "proposed_fix": "",
+   "added": "2026-07-26"
+  },
+  {
+   "line": 493,
+   "quote": "It costs \\textbf{0.76$\\times$} static\\nover the aggregate (0.79$\\times$ on F6).",
+   "metric": "hybrid_cost_ratio",
+   "criticality": "headline",
+   "thesis_value": "0.76x static over the aggregate",
+   "db_value": "2,944,979.7 / 3,869,278.8 = 0.76112 -> 0.76",
+   "sql": "artifact: simulation/results/encoder_hybrid/hybrid.jsonl.stats.json provisioned_worker_seconds = 2944979.7; select provisioned_worker_seconds from provenance.encoder_run_summary where run_id='a6:static_C8' -> 3869278.8",
+   "verdict": "CONFIRMED",
+   "delta": "0.001 (rounding)",
+   "reasoning": "Recomputed 2026-07-26: hybrid provisioned worker-seconds over the static C8 worker-seconds (the same denominator as the 0.62x encoder headline) = 0.76112, printing as 0.76. The 0.79x-on-F6 sub-claim is not separately recomputed here. Gated continuously by verify_all.sh derived check [6] since 2026-07-26.",
+   "proposed_fix": "",
+   "added": "2026-07-26"
+  },
+  {
+   "line": 500,
+   "quote": "\\textbf{0.62$\\times$} aggressive,\\ndropping the single fold-scale onset, to \\textbf{0.76$\\times$} fold-robust.",
+   "metric": "encoder_cost_frontier",
+   "criticality": "headline",
+   "thesis_value": "0.62x aggressive to 0.76x fold-robust",
+   "db_value": "0.62: 2,410,754.7 / 3,869,278.8 = 0.62305 -> 0.62; 0.76: 2,944,979.7 / 3,869,278.8 = 0.76112 -> 0.76",
+   "sql": "select provisioned_worker_seconds from provenance.encoder_run_summary where run_id in ('aggregate44:fc_p90_L30_issuetime','a6:static_C8'); hybrid artifact as line 493",
+   "verdict": "CONFIRMED",
+   "delta": "<0.005 at each rounding",
+   "reasoning": "Recomputed 2026-07-26 from the store (issue-time fc and static C8 worker-seconds) and the hybrid stats artifact. Both endpoints of the printed frontier are correct roundings of the raw ratios.",
+   "proposed_fix": "",
+   "added": "2026-07-26"
   }
- ]
+ ],
+ "addendum": {
+  "date": "2026-07-26",
+  "reason": "Adversarial review Finding 4: the corpus (2026-07-19) predated the 2026-07-24/25 results and contained no 0.76, 0.82, hybrid, 440.0 or 330.4 claim. Appended manually following the existing schema (the corpus is agent-authored; no generator exists). New entries carry added=\"2026-07-26\".",
+  "lines": [
+   325,
+   331,
+   493,
+   500
+  ]
+ }
 }

@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "trace-eda-0094",
+  "chapter": "trace-eda",
+  "claim_type": "methodological",
+  "anchor": "every figure and number is reproducible from versioned scripts inventoried in the accompanying workspace report",
+  "claim_text": "All figures and numbers are reproducible from versioned scripts in the workspace report.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "conclusion-0109",
+  "chapter": "conclusion",
+  "claim_type": "methodological",
+  "anchor": "the evidence is one seven-day production trace with an offered-work upper bound on decode demand",
+  "claim_text": "The evidence is based on a seven-day production trace with an offered-work upper bound on decode demand.",
+  "expected_backing": "trace_data"
+ },
+ {
+  "claim_id": "apendice-0122",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "NVIDIA driver / CUDA & 595.71.05 / 13.2 & benchmark node (RTX 5090)",
+  "claim_text": "NVIDIA driver version 595.71.05 with CUDA 13.2 used on RTX 5090 benchmark node",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "apendice-0123",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "vLLM (container) & vllm/vllm-openai:v0.22.0 & collection + kernel profiling",
+  "claim_text": "vLLM container image vllm/vllm-openai:v0.22.0 used for collection and kernel profiling",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "apendice-0124",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "aiconfigurator & 0.10.0 (editable, data branch) & encoder + LLM cost model",
+  "claim_text": "aiconfigurator version 0.10.0 (editable, data branch) used for encoder and LLM cost model",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "apendice-0125",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "ai-dynamo & 1.2.1 wheel / 1.3.0 source & dynamo.replay runtime",
+  "claim_text": "ai-dynamo 1.2.1 wheel and 1.3.0 source used for dynamo.replay runtime",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "apendice-0126",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "aiperf & 0.11.0 & live closed-loop client (TTFT/ITL/goodput)",
+  "claim_text": "aiperf 0.11.0 used as live closed-loop client for TTFT/ITL/goodput",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "apendice-0127",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "cuDF / cuML / CuPy & 26.06 / 26.06 / 14.1.1 & trace EDA (GPU)",
+  "claim_text": "cuDF 26.06, cuML 26.06, CuPy 14.1.1 used for trace EDA on GPU",
+  "expected_backing": "eda_metric"
+ }
+]

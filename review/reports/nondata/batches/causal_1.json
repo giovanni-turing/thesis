@@ -1,0 +1,58 @@
+[
+ {
+  "claim_id": "twopool-0061",
+  "chapter": "twopool",
+  "claim_type": "causal",
+  "anchor": "Provisioned worker-time is invariant across image size, because the schedule is driven by image count and is blind to size --- a size increase arrives as pure service-time inflation with no provisioning response.",
+  "claim_text": "Provisioned worker-time invariant to image size; schedule driven by image count, size increase causes pure service-time inflation without provisioning response.",
+  "expected_backing": "v_grid_static_effective, collector_encoder_fn"
+ },
+ {
+  "claim_id": "twopool-0069",
+  "chapter": "twopool",
+  "claim_type": "causal",
+  "anchor": "On steady traffic the pools saturate an order of magnitude apart, and inside the largest burst both fail at the naive topology, differently --- a removable TP1 prefill floor against episodic FIFO queueing that yields only to capacity.",
+  "claim_text": "Steady traffic: pools saturate order of magnitude apart; largest burst: both fail at naive topology differently (removable TP1 prefill floor vs episodic FIFO queueing needing capacity).",
+  "expected_backing": "v_pool_latency, v_infraction, v_grid_static_effective"
+ },
+ {
+  "claim_id": "twopool-0070",
+  "chapter": "twopool",
+  "claim_type": "causal",
+  "anchor": "A single scaling signal cannot serve both pools, and the one the vision pool needs is invisible to the monitors reactive systems watch.",
+  "claim_text": "Single scaling signal cannot serve both pools; vision pool's needed signal invisible to reactive system monitors.",
+  "expected_backing": "eda_metric, v_pool_latency"
+ },
+ {
+  "claim_id": "apendice-0134",
+  "chapter": "apendice",
+  "claim_type": "causal",
+  "anchor": "the wheel's per-request Python timing callback inflated extreme tail maxima only --- documented in Chapter 2",
+  "claim_text": "ai-dynamo 1.2.1 wheel's per-request Python timing callback inflated extreme tail maxima only",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "apendice-0137",
+  "chapter": "apendice",
+  "claim_type": "causal",
+  "anchor": "The batch-axis discrepancy of Section 3.2 between AIC's composed encoder forward and end-to-end measurement is predominantly execution-stack-specific --- a property of the execution engine used for measurement more than of the cost model.",
+  "claim_text": "Batch-axis discrepancy between AIC composed encoder forward and end-to-end measurement is predominantly execution-stack-specific, a property of execution engine more than cost model",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "intro-0213",
+  "chapter": "intro",
+  "claim_type": "causal",
+  "anchor": "The burst-window language pass at TP2 is token-accounting-convention-dependent while the TP1 prefill floor and the vision-pool verdict are not.",
+  "claim_text": "TP2 language pass depends on token accounting convention; TP1 prefill floor and vision verdict do not",
+  "expected_backing": "v_pool_latency; v_infraction"
+ },
+ {
+  "claim_id": "intro-0220",
+  "chapter": "intro",
+  "claim_type": "causal",
+  "anchor": "Nor would watching the right signal reactively suffice.",
+  "claim_text": "Reactive scaling on correct signal is insufficient",
+  "expected_backing": "v_pool_latency; v_infraction"
+ }
+]

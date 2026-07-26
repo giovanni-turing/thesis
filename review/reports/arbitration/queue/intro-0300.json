@@ -1,0 +1,29 @@
+{
+ "claim_id": "intro-0300",
+ "chapter": "intro",
+ "claim_type": "comparative",
+ "anchor": "Per-pool provisioning holds the tail latency objective through burst onsets that defeat an identically informed reactive controller, at a fraction of the deployable static encoder fleet's GPU-time",
+ "claim_text": "Per-pool provisioning holds tail latency objectives through burst onsets at a fraction of the deployable static encoder fleet's GPU-time.",
+ "expected_backing": "v_cost_ratio",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "aggregate = 0.6035, burst1 = 1.7094-1.7495, burst3 = 2.2049-2.4872, burst4 = 2.6255, burst5 = 2.2851-2.2860",
+   "evidence": "The 0.60x savings (0.6035 observed) apply strictly to the encoder pool over the full aggregate weekly trace, but during every single burst onset (windows burst1-5), the forecast policy costs 1.71x to 2.63x more than the deployable static fleet.",
+   "severity": "major",
+   "fix": "Concede that the 0.60x savings are an encoder-only aggregate result over the full weekly trace (dominated by quiet periods), whereas during burst onsets, predictive provisioning costs 1.71x to 2.63x more than the deployable static baseline to ensure SLA compliance, and the language-pool forecast is consistently dearer than static (2.2x to 3.8x).",
+   "query": "SELECT window_name, run_id, avg(cost_ratio) as cost_ratio FROM provenance.v_cost_ratio WHERE is_current = true AND denominator_kind = 'deployable_static_c8' AND ((pool = 'encoder' AND policy = 'forecast' AND window_name IN ('burst1','burst3','burst4','burst5')) OR (run_id = 'a12:week_encoder_timesfm')) GROUP BY window_name, run_id ORDER BY window_name;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Covered-span aggregate cost_ratio=0.6034767619719481 against deployable C=8, but burst1=1.7495152692280713 and burst3=2.4570908192875223; all denominator_window_mismatch=false.",
+   "evidence": "The fraction is supported only as a covered-span aggregate; attaching it directly to burst onsets overstates the per-window evidence, where both checked burst ratios exceed the static fleet.",
+   "severity": "major",
+   "fix": "Separate the claims: state that provisioning meets the tail objective at burst onsets where reactive fails, and that over the covered span the encoder schedule uses 0.6034767619719481x the deployable C=8 fleet's worker-time.",
+   "query": "WITH evidence AS (SELECT 'covered-span aggregate'::text AS scope, run_id, window_name, numerator_worker_seconds, denominator_worker_seconds, cost_ratio, denominator_workers, denominator_basis, denominator_window_mismatch FROM provenance.v_cost_ratio WHERE is_current = TRUE AND run_id = 'a12:week_encoder_timesfm' AND denominator_kind = 'deployable_static_c8' UNION ALL SELECT 'burst-window check'::text AS scope, run_id, window_name, numerator_worker_seconds, denominator_worker_seconds, cost_ratio, denominator_workers, denominator_basis, denominator_window_mismatch FROM provenance.v_cost_ratio WHERE is_current = TRUE AND experiment = 'rerun_verify' AND pool = 'encoder' AND policy = 'forecast' AND lead_s = 30 AND window_name LIKE 'burst%' AND denominator_kind = 'deployable_static_c8') SELECT scope, run_id, window_name, numerator_worker_seconds, denominator_worker_seconds, cost_ratio, denominator_workers, denominator_basis, denominator_window_mismatch FROM evidence ORDER BY scope, window_name"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

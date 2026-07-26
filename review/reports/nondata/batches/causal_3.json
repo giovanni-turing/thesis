@@ -1,0 +1,58 @@
+[
+ {
+  "claim_id": "intro-0249",
+  "chapter": "intro",
+  "claim_type": "causal",
+  "anchor": "The stamped decode series is faithful in total volume but temporally displaced, licensing no pointwise provisioning claim in either direction.",
+  "claim_text": "Decode series faithful in volume but temporally displaced; no pointwise provisioning claims",
+  "expected_backing": "eda_metric; v_pool_latency"
+ },
+ {
+  "claim_id": "apendice-0267",
+  "chapter": "apendice",
+  "claim_type": "causal",
+  "anchor": "The batch-axis discrepancy ... is predominantly execution-stack-specific",
+  "claim_text": "The batch-axis discrepancy between AIC's composed encoder forward and end-to-end measurement is predominantly due to the execution engine used for measurement.",
+  "expected_backing": "v_batch_axis_discrepancy"
+ },
+ {
+  "claim_id": "related-0279",
+  "chapter": "related",
+  "claim_type": "causal",
+  "anchor": "This line establishes the thesis's premise: heterogeneous stages deserve separately provisioned pools.",
+  "claim_text": "Thesis premise: heterogeneous stages deserve separately provisioned pools.",
+  "expected_backing": "chapter_1"
+ },
+ {
+  "claim_id": "related-0285",
+  "chapter": "related",
+  "claim_type": "causal",
+  "anchor": "The common thread: the watched signal is the aggregate request stream or utilization --- for single-stage, text-only services, a reasonable proxy for the one pool's demand.",
+  "claim_text": "Common thread: watched signal is aggregate request stream or utilization, a reasonable proxy for single pool demand in text-only services.",
+  "expected_backing": "paper_library"
+ },
+ {
+  "claim_id": "related-0290",
+  "chapter": "related",
+  "claim_type": "causal",
+  "anchor": "so grafting them onto a modality-disaggregated deployment reproduces the missizing this thesis quantifies.",
+  "claim_text": "Grafting text-only autoscalers onto modality-disaggregated deployment reproduces missizing quantified in thesis.",
+  "expected_backing": "chapter_7"
+ },
+ {
+  "claim_id": "baselines-0349",
+  "chapter": "baselines",
+  "claim_type": "causal",
+  "anchor": "intra-request tensor parallelism shortens the single long prefill that independent replicas can only queue.",
+  "claim_text": "Intra-request tensor parallelism shortens the single long prefill that independent replicas can only queue.",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "baselines-0359",
+  "chapter": "baselines",
+  "claim_type": "causal",
+  "anchor": "Variants A and B fail alike, so loop tuning is not the issue.",
+  "claim_text": "Both variants A and B fail similarly, indicating loop tuning is not the issue.",
+  "expected_backing": "v_infraction"
+ }
+]

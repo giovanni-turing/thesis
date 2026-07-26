@@ -1,0 +1,11 @@
+{
+  "claim_id": "baselines-0364",
+  "verdict": "contradicted",
+  "observed": "Reactive encoder-delay p99 by lead (current, is_violation vs 1000ms bound): burst2 L45=588.37 (pass), L165=1065.05 (violation) -> L*=45s. burst5 L45=588.37 (pass), L165=3250.16 (violation) -> L*=45s. burst4 L45=588.37 (pass), L165=904.739 (is_violation=FALSE, PASSES), L300 fails per table -> L*=165s. v_infraction confirms burst4 L165 is_violation=f.",
+  "claimed": "Medium onsets survive only sub-minute leads (L*=45 s).",
+  "evidence": "The universal L*=45s for medium onsets is contradicted by burst4 (onset 60 min): it passes the 1000ms encoder-delay SLA at L=165s (p99 904.739ms, v_infraction is_violation=false), so its L*=165s (a 2.75-minute lead), not 45s. Table tab:base-react-enc also lists burst4 L*=45s, which is itself wrong. Only 2 of 3 medium onsets (burst2, burst5) are limited to L*=45s. Both adjudicators correctly identified this; the flag is real.",
+  "severity": "major",
+  "fix": "Correct burst4 L* to 165 s in Table tab:base-react-enc, and reword the claim to 'medium onsets survive only short leads (L* = 45-165 s), with 2 of 3 windows limited to 45 s' — burst4 tolerates a 2.75-minute lead.",
+  "confidence": 0.9,
+  "query": "SELECT run_id,window_name,lead_s,sla_metric,bound_ms,achieved_p99_ms,is_violation FROM v_infraction WHERE is_current AND window_name IN ('burst2','burst4','burst5') AND sla_metric='encoder_delay' AND run_id ILIKE '%reactive%L165%'; SELECT window_name,lead_s,p99_ms FROM v_pool_latency WHERE is_current AND window_name IN ('burst2','burst4','burst5') AND policy='reactive' AND sla_metric='encoder_delay' ORDER BY window_name,lead_s;"
+}

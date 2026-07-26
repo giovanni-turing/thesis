@@ -1,0 +1,167 @@
+[
+ {
+  "batch": "methodological_0",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_1",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_2",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_3",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_4",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_5",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_6",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_7",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_8",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_9",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_10",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_11",
+  "type": "methodological",
+  "n": 8
+ },
+ {
+  "batch": "methodological_12",
+  "type": "methodological",
+  "n": 6
+ },
+ {
+  "batch": "causal_0",
+  "type": "causal",
+  "n": 7
+ },
+ {
+  "batch": "causal_1",
+  "type": "causal",
+  "n": 7
+ },
+ {
+  "batch": "causal_2",
+  "type": "causal",
+  "n": 7
+ },
+ {
+  "batch": "causal_3",
+  "type": "causal",
+  "n": 7
+ },
+ {
+  "batch": "causal_4",
+  "type": "causal",
+  "n": 7
+ },
+ {
+  "batch": "causal_5",
+  "type": "causal",
+  "n": 1
+ },
+ {
+  "batch": "existence_0",
+  "type": "existence",
+  "n": 8
+ },
+ {
+  "batch": "existence_1",
+  "type": "existence",
+  "n": 8
+ },
+ {
+  "batch": "existence_2",
+  "type": "existence",
+  "n": 8
+ },
+ {
+  "batch": "existence_3",
+  "type": "existence",
+  "n": 8
+ },
+ {
+  "batch": "existence_4",
+  "type": "existence",
+  "n": 8
+ },
+ {
+  "batch": "existence_5",
+  "type": "existence",
+  "n": 8
+ },
+ {
+  "batch": "existence_6",
+  "type": "existence",
+  "n": 8
+ },
+ {
+  "batch": "existence_7",
+  "type": "existence",
+  "n": 8
+ },
+ {
+  "batch": "existence_8",
+  "type": "existence",
+  "n": 8
+ },
+ {
+  "batch": "existence_9",
+  "type": "existence",
+  "n": 8
+ },
+ {
+  "batch": "existence_10",
+  "type": "existence",
+  "n": 8
+ },
+ {
+  "batch": "existence_11",
+  "type": "existence",
+  "n": 3
+ },
+ {
+  "batch": "citation_0",
+  "type": "citation",
+  "n": 8
+ },
+ {
+  "batch": "behavioral_0",
+  "type": "behavioral",
+  "n": 5
+ }
+]

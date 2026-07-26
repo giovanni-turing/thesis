@@ -1,0 +1,10 @@
+{
+ "claim_id": "closedloop-0457",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "Replaying the winning p90/rho=15 schedule with the encoder repriced at the directly-measured vLLM f(N) leaves the schedule's provisioned worker-time --- the cost-ratio numerator --- unchanged and the static C=8 denominator feasible, so the reported 0.62x holds on measured standalone vLLM cost, not only the AIC model.",
+ "claim_text": "0.62x holds on measured vLLM cost (not just AIC model); static C=8 feasible.",
+ "expected_backing": "v_cost_ratio",
+ "adjudication": [],
+ "reason": "no-adjudicator"
+}

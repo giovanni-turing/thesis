@@ -1,0 +1,10 @@
+[
+ {
+  "claim_id": "closedloop-0467",
+  "chapter": "closedloop",
+  "claim_type": "causal",
+  "anchor": "On the language pool the same forecast passes bursts under realistic replica leads only through the tail-aware capacity conversion --- a measured belief-to-knee ratio, tested under a held forecast cursor rather than a second anticipation test --- which repairs the mean-based sizing defect shared by every reactive configuration tested.",
+  "claim_text": "Language pool: forecast passes bursts via tail-aware conversion (belief-to-knee ratio) under held cursor; fixes mean-sizing defect.",
+  "expected_backing": "v_pool_latency"
+ }
+]

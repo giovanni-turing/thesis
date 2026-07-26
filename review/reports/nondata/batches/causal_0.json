@@ -1,0 +1,58 @@
+[
+ {
+  "claim_id": "validation-0008",
+  "chapter": "validation",
+  "claim_type": "causal",
+  "anchor": "the divergences that do exist (identified, explained, in one case fixed on a local branch to be proposed upstream) are properties of the harnesses, not of the policies this thesis compares.",
+  "claim_text": "Divergences are properties of harnesses, not policies; identified, explained, one fixed on local branch for upstream proposal.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "validation-0010",
+  "chapter": "validation",
+  "claim_type": "causal",
+  "anchor": "The live planner's capacity model starves at calm load due to insufficient mixed prefill+decode pass samples.",
+  "claim_text": "The live planner's capacity model starves at calm load due to insufficient mixed prefill+decode pass samples (~1% of calm-load samples).",
+  "expected_backing": "live_runs/live_fc,live_re"
+ },
+ {
+  "claim_id": "twopool-0014",
+  "chapter": "twopool",
+  "claim_type": "causal",
+  "anchor": "Inside the trace's largest burst both pools violate the evaluation SLA at the locked naive topology in structurally different ways: a removable language-pool prefill floor against episodic vision-pool queueing invisible to rate- and utilization-based monitoring.",
+  "claim_text": "In the largest burst, both pools violate SLA at naive topology: language pool has removable prefill floor, vision pool has episodic queueing invisible to rate/utilization monitors.",
+  "expected_backing": "v_infraction, eda_metric"
+ },
+ {
+  "claim_id": "twopool-0046",
+  "chapter": "twopool",
+  "claim_type": "causal",
+  "anchor": "No single load axis serves both pools.",
+  "claim_text": "No single load axis can serve both pools due to different saturation characteristics.",
+  "expected_backing": "v_pool_latency, eda_metric"
+ },
+ {
+  "claim_id": "twopool-0048",
+  "chapter": "twopool",
+  "claim_type": "causal",
+  "anchor": "At the knee's successor point the TTFT budget still has 1.8--2.1\u00d7 slack while ITL p99 has crossed, so language-pool capacity under an interactive SLA is set by sustained token throughput per user.",
+  "claim_text": "At language knee successor point, TTFT budget has 1.8-2.1\u00d7 slack while ITL p99 crosses; capacity set by sustained token throughput per user.",
+  "expected_backing": "v_pool_latency, v_infraction"
+ },
+ {
+  "claim_id": "twopool-0057",
+  "chapter": "twopool",
+  "claim_type": "causal",
+  "anchor": "Frames-class language work is thus undercounted (making the language pool look better in bursts) while the uniform 448^2 assumption overstates frames-class encoder work (making the vision pool look worse); both biases lean toward the burst asymmetry above.",
+  "claim_text": "Token accounting biases: language work undercounted (better burst appearance), encoder work overstated (worse vision appearance), both lean toward burst asymmetry.",
+  "expected_backing": "v_pool_latency, collector_encoder_fn"
+ },
+ {
+  "claim_id": "twopool-0058",
+  "chapter": "twopool",
+  "claim_type": "causal",
+  "anchor": "The TP1 prefill floor is robust to them (it worsens at 3\u00d7 the tokens); the TP2 margin is not.",
+  "claim_text": "TP1 prefill floor robust to token accounting biases (worsens at 3\u00d7 tokens); TP2 margin not robust.",
+  "expected_backing": "v_pool_latency, v_infraction"
+ }
+]

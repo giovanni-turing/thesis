@@ -1,0 +1,11 @@
+{
+  "claim_id": "intro-0308",
+  "verdict": "holds",
+  "observed": "The DB has one current vLLM/H100 startup run (measured:vllm_h100_trace, is_current): Overall Loading 23.73 s, Load weights 4.90 s, Warmup (GPU) 0.28 s; 0 scheduling spans, 0 minute-scale spans. This backs the low end ('tens of seconds', 23.7 s). The sentence is an explicit general characterization of GPU serving ('optimistic for GPU serving, where bringing up a replica ... takes tens of seconds to minutes') used to motivate a modeling assumption -- not a claim about the thesis's own measurement. 'to minutes' is standard domain knowledge (large-model weight loading e.g. 235B-TP8, K8s scheduling, image pull, CUDA-graph capture); the single measured 8B run anchors the lower bound.",
+  "claimed": "Bringing up a GPU replica (scheduling, weight loading, warmup) takes tens of seconds to minutes.",
+  "evidence": "vllm_otlp_startup joined v_dim is_current: only run measured:vllm_h100_trace, Overall Loading 23.726728601999998 s; no minute-scale or scheduling span. The 'minutes' upper bound is a general domain statement, not a thesis result -- the flag treats a motivational generalization as an empirical claim (wrong-scope).",
+  "severity": "minor",
+  "fix": "No change required for a background/motivation sentence. If strict DB-only backing is desired, add 'in our vLLM/H100 measurement, ~24 s' as an exemplar of the low end.",
+  "confidence": 0.6,
+  "query": "vllm_otlp_startup: measured:vllm_h100_trace Overall Loading 23.73s, weights 4.90s, warmup 0.28s; 0 minute-scale/scheduling spans"
+}

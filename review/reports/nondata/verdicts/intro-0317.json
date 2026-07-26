@@ -1,0 +1,1 @@
+{"claim_id":"intro-0317","type":"existence","verdict":"supported","evidence":"eda_metric table has 1475 rows; supporting eda_rate_series, eda_burst_episode, eda_request_archetype tables exist -- production traffic characterized as per-pool demand signals.","fix":"","confidence":0.95}

@@ -188,8 +188,8 @@ trend (independence); ctx×gen a diffuse weak-coupled cloud (ρ=0.17).
 ## I — Burst anatomy (onset dynamics)
 
 18 merged episodes (from 87 raw p99-exceedances; boundaries extended to p50
-crossings). **Onset baseline→peak: p50 = 6 min, p10 = 2 min, fastest = 1 min**;
-median ramp 42 img/s per minute; **median steepest single-minute jump =
+crossings). **Onset baseline→peak: p50 = 6.5 min, p10 = 2 min, fastest = 1 min**;
+median ramp 38 img/s per minute; **median steepest single-minute jump =
 208 img/s** (max 355). Design consequence: with cold starts of tens of
 seconds to minutes, the fast half of bursts cannot be caught reactively —
 the forecast-horizon budget (onset minus cold-start) is the autoscaler's
@@ -203,9 +203,13 @@ binding constraint. (`i_burst_onsets.png`, `i_burst_aligned.png`)
 | single | 1 | 33.0% | 2.3% | 1,069 | 1.1 |
 | tiled_small | 2–5 | 13.1% | 10.6% | 4,558 | 1.1 |
 | tiled_large | 6–10 | 1.1% | 5.9% | 13,747 | 15.6 |
-| frames | >10 | 2.7% | **81.2%** | 33,722 | 5.4 |
+| frames | >10 | 2.7% | **81.1%** | 33,722 | 5.4 |
+| nonsquare | — | 0.005% | 0.07% | 4,785 | — |
 
-**Every top-6 burst episode is 93–96% frames-class image volume.** The
+(nonsquare = the 53 requests whose positive image count is not a perfect
+square; kept as an explicit class instead of being rounded into single/tiled.)
+
+**Every top-6 burst episode is 92–96% frames-class image volume.** The
 vision pool's demand — and its bursts — are effectively one workload class
 (video-like frame jobs, 2.7% of requests). Per-class signals
 (`j_class_signals.png`) show frames switching between off and full-on

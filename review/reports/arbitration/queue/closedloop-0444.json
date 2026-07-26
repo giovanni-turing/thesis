@@ -1,0 +1,10 @@
+{
+ "claim_id": "closedloop-0444",
+ "chapter": "closedloop",
+ "claim_type": "numeric",
+ "anchor": "The provenance store behind every number above held 2,060 simulation runs across the committed families, validated by 44 automated consistency checks.",
+ "claim_text": "Provenance: 2,060 simulation runs, 44 automated consistency checks.",
+ "expected_backing": "v_pool_latency",
+ "adjudication": [],
+ "reason": "no-adjudicator"
+}

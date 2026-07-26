@@ -1,0 +1,24 @@
+claim extraction: 22 runs (2 extractors x 11 chapters)
+  ernie     intro            ok         claims=35
+  ernie     related          ok         claims=3
+  ernie     trace-eda        ok         claims=7
+  ernie     predictors       ok         claims=3
+  ernie     aiconfigurator   ok         claims=21
+  ernie     twopool          ok         claims=11
+  ernie     baselines        ok         claims=10
+  ernie     closedloop       ok         claims=13
+  ernie     validation       ok         claims=11
+  ernie     conclusion       ok         claims=15
+  ernie     apendice         ok         claims=9
+  nemotron  intro            ok         claims=64
+  nemotron  related          ok         claims=14
+  nemotron  trace-eda        ok         claims=21
+  nemotron  predictors       ok         claims=37
+  nemotron  aiconfigurator   ok         claims=21
+  nemotron  twopool          ok         claims=64
+  nemotron  baselines        ok         claims=47
+  nemotron  closedloop       ok         claims=127
+  nemotron  validation       ok         claims=11
+  nemotron  conclusion       ok         claims=10
+  nemotron  apendice         ok         claims=77
+done. per-file jsonl in review/claim-inventory/

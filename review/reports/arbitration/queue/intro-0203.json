@@ -1,0 +1,29 @@
+{
+ "claim_id": "intro-0203",
+ "chapter": "intro",
+ "claim_type": "comparative",
+ "anchor": "A 235B-TP8 spot-check finds its saturation knee below the 8B's --- decoder scale shrinks only the language pool's envelope, leaving the vision pool untouched.",
+ "claim_text": "235B-TP8 saturation knee below 8B; decoder scale shrinks only language pool envelope",
+ "expected_backing": "v_pool_latency; v_grid_static_effective",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "overclaimed",
+   "observed": "235B-TP8 TTFT knee speedup = 2.4495 (ITL knee = 1.1351) vs 8B-TP2 TTFT knee speedup = 11.4069 (ITL knee = 6.0542) and 8B-TP1 TTFT knee speedup = 4.899 (ITL knee = 2.8158). There are 0 vision pool runs in experiment g3_32b, and the effective static vision allocation is 8 workers.",
+   "evidence": "The knee comparison holds (2.45 vs 11.41 / 4.90), but 'vision pool untouched' lacks empirical latency backing as experiment g3_32b contains exactly 0 vision/encoder pool runs.",
+   "severity": "major",
+   "fix": "Weaken 'leaving the vision pool untouched' to clarify that this is an architectural consequence of disaggregation rather than a co-measured latency result, since experiment g3_32b has 0 vision-pool runs.",
+   "query": "WITH latency AS ( SELECT CASE WHEN d.run_id LIKE 'g3_32b:235b_tp8_%' THEN '235B-TP8' WHEN d.run_id LIKE 'g3_32b:8b_tp1_%' THEN '8B-TP1' WHEN d.run_id LIKE 'g3_32b:8b_tp2_%' THEN '8B-TP2' END AS config, replace(substring(d.run_id from '_s(.*)$'), 'p', '.')::numeric AS speedup, p.p99_ms, p.sla_metric FROM provenance.v_dim d JOIN provenance.v_pool_latency p USING (run_id) WHERE d.is_current = true AND d.superseded_by IS NULL AND p.is_current = true AND d.experiment = 'g3_32b' ), knees AS ( SELECT config, MAX(CASE WHEN sla_metric = 'ttft' AND p99_ms <= 1000 THEN speedup END) AS ttft_knee_speedup, MAX(CASE WHEN sla_metric = 'itl' AND p99_ms <= 100 THEN speedup END) AS itl_knee_speedup FROM latency GROUP BY config ) SELECT k.config, k.ttft_knee_speedup, k.itl_knee_speedup, (SELECT COUNT(*) FROM provenance.v_dim WHERE is_current = true AND experiment = 'g3_32b' AND pool IN ('encoder', 'vision')) AS vision_runs, (SELECT static_encoder_workers_effective FROM provenance.v_grid_static_effective) AS static_encoder_workers_effective FROM knees k;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "On the sole head2k window, p99 TTFT rises from 680.8319655983069 ms at speedup 2.4495 to 1556.8793047659128 ms at 2.7108 for 235B-TP8; the corresponding 8B brackets are 924.9876413101883 to 1500.3221042367077 ms at 4.899 to 5.1537 for TP1 and 865.3983696572977 to 1586.0607015162896 ms at 11.4069 to 11.6997 for TP2. The experiment has 232 current unsuperseded language runs and 0 vision runs; v_grid_static_effective has one burst2 row, not the head2k window.",
+   "evidence": "The lower 235B-TP8 language knee is supported, but 0 vision observations in the experiment cannot establish that decoder scale leaves the vision pool untouched.",
+   "severity": "major",
+   "fix": "Limit the sentence to the measured language result: \"On the head2k spot-check, 235B-TP8 reaches its saturation knee below both measured 8B configurations.\" Remove the vision-pool conclusion unless a decoder-scale-controlled vision comparison is added.",
+   "query": "WITH latency AS (SELECT d.run_id,d.pool,d.window_name,d.tp,d.superseded_by,p.is_current AS latency_is_current,p.sla_metric,p.p99_ms,p.n_requests,CASE WHEN d.run_id LIKE 'g3_32b:235b_tp8_%' THEN '235B-TP8' WHEN d.run_id LIKE 'g3_32b:8b_tp1_%' THEN '8B-TP1' WHEN d.run_id LIKE 'g3_32b:8b_tp2_%' THEN '8B-TP2' END AS config,replace(substring(d.run_id from '_s(.*)$'),'p','.')::numeric AS speedup FROM provenance.v_dim d JOIN provenance.v_pool_latency p ON p.run_id=d.run_id WHERE d.is_current=true AND d.superseded_by IS NULL AND p.is_current=true AND d.experiment='g3_32b' AND p.sla_metric='ttft' AND (d.run_id LIKE 'g3_32b:235b_tp8_%' OR d.run_id LIKE 'g3_32b:8b_tp1_%' OR d.run_id LIKE 'g3_32b:8b_tp2_%')), coverage AS (SELECT count(*) AS current_unsuperseded_runs,count(*) FILTER (WHERE pool='language') AS language_runs,count(*) FILTER (WHERE pool IN ('encoder','vision')) AS vision_runs,count(DISTINCT window_name) AS windows FROM provenance.v_dim WHERE is_current=true AND superseded_by IS NULL AND experiment='g3_32b'), denominators AS (SELECT config,count(*) AS config_ttft_runs,sum(n_requests) AS config_requests,count(DISTINCT window_name) AS config_windows FROM latency GROUP BY config), effective AS (SELECT count(*) AS effective_rows,min(static_encoder_workers_effective) AS effective_workers,min(binding_window_effective) AS effective_window,min(static_as_ingested) AS ingested_workers,min(binding_as_ingested) AS ingested_window FROM provenance.v_grid_static_effective) SELECT l.config,l.speedup,l.p99_ms,l.n_requests,d.config_ttft_runs,d.config_requests,d.config_windows,c.current_unsuperseded_runs,c.language_runs,c.vision_runs,c.windows,e.effective_rows,e.effective_workers,e.effective_window,e.ingested_workers,e.ingested_window FROM latency l JOIN denominators d USING(config) CROSS JOIN coverage c CROSS JOIN effective e WHERE (l.config='235B-TP8' AND l.speedup IN (2.4495,2.7108)) OR (l.config='8B-TP1' AND l.speedup IN (4.899,5.1537)) OR (l.config='8B-TP2' AND l.speedup IN (11.4069,11.6997)) ORDER BY l.config,l.speedup"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

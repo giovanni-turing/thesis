@@ -1,0 +1,29 @@
+{
+ "claim_id": "apendice-0149",
+ "chapter": "apendice",
+ "claim_type": "numeric",
+ "anchor": "Language-pool week replay (651 ms / 518.6 GPU-h; p50, Toto, TimesFM, reactive arms)",
+ "claim_text": "Language-pool week replay: 651 ms / 518.6 GPU-h at p50 with Toto, TimesFM, reactive arms",
+ "expected_backing": "v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "contradicted",
+   "observed": "p99_ms=651.14 (p50_ms=22.65), gpu_hours=518.61 for planner:week_fc_p90 (forecast/null); toto: p99=651.14, gpu_hours=625.27; timesfm: p99=651.14, gpu_hours=641.08; reactive: p99=1196.57, gpu_hours=281.79; p50-forecast: p99=827.81, gpu_hours=319.91",
+   "evidence": "651 ms is the p99 TTFT latency of the p90-forecast runs (not p50, which is ~22.65 ms); 518.6 GPU-h is the cost of the base p90-forecast run with null model, not a p50-forecast run (319.91 GPU-h) or runs with Toto (625.27 GPU-h), TimesFM (641.08 GPU-h), or reactive arms (281.79 GPU-h).",
+   "severity": "blocking",
+   "fix": "Correct 'at p50' to 'at p99' and drop the 'Toto, TimesFM, reactive arms' attribution from these specific numbers, or cite the distinct costs/latencies of those individual configurations.",
+   "query": "SELECT l.run_id, l.policy, l.forecast_model, l.quantile, l.p50_ms, l.p99_ms, c.gpu_hours FROM v_pool_latency l JOIN v_pool_cost c USING (run_id, pool, window_name, is_current) WHERE l.is_current = true AND l.experiment = 'planner' AND l.pool = 'language' AND l.window_name = 'aggregate' AND l.sla_metric = 'ttft';"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "For 749601 requests, 651.1395369768143 ms is TTFT p99 for planner p90/Toto/TimesFM; their p50 is 22.493120789527893\u201322.652428030967712 ms. The planner p50 arm has TTFT p99 827.8129093647003 ms, while reactive has p99 1191.6285899281502\u20131196.5717934966087 ms. v_pool_latency contains no GPU-hour value.",
+   "evidence": "The claim conflates the 651.1395 ms p99 of p90/Toto/TimesFM forecast runs with p50 and reactive arms, and the owning view does not back 518.6 GPU-h.",
+   "severity": "major",
+   "fix": "Report 651.14 ms explicitly as TTFT p99 for the p90/Toto/TimesFM forecast runs, report their approximately 22.49\u201322.65 ms p50 separately, exclude reactive from that value, and cite an owning GPU-usage view for 518.6 GPU-h or remove it.",
+   "query": "SELECT run_id, window_name, policy, forecast_model, quantile, sla_metric, p50_ms, p90_ms, p99_ms, max_ms, n_requests, is_current, source_relation FROM provenance.v_pool_latency WHERE is_current = TRUE AND pool = 'language' AND run_id IN ('planner:week_fc_p50','planner:week_fc_p90','planner:week_fc_p90_toto','planner:week_fc_p90_timesfm','planner:week_re','a12:week_fc_toto','a12:week_fc_timesfm','a12:week_reactive') ORDER BY run_id, sla_metric"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

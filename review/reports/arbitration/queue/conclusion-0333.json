@@ -1,0 +1,29 @@
+{
+ "claim_id": "conclusion-0333",
+ "chapter": "conclusion",
+ "claim_type": "numeric",
+ "anchor": "a composed forward matches vLLM's own vision tower to within 12.8%",
+ "claim_text": "Composed encoder forward pass matches vLLM vision tower latency within 12.8%",
+ "expected_backing": "collector_encoder_fn comparing composed forward vs vLLM vision tower",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "12.709% (N=52, vLLM: 289.7691 ms, AIC: 257.094 ms)",
+   "evidence": "Across all batch sizes N <= 64, the percentage deviation between the AIC cost model prediction and standalone vLLM vision tower latency is within the 12.8% bound, peaking at 12.709% at N=52. The prior REFUTE verdict incorrectly compared PyTorch compiled vs. vLLM engines instead of the AIC cost composition.",
+   "severity": "minor",
+   "fix": "",
+   "query": "SELECT v.n_images AS n, a.aic_pred_ms AS aic_ms, v.mean_ms AS vllm_ms, ROUND((100 * (v.mean_ms - a.aic_pred_ms) / a.aic_pred_ms)::numeric, 3) AS pct_diff FROM (SELECT DISTINCT n_images, aic_pred_ms FROM provenance.collector_encoder_fn WHERE image_px = 448 AND aic_pred_ms IS NOT NULL AND is_valid) a JOIN (SELECT DISTINCT n_images, mean_ms FROM provenance.collector_encoder_fn WHERE image_px = 448 AND engine = 'vllm' AND is_valid) v ON a.n_images = v.n_images WHERE v.n_images <= 64 ORDER BY ABS(100 * (v.mean_ms - a.aic_pred_ms) / a.aic_pred_ms) DESC;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "Maximum deviation 12.952557080873463% across 3 comparable batch points; N=8: 47.64 vs 42.177 ms, N=32: 179.09 vs 178.343 ms, N=64: 355.91 vs 333.732 ms",
+   "evidence": "Using vLLM latency as the denominator, the N=8 composed-forward point deviates by 12.952557080873463%, exceeding 12.8%; collector_encoder_fn has no is_current, is_superseded, or effective columns.",
+   "severity": "minor",
+   "fix": "Change the bound to \"within 13.0%\" or report the three batch-specific deviations.",
+   "query": "WITH composed AS (SELECT n_images, mean_ms FROM provenance.collector_encoder_fn WHERE is_valid IS TRUE AND source_path = '/home/gio/tese/collector_artifacts/phaseE_physical_anchor/vit_compile.json' AND engine = 'compiled' AND image_px = 448), vllm AS (SELECT n_images, mean_ms FROM provenance.collector_encoder_fn WHERE is_valid IS TRUE AND source_path = '/home/gio/tese/collector_artifacts/phaseE_physical_anchor/vllm_eager_vit.json' AND engine = 'vllm' AND image_px = 448), paired AS (SELECT c.n_images, c.mean_ms AS composed_ms, v.mean_ms AS vllm_ms, 100.0 * ABS(c.mean_ms - v.mean_ms) / v.mean_ms AS deviation_pct FROM composed c JOIN vllm v USING (n_images)) SELECT n_images, composed_ms, vllm_ms, deviation_pct, COUNT(*) OVER () AS denominator_points, MAX(deviation_pct) OVER () AS max_deviation_pct FROM paired ORDER BY n_images"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

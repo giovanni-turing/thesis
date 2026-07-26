@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "predictors-0162",
+  "chapter": "predictors",
+  "claim_type": "methodological",
+  "anchor": "All forecasts are floored at zero (rates are non-negative)",
+  "claim_text": "All forecasts floored at zero due to non-negative rates",
+  "expected_backing": "predictors/benchmark.py post-processing"
+ },
+ {
+  "claim_id": "predictors-0163",
+  "chapter": "predictors",
+  "claim_type": "methodological",
+  "anchor": "The nine quantile levels $0.1, \\ldots, 0.9$ are the intersection of the three models' native heads",
+  "claim_text": "Nine quantile levels (0.1 to 0.9) used, intersection of models' native quantile heads",
+  "expected_backing": "predictors/benchmark.py quantile levels"
+ },
+ {
+  "claim_id": "predictors-0164",
+  "chapter": "predictors",
+  "claim_type": "methodological",
+  "anchor": "Accuracy is reported as WAPE, $\\sum_t |\\hat y_t - y_t| \\,/ \\sum_t y_t$ (scale-free and defined on zero-signal bins), alongside MAE where absolute units aid interpretation",
+  "claim_text": "Metrics: WAPE (scale-free, defined on zero bins) and MAE",
+  "expected_backing": "predictors/precision.py metric definitions"
+ },
+ {
+  "claim_id": "predictors-0188",
+  "chapter": "predictors",
+  "claim_type": "methodological",
+  "anchor": "Finally, results derive from one seven-day trace of one production cluster, with its by-construction 50/50 modality split",
+  "claim_text": "Results from single 7-day trace of one production cluster with 50/50 modality split",
+  "expected_backing": "trace provenance + modality split"
+ },
+ {
+  "claim_id": "predictors-0192",
+  "chapter": "predictors",
+  "claim_type": "methodological",
+  "anchor": "Tiled contiguously at the serving cadence, these forecasts are the input the following chapters' predictive autoscaling experiments consume",
+  "claim_text": "Forecasts tiled contiguously at serving cadence serve as input for predictive autoscaling experiments in following chapters",
+  "expected_backing": "chapters/closedloop.tex forecast consumption"
+ },
+ {
+  "claim_id": "intro-0204",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "Forecasting uses three pretrained time-series foundation models (TimesFM-2.0, Chronos-2, and Toto-2.0) against naive, exponential-smoothing, and Holt-Winters baselines, under one rolling-origin protocol.",
+  "claim_text": "Three foundation models (TimesFM-2.0, Chronos-2, Toto-2.0) vs three classical baselines under rolling-origin protocol",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "intro-0205",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "The vision pool is an event-driven FIFO of encoder workers costed by aiconfigurator (AIC), NVIDIA's offline planner, over performance data collected on an NVIDIA GeForce RTX 5090.",
+  "claim_text": "Vision pool uses AIC-costed encoder workers on RTX 5090 with event-driven FIFO",
+  "expected_backing": "collector_encoder_fn; v_cost_ratio"
+ },
+ {
+  "claim_id": "intro-0206",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "The language pool is simulated by Dynamo's discrete-event engine (dynamo.replay with a KV-aware router) under AIC-calibrated H100 timing.",
+  "claim_text": "Language pool simulated by Dynamo's dynamo.replay with KV-aware router under AIC-calibrated H100 timing",
+  "expected_backing": "v_pool_latency; v_cost_ratio"
+ }
+]

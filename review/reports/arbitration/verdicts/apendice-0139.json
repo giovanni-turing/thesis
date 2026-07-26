@@ -1,0 +1,11 @@
+{
+ "claim_id": "apendice-0139",
+ "verdict": "supported",
+ "observed": "collector_encoder_fn: sdpa mean_ms(N=512)=4208.52, vllm mean_ms(N=512)=3033.79. Named figure artifact aic_fn_engines_aiccurve.csv (thesis-declared composed-model denominator beyond N=128): aic_ms(512)=2491.4717. SDPA ratio=4208.5209/2491.4717=1.6892 ~=1.69x. vLLM dense (vllm_eager_dense) vs composed AIC over serving regime N<=64: max |ratio-1| = 12.710% at N=52 (< 12.8% band). torch.compile lies between vLLM and SDPA at all table anchors (N=8: 48.8 in [42.2,58.7]; N=32: 186.0 in [178.3,253.8]; N=64: 370.6 in [333.7,511.6]).",
+ "claimed": "vLLM within +/-12.8% band across serving regime; HF-SDPA climbs to 1.69x by N=512; torch.compile in between.",
+ "evidence": "All three sub-claims reproduce. vLLM max deviation over the serving regime (N<=64, the FIFO cap) is 12.71% < 12.8%. The 1.69x is SDPA mean(512)=4208.52 (DB) over composed AIC(512)=2491.47 from the artifact the thesis explicitly names as the denominator beyond N=128; collector_encoder_fn.aic_pred_ms is NULL there by design, so the missing ratio column is not a refutation. torch.compile is between the other two engines everywhere data overlaps.",
+ "severity": "minor",
+ "fix": "None required.",
+ "confidence": 0.93,
+ "query": "SELECT n_images, engine, mean_ms FROM collector_encoder_fn WHERE engine IN ('sdpa','vllm') AND n_images=512; -- plus aic_fn_engines_aiccurve.csv N=512 => 2491.4717; ratio 4208.52/2491.47=1.689"
+}

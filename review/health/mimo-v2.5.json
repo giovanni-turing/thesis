@@ -1,0 +1,12 @@
+{
+ "model": "mimo-v2.5",
+ "status": "active",
+ "cal_recall": "4/7",
+ "cal_fab": 0,
+ "cal_latency_s": 36,
+ "valid_json_rate": 1.0,
+ "grounding_rate": null,
+ "fabrication_rate": 0.0,
+ "units_done": 0,
+ "disabled": false
+}

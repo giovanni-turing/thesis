@@ -1,0 +1,1 @@
+{"claim_id":"intro-0312","type":"existence","verdict":"supported","evidence":"forecast_metrics table has 41600 rows; foundation-model forecast tables forecast_timesfm (2.88M rows), forecast_chronos (5.35M rows) exist; per-pool demand forecasting materialized in provenance DB.","fix":"","confidence":0.95}

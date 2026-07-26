@@ -1,0 +1,29 @@
+{
+ "claim_id": "aiconfigurator-0386",
+ "chapter": "aiconfigurator",
+ "claim_type": "comparative",
+ "anchor": "the gap shrinks from $1.45\\times$ at $448^2$ to $1.14$--$1.16\\times$ at larger images",
+ "claim_text": "Prediction-measurement gap shrinks from 1.45x at 448\u00b2 to 1.14-1.16x at larger images.",
+ "expected_backing": "v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "contradicted",
+   "observed": "448\u00b2: eager=11.333 ms, aic=8.186 ms (ratio 1.384x). 672\u00b2: eager=20.467 ms, aic=16.603 ms (ratio 1.233x). 896\u00b2/1344\u00b2: 0 rows.",
+   "evidence": "The database contains different ratios (1.38x at 448\u00b2 and 1.23x at 672\u00b2) and completely lacks 896\u00b2 and 1344\u00b2 data, which only exist in the local result.txt file.",
+   "severity": "blocking",
+   "fix": "Cite the offline validation file (collector_artifacts/phaseA_validation/result.txt) instead of the database, or update the text's ratios to match the database values of 1.38x at 448\u00b2 and 1.23x at 672\u00b2.",
+   "query": "SELECT image_px, engine, mean_ms FROM provenance.collector_encoder_fn WHERE n_images = 1 AND image_px IN (448, 672) AND (engine = 'eager' OR (engine = 'aic' AND note LIKE '%analytic%')) ORDER BY image_px, engine;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "For eager measurements, 448\u00b2 is 11.333/8.186 = 1.3844x and 672\u00b2 is 20.467/16.603 = 1.2327x; each ratio has one prediction and one eager-measurement row.",
+   "evidence": "The gap does shrink from 448\u00b2 to 672\u00b2, but neither claimed endpoint matches the valid paired multires rows; v_pool_latency has no prediction field and cannot supply these ratios.",
+   "severity": "major",
+   "fix": "Replace with \u201cthe eager prediction-measurement gap shrinks from 1.38x at 448\u00b2 to 1.23x at 672\u00b2.\u201d",
+   "query": "WITH relevant AS ( SELECT source_path, image_px, n_images, engine, mean_ms, is_valid, note FROM provenance.collector_encoder_fn WHERE is_valid = TRUE AND n_images = 1 AND source_path IN ('/home/gio/tese/collector_artifacts/phaseE_physical_anchor/aic_multires.json','/home/gio/tese/collector_artifacts/phaseE_physical_anchor/fn_multires.json') ), paired AS ( SELECT image_px, MAX(mean_ms) FILTER (WHERE engine = 'aic') AS aic_pred_ms, MAX(mean_ms) FILTER (WHERE engine = 'eager') AS eager_meas_ms, MAX(mean_ms) FILTER (WHERE engine = 'compiled') AS compiled_meas_ms, COUNT(*) FILTER (WHERE engine = 'aic') AS pred_denominator, COUNT(*) FILTER (WHERE engine = 'eager') AS eager_denominator, COUNT(*) FILTER (WHERE engine = 'compiled') AS compiled_denominator FROM relevant GROUP BY image_px ) SELECT image_px, aic_pred_ms, eager_meas_ms, compiled_meas_ms, pred_denominator, eager_denominator, compiled_denominator, ROUND((eager_meas_ms / aic_pred_ms)::numeric, 4) AS eager_gap_x, ROUND((compiled_meas_ms / aic_pred_ms)::numeric, 4) AS compiled_gap_x FROM paired ORDER BY image_px"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

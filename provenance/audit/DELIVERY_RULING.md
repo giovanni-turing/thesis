@@ -609,6 +609,16 @@ the thesis or the defence**, and any sentence contrasting forecast with reactive
 must name the static baseline's pass. G1's and G4's language results are consistent, mutually
 reinforcing, and point the same way.
 
+**AMENDED 2026-07-25 (see `S5_2_LANG_RECONCILE.md`; DB-backed, `experiment='langcalib'`).** This ruling
+is correct **for the operating point it measured — the published Chronos p90/scale-8 arm** (1.02×–3.81×
+across folds). It is **scoped, not retracted**: under honest held-out calibration (operating point
+selected on the 1.4-day forecast-context split, graded held-out) the language pool **does** clear static
+— a cost-optimal point near **0.62×** (which drops the e13 fold) and an **e13-robust point at 0.82× time
+/ 0.87× request** (p90 quantile at a leaner conversion scale, passing all 7 daily folds, e13 = 886 ms).
+So *"no language cost advantage may be claimed anywhere"* softens to *"the published p90/s8 arm is
+static-dominated; an honestly-calibrated e13-robust point modestly beats static (~0.82×) — the advantage
+modest and fold-variant, and the larger 0.62× drops the e13 onset."* The encoder RQ4 result is unchanged.
+
 ### 5.3 Other standing conflicts
 
 - **`closedloop.tex:494-501`** already documents the encoder warm-pool vs strict-re-warm duality. G7's

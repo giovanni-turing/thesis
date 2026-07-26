@@ -1,0 +1,11 @@
+{
+ "claim_id": "aiconfigurator-0370",
+ "verdict": "supported",
+ "observed": "provenance.collector_kernel_perf under source_path LIKE '%phaseC_vit_shape_infill%' holds EXACTLY 465 rows: 81 (op_name='encoder_attention', encoder_attention_perf.txt) + 384 (op_name='gemm', gemm_perf.txt). batch_size range [1,64] with all 64 distinct N values present. ledger_entry id=974 'Phase C shape infill (2026-07-08)' records the same artifact set and the exact phrase '465 cases'.",
+ "claimed": "465-case infill collected for exact N in [1,64] attention and GEMM shapes.",
+ "evidence": "The claim's expected_backing metadata (collector_encoder_fn) is wrong: that is the whole-tower latency table (~536 rows), not the operator-kernel table. The operator-kernel table collector_kernel_perf is the correct owner and yields exactly 81 attention + 384 GEMM = 465 rows over N in [1,64] (min=1, max=64, 64 distinct), corroborated byte-for-byte by ledger_entry 974. gpt-5.6-sol's 'unverifiable' derives from querying the wrong table (collector_encoder_fn, 516 valid N-in-range rows); this is the SCHEMA '§not-in-this-view read as unverifiable' trap. gemini-3.5-flash and qwen3.7-max identified the correct table.",
+ "severity": "minor",
+ "fix": "None required to the thesis. Correct the claim's expected_backing pointer from collector_encoder_fn to collector_kernel_perf (source_path phaseC_vit_shape_infill; op_name in {encoder_attention, gemm}).",
+ "confidence": 0.98,
+ "query": "SELECT op_name, count(*) FROM collector_kernel_perf WHERE source_path LIKE '%phaseC_vit_shape_infill%' GROUP BY op_name; -- encoder_attention 81, gemm 384 (=465). SELECT min(batch_size),max(batch_size),count(distinct batch_size),count(*) -> 1,64,64,465. ledger_entry id=974 name='Phase C shape infill  (2026-07-08)'."
+}

@@ -575,6 +575,12 @@ def main() -> None:
             "max": round(max((fin - start for start, fin, _t, _nf in batches), default=0.0), 3),
         },
         "encoder_delay_ms": {**percentiles(enc_delays), "max": round(max(enc_delays), 3)},
+        # week-wide SLO-violation counts: how many of ALL requests had encoder delay > T ms
+        "encoder_delay_violations": {
+            str(T): int(sum(1 for d in enc_delays if d > T)) for T in (250, 500, 1000, 2000, 5000)},
+        "encoder_delay_violation_frac": {
+            str(T): round(sum(1 for d in enc_delays if d > T) / len(enc_delays), 6)
+            for T in (250, 500, 1000, 2000, 5000)} if enc_delays else {},
         "handoff_ms": {**percentiles(handoffs),
                        "max": round(max(handoffs), 3) if handoffs else 0.0},
         "encoder_utilization": round(utilization, 4),

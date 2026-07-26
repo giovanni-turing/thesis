@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "intro-0208",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "The trace records image counts, not sizes, so the encoder pool assumes a uniform 448^2 image.",
+  "claim_text": "Encoder pool assumes uniform 448x448 images since trace only has counts not sizes",
+  "expected_backing": "collector_encoder_fn; eda_metric"
+ },
+ {
+  "claim_id": "intro-0210",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "The inter-pool handoff is priced single-stream: at Qwen3-VL's full DeepStack payload the 588 ms floor and the 0.62x result assume an embedding-only handoff or a \u2265100 Gbps fabric.",
+  "claim_text": "Handoff assumes embedding-only or \u2265100 Gbps fabric; 588ms floor and 0.62x result depend on this",
+  "expected_backing": "v_pool_latency; v_cost_ratio"
+ },
+ {
+  "claim_id": "intro-0211",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "The simulation is open-loop and deterministic, with no speculative encoder-prefill overlap.",
+  "claim_text": "Simulation is open-loop, deterministic, no speculative encoder-prefill overlap",
+  "expected_backing": "v_pool_latency; v_infraction"
+ },
+ {
+  "claim_id": "intro-0212",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "Language-pool results characterize the 8B at TP1 but deploy it at TP2\u00d72, with a 235B-TP8 spot-check.",
+  "claim_text": "Language pool: 8B characterized at TP1, deployed at TP2\u00d72; 235B-TP8 spot-check",
+  "expected_backing": "v_pool_latency; v_grid_static_effective"
+ },
+ {
+  "claim_id": "intro-0214",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "Forecasts are zero-shot, the conservative reading of the foundation models' capability.",
+  "claim_text": "Forecasts are zero-shot (conservative reading)",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "intro-0230",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "Scripted, GPU-accelerated analysis establishes the decoupling, burst anatomy, and persistence contrast.",
+  "claim_text": "GPU-accelerated analysis establishes decoupling, burst anatomy, persistence contrast",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "intro-0232",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "The RTX 5090 onboarded as a new AIC system; encoder-attention and bf16-GEMM datasets collected at locked clocks in the production container and upstreamed (draft PR ai-dynamo/aiconfigurator#1312).",
+  "claim_text": "RTX 5090 added to AIC; encoder-attention and bf16-GEMM datasets collected at locked clocks, upstreamed in PR #1312",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "intro-0246",
+  "chapter": "intro",
+  "claim_type": "methodological",
+  "anchor": "The evaluation SLA's bounds are a design choice whose sensitivity Chapter 5 quantifies.",
+  "claim_text": "Evaluation SLA bounds are design choice; sensitivity quantified in Chapter 5",
+  "expected_backing": "v_infraction; v_pool_latency"
+ }
+]

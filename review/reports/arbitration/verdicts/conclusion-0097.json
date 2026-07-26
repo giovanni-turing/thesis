@@ -1,0 +1,11 @@
+{
+  "claim_id": "conclusion-0097",
+  "verdict": "supported",
+  "observed": "With the headline operand (mode='uni', span='common', candidate='point', h=-1 overall = Table tab:pred-wape config), in ALL 20 (resolution,signal) cells the WORST foundation model beats the BEST classical baseline. Tightest cells: 1min/ctx worst FM 43.36% vs best classical (ewma) 44.70%; 1min/images 53.39% vs 54.16%; 1min/requests 33.49% vs 35.17%. No cell inverts.",
+  "claimed": "Three pretrained foundation models beat every tested fixed-parameter classical baseline in all twenty (resolution,signal) cells.",
+  "evidence": "Both adjudicators derived their 16/60 failures from MIN(wape) taken over ALL spans (common+full), ALL candidates (point+p10..p90 quantiles), and ALL horizon steps (h=-1..12) simultaneously - a mixed operand that pools the point forecast with quantile candidates and per-step values. The headline table (predictors.tex:97,104: 'overall point WAPE on the common span') fixes span=common, candidate=point, h=-1. Under that exact operand every FM beats every classical in all 20 cells; the '2-9% margin over EWMA at 1min' stated in the text is reproduced (e.g. ctx 3.3%, images 1.4%).",
+  "severity": "minor",
+  "fix": "No change. Flag is a wrong-operand artifact.",
+  "confidence": 0.95,
+  "query": "SELECT resolution,variate, MAX(wape) FILTER (WHERE model IN('chronos','timesfm','toto')) AS worst_fm, MIN(wape) FILTER (WHERE model IN('naive','ewma','holt_winters')) AS best_classical, (MAX(wape) FILTER (WHERE model IN('chronos','timesfm','toto')) < MIN(wape) FILTER (WHERE model IN('naive','ewma','holt_winters'))) AS ok FROM forecast_metrics WHERE mode='uni' AND span='common' AND candidate='point' AND h=-1 GROUP BY resolution,variate; -- all 20 rows ok=t"
+}

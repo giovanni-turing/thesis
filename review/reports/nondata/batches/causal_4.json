@@ -1,0 +1,58 @@
+[
+ {
+  "claim_id": "baselines-0360",
+  "chapter": "baselines",
+  "claim_type": "causal",
+  "anchor": "The defect is the mean-based capacity conversion: sizing replicas so mean throughput meets mean demand leaves no room for the tail the SLA prices.",
+  "claim_text": "The defect is mean-based capacity conversion: sizing replicas to meet mean demand leaves no capacity for the tail that the SLA prices.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "baselines-0361",
+  "chapter": "baselines",
+  "claim_type": "causal",
+  "anchor": "Burst1's 220-minute onset gives a trailing window ample time, yet tightening the mean targets still cannot buy the tail: the failure is the conversion, not thrift or timing",
+  "claim_text": "Despite burst1's 220-minute onset providing ample time, tightening mean targets cannot meet the tail SLA; the failure is due to conversion, not thrift or timing.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "baselines-0365",
+  "chapter": "baselines",
+  "claim_type": "causal",
+  "anchor": "burst6's one-minute onset is caught at short leads (L*=45 s) because its peak (337 img/s) drains within a batch",
+  "claim_text": "Burst6 (1-min onset, peak 337 img/s) is caught at short leads (L*=45 s) because its peak drains within a batch.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "baselines-0367",
+  "chapter": "baselines",
+  "claim_type": "causal",
+  "anchor": "It is the same peak against a thinner request stream: watching the right signal is necessary but not sufficient, since against a fast, high-volume onset no affordable lead delivers workers before the queue does the damage.",
+  "claim_text": "For the same peak, a thinner request stream (burst3) makes reactive control insufficient; no affordable lead can deliver workers before queue damage.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0405",
+  "chapter": "closedloop",
+  "claim_type": "causal",
+  "anchor": "The closed-loop pass on burst3 therefore does not rest on pre-signal detection: it rests on the calibrated band's graduated headroom, which already sits elevated during the ambient activity before the spike, lifting provisioned capacity to approx 21 workers.",
+  "claim_text": "Burst3 pass due to graduated headroom elevating capacity to ~21 workers before spike, not pre-signal detection.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0418",
+  "chapter": "closedloop",
+  "claim_type": "causal",
+  "anchor": "Scaling the forecast by r_hat/r_tail makes the mean-based planner land on tail-adequate replica counts, and validation flips exactly at the formula's boundary on both windows tested.",
+  "claim_text": "Scaling forecast by r_hat/r_tail achieves tail-adequate replica counts; validation flips at formula boundary.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0462",
+  "chapter": "closedloop",
+  "claim_type": "causal",
+  "anchor": "The ratio is monotone in each fold's offered image load (a 12x demand spread produces part of the range by construction).",
+  "claim_text": "Cost ratio monotone in fold image load (12x demand spread).",
+  "expected_backing": "v_cost_ratio"
+ }
+]

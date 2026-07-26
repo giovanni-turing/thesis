@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "trace-eda-0084",
+  "chapter": "trace-eda",
+  "claim_type": "existence",
+  "anchor": "The demand signals are not derivable from one another under any of the relationships tested here: constant-fraction scaling, rank correlation, and lagged linear cross-correlation",
+  "claim_text": "Demand signals cannot be derived from each other using constant-fraction scaling, rank correlation, or lagged linear cross-correlation.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "trace-eda-0086",
+  "chapter": "trace-eda",
+  "claim_type": "existence",
+  "anchor": "At window level, the image--generation cross-correlation peaks sharply at lag zero with no lead",
+  "claim_text": "At window level, image-generation cross-correlation peaks at lag zero with no lead.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "trace-eda-0087",
+  "chapter": "trace-eda",
+  "claim_type": "existence",
+  "anchor": "Below the one-minute scale, all signals reach a white shot-noise floor: finer-grained inputs add noise, not information",
+  "claim_text": "Below one-minute resolution, all signals reach a white shot-noise floor; finer granularity adds noise not information.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "trace-eda-0090",
+  "chapter": "trace-eda",
+  "claim_type": "existence",
+  "anchor": "The trace carries no image resolutions (counts only), no session or user identifiers, and no latency or completion-time ground truth (it is arrival-side only)",
+  "claim_text": "The trace lacks image resolutions, session/user IDs, and latency/completion-time ground truth (arrival-side only).",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "conclusion-0095",
+  "chapter": "conclusion",
+  "claim_type": "existence",
+  "anchor": "the two pools' demands decouple statistically and saturate an order of magnitude apart on steady traffic",
+  "claim_text": "The vision and language pool demands decouple statistically and saturate at significantly different levels under steady traffic.",
+  "expected_backing": "v_pool_latency, v_cost_ratio"
+ },
+ {
+  "claim_id": "conclusion-0096",
+  "chapter": "conclusion",
+  "claim_type": "existence",
+  "anchor": "with the encoder pool failing its tail bound at the trace's own recorded rate --- invisibly to rate- and utilization-based monitors",
+  "claim_text": "The encoder pool fails its tail bound at the recorded rate, undetected by rate- and utilization-based monitors.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "conclusion-0099",
+  "chapter": "conclusion",
+  "claim_type": "existence",
+  "anchor": "covariates are nearly irrelevant at provisioning cadence",
+  "claim_text": "Covariates have negligible impact at provisioning cadence.",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "conclusion-0102",
+  "chapter": "conclusion",
+  "claim_type": "existence",
+  "anchor": "The language pool runs under calibrated engine timing (a Dynamo discrete-event simulation on AIC H100 timing, not real H100) whose delta against the simulator's default polynomial is quantified, including a burst-window SLA violation the polynomial misses",
+  "claim_text": "The language pool simulation quantifies timing differences against the default polynomial, including an SLA violation missed by the polynomial.",
+  "expected_backing": "eda_metric, v_infraction"
+ }
+]

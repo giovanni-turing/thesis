@@ -1,0 +1,11 @@
+{
+  "claim_id": "intro-0197",
+  "verdict": "overclaimed",
+  "observed": "eda_metric (is_current run): window_1min img_per_s.cv2=3.830827, req_per_s.cv2=0.321189 -> ratio 11.93x; img peak_to_mean=15.621x (max 370.183 / mean 23.697); at the week's largest image burst, coincident req_per_s=4.4833 = 2.712x the weekly req mean (1.6534) and above the weekly req p99 (4.35), still below the weekly req max (7.8).",
+  "claimed": "Image signal an order of magnitude burstier; largest burst drives image load to ~16x weekly mean while the request rate barely moves (extremes disjoint).",
+  "evidence": "The two quantitative anchors hold: CV2 ratio 11.93x supports 'an order of magnitude burstier', and 15.62x supports 'nearly sixteen times its weekly mean'. But 'the request rate barely moves' is overstated: at the largest image burst the request rate is 4.48/s = 2.71x its weekly mean and exceeds its own weekly p99 (4.35/s), so that minute actually sits in the request signal's top percentile -- weakening the companion 'top-percentile minutes essentially disjoint' at the very point cited. The non-co-occurrence of the two signals' MAXIMA still holds (4.48 << 7.8 request max; low img-vs-req correlation ~0.35).",
+  "severity": "minor",
+  "fix": "Replace 'while the request rate barely moves' with e.g. 'while the request rate rises only modestly (to ~2.7x its weekly mean, still far below its own weekly maximum)'.",
+  "confidence": 0.85,
+  "query": "SELECT metric_path, value_num FROM eda_metric e JOIN v_dim d USING(run_id) WHERE d.is_current AND metric_path IN ('window_1min.img_per_s.cv2','window_1min.req_per_s.cv2','window_1min.peak_to_mean_img','window_1min.req_per_s.mean','window_1min.req_per_s.p99','window_1min.req_per_s.max','burst_episodes_img_gt_p99.top6[0].peak_req_per_s');"
+}

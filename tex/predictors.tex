@@ -21,9 +21,11 @@ resolutions, under one rolling-origin protocol. The questions are
 a predictive autoscaler's: accuracy at the next step and across a 12-step
 horizon; whether conditioning on the other signals (covariates) helps; and
 whether the models' native quantile bands offer a better operating point
-than their point forecasts. Every number and figure is reproducible from
+than their point forecasts. Every number and figure derives from
 versioned scripts (\texttt{predictors/}); the full forecast set is
-archived next to the metric tables (Appendix~\ref{ap:artifacts}).
+archived and hash-verified next to the metric tables, and every archived
+forecast fact carries a run identifier in the provenance store's
+current-run views (Appendix~\ref{ap:artifacts}).
 
 \section{Experimental protocol}
 \label{sec:pred-protocol}
@@ -143,17 +145,19 @@ the four signals --- and widens as bins shrink: at \SI{1}{\second} the best
 model reduces image WAPE by about one-third
 (Table~\ref{tab:pred-wape}). That sub-minute
 margin must be read against WAPE's no-skill floor: always predicting
-zero scores exactly 100\%, so at 1-second bins the models move from
-far-worse-than-zero (the baselines) to par-with-zero, the white shot-noise
-floor of Section~\ref{sec:eda-predictability}. The operative reading: at
-provisioning cadence, a modest but uniform edge from one untuned model
-across all four signals; at sub-minute cadence, nothing forecasts single
+zero scores exactly 100\%, so at 1-second bins the image forecasts move
+from far-worse-than-zero (the baselines) to par-with-zero, the white
+shot-noise floor of Section~\ref{sec:eda-predictability}; the smoother
+signals keep measurable 1-second skill (best request WAPE 62.9\%,
+Table~\ref{tab:pred-wape}). The operative reading: at provisioning
+cadence, a modest but uniform edge from one untuned model across all
+four signals; at sub-minute cadence, nothing forecasts single image
 bins, and no policy should assume otherwise.
 
 Second, \textbf{which model wins is resolution-dependent, and the
 inter-model ranking is noise-level}. Toto-2 (usually with covariates)
-takes nearly all the 1\,s--30\,s cells; at \SI{45}{\second} TimesFM leads, and at
-\SI{1}{\minute} Toto-2 has the most wins, with Chronos-2 and EWMA behind it. But the
+takes nearly all the 1\,s--30\,s cells; at \SI{45}{\second} Chronos-2 and Toto-2 split the cells, and at
+\SI{1}{\minute} Chronos-2 has the most wins, with Toto-2 and TimesFM behind it. But the
 spreads are small (typically under 2 WAPE points) and
 several bolded column wins are decided by $\leq$0.1 WAPE point, below
 plausible sampling variability with no significance test attached. The
@@ -163,14 +167,25 @@ the three point paths nearly coincident over the week's largest burst.
 
 The comparison extends to production practice: Dynamo's SLA planner
 selects a load predictor from a fixed registry (ARIMA, Kalman, Prophet, or
-constant). Run through the same protocol on the image signal (shipped
-defaults; the constant predictor reproduces the naive baseline's WAPE
-exactly), at \SI{1}{\minute} all four sit at or below the classical frontier and none
-reaches the foundation-model level (at \SI{15}{\second}, ARIMA and Prophet edge
-ahead of the classical baselines and ARIMA matches Chronos): the best (ARIMA)
-ties the classical baselines and trails the best foundation model by about a
-WAPE point, with the gap widening at finer resolutions (per-config numbers in
-Appendix~\ref{ap:artifacts}). The point is not that foundation models
+constant). All four run the same rolling-origin protocol on the image
+signal (shipped defaults; the constant predictor reproduces the naive
+baseline's WAPE exactly), with one asymmetry: at \SI{15}{\second} the
+costly ARIMA and Prophet fits score an evenly subsampled 300 of the
+2{,}687 common-span origins. At \SI{1}{\minute} all four sit at or below
+the naive baseline and none materially beats the best classical
+forecaster or reaches the foundation-model level. At \SI{15}{\second},
+ARIMA edges ahead of the classical baselines (naive scores 69.0\% on the
+same 300 origins; Prophet, at 73.3\%, trails both); rescoring the
+archived foundation-model forecasts on ARIMA's exact 300 origins puts
+ARIMA at 66.8\% WAPE against 66.0--66.1\% for Chronos and 66.5\% for
+TimesFM --- sub-point gaps a paired origin bootstrap cannot distinguish
+from zero --- while Toto with covariates, at 60.9\%, beats ARIMA by a
+statistically significant margin. The shipped best (ARIMA) thus ties the
+classical baselines and trails the best foundation model by about a WAPE
+point at \SI{1}{\minute}, widening to ${\approx}6$ points at
+\SI{15}{\second} (per-config numbers in Appendix~\ref{ap:artifacts};
+matched-origin rescore in
+\texttt{predictors/matched\_origin\_rescore\_2026-07-26.json}). The point is not that foundation models
 forecast this signal dramatically better but that the shipped predictors
 do not (the closed-loop consequence is in Chapter~\ref{cap:closedloop}).
 
@@ -246,10 +261,11 @@ the wins concentrate entirely where the point forecast is \emph{not} the
 median: TimesFM's mean head is beaten in nearly all its cells by the median
 or a lower quantile, and the Gaussian-band baselines account for most of
 the rest. For Chronos-2 and Toto-2, whose point \emph{is} the median,
-quantiles improve essentially nothing (per-cell counts in
+quantiles improve essentially nothing --- the largest gain anywhere is
+0.06 WAPE point, at 1-second image bins (per-cell counts in
 Appendix~\ref{ap:artifacts}). The pattern is what right-skewed, bursty
 rates predict: the conditional median sits below the mean, so mean-like
-forecasts overshoot after spikes and a slightly pessimistic quantile
+forecasts overshoot after spikes and the median (or a slightly lower quantile)
 corrects them. Conclusion: with a median-point foundation model the point
 path is already the best single operating line; the band's role is headroom
 sizing, not point correction.
@@ -286,7 +302,7 @@ cost~\cite{Arrow1951Newsvendor}, settled empirically in the closed-loop
 p50-vs-p90 sweep. At the burst's collapse the stitched path lags by up to
 one horizon (12 minutes), the price of forecasting in $H$-step tiles ---
 but holding capacity 12 minutes too long is a far cheaper failure than
-arriving 6 minutes late to a median-onset burst
+arriving 6.5 minutes late to a median-onset burst
 (Section~\ref{sec:eda-vision}).
 
 Two boundaries on what these metrics establish. First, WAPE measures
@@ -323,14 +339,22 @@ zero-shot posture. Zero-shot carries a contamination caveat: Chronos-2 and
 Toto-2 postdate the trace's 2025 public release, so their pretraining
 corpora could in principle contain series derived from it, though verbatim
 ingestion is unlikely and cannot be ruled in or out. TimesFM-2.0, however,
-\emph{predates} the release and lands within ${\approx}2$ WAPE points of
-the other two at provisioning cadence, bounding any contamination advantage
-at about that size where the forecasts are consumed. The classical
+\emph{predates} the release and stays broadly competitive --- reassuring
+indirect evidence against large-scale contamination, though not a bound:
+in the consumed \SI{15}{\second} image cell TimesFM trails the best
+Toto-2 mode by 4.3 WAPE points pooled (6.5 at $h{=}1$), and a different
+architecture's score cannot separate contamination from intrinsic model
+differences, so the magnitude of any contamination advantage remains
+unidentified. The classical
 baselines are \emph{fixed-parameter} (context-capped at TimesFM's budget);
 per-series tuning would narrow the margins of Table~\ref{tab:pred-wape},
 which should be read as a lower bound on tuned-baseline competitiveness.
 ARIMA (the incumbent in production autoscalers, including Dynamo's) is
-absent from this accuracy benchmark but present where it matters more: the
+absent from the main resolution$\times$signal grid
+(Table~\ref{tab:pred-wape}) --- though benchmarked on the image signal
+above, where at \SI{15}{\second} it is statistically indistinguishable
+from Chronos on matched origins --- but present where
+it matters more: the
 reactive baseline of Chapters~\ref{cap:baselines} and~\ref{cap:closedloop}
 runs Dynamo's planner with its ARIMA predictor unmodified. Quantile
 calibration is partially assessed (Section~\ref{sec:pred-quantiles}: upper
@@ -352,8 +376,8 @@ Chapter~\ref{cap:trace-eda} is exploitable at lead times that cover the
 median burst onset. The p90 band edge is empirically calibrated at
 provisioning cadence (coverage 0.88--0.90), making upper-quantile
 headroom a sound provisioning input; covariates are nearly irrelevant
-there, and for median-point models no fixed quantile improves on the
-point path --- the band is headroom, not correction. Inter-model margins
+there, and for median-point models no fixed quantile materially improves
+on the point path --- the band is headroom, not correction. Inter-model margins
 are small enough that engineering considerations can drive the choice.
 Tiled contiguously at the serving cadence, these forecasts are the input
 the following chapters' predictive autoscaling experiments consume.

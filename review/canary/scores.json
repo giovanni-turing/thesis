@@ -1,0 +1,87 @@
+{
+ "gate": "recall>=4/7, fab<=1, findings>=4",
+ "results": {
+  "minimax-m3": {
+   "recall": "7/7",
+   "fabrication": 0,
+   "latency_s": 26,
+   "verdict": "APPROVE"
+  },
+  "hy3": {
+   "recall": "7/7",
+   "fabrication": 0,
+   "latency_s": 76,
+   "verdict": "APPROVE"
+  },
+  "glm-5.2": {
+   "recall": "7/7",
+   "fabrication": 0,
+   "latency_s": 92,
+   "verdict": "APPROVE"
+  },
+  "kimi-k3": {
+   "recall": "7/7",
+   "fabrication": 0,
+   "latency_s": 91,
+   "verdict": "APPROVE"
+  },
+  "gemini-3.5-flash": {
+   "recall": "6/7",
+   "fabrication": 0,
+   "latency_s": 17,
+   "verdict": "APPROVE"
+  },
+  "step-3.7-flash": {
+   "recall": "6/7",
+   "fabrication": 0,
+   "latency_s": 46,
+   "verdict": "APPROVE"
+  },
+  "gpt-5.6-sol": {
+   "recall": "7/7",
+   "fabrication": 1,
+   "latency_s": 37,
+   "verdict": "APPROVE"
+  },
+  "qwen3.7-max": {
+   "recall": "7/7",
+   "fabrication": 1,
+   "latency_s": 92,
+   "verdict": "APPROVE"
+  },
+  "ernie-4.5-424b": {
+   "recall": "7/7",
+   "fabrication": 1,
+   "latency_s": 15,
+   "verdict": "APPROVE"
+  },
+  "nemotron-3-ultra": {
+   "recall": "7/7",
+   "fabrication": 1,
+   "latency_s": 20,
+   "verdict": "APPROVE"
+  },
+  "deepseek-v4-pro": {
+   "recall": "6/7",
+   "fabrication": 1,
+   "latency_s": 39,
+   "verdict": "APPROVE"
+  },
+  "command-a": {
+   "recall": "5/7",
+   "fabrication": 1,
+   "latency_s": 7,
+   "verdict": "APPROVE"
+  },
+  "mimo-v2.5": {
+   "recall": "4/7",
+   "fabrication": 0,
+   "latency_s": 36,
+   "verdict": "APPROVE"
+  },
+  "doubao-seed-2.0-pro": {
+   "verdict": "DROPPED",
+   "reason": "unreachable on configured providers"
+  }
+ }
+}

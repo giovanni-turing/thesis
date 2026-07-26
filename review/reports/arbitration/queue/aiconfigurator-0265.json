@@ -1,0 +1,47 @@
+{
+ "claim_id": "aiconfigurator-0265",
+ "chapter": "aiconfigurator",
+ "claim_type": "numeric",
+ "anchor": "The analytical model matched the empirical test with a \u22480.7 ms remainder",
+ "claim_text": "The analytical model matched the empirical test, with a remainder of approximately 0.7 ms.",
+ "expected_backing": "validation results",
+ "adjudication": [
+  {
+   "model": "hy3",
+   "verdict": "contradicted",
+   "observed": "remainder (empirical - aic_pred) min 3.055 ms, max 337.389 ms, avg 94.27 ms; ratio_meas_over_aic 1.2535\u20131.6208 (empirical exceeds model by 25\u201362%)",
+   "evidence": "The validation table collector_encoder_fn (expected backing 'validation results') shows the analytical model underpredicts empirical encoder latency by 3.055\u2013337.389 ms; zero of 530 valid rows are within 0.2 ms of 0.7 ms. Gemini's 0.752 ms is the sum of unmodeled kernel components (patch_embed_conv 0.495 + gather_cat 0.257) from collector_kernel_ledger \u2014 a decomposition artifact, not a model-vs-empirical validation residual.",
+   "severity": "major",
+   "fix": "Correct the claim: the analytical model does NOT match the empirical test within \u22480.7 ms. The validation residual is 3\u2013337 ms (ratio 1.25\u20131.62). The 0.7 ms figure is the unmodeled-component sum (patch_embed_conv + gather_cat), which should be described as a model-coverage gap, not a validation match error.",
+   "query": "SELECT COUNT(*) AS n, MIN(mean_ms - aic_pred_ms) AS min_rem, MAX(mean_ms - aic_pred_ms) AS max_rem, AVG(mean_ms - aic_pred_ms) AS avg_rem, MIN(ratio_meas_over_aic) AS min_ratio, MAX(ratio_meas_over_aic) AS max_ratio FROM collector_encoder_fn WHERE is_valid"
+  },
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "contradicted",
+   "observed": "min remainder = 3.055 ms, max = 311.465 ms across 530 valid paired points (average = 89.124 ms); 0 points are within 0.2 ms of 0.7 ms",
+   "evidence": "The vision encoder validation table (collector_encoder_fn) shows the analytical model systematically underpredicts empirical measurements by 3.055 ms to 311.465 ms. The \u22480.7 ms figure is actually the sum of two unmodeled kernel ledger components (patch_embed_conv at 0.495 ms and gather_cat at 0.257 ms), which represents a model-coverage gap, not a validation residual.",
+   "severity": "major",
+   "fix": "Correct the claim to state that the analytical model underpredicts empirical encoder latency by at least 3.1 ms (and up to 311.5 ms), and characterize the \u22480.7 ms figure as the latency of unmodeled kernel components rather than a validation match error.",
+   "query": "SELECT COUNT(*) AS n_valid, MIN(mean_ms - aic_pred_ms) AS min_rem, MAX(mean_ms - aic_pred_ms) AS max_rem, AVG(mean_ms - aic_pred_ms) AS avg_rem FROM provenance.collector_encoder_fn WHERE is_valid = true;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "Across 85 valid paired results, mean_ms minus aic_pred_ms ranges from 3.055 ms to 311.465 ms; 0 results lie between 0.6 and 0.8 ms. The separate patch_embed_conv plus gather_cat diagnostic is 0.752 ms.",
+   "evidence": "The 0.752 ms value is a sum of two N=1 kernel categories, not the empirical-minus-model remainder; every valid paired validation remainder exceeds 3.055 ms.",
+   "severity": "major",
+   "fix": "Replace the claim with the validated 3.055\u2013311.465 ms remainder range, or explicitly describe 0.752 ms only as the N=1 patch-embedding-plus-gather kernel contribution.",
+   "query": "WITH dim_audit AS (\n  SELECT COUNT(*) AS current_dim_rows\n  FROM provenance.v_dim\n  WHERE is_current = true\n    AND source_path IN (\n      SELECT DISTINCT source_path\n      FROM provenance.collector_encoder_fn\n      WHERE aic_pred_ms IS NOT NULL\n    )\n), paired AS (\n  SELECT source_path, engine, attn, image_px, n_images,\n         mean_ms - aic_pred_ms AS remainder_ms\n  FROM provenance.collector_encoder_fn\n  WHERE is_valid = true\n    AND mean_ms IS NOT NULL\n    AND aic_pred_ms IS NOT NULL\n), breakdown AS (\n  SELECT source_path, engine, attn, image_px,\n         COUNT(*) AS n_paired,\n         ROUND(MIN(remainder_ms)::numeric, 3) AS min_remainder_ms,\n         ROUND(MAX(remainder_ms)::numeric, 3) AS max_remainder_ms,\n         COUNT(*) FILTER (WHERE remainder_ms BETWEEN 0.6 AND 0.8) AS n_between_0_6_and_0_8_ms\n  FROM paired\n  GROUP BY source_path, engine, attn, image_px\n), kernel_diagnostic AS (\n  SELECT ROUND(SUM(ms)::numeric, 3) AS patch_embed_plus_gather_ms\n  FROM provenance.collector_kernel_ledger\n  WHERE n_images = 1\n    AND entry_kind = 'category'\n    AND entry_name IN ('patch_embed_conv', 'gather_cat')\n)\nSELECT COUNT(*) AS valid_paired_denominator,\n       ROUND(MIN(p.remainder_ms)::numeric, 3) AS min_remainder_ms,\n       ROUND(MAX(p.remainder_ms)::numeric, 3) AS max_remainder_ms,\n       COUNT(*) FILTER (WHERE p.remainder_ms BETWEEN 0.6 AND 0.8) AS n_between_0_6_and_0_8_ms,\n       d.current_dim_rows,\n       k.patch_embed_plus_gather_ms,\n       (SELECT jsonb_agg(to_jsonb(b) ORDER BY b.source_path, b.engine, b.image_px) FROM breakdown b) AS per_source_breakdown\nFROM paired p\nCROSS JOIN dim_audit d\nCROSS JOIN kernel_diagnostic k\nGROUP BY d.current_dim_rows, k.patch_embed_plus_gather_ms"
+  },
+  {
+   "model": "glm-5.2",
+   "verdict": "contradicted",
+   "observed": "min remainder = 3.055 ms, max = 311.465 ms across 530 valid paired points; 0 points in [0.5,0.9] ms; avg = 94.27 ms",
+   "evidence": "In collector_encoder_fn the smallest |mean_ms \u2212 aic_pred_ms| over 530 valid rows is 3.055 ms (n_images=1, sdpa, 448px: mean 11.217 vs aic_pred 8.162) \u2014 4.4\u00d7 the claim; zero rows fall near 0.7 ms.",
+   "severity": "blocking",
+   "fix": "Replace with actual validation figures: the analytical model systematically under-predicts encoder latency, with remainder ranging from ~3.1 ms (single image) to ~311 ms (large batch); it does not match to within 0.7 ms.",
+   "query": "SELECT COUNT(*) AS n_valid, MIN(mean_ms - aic_pred_ms) AS min_rem, MAX(mean_ms - aic_pred_ms) AS max_rem, MIN(ABS(mean_ms - aic_pred_ms)) AS min_abs_rem FROM provenance.collector_encoder_fn WHERE is_valid; -- plus: SELECT COUNT(*) AS n_near FROM provenance.collector_encoder_fn WHERE ABS(mean_ms - aic_pred_ms) BETWEEN 0.5 AND 0.9"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

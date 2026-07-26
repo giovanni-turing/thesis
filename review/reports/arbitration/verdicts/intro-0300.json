@@ -1,0 +1,11 @@
+{
+  "claim_id": "intro-0300",
+  "verdict": "holds",
+  "observed": "v_cost_ratio (is_current): a12:week_encoder_timesfm aggregate cost_ratio=0.6035 vs deployable_static_c8 (denominator_window_mismatch=false). Per-burst forecast encoder ratios vs the same C=8 denominator: burst1=1.7495, burst3=2.4571.",
+  "claimed": "Per-pool provisioning holds the tail latency objective through burst onsets (that defeat reactive) at a fraction of the deployable static encoder fleet's GPU-time.",
+  "evidence": "The sentence combines two individually true headlines: (1) SLA held through burst onsets where an identically-informed reactive controller fails (closed-loop factorial), and (2) the encoder schedule consumes 0.6035x the deployable static C=8 fleet's TOTAL GPU-time over the covered span. 'A fraction of the deployable static encoder fleet's GPU-time' precisely denotes the fleet's integrated (aggregate) GPU-time = 0.60x, which is what the data shows. The thesis's own fuller statement (intro.tex:177-179) explicitly scopes this cost as 'over the evaluated week, at a fraction of the best static encoder fleet's GPU-hours'. Both adjudicators mis-attached the aggregate cost fraction to per-burst windows (where forecast provisioning is 1.75-2.46x static because it spins up ahead); the sentence makes no per-burst cost claim. Wrong-scope flag.",
+  "severity": "minor",
+  "fix": "Optional clarity only: the compressed anchor could add 'over the week' (as the fuller line 177 does) to preclude a per-burst cost reading. No factual defect.",
+  "confidence": 0.72,
+  "query": "SELECT run_id,window_name,ROUND(cost_ratio::numeric,4) ratio,denominator_kind,denominator_window_mismatch FROM v_cost_ratio WHERE is_current AND denominator_kind='deployable_static_c8' AND (run_id='a12:week_encoder_timesfm' OR (experiment='rerun_verify' AND pool='encoder' AND policy='forecast' AND lead_s=30 AND window_name LIKE 'burst%'));"
+}

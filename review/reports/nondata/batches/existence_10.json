@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "conclusion-0331",
+  "chapter": "conclusion",
+  "claim_type": "existence",
+  "anchor": "the encoder pool failing its tail bound at the trace's own recorded rate --- invisibly to rate- and utilization-based monitors",
+  "claim_text": "Encoder pool violates its tail latency SLA at the trace's actual request rate, undetected by rate- or utilization-based monitoring",
+  "expected_backing": "v_infraction showing encoder tail bound violations at trace rate"
+ },
+ {
+  "claim_id": "baselines-0352",
+  "chapter": "baselines",
+  "claim_type": "existence",
+  "anchor": "It also carries a fleet-shape difference (TP2 versus TP1) that no replica autoscaler can morph at runtime.",
+  "claim_text": "The fleet-shape difference (TP2 vs TP1) cannot be morphed by a replica autoscaler at runtime.",
+  "expected_backing": "v_grid_static_effective"
+ },
+ {
+  "claim_id": "aiconfigurator-0379",
+  "chapter": "aiconfigurator",
+  "claim_type": "existence",
+  "anchor": "The Qwen3-VL family shares this tower across its 8B, 32B, and 235B variants",
+  "claim_text": "Qwen3-VL 8B, 32B, 235B share same vision tower.",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "closedloop-0401",
+  "chapter": "closedloop",
+  "claim_type": "existence",
+  "anchor": "All three foundation models pass all 60 p90/rho=15 cells, consistent with the small cross-model spreads of Chapter 3.",
+  "claim_text": "All three foundation models (Chronos, Toto, TimesFM) pass all 60 p90/rho=15 factorial cells.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "closedloop-0402",
+  "chapter": "closedloop",
+  "claim_type": "existence",
+  "anchor": "Swapping Dynamo's own load predictor among ARIMA, Kalman, and Prophet leaves the SLA verdict unchanged (all failing together on the fast onset, burst3).",
+  "claim_text": "Dynamo's built-in predictors (ARIMA, Kalman, Prophet) all fail burst3 identically.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "closedloop-0406",
+  "chapter": "closedloop",
+  "claim_type": "existence",
+  "anchor": "Point and p50 paths, sizing to the mean, detect the same onsets late or never and fail as provisioning signals; the p90 band shows zero false alarms across the calm day for every model.",
+  "claim_text": "p50/point forecasts fail as provisioning signals; p90 band has zero false alarms on calm day for all models.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "closedloop-0413",
+  "chapter": "closedloop",
+  "claim_type": "existence",
+  "anchor": "Run with the planner's native conversion (replicas = mean demand over mean per-replica throughput), the same forecast fails much like the reactive baseline.",
+  "claim_text": "Forecast with mean-based conversion fails similarly to reactive baseline.",
+  "expected_backing": "v_infraction"
+ },
+ {
+  "claim_id": "closedloop-0424",
+  "chapter": "closedloop",
+  "claim_type": "existence",
+  "anchor": "On the encoder pool p50 fails every one of its 48 week-scale cells.",
+  "claim_text": "Encoder pool p50 fails all 48 week-scale cells.",
+  "expected_backing": "v_infraction"
+ }
+]

@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "apendice-0143",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "The matched-engine check times eager vLLM's standalone vision-tower forward on synthetic GPU-resident inputs with randomly initialised weights (latency is shape-determined, so weight values are not expected to materially affect these dense-kernel timings): it is the forward compute, not the complete serving path (image preprocessing, host-to-device transfer, scheduling, prefill), swept densely over N=1--512.",
+  "claim_text": "Matched-engine check times eager vLLM standalone vision-tower forward on synthetic GPU-resident inputs with random weights; latency shape-determined; forward compute only (not full serving path); swept N=1-512",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "apendice-0150",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "Per-window factorial (60-cell p90 headline + p50; rho-rating surface)",
+  "claim_text": "Per-window factorial: 60-cell p90 headline + p50; rho-rating surface",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "apendice-0155",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "results/*.parquet (26 files); runtime logs results/logs/",
+  "claim_text": "Predictor results: 26 parquet files in results/ and runtime logs in results/logs/",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "apendice-0156",
+  "chapter": "apendice",
+  "claim_type": "methodological",
+  "anchor": "provenance store (schema provenance: v_joint_e2e, v_pool_latency, v_pool_cost) over simulation/results/",
+  "claim_text": "Provenance store schema: v_joint_e2e, v_pool_latency, v_pool_cost over simulation/results/",
+  "expected_backing": "v_pool_latency"
+ },
+ {
+  "claim_id": "predictors-0157",
+  "chapter": "predictors",
+  "claim_type": "methodological",
+  "anchor": "on all four demand signals, at five bin resolutions, under one rolling-origin protocol",
+  "claim_text": "Evaluation covers four demand signals (requests, images, context tokens, generated tokens) at five bin resolutions (1s, 15s, 30s, 45s, 1min) with rolling-origin protocol",
+  "expected_backing": "predictors/benchmark.py protocol config"
+ },
+ {
+  "claim_id": "predictors-0158",
+  "chapter": "predictors",
+  "claim_type": "methodological",
+  "anchor": "Origins advance in strides of $H$, every origin a multiple of $H$: consecutive forecasts tile the timeline into a continuous, non-overlapping prediction path",
+  "claim_text": "Rolling origins advance in strides of H=12 bins, tiling timeline into continuous non-overlapping prediction path",
+  "expected_backing": "predictors/benchmark.py origin stride"
+ },
+ {
+  "claim_id": "predictors-0160",
+  "chapter": "predictors",
+  "claim_type": "methodological",
+  "anchor": "Chronos-2 forecasts each target with the other three series supplied as past-only covariates, its native conditioning path; Toto-2 forecasts all four signals jointly as one multivariate series",
+  "claim_text": "Chronos-2 uses other three series as past-only covariates; Toto-2 forecasts all four jointly as multivariate series",
+  "expected_backing": "predictors/benchmark.py covariate modes"
+ },
+ {
+  "claim_id": "predictors-0161",
+  "chapter": "predictors",
+  "claim_type": "methodological",
+  "anchor": "Point forecasts are the median for Chronos-2 and Toto-2, the mean head for TimesFM, and the model value for the baselines, whose quantile bands are Gaussian prediction intervals",
+  "claim_text": "Point forecasts: median for Chronos-2/Toto-2, mean head for TimesFM, model value for baselines; baseline quantiles are Gaussian prediction intervals",
+  "expected_backing": "predictors/benchmark.py point forecast extraction"
+ }
+]

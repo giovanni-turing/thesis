@@ -1,0 +1,25 @@
+{
+ "claim_id": "closedloop-0117",
+ "chapter": "closedloop",
+ "claim_type": "comparative",
+ "anchor": "the p90-forecast policy passes the week at TTFT p99 651 ms (ITL p99 6.4 ms) for 518.6 H100 GPU-hours, slightly below the burst-sized static TP2\u00d72 fleet's 537.4 for the same span (0.965\u00d7)",
+ "claim_text": "The p90-forecast policy achieves 0.965\u00d7 the GPU-hours of the burst-sized static TP2\u00d72 fleet",
+ "expected_backing": "v_cost_ratio",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "holds",
+   "observed": "gpu_hours=518.606, p99_ttft=651.14ms, p99_itl=6.41ms, denominator=537.400, cost_ratio=0.9650",
+   "evidence": "Exact match of numerator (518.61 GPU-h), TTFT p99 (651.1 ms), and ITL p99 (6.4 ms) in llm_run_summary; the 537.4 GPU-h baseline is the analytical cost of a 4-GPU static TP2x2 fleet over the 483,659.8s aggregate window (518.61 / 537.40 = 0.9650x).",
+   "severity": "minor"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "unverifiable",
+   "observed": "518.6063450234815 GPU-hours; 0 v_cost_ratio rows; 0 static-denominator rows; TP and replica count are null; 0 per-window rows. A hypothetical constant four-GPU denominator gives 537.3997777777778 GPU-hours and ratio 0.9650289532459247.",
+   "evidence": "The arithmetic holds only for an assumed four-GPU fleet, but the owning view contains no comparison row and the current run does not identify TP2\u00d72 or provide per-window backing.",
+   "severity": "major"
+  }
+ ],
+ "reason": "split-adjudicators"
+}

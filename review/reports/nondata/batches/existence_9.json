@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "intro-0312",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "Each pool must therefore be provisioned on its own demand signal, and can be provisioned predictively, because the signal least visible to conventional autoscaling is also the most persistent: pretrained time-series models forecast it, zero-shot, at the horizons provisioning requires.",
+  "claim_text": "Each pool must be provisioned on its own demand signal, which can be forecasted predictively by pretrained time-series models.",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "intro-0317",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "A characterization of production multimodal inference traffic as per-pool demand signals",
+  "claim_text": "Production multimodal inference traffic is characterized as per-pool demand signals.",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "intro-0318",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "A zero-shot benchmark of time-series foundation models on serving demand signals",
+  "claim_text": "Time-series foundation models are benchmarked zero-shot on serving demand signals.",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "intro-0319",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "A silicon-calibrated cost model for consumer-GPU vision encoding",
+  "claim_text": "A silicon-calibrated cost model for consumer-GPU vision encoding is developed.",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "intro-0320",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "A calibrated two-pool simulation platform, and the saturation-knee result",
+  "claim_text": "A calibrated two-pool simulation platform is developed, showing saturation knees an order of magnitude apart.",
+  "expected_backing": "v_grid_static_effective"
+ },
+ {
+  "claim_id": "intro-0321",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "Baselines and the closed predictive-scaling loop",
+  "claim_text": "Baselines and a closed predictive-scaling loop are established.",
+  "expected_backing": "v_cost_ratio"
+ },
+ {
+  "claim_id": "twopool-0328",
+  "chapter": "twopool",
+  "claim_type": "existence",
+  "anchor": "the vision pool's cost model admits an exact batching law, grounding a realistic cross-request batching policy and an analytic bound on the inter-pool handoff",
+  "claim_text": "The vision pool's cost model provides an exact batching law that enables a realistic cross-request batching policy and an analytic bound on inter-pool handoff latency.",
+  "expected_backing": "v_cost_ratio, collector_encoder_fn, simulation/results/sweeps/summary.json"
+ },
+ {
+  "claim_id": "twopool-0330",
+  "chapter": "twopool",
+  "claim_type": "existence",
+  "anchor": "the vision pool's steady-window knee is censored ($s \\geq 32$)",
+  "claim_text": "The vision pool's saturation knee in the steady window is censored at speedup s\u226532.",
+  "expected_backing": "v_grid_static_effective, Table tab:sim-knees"
+ }
+]

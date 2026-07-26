@@ -1,0 +1,37 @@
+Phase 4: 85 FAIL claims -> 85 validation units
+per-model: {'minimax-m3': 85}
+[ok     ] minimax-m3       validation-0004
+[timeout] minimax-m3       twopool-0020
+[ok     ] minimax-m3       twopool-0021
+[ok     ] minimax-m3       twopool-0024
+[ok     ] minimax-m3       twopool-0025
+[ok     ] minimax-m3       twopool-0027
+[ok     ] minimax-m3       twopool-0039
+[ok     ] minimax-m3       twopool-0045
+[ok     ] minimax-m3       twopool-0047
+[ok     ] minimax-m3       twopool-0053
+[ok     ] minimax-m3       twopool-0056
+[ok     ] minimax-m3       twopool-0062
+[ok     ] minimax-m3       twopool-0068
+[ok     ] minimax-m3       predictors-0072
+[ok     ] minimax-m3       predictors-0073
+[ok     ] minimax-m3       trace-eda-0074
+[ok     ] minimax-m3       trace-eda-0088
+[ok     ] minimax-m3       conclusion-0097
+[timeout] minimax-m3       conclusion-0098
+[ok     ] minimax-m3       conclusion-0100
+[timeout] minimax-m3       conclusion-0101
+[ok     ] minimax-m3       closedloop-0119
+[ok     ] minimax-m3       closedloop-0120
+[ok     ] minimax-m3       closedloop-0121
+[ok     ] minimax-m3       apendice-0138
+[ok     ] minimax-m3       apendice-0144
+[ok     ] minimax-m3       apendice-0145
+[ok     ] minimax-m3       apendice-0149
+[ok     ] minimax-m3       predictors-0166
+[ok     ] minimax-m3       predictors-0171
+[ok     ] minimax-m3       predictors-0173
+[ok     ] minimax-m3       predictors-0174
+[ok     ] minimax-m3       predictors-0176
+[ok     ] minimax-m3       predictors-0191
+[ok     ] minimax-m3       intro-0197

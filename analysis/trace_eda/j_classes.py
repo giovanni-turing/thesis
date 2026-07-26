@@ -1,8 +1,10 @@
 """EDA J — workload-class decomposition on the k² tile structure (GPU/cuDF).
 
-Classes by tile-grid side k = sqrt(NumImages):
-  text  (k=0) · single (k=1) · tiled-small (k∈[2,5], 4–25 imgs)
+Classes by tile-grid side k = sqrt(NumImages) over perfect-square counts:
+  text (0 imgs) · single (1 img) · tiled-small (k∈[2,5], 4–25 imgs)
   tiled-large (k∈[6,10], 36–100) · frames (k>10, >100 imgs — video-like)
+  · nonsquare (positive counts that are not perfect squares — 53 requests;
+    kept explicit rather than rounded into the nearest square class)
 
 Per class: request/image volume shares, token profiles, rate signals and
 burstiness — and the attribution question: WHICH class drives each burst
@@ -17,18 +19,20 @@ from _common import C_AQUA, C_BLUE, C_YELLOW, MUTED, load_trace, plt, save_fig, 
 df = load_trace()
 k = df["NumImages"].pow(0.5).round().astype("int32")
 df = df.assign(k=k)
+is_square = (df["k"] * df["k"]) == df["NumImages"]
 conds = [
     ("text", df["NumImages"] == 0),
-    ("single", (df["k"] == 1) & (df["NumImages"] > 0)),  # k=1 incl. NumImages=2 rounding down
-    ("tiled_small", (df["k"] >= 2) & (df["k"] <= 5) & (df["NumImages"] > 1)),
-    ("tiled_large", (df["k"] >= 6) & (df["k"] <= 10)),
-    ("frames", df["k"] > 10),
+    ("single", df["NumImages"] == 1),
+    ("nonsquare", (df["NumImages"] > 0) & ~is_square),  # explicit, not rounded into a square class
+    ("tiled_small", is_square & (df["k"] >= 2) & (df["k"] <= 5)),
+    ("tiled_large", is_square & (df["k"] >= 6) & (df["k"] <= 10)),
+    ("frames", is_square & (df["k"] > 10)),
 ]
 df["cls"] = "text"
 for name, cond in conds[1:]:
     df["cls"] = df["cls"].where(~cond, name)
 
-CLASSES = ["text", "single", "tiled_small", "tiled_large", "frames"]
+CLASSES = ["text", "single", "nonsquare", "tiled_small", "tiled_large", "frames"]
 stats = {"classes": {}}
 tot_img = float(df["NumImages"].sum())
 for c in CLASSES:

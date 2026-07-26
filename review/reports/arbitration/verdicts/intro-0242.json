@@ -1,0 +1,11 @@
+{
+  "claim_id": "intro-0242",
+  "verdict": "supported",
+  "observed": "ewma_ablation_cell (chronos, aggregate, p90, rho=15, readiness=warm, lead_s=30, is_current): ws=2410754.7 worker-s / denom_static_c8_ws=3869278.4 = ratio 0.6231 (p99=589.301ms, feasible=t). This matches Table cl-aggregate (Forecast p90 L=30s issue-time: 2.41 Mworker-s, 0.62x). 0.6231 rounds to 0.62x.",
+  "claimed": "Prices the covered week at 0.62x the deployable static encoder fleet's worker-time.",
+  "evidence": "The 0.62x headline is the Chronos p90 rho=15 L=30s issue-time forecast schedule, documented as the canonical cell in SCHEMA_GUIDE.md 2.3 and backed by ewma_ablation_cell = 0.6231 (rounds to 0.62). Both adjudicators queried a12:week_encoder_timesfm (0.6035) — a TimesFM model-robustness cross-check, NOT the Chronos p90 headline. Thesis is explicit that forecast policies use Chronos-2 at rho=15 (closedloop.tex:358). The flag is a wrong-operand artifact (wrong forecast model). Denominator = deployable_static_c8 = 3.87 Mworker-s, matching the claim's 'deployable static encoder fleet'.",
+  "severity": "minor",
+  "fix": "None. Claim stands; 0.62x is the correct rounding of the Chronos p90 issue-time cell (0.6231). Do not change to 0.60x — that is the TimesFM cross-check run, not the headline.",
+  "confidence": 0.93,
+  "query": "SELECT model,window_name,quantile,rho,readiness,lead_s,round(ws::numeric,1) AS ws,denom_static_c8_ws,round(ratio_vs_static::numeric,4) AS ratio,round(p99_ms::numeric,3) AS p99,feasible FROM ewma_ablation_cell WHERE model='chronos' AND window_name='aggregate' AND quantile='p90' AND rho=15 AND readiness='warm' AND lead_s=30;"
+}

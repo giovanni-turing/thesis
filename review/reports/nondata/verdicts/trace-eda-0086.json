@@ -1,0 +1,1 @@
+{"claim_id":"trace-eda-0086","type":"existence","verdict":"supported","evidence":"analysis/trace_eda/e_comprehensive_stats.json img_gen_xcorr_1min: best_lag_minutes=0, best_corr=0.2769, at_lag_0=0.2769 (identical to best), i.e. the 1-min window image-generation cross-correlation peaks at lag zero with no lead.","fix":"","confidence":0.95}

@@ -95,8 +95,8 @@ behave as composed: attention exactly linear per image (1.300→1.306 ms —
 matches the collected b=64 row), GEMM per-image falls 6.03→3.69 ms;
 dispatch amortizes 15.3%→2.5%. The growth is the unmodeled categories:
 elementwise 1.18→1.89 ms/img, DeepStack gather/cat 0.26→0.58 ms/img;
-unmodeled total 168.6 ms at N=64 = 92% of the 182 ms model-vs-kernel
-gap. Ledger CLOSED; recorded in thesis §5.3.1.
+unmodeled total 168.6 ms at N=64 = 92.6% (thesis rounds 93%) of the
+182 ms model-vs-kernel gap. Ledger CLOSED; recorded in thesis §5.3.1.
 
 ## Follow-ups
 

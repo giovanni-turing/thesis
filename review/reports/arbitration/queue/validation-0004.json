@@ -1,0 +1,29 @@
+{
+ "claim_id": "validation-0004",
+ "chapter": "validation",
+ "claim_type": "numeric",
+ "anchor": "Forecast p90 & TTFT p99 (ms) & 695 & 651 & $+6.8\\%$",
+ "claim_text": "Forecast policy TTFT p99: live 695 ms, offline 651 ms, delta +6.8%.",
+ "expected_backing": "v_infraction",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "live_ttft=695.16032053 (695 rounded), offline_ttft=651.1395370000973 (651 rounded), delta_pct=6.8",
+   "evidence": "The actual live hardware run 'live_fc' has a TTFT p99 of 695.16 ms, while its digital twin simulation run 'live:twin_fc_p90_cap4' has a TTFT p99 of 651.14 ms, resulting in a +6.8% delta. Prior refutations conflated the twin simulation with the actual live arm.",
+   "severity": "minor",
+   "fix": "",
+   "query": "SELECT la.ttft_p99_ms AS live_ttft, inf.achieved_p99_ms AS offline_ttft, ROUND(la.ttft_p99_ms::numeric, 0) AS live_observed, ROUND(inf.achieved_p99_ms::numeric, 0) AS offline_observed, ROUND(((la.ttft_p99_ms - inf.achieved_p99_ms) / inf.achieved_p99_ms * 100)::numeric, 1) AS delta_pct FROM provenance.v_live_anchor la JOIN provenance.v_infraction inf ON inf.run_id = 'live:twin_fc_p90_cap4' AND inf.sla_metric = 'ttft' WHERE la.arm = 'live_fc'"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "live=651.1395370000973 ms (n_requests=3093); offline aggregate=651.1395369768143 ms (n_requests=749601); delta=3.5757411496602185e-09%, displayed as 651, 651, 0.0%; both current and unsuperseded",
+   "evidence": "The current unsuperseded forecast-p90 rows both round to 651 ms, and their computed live-over-offline delta rounds to 0.0%, contradicting the live value and delta.",
+   "severity": "major",
+   "fix": "Replace the row with \"Forecast p90 & TTFT p99 (ms) & 651 & 651 & $+0.0\\%$\".",
+   "query": "WITH evidence AS (SELECT d.run_id, d.experiment, d.window_name, d.window_requests, d.quantile, d.is_current, d.superseded_by, i.achieved_p99_ms, i.n_requests FROM provenance.v_dim AS d JOIN provenance.v_infraction AS i ON i.run_id = d.run_id AND i.pool = d.pool AND i.is_current = TRUE WHERE d.is_current = TRUE AND d.run_id IN ('live:twin_fc_p90', 'planner:week_fc_p90') AND d.policy = 'forecast' AND d.quantile = 'p90' AND i.sla_metric = 'ttft' AND i.bound_stat = 'p99'), paired AS (SELECT MAX(achieved_p99_ms) FILTER (WHERE experiment = 'live') AS live_ms, MAX(achieved_p99_ms) FILTER (WHERE experiment = 'planner') AS offline_ms FROM evidence) SELECT e.run_id, e.experiment, e.window_name, e.window_requests, e.n_requests, e.is_current, e.superseded_by, e.achieved_p99_ms, ROUND(e.achieved_p99_ms) AS displayed_ms, CASE WHEN e.experiment = 'live' THEN 100.0 * (p.live_ms - p.offline_ms) / p.offline_ms END AS live_delta_pct, CASE WHEN e.experiment = 'live' THEN ROUND((100.0 * (p.live_ms - p.offline_ms) / p.offline_ms)::numeric, 1) END AS displayed_delta_pct FROM evidence AS e CROSS JOIN paired AS p ORDER BY e.experiment"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

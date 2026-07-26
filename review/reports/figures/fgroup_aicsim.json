@@ -1,0 +1,22 @@
+[
+ {
+  "name": "aic_fn",
+  "path": "/home/gio/tese-review-frozen/figuras/aic/aic_fn.png",
+  "exists": true
+ },
+ {
+  "name": "aic_fn_engines",
+  "path": "/home/gio/tese-review-frozen/figuras/aic/aic_fn_engines.png",
+  "exists": true
+ },
+ {
+  "name": "sim_burst_queue",
+  "path": "/home/gio/tese-review-frozen/figuras/sim/sim_burst_queue.png",
+  "exists": true
+ },
+ {
+  "name": "sim_knees",
+  "path": "/home/gio/tese-review-frozen/figuras/sim/sim_knees.png",
+  "exists": true
+ }
+]

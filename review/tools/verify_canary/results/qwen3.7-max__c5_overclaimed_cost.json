@@ -1,0 +1,1 @@
+{"model": "qwen3.7-max", "claim": "c5_overclaimed_cost", "known": "overclaimed", "got": "contradicted", "queried_right_view": true, "any_query": true}

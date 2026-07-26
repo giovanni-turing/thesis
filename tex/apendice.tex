@@ -54,7 +54,8 @@ Chapter~\ref{cap:twopool}).
 
 The GPU EDA environment (\texttt{eda/}: cuDF/cuML/CuPy on the RAPIDS
 \texttt{cu13} stack) is reproducible from this checkout via its tracked
-\texttt{uv} lock (\texttt{eda/uv.lock}, \texttt{eda/pyproject.toml}); its
+\texttt{uv} lock (\texttt{eda/\allowbreak uv.lock},
+\texttt{eda/\allowbreak pyproject.toml}); its
 multi-gigabyte \texttt{.venv} stays gitignored. The aiconfigurator and
 ai-dynamo environments are separate virtual environments external to this
 checkout, pinned to the principal versions in Table~\ref{tab:ap-env}. The
@@ -103,11 +104,11 @@ contributions returned upstream.
 
 Table~\ref{tab:app-engine} times the same Qwen3-VL vision-tower forward
 (bf16, $448^2$, RTX~5090 under an external \texttt{nvidia-smi} clock lock,
-target SM~2400\,/\,mem~14001\,\si{\mega\hertz}) under four
-execution paths, against AIC's composition. This is a separate
-recollection from the Phase-E self-lock attempt of the Environment section
-(per-$N$ SM readings 2377--2400\,\si{\mega\hertz}, no memory-clock reading
-or lock-command log captured).
+target SM \SI{2400}{\mega\hertz}, memory \SI{14001}{\mega\hertz}) under
+four execution paths, against AIC's composition. This is a separate
+recollection from the Phase-E self-lock attempt of the Environment
+section (per-$N$ SM readings 2377--2400 \si{\mega\hertz}, no
+memory-clock reading or lock-command log captured).
 
 \begin{table}[htbp]
 \centering
@@ -125,22 +126,22 @@ composition.}
 $N$ & AIC & HF-SDPA & HF-FA2 & vLLM-FA & \texttt{compile} & vLLM/AIC \\
 \midrule
 1  & 8.2   & 11.3  & 11.2  & 8.0   & 10.1  & 0.98 \\
-8  & 43.1  & 58.7  & 54.1  & 42.2  & 48.8  & 0.98 \\
-32 & 160.2 & 253.8 & 232.0 & 178.3 & 186.0 & 1.11 \\
-64 & 316.4 & 511.6 & 465.7 & 333.7 & 370.6 & 1.05 \\
+8  & 43.1  & 58.7  & 54.2  & 42.2  & 48.8  & 0.98 \\
+32 & 160.2 & 253.8 & 232.0 & 178.4 & 186.0 & 1.11 \\
+64 & 316.4 & 511.6 & 465.6 & 333.6 & 370.6 & 1.05 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The four table rows are anchor shapes within a dense sweep;
+The four table rows are anchor shapes within the $N{\le}64$-dense sweep;
 Figure~\ref{fig:app-engines} plots the engines across the whole batch axis.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figuras/aic/aic_fn_engines}
 \caption{Dense $f(N)$ for the four execution engines vs.\ the AIC
-composition ($448^2$, RTX~5090, external clock lock; dense sweeps with
-tight CIs, details in the artifact). \emph{Left}: forward latency
+composition ($448^2$, RTX~5090, external clock lock; $N{\le}64$-dense
+sweeps plus off-cap probes, tight CIs, details in the artifact). \emph{Left}: forward latency
 (log--log). \emph{Right}: each engine relative to the composition; the
 shaded band marks $\pm12.8\%$ and the dotted line the FIFO cap
 ($N{=}64$). vLLM stays inside the band across the serving regime;
@@ -173,7 +174,7 @@ initialised weights (latency is shape-determined, so weight values are not
 expected to materially affect these dense-kernel timings): it is the
 forward compute, not the complete serving path (image preprocessing,
 host-to-device transfer, scheduling, prefill), swept densely over
-$N{=}1$--$512$. Fed through the encoder FIFO --- the AIC-sized winning week
+$N{=}1$--$64$ plus five off-cap probes ($N\in\{96,128,192,256,512\}$). Fed through the encoder FIFO --- the AIC-sized winning week
 schedule of Chapter~\ref{cap:closedloop} replayed with $f(N)$ repriced at
 the measured vLLM curve --- it leaves the week-scale encoder-delay p99 at
 \SI{606}{\milli\second} (from \SI{589}{\milli\second} under AIC),
@@ -235,7 +236,8 @@ Figs.~\ref{fig:pred-heatmap}--\ref{fig:pred-horizon},
 \ref{fig:pred-band}, \ref{fig:pred-models},
 \ref{fig:cl-framework-diff} &
   \texttt{predictors/ \{benchmark, precision, figures\_tex\}.py} &
-  \texttt{results/*.parquet} (26 files); runtime logs
+  \texttt{results/*.parquet} (the 4-signal $\times$ 6-model base grid);
+  runtime logs
   \texttt{results/logs/} \\
 Dynamo shipped-predictor comparison (\S\ref{sec:pred-point}) &
   registry sweep through the same protocol &
@@ -243,7 +245,8 @@ Dynamo shipped-predictor comparison (\S\ref{sec:pred-point}) &
   constant\}\_*.json; comparison\_table.csv} \\
 Additive context decomposition (\S\ref{sec:pred-covariates}) &
   structural ablation over the archive &
-  \texttt{results/metrics/ additive\_structural\_ablation.json} \\
+  \texttt{results/metrics/
+  additive\_\allowbreak structural\_\allowbreak ablation.json} \\
 Quantile coverage (\S\ref{sec:pred-quantiles}) &
   coverage pass over the archive &
   \texttt{results/metrics/ quantile\_coverage.json} \\
@@ -264,6 +267,17 @@ Tab.~\ref{tab:sim-poly-aic} &
 Tab.~\ref{tab:sim-knees}, Fig.~\ref{fig:sim-knees} &
   \texttt{simulation/sweep\_load.py}; \texttt{sweep\_fig.py} &
   \texttt{results/sweeps/ summary.json} \\
+235B family transfer (\S\ref{sec:sim-timing}; ITL/TTFT p99, ms: wheel
+  $s{=}1$ 87.7/397.7; source 1.3.0 $s{=}1$ 86.2/387.4, $s{=}2$
+  210.6/524.0) &
+  wheel-era spot check \texttt{simulation/ run\_replay.sh}
+  (\texttt{AIC\_TP=8}, \texttt{AIC\_MOE\_TP=8}); source-built ladder
+  \texttt{defense/anim/build/ gen\_g3\_32b.py} &
+  \texttt{simulation/results/235b/
+  llm\_head2k\_\allowbreak aic235btp8\_\allowbreak s\{1,4,16\}.json}
+  (wheel era); \texttt{defense/anim/data/g3\_32b/
+  reports/235b\_tp8\_s*.report.json} (DB runs
+  \texttt{g3\_32b:235b\_\allowbreak tp8\_*}) \\
 Fig.~\ref{fig:sim-burst-queue} &
   \texttt{simulation/ burst\_queue\_fig.py} &
   \texttt{results/sweeps/series/ vision\_burst1\_s1.series.json} \\
@@ -286,6 +300,16 @@ Tabs.~\ref{tab:cl-ledger-enc}--\ref{tab:cl-ledger-joint}
 Daily folds (\S\ref{sec:cl-limits}) &
   fold split + per-fold replay &
   \texttt{defense/anim/data/ g4\_folds/folds\_table.md} \\
+Hybrid encoder schedule $\max(fc,re)$: aggregate, F1--F7 folds,
+  combiner sweep (\S\ref{sec:cl-aggregate}) &
+  \texttt{simulation/
+  run\_encoder\_\allowbreak hybrid\allowbreak\{,\_folds,\_combos\}.sh};
+  combiner \texttt{simulation/ combine\_schedules.py} &
+  \texttt{simulation/results/ encoder\_hybrid/}:
+  \texttt{\{fc,re,hybrid\}.*} (aggregate),
+  \texttt{F6\_\{fc,re,hybrid\}.*}, \texttt{folds/ F\{1..7\}\_*.*},
+  \texttt{combos/*.*} (its p90/re cells are byte-identical to the
+  \texttt{F6\_*} runs); DB runs \texttt{encoder\_hybrid:*} \\
 Tab.~\ref{tab:base-grid} (burst5 $C^{*}$ corrected to 8) &
   \texttt{simulation/sweep\_grid.py} (+35 close-out corner runs);
   burst5 stability correction \texttt{verification/scripts/ burst5\_stability.py} &
@@ -305,33 +329,60 @@ Per-window factorial (60-cell p90 headline + p50; $\rho$-rating
   \texttt{simulation/ run\_44\_factorial\_issuetime.py}
   (\texttt{QUANTILE}/\texttt{RHO} env; issue-time, warm{+}strict);
   target-time exploratory grid
-  \texttt{\{gen\_cells\_44.py, e2b\_fleet.py\}} &
+  \texttt{\{gen\_cells\_44.py, e2b\_fleet.py\}}; burst4 reactive
+  $L{=}165$ supplementary cell
+  \texttt{defense/anim/build/ gen\_a2\_fleet.py} &
   \texttt{simulation/results/ factorial\_issuetime/
-  factorial\_issuetime\_\{p50\_rho15, p90\_rho\{10,15,20,25\}\}\_results.json};
-  target-time grid \texttt{results/ results\_44.jsonl} \\
+  factorial\_issuetime\_\allowbreak\{p50\_rho15,
+  p90\_rho\{10,15,20,25\}\}\_\allowbreak results.json};
+  target-time grid \texttt{results/ results\_44.jsonl};
+  supplementary cell \texttt{defense/anim/data/ a2\_runs/
+  burst4\_reactive\_\allowbreak L165.jsonl\allowbreak\{,.stats.json\}}
+  (DB run \texttt{a2:burst4\_\allowbreak reactive\_L165}) \\
 Week-scale surface (\S\ref{sec:cl-aggregate}; quantile-decisive,
   rating-cost) &
-  \texttt{simulation/ run\_44\_week\_surface\_issuetime.py} (96 issue-time
-  aggregate cells) &
+  \texttt{simulation/
+  run\_44\_week\_\allowbreak surface\_\allowbreak issuetime.py} (96
+  issue-time aggregate cells) &
   \texttt{simulation/results/ week\_surface\_issuetime/
-  week\_surface\_issuetime\_results.json} \\
+  week\_surface\_\allowbreak issuetime\_\allowbreak results.json} \\
 Language-pool week replay (\S\ref{sec:cl-llm}: 651\,ms / 518.6 GPU-h;
   p50, Toto, TimesFM, reactive arms) &
   \texttt{simulation/results/ llm\_week/launch.sh} (composed trace +
   winning encoder schedule through the planner) &
   \texttt{llm\_week/ week\_\{fc\_p90, fc\_p90\_toto, fc\_p90\_timesfm,
   fc\_p50, re\}.report.json} \\
+Language operating-point calibration: $q\times s$ grid, held-out
+  frontier, daily folds (\S\ref{sec:cl-llm}) &
+  \texttt{simulation/ run\_lang\_calib.sh} (burst2/burst6 grid);
+  \texttt{run\_lang\_calib\_eval.sh} (held-out windows);
+  \texttt{run\_lang\_folds.sh} (folds) &
+  \texttt{simulation/results/ lang\_qsweep/}:
+  \texttt{\{burst2,burst6\}\_\allowbreak
+  p\{50,60,70,80,90\}\_\allowbreak s\{2..8\}.report.json},
+  \texttt{eval\_\{p50\_s8, p70\_s6, p90\_\{s1,s4,s6\}\}/},
+  \texttt{folds\_*/};
+  DB runs \texttt{langcalib:*}, \texttt{lang\_qsweep:*} \\
+Controller inference cost (\S\ref{sec:cl-ledger-cost}: per-model
+  per-tick pricing and feasibility) &
+  \texttt{defense/anim/build/ gen\_a16\_controller\_cost.py} &
+  \texttt{defense/anim/data/ a16\_controller\_cost/
+  \{accounting.\{csv,json\},
+  timing\_\allowbreak\{chronos,toto,timesfm\}\_\allowbreak
+  \{cpu,cuda\}.json, timing\_arima\_cpu.json, REPORT.md\}} \\
 Onset detection (\S\ref{sec:cl-matrix}) &
   \texttt{simulation/ detect\_onsets\_44.py} &
   \texttt{results/riders44/ detection\_delay.json} \\
 Tab.~\ref{tab:cl-aggregate} (0.62$\times$ headline is the issue-time
   schedule; \texttt{run\_44\_aggregate.sh} gives the target-time bound) &
-  \texttt{simulation/ run\_44\_aggregate\_issuetime.sh}, wrapping
-  \texttt{verification/scripts/ forecast\_schedule\_issuetime.py}
+  \texttt{simulation/ run\_44\_aggregate\_\allowbreak issuetime.sh}, wrapping
+  \texttt{verification/scripts/
+  forecast\_\allowbreak schedule\_\allowbreak issuetime.py}
   (\texttt{--strict-rewarm} for the sensitivity); target-time bound from
   \texttt{simulation/ run\_44\_aggregate.sh} &
   under \texttt{simulation/results/}:
-  \texttt{aggregate44/ fc\_p90\_L\{15,30,45,165\}\_issuetime.*},
+  \texttt{aggregate44/
+  fc\_p90\_L\{15,30,45,165\}\_\allowbreak issuetime.*},
   \texttt{fc\_p50\_L30\_issuetime.*},
   \texttt{aggregate44\_rho/ *\_issuetime.*} ($\rho$ frontier),
   \texttt{aggregate44\_strict/ \{fc\_p90\_L*, fc\_p50\_L30,

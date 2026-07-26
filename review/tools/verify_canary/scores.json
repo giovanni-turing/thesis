@@ -1,0 +1,80 @@
+{
+ "minimax-m3": {
+  "verdict_acc": 0.29,
+  "polarity": 0.57,
+  "evidence": 1.0,
+  "keep": false
+ },
+ "hy3": {
+  "verdict_acc": 1.0,
+  "polarity": 1.0,
+  "evidence": 1.0,
+  "keep": true
+ },
+ "glm-5.2": {
+  "verdict_acc": 0.71,
+  "polarity": 0.86,
+  "evidence": 1.0,
+  "keep": true
+ },
+ "kimi-k3": {
+  "verdict_acc": 0.86,
+  "polarity": 0.86,
+  "evidence": 1.0,
+  "keep": true
+ },
+ "gemini-3.5-flash": {
+  "verdict_acc": 1.0,
+  "polarity": 1.0,
+  "evidence": 1.0,
+  "keep": true
+ },
+ "step-3.7-flash": {
+  "verdict_acc": 0.57,
+  "polarity": 0.57,
+  "evidence": 1.0,
+  "keep": false
+ },
+ "gpt-5.6-sol": {
+  "verdict_acc": 0.86,
+  "polarity": 0.86,
+  "evidence": 1.0,
+  "keep": true
+ },
+ "qwen3.7-max": {
+  "verdict_acc": 0.57,
+  "polarity": 0.86,
+  "evidence": 1.0,
+  "keep": false
+ },
+ "ernie-4.5-424b": {
+  "verdict_acc": 0.0,
+  "polarity": 0.0,
+  "evidence": 0.0,
+  "keep": false
+ },
+ "nemotron-3-ultra": {
+  "verdict_acc": 0.57,
+  "polarity": 0.57,
+  "evidence": 0.83,
+  "keep": false
+ },
+ "deepseek-v4-pro": {
+  "verdict_acc": 0.71,
+  "polarity": 0.71,
+  "evidence": 1.0,
+  "keep": true
+ },
+ "command-a": {
+  "verdict_acc": 0.0,
+  "polarity": 0.0,
+  "evidence": 0.0,
+  "keep": false
+ },
+ "mimo-v2.5": {
+  "verdict_acc": 0.71,
+  "polarity": 0.86,
+  "evidence": 0.83,
+  "keep": true
+ }
+}

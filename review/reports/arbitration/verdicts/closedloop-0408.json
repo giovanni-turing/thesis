@@ -1,0 +1,11 @@
+{
+  "claim_id": "closedloop-0408",
+  "verdict": "supported",
+  "observed": "The '1.4-day context' is exactly correct and the flag is wrong-scope. The thesis defines (closedloop.tex L44): trace's first 1.4 days = forecast context (never graded), remaining 5.60 days = eval span. Verified from the EWMA manifest at 15s: warmup context_length=1928 + calibration n_calib=6144 = 8072 samples @15s = 1.4014 days (= the '1.4-day context'); eval n_eval=32244 @15s = 5.5979 days (= '5.60 days'); total 40316 @15s = 6.9993 = 7.0-day trace. Adjudicators equated the 6144-sample calibration subset alone (1.067 days) with the context and called 1.4 wrong -- but the context = warmup + calibration = 1.40 days. Three schemes add/mult/wsc confirmed. Nominal p90 (0.9). Coverage: calib add 0.898 / mult 0.898 / wsc 0.900; eval add 0.901 / mult 0.878 / wsc 0.877 -> band [0.877,0.901] consistent with the stated 0.88-0.90 (rounding). Coverage-vs-cost bind holds.",
+  "claimed": "Forward EWMA p90 calibrated on the 1.4-day context to the same 0.88-0.90 coverage by three standard schemes, exposing a coverage-cost bind.",
+  "evidence": "ewma_cal_manifest: resolution=15s, n_calib=6144, n_eval=32244; predictors:ewma_images config context_length=1928. (1928+6144)*15/86400=1.4014; 32244*15/86400=5.5979; total 6.9993. ewma_cal_coverage: add/mult/wsc eval 0.901/0.878/0.877, nominal 0.9. Arithmetic matches the thesis's own 1.4+5.60=7.0 split exactly.",
+  "severity": "minor",
+  "fix": "None. The 1.4-day context, 0.88-0.90 coverage, three schemes, and coverage-cost bind are all correct and internally consistent (1.4 context + 5.60 eval = 7.0-day trace).",
+  "confidence": 0.88,
+  "query": "ewma_cal_manifest n_calib=6144,n_eval=32244,res=15s; ewma_gen context_length=1928 -> (1928+6144)@15s=1.4014d context, 32244@15s=5.5979d eval, total 7.0d"
+}

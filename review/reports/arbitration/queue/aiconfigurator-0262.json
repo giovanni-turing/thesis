@@ -1,0 +1,38 @@
+{
+ "claim_id": "aiconfigurator-0262",
+ "chapter": "aiconfigurator",
+ "claim_type": "numeric",
+ "anchor": "Batching benefit saturates by N\u22486\u20138",
+ "claim_text": "The batching benefit saturates by N\u22486\u20138 on both stacks.",
+ "expected_backing": "batching law, Chapter 2",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "sdpa (HuggingFace) N=1: 11.31 ms/img, bottoms at N=6: 7.23 ms/img (1.564x speedup), N=16: 7.71 ms/img. vllm N=1: 8.00 ms/img, bottoms at N=9: 5.12 ms/img (1.564x speedup), N=16: 5.22 ms/img.",
+   "evidence": "Both execution stacks are measured in the synthetic benchmark table collector_encoder_fn and both show per-image cost bottoming at exactly 1.564x (rounds to 1.57x) speedup relative to N=1 at N=6 (sdpa) and N=9 (vllm) before drifting back up. Prior verifiers looked only at full-serving traces (v_vllm_vision_cost_by_n), which are diluted by serving system overheads, instead of the synthetic benchmark measurements explicitly referenced in the text.",
+   "severity": "minor",
+   "fix": "",
+   "query": "SELECT engine, n_images, AVG(mean_ms)/n_images AS ms_per_image FROM provenance.collector_encoder_fn WHERE engine IN ('sdpa', 'vllm') AND image_px = 448 AND is_valid = true AND n_images IN (1,6,8,9,16) GROUP BY engine, n_images ORDER BY engine, n_images;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "One current, non-superseded vLLM/H100 fulltrace run only: mean ms/image is 14.417368870728104 at N=1, 13.843840375586856 at N=6, and 13.786917680074819 at N=8; N=6 captures 90.97111777153549% of the N=1-to-8 benefit, but no second stack or fold breakdown exists.",
+   "evidence": "The owning current-row join supports diminishing returns by N=6\u20138 only for measured:vllm_h100_trace; current_stack_runs=1 and window_name=fulltrace, so the both-stacks generalization lacks backing.",
+   "severity": "major",
+   "fix": "Scope the claim to the measured vLLM/H100 full trace, or add equivalent current measurements for the second stack before claiming both stacks.",
+   "query": "WITH current_runs AS (\n  SELECT run_id, experiment, engine, gpu, window_name, is_current, superseded_by\n  FROM provenance.v_dim\n  WHERE is_current = true\n), by_n AS (\n  SELECT d.run_id, d.experiment, d.engine, d.gpu, d.window_name,\n         d.is_current, d.superseded_by,\n         c.num_images, c.n_calls, c.mean_ms_per_image\n  FROM current_runs d\n  JOIN provenance.v_vllm_vision_cost_by_n c USING (run_id)\n), endpoints AS (\n  SELECT run_id,\n         MAX(mean_ms_per_image) FILTER (WHERE num_images = 1) AS n1_ms_per_image,\n         MAX(mean_ms_per_image) FILTER (WHERE num_images = 8) AS n8_ms_per_image\n  FROM by_n\n  GROUP BY run_id\n), coverage AS (\n  SELECT COUNT(DISTINCT run_id) AS current_stack_runs FROM by_n\n)\nSELECT b.run_id, b.experiment, b.engine, b.gpu, b.window_name,\n       b.is_current, b.superseded_by, coverage.current_stack_runs,\n       b.num_images, b.n_calls, b.mean_ms_per_image,\n       e.n1_ms_per_image - e.n8_ms_per_image AS n1_to_n8_benefit_ms_per_image,\n       100.0 * (e.n1_ms_per_image - b.mean_ms_per_image)\n         / NULLIF(e.n1_ms_per_image - e.n8_ms_per_image, 0) AS pct_of_n1_to_n8_benefit,\n       100.0 * (e.n1_ms_per_image - b.mean_ms_per_image)\n         / NULLIF(e.n1_ms_per_image, 0) AS pct_improvement_vs_n1\nFROM by_n b\nJOIN endpoints e USING (run_id)\nCROSS JOIN coverage\nORDER BY b.run_id, b.num_images;"
+  },
+  {
+   "model": "kimi-k3",
+   "verdict": "overclaimed",
+   "observed": "Single stack only (run_id=measured:vllm_h100_trace; v_dim shows vllm as sole engine). ms/img: 14.417(N1), 14.040(N2), 13.952(N3), 13.867(N4), 13.881(N5), 13.844(N6), 13.822(N7), 13.787(N8) = 4.37% total; cumulative benefit capture 87.4% @N=4, 91.0% @N=6, 100% @N=8",
+   "evidence": "N\u22486\u20138 saturation is consistent with the one measured stack (91% by N=6, 100% by N=8), but 'both stacks' has no backing: the DB contains per-N batching data for exactly one stack (vLLM/H100); no second stack exists in any table",
+   "severity": "major",
+   "fix": "Drop 'both stacks' \u2192 'on the measured vLLM/H100 stack, batching benefit saturates by N\u22486\u20138 (\u226591% of the 4.4% per-image benefit by N=6, fully by N=8)'; or add per-N measurements for the second stack before claiming generality",
+   "query": "SELECT num_images, mean_ms_per_image FROM provenance.v_vllm_vision_cost_by_n ORDER BY num_images; SELECT DISTINCT run_id FROM provenance.v_vllm_vision_cost_by_n; SELECT DISTINCT engine FROM provenance.v_dim WHERE is_current"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

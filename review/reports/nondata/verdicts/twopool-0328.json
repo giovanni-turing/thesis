@@ -1,0 +1,1 @@
+{"claim_id":"twopool-0328","type":"existence","verdict":"supported","evidence":"collector_encoder_fn (536 rows) grounds the batching law; v_cost_ratio (2388 rows) exists; simulation/results/sweeps/summary.json present (51KB); twopool.tex sec at line 107 'Encoder-pool realism: an exact batching law and a handoff bound'.","fix":"","confidence":0.95}

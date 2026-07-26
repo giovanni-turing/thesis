@@ -110,8 +110,8 @@ forecastable one.
   episodes; the top episode peaks at **370 img/s while requests peak at
   4.48 req/s**. Vision CV² is ~12× the request CV² on the same clock.
 - **Bursts are one workload class** (§J, `j_burst_attribution.png`): the
-  frames class (k>10; 2.7% of requests) carries **81.2% of all image
-  volume**, and every top-6 episode is **93–96% frames-class**. Episode
+  frames class (k>10; 2.7% of requests) carries **81.1% of all image
+  volume**, and every top-6 episode is **92–96% frames-class**. Episode
   clustering (§K, cuML) confirms a single burst type — 17 of 18 episodes
   are homogeneous frames-floods (one mixed outlier); they vary in
   magnitude and duration, not kind.
@@ -121,7 +121,7 @@ forecastable one.
   **2.69×** calm minutes. More images AND longer prefills arrive together
   (window-level images~ctx r = 0.89): vision and prefill are one pressure.
 - **Onset speed sets the design constraint** (§I, `i_burst_onsets.png`):
-  baseline→peak in **p50 = 6 min, p10 = 2 min, fastest = 1 min**, with a
+  baseline→peak in **p50 = 6.5 min, p10 = 2 min, fastest = 1 min**, with a
   median steepest single-minute jump of **208 img/s** (max 355). Against
   cold starts of tens of seconds to minutes, the fast half of bursts cannot be
   tracked reactively — the forecast-horizon budget (onset − cold-start)
@@ -173,8 +173,8 @@ forecastable one.
 4. The image signal is the burstiest (CV² 3.83) and most persistent
    (H ≈ 0.93) of the four demand signals; it is poorly explained by request
    rate (R² = 0.123) while decode load is largely rate-carried (R² = 0.654).
-5. Bursts are homogeneous frames-class floods (93–96% of episode volume),
-   ramping baseline→peak in a median of 6 minutes with single-minute jumps
+5. Bursts are homogeneous frames-class floods (92–96% of episode volume),
+   ramping baseline→peak in a median of 6.5 minutes with single-minute jumps
    of ~208 img/s, and compounding with 2.69× longer prefills.
 6. Demands are mutually non-derivable (img↔gen independent at request and
    window level); each demand signal carries information the others do not.
@@ -235,8 +235,8 @@ model-transferable).
 | `f_fourier.py` / `f2_fourier_ctx.py` | `f_fourier_spectra.png`, `f2_fourier_ctx.png` | `f_fourier_stats.json`, `f2_fourier_ctx_stats.json` | H gradient 0.83→0.93; diurnal family only |
 | `g_ctx.py` | `g_ctx_decomposition.png`, `g_ctx_mixture_burst.png` | `g_ctx_stats.json` | 72.5% of prefill is vision-borne; bursts 2.69× longer prefills |
 | `h_colormaps.py` | `h_pairwise_density.png` | — | pairwise structure, one hue per panel |
-| `i_burst_anatomy.py` | `i_burst_onsets.png`, `i_burst_aligned.png` | `i_burst_anatomy_stats.json` | onset p50 6 min; 208 img/s 1-min jumps |
-| `j_classes.py` | `j_class_signals.png`, `j_burst_attribution.png` | `j_classes_stats.json` | frames class = 81.2% of volume; bursts 93–96% frames |
+| `i_burst_anatomy.py` | `i_burst_onsets.png`, `i_burst_aligned.png` | `i_burst_anatomy_stats.json` | onset p50 6.5 min; 208 img/s 1-min jumps |
+| `j_classes.py` | `j_class_signals.png`, `j_burst_attribution.png` | `j_classes_stats.json` | frames class = 81.1% of volume; bursts 92–96% frames |
 | `k_episode_clusters.py` | `k_episode_clusters.png` | `k_episode_clusters_stats.json` | one burst type (honest negative) |
 | `l_request_clusters.py` | `l_request_clusters.png` | `l_request_clusters_stats.json` | 4 semantic archetypes ↔ serving stages |
 | `m_gen_and_global.py` | `m_gen_signal.png` | `m_gen_and_global_stats.json`, `m_global_percentiles.md` | decode-signal symmetry; global percentile tables |

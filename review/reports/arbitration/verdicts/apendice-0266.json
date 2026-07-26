@@ -1,0 +1,11 @@
+{
+  "claim_id": "apendice-0266",
+  "verdict": "holds",
+  "observed": "forecast_metrics (span=common, candidate=point, h=-1 = metrics_overall.parquet, the actual heatmap backing per figuras_new/predictors.py fig_heatmap): in all 20 (signal x resolution) columns holt_winters has the MAXIMUM WAPE of the 6 models and is > naive in every column. e.g. images 1min HW=0.6938 > naive=0.6783; images 1s HW=2.1704 > naive=1.5686; requests 1min HW=0.4380 > naive=0.4233.",
+  "claimed": "Holt-Winters is the worst model in every column --- worse than naive persistence.",
+  "evidence": "fig:pred-heatmap reads metrics_overall.parquet filtered to span='common', candidate='point' (verified in figuras_new/predictors.py). Querying forecast_metrics at exactly that scope, holt_winters is the argmax WAPE in all 20 columns and strictly worse than naive in all 20. Both flags used forecast_eval instead -- a different evaluation (per-origin/horizon-resolved) that is NOT the heatmap's data source; there images 1min gives HW=0.5946<naive=0.618, but that view does not back this figure. Wrong-view artifact.",
+  "severity": "minor",
+  "fix": "None. Flag is a wrong-view artifact (forecast_eval vs the heatmap's forecast_metrics/metrics_overall). Claim is fully supported.",
+  "confidence": 0.85,
+  "query": "SELECT variate,resolution,model,wape FROM provenance.forecast_metrics WHERE span='common' AND candidate='point' AND h=-1 AND model IN ('holt_winters','naive') ORDER BY variate,resolution,model; -- plus per-column argmax over all 6 models"
+}

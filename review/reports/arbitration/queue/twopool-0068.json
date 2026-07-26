@@ -1,0 +1,29 @@
+{
+ "claim_id": "twopool-0068",
+ "chapter": "twopool",
+ "claim_type": "numeric",
+ "anchor": "The steady head used here is vision-lean (2.9 images per request against the trace's \u224814), which the 24-hour steady window corrects.",
+ "claim_text": "Steady head vision-lean: 2.9 images/request vs trace ~14; 24h steady window corrects this.",
+ "expected_backing": "eda_metric, v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "contradicted",
+   "observed": "steady24h: 5.326 img/req; head2k (steady head): 2.879 img/req; trace overall: 14.332 img/req",
+   "evidence": "The steady head (head2k) has 2.879 images/request and the trace has 14.332, but the 24-hour steady window has only 5.326 images/request, which remains highly vision-lean and does not correct it.",
+   "severity": "minor",
+   "fix": "Acknowledge that while steady24h (5.3 img/req) is slightly less lean than head2k (2.9 img/req), it remains highly vision-lean compared to the full trace's overall average of ~14.3.",
+   "query": "SELECT 'steady24h' AS win, mean_img_per_s/mean_req_per_s AS val FROM provenance.windows WHERE window_name = 'steady24h' UNION ALL SELECT 'head2k' AS win, mean_img_per_s/mean_req_per_s AS val FROM provenance.windows WHERE window_name = 'head2k' UNION ALL SELECT 'trace' AS win, value_num AS val FROM provenance.eda_metric WHERE metric_path = 'numimages.mean_images_per_request_overall';"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "contradicted",
+   "observed": "Current, non-superseded rows give steady head 5758/2000 = 2.879 images/request across all six head runs; full trace = 14.33217 over 1000000 requests; steady24h = 470293/88260 = 5.328495354634036 across every window breakdown.",
+   "evidence": "The head and trace figures hold, but steady24h remains 5.3285 images/request rather than correcting the mix to the 14.33217 trace rate.",
+   "severity": "major",
+   "fix": "Replace \u201cwhich the 24-hour steady window corrects\u201d with \u201cwhich the 24-hour steady window mitigates, raising the rate to 5.33 images per request, still below the trace-wide 14.33.\u201d",
+   "query": "WITH current_dim AS (\n  SELECT *\n  FROM provenance.v_dim\n  WHERE is_current = true\n), trace AS (\n  SELECT 'trace'::text AS sample, d.run_id, d.experiment, d.window_name,\n         d.window_span_s, d.window_requests AS denominator_requests,\n         NULL::bigint AS requests_with_images, NULL::bigint AS total_images,\n         e.value_num AS images_per_request, 1::bigint AS run_count,\n         d.is_current, d.superseded_by\n  FROM current_dim d\n  JOIN provenance.eda_metric e ON e.run_id = d.run_id\n  WHERE d.run_id = 'eda:b_marginals'\n    AND e.metric_path = 'numimages.mean_images_per_request_overall'\n), run_breakdown AS (\n  SELECT CASE WHEN d.run_id LIKE 'sweeps:vision_head2k%' THEN 'steady_head'\n              ELSE 'steady24h' END AS sample,\n         CASE WHEN d.run_id LIKE 'sweeps:vision_head2k%' THEN d.run_id\n              ELSE d.experiment || ':steady24h' END AS run_id,\n         d.experiment, d.window_name, d.window_span_s,\n         s.requests AS denominator_requests, s.requests_with_images, s.total_images,\n         s.total_images::double precision / NULLIF(s.requests, 0) AS images_per_request,\n         COUNT(*)::bigint AS run_count, bool_and(d.is_current) AS is_current,\n         CASE WHEN bool_or(d.superseded_by IS NOT NULL) THEN 'has_superseded_row' END AS superseded_by\n  FROM current_dim d\n  JOIN provenance.encoder_run_summary s ON s.run_id = d.run_id\n  JOIN provenance.v_pool_latency p ON p.run_id = d.run_id AND p.is_current = true\n  WHERE d.run_id LIKE 'sweeps:vision_head2k%'\n     OR d.window_name = 'steady24h'\n  GROUP BY 1, 2, d.experiment, d.window_name, d.window_span_s,\n           s.requests, s.requests_with_images, s.total_images\n)\nSELECT * FROM trace\nUNION ALL\nSELECT * FROM run_breakdown\nORDER BY sample, experiment, run_id"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

@@ -1,0 +1,58 @@
+[
+ {
+  "claim_id": "intro-0221",
+  "chapter": "intro",
+  "claim_type": "causal",
+  "anchor": "Aggregation does not rescue the reactive loop: the arrival process is overdispersed at every tested operational scale.",
+  "claim_text": "Aggregation doesn't fix reactive loop; overdispersion at all tested scales",
+  "expected_backing": "eda_metric; v_infraction"
+ },
+ {
+  "claim_id": "intro-0224",
+  "chapter": "intro",
+  "claim_type": "causal",
+  "anchor": "The provisioning gap is a lead-time problem, and the lead time is available --- to a forecaster.",
+  "claim_text": "Provisioning gap is lead-time problem; lead time available to forecaster",
+  "expected_backing": "forecast_metrics; v_pool_latency"
+ },
+ {
+  "claim_id": "intro-0228",
+  "chapter": "intro",
+  "claim_type": "causal",
+  "anchor": "Anticipatory headroom, not signal choice, carries the encoder pool.",
+  "claim_text": "Anticipatory headroom (not signal choice) carries encoder pool",
+  "expected_backing": "v_pool_latency; v_infraction; forecast_metrics"
+ },
+ {
+  "claim_id": "intro-0229",
+  "chapter": "intro",
+  "claim_type": "causal",
+  "anchor": "A measured tail-aware conversion --- not loop tuning --- repairs the mean-based sizing defect every reactive configuration shares.",
+  "claim_text": "Tail-aware conversion (not loop tuning) fixes mean-based sizing defect in reactive configs",
+  "expected_backing": "v_pool_latency; v_infraction; v_grid_static_effective"
+ },
+ {
+  "claim_id": "intro-0239",
+  "chapter": "intro",
+  "claim_type": "causal",
+  "anchor": "The largest burst breaking the two pools in structurally different ways (a shape-fixable prefill floor in the language pool; in the encoder pool, the invisible episodic queueing fixable only by capacity).",
+  "claim_text": "Largest burst breaks pools differently: language pool has shape-fixable prefill floor; encoder pool has invisible episodic queueing fixable only by capacity",
+  "expected_backing": "v_pool_latency; v_infraction; v_grid_static_effective"
+ },
+ {
+  "claim_id": "intro-0244",
+  "chapter": "intro",
+  "claim_type": "causal",
+  "anchor": "The language pool needs a derived tail-aware conversion as the second necessary ingredient.",
+  "claim_text": "Language pool requires tail-aware conversion as second necessary ingredient",
+  "expected_backing": "v_pool_latency; v_infraction; v_grid_static_effective"
+ },
+ {
+  "claim_id": "intro-0245",
+  "chapter": "intro",
+  "claim_type": "causal",
+  "anchor": "A calibrated-EWMA control shows the band shape --- supplied zero-shot by the foundation models --- to be load-bearing, not point-forecast accuracy alone.",
+  "claim_text": "Calibrated-EWMA shows forecast band shape (from foundation models) is load-bearing, not point accuracy",
+  "expected_backing": "forecast_metrics; v_pool_latency; v_infraction"
+ }
+]

@@ -1,0 +1,1 @@
+{"claim_id":"intro-0219","type":"existence","verdict":"supported","evidence":"provenance.eda_metric distinct 'signal' includes req_per_s, images_per_s/img_per_s, ctx_tokens_per_s, gen_tokens_per_s — the four per-second offered-work signals (requests, images, context tokens, generated tokens).","fix":"","confidence":0.95}

@@ -1,0 +1,1 @@
+{"claim_id":"intro-0217","type":"existence","verdict":"supported","evidence":"provenance.eda_metric: SUM(context_tokens_by_numimages.*.count)=1,000,000 (1M requests); metric_path 'duration_days'=7. Dataset name AzureLMMInference referenced in /home/gio/tese/workload/trace_to_two_pool.py and /home/gio/tese/analysis/trace_eda/{summary,REPORT}.md.","fix":"","confidence":0.97}

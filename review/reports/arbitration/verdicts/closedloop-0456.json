@@ -1,0 +1,11 @@
+{
+  "claim_id": "closedloop-0456",
+  "verdict": "supported",
+  "observed": "collector_encoder_fn (vllm_eager_dense vs silicon_burst5 AIC, 448px, N<=64, is_valid): 12 paired anchors at N=1,4,9,16,17,25,33,36,41,49,57,64 spanning the full range; abs error |vllm/aic-1| max=12.51% at N=57, all within 12.8%.",
+  "claimed": "vLLM's Qwen3-VL vision tower matches AIC to within 12.8% across the whole N<=64 serving regime (because AIC's collected operators are vLLM's kernels).",
+  "evidence": "FLAG LARGELY SPURIOUS for the numeric claim: the 12.8% bound HOLDS (max abs error 12.509% at N=57) and is even slightly loose. The 12 anchors are well distributed across N=1..64 (including both endpoints), so 'across the whole N<=64 serving regime' is a fair characterization of the validated f(N) curve rather than an overclaim. The only soft element is the causal 'because' clause, a plausible mechanistic explanation (AIC collects the same attention/GEMM operators vLLM runs), not a numeric overclaim.",
+  "severity": "minor",
+  "fix": "Optional: note the bound is validated at 12 representative N anchors spanning 1-64; soften or evidence the causal 'because' clause if strict causal backing is wanted. The 12.8% figure itself needs no change.",
+  "confidence": 0.82,
+  "query": "WITH v AS (SELECT n_images, mean_ms FROM collector_encoder_fn WHERE engine='vllm' AND is_valid AND image_px=448 AND n_images<=64 AND source_path LIKE '%vllm_eager_dense.json'), a AS (SELECT n_images, mean_ms FROM collector_encoder_fn WHERE engine='aic' AND is_valid AND image_px=448 AND n_images<=64 AND source_path LIKE '%silicon_burst5.json') SELECT count(*), max(ABS(v.mean_ms/a.mean_ms-1)*100) FROM v JOIN a USING(n_images);"
+}

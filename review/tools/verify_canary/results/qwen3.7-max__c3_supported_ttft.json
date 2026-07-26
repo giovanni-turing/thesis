@@ -1,0 +1,1 @@
+{"model": "qwen3.7-max", "claim": "c3_supported_ttft", "known": "supported", "got": "overclaimed", "queried_right_view": true, "any_query": true}

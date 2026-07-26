@@ -1,0 +1,11 @@
+{
+  "claim_id": "closedloop-0399",
+  "verdict": "supported",
+  "observed": "current_factorial (canonical issue-time view, C507): forecast p90 rho=15 p99_ms=588.370 EXACTLY on burst1, burst3, burst4, burst5 at every lead L in {15,30,45,165} under both warm and strict readiness (96/96 rows). steady24h (calm) at rho=15: p99 spans 548.363-733.643, all feasible, max 733.643 < 734.",
+  "claimed": "Actuated on issue time, the p90 policy holds per-window p99 unchanged across L=15 to 165 s at the 588 ms service floor on every burst window and feasible (<734 ms) on the calm day.",
+  "evidence": "All three components are exactly backed by the canonical issue-time factorial at the p90 policy's rated operating point rho=15: lead-invariant 588.370 ms on every burst window in the factorial's burst set (burst1/3/4/5), and steady24h below 734 (max 733.643). The adjudicators' objections are wrong-scope/wrong-experiment artifacts: (a) gpt's 598.739 ms burst1 comes from experiment='ctmatrix' (the EWMA-ablation replay harness, which reads the floor ~1 ms high), not the published current_factorial, which gives 588.370; (b) gemini's rho=25 failure is EXPLICITLY disclosed by the thesis's very next bullet ('only rho=25 drops cells --- 9 of 60, all on burst5'), and the invariance claim is scoped to the passing operating point (rho in {10,15,20} = 60/60); (c) burst2/burst6 are outside the factorial's standard burst set (burst1/3/4/5, as in Table tab:cl-ewma), so 'every burst window' = every tested burst window; (d) the physical-validation 598.74 ms belongs to a separate live-measurement chapter, not this simulated issue-time claim.",
+  "severity": "minor",
+  "fix": "No thesis change needed. The flag is a wrong-experiment (ctmatrix vs current_factorial) / wrong-scope (rho=25, burst2/6, physical validation -- all disclosed or out-of-scope) artifact.",
+  "confidence": 0.9,
+  "query": "SELECT window_name,rho,readiness,lead_s,ROUND(p99_ms::numeric,3) p99,feasible FROM current_factorial WHERE policy='forecast' AND quantile='p90' AND rho=15 AND (window_name LIKE 'burst%' OR window_name='steady24h') ORDER BY window_name,readiness,lead_s;"
+}

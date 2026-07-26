@@ -1,0 +1,25 @@
+{
+ "claim_id": "twopool-0034",
+ "chapter": "twopool",
+ "claim_type": "numeric",
+ "anchor": "First, a disaggregated Qwen3-VL deployment must also ship the three DeepStack projections the language model consumes in its early layers (three more such tensors per image), quadrupling the payload to \u22486.4 MB per image (\u2248250 ms at the 121-image maximum on the default link).",
+ "claim_text": "DeepStack projections quadruple payload to ~6.4 MB/image (~250 ms at 121-image max on 25 Gbps link).",
+ "expected_backing": "v_cost_ratio, collector_encoder_fn",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "supported",
+   "observed": "handoff_gbps: 25, handoff_rtt_ms: 0.2, max_ms: 62.37, post_merge_tokens: 196, calculated_max_images: 121.0, projected_deepstack_max_handoff_ms: 248.88",
+   "evidence": "In sweeps:vision_head2k_s1, default 25 Gbps link handoff max is 62.37 ms (exactly 121.0 images of 1.6 MB). DeepStack x4 (6.4 MB/image) takes 248.88 ms (\u2248250 ms) for 121 images.",
+   "severity": ""
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "unverifiable",
+   "observed": "The current unsuperseded run has a 25 Gbps link and 62.37 ms observed maximum handoff; collector_encoder_fn has 530 valid rows, 196 tokens/image, tested n_images from 1 to 512, 0 rows at 121, and 0 DeepStack rows. v_cost_ratio has 0 current rows for the run. Across 5 non-superseded effective windows, the largest mean is 115.42304593070105 images per image-bearing request.",
+   "evidence": "The DB supports the link rate and base token count but contains no DeepStack payload/projection backing or 121-image observation, so neither the necessary four-tensor transfer nor the resulting payload and latency is established.",
+   "severity": "major"
+  }
+ ],
+ "reason": "split-adjudicators"
+}

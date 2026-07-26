@@ -1,0 +1,66 @@
+[
+ {
+  "claim_id": "intro-0217",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "The empirical basis is AzureLMMInferenceDataset2025, the production trace Microsoft released with ModServe: one million requests over seven days of a multimodal inference cluster.",
+  "claim_text": "AzureLMMInferenceDataset2025: 1M requests over 7 days from multimodal inference cluster",
+  "expected_backing": "eda_metric"
+ },
+ {
+  "claim_id": "intro-0219",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "The trace's four demand signals (requests, images, context tokens, and generated tokens per second) are the trace-derived offered-work signals a scaling policy can watch.",
+  "claim_text": "Four demand signals: requests, images, context tokens, generated tokens per second",
+  "expected_backing": "eda_metric; forecast_metrics"
+ },
+ {
+  "claim_id": "intro-0222",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "The failure is also invisible to the dashboards reactive systems watch.",
+  "claim_text": "Failure invisible to reactive system dashboards",
+  "expected_backing": "v_infraction; v_pool_latency"
+ },
+ {
+  "claim_id": "intro-0231",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "The full forecast set is archived with the metric tables (Appendix).",
+  "claim_text": "Full forecast set archived with metric tables",
+  "expected_backing": "forecast_metrics"
+ },
+ {
+  "claim_id": "intro-0234",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "AIC has no usable encoder-timing fallback, so support-matrix PASS entries on uncollected systems certify text-only costing.",
+  "claim_text": "AIC has no encoder-timing fallback; PASS entries on uncollected systems = text-only costing",
+  "expected_backing": "collector_encoder_fn"
+ },
+ {
+  "claim_id": "intro-0236",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "A probe-verified exact batching law (encoder cost depends only on total images per forward) with an analytic handoff bound.",
+  "claim_text": "Encoder cost depends only on total images per forward (exact batching law); analytic handoff bound",
+  "expected_backing": "collector_encoder_fn; v_pool_latency"
+ },
+ {
+  "claim_id": "intro-0240",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "The static-optimal worker-grid frontier per window, the reactive SLA-planner baseline that satisfies its own window-mean control law while violating the tail SLA.",
+  "claim_text": "Static-optimal worker-grid frontier; reactive SLA-planner satisfies window-mean but violates tail SLA",
+  "expected_backing": "v_grid_static_effective; v_infraction; v_pool_latency"
+ },
+ {
+  "claim_id": "intro-0241",
+  "chapter": "intro",
+  "claim_type": "existence",
+  "anchor": "The p90-forecast policy holds the SLA on every forecast-covered window at every forecast-issued lead.",
+  "claim_text": "p90-forecast policy holds SLA on all forecast-covered windows at all leads",
+  "expected_backing": "v_infraction; forecast_metrics"
+ }
+]

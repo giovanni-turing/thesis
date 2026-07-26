@@ -1,0 +1,455 @@
+Phase 2: 227 claims -> 454 verify units | pool=['hy3', 'gemini-3.5-flash', 'gpt-5.6-sol', 'mimo-v2.5', 'deepseek-v4-pro']
+[skip   ] hy3              CONFIRM validation-0002
+[skip   ] gemini-3.5-flash REFUTE  validation-0002
+[skip   ] gemini-3.5-flash CONFIRM validation-0004
+[ok     ] gpt-5.6-sol      REFUTE  validation-0004
+[ok     ] gpt-5.6-sol      CONFIRM validation-0005
+[ok     ] mimo-v2.5        REFUTE  validation-0005
+[ok     ] hy3              CONFIRM validation-0006
+[ok     ] deepseek-v4-pro  REFUTE  validation-0006
+[ok     ] deepseek-v4-pro  CONFIRM validation-0012
+[ok     ] hy3              REFUTE  validation-0012
+[ok     ] hy3              CONFIRM twopool-0020
+[ok     ] gemini-3.5-flash REFUTE  twopool-0020
+[ok     ] gemini-3.5-flash CONFIRM twopool-0021
+[ok     ] gpt-5.6-sol      REFUTE  twopool-0021
+[ok     ] gpt-5.6-sol      CONFIRM twopool-0022
+[ok     ] mimo-v2.5        REFUTE  twopool-0022
+[ok     ] gpt-5.6-sol      CONFIRM twopool-0023
+[ok     ] deepseek-v4-pro  REFUTE  twopool-0023
+[ok     ] deepseek-v4-pro  CONFIRM twopool-0024
+[ok     ] hy3              REFUTE  twopool-0024
+[ok     ] hy3              CONFIRM twopool-0025
+[ok     ] gemini-3.5-flash REFUTE  twopool-0025
+[ok     ] gemini-3.5-flash CONFIRM twopool-0027
+[ok     ] gpt-5.6-sol      REFUTE  twopool-0027
+[ok     ] gpt-5.6-sol      CONFIRM twopool-0028
+[ok     ] mimo-v2.5        REFUTE  twopool-0028
+[ok     ] gemini-3.5-flash CONFIRM twopool-0029
+[ok     ] deepseek-v4-pro  REFUTE  twopool-0029
+[ok     ] deepseek-v4-pro  CONFIRM twopool-0032
+[ok     ] hy3              REFUTE  twopool-0032
+[ok     ] hy3              CONFIRM twopool-0033
+[ok     ] gemini-3.5-flash REFUTE  twopool-0033
+[ok     ] gemini-3.5-flash CONFIRM twopool-0034
+[ok     ] gpt-5.6-sol      REFUTE  twopool-0034
+[ok     ] gpt-5.6-sol      CONFIRM twopool-0036
+[ok     ] mimo-v2.5        REFUTE  twopool-0036
+[ok     ] hy3              CONFIRM twopool-0039
+[timeout] deepseek-v4-pro  REFUTE  twopool-0039
+[ok     ] deepseek-v4-pro  CONFIRM twopool-0041
+[ok     ] hy3              REFUTE  twopool-0041
+[ok     ] hy3              CONFIRM twopool-0042
+[ok     ] gemini-3.5-flash REFUTE  twopool-0042
+[ok     ] gemini-3.5-flash CONFIRM twopool-0043
+[ok     ] gpt-5.6-sol      REFUTE  twopool-0043
+[ok     ] gpt-5.6-sol      CONFIRM twopool-0044
+[ok     ] mimo-v2.5        REFUTE  twopool-0044
+[ok     ] gpt-5.6-sol      CONFIRM twopool-0045
+[ok     ] deepseek-v4-pro  REFUTE  twopool-0045
+[ok     ] deepseek-v4-pro  CONFIRM twopool-0047
+[ok     ] hy3              REFUTE  twopool-0047
+[ok     ] hy3              CONFIRM twopool-0049
+[ok     ] gemini-3.5-flash REFUTE  twopool-0049
+[ok     ] gemini-3.5-flash CONFIRM twopool-0050
+[ok     ] gpt-5.6-sol      REFUTE  twopool-0050
+[ok     ] gpt-5.6-sol      CONFIRM twopool-0051
+[ok     ] mimo-v2.5        REFUTE  twopool-0051
+[ok     ] gemini-3.5-flash CONFIRM twopool-0052
+[ok     ] deepseek-v4-pro  REFUTE  twopool-0052
+[ok     ] deepseek-v4-pro  CONFIRM twopool-0053
+[ok     ] hy3              REFUTE  twopool-0053
+[ok     ] hy3              CONFIRM twopool-0054
+[ok     ] gemini-3.5-flash REFUTE  twopool-0054
+[ok     ] gemini-3.5-flash CONFIRM twopool-0055
+[ok     ] gpt-5.6-sol      REFUTE  twopool-0055
+[ok     ] gpt-5.6-sol      CONFIRM twopool-0056
+[ok     ] mimo-v2.5        REFUTE  twopool-0056
+[ok     ] hy3              CONFIRM twopool-0060
+[ok     ] deepseek-v4-pro  REFUTE  twopool-0060
+[ok     ] deepseek-v4-pro  CONFIRM twopool-0062
+[ok     ] hy3              REFUTE  twopool-0062
+[ok     ] hy3              CONFIRM twopool-0068
+[ok     ] gemini-3.5-flash REFUTE  twopool-0068
+[ok     ] gemini-3.5-flash CONFIRM predictors-0072
+[ok     ] gpt-5.6-sol      REFUTE  predictors-0072
+[ok     ] gpt-5.6-sol      CONFIRM predictors-0073
+[ok     ] mimo-v2.5        REFUTE  predictors-0073
+[ok     ] gpt-5.6-sol      CONFIRM trace-eda-0074
+[ok     ] deepseek-v4-pro  REFUTE  trace-eda-0074
+[ok     ] deepseek-v4-pro  CONFIRM trace-eda-0076
+[ok     ] hy3              REFUTE  trace-eda-0076
+[ok     ] hy3              CONFIRM trace-eda-0078
+[ok     ] gemini-3.5-flash REFUTE  trace-eda-0078
+[ok     ] gemini-3.5-flash CONFIRM trace-eda-0079
+[ok     ] gpt-5.6-sol      REFUTE  trace-eda-0079
+[ok     ] gpt-5.6-sol      CONFIRM trace-eda-0080
+[ok     ] mimo-v2.5        REFUTE  trace-eda-0080
+[ok     ] gemini-3.5-flash CONFIRM trace-eda-0082
+[ok     ] deepseek-v4-pro  REFUTE  trace-eda-0082
+[ok     ] deepseek-v4-pro  CONFIRM trace-eda-0083
+[ok     ] hy3              REFUTE  trace-eda-0083
+[ok     ] hy3              CONFIRM trace-eda-0085
+[ok     ] gemini-3.5-flash REFUTE  trace-eda-0085
+[ok     ] gemini-3.5-flash CONFIRM trace-eda-0088
+[ok     ] gpt-5.6-sol      REFUTE  trace-eda-0088
+[ok     ] gpt-5.6-sol      CONFIRM trace-eda-0089
+[ok     ] mimo-v2.5        REFUTE  trace-eda-0089
+[ok     ] hy3              CONFIRM conclusion-0097
+[ok     ] deepseek-v4-pro  REFUTE  conclusion-0097
+[ok     ] deepseek-v4-pro  CONFIRM conclusion-0098
+[ok     ] hy3              REFUTE  conclusion-0098
+[ok     ] hy3              CONFIRM conclusion-0100
+[ok     ] gemini-3.5-flash REFUTE  conclusion-0100
+[ok     ] gemini-3.5-flash CONFIRM conclusion-0101
+[ok     ] gpt-5.6-sol      REFUTE  conclusion-0101
+[ok     ] gpt-5.6-sol      CONFIRM conclusion-0103
+[ok     ] mimo-v2.5        REFUTE  conclusion-0103
+[ok     ] gpt-5.6-sol      CONFIRM conclusion-0107
+[ok     ] deepseek-v4-pro  REFUTE  conclusion-0107
+[ok     ] deepseek-v4-pro  CONFIRM closedloop-0110
+[ok     ] hy3              REFUTE  closedloop-0110
+[ok     ] hy3              CONFIRM closedloop-0111
+[ok     ] gemini-3.5-flash REFUTE  closedloop-0111
+[ok     ] gemini-3.5-flash CONFIRM closedloop-0113
+[timeout] gpt-5.6-sol      REFUTE  closedloop-0113
+[ok     ] gpt-5.6-sol      CONFIRM closedloop-0114
+[ok     ] mimo-v2.5        REFUTE  closedloop-0114
+[ok     ] gemini-3.5-flash CONFIRM closedloop-0116
+[ok     ] deepseek-v4-pro  REFUTE  closedloop-0116
+[ok     ] deepseek-v4-pro  CONFIRM closedloop-0117
+[ok     ] hy3              REFUTE  closedloop-0117
+[ok     ] hy3              CONFIRM closedloop-0118
+[ok     ] gemini-3.5-flash REFUTE  closedloop-0118
+[ok     ] gemini-3.5-flash CONFIRM closedloop-0119
+[ok     ] gpt-5.6-sol      REFUTE  closedloop-0119
+[ok     ] gpt-5.6-sol      CONFIRM closedloop-0120
+[ok     ] mimo-v2.5        REFUTE  closedloop-0120
+[ok     ] hy3              CONFIRM closedloop-0121
+[ok     ] deepseek-v4-pro  REFUTE  closedloop-0121
+[ok     ] deepseek-v4-pro  CONFIRM apendice-0138
+[ok     ] hy3              REFUTE  apendice-0138
+[ok     ] hy3              CONFIRM apendice-0139
+[ok     ] gemini-3.5-flash REFUTE  apendice-0139
+[ok     ] gemini-3.5-flash CONFIRM apendice-0141
+[ok     ] gpt-5.6-sol      REFUTE  apendice-0141
+[ok     ] gpt-5.6-sol      CONFIRM apendice-0144
+[timeout] mimo-v2.5        REFUTE  apendice-0144
+[ok     ] gpt-5.6-sol      CONFIRM apendice-0145
+[ok     ] deepseek-v4-pro  REFUTE  apendice-0145
+[ok     ] deepseek-v4-pro  CONFIRM apendice-0149
+[ok     ] hy3              REFUTE  apendice-0149
+[ok     ] hy3              CONFIRM predictors-0165
+[ok     ] gemini-3.5-flash REFUTE  predictors-0165
+[ok     ] gemini-3.5-flash CONFIRM predictors-0166
+[ok     ] gpt-5.6-sol      REFUTE  predictors-0166
+[ok     ] gpt-5.6-sol      CONFIRM predictors-0167
+[ok     ] mimo-v2.5        REFUTE  predictors-0167
+[ok     ] gemini-3.5-flash CONFIRM predictors-0168
+[ok     ] deepseek-v4-pro  REFUTE  predictors-0168
+[ok     ] deepseek-v4-pro  CONFIRM predictors-0169
+[ok     ] hy3              REFUTE  predictors-0169
+[ok     ] hy3              CONFIRM predictors-0170
+[ok     ] gemini-3.5-flash REFUTE  predictors-0170
+[ok     ] gemini-3.5-flash CONFIRM predictors-0171
+[ok     ] gpt-5.6-sol      REFUTE  predictors-0171
+[ok     ] gpt-5.6-sol      CONFIRM predictors-0172
+[ok     ] mimo-v2.5        REFUTE  predictors-0172
+[ok     ] hy3              CONFIRM predictors-0173
+[ok     ] deepseek-v4-pro  REFUTE  predictors-0173
+[ok     ] deepseek-v4-pro  CONFIRM predictors-0174
+[ok     ] hy3              REFUTE  predictors-0174
+[ok     ] hy3              CONFIRM predictors-0176
+[ok     ] gemini-3.5-flash REFUTE  predictors-0176
+[ok     ] gemini-3.5-flash CONFIRM predictors-0177
+[ok     ] gpt-5.6-sol      REFUTE  predictors-0177
+[ok     ] gpt-5.6-sol      CONFIRM predictors-0178
+[ok     ] mimo-v2.5        REFUTE  predictors-0178
+[ok     ] gpt-5.6-sol      CONFIRM predictors-0179
+[timeout] deepseek-v4-pro  REFUTE  predictors-0179
+[ok     ] deepseek-v4-pro  CONFIRM predictors-0180
+[ok     ] hy3              REFUTE  predictors-0180
+[ok     ] hy3              CONFIRM predictors-0181
+[ok     ] gemini-3.5-flash REFUTE  predictors-0181
+[ok     ] gemini-3.5-flash CONFIRM predictors-0182
+[ok     ] gpt-5.6-sol      REFUTE  predictors-0182
+[ok     ] gpt-5.6-sol      CONFIRM predictors-0184
+[ok     ] mimo-v2.5        REFUTE  predictors-0184
+[ok     ] gemini-3.5-flash CONFIRM predictors-0185
+[ok     ] deepseek-v4-pro  REFUTE  predictors-0185
+[ok     ] deepseek-v4-pro  CONFIRM predictors-0189
+[ok     ] hy3              REFUTE  predictors-0189
+[ok     ] hy3              CONFIRM predictors-0191
+[ok     ] gemini-3.5-flash REFUTE  predictors-0191
+[ok     ] gemini-3.5-flash CONFIRM intro-0196
+[ok     ] gpt-5.6-sol      REFUTE  intro-0196
+[ok     ] gpt-5.6-sol      CONFIRM intro-0197
+[ok     ] mimo-v2.5        REFUTE  intro-0197
+[ok     ] hy3              CONFIRM intro-0198
+[ok     ] deepseek-v4-pro  REFUTE  intro-0198
+[ok     ] deepseek-v4-pro  CONFIRM intro-0199
+[ok     ] hy3              REFUTE  intro-0199
+[ok     ] hy3              CONFIRM intro-0200
+[ok     ] gemini-3.5-flash REFUTE  intro-0200
+[ok     ] gemini-3.5-flash CONFIRM intro-0201
+[ok     ] gpt-5.6-sol      REFUTE  intro-0201
+[ok     ] gpt-5.6-sol      CONFIRM intro-0202
+[timeout] mimo-v2.5        REFUTE  intro-0202
+[ok     ] gpt-5.6-sol      CONFIRM intro-0203
+[ok     ] deepseek-v4-pro  REFUTE  intro-0203
+[ok     ] deepseek-v4-pro  CONFIRM intro-0209
+[ok     ] hy3              REFUTE  intro-0209
+[ok     ] hy3              CONFIRM intro-0215
+[ok     ] gemini-3.5-flash REFUTE  intro-0215
+[ok     ] gemini-3.5-flash CONFIRM intro-0218
+[ok     ] gpt-5.6-sol      REFUTE  intro-0218
+[ok     ] gpt-5.6-sol      CONFIRM intro-0223
+[ok     ] mimo-v2.5        REFUTE  intro-0223
+[ok     ] gemini-3.5-flash CONFIRM intro-0225
+[ok     ] deepseek-v4-pro  REFUTE  intro-0225
+[ok     ] deepseek-v4-pro  CONFIRM intro-0226
+[ok     ] hy3              REFUTE  intro-0226
+[ok     ] hy3              CONFIRM intro-0227
+[ok     ] gemini-3.5-flash REFUTE  intro-0227
+[ok     ] gemini-3.5-flash CONFIRM intro-0233
+[ok     ] gpt-5.6-sol      REFUTE  intro-0233
+[ok     ] gpt-5.6-sol      CONFIRM intro-0235
+[ok     ] mimo-v2.5        REFUTE  intro-0235
+[ok     ] hy3              CONFIRM intro-0237
+[ok     ] deepseek-v4-pro  REFUTE  intro-0237
+[ok     ] deepseek-v4-pro  CONFIRM intro-0238
+[ok     ] hy3              REFUTE  intro-0238
+[ok     ] hy3              CONFIRM intro-0242
+[ok     ] gemini-3.5-flash REFUTE  intro-0242
+[ok     ] gemini-3.5-flash CONFIRM intro-0243
+[ok     ] gpt-5.6-sol      REFUTE  intro-0243
+[ok     ] gpt-5.6-sol      CONFIRM aiconfigurator-0251
+[ok     ] mimo-v2.5        REFUTE  aiconfigurator-0251
+[ok     ] gpt-5.6-sol      CONFIRM aiconfigurator-0252
+[ok     ] deepseek-v4-pro  REFUTE  aiconfigurator-0252
+[timeout] deepseek-v4-pro  CONFIRM aiconfigurator-0256
+[ok     ] hy3              REFUTE  aiconfigurator-0256
+[ok     ] hy3              CONFIRM aiconfigurator-0257
+[ok     ] gemini-3.5-flash REFUTE  aiconfigurator-0257
+[ok     ] gemini-3.5-flash CONFIRM aiconfigurator-0258
+[ok     ] gpt-5.6-sol      REFUTE  aiconfigurator-0258
+[ok     ] gpt-5.6-sol      CONFIRM aiconfigurator-0260
+[ok     ] mimo-v2.5        REFUTE  aiconfigurator-0260
+[ok     ] gemini-3.5-flash CONFIRM aiconfigurator-0261
+[ok     ] deepseek-v4-pro  REFUTE  aiconfigurator-0261
+[ok     ] deepseek-v4-pro  CONFIRM aiconfigurator-0262
+[ok     ] hy3              REFUTE  aiconfigurator-0262
+[ok     ] hy3              CONFIRM aiconfigurator-0264
+[ok     ] gemini-3.5-flash REFUTE  aiconfigurator-0264
+[ok     ] gemini-3.5-flash CONFIRM aiconfigurator-0265
+[ok     ] gpt-5.6-sol      REFUTE  aiconfigurator-0265
+[ok     ] gpt-5.6-sol      CONFIRM apendice-0266
+[ok     ] mimo-v2.5        REFUTE  apendice-0266
+[ok     ] hy3              CONFIRM baselines-0275
+[ok     ] deepseek-v4-pro  REFUTE  baselines-0275
+[ok     ] deepseek-v4-pro  CONFIRM baselines-0277
+[ok     ] hy3              REFUTE  baselines-0277
+[ok     ] hy3              CONFIRM baselines-0278
+[ok     ] gemini-3.5-flash REFUTE  baselines-0278
+[ok     ] gemini-3.5-flash CONFIRM related-0286
+[ok     ] gpt-5.6-sol      REFUTE  related-0286
+[ok     ] gpt-5.6-sol      CONFIRM related-0291
+[ok     ] mimo-v2.5        REFUTE  related-0291
+[ok     ] gpt-5.6-sol      CONFIRM related-0294
+[ok     ] deepseek-v4-pro  REFUTE  related-0294
+[ok     ] deepseek-v4-pro  CONFIRM intro-0296
+[ok     ] hy3              REFUTE  intro-0296
+[ok     ] hy3              CONFIRM intro-0300
+[ok     ] gemini-3.5-flash REFUTE  intro-0300
+[ok     ] gemini-3.5-flash CONFIRM intro-0308
+[ok     ] gpt-5.6-sol      REFUTE  intro-0308
+[ok     ] gpt-5.6-sol      CONFIRM intro-0310
+[ok     ] mimo-v2.5        REFUTE  intro-0310
+[ok     ] gemini-3.5-flash CONFIRM intro-0313
+[ok     ] deepseek-v4-pro  REFUTE  intro-0313
+[ok     ] deepseek-v4-pro  CONFIRM trace-eda-0322
+[ok     ] hy3              REFUTE  trace-eda-0322
+[ok     ] hy3              CONFIRM trace-eda-0323
+[ok     ] gemini-3.5-flash REFUTE  trace-eda-0323
+[ok     ] gemini-3.5-flash CONFIRM trace-eda-0324
+[ok     ] gpt-5.6-sol      REFUTE  trace-eda-0324
+[ok     ] gpt-5.6-sol      CONFIRM trace-eda-0325
+[ok     ] mimo-v2.5        REFUTE  trace-eda-0325
+[ok     ] hy3              CONFIRM twopool-0326
+[ok     ] deepseek-v4-pro  REFUTE  twopool-0326
+[ok     ] deepseek-v4-pro  CONFIRM twopool-0327
+[ok     ] hy3              REFUTE  twopool-0327
+[ok     ] hy3              CONFIRM twopool-0329
+[ok     ] gemini-3.5-flash REFUTE  twopool-0329
+[ok     ] gemini-3.5-flash CONFIRM conclusion-0333
+[ok     ] gpt-5.6-sol      REFUTE  conclusion-0333
+[ok     ] gpt-5.6-sol      CONFIRM baselines-0334
+[ok     ] mimo-v2.5        REFUTE  baselines-0334
+[ok     ] gpt-5.6-sol      CONFIRM baselines-0338
+[ok     ] deepseek-v4-pro  REFUTE  baselines-0338
+[ok     ] deepseek-v4-pro  CONFIRM baselines-0339
+[ok     ] hy3              REFUTE  baselines-0339
+[ok     ] hy3              CONFIRM baselines-0340
+[ok     ] gemini-3.5-flash REFUTE  baselines-0340
+[ok     ] gemini-3.5-flash CONFIRM baselines-0341
+[ok     ] gpt-5.6-sol      REFUTE  baselines-0341
+[ok     ] gpt-5.6-sol      CONFIRM baselines-0342
+[ok     ] mimo-v2.5        REFUTE  baselines-0342
+[ok     ] gemini-3.5-flash CONFIRM baselines-0343
+[ok     ] deepseek-v4-pro  REFUTE  baselines-0343
+[ok     ] deepseek-v4-pro  CONFIRM baselines-0344
+[ok     ] hy3              REFUTE  baselines-0344
+[ok     ] hy3              CONFIRM baselines-0345
+[ok     ] gemini-3.5-flash REFUTE  baselines-0345
+[ok     ] gemini-3.5-flash CONFIRM baselines-0346
+[ok     ] gpt-5.6-sol      REFUTE  baselines-0346
+[ok     ] gpt-5.6-sol      CONFIRM baselines-0347
+[ok     ] mimo-v2.5        REFUTE  baselines-0347
+[ok     ] hy3              CONFIRM baselines-0348
+[ok     ] deepseek-v4-pro  REFUTE  baselines-0348
+[ok     ] deepseek-v4-pro  CONFIRM baselines-0350
+[ok     ] hy3              REFUTE  baselines-0350
+[ok     ] hy3              CONFIRM baselines-0351
+[ok     ] gemini-3.5-flash REFUTE  baselines-0351
+[ok     ] gemini-3.5-flash CONFIRM baselines-0354
+[timeout] gpt-5.6-sol      REFUTE  baselines-0354
+[ok     ] gpt-5.6-sol      CONFIRM baselines-0357
+[ok     ] mimo-v2.5        REFUTE  baselines-0357
+[ok     ] gpt-5.6-sol      CONFIRM baselines-0358
+[ok     ] deepseek-v4-pro  REFUTE  baselines-0358
+[ok     ] deepseek-v4-pro  CONFIRM baselines-0363
+[ok     ] hy3              REFUTE  baselines-0363
+[ok     ] hy3              CONFIRM baselines-0364
+[ok     ] gemini-3.5-flash REFUTE  baselines-0364
+[ok     ] gemini-3.5-flash CONFIRM baselines-0366
+[timeout] gpt-5.6-sol      REFUTE  baselines-0366
+[ok     ] gpt-5.6-sol      CONFIRM baselines-0368
+[ok     ] mimo-v2.5        REFUTE  baselines-0368
+[ok     ] gemini-3.5-flash CONFIRM baselines-0369
+[ok     ] deepseek-v4-pro  REFUTE  baselines-0369
+[ok     ] deepseek-v4-pro  CONFIRM aiconfigurator-0370
+[ok     ] hy3              REFUTE  aiconfigurator-0370
+[ok     ] hy3              CONFIRM aiconfigurator-0371
+[ok     ] gemini-3.5-flash REFUTE  aiconfigurator-0371
+[ok     ] gemini-3.5-flash CONFIRM aiconfigurator-0372
+[ok     ] gpt-5.6-sol      REFUTE  aiconfigurator-0372
+[ok     ] gpt-5.6-sol      CONFIRM aiconfigurator-0373
+[ok     ] mimo-v2.5        REFUTE  aiconfigurator-0373
+[ok     ] hy3              CONFIRM aiconfigurator-0374
+[ok     ] deepseek-v4-pro  REFUTE  aiconfigurator-0374
+[ok     ] deepseek-v4-pro  CONFIRM aiconfigurator-0375
+[ok     ] hy3              REFUTE  aiconfigurator-0375
+[ok     ] hy3              CONFIRM aiconfigurator-0376
+[ok     ] gemini-3.5-flash REFUTE  aiconfigurator-0376
+[ok     ] gemini-3.5-flash CONFIRM aiconfigurator-0377
+[ok     ] gpt-5.6-sol      REFUTE  aiconfigurator-0377
+[ok     ] gpt-5.6-sol      CONFIRM aiconfigurator-0378
+[ok     ] mimo-v2.5        REFUTE  aiconfigurator-0378
+[ok     ] gpt-5.6-sol      CONFIRM aiconfigurator-0380
+[timeout] deepseek-v4-pro  REFUTE  aiconfigurator-0380
+[ok     ] deepseek-v4-pro  CONFIRM aiconfigurator-0382
+[ok     ] hy3              REFUTE  aiconfigurator-0382
+[ok     ] hy3              CONFIRM aiconfigurator-0383
+[ok     ] gemini-3.5-flash REFUTE  aiconfigurator-0383
+[ok     ] gemini-3.5-flash CONFIRM aiconfigurator-0384
+[ok     ] gpt-5.6-sol      REFUTE  aiconfigurator-0384
+[timeout] gpt-5.6-sol      CONFIRM aiconfigurator-0385
+[timeout] mimo-v2.5        REFUTE  aiconfigurator-0385
+[timeout] gemini-3.5-flash CONFIRM aiconfigurator-0386
+[timeout] deepseek-v4-pro  REFUTE  aiconfigurator-0386
+[timeout] deepseek-v4-pro  CONFIRM closedloop-0394
+[timeout] hy3              REFUTE  closedloop-0394
+[timeout] hy3              CONFIRM closedloop-0395
+[timeout] gemini-3.5-flash REFUTE  closedloop-0395
+[timeout] gemini-3.5-flash CONFIRM closedloop-0396
+[timeout] gpt-5.6-sol      REFUTE  closedloop-0396
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0397
+[timeout] mimo-v2.5        REFUTE  closedloop-0397
+[timeout] hy3              CONFIRM closedloop-0398
+[timeout] deepseek-v4-pro  REFUTE  closedloop-0398
+[timeout] deepseek-v4-pro  CONFIRM closedloop-0399
+[timeout] hy3              REFUTE  closedloop-0399
+[timeout] hy3              CONFIRM closedloop-0400
+[timeout] gemini-3.5-flash REFUTE  closedloop-0400
+[timeout] gemini-3.5-flash CONFIRM closedloop-0403
+[timeout] gpt-5.6-sol      REFUTE  closedloop-0403
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0404
+[timeout] mimo-v2.5        REFUTE  closedloop-0404
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0407
+[timeout] deepseek-v4-pro  REFUTE  closedloop-0407
+[timeout] deepseek-v4-pro  CONFIRM closedloop-0408
+[timeout] hy3              REFUTE  closedloop-0408
+[timeout] hy3              CONFIRM closedloop-0409
+[timeout] gemini-3.5-flash REFUTE  closedloop-0409
+[timeout] gemini-3.5-flash CONFIRM closedloop-0410
+[timeout] gpt-5.6-sol      REFUTE  closedloop-0410
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0411
+[timeout] mimo-v2.5        REFUTE  closedloop-0411
+[timeout] gemini-3.5-flash CONFIRM closedloop-0412
+[timeout] deepseek-v4-pro  REFUTE  closedloop-0412
+[timeout] deepseek-v4-pro  CONFIRM closedloop-0414
+[timeout] hy3              REFUTE  closedloop-0414
+[timeout] hy3              CONFIRM closedloop-0415
+[timeout] gemini-3.5-flash REFUTE  closedloop-0415
+[timeout] gemini-3.5-flash CONFIRM closedloop-0416
+[timeout] gpt-5.6-sol      REFUTE  closedloop-0416
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0417
+[timeout] mimo-v2.5        REFUTE  closedloop-0417
+[timeout] hy3              CONFIRM closedloop-0419
+[timeout] deepseek-v4-pro  REFUTE  closedloop-0419
+[timeout] deepseek-v4-pro  CONFIRM closedloop-0420
+[timeout] hy3              REFUTE  closedloop-0420
+[timeout] hy3              CONFIRM closedloop-0421
+[timeout] gemini-3.5-flash REFUTE  closedloop-0421
+[timeout] gemini-3.5-flash CONFIRM closedloop-0422
+[timeout] gpt-5.6-sol      REFUTE  closedloop-0422
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0423
+[timeout] mimo-v2.5        REFUTE  closedloop-0423
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0425
+[timeout] deepseek-v4-pro  REFUTE  closedloop-0425
+[timeout] deepseek-v4-pro  CONFIRM closedloop-0426
+[timeout] hy3              REFUTE  closedloop-0426
+[timeout] hy3              CONFIRM closedloop-0427
+[timeout] gemini-3.5-flash REFUTE  closedloop-0427
+[timeout] gemini-3.5-flash CONFIRM closedloop-0428
+[timeout] gpt-5.6-sol      REFUTE  closedloop-0428
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0430
+[timeout] mimo-v2.5        REFUTE  closedloop-0430
+[timeout] gemini-3.5-flash CONFIRM closedloop-0431
+[timeout] deepseek-v4-pro  REFUTE  closedloop-0431
+[timeout] deepseek-v4-pro  CONFIRM closedloop-0436
+[timeout] hy3              REFUTE  closedloop-0436
+[timeout] hy3              CONFIRM closedloop-0437
+[timeout] gemini-3.5-flash REFUTE  closedloop-0437
+[timeout] gemini-3.5-flash CONFIRM closedloop-0438
+[timeout] gpt-5.6-sol      REFUTE  closedloop-0438
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0439
+[timeout] mimo-v2.5        REFUTE  closedloop-0439
+[timeout] hy3              CONFIRM closedloop-0440
+[timeout] deepseek-v4-pro  REFUTE  closedloop-0440
+[timeout] deepseek-v4-pro  CONFIRM closedloop-0441
+[timeout] hy3              REFUTE  closedloop-0441
+[timeout] hy3              CONFIRM closedloop-0444
+[timeout] gemini-3.5-flash REFUTE  closedloop-0444
+[timeout] gemini-3.5-flash CONFIRM closedloop-0446
+[timeout] gpt-5.6-sol      REFUTE  closedloop-0446
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0452
+[timeout] mimo-v2.5        REFUTE  closedloop-0452
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0455
+[timeout] deepseek-v4-pro  REFUTE  closedloop-0455
+[timeout] deepseek-v4-pro  CONFIRM closedloop-0456
+[timeout] hy3              REFUTE  closedloop-0456
+[timeout] hy3              CONFIRM closedloop-0457
+[timeout] gemini-3.5-flash REFUTE  closedloop-0457
+[timeout] gemini-3.5-flash CONFIRM closedloop-0458
+[timeout] gpt-5.6-sol      REFUTE  closedloop-0458
+[timeout] gpt-5.6-sol      CONFIRM closedloop-0459
+[timeout] mimo-v2.5        REFUTE  closedloop-0459
+[timeout] gemini-3.5-flash CONFIRM closedloop-0460
+[timeout] deepseek-v4-pro  REFUTE  closedloop-0460
+[timeout] deepseek-v4-pro  CONFIRM closedloop-0461
+[timeout] hy3              REFUTE  closedloop-0461
+[timeout] hy3              CONFIRM closedloop-0466
+[timeout] gemini-3.5-flash REFUTE  closedloop-0466
+[timeout] gemini-3.5-flash CONFIRM closedloop-0468
+[timeout] gpt-5.6-sol      REFUTE  closedloop-0468

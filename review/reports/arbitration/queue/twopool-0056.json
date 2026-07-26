@@ -1,0 +1,29 @@
+{
+ "claim_id": "twopool-0056",
+ "chapter": "twopool",
+ "claim_type": "numeric",
+ "anchor": "The simulation costs encoder work as a full 448^2 forward per image and ships 196 \u00d7 4096 post-merge tokens per image across the seam, but sets the language pool's prefill length to the trace's ContextTokens verbatim --- which embeds the traced model's vision tokenization (\u224866 tokens per image), roughly 3\u00d7 below a Qwen3-VL-consistent 196-per-image prefill.",
+ "claim_text": "Encoder cost: 448^2 forward per image, ships 196\u00d74096 tokens/image; language prefill uses trace ContextTokens (~66 tokens/image) vs Qwen3-VL 196 tokens/image (3\u00d7 difference).",
+ "expected_backing": "collector_encoder_fn, eda_metric",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "holds",
+   "observed": "slope=64.40, post_merge=196, ratio=3.04x",
+   "evidence": "DB slope is 64.40, post_merge is 196, yielding a ratio of 196/64.40 = 3.043x difference, which perfectly supports the '\u224866' (or \u224864.4) and 'roughly 3x' assertions.",
+   "severity": "minor",
+   "fix": "",
+   "query": "SELECT (SELECT value_num FROM provenance.eda_metric WHERE metric_path = 'median_context_vs_images_slope_tokens_per_image') AS slope, (SELECT MAX(post_merge_tokens) FROM provenance.collector_encoder_fn WHERE image_px = 448 AND n_images = 1) AS post_merge;"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "overclaimed",
+   "observed": "Current unsuperseded EDA slope 64.40028813892138 tokens/image; 196/slope=3.043464643779197; valid encoder artifacts use 448 px, 784 patches/image, and 196 post-merge tokens/image; rows backing 4096=0; slope window breakdowns=0.",
+   "evidence": "The numeric 448, 196, and roughly 3\u00d7 components hold, but the DB slope is a median-ContextTokens regression with intercept 5474.485707028881, not direct vision tokenization, and it does not back the 4096 seam width or verbatim prefill implementation.",
+   "severity": "major",
+   "fix": "State that valid encoder artifacts use 448-pixel inputs and 196 post-merge tokens/image, while the current trace EDA estimates a 64.40028813892138-token/image slope, making 196 larger by 3.043464643779197\u00d7; remove the unsupported 4096 seam, verbatim-prefill, and traced-model-tokenization assertions unless separately sourced.",
+   "query": "WITH current_eda AS (SELECT e.metric_path,e.value_num,e.window_bin,d.is_current,d.superseded_by FROM provenance.v_dim d JOIN provenance.eda_metric e ON e.run_id=d.run_id WHERE d.run_id='eda:a_quality' AND d.is_current=true), slope AS (SELECT MAX(value_num) FILTER (WHERE metric_path='median_context_vs_images_slope_tokens_per_image') AS traced_slope,MAX(value_num) FILTER (WHERE metric_path='median_context_vs_images_intercept') AS intercept,COUNT(DISTINCT window_bin) FILTER (WHERE metric_path LIKE 'median_context_vs_images%') AS slope_window_breakdowns,BOOL_AND(is_current) AS is_current,COUNT(*) FILTER (WHERE superseded_by IS NOT NULL) AS superseded_rows FROM current_eda WHERE metric_path LIKE 'median_context_vs_images%'), image_breakdown AS (SELECT jsonb_object_agg(metric_path,value_num ORDER BY metric_path) AS selected_denominator_breakdown FROM current_eda WHERE metric_path ~ '^context_tokens_by_numimages\\.(0|1|4|9|16|25|36|49|64|81|100)\\.(count|median)$'), encoder AS (SELECT COUNT(*) AS function_rows,COUNT(DISTINCT source_path) AS source_artifacts,COUNT(DISTINCT b.model_dir) AS model_dirs,MIN(f.image_px) AS min_image_px,MAX(f.image_px) AS max_image_px,MIN(f.patches::numeric/f.n_images) AS min_patches_per_image,MAX(f.patches::numeric/f.n_images) AS max_patches_per_image,MIN(f.post_merge_tokens::numeric/f.n_images) AS min_post_merge_tokens_per_image,MAX(f.post_merge_tokens::numeric/f.n_images) AS max_post_merge_tokens_per_image,BOOL_AND(f.is_valid AND b.is_valid) AS all_valid,COUNT(*) FILTER (WHERE f.raw::text LIKE '%4096%' OR b.raw::text LIKE '%4096%') AS rows_backing_4096 FROM provenance.collector_encoder_fn f JOIN provenance.collector_bench_run b USING (source_path) WHERE f.post_merge_tokens IS NOT NULL AND b.family='anchor'), owner_status AS (SELECT COUNT(*) AS encoder_artifacts_with_v_dim_owner FROM provenance.v_dim d WHERE d.source_path IN (SELECT DISTINCT source_path FROM provenance.collector_encoder_fn WHERE post_merge_tokens IS NOT NULL)) SELECT s.traced_slope,196.0/s.traced_slope AS ratio_196_to_slope,s.intercept,s.slope_window_breakdowns,s.is_current,s.superseded_rows,i.selected_denominator_breakdown,e.*,o.encoder_artifacts_with_v_dim_owner FROM slope s CROSS JOIN image_breakdown i CROSS JOIN encoder e CROSS JOIN owner_status o"
+  }
+ ],
+ "reason": "adjudicators-split"
+}

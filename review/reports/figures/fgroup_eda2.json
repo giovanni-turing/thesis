@@ -1,0 +1,17 @@
+[
+ {
+  "name": "eda_i_burst_onsets",
+  "path": "/home/gio/tese-review-frozen/figuras/eda/eda_i_burst_onsets.png",
+  "exists": true
+ },
+ {
+  "name": "eda_l_request_clusters",
+  "path": "/home/gio/tese-review-frozen/figuras/eda/eda_l_request_clusters.png",
+  "exists": true
+ },
+ {
+  "name": "eda_q_multires",
+  "path": "/home/gio/tese-review-frozen/figuras/eda/eda_q_multires.png",
+  "exists": true
+ }
+]

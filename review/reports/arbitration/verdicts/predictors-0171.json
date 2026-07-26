@@ -1,0 +1,11 @@
+{
+ "claim_id": "predictors-0171",
+ "verdict": "holds",
+ "observed": "Zero-forecast WAPE is exactly 100% (mathematical identity, nonzero denominator). At 1s bins the IMAGE signal: baselines ewma/naive/holt_winters = 146.092/156.859/217.041% (all far-worse-than-zero), best foundation toto = 98.761% (par-with-zero). The passage's anchor 'that sub-minute margin' = the ~one-third image WAPE reduction, and line 184 fixes the image 1s floor at ~99%.",
+ "claimed": "Zero forecast = 100% WAPE; at 1s bins baselines worse-than-zero, foundation ~par-with-zero (white shot-noise floor).",
+ "evidence": "For the image signal the passage describes, every number checks: baselines 146-217% far-worse-than-zero, best foundation 98.761% par-with-zero, zero=100% identity exact. The adjudicators expanded to all four signals (requests best baseline 68.072% and foundation 62.911% beat zero; ctx/gen foundations 86.043/81.631% beat zero) and flagged overclaim, but the anchor sentence is scoped to the image one-third margin it is explaining, not a four-signal blanket. Scoping-to-images is a clarity edit, not a factual correction.",
+ "severity": "minor",
+ "fix": "Optional clarity: explicitly attach 'the models move from far-worse-than-zero to par-with-zero' to the image signal, since requests/ctx/gen retain forecastability at 1s.",
+ "confidence": 0.62,
+ "query": "SELECT variate, model, round((100.0*wape)::numeric,3) wape_pct FROM forecast_metrics WHERE resolution='1s' AND span='common' AND candidate='point' AND h=-1 AND model IN ('chronos','toto','timesfm','ewma','naive','holt_winters') ORDER BY variate, wape_pct;"
+}

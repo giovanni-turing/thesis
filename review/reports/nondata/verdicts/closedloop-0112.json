@@ -1,0 +1,1 @@
+{"claim_id":"closedloop-0112","type":"existence","verdict":"supported","evidence":"simulation/results/results_44.jsonl: exactly 60 cells with quantile=p90 and rho=15, distributed 20 each across toto/chronos/timesfm, all with feasible=True (0 infeasible). All three foundation models pass all 60 p90/rho15 cells.","fix":"","confidence":0.95}

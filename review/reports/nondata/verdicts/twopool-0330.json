@@ -1,0 +1,1 @@
+{"claim_id":"twopool-0330","type":"existence","verdict":"supported","evidence":"twopool.tex:248 Table tab:sim-knees row 'Vision / AIC & steady & $\\geq s{=}32$ (cens.)'; twopool.tex:225 states knee censored, bound never crossed within swept range s<=32; v_grid_static_effective backing present.","fix":"","confidence":0.95}

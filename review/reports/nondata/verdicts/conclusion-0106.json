@@ -1,0 +1,1 @@
+{"claim_id":"conclusion-0106","type":"existence","verdict":"supported","evidence":"v_infraction: a12:week_fc_chronos / a14:chronos_e2e observed_span_s=483659.85 = 5.5979 days (~5.60), aggregate is_violation=f (SLA held). Four in-span burst episodes burst1/3/4/5 under forecast (a11:burst{1,3,4,5}_fc_chronos/timesfm) all is_violation=f.","fix":"","confidence":0.85}

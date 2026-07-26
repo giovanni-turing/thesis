@@ -1,0 +1,11 @@
+{
+  "claim_id": "apendice-0138",
+  "verdict": "supported",
+  "observed": "The shipped HF-FA2 N=32 cell (232.0 ms) is CORRECT: the source collector artifact /home/gio/tese/collector_artifacts/phaseE_physical_anchor/merged_fa2.csv holds the valid uncontended N=32 FA2 measurement mean_ms=231.962 (tight CI 0.140, p99 233.146) with AIC pred 160.196 -> matches the table's AIC N=32=160.2 and vLLM/AIC ratio 178.3/160.2=1.11. The DB view collector_encoder_fn only ingested the CONTENDED invalid variant (mean_ms=493.265, is_valid=false); the valid 231.962 row was never loaded. Other FA2 cells check out: N=1 valid 11.218->11.2, N=8 valid 54.060->54.1, N=64 valid 465.742->465.7.",
+  "claimed": "HF-FA2 N=32 = 232.0 ms.",
+  "evidence": "psql collector_encoder_fn engine=flash_attention_2 n_images=32 -> only is_valid=false row at 493.265 (CONTENDED). Source artifact merged_fa2.csv row: n_images=32,patches=6272,mean_ms=231.962,...,aic_pred=160.196. 231.962 rounds to 232.0; provenance-traceable and correct.",
+  "severity": "minor",
+  "fix": "No thesis change needed -- 232.0 is the correct valid measurement. Fix the DB ingest gap: load the valid uncontended N=32 FA2 row (231.962 ms, is_valid=true) from merged_fa2.csv into collector_encoder_fn; the loader currently keeps only the CONTENDED invalid variant.",
+  "confidence": 0.9,
+  "query": "collector_encoder_fn engine='flash_attention_2' n_images=32 -> only 493.265 invalid; source merged_fa2.csv line -> valid 231.962 (=232.0), aic 160.196 (=160.2)"
+}

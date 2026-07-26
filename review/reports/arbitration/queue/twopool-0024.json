@@ -1,0 +1,29 @@
+{
+ "claim_id": "twopool-0024",
+ "chapter": "twopool",
+ "claim_type": "numeric",
+ "anchor": "Output tok/s per user (avg) & 160.6 & 142.0",
+ "claim_text": "Polynomial vs AIC h100: output tokens per user avg 160.6 vs 142.0.",
+ "expected_backing": "v_pool_latency",
+ "adjudication": [
+  {
+   "model": "gemini-3.5-flash",
+   "verdict": "inconsistent",
+   "observed": "head2k_src: poly=160.63317, aic=141.95316; two_pool: poly=160.66866, aic=141.98464",
+   "evidence": "The thesis table numbers are perfectly backed by the head2k_src/srcbuild runs (160.63 -> 160.6 and 141.95 -> 142.0), but the stated backing view (v_pool_latency) only contains latency metrics. If two_pool runs were intended, Polynomial is 160.669 which rounds to 160.7. The metric is indeed a rate (tok/s per user), contrary to prior verifier claims.",
+   "severity": "minor",
+   "fix": "Correct EXPECTED BACKING to cost_model_variant or llm_run_summary, and clarify if using head2k_src runs (160.6) or two_pool runs (which would round to 160.7 for poly).",
+   "query": "SELECT variant_id, mean_output_tok_per_user FROM cost_model_variant WHERE variant_id IN ('head2k_src:poly','head2k_src:aic','two_pool:poly','two_pool:aic');"
+  },
+  {
+   "model": "gpt-5.6-sol",
+   "verdict": "inconsistent",
+   "observed": "cost_model_variant head2k_src: poly=160.6331738084524 (160.6 rounded), AIC=141.95315686251078 (142.0 rounded), each over 2000 completed requests and 398649 output tokens; both published. v_pool_latency exposes only ITL/TTFT rows with n_requests=2000, while v_dim gpu is NULL.",
+   "evidence": "The values match published cost_model_variant rows, but the declared v_pool_latency backing contains no output-tok/s metric and the owning dimensions do not identify H100.",
+   "severity": "major",
+   "fix": "Back the row with cost_model_variant head2k_src and document the H100 provenance, or remove the H100 qualification; do not cite v_pool_latency for this metric.",
+   "query": "WITH d AS (SELECT run_id, experiment, pool, window_name, gpu, is_current, superseded_by FROM provenance.v_dim WHERE is_current=true AND run_id IN ('srcbuild:llm_head2k_poly_src','srcbuild:llm_head2k_aic_src')), p AS (SELECT run_id, window_name, sla_metric, n_requests FROM provenance.v_pool_latency WHERE is_current=true AND run_id IN ('srcbuild:llm_head2k_poly_src','srcbuild:llm_head2k_aic_src')), c AS (SELECT variant_id, converter, mean_output_tok_per_user, ROUND(mean_output_tok_per_user::numeric,1) AS rounded_value, completed_requests, total_output_tokens, window_name, runtime, is_published FROM provenance.cost_model_variant WHERE family='head2k_src' AND converter IN ('poly','aic')) SELECT c.*, d.run_id, d.gpu, d.superseded_by, p.window_name AS latency_window, p.sla_metric, p.n_requests FROM c LEFT JOIN d ON d.run_id='srcbuild:llm_head2k_'||c.converter||'_src' LEFT JOIN p ON p.run_id=d.run_id ORDER BY c.converter,p.sla_metric"
+  }
+ ],
+ "reason": "unanimous-defect (both adjudicators flagged \u2014 verify the flag is real)"
+}

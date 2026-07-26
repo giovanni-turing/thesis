@@ -1,0 +1,147 @@
+# Thesis fixes -- 11 confirmed defects (apply from /home/gio/tese with: git apply review/thesis-fixes.patch)
+# NOT included: aiconfigurator-0382 (tab:aic-validation 448^2 row) -- the caption already states
+#   'Predictions from the raw slice'; the arbiter's 11.333/8.162/1.39 are the COMPOSED model, a
+#   different quantity. Author judgment: leave as-is, or add a note that the composed model gives 1.39x.
+--- a/tex/baselines.tex
++++ b/tex/baselines.tex
+@@ -206,8 +206,9 @@
+ 
+ The pattern tracks onset speed and peak volume together. Slow ramps
+ (burst1, the calm day) are reactive-scalable at any tested lead; medium
+-onsets survive only sub-minute leads ($L^{*}{=}$\SI{45}{\second}, below
+-what pod-scheduled GPU workers realistically offer). The two fastest
++onsets survive only short leads ($L^{*}{=}$45--\SI{165}{\second}; two of
++three windows are limited to \SI{45}{\second}, below what pod-scheduled GPU
++workers realistically offer, though burst4 tolerates a 2.75-minute lead). The two fastest
+ onsets diverge by volume: burst6's one-minute onset is caught at short
+ leads ($L^{*}{=}$\SI{45}{\second}) because its peak (\SI{337}{img/s})
+ drains within a batch, whereas burst3's one-minute onset defeats the
+--- a/tex/closedloop.tex
++++ b/tex/closedloop.tex
+@@ -80,7 +80,8 @@
+ and the \SI{300}{\second} cell reached the floor only by target-time
+ indexing --- an upper bound, not an issued lead. By contrast, the
+ identically informed reactive controller loses burst3 at every lead and
+-burst4/5 beyond 45 seconds (Table~\ref{tab:base-react-enc}). On the
++burst5 beyond 45 seconds, though burst4 still passes at $L{=}\SI{165}{\second}$
++(\SI{904.7}{\milli\second}) (Table~\ref{tab:base-react-enc}). On the
+ burst windows the p90 schedule's p99 encoder delay is pinned at
+ \SI{588}{\milli\second}, the platform's zero-queueing
+ service floor: a full-batch forward ($f(64) =$
+@@ -116,7 +117,7 @@
+ spreads of Chapter~\ref{cap:predictors}. The same holds for the predictor
+ a production planner ships: swapping Dynamo's own load predictor among
+ ARIMA, Kalman, and Prophet leaves the SLA verdict unchanged (all failing
+-together on the fast onset, burst3), because the integer-replica conversion
++together on burst4 and the 24-hour steady window), because the integer-replica conversion
+ quantizes the differing forecasts onto the same worker schedule.
+ Predictor choice is second-order \emph{within} these families; the
+ signal, the conversion, and the calibrated band \emph{shape} are not
+@@ -358,9 +359,10 @@
+ use Chronos-2 at $\rho{=}15$; $L$ is the cold-start lead. Forecast
+ schedules use issue-time actuation; worker-time is integrated from
+ readiness under the warm-pool model (cold-start warm-up reported
+-separately, Section~\ref{sec:cl-ledger-enc}) and is lead-invariant
+-across the archive's
+-realizable 15--\SI{165}{\second} issued-lead range (see text). The three
++separately, Section~\ref{sec:cl-ledger-enc}) and varies only
++modestly across the archive's
++realizable 15--\SI{165}{\second} issued-lead range, declining systematically by
++${\sim}6$--7\% from $L{=}15$ to \SI{165}{\second} (see text). The three
+ rows reading \SI{588}{\milli\second} are distinct runs that coincide at
+ the zero-queueing service floor (Section~\ref{sec:cl-matrix}); rows above
+ it carry queueing on top of that floor.}
+--- a/tex/intro.tex
++++ b/tex/intro.tex
+@@ -123,8 +123,9 @@
+ stamped at arrival --- Chapter~\ref{cap:trace-eda}). The image signal is
+ also an order of magnitude burstier, and its extremes do not co-occur
+ with the request signal's: the week's largest burst drives image load to
+-nearly sixteen times its weekly mean while the request rate barely
+-moves, leaving the two signals' top-percentile minutes essentially
++nearly sixteen times its weekly mean while the request rate rises only
++modestly (to ${\sim}2.7\times$ its weekly mean, still far below its own weekly
++maximum), leaving the two signals' top-percentile minutes essentially
+ disjoint. Each major burst is a near-pure flood of the frames class.
+ Yet the load is knowable: every request declares its image count at
+ admission, so watching the right signal needs no new instrumentation, only
+--- a/tex/predictors.tex
++++ b/tex/predictors.tex
+@@ -152,7 +152,8 @@
+ 
+ Second, \textbf{which model wins is resolution-dependent, and the
+ inter-model ranking is noise-level}. Toto-2 (usually with covariates)
+-takes the fine-bin cells and Chronos-2 most of the coarse ones. But the
++takes nearly all the 1\,s--30\,s cells; at \SI{45}{\second} TimesFM leads, and at
++\SI{1}{\minute} Toto-2 has the most wins, with Chronos-2 and EWMA behind it. But the
+ spreads are small (typically under 2 WAPE points) and
+ several bolded column wins are decided by $\leq$0.1 WAPE point, below
+ plausible sampling variability with no significance test attached. The
+@@ -164,10 +165,11 @@
+ selects a load predictor from a fixed registry (ARIMA, Kalman, Prophet, or
+ constant). Run through the same protocol on the image signal (shipped
+ defaults; the constant predictor reproduces the naive baseline's WAPE
+-exactly), all four sit at or below the classical frontier and none reaches
+-the foundation-model level: at \SI{1}{\minute} the best (ARIMA) ties the
+-classical baselines and trails the best foundation model by about a WAPE
+-point, widening at finer resolutions (per-config numbers in
++exactly), at \SI{1}{\minute} all four sit at or below the classical frontier and none
++reaches the foundation-model level (at \SI{15}{\second}, ARIMA and Prophet edge
++ahead of the classical baselines and ARIMA matches Chronos): the best (ARIMA)
++ties the classical baselines and trails the best foundation model by about a
++WAPE point, with the gap widening at finer resolutions (per-config numbers in
+ Appendix~\ref{ap:artifacts}). The point is not that foundation models
+ forecast this signal dramatically better but that the shipped predictors
+ do not (the closed-loop consequence is in Chapter~\ref{cap:closedloop}).
+--- a/tex/related.tex
++++ b/tex/related.tex
+@@ -191,8 +191,9 @@
+ generative modeling of Alibaba production workloads, which notes that
+ realistic workloads must be composed per category rather than as one
+ stream~\cite{Xiang2025ServeGen}; and Aegaeon's multi-month view of
+-bursty multi-model traffic at Alibaba~\cite{Xiang2025Aegaeon}. All are text-centric:
+-their request descriptors are token counts and timestamps. The
++bursty multi-model traffic at Alibaba~\cite{Xiang2025Aegaeon}. All but ServeGen are text-centric:
++their request descriptors are token counts and timestamps (ServeGen models
++per-category multimodal descriptors). The
+ \textit{AzureLMMInferenceDataset2025} released with
+ ModServe~\cite{Qiu2025ModServe} is the first public
+ production trace of a \emph{multimodal} inference cluster;
+--- a/tex/twopool.tex
++++ b/tex/twopool.tex
+@@ -71,8 +71,9 @@
+ \paragraph{Family transfer.} The language-pool numbers in this chapter are
+ for Qwen3-VL-8B at TP1. A spot-check prices the family flagship,
+ Qwen3-VL-235B-A22B at TP8, on the same shipped H100 data, window,
+-and topology: ${\sim}2\times$ the 8B's decode latency throughout, with ITL
+-p99 already \SI{87.7}{\milli\second} at the trace's own rate, so the decode
++and topology: ${\sim}1.9\times$ the 8B's mean decode latency at the trace's own rate
++(1.2--3.9$\times$ across the sweep), with ITL
++p99 \SI{86.2}{\milli\second} at that rate, so the decode
+ bound moves and its knee drops to $s{=}1$ against the 8B's $s{=}2$ ---
+ decoder scale halves the language pool's operating envelope (per-metric
+ numbers in Appendix~\ref{ap:artifacts}). The vision
+@@ -396,8 +397,11 @@
+ size increase arrives as pure service-time inflation with no provisioning
+ response, unlike the engine-cost gap above, which p90 headroom absorbs with
+ no added workers. Two scope limits bind: the $672^2$ margin on the faster
+-fabric is thin and reflects the single-stream handoff assumption, and on the
+-sustained 24-hour window $672^2$ misses the bound on \emph{both} fabrics ---
++fabric is thin and reflects the single-stream handoff assumption, and under
++the plain forecast schedule (\texttt{fc\_L30}) on the sustained 24-hour window
++$672^2$ misses the bound on \emph{both} fabrics (the forecast-aware variant and
++the deployable static-$C{=}8$ reference still meet it on the faster fabric,
++\SI{842}{\milli\second}) ---
+ so that fabric margin is a burst-window result and must never be quoted
+ without its window ($896^2$ cells extrapolate beyond the collected batch
+ axis, and every size distribution is \emph{assumed}). The dispatch cap is
+@@ -415,7 +419,8 @@
+ chapter's grid, which re-derives per-window optima across all six burst
+ windows and a 24-hour steady window). The steady head used here is
+ vision-lean (2.9 images per request against the trace's ${\approx}14$),
+-which the 24-hour steady window corrects.
++which the 24-hour steady window partly mitigates, raising the rate to 5.3
++images per request --- still well below the trace-wide 14.3.
+ 
+ \section{Summary}
+ 

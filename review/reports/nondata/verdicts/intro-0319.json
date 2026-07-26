@@ -1,0 +1,1 @@
+{"claim_id":"intro-0319","type":"existence","verdict":"supported","evidence":"collector_encoder_fn table has 536 rows (silicon-calibrated vision encoder cost fits); v_encoder_cost view and collector_encoder_stats exist; collector_artifacts/phaseE_physical_anchor present.","fix":"","confidence":0.95}
