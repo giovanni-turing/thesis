@@ -1,0 +1,5321 @@
+[
+ {
+  "target_ts": "2024-10-16 21:39:00",
+  "level": 1,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 21:39:30",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 21:39:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 22:02:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 22:23:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 22:28:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 22:36:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 22:54:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 22:54:30",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 23:06:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 23:06:30",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 23:10:30",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 23:12:30",
+  "level": 7,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 23:16:30",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 23:22:15",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 23:22:45",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 23:28:45",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-16 23:34:30",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 00:03:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 00:10:45",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 00:21:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 00:25:15",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 00:27:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 00:36:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 00:54:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 00:58:45",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 01:04:15",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 01:06:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 01:28:30",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 01:40:15",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 01:58:30",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 02:11:30",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 02:38:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 02:44:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 02:45:45",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 02:58:45",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 03:04:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 03:11:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 03:31:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 03:38:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 03:44:30",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 03:51:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 03:58:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 04:06:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 04:11:30",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 04:18:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 04:24:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 04:30:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 04:31:30",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 04:38:30",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 04:44:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 04:49:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 04:57:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 05:04:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 05:10:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 07:51:00",
+  "level": 7,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 07:55:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 07:57:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 08:04:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 08:39:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 08:48:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 08:57:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 09:01:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 09:36:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 09:55:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 10:33:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 10:42:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 11:21:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 13:09:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 13:24:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 13:39:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 13:45:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 14:21:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 14:42:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 14:48:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 15:27:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 17:36:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 18:33:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 18:48:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 19:00:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 19:06:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 19:12:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 23:00:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 23:12:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 23:21:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-17 23:33:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 00:09:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 00:45:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 01:45:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 02:03:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 04:33:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 06:03:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 06:08:45",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 06:20:45",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 06:30:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 06:42:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 06:51:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 07:06:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 07:18:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 07:28:30",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 07:42:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 07:54:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 08:42:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 08:45:00",
+  "level": 7,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 08:48:30",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:00:45",
+  "level": 8,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:01:15",
+  "level": 9,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:09:45",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:15:00",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:15:30",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:27:00",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:28:15",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:30:30",
+  "level": 14,
+  "justifying_issue_ts": "2024-10-18 09:30:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:36:30",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:39:00",
+  "level": 14,
+  "justifying_issue_ts": "2024-10-18 09:30:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:42:30",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:49:15",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:49:45",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:50:15",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:54:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 09:57:30",
+  "level": 30,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:10:15",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:12:45",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:13:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:21:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:25:15",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:26:30",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:30:00",
+  "level": 24,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:36:45",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:42:00",
+  "level": 23,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:47:00",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:54:45",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:55:00",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 10:55:15",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:01:15",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:01:30",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:03:00",
+  "level": 30,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:03:30",
+  "level": 32,
+  "justifying_issue_ts": "2024-10-18 11:03:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 11:03:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:08:30",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:12:00",
+  "level": 29,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:24:00",
+  "level": 32,
+  "justifying_issue_ts": "2024-10-18 11:03:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 11:03:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:33:45",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:34:15",
+  "level": 24,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:34:45",
+  "level": 25,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:45:15",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 11:53:15",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 12:00:00",
+  "level": 31,
+  "justifying_issue_ts": "2024-10-18 11:03:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 11:03:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 12:21:00",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 12:27:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 12:33:00",
+  "level": 14,
+  "justifying_issue_ts": "2024-10-18 09:30:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 12:36:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 12:45:00",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 12:48:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 12:54:00",
+  "level": 28,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 13:05:30",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 13:06:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 13:21:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 13:27:00",
+  "level": 26,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 13:30:00",
+  "level": 29,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 13:42:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 13:48:00",
+  "level": 24,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 13:54:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 13:57:00",
+  "level": 25,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:03:00",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:06:00",
+  "level": 26,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:13:30",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:15:00",
+  "level": 24,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:24:45",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:34:15",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:36:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:48:45",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:50:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:57:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:00:45",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:03:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:07:15",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:18:00",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:18:30",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:26:00",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:30:00",
+  "level": 24,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:42:30",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:43:15",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:45:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:51:00",
+  "level": 26,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 16:00:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 16:04:15",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 16:12:00",
+  "level": 30,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 16:19:15",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 16:27:30",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 16:33:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 16:36:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 16:48:00",
+  "level": 30,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 17:00:00",
+  "level": 30,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 17:04:30",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 17:09:00",
+  "level": 25,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 17:15:00",
+  "level": 29,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 17:27:00",
+  "level": 32,
+  "justifying_issue_ts": "2024-10-18 11:03:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 11:03:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 17:35:45",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 17:36:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 17:39:00",
+  "level": 24,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 17:49:30",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 17:51:00",
+  "level": 32,
+  "justifying_issue_ts": "2024-10-18 11:03:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 11:03:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 18:00:00",
+  "level": 26,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 18:15:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 18:30:30",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 18:32:00",
+  "level": 14,
+  "justifying_issue_ts": "2024-10-18 09:30:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 18:39:15",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 18:39:30",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 18:39:45",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 18:45:00",
+  "level": 14,
+  "justifying_issue_ts": "2024-10-18 09:30:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 18:45:45",
+  "level": 15,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 19:15:00",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 19:24:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 19:33:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 19:39:30",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 19:42:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 19:48:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 19:52:45",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 19:58:45",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 20:06:00",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 20:12:00",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 20:55:30",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 22:18:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 22:48:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 22:52:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 22:57:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 23:19:15",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 00:00:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 00:18:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 01:00:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 01:09:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 01:39:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 01:45:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 02:12:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 02:24:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 02:45:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 02:51:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 03:18:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 03:30:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 03:45:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 03:48:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 04:09:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 04:22:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 04:27:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 04:37:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 04:58:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 05:09:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 05:39:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 05:46:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 06:33:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 06:39:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 06:54:30",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 07:03:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 07:58:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 08:03:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 08:27:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 08:36:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 08:43:15",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 08:52:30",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 09:33:30",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 09:36:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 09:54:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 10:15:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 10:32:45",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 11:21:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 11:30:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 11:42:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 12:00:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 12:36:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 12:46:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 13:00:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 13:10:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 14:30:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 14:48:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 15:00:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 16:57:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 17:27:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 17:35:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 17:42:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 17:51:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 18:30:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 19:06:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 19:24:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 19:30:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 19:46:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 20:15:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 20:18:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 20:25:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 20:40:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 21:00:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 21:25:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 21:36:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 21:55:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 22:03:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 22:13:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 22:33:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 23:12:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 23:21:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 23:27:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 23:37:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-19 23:52:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 00:09:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 00:16:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 00:21:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 00:30:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 00:37:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 02:03:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 02:12:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 02:21:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 02:39:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 02:45:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 02:51:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 03:21:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 03:27:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 03:33:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 03:51:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 03:54:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 04:07:30",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 04:32:45",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 05:09:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 05:24:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 05:42:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 05:54:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 06:15:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 06:24:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 07:15:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 07:30:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 07:42:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 08:06:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 08:15:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 08:21:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 08:30:00",
+  "level": 7,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 08:42:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 08:45:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 08:51:30",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 08:57:00",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 09:21:30",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 09:27:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 09:42:00",
+  "level": 7,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 09:54:30",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 10:00:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 10:09:30",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 10:48:45",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 10:56:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 11:03:45",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 11:39:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 11:48:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 13:01:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 13:12:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 13:15:00",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 13:27:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 13:36:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 13:39:00",
+  "level": 9,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 13:52:30",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 14:12:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 14:21:30",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 14:27:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 14:37:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 14:46:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 15:31:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 15:48:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 15:54:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 16:21:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 16:30:00",
+  "level": 7,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 17:32:45",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 17:57:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:06:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:15:00",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:21:00",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:24:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:30:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:36:00",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:45:15",
+  "level": 8,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:45:30",
+  "level": 9,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:46:30",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:48:00",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:53:30",
+  "level": 9,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 18:57:00",
+  "level": 15,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:12:30",
+  "level": 7,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:13:15",
+  "level": 8,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:16:45",
+  "level": 8,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:22:30",
+  "level": 9,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:22:45",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:23:00",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:28:45",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:29:15",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:39:00",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:43:15",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:52:00",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:53:15",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 19:54:00",
+  "level": 24,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 20:00:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 20:06:00",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 20:12:00",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 20:15:00",
+  "level": 14,
+  "justifying_issue_ts": "2024-10-18 09:30:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 20:18:00",
+  "level": 15,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 20:23:30",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 20:27:00",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 20:33:00",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 20:40:45",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 20:48:00",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 20:55:30",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 21:03:00",
+  "level": 14,
+  "justifying_issue_ts": "2024-10-18 09:30:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 21:12:45",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 21:17:30",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 21:18:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 21:40:00",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 21:45:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 21:51:00",
+  "level": 15,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 22:00:00",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 22:06:00",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 22:17:15",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 22:26:30",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 22:33:00",
+  "level": 15,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 22:39:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 22:48:00",
+  "level": 14,
+  "justifying_issue_ts": "2024-10-18 09:30:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 22:57:00",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-20 23:39:30",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 01:48:00",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 02:06:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 02:10:15",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 03:22:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 03:48:00",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 04:39:30",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 04:48:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 04:53:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 05:06:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 05:15:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 05:42:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 06:15:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 06:27:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 07:18:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 07:30:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 08:03:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 08:15:00",
+  "level": 7,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 08:45:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 08:57:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 09:01:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 09:09:00",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 09:15:00",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 09:18:00",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 09:27:00",
+  "level": 28,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 09:39:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 09:39:15",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 09:42:00",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 09:50:15",
+  "level": 7,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 09:54:00",
+  "level": 9,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 09:58:30",
+  "level": 8,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 10:00:00",
+  "level": 9,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 10:12:45",
+  "level": 8,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 10:15:00",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 10:22:45",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 10:25:45",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 10:33:00",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 10:45:00",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 11:00:00",
+  "level": 12,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 11:07:00",
+  "level": 8,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 11:15:00",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 11:21:30",
+  "level": 8,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 11:21:45",
+  "level": 9,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 11:28:15",
+  "level": 10,
+  "justifying_issue_ts": "2024-10-18 08:48:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 08:48:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 11:30:00",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 11:42:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 11:48:00",
+  "level": 14,
+  "justifying_issue_ts": "2024-10-18 09:30:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 11:54:00",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 12:00:15",
+  "level": 11,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 12:09:00",
+  "level": 14,
+  "justifying_issue_ts": "2024-10-18 09:30:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 12:21:00",
+  "level": 29,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 12:27:00",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 12:33:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 12:42:00",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 12:48:00",
+  "level": 15,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 13:12:00",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 13:15:45",
+  "level": 13,
+  "justifying_issue_ts": "2024-10-18 09:15:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:15:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 13:21:00",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 13:28:00",
+  "level": 15,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 13:37:15",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 13:49:00",
+  "level": 15,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 13:51:00",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 13:54:00",
+  "level": 26,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 14:00:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 14:12:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 14:15:00",
+  "level": 23,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 14:21:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 14:36:00",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 14:42:00",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 14:45:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 15:08:30",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 15:12:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 15:33:00",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 15:36:00",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 15:45:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 15:51:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 15:54:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 16:00:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 16:10:15",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 16:12:00",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 16:19:15",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 16:21:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 16:24:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 16:30:00",
+  "level": 23,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 16:34:30",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 16:47:45",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 16:48:00",
+  "level": 27,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 17:05:45",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 17:09:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 17:18:45",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 17:32:15",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 17:33:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 17:43:30",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 17:48:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 17:53:15",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 18:08:30",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 18:24:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 18:33:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 18:40:45",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 18:45:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 18:55:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 19:09:30",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 19:10:15",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 19:15:00",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 19:27:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 19:39:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 19:54:00",
+  "level": 24,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 20:04:45",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 20:09:45",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 20:12:00",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 20:18:30",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 20:30:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 09:57:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 09:57:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 20:40:45",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 20:46:30",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 20:54:00",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 09:42:00",
+  "justifying_h": 3,
+  "ready_ts": "2024-10-18 09:42:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 21:18:15",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 21:19:45",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 21:36:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 21:51:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 22:10:45",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 22:21:00",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 23:09:00",
+  "level": 7,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 23:15:00",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-21 23:39:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 00:06:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 00:18:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 00:36:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 01:27:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 01:31:30",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 01:54:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 02:32:15",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 02:39:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 03:00:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 03:48:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 03:57:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 04:12:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 04:18:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 04:24:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 04:37:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 04:54:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 04:57:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 05:06:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 05:24:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 05:30:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 05:45:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 05:57:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 06:15:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 06:48:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 07:27:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 07:36:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 07:45:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 08:03:45",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 08:06:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 08:25:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 08:36:45",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 08:42:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 08:48:30",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 08:51:00",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 09:00:00",
+  "level": 6,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 09:24:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 09:27:00",
+  "level": 7,
+  "justifying_issue_ts": "2024-10-16 23:12:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:12:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 09:39:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 10:00:30",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 10:07:15",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 10:21:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 10:23:45",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 10:37:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 10:48:00",
+  "level": 3,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 4,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 11:13:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 11:18:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 11:25:00",
+  "level": 2,
+  "justifying_issue_ts": "2024-10-16 21:39:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 21:39:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 11:27:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 11:39:00",
+  "level": 4,
+  "justifying_issue_ts": "2024-10-16 22:54:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 22:54:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-22 11:51:00",
+  "level": 5,
+  "justifying_issue_ts": "2024-10-16 23:06:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-16 23:06:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ }
+]

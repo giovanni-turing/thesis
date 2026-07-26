@@ -1,0 +1,209 @@
+[
+ {
+  "target_ts": "2024-10-18 14:32:00",
+  "target_rel_s": -1.917,
+  "level": 7,
+  "order_rel_s": -31.917,
+  "ready_rel_s": -1.917,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 14:32:15",
+  "target_rel_s": 13.083,
+  "level": 16,
+  "order_rel_s": -16.917,
+  "ready_rel_s": 13.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 14:32:30",
+  "target_rel_s": 28.083,
+  "level": 18,
+  "order_rel_s": -1.917,
+  "ready_rel_s": 28.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 14:37:45",
+  "target_rel_s": 343.083,
+  "level": 22,
+  "order_rel_s": 313.083,
+  "ready_rel_s": 343.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 14:41:15",
+  "target_rel_s": 553.083,
+  "level": 16,
+  "order_rel_s": -16.917,
+  "ready_rel_s": 13.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 14:46:15",
+  "target_rel_s": 853.083,
+  "level": 22,
+  "order_rel_s": 313.083,
+  "ready_rel_s": 343.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 14:51:30",
+  "target_rel_s": 1168.083,
+  "level": 20,
+  "order_rel_s": 313.083,
+  "ready_rel_s": 343.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 14:57:45",
+  "target_rel_s": 1543.083,
+  "level": 25,
+  "order_rel_s": 1513.083,
+  "ready_rel_s": 1543.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 14:59:30",
+  "target_rel_s": 1648.083,
+  "level": 27,
+  "order_rel_s": 1618.083,
+  "ready_rel_s": 1648.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:03:00",
+  "target_rel_s": 1858.083,
+  "level": 20,
+  "order_rel_s": 313.083,
+  "ready_rel_s": 343.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:06:45",
+  "target_rel_s": 2083.083,
+  "level": 32,
+  "order_rel_s": 2053.083,
+  "ready_rel_s": 2083.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:14:15",
+  "target_rel_s": 2533.083,
+  "level": 23,
+  "order_rel_s": 1513.083,
+  "ready_rel_s": 1543.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:14:30",
+  "target_rel_s": 2548.083,
+  "level": 27,
+  "order_rel_s": 1618.083,
+  "ready_rel_s": 1648.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:17:00",
+  "target_rel_s": 2698.083,
+  "level": 30,
+  "order_rel_s": 2053.083,
+  "ready_rel_s": 2083.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:21:45",
+  "target_rel_s": 2983.083,
+  "level": 14,
+  "order_rel_s": -16.917,
+  "ready_rel_s": 13.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:25:15",
+  "target_rel_s": 3193.083,
+  "level": 19,
+  "order_rel_s": 313.083,
+  "ready_rel_s": 343.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:25:30",
+  "target_rel_s": 3208.083,
+  "level": 27,
+  "order_rel_s": 1618.083,
+  "ready_rel_s": 1648.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:30:00",
+  "target_rel_s": 3478.083,
+  "level": 24,
+  "order_rel_s": 1513.083,
+  "ready_rel_s": 1543.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:39:00",
+  "target_rel_s": 4018.083,
+  "level": 18,
+  "order_rel_s": -1.917,
+  "ready_rel_s": 28.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:39:45",
+  "target_rel_s": 4063.083,
+  "level": 26,
+  "order_rel_s": 1618.083,
+  "ready_rel_s": 1648.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:45:15",
+  "target_rel_s": 4393.083,
+  "level": 22,
+  "order_rel_s": 313.083,
+  "ready_rel_s": 343.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:50:45",
+  "target_rel_s": 4723.083,
+  "level": 20,
+  "order_rel_s": 313.083,
+  "ready_rel_s": 343.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ },
+ {
+  "target_ts": "2024-10-18 15:51:15",
+  "target_rel_s": 4753.083,
+  "level": 29,
+  "order_rel_s": 2053.083,
+  "ready_rel_s": 2083.083,
+  "lead_s": 30.0,
+  "signal": "true-future-point"
+ }
+]

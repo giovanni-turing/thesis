@@ -1,0 +1,1274 @@
+{
+ "experiment": "thesis_shortening_plan_v3.md \u00a78.2 \u2014 decisive encoder-pool baseline experiment",
+ "question": "does forecasting improve the achievable worker-time vs worst-episode-p99 frontier over a calibrated warm-floor reactive autoscaler, at equal compliance?",
+ "answer": "YES. At 0 failed episodes on the 5.60-day evaluation span the p90 forecast arm costs 2,410,754.7 worker-s (0.623x static), while the cheapest warm-floor reactive that also passes costs 4,033,184.1 (1.042x static) under the shipped mechanics and 2,886,614.5 (0.746x) under the readiness model most favourable to reactive \u2014 forecast is 1.20x to 1.69x cheaper, and is cheaper than EVERY member of the warm-floor family, passing or failing.",
+ "date": "2026-07-26",
+ "status": "COMPLETE \u2014 single evaluation pass, frozen parameters, zero retuning",
+ "gate_and_frozen_parameters": {
+  "declared_sla_gate": {
+   "metric": "encoder delay p99 (queue + service + handoff), over ALL requests of the window",
+   "bound_ms": 1000.0,
+   "relation": "strict <",
+   "population_note": "text-only requests contribute exactly zero delay: a user-population tail, not a vision-pool-conditional one",
+   "source": [
+    "tex/twopool.tex:189-194",
+    "tex/baselines.tex:14-17"
+   ]
+  },
+  "windows": {
+   "file": "simulation/windows.json (READ-ONLY; not modified by this experiment)",
+   "calibration_span": "trace's first 1.4 days (forecast context), episodes burst2 + burst6",
+   "evaluation_span": "5.60-day forecast-covered aggregate window [2024-10-16 21:39:00 .. trace end], 749,601 requests; episodes burst1 / burst3 / burst4 / burst5 / steady24h (calm day)",
+   "source": [
+    "tex/closedloop.tex:43-53",
+    "tex/closedloop.tex:423-427"
+   ]
+  },
+  "control_law": {
+   "conversion": "C(t) = clamp(ceil(demand(t) / rho), min_workers, max_workers)",
+   "rho_img_per_s": 15,
+   "control_bin_s": 15,
+   "hysteresis_min": 3,
+   "min_workers_default": 1,
+   "max_workers": 32,
+   "source": [
+    "tex/closedloop.tex:28-34",
+    "tex/baselines.tex:192-196",
+    "simulation/forecast_schedule.py:11-19"
+   ]
+  },
+  "startup_delay_convention": {
+   "rule": "up-lead / down-now: capacity ordered at t is ready at t+L; decreases take effect immediately",
+   "cold_start_lead_s": 30,
+   "shipped_readiness_forecast_and_oracle": "warm-pool / issue-time maturity \u2014 ready_i = max{hdesired_j : O_j + L <= ts_i}, avail_i = min(hdesired_i, ready_i)",
+   "shipped_readiness_reactive_family": "strict re-warm \u2014 avail_i = min(desired[i-lead .. i]); a level that drops re-pays the full lead",
+   "source": [
+    "verification/scripts/forecast_schedule_issuetime.py:19-30",
+    "simulation/forecast_schedule.py:13-17",
+    "simulation/forecast_schedule.py:146-150",
+    "simulation/run_encoder_hybrid.sh:19"
+   ],
+   "asymmetry_disclosure": "the two readiness models are NOT the same dial; the frontier's shipped arms mix them. Both symmetric repairs are measured below (forecast under strict re-warm; reactive family under warm-pool)."
+  },
+  "replay": {
+   "converter": "workload/trace_to_two_pool.py --worker-schedule <sched> (encoder-workers 2 default)",
+   "percentile_rule": "s[min(n-1, int(n*p/100))]  (workload/trace_to_two_pool.py:401-406)",
+   "interpreter": "/home/gio/tese/ai-dynamo/dynamo/.venv/bin/python \u2014 the interpreter that produced the archived fc/re/hybrid arms. The aiconfigurator venv is dead and its EncoderCostModel build differs on the tail by up to 0.39%."
+  }
+ },
+ "calibration": {
+  "cells_recomputed": 132,
+  "recomputation_mismatches": 0,
+  "rule_R1": {
+   "statement": "cheapest floor M holding the gate on BOTH calibration episodes at L=30 s",
+   "passing_set": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    14,
+    16,
+    20,
+    24,
+    32
+   ],
+   "selected_M": 1,
+   "verdict": "DEGENERATE \u2014 the un-floored reactive already passes both calibration episodes at L=30 s (burst2 589.301 ms, burst6 749.607 ms), so M=1 makes arm 3 identical to arm 2"
+  },
+  "rule_R2": {
+   "statement": "cheapest floor M holding the gate on BOTH calibration episodes at EVERY declared encoder cold-start lead L in {15, 30, 45, 300} s (tex/baselines.tex tab:base-react-enc, simulation/run_burst26_reactive.sh:9)",
+   "passing_set": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    14,
+    16,
+    20,
+    24,
+    32
+   ],
+   "selected_M": 4,
+   "binding_cell": {
+    "window": "burst2",
+    "L_s": 300,
+    "p99_ms": 995.959,
+    "margin_ms": 4.041
+   },
+   "verdict": "NON-DEGENERATE \u2014 used as the frontier's warm-floor arm (frozen M=4)",
+   "disclosed_caveats": [
+    "the selection is decided ENTIRELY by the L=300 s column: every M in the grid passes at L=15/30/45 s. The deployed lead is L=30 s, 10x smaller.",
+    "margin at the binding cell is thin (4.041 ms)."
+   ],
+   "corrections_to_the_design_report": [
+    "the parenthetical 'except b6 at M<=3, L=45' is WRONG: burst6 at L=45 passes at M=1/2/3 (906.600 / 749.607 / 678.660 ms). The selection is unaffected."
+   ]
+  },
+  "rule_R3": {
+   "statement": "cheapest oracle hysteresis H in {0, 3} min holding the gate on BOTH calibration episodes at L=30 s",
+   "selected_H": 0,
+   "calibration": {
+    "H0": {
+     "burst2": {
+      "p99_ms": 906.6,
+      "worker_s": 60159.9
+     },
+     "burst6": {
+      "p99_ms": 906.6,
+      "worker_s": 31933.8
+     },
+     "passes_both": true,
+     "calibration_worker_s": 92093.7
+    },
+    "H3": {
+     "burst2": {
+      "p99_ms": 589.301,
+      "worker_s": 134374.6
+     },
+     "burst6": {
+      "p99_ms": 589.301,
+      "worker_s": 90943.2
+     },
+     "passes_both": true,
+     "calibration_worker_s": 225317.8
+    }
+   }
+  },
+  "no_evaluation_data_used": true
+ },
+ "static_reference_worker_s": 3869278.8,
+ "static_path_identity_check": {
+  "encoder_workers_8": {
+   "p99_ms": 646.943,
+   "worker_s": 3869278.8
+  },
+  "worker_schedule_[[0,8]]": {
+   "p99_ms": 646.943,
+   "worker_s": 3869278.8
+  },
+  "identical": true
+ },
+ "arms": {
+  "1_forecast_p90_issue_time": {
+   "rank": 1,
+   "policy": "Chronos-2 p90 image-rate forecast, 15-s bins, rho=15 img/s, 3-min hysteresis, issue-time actuation at L=30 s",
+   "generator": "verification/scripts/forecast_schedule_issuetime.py --quantile p90 --rho 15 --cold-start-s 30",
+   "readiness_model": "warm-pool (issue-time maturity)",
+   "arm_key": "forecast_p90",
+   "p99_ms_per_window": {
+    "aggregate": 589.301,
+    "burst1": 589.301,
+    "burst3": 589.301,
+    "burst4": 589.301,
+    "burst5": 589.301,
+    "steady24h": 681.117
+   },
+   "worker_s_per_window": {
+    "aggregate": 2410754.7,
+    "burst1": 540202.9,
+    "burst3": 32228.0,
+    "burst4": 238172.9,
+    "burst5": 88805.7,
+    "steady24h": 162325.8
+   },
+   "cost_worker_s_eval_span": 2410754.7,
+   "vs_static": 0.6231,
+   "aggregate_p99_ms": 589.301,
+   "worst_episode": "steady24h",
+   "worst_episode_p99_ms": 681.117,
+   "episodes_failed": 0,
+   "episodes_failed_names": [],
+   "sla_violations_per_window": {
+    "aggregate": 2650,
+    "burst1": 73,
+    "burst3": 0,
+    "burst4": 0,
+    "burst5": 0,
+    "steady24h": 387
+   }
+  },
+  "2_reactive_react_point": {
+   "rank": 2,
+   "policy": "same-image-signal reactive strawman: trailing OBSERVED point image rate, identical conversion / hysteresis / lead",
+   "generator": "verification/scripts/reactive_quantile_schedule.py --mode react_point --rho 15 --cold-start-s 30",
+   "readiness_model": "strict re-warm",
+   "arm_key": "reactive",
+   "p99_ms_per_window": {
+    "aggregate": 589.301,
+    "burst1": 589.301,
+    "burst3": 16083.74,
+    "burst4": 589.301,
+    "burst5": 589.301,
+    "steady24h": 684.999
+   },
+   "worker_s_per_window": {
+    "aggregate": 2611319.7,
+    "burst1": 557458.5,
+    "burst3": 28355.8,
+    "burst4": 242403.6,
+    "burst5": 98643.0,
+    "steady24h": 182486.7
+   },
+   "cost_worker_s_eval_span": 2611319.7,
+   "vs_static": 0.6749,
+   "aggregate_p99_ms": 589.301,
+   "worst_episode": "burst3",
+   "worst_episode_p99_ms": 16083.74,
+   "episodes_failed": 1,
+   "episodes_failed_names": [
+    "burst3"
+   ],
+   "sla_violations_per_window": {
+    "aggregate": 3299,
+    "burst1": 74,
+    "burst3": 189,
+    "burst4": 28,
+    "burst5": 40,
+    "steady24h": 406
+   }
+  },
+  "3_reactive_plus_warm_floor_M4": {
+   "rank": 3,
+   "policy": "arm 2 plus a minimum standing worker floor M, frozen at M=4 by calibration rule R2",
+   "generator": "verification/scripts/reactive_quantile_schedule.py --mode react_point --min-workers 4",
+   "readiness_model": "strict re-warm",
+   "arm_key": "warm_floor_M4",
+   "p99_ms_per_window": {
+    "aggregate": 589.301,
+    "burst1": 589.301,
+    "burst3": 2083.83,
+    "burst4": 589.301,
+    "burst5": 589.301,
+    "steady24h": 418.205
+   },
+   "worker_s_per_window": {
+    "aggregate": 3338084.3,
+    "burst1": 558207.1,
+    "burst3": 28640.7,
+    "burst4": 242673.3,
+    "burst5": 98772.3,
+    "steady24h": 350086.9
+   },
+   "cost_worker_s_eval_span": 3338084.3,
+   "vs_static": 0.8627,
+   "aggregate_p99_ms": 589.301,
+   "worst_episode": "burst3",
+   "worst_episode_p99_ms": 2083.83,
+   "episodes_failed": 1,
+   "episodes_failed_names": [
+    "burst3"
+   ],
+   "sla_violations_per_window": {
+    "aggregate": 915,
+    "burst1": 70,
+    "burst3": 73,
+    "burst4": 10,
+    "burst5": 4,
+    "steady24h": 6
+   }
+  },
+  "4_static_C8_deployable": {
+   "rank": 4,
+   "policy": "the deployable static encoder fleet of Chapter 4 (baselines), C=8 workers, no control",
+   "generator": "workload/trace_to_two_pool.py --encoder-workers 8 (== --worker-schedule [[0,8]])",
+   "readiness_model": "n/a (constant)",
+   "arm_key": "static_C8",
+   "p99_ms_per_window": {
+    "aggregate": 646.943,
+    "burst1": 807.6,
+    "burst3": 717.755,
+    "burst4": 790.385,
+    "burst5": 761.385,
+    "steady24h": 418.205
+   },
+   "worker_s_per_window": {
+    "aggregate": 3869278.8,
+    "burst1": 239514.6,
+    "burst3": 12957.5,
+    "burst4": 90713.6,
+    "burst5": 38866.6,
+    "steady24h": 691173.8
+   },
+   "cost_worker_s_eval_span": 3869278.8,
+   "vs_static": 1.0,
+   "aggregate_p99_ms": 646.943,
+   "worst_episode": "burst1",
+   "worst_episode_p99_ms": 807.6,
+   "episodes_failed": 0,
+   "episodes_failed_names": [],
+   "sla_violations_per_window": {
+    "aggregate": 599,
+    "burst1": 192,
+    "burst3": 0,
+    "burst4": 42,
+    "burst5": 7,
+    "steady24h": 1
+   }
+  },
+  "5_perfect_future_oracle_H0": {
+   "rank": 5,
+   "policy": "perfect-future oracle: schedule from the TRUE future per-bin image demand, headroom-free point conversion, H=0 by calibration rule R3, orders clamped to order_i = max(0, ts_i - L) (cannot order before the window opens)",
+   "generator": "simulation/comparator_frontier_oracle.py --hysteresis-min 0",
+   "readiness_model": "warm-pool (issue-time maturity)",
+   "arm_key": "oracle_H0",
+   "p99_ms_per_window": {
+    "aggregate": 613.449,
+    "burst1": 906.6,
+    "burst3": 1978.559,
+    "burst4": 861.385,
+    "burst5": 906.6,
+    "steady24h": 441.406
+   },
+   "worker_s_per_window": {
+    "aggregate": 1130339.7,
+    "burst1": 248174.1,
+    "burst3": 10109.7,
+    "burst4": 107548.5,
+    "burst5": 39271.1,
+    "steady24h": 103046.7
+   },
+   "cost_worker_s_eval_span": 1130339.7,
+   "vs_static": 0.2921,
+   "aggregate_p99_ms": 613.449,
+   "worst_episode": "burst3",
+   "worst_episode_p99_ms": 1978.559,
+   "episodes_failed": 1,
+   "episodes_failed_names": [
+    "burst3"
+   ],
+   "sla_violations_per_window": {
+    "aggregate": 1872,
+    "burst1": 348,
+    "burst3": 48,
+    "burst4": 67,
+    "burst5": 78,
+    "steady24h": 172
+   }
+  }
+ },
+ "warm_floor_family_envelope": {
+  "note": "reported as an ENVELOPE, never a selection; only M=4 (rule R2) is a frozen arm",
+  "cheapest_member_passing_all_episodes": "warm_floor_M6",
+  "members": {
+   "warm_floor_M1": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 16083.74,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 684.999
+    },
+    "worker_s_per_window": {
+     "aggregate": 2611319.7,
+     "burst1": 557458.5,
+     "burst3": 28355.8,
+     "burst4": 242403.6,
+     "burst5": 98643.0,
+     "steady24h": 182486.7
+    },
+    "cost_worker_s_eval_span": 2611319.7,
+    "vs_static": 0.6749,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 16083.74,
+    "episodes_failed": 1,
+    "episodes_failed_names": [
+     "burst3"
+    ],
+    "sla_violations_per_window": {
+     "aggregate": 3299,
+     "burst1": 74,
+     "burst3": 189,
+     "burst4": 28,
+     "burst5": 40,
+     "steady24h": 406
+    }
+   },
+   "warm_floor_M2": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 9352.179,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 441.406
+    },
+    "worker_s_per_window": {
+     "aggregate": 2769659.6,
+     "burst1": 557503.0,
+     "burst3": 28445.8,
+     "burst4": 242493.5,
+     "burst5": 98686.1,
+     "steady24h": 212633.4
+    },
+    "cost_worker_s_eval_span": 2769659.6,
+    "vs_static": 0.7158,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 9352.179,
+    "episodes_failed": 1,
+    "episodes_failed_names": [
+     "burst3"
+    ],
+    "sla_violations_per_window": {
+     "aggregate": 2034,
+     "burst1": 73,
+     "burst3": 160,
+     "burst4": 24,
+     "burst5": 22,
+     "steady24h": 111
+    }
+   },
+   "warm_floor_M3": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 4005.737,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 3026099.4,
+     "burst1": 557682.5,
+     "burst3": 28535.8,
+     "burst4": 242583.4,
+     "burst5": 98729.2,
+     "steady24h": 273905.2
+    },
+    "cost_worker_s_eval_span": 3026099.4,
+    "vs_static": 0.7821,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 4005.737,
+    "episodes_failed": 1,
+    "episodes_failed_names": [
+     "burst3"
+    ],
+    "sla_violations_per_window": {
+     "aggregate": 1457,
+     "burst1": 73,
+     "burst3": 127,
+     "burst4": 18,
+     "burst5": 15,
+     "steady24h": 21
+    }
+   },
+   "warm_floor_M4": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 2083.83,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 3338084.3,
+     "burst1": 558207.1,
+     "burst3": 28640.7,
+     "burst4": 242673.3,
+     "burst5": 98772.3,
+     "steady24h": 350086.9
+    },
+    "cost_worker_s_eval_span": 3338084.3,
+    "vs_static": 0.8627,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 2083.83,
+    "episodes_failed": 1,
+    "episodes_failed_names": [
+     "burst3"
+    ],
+    "sla_violations_per_window": {
+     "aggregate": 915,
+     "burst1": 70,
+     "burst3": 73,
+     "burst4": 10,
+     "burst5": 4,
+     "steady24h": 6
+    }
+   },
+   "warm_floor_M5": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 1271.901,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 3678959.2,
+     "burst1": 558836.6,
+     "burst3": 28745.7,
+     "burst4": 242763.2,
+     "burst5": 98815.4,
+     "steady24h": 433633.6
+    },
+    "cost_worker_s_eval_span": 3678959.2,
+    "vs_static": 0.9508,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 1271.901,
+    "episodes_failed": 1,
+    "episodes_failed_names": [
+     "burst3"
+    ],
+    "sla_violations_per_window": {
+     "aggregate": 586,
+     "burst1": 68,
+     "burst3": 50,
+     "burst4": 7,
+     "burst5": 2,
+     "steady24h": 3
+    }
+   },
+   "warm_floor_M6": {
+    "p99_ms_per_window": {
+     "aggregate": 566.18,
+     "burst1": 589.301,
+     "burst3": 906.6,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 4033184.1,
+     "burst1": 559720.9,
+     "burst3": 29105.7,
+     "burst4": 243003.1,
+     "burst5": 98858.4,
+     "steady24h": 518710.3
+    },
+    "cost_worker_s_eval_span": 4033184.1,
+    "vs_static": 1.0424,
+    "aggregate_p99_ms": 566.18,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 906.6,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 489,
+     "burst1": 68,
+     "burst3": 16,
+     "burst4": 3,
+     "burst5": 1,
+     "steady24h": 2
+    }
+   },
+   "warm_floor_M7": {
+    "p99_ms_per_window": {
+     "aggregate": 566.18,
+     "burst1": 589.301,
+     "burst3": 749.911,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 4406429.0,
+     "burst1": 560725.2,
+     "burst3": 29480.7,
+     "burst4": 243243.1,
+     "burst5": 98901.5,
+     "steady24h": 604777.1
+    },
+    "cost_worker_s_eval_span": 4406429.0,
+    "vs_static": 1.1388,
+    "aggregate_p99_ms": 566.18,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 749.911,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 433,
+     "burst1": 68,
+     "burst3": 6,
+     "burst4": 3,
+     "burst5": 1,
+     "steady24h": 2
+    }
+   },
+   "warm_floor_M8": {
+    "p99_ms_per_window": {
+     "aggregate": 566.18,
+     "burst1": 589.301,
+     "burst3": 678.66,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 4793353.8,
+     "burst1": 561729.6,
+     "burst3": 29855.6,
+     "burst4": 243543.0,
+     "burst5": 98959.6,
+     "steady24h": 691173.8
+    },
+    "cost_worker_s_eval_span": 4793353.8,
+    "vs_static": 1.2388,
+    "aggregate_p99_ms": 566.18,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 678.66,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 379,
+     "burst1": 67,
+     "burst3": 0,
+     "burst4": 0,
+     "burst5": 0,
+     "steady24h": 1
+    }
+   },
+   "warm_floor_M9": {
+    "p99_ms_per_window": {
+     "aggregate": 566.18,
+     "burst1": 589.301,
+     "burst3": 589.301,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 5185078.7,
+     "burst1": 562823.9,
+     "burst3": 30245.6,
+     "burst4": 243857.9,
+     "burst5": 99017.7,
+     "steady24h": 777570.5
+    },
+    "cost_worker_s_eval_span": 5185078.7,
+    "vs_static": 1.3401,
+    "aggregate_p99_ms": 566.18,
+    "worst_episode": "burst1",
+    "worst_episode_p99_ms": 589.301,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 372,
+     "burst1": 67,
+     "burst3": 0,
+     "burst4": 0,
+     "burst5": 0,
+     "steady24h": 1
+    }
+   },
+   "warm_floor_M10": {
+    "p99_ms_per_window": {
+     "aggregate": 566.18,
+     "burst1": 589.301,
+     "burst3": 589.301,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 5582908.5,
+     "burst1": 564593.2,
+     "burst3": 30665.6,
+     "burst4": 244202.8,
+     "burst5": 99120.8,
+     "steady24h": 863967.2
+    },
+    "cost_worker_s_eval_span": 5582908.5,
+    "vs_static": 1.4429,
+    "aggregate_p99_ms": 566.18,
+    "worst_episode": "burst1",
+    "worst_episode_p99_ms": 589.301,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 367,
+     "burst1": 67,
+     "burst3": 0,
+     "burst4": 0,
+     "burst5": 0,
+     "steady24h": 1
+    }
+   },
+   "warm_floor_M12": {
+    "p99_ms_per_window": {
+     "aggregate": 566.18,
+     "burst1": 589.301,
+     "burst3": 589.301,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 6395233.2,
+     "burst1": 570231.9,
+     "burst3": 31505.6,
+     "burst4": 245327.6,
+     "burst5": 99416.9,
+     "steady24h": 1036760.7
+    },
+    "cost_worker_s_eval_span": 6395233.2,
+    "vs_static": 1.6528,
+    "aggregate_p99_ms": 566.18,
+    "worst_episode": "burst1",
+    "worst_episode_p99_ms": 589.301,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 347,
+     "burst1": 66,
+     "burst3": 0,
+     "burst4": 0,
+     "burst5": 0,
+     "steady24h": 1
+    }
+   },
+   "warm_floor_M14": {
+    "p99_ms_per_window": {
+     "aggregate": 566.18,
+     "burst1": 589.301,
+     "burst3": 589.301,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 7226562.9,
+     "burst1": 580550.5,
+     "burst3": 32375.5,
+     "burst4": 247967.4,
+     "burst5": 100163.1,
+     "steady24h": 1209554.1
+    },
+    "cost_worker_s_eval_span": 7226562.9,
+    "vs_static": 1.8677,
+    "aggregate_p99_ms": 566.18,
+    "worst_episode": "burst1",
+    "worst_episode_p99_ms": 589.301,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 330,
+     "burst1": 64,
+     "burst3": 0,
+     "burst4": 0,
+     "burst5": 0,
+     "steady24h": 1
+    }
+   },
+   "warm_floor_M16": {
+    "p99_ms_per_window": {
+     "aggregate": 566.18,
+     "burst1": 589.301,
+     "burst3": 589.301,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 8078367.6,
+     "burst1": 597424.1,
+     "burst3": 33470.5,
+     "burst4": 252437.3,
+     "burst5": 101854.3,
+     "steady24h": 1382347.6
+    },
+    "cost_worker_s_eval_span": 8078367.6,
+    "vs_static": 2.0878,
+    "aggregate_p99_ms": 566.18,
+    "worst_episode": "burst1",
+    "worst_episode_p99_ms": 589.301,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 314,
+     "burst1": 63,
+     "burst3": 0,
+     "burst4": 0,
+     "burst5": 0,
+     "steady24h": 0
+    }
+   },
+   "warm_floor_M20": {
+    "p99_ms_per_window": {
+     "aggregate": 566.18,
+     "burst1": 589.301,
+     "burst3": 589.301,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 9839247.0,
+     "burst1": 653506.4,
+     "burst3": 37235.4,
+     "burst4": 267749.1,
+     "burst5": 108866.6,
+     "steady24h": 1727934.5
+    },
+    "cost_worker_s_eval_span": 9839247.0,
+    "vs_static": 2.5429,
+    "aggregate_p99_ms": 566.18,
+    "worst_episode": "burst1",
+    "worst_episode_p99_ms": 589.301,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 42,
+     "burst1": 10,
+     "burst3": 0,
+     "burst4": 0,
+     "burst5": 0,
+     "steady24h": 0
+    }
+   },
+   "warm_floor_M24": {
+    "p99_ms_per_window": {
+     "aggregate": 566.18,
+     "burst1": 589.301,
+     "burst3": 589.301,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 11674841.5,
+     "burst1": 742198.7,
+     "burst3": 41555.3,
+     "burst4": 290470.9,
+     "burst5": 121173.9,
+     "steady24h": 2073521.4
+    },
+    "cost_worker_s_eval_span": 11674841.5,
+    "vs_static": 3.0173,
+    "aggregate_p99_ms": 566.18,
+    "worst_episode": "burst1",
+    "worst_episode_p99_ms": 589.301,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 38,
+     "burst1": 9,
+     "burst3": 0,
+     "burst4": 0,
+     "burst5": 0,
+     "steady24h": 0
+    }
+   },
+   "warm_floor_M32": {
+    "p99_ms_per_window": {
+     "aggregate": 566.18,
+     "burst1": 589.301,
+     "burst3": 589.301,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 15477115.3,
+     "burst1": 958058.3,
+     "burst3": 51830.1,
+     "burst4": 362854.5,
+     "burst5": 155464.1,
+     "steady24h": 2764695.1
+    },
+    "cost_worker_s_eval_span": 15477115.3,
+    "vs_static": 4.0,
+    "aggregate_p99_ms": 566.18,
+    "worst_episode": "burst1",
+    "worst_episode_p99_ms": 589.301,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 28,
+     "burst1": 1,
+     "burst3": 0,
+     "burst4": 0,
+     "burst5": 0,
+     "steady24h": 0
+    }
+   }
+  }
+ },
+ "symmetry_repair_diagnostics": {
+  "note": "adversarial diagnostics, NOT frontier arms. They equalise the one undisclosed asymmetry (readiness model) and the oracle's window-boundary clamp. All were run after the frontier was fixed and change no frozen parameter.",
+  "cheapest_warmpool_reactive_passing_all_episodes": "reactive_warmpool_M2",
+  "arms": {
+   "forecast_p90_strict_rewarm": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 589.301,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 732.999
+    },
+    "worker_s_per_window": {
+     "aggregate": 2387924.7,
+     "burst1": 538102.9,
+     "burst3": 32018.0,
+     "burst4": 236312.9,
+     "burst5": 88355.7,
+     "steady24h": 160795.8
+    },
+    "cost_worker_s_eval_span": 2387924.7,
+    "vs_static": 0.6171,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "steady24h",
+    "worst_episode_p99_ms": 732.999,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 2753,
+     "burst1": 75,
+     "burst3": 0,
+     "burst4": 0,
+     "burst5": 0,
+     "steady24h": 402
+    }
+   },
+   "reactive_warmpool_M1": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 1999.773,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 441.406
+    },
+    "worker_s_per_window": {
+     "aggregate": 2743484.6,
+     "burst1": 575998.5,
+     "burst3": 29945.8,
+     "burst4": 249663.6,
+     "burst5": 101853.0,
+     "steady24h": 191246.7
+    },
+    "cost_worker_s_eval_span": 2743484.6,
+    "vs_static": 0.709,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 1999.773,
+    "episodes_failed": 1,
+    "episodes_failed_names": [
+     "burst3"
+    ],
+    "sla_violations_per_window": {
+     "aggregate": 2002,
+     "burst1": 65,
+     "burst3": 48,
+     "burst4": 28,
+     "burst5": 40,
+     "steady24h": 256
+    }
+   },
+   "reactive_warmpool_M2": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 826.849,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 2886614.5,
+     "burst1": 576043.0,
+     "burst3": 30005.8,
+     "burst4": 249753.5,
+     "burst5": 101896.1,
+     "steady24h": 217583.4
+    },
+    "cost_worker_s_eval_span": 2886614.5,
+    "vs_static": 0.746,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 826.849,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 1365,
+     "burst1": 64,
+     "burst3": 25,
+     "burst4": 24,
+     "burst5": 22,
+     "steady24h": 96
+    }
+   },
+   "reactive_warmpool_M3": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 709.362,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 3129374.4,
+     "burst1": 576192.5,
+     "burst3": 30065.8,
+     "burst4": 249843.4,
+     "burst5": 101939.2,
+     "steady24h": 276005.2
+    },
+    "cost_worker_s_eval_span": 3129374.4,
+    "vs_static": 0.8088,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 709.362,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 999,
+     "burst1": 64,
+     "burst3": 20,
+     "burst4": 18,
+     "burst5": 15,
+     "steady24h": 18
+    }
+   },
+   "reactive_warmpool_M4": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 685.251,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 3431519.3,
+     "burst1": 576687.1,
+     "burst3": 30140.7,
+     "burst4": 249933.3,
+     "burst5": 101982.3,
+     "steady24h": 350806.9
+    },
+    "cost_worker_s_eval_span": 3431519.3,
+    "vs_static": 0.8869,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 685.251,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 699,
+     "burst1": 61,
+     "burst3": 7,
+     "burst4": 10,
+     "burst5": 4,
+     "steady24h": 6
+    }
+   },
+   "oracle_H3": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 1978.559,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 2744519.6,
+     "burst1": 576808.5,
+     "burst3": 30755.8,
+     "burst4": 250818.6,
+     "burst5": 102633.0,
+     "steady24h": 191411.7
+    },
+    "cost_worker_s_eval_span": 2744519.6,
+    "vs_static": 0.7093,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "burst3",
+    "worst_episode_p99_ms": 1978.559,
+    "episodes_failed": 1,
+    "episodes_failed_names": [
+     "burst3"
+    ],
+    "sla_violations_per_window": {
+     "aggregate": 664,
+     "burst1": 46,
+     "burst3": 39,
+     "burst4": 0,
+     "burst5": 39,
+     "steady24h": 70
+    }
+   },
+   "oracle_warmstart_H0": {
+    "p99_ms_per_window": {
+     "aggregate": 613.449,
+     "burst1": 906.6,
+     "burst3": 748.581,
+     "burst4": 861.385,
+     "burst5": 883.479,
+     "steady24h": 441.406
+    },
+    "worker_s_per_window": {
+     "aggregate": 1130339.7,
+     "burst1": 248247.3,
+     "burst3": 10574.4,
+     "burst4": 107548.5,
+     "burst5": 39829.6,
+     "steady24h": 103061.7
+    },
+    "cost_worker_s_eval_span": 1130339.7,
+    "vs_static": 0.2921,
+    "aggregate_p99_ms": 613.449,
+    "worst_episode": "burst1",
+    "worst_episode_p99_ms": 906.6,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 1872,
+     "burst1": 345,
+     "burst3": 9,
+     "burst4": 67,
+     "burst5": 34,
+     "steady24h": 171
+    }
+   },
+   "oracle_warmstart_H3": {
+    "p99_ms_per_window": {
+     "aggregate": 589.301,
+     "burst1": 589.301,
+     "burst3": 589.301,
+     "burst4": 589.301,
+     "burst5": 589.301,
+     "steady24h": 418.205
+    },
+    "worker_s_per_window": {
+     "aggregate": 2744519.6,
+     "burst1": 576986.6,
+     "burst3": 31340.6,
+     "burst4": 250818.6,
+     "burst5": 103191.5,
+     "steady24h": 191426.7
+    },
+    "cost_worker_s_eval_span": 2744519.6,
+    "vs_static": 0.7093,
+    "aggregate_p99_ms": 589.301,
+    "worst_episode": "burst1",
+    "worst_episode_p99_ms": 589.301,
+    "episodes_failed": 0,
+    "episodes_failed_names": [],
+    "sla_violations_per_window": {
+     "aggregate": 664,
+     "burst1": 42,
+     "burst3": 0,
+     "burst4": 0,
+     "burst5": 0,
+     "steady24h": 69
+    }
+   }
+  }
+ },
+ "headline": {
+  "equal_compliance_basis": "0 failed episodes on the 5.60-day evaluation span (encoder p99 < 1 s per window)",
+  "comparisons": [
+   {
+    "basis": "shipped mechanics (reactive family under strict re-warm)",
+    "cheapest_passing_reactive": "warm_floor_M6",
+    "reactive_worker_s": 4033184.1,
+    "reactive_vs_static": 1.0424,
+    "forecast_worker_s": 2410754.7,
+    "forecast_vs_static": 0.6231,
+    "forecast_advantage_x": 1.673
+   },
+   {
+    "basis": "both arms under strict re-warm (symmetric, conservative to forecast)",
+    "cheapest_passing_reactive": "warm_floor_M6",
+    "reactive_worker_s": 4033184.1,
+    "reactive_vs_static": 1.0424,
+    "forecast_worker_s": 2387924.7,
+    "forecast_vs_static": 0.6171,
+    "forecast_advantage_x": 1.689
+   },
+   {
+    "basis": "both arms under warm-pool readiness (MOST favourable to reactive)",
+    "cheapest_passing_reactive": "reactive_warmpool_M2",
+    "reactive_worker_s": 2886614.5,
+    "reactive_vs_static": 0.746,
+    "forecast_worker_s": 2410754.7,
+    "forecast_vs_static": 0.6231,
+    "forecast_advantage_x": 1.197
+   },
+   {
+    "basis": "calibration-frozen floor M=4 under warm-pool readiness (passes)",
+    "cheapest_passing_reactive": "reactive_warmpool_M4",
+    "reactive_worker_s": 3431519.3,
+    "reactive_vs_static": 0.8869,
+    "forecast_worker_s": 2410754.7,
+    "forecast_vs_static": 0.6231,
+    "forecast_advantage_x": 1.423
+   }
+  ],
+  "defensible_range_x": [
+   1.2,
+   1.69
+  ],
+  "oracle_bound": {
+   "shipped_boundary_clamped": {
+    "worker_s": 1130339.7,
+    "vs_static": 0.2921,
+    "episodes_failed": 1,
+    "burst3_p99_ms": 1978.559,
+    "note": "its only burst3 failure is a WINDOW-BOUNDARY artifact: the oracle cannot order before the window opens, while the forecast arm's orders are absolute-epoch and predate the burst3 window. Not a signal-quality limit."
+   },
+   "warm_start_symmetry_repaired": {
+    "worker_s": 1130339.7,
+    "vs_static": 0.2921,
+    "episodes_failed": 0,
+    "burst3_p99_ms": 748.581,
+    "note": "with the single asymmetry removed (order_t = ts - L, may precede window start) the oracle passes EVERY evaluation episode; aggregate schedule is unchanged. This \u2014 not the clamped variant \u2014 is the honest signal-quality bound."
+   },
+   "fraction_of_achievable_saving_captured_by_forecast": 0.5325
+  }
+ },
+ "verdicts": {
+  "1_forecast_p90_issue_time": "PASSES every evaluation episode at 0.623x static; the only autoscaling arm that does. Win survives the symmetric strict-re-warm repair (0.617x, 0 failures).",
+  "2_reactive_react_point": "FAILS burst3. Its 16,083.740 ms is partly a readiness-model artifact: the same policy under the forecast arm's own warm-pool actuation reads 1,999.773 ms \u2014 still a failure, 8x smaller.",
+  "3_reactive_plus_warm_floor_M4": "FAILS burst3 at 2,083.830 ms and 0.863x static. Under warm-pool readiness M=4 passes at 0.887x \u2014 still dearer than forecast. No floor in the family reaches forecast's cost.",
+  "4_static_C8_deployable": "PASSES every episode at 1.000x static by construction; the cost reference.",
+  "5_perfect_future_oracle_H0": "0.292x static. As shipped it fails burst3, but ONLY through a window-boundary clamp the forecast arm does not carry; with that single asymmetry repaired it passes every episode at the same 0.292x. It is the frontier leader and the honest bound."
+ },
+ "caveats": [
+  "the 1.67x headline is NOT robust to the readiness-model repair \u2014 it collapses to 1.20x. The defensible claim is 'forecast is 1.2-1.7x cheaper than the best warm-floor reactive at equal compliance'.",
+  "'even the perfect-future oracle fails burst3' is FALSE and must not be published: the clamped oracle's burst3 failure is a window-boundary artifact; the warm-start oracle passes every episode at the same aggregate cost.",
+  "'buying enough standing capacity costs more than the static fleet' holds only under the strict-re-warm actuation; under warm-pool the M=2 floor passes at 0.746x, cheaper than static. The conclusion (a floor alone never reaches forecast's cost) is unaffected.",
+  "the comparison is conservative in reactive's favour: forecast is a single frozen policy, the floor family is an ex-post best-of-family read on the evaluation span.",
+  "R2 is decided entirely by the L=300 s calibration column; the arm is deployed at L=30 s.",
+  "p99 cross-quoting: the forecast and reactive aggregate p99s recomputed here (589.301 ms) are EXACTLY the archived / DB-ingested values (provenance run_ids encoder_hybrid:fc and encoder_hybrid:re, 589.301 ms) \u2014 no fork. The manuscript's '588 ms plateau' label (tex/closedloop.tex:441,455-461) traces to a 588.37 ms measurement from a different EncoderCostModel build (0.158% below), which the manuscript itself footnotes as the '588/589 ms floor' (tex/closedloop.tex:534). Static IS forked: 646.943 ms here vs the archived rerun_verify:week_static_C8 644.440 ms (+0.389%) and vs the table's 644 (+0.457%) \u2014 inside the repo's declared 0.5% bound. All worker-seconds and cost ratios match the manuscript and the DB exactly (2,410,754.7 / 2,611,319.7 / 3,869,278.8).",
+  "single trace; rho=15 and the 15-s control bin are not swept here."
+ ],
+ "independent_recomputation": {
+  "method": "delay_i = timestamp_i(ms) - arrival_i(ms), index = hash_ids[0]//100000; percentile = the converter's own rule s[min(n-1,int(n*p/100))]; worker-s = schedule integral to t_end = max(last_arrival, max_i(ts_i - handoff(n_img_i))), handoff(n) = 0.2 + n*196*4096*2/(25e9/8)*1e3 ms. Imports nothing from simulation/ or workload/.",
+  "script": "simulation/results/comparator_frontier/build_frontier_summary.py",
+  "eval_cells_recomputed": 169,
+  "calibration_cells_recomputed": 132,
+  "mismatches_vs_stats_json": 0
+ },
+ "artifacts": {
+  "cells_eval": "simulation/results/comparator_frontier/frontier_summary_cells.json",
+  "cells_calibration": "simulation/results/comparator_frontier/calib_recheck_cells.json",
+  "summary": "simulation/results/comparator_frontier/frontier_summary.json",
+  "figure": "simulation/results/comparator_frontier/frontier_worktime_vs_worstp99.pdf",
+  "raw_core": "simulation/results/comparator_frontier/eval/ (30 cells)",
+  "raw_family": "simulation/results/comparator_frontier/eval_family/ (90 cells)",
+  "raw_calibration": "simulation/results/comparator_frontier/calib/ (144 cells)",
+  "raw_adversarial": "simulation/results/comparator_frontier/adversarial/ (48 cells + verifiers)",
+  "frozen_record": "simulation/results/comparator_frontier/FROZEN.json"
+ }
+}

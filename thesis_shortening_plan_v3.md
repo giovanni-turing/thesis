@@ -130,7 +130,7 @@ gates (0.62/0.76/0.82) are count-independent and must stay green throughout.
   guard re-floors + fresh adversarial pass against the preservation contract.
 - **Phase 4:** institutional template (ABNT/IME front matter, biblatex), draft-note
   removal, blank-page policy, Lists check, **defense-deck sync** (renumbering breaks
-  deck references: defense-qa.tex, slides.tex, reveal deck).
+  deck references: reveal deck only; beamer slides retired, defense-qa.tex unmaintained per author 2026-07-26).
 
 ## 8. Additional author directives (2026-07-26, second batch)
 
@@ -178,8 +178,7 @@ RTX and H100 time into one economic number without the explicit conversion model
 New title: "Forecast-Informed Vision-Pool Provisioning for Modality-Disaggregated
 Multimodal Serving" — replaces "Predictive Per-Pool Provisioning" (overstates
 symmetry). Apply in tese.tex (title page + PT translation, PDF metadata) during the
-Phase-2 skeleton; propagate to defense deck, slides, defense-qa, and any running
-headers in Phase 4's deck-sync pass.
+Phase-2 skeleton; propagate to the reveal deck (defense/reveal + deck_single) in Phase 4's deck-sync pass; defense-qa.tex is unmaintained (author, 2026-07-26). The beamer slides/ deck is retired (author, 2026-07-26) — the reveal deck IS the presentation.
 
 ### 8.8 Second-experiment queue (after 8.2)
 1. Independent reproduction test: three headline results from a clean checkout +

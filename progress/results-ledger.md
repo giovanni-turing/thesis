@@ -2433,3 +2433,134 @@ caveats:    residual-risk list in the resolution doc: worktree still uncommitted
             removed, not re-earned); p90/s6 stays a post-hoc sensitivity absent a second trace;
             slides/ + defense/ decks still carry pre-campaign 81.2% / 93-96% (sync before defense).
 commit:     uncommitted (working tree)
+
+## §8.2 DECISIVE BASELINE: encoder worker-time vs worst-episode-p99 frontier (2026-07-26)
+date:       2026-07-26
+artifact:   simulation/results/comparator_frontier/frontier_summary.json (arms, frozen params,
+            per-episode p99s, per-episode worker-seconds, ratios, verdicts, caveats) +
+            frontier_worktime_vs_worstp99.pdf/.png (2-panel frontier figure);
+            frontier_summary_cells.json (169 independently recomputed evaluation cells) +
+            calib_recheck_cells.json (132 independently recomputed calibration cells);
+            raw runs: comparator_frontier/{eval/ 30 core cells, eval_family/ 90 warm-floor cells,
+            calib/ 144 calibration cells, adversarial/ 48 symmetry-repair cells, checks/ 1
+            static-path-identity cell}; FROZEN.json (the pre-evaluation freeze record);
+            ADVERSARIAL_VERIFICATION.json; EVAL_RESULTS.json / frontier.json / frontier_table.txt.
+            New tooling: comparator_frontier_{calibrate,eval}.sh, comparator_frontier_oracle.py,
+            comparator_frontier_{summarize,percell,reuse}.py, and the report builders
+            comparator_frontier/{build_frontier_summary.py, make_frontier_report.py}.
+command:    calibration (burst2+burst6 ONLY): bash simulation/comparator_frontier_calibrate.sh
+            -> FROZEN.json; then the SINGLE evaluation pass: bash simulation/comparator_frontier_eval.sh
+            (schedules from verification/scripts/forecast_schedule_issuetime.py --quantile p90,
+            verification/scripts/reactive_quantile_schedule.py --mode react_point [--min-workers M],
+            simulation/comparator_frontier_oracle.py; replayed by
+            workload/trace_to_two_pool.py --worker-schedule under ai-dynamo/dynamo/.venv/bin/python).
+            Report: /home/gio/tese/eda/.venv/bin/python simulation/results/comparator_frontier/
+            build_frontier_summary.py --jobs 12 && .../make_frontier_report.py
+frozen-params (provenance — all DISCOVERED from tex/scripts, verbatim, never chosen on eval data):
+            gate        encoder-delay p99 < 1 s, over ALL requests of the window (text-only requests
+                        contribute exactly 0 -> user-population tail, not vision-conditional)
+                        -- tex/twopool.tex:189-194, tex/baselines.tex:14-17
+            split       calibration = trace's first 1.4 d (episodes burst2, burst6);
+                        evaluation  = the 5.60-d forecast-covered aggregate, 749,601 req
+                        (episodes burst1/3/4/5 + steady24h calm day)
+                        -- tex/closedloop.tex:43-53, :423-427; simulation/windows.json (NOT modified)
+            law         C(t) = clamp(ceil(demand/rho), 1, 32), rho = 15 img/s, 15-s control bin,
+                        3-min scale-down hysteresis
+                        -- tex/closedloop.tex:28-34, tex/baselines.tex:192-196,
+                           simulation/forecast_schedule.py:11-19
+            startup     up-lead / down-now: capacity ordered at t is ready at t+L, decreases immediate;
+                        L = 30 s -- simulation/forecast_schedule.py:13-17,:146-150,
+                        verification/scripts/forecast_schedule_issuetime.py:19-30,
+                        simulation/run_encoder_hybrid.sh:19
+            percentile  the converter's own rule s[min(n-1,int(n*p/100))]
+                        -- workload/trace_to_two_pool.py:401-406
+            arm 3 M     R2 = cheapest floor holding the gate on BOTH calibration episodes at EVERY
+                        declared lead L in {15,30,45,300} s (tex/baselines.tex tab:base-react-enc,
+                        simulation/run_burst26_reactive.sh:9) -> M = 4. Binding cell burst2@L=300 s,
+                        p99 995.959 ms, margin 4.041 ms. (R1, the L=30-only rule, is DEGENERATE: the
+                        un-floored reactive already passes burst2 589.301 / burst6 749.607.)
+            arm 5 H     R3 = cheapest oracle hysteresis in {0,3} min passing both calibration
+                        episodes at L=30 s -> H = 0 (906.600 ms both, 92,093.7 worker-s vs H=3's
+                        589.301 ms, 225,317.8 worker-s).
+result:     THE FRONTIER (cost axis = provisioned worker-s on the 5.60-d evaluation span;
+            compliance = encoder p99 < 1 s in EVERY one of the 5 evaluation episodes):
+              arm                       worker-s     vs static  agg p99  worst-ep p99  worst ep   failed
+              5 oracle (perfect fut,H=0)  1,130,339.7   0.292x   613.449      1978.559  burst3      1
+              1 forecast p90 (issue-time) 2,410,754.7   0.623x   589.301       681.117  steady24h   0
+              2 reactive (same img signal) 2,611,319.7  0.675x   589.301     16083.740  burst3      1
+              3 reactive + warm floor M=4 3,338,084.3   0.863x   589.301      2083.830  burst3      1
+              4 static C=8 (deployable)   3,869,278.8   1.000x   646.943       807.600  burst1      0
+            Per-window encoder-delay p99 (ms) -- aggregate / b1 / b3 / b4 / b5 / calm:
+              forecast 589.301/589.301/589.301/589.301/589.301/681.117
+              reactive 589.301/589.301/16083.740/589.301/589.301/684.999
+              floor M4 589.301/589.301/2083.830/589.301/589.301/418.205
+              static   646.943/807.600/717.755/790.385/761.385/418.205
+              oracle   613.449/906.600/1978.559/861.385/906.600/441.406
+            Per-window worker-s -- forecast 2,410,754.7/540,202.9/32,228.0/238,172.9/88,805.7/162,325.8;
+              reactive 2,611,319.7/557,458.5/28,355.8/242,403.6/98,643.0/182,486.7; floor M4
+              3,338,084.3/558,207.1/28,640.7/242,673.3/98,772.3/350,086.9; static
+              3,869,278.8/239,514.6/12,957.5/90,713.6/38,866.6/691,173.8; oracle
+              1,130,339.7/248,174.1/10,109.7/107,548.5/39,271.1/103,046.7.
+            WARM-FLOOR FAMILY (M = 1..32, 90 cells, an ENVELOPE not a selection): cheapest member
+              clearing all 5 episodes is M=6 at 4,033,184.1 worker-s = 1.042x static = 1.67x the
+              forecast arm. M=1..5 all fail burst3 (16083.7 / 9352.2 / 4005.7 / 2083.8 / 1271.9 ms);
+              M>=9 saturates at the 589.301 ms no-queue plateau. So a standing floor alone never
+              reaches forecast's cost.
+            SYMMETRY REPAIRS (adversarial diagnostics, not frontier arms; every frozen parameter
+              unchanged). (i) Readiness-model asymmetry, now disclosed: the forecast/oracle arms
+              actuate through a warm pool (issue-time maturity, forecast_schedule_issuetime.py:127-162)
+              while the reactive family re-warms strictly (forecast_schedule.py:146-150). Forecast
+              under strict re-warm: 2,387,924.7 = 0.617x, 0 failures -- the win SURVIVES. Reactive
+              under warm-pool: M=1 fails burst3 at 1999.773 ms (not 16083.7 -- that number is 8x
+              inflated by the asymmetry), M=2 PASSES at 2,886,614.5 = 0.746x, M=4 passes at
+              3,431,519.3 = 0.887x. (ii) The oracle's burst3 failure is a WINDOW-BOUNDARY artifact:
+              it is clamped to order_i = max(0, ts_i - L) while the forecast arm's orders are
+              absolute-epoch and predate the window. Warm-start oracle (order_t = ts - L): burst3
+              748.581 ms, 0 failed episodes, SAME aggregate 1,130,339.7 = 0.292x. So the forecast arm
+              captures (1-0.623)/(1-0.292) = 53.3% of the achievable saving.
+            ANSWER (one sentence): YES -- forecasting improves the achievable frontier over a
+              calibrated warm floor: at equal compliance (0 failed episodes) the p90 forecast arm
+              costs 2,410,754.7 worker-s = 0.623x static while the cheapest warm-floor reactive that
+              also passes costs 4,033,184.1 = 1.042x under the shipped mechanics and 2,886,614.5 =
+              0.746x under the readiness model most favourable to reactive, i.e. forecast is
+              1.20x-1.69x cheaper and is cheaper than EVERY member of the warm-floor family.
+            VERIFICATION: 169 evaluation cells + 132 calibration cells recomputed from the raw trace
+              + emitted mooncake JSONL + schedules by build_frontier_summary.py (imports nothing from
+              simulation/ or workload/; delay_i = ts_i - arrival_i indexed by hash_ids[0]//100000;
+              worker-s = schedule integral to t_end = max(last_arrival, max_i(ts_i - handoff(n_img_i)))).
+              0 mismatches against the runs' own stats.json. Static path identity confirmed:
+              --encoder-workers 8 and --worker-schedule [[0,8]] both give 646.943 ms / 3,869,278.8.
+feeds:      NOT yet in the manuscript. Candidate for tex/closedloop.tex §sec:cl-aggregate as the
+            baseline-completeness answer to "why not just give the reactive controller a warm floor".
+            Author decision required; the corrections below MUST land with it.
+supersedes: nothing measured. It CORRECTS three claims made in the design/run reports of this same
+            effort: (a) "even the perfect-future oracle fails burst3" is FALSE (boundary artifact;
+            the warm-start oracle passes every episode at the same 0.292x); (b) reactive's burst3
+            16,083.7 ms must be quoted with its warm-pool counterpart 1,999.8 ms; (c) "buying enough
+            standing capacity costs more than the static fleet" holds only under strict re-warm --
+            under warm-pool the M=2 floor passes at 0.746x, cheaper than static (the CONCLUSION is
+            unaffected: no floor reaches forecast's cost). Also corrects the design report's R2
+            parenthetical "except b6 at M<=3, L=45" -- burst6@L=45 passes at M=1/2/3
+            (906.600/749.607/678.660); selection unchanged. And the reuse audit's "no per-episode
+            artifacts exist" is overstated: provenance.current_encoder_summary carries matching
+            per-episode rows (rerun_verify:burst3_react_L30 28,355.8 ws, rerun_verify:burst3_issue_L30
+            32,228.0, a2:burst1_forecast_L30 540,202.9, a2:burst1_reactive_L30 557,458.5,
+            g6:u448__burst3__static_C8 12,957.5) that reproduce these worker-seconds exactly.
+caveats:    the 1.67x headline is NOT robust -- it collapses to 1.20x once the readiness models are
+            equalised, so the defensible claim is "1.2-1.7x cheaper at equal compliance", never 1.67x
+            alone. p99 cross-quoting, stated exactly: the forecast/reactive aggregate p99s here
+            (589.301 ms) ARE the archived + DB-ingested values (provenance encoder_hybrid:fc and
+            encoder_hybrid:re, 589.301) -- no fork there; the manuscript's "588 ms plateau" label
+            (tex/closedloop.tex:441,455-461) traces to a 588.37 ms measurement from a different
+            EncoderCostModel build, 0.158% below, which the manuscript itself footnotes as the
+            "588/589 ms floor" (tex/closedloop.tex:534). Static IS forked: 646.943 here vs archived
+            rerun_verify:week_static_C8 644.440 (+0.389%) and vs the table's 644 (+0.457%) -- inside
+            the repo's declared 0.5% bound. Worker-seconds and cost ratios match the manuscript and
+            the DB EXACTLY (2,410,754.7 / 2,611,319.7 / 3,869,278.8). R2 is decided entirely by the
+            L=300 s calibration column
+            although the arm is deployed at L=30 s, and its binding margin is 4.0 ms. The floor family
+            is an ex-post best-of-family read on the evaluation span while forecast is a single frozen
+            policy -- conservative in reactive's favour. Single trace; rho=15 and the 15-s control bin
+            not swept here. Not ingested to the provenance DB (encoder stats are converter
+            .stats.json, not llm_run_summary).
+commit:     uncommitted (working tree)

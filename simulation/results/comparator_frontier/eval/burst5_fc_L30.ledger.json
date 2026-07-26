@@ -1,0 +1,173 @@
+[
+ {
+  "target_ts": "2024-10-18 14:31:15",
+  "level": 15,
+  "justifying_issue_ts": "2024-10-18 14:30:00",
+  "justifying_h": 6,
+  "ready_ts": "2024-10-18 14:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:34:15",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 14:33:00",
+  "justifying_h": 6,
+  "ready_ts": "2024-10-18 14:33:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:36:30",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:48:45",
+  "level": 16,
+  "justifying_issue_ts": "2024-10-18 14:33:00",
+  "justifying_h": 6,
+  "ready_ts": "2024-10-18 14:33:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:50:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 14:57:00",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:00:45",
+  "level": 17,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:03:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:07:15",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:18:00",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:18:30",
+  "level": 20,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:26:00",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:30:00",
+  "level": 22,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:30:30",
+  "level": 24,
+  "justifying_issue_ts": "2024-10-18 15:30:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 15:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:42:30",
+  "level": 18,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:43:15",
+  "level": 19,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:45:00",
+  "level": 21,
+  "justifying_issue_ts": "2024-10-18 14:36:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 14:36:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:51:00",
+  "level": 24,
+  "justifying_issue_ts": "2024-10-18 15:30:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 15:30:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ },
+ {
+  "target_ts": "2024-10-18 15:51:30",
+  "level": 26,
+  "justifying_issue_ts": "2024-10-18 15:51:00",
+  "justifying_h": 1,
+  "ready_ts": "2024-10-18 15:51:30",
+  "lead_s": 30.0,
+  "model": "warm-pool"
+ }
+]

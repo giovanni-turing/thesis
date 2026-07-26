@@ -1,0 +1,22 @@
+{
+ "verifier": "adversarial recomputation, independent of simulation/comparator_frontier_summarize.py",
+ "recomputation": {
+  "method": "delay_i = mooncake_timestamp_i(ms) - trace_arrival_i(ms), index=hash_ids[0]//100000; percentile = converter rule s[min(n-1,int(n*p/100))] (workload/trace_to_two_pool.py:401-406); worker-s = schedule integral to t_end=max(last_arrival, max_i(ts_i - handoff(n_img_i))), handoff(n)=0.2+n*196*4096*2/(25e9/8)*1e3 ms",
+  "cells_checked": {
+   "calib": 144,
+   "eval_core": 30,
+   "eval_family": 90,
+   "static_path_check": 1,
+   "reused": 4
+  },
+  "mismatches": 0
+ },
+ "adversarial_runs_added": {
+  "dir": "simulation/results/comparator_frontier/adversarial/",
+  "oracleH3": "shipped oracle, hysteresis 3 min (the other calibration-passing dial)",
+  "oracleWS": "oracle with pre-window ordering allowed (order_t = ts-L, may be negative) = the fc arm's convention",
+  "oracleWSH3": "both",
+  "reWPm{1,2,3,4}": "reactive react_point + floor M under the WARM-POOL readiness model used by fc/oracle",
+  "fcSTRICT": "forecast p90 issue-time under --strict-rewarm (the symmetric fix)"
+ }
+}
