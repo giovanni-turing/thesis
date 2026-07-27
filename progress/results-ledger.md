@@ -3006,3 +3006,31 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   multiplication, a rough bound only, superseded by these retimes.
 - **Feeds:** bridge D63 closure; the physical-anchor manuscript section
   (pending) must cite the retimed values, not the scalar.
+
+### metric-stack-compute (2026-07-27)
+
+- **Artifact:** `simulation/results/comparator_frontier/metric_stack.{py,json}`
+  (20 frontier arms, aggregate span) and
+  `simulation/results/composed_fill/composed_metric_stack.json` (+ script
+  `simulation/composed_metric_stack.py`; 9 composed cells).
+- **Command:** compute-only (author directive "compute first"); per-request
+  delay/TTFT/E2E vectors from the same tracked raw inputs the frontier
+  builder and composed join read; NO manuscript change.
+- **Result (frontier, aggregate span, convention-free):** forecast_p90
+  STRICTLY DOMINATES reactive on every swept threshold AND worker-time:
+  669.6 vs 725.4 worker-h; violations >1000 ms 2,650 vs 3,299; excess mass
+  3,688 vs 6,710 request-s; identical at p50/p90 (the 589.3 plateau).
+  reactive == warm_floor_M1 exactly. The floor family is monotone
+  (worker-h up, violations down); cheapest floor with fewer v>1000 than
+  forecast is M2 (2,034 at 769.4 h = 0.716x, i.e. +15% worker-time for
+  -23% violations vs forecast) -- the SLO-free trade space. oracle_H0:
+  314.0 h, 1,872 v>1000, excess 563.
+- **Result (composed cells):** full TTFT/E2E quantile grids + sweeps;
+  fulltrace reactive vs static C8: TTFT>1000 13,286 vs 2,072 (6.4x),
+  E2E>2000 6,655 vs 1,058; calm day TTFT>1000: static 183 / forecast 196 /
+  reactive 364 (all sub-1% of 88,260 -- the p99-pass margins now visible
+  as counts).
+- **Feeds:** metric-stack manuscript decision (author go/no-go pending);
+  candidate tab for §8.2 (violations/intensity/worker-hours) + per-arm
+  distribution presentation. Reviewer note: manuscript integration would
+  reopen review for that delta only (bridge 196 scope boundary).
