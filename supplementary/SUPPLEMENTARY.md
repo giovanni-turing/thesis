@@ -272,8 +272,15 @@ label of the four survived the move.
 
 ## S7 — Clean-checkout reproduction test (plan §8.8-1)
 
-**Path:** `verification/repro_clean_checkout.sh` (runner) and
-`verification/repro_clean_checkout_report.md` (latest report).
+**Path:** `verification/repro_clean_checkout.sh` (runner, v2 — portable:
+repo derived from the script's own location; `REPRO_PY`/`REPRO_SCRATCH`/
+`REPRO_REPORT` knobs; pass/fail predicates in
+`verification/repro_predicates.py` with `--selftest` negative probes),
+`verification/repro_requirements.txt` (minimal pinned environment, no GPU
+wheel), `verification/replay_archive_manifest.json` (per-file provenance of
+the six archives), and `verification/repro_clean_checkout_report.md` (a
+committed report labeled with the exact HEAD it observed — regenerate rather
+than trust it as current).
 
 Independent reproduction of headline results from a **detached clean worktree
 at HEAD**, no live-tree state: (1) the §8.2 comparator frontier recomputed
@@ -285,6 +292,10 @@ committed artifact; the boundary is recorded exactly), then (3) with the four
 archive-dependent cells' replay inputs inflated from their **tracked
 `.jsonl.zst` archives inside the checkout** (`zstd -d`), after which the
 regenerated nine-cell artifact must be **byte-identical** to the committed
-object. The bulky replay inputs (1.8 GB plain) are therefore carried by the
-repository itself at ~192 MB compressed; this archive keeps its pointer-only
-contract.
+object. The bulky replay inputs (1,901,299,280 B plain, i.e. 1.77 GiB) are
+therefore carried by the repository itself at 200,323,568 B compressed
+(191.04 MiB); per-file SHA-256 (plain and compressed), byte and row counts,
+generating source, compression command/version, round-trip verification, and
+source lineage/terms are pinned in
+`verification/replay_archive_manifest.json`. This archive keeps its
+pointer-only contract.

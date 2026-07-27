@@ -1,0 +1,91 @@
+{
+ "package": "composed-join replay inputs (tab:cl-ledger-* / K16 pipeline)",
+ "lineage": "Replay outputs derived from AzureLMMInferenceDataset2025 (Microsoft/ModServe public production trace, CC-BY-4.0; see data/source/README.md) via the simulation pipeline of tex/metodologia.tex; no raw trace rows are redistributed beyond what the tracked trace file already carries.",
+ "terms": "Derived data package, distributed with the thesis repository under the same terms as its source attribution (CC-BY-4.0 for trace-derived content); cite the thesis and the dataset.",
+ "files": [
+  {
+   "path": "defense/anim/data/a2_runs/steady24h_forecast_L30.jsonl.zst",
+   "plain_path": "defense/anim/data/a2_runs/steady24h_forecast_L30.jsonl",
+   "plain_sha256": "02045538468ed4f682fd21af29d6dcca7748f7d875e1d6e2dcdd2310ba92f547",
+   "compressed_sha256": "33e866b78ff5f1c769016a67c71d5c4d8da41a76bf6dc767592bafe8f18d3ccf",
+   "plain_bytes": 13114544,
+   "compressed_bytes": 1478333,
+   "rows": 88260,
+   "generating_source": "a2 steady24h forecast_L30 composed replay trace (gen_a2 fleet campaign; see ledger 'a2 fleet' entries)",
+   "archived_in_commit": "ba5e4a3",
+   "compression": "zstd -19 -T8",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "round_trip_cmp": "identical (this manifest generation re-verified)"
+  },
+  {
+   "path": "defense/anim/data/a2_runs/steady24h_reactive_L30.jsonl.zst",
+   "plain_path": "defense/anim/data/a2_runs/steady24h_reactive_L30.jsonl",
+   "plain_sha256": "09237e0626e69b790b745b562f601bf1d2782ef3edb803a58d58831e68161ced",
+   "compressed_sha256": "716106c57688e509f3f5a94eed39431800ac0073c861b279b9c5a3fee6da06d8",
+   "plain_bytes": 13114571,
+   "compressed_bytes": 1476891,
+   "rows": 88260,
+   "generating_source": "a2 steady24h reactive_L30 composed replay trace (gen_a2 fleet campaign; see ledger 'a2 fleet' entries)",
+   "archived_in_commit": "ba5e4a3",
+   "compression": "zstd -19 -T8",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "round_trip_cmp": "identical (this manifest generation re-verified)"
+  },
+  {
+   "path": "defense/anim/data/a13_runs/ft_static_C8.jsonl.zst",
+   "plain_path": "defense/anim/data/a13_runs/ft_static_C8.jsonl",
+   "plain_sha256": "d80ed42189a9d753e87e0eb73c05303da52d59d376d8f25da4830e2de2d86f08",
+   "compressed_sha256": "7d34a3f94d43ddf19a0c1d173cd090f0b9a6d28480ba31dce15fb8f8b7ca0660",
+   "plain_bytes": 164494623,
+   "compressed_bytes": 16779235,
+   "rows": 1000000,
+   "generating_source": "a13 full-trace static C=8 composed replay trace (a13 full-trace campaign; see ledger 'a13' entries)",
+   "archived_in_commit": "ba5e4a3",
+   "compression": "zstd -19 -T8",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "round_trip_cmp": "identical (this manifest generation re-verified)"
+  },
+  {
+   "path": "defense/anim/data/a13_runs/ft_llm_static.requests.jsonl.zst",
+   "plain_path": "defense/anim/data/a13_runs/ft_llm_static.requests.jsonl",
+   "plain_sha256": "72eb60fab5cc1ba237c2c493076c75b683483ec0dab87090eca9b27f386eb21d",
+   "compressed_sha256": "3d78a34d91b09b6bb3c80e99020cd52c3dc6698c71ee31b268faba12985fd6e9",
+   "plain_bytes": 767449032,
+   "compressed_bytes": 77509978,
+   "rows": 1000000,
+   "generating_source": "a13 full-trace static language-pool per-request records (dynamo.replay output)",
+   "archived_in_commit": "ba5e4a3",
+   "compression": "zstd -19 -T8",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "round_trip_cmp": "identical (this manifest generation re-verified)"
+  },
+  {
+   "path": "defense/anim/data/a13_runs/ft_reactive_L30.jsonl.zst",
+   "plain_path": "defense/anim/data/a13_runs/ft_reactive_L30.jsonl",
+   "plain_sha256": "9f5850915680490e42ee47f73aeb35c297333e757cfbe15727e9ce7089d808e7",
+   "compressed_sha256": "2a1278a9d310da564108589b5492d98b007b2fb404cca434d0aabf25496034e1",
+   "plain_bytes": 164487566,
+   "compressed_bytes": 17266009,
+   "rows": 1000000,
+   "generating_source": "a13 full-trace reactive_L30 composed replay trace (a13 full-trace campaign)",
+   "archived_in_commit": "ba5e4a3",
+   "compression": "zstd -19 -T8",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "round_trip_cmp": "identical (this manifest generation re-verified)"
+  },
+  {
+   "path": "defense/anim/data/a13_runs/ft_llm_reactive.requests.jsonl.zst",
+   "plain_path": "defense/anim/data/a13_runs/ft_llm_reactive.requests.jsonl",
+   "plain_sha256": "b5c667a09bf627eeb06cbd66d2c4389f0ecfdf6767d641e90558e550d4107d0e",
+   "compressed_sha256": "d1a08f3749af677c8fbbbc7361f4da0152c4472be85e010cf232311ce5bba4e7",
+   "plain_bytes": 778638944,
+   "compressed_bytes": 85813122,
+   "rows": 1000000,
+   "generating_source": "a13 full-trace reactive language-pool per-request records (dynamo.replay output)",
+   "archived_in_commit": "ba5e4a3",
+   "compression": "zstd -19 -T8",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "round_trip_cmp": "identical (this manifest generation re-verified)"
+  }
+ ]
+}
