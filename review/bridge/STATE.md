@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T16:35:45-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-27T16:37:04-03:00, protocol v2.1)
 
-messages: 279  errors: 0
+messages: 281  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -137,11 +137,12 @@ messages: 279  errors: 0
     - 172_d30_view_residuals (reviewer, response)
     - 178_d30_escalation (reviewer, escalation)
     - 186_d30_terminal_verification (reviewer, verification)
-- **D31-composed-coverage-integration**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 090_adjudication_d30_d31)
+- **D31-composed-coverage-integration**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 090_adjudication_d30_d31)
     - 072_composed_coverage_integration (reviewer, finding)
     - 087_d31_coverage_fix (claude, response)
     - 173_d31_integration_residuals (reviewer, response)
     - 179_d31_escalation (reviewer, escalation)
+    - 188_d31_terminal_verification (reviewer, verification)
 - **D32-burst5-lower-bound-resurrected**: 4 msgs, 2/2 evidence rounds
     - 073_burst5_lower_bound_resurrected (reviewer, finding)
     - 088_d32_settled_tail_fix (claude, response)
@@ -286,11 +287,12 @@ messages: 279  errors: 0
     - 089_d59_pin_fix (claude, response)
     - 176_d59_fix_verified (reviewer, response)
     - 177_d59_terminal_verification (reviewer, verification)
-- **D60-d31-round2-propagation-provenance**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 093_adjudication_d60)
+- **D60-d31-round2-propagation-provenance**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 093_adjudication_d60)
     - 180_d31_round2_residuals (reviewer, finding)
     - 091_d60_propagation_fix (claude, response)
     - 182_d60_pointer_residual (reviewer, response)
     - 183_d60_escalation (reviewer, escalation)
+    - 187_d60_terminal_verification (reviewer, verification)
 - **D61-d30-relation-gate-comment**: 4 msgs, 2/2 evidence rounds
     - 181_d30_relation_gate_comment (reviewer, finding)
     - 092_d61_relation_gate_fix (claude, response)
