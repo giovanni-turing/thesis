@@ -143,22 +143,34 @@ def cells() -> list[dict]:
             out.append(dict(group="adversarial", window=w, arm=arm,
                             M=int(suf[-1]) if suf.startswith("reWP") else None,
                             tag=f"{w}_{suf}", dir=HERE / "adversarial"))
-    # D20 (2026-07-26): the calibration grid is part of the evidential chain --
-    # M4's selection must be recomputable. Inventory every calib schedule.
+    # D20 (2026-07-26, hardened per reviewer D20-round-2): the calibration grid is
+    # pinned by EXACT identity -- the expected Cartesian products from FROZEN.json,
+    # not whatever files happen to match a regex. A missing declared cell OR an
+    # undeclared extra cell is a hard abort (identity substitution defense).
+    frozen0 = json.loads((HERE / "FROZEN.json").read_text())
+    grid_M = frozen0["arm_3_reactive_plus_warm_floor"]["grid_M"]
+    LEADS = [15, 30, 45, 300]
+    expected = {f"{w}_floorM{M}_L{L}" for w in ("burst2", "burst6")
+                for M in grid_M for L in LEADS}
+    expected |= {f"{w}_oracle_L{L}_H{H}" for w in ("burst2", "burst6")
+                 for L in LEADS for H in (0, 3)}
     import glob as _glob, re as _re
-    for spx in sorted(_glob.glob(str(HERE / "calib" / "*.sched.json"))):
-        base = Path(spx).name[:-len(".sched.json")]
+    found = {Path(x).name[:-len(".sched.json")]
+             for x in _glob.glob(str(HERE / "calib" / "*.sched.json"))}
+    if found != expected:
+        missing = sorted(expected - found); extra = sorted(found - expected)
+        raise SystemExit(f"calibration identity mismatch: missing={missing[:5]} extra={extra[:5]} "
+                         f"(missing {len(missing)}, extra {len(extra)})")
+    for base in sorted(found):
         m = _re.match(r"^(burst[26])_floorM(\d+)_L(\d+)$", base)
         mo = _re.match(r"^(burst[26])_oracle_L(\d+)_H(\d+)$", base)
         if m:
             out.append(dict(group="calib", window=m.group(1), arm=f"calib_floorM{m.group(2)}_L{m.group(3)}",
                             M=int(m.group(2)), tag=base, dir=HERE / "calib"))
-        elif mo:
+        else:
             out.append(dict(group="calib_oracle", window=mo.group(1),
                             arm=f"calib_oracle_L{mo.group(2)}_H{mo.group(3)}", M=None,
                             tag=base, dir=HERE / "calib"))
-        else:
-            raise SystemExit(f"unrecognized calib cell name: {base}")
     out.append(dict(group="check", window=COST_WINDOW, arm="static_C8_encworkers_path", M=8,
                     tag="aggregate_encworkers8", dir=HERE / "checks"))
     return out
@@ -209,7 +221,6 @@ def work(c: dict) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--jobs", type=int, default=10)
-    ap.add_argument("--out", default=str(HERE / "frontier_summary.json"))
     args = ap.parse_args()
 
     cs = cells()
@@ -245,23 +256,38 @@ def main() -> None:
     try:
         summ = json.loads((HERE / "frontier_summary.json").read_text())
         static_ref = summ["static_reference_worker_s"]
-        agg = df[(df["group"].isin(["core", "family"])) & (df["window"] == COST_WINDOW)]
-        by_arm = {r["arm"]: r["worker_s"] for _, r in agg.iterrows()}
-        for key, arm in [("1_forecast_p90_issue_time", "forecast_p90"),
-                         ("2_reactive_react_point", "reactive"),
-                         ("3_reactive_plus_warm_floor_M4", "warm_floor_M4"),
-                         ("4_static_C8_deployable", "static_C8"),
-                         ("5_perfect_future_oracle_H0", "oracle_H0")]:
-            want = summ["arms"][key]["cost_worker_s_eval_span"]
-            got_ws = by_arm.get(arm)
-            if got_ws is None or abs(got_ws - want) > 0.15:
-                link_ok = f"FAIL({arm}:{got_ws} vs {want})"; fail = True; break
-            r = round(got_ws / static_ref, 4)
-            if abs(r - summ["arms"][key]["vs_static"]) > 5e-4:
-                link_ok = f"FAIL(ratio {arm})"; fail = True; break
-        m6 = summ["warm_floor_family_envelope"]["members"]["warm_floor_M6"]["cost_worker_s_eval_span"]
-        if link_ok == "OK" and abs(by_arm.get("warm_floor_M6", -1) - m6) > 0.15:
-            link_ok = "FAIL(M6)"; fail = True
+        cells_by = {}
+        for _, r in df[df["group"].isin(["core", "family", "adversarial"])].iterrows():
+            cells_by[(r["arm"], r["window"])] = r
+        problems = []
+        def _check_block(key, arm, blk):
+            for w, want_p99 in blk.get("p99_ms_per_window", {}).items():
+                row = cells_by.get((arm, w))
+                if row is None: problems.append(f"{arm}/{w}:no-cell"); return
+                if abs(row["p99"] - want_p99) > 1e-2: problems.append(f"{arm}/{w}:p99 {row['p99']} vs {want_p99}"); return
+            for w, want_ws in blk.get("worker_s_per_window", {}).items():
+                row = cells_by.get((arm, w))
+                if row is None or abs(row["worker_s"] - want_ws) > 0.15:
+                    problems.append(f"{arm}/{w}:worker_s"); return
+            if "cost_worker_s_eval_span" in blk:
+                row = cells_by.get((arm, COST_WINDOW))
+                if row is None or abs(row["worker_s"] - blk["cost_worker_s_eval_span"]) > 0.15:
+                    problems.append(f"{arm}:eval-span cost"); return
+                if "vs_static" in blk and abs(round(row["worker_s"]/static_ref, 4) - blk["vs_static"]) > 5e-4:
+                    problems.append(f"{arm}:vs_static"); return
+            if "episodes_failed" in blk:
+                eps = [w for w in blk.get("p99_ms_per_window", {}) if w != COST_WINDOW]
+                nf = sum(1 for w in eps if cells_by.get((arm, w)) is not None and cells_by[(arm, w)]["p99"] >= 1000.0)
+                if nf != blk["episodes_failed"]: problems.append(f"{arm}:episodes_failed {nf} vs {blk['episodes_failed']}")
+        arm_map = {"1_forecast_p90_issue_time": "forecast_p90", "2_reactive_react_point": "reactive",
+                   "3_reactive_plus_warm_floor_M4": "warm_floor_M4", "4_static_C8_deployable": "static_C8",
+                   "5_perfect_future_oracle_H0": "oracle_H0"}
+        for key, arm in arm_map.items():
+            _check_block(key, arm, summ["arms"][key])
+        for name, blk in summ["warm_floor_family_envelope"]["members"].items():
+            _check_block(name, name, blk)
+        if problems:
+            link_ok = "FAIL(" + "; ".join(problems[:3]) + ")"; fail = True
     except Exception as e:
         link_ok = f"FAIL({e})"; fail = True
     if len(bad):

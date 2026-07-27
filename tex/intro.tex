@@ -30,7 +30,7 @@ invisible to the aggregate monitors reactive autoscalers watch and moves
 faster than a replica can start. The
 contribution is not any single ingredient but the complete operational
 chain --- encoder-specific signal, provisioning-horizon forecast, replica
-schedule under startup delay, episode-level SLA and resource grading ---
+schedule under startup delay, window-level SLA and resource grading ---
 built once and measured end to end against the controls a practitioner would
 actually deploy.
 
@@ -164,7 +164,7 @@ with usable uncertainty at replica-startup horizons?
 (Chapter~\ref{cap:predictors}.)
 
 \item[RQ3 --- Control payoff.] Does forecast-driven vision provisioning
-improve the episode-level tail-SLA/resource trade-off over matched reactive
+improve the window-level tail-SLA/resource trade-off over matched reactive
 and static controls? (Chapter~\ref{cap:closedloop}.)
 \end{description}
 
@@ -271,14 +271,14 @@ measured end to end.} An encoder-specific demand signal taken from the
 request stream itself; a provisioning-horizon probabilistic forecast of it,
 zero-shot, with an empirically calibrated upper band edge; a replica
 schedule derived from that band under an explicit startup delay; and an
-episode-level grading of the resulting tail-SLA and resource-time against
+window-level grading (per burst window and calm day) of the resulting
+tail-SLA and resource-time against
 the controls a practitioner would deploy --- the best static fleet, an
 identically informed reactive controller, that controller with a warm floor
 calibrated outside the evaluation span, and a perfect-future oracle. The
 chain is graded under a pre-frozen replay protocol, and the result is reported as
 what it is: a trade-off with an identified failure mode, in which forecast
-and reactive tails tie exactly on four of the five composed evaluation
-episodes and the payoff is resource-time at equal compliance
+and reactive tails tie exactly on four of the five evaluation windows and the payoff is resource-time at equal compliance
 (Chapter~\ref{cap:closedloop}).
 
 No ingredient of that chain is claimed as novel; modality disaggregation,

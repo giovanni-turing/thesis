@@ -60,7 +60,7 @@ those signals carry every pool's demand. This thesis builds and grades one
 complete operational chain for the pool where that assumption fails:
 an encoder-specific demand signal, a provisioning-horizon probabilistic
 forecast of it, a replica schedule derived from that forecast under startup
-delay, and episode-level SLA/resource grading against matched controls.
+delay, and window-level SLA/resource grading against matched controls.
 No ingredient is new; the chain, measured end to end, is the contribution.
 
 On a public production trace of a multimodal inference cluster (Azure, one
@@ -87,9 +87,9 @@ evaluation windows the forecast and reactive tails tie exactly,
 and the latency advantage lives in the one-minute onset. What forecasting
 buys at week scale is resource-time at equal compliance. Over the 5.60-day
 evaluation span the p90-forecast schedule holds the encoder tail bound in
-every episode at 0.62$\times$ the deployable static encoder fleet's
+every evaluation window at 0.62$\times$ the deployable static encoder fleet's
 provisioned worker-time, while a reactive controller granted a warm floor
-calibrated on the calibration split fails a held-out episode and its
+calibrated on the calibration split fails a held-out window and its
 cheapest all-passing member costs 1.042$\times$ static --- forecast-informed
 placement is 1.20$\times$ cheaper at equal compliance even under the
 readiness model most favourable to reactive (1.67$\times$ under the shipped
@@ -131,7 +131,7 @@ Esta tese constr\'oi e avalia uma cadeia operacional completa para o
 do codificador, uma previs\~ao probabil\'istica desse sinal no horizonte de
 provisionamento, um cronograma de r\'eplicas derivado dessa previs\~ao sob
 atraso de inicializa\c{c}\~ao, e avalia\c{c}\~ao de SLA e de recursos por
-epis\'odio contra controles pareados. Nenhum ingrediente \'e novo; a
+janela de avalia\c{c}\~ao contra controles pareados. Nenhum ingrediente \'e novo; a
 cadeia, medida de ponta a ponta, \'e a contribui\c{c}\~ao.
 
 Em um \emph{trace} p\'ublico de produ\c{c}\~ao de um \emph{cluster} de
@@ -159,15 +159,15 @@ taxa e utiliza\c{c}\~ao.
 
 Fechando o la\c{c}o sob um protocolo \'unico de replay pr\'e-congelado, o resultado \'e um
 compromisso com um modo de falha identificado, e n\~ao superioridade
-universal: em quatro dos cinco epis\'odios de avalia\c{c}\~ao compostos as
+universal: em quatro das cinco janelas de avalia\c{c}\~ao as
 caudas da previs\~ao e do reativo \emph{empatam exatamente}, e a vantagem de
 lat\^encia reside no in\'icio de um minuto. O que a previs\~ao compra em
 escala semanal \'e tempo de recurso a igual conformidade. No intervalo de
 avalia\c{c}\~ao de 5,60 dias o cronograma de previs\~ao p90 sustenta o
-limite de cauda do codificador em todos os epis\'odios a 0,62$\times$ o
+limite de cauda do codificador em todas as janelas de avalia\c{c}\~ao a 0,62$\times$ o
 tempo de \emph{workers} provisionado da frota est\'atica de codificadores
 implant\'avel, enquanto um controlador reativo dotado de um piso quente
-calibrado no conjunto de calibra\c{c}\~ao falha em um epis\'odio reservado e
+calibrado no conjunto de calibra\c{c}\~ao falha em uma janela reservada e
 seu membro mais barato que passa custa 1,042$\times$ o est\'atico --- a
 coloca\c{c}\~ao informada por previs\~ao \'e 1,20$\times$ mais barata a
 igual conformidade mesmo sob o modelo de prontid\~ao mais favor\'avel ao

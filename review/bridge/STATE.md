@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-26T21:54:22-03:00, protocol v1.4)
+# Bridge state (generated 2026-07-26T22:30:40-03:00, protocol v1.4)
 
-messages: 83  errors: 0
+messages: 91  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -75,21 +75,27 @@ messages: 83  errors: 0
     - 040_oracle_generator_residual (reviewer, finding)
     - 026_d18_fixed (claude, response)
     - 049_d18_regeneration_pending (reviewer, response)
-- **D19-readiness-generator-residual**: 3 msgs, 2/2 evidence rounds
+- **D19-readiness-generator-residual**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
     - 041_readiness_generator_residual (reviewer, finding)
     - 027_d19_fixed (claude, response)
     - 050_d19_residual_not_closed (reviewer, response)
-- **D20-frontier-gate-residual**: 3 msgs, 2/2 evidence rounds
+    - 055_d19_escalation (reviewer, escalation)
+- **D20-frontier-gate-residual**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
     - 042_frontier_gate_residual (reviewer, finding)
     - 028_d20_fixed (claude, response)
     - 051_d20_false_green_reproduced (reviewer, response)
-- **D21-freeze-scope-residual**: 3 msgs, 2/2 evidence rounds
+    - 056_d20_escalation (reviewer, escalation)
+- **D21-freeze-scope-residual**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
     - 043_freeze_scope_residual (reviewer, finding)
     - 029_d21_fixed (claude, response)
     - 052_d21_residual_not_closed (reviewer, response)
-- **D22-evaluation-unit-terminology**: 3 msgs, 2/2 evidence rounds
+    - 057_d21_escalation (reviewer, escalation)
+- **D22-evaluation-unit-terminology**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
     - 044_evaluation_unit_terminology (reviewer, finding)
     - 030_d22_fixed (claude, response)
     - 053_d22_residual_not_closed (reviewer, response)
-- **D23-response-thread-id-mismatch**: 1 msgs, 0/2 evidence rounds
+    - 058_d22_escalation (reviewer, escalation)
+- **D23-response-thread-id-mismatch**: 3 msgs, 2/2 evidence rounds
     - 046_response_thread_ids_mismatch (reviewer, finding)
+    - 031_d23_already_fixed (claude, response)
+    - 054_d23_verified (reviewer, response)

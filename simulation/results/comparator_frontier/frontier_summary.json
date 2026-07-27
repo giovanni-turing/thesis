@@ -3,7 +3,7 @@
  "question": "does forecasting improve the achievable worker-time vs worst-episode-p99 frontier over a calibrated warm-floor reactive autoscaler, at equal compliance?",
  "answer": "YES. At 0 failed episodes on the 5.60-day evaluation span the p90 forecast arm costs 2,410,754.7 worker-s (0.623x static), while the cheapest warm-floor reactive that also passes costs 4,033,184.1 (1.042x static) under the shipped mechanics and 2,886,614.5 (0.746x) under the readiness model most favourable to reactive \u2014 forecast is 1.20x to 1.69x cheaper, and is cheaper than EVERY member of the warm-floor family, passing or failing.",
  "date": "2026-07-26",
- "status": "COMPLETE \u2014 single evaluation pass, frozen parameters, zero retuning",
+ "status": "COMPLETE \u2014 single evaluation pass; arm mechanics pre-frozen before the frontier replay (rho=15 was an earlier ex-post choice, disclosed); no retuning during the replay",
  "gate_and_frozen_parameters": {
   "declared_sla_gate": {
    "metric": "encoder delay p99 (queue + service + handoff), over ALL requests of the window",
@@ -48,7 +48,7 @@
     "simulation/forecast_schedule.py:146-150",
     "simulation/run_encoder_hybrid.sh:19"
    ],
-   "asymmetry_disclosure": "the two readiness models are NOT the same dial; the frontier's shipped arms mix them. Both symmetric repairs are measured below (forecast under strict re-warm; reactive family under warm-pool)."
+   "asymmetry_disclosure": "the two readiness models are NOT the same dial; the frontier's shipped arms mix them. Both directions are repaired and measured below (the warm-pool direction is algorithmically symmetric; the strict direction is near-symmetric \u2014 the forecast variant retains matured orders for a 165 s hold) (forecast under strict re-warm; reactive family under warm-pool)."
   },
   "replay": {
    "converter": "workload/trace_to_two_pool.py --worker-schedule <sched> (encoder-workers 2 default)",
@@ -902,7 +902,7 @@
   }
  },
  "symmetry_repair_diagnostics": {
-  "note": "adversarial diagnostics, NOT frontier arms. They equalise the one undisclosed asymmetry (readiness model) and the oracle's window-boundary clamp. All were run after the frontier was fixed and change no frozen parameter.",
+  "note": "adversarial diagnostics, NOT frontier arms. They repair the one readiness asymmetry (readiness model) and the oracle's window-boundary clamp. All were run after the frontier was fixed and change no frozen parameter.",
   "cheapest_warmpool_reactive_passing_all_episodes": "reactive_warmpool_M2",
   "arms": {
    "forecast_p90_strict_rewarm": {
@@ -1188,7 +1188,7 @@
     "forecast_advantage_x": 1.673
    },
    {
-    "basis": "both arms under strict re-warm (symmetric, conservative to forecast)",
+    "basis": "both arms under strict re-warm variants (near-symmetric sensitivity, NOT identical semantics: forecast retains matured orders for a 165 s hold vs reactive trailing-window re-warm; conservative to forecast)",
     "cheapest_passing_reactive": "warm_floor_M6",
     "reactive_worker_s": 4033184.1,
     "reactive_vs_static": 1.0424,
@@ -1219,7 +1219,7 @@
    1.2,
    1.69
   ],
-  "oracle_bound": {
+  "oracle_reference": {
    "shipped_boundary_clamped": {
     "worker_s": 1130339.7,
     "vs_static": 0.2921,
@@ -1232,23 +1232,23 @@
     "vs_static": 0.2921,
     "episodes_failed": 0,
     "burst3_p99_ms": 748.581,
-    "note": "with the single asymmetry removed (order_t = ts - L, may precede window start) the oracle passes EVERY evaluation episode; aggregate schedule is unchanged. This \u2014 not the clamped variant \u2014 is the honest signal-quality bound."
+    "note": "with the single asymmetry removed (order_t = ts - L, may precede window start) the oracle passes EVERY evaluation episode; aggregate schedule is unchanged. This \u2014 not the clamped variant \u2014 is the perfect-information fixed-conversion reference on the signal-quality axis (its scale-down runs H=0; not a lower bound over admissible SLA-passing schedules)."
    },
-   "fraction_of_achievable_saving_captured_by_forecast": 0.5325
+   "fraction_of_measured_gap_to_reference_captured_by_forecast": 0.5325
   }
  },
  "verdicts": {
-  "1_forecast_p90_issue_time": "PASSES every evaluation episode at 0.623x static; the only autoscaling arm that does. Win survives the symmetric strict-re-warm repair (0.617x, 0 failures).",
+  "1_forecast_p90_issue_time": "PASSES every evaluation window at 0.623x static; the only autoscaling arm that does. Win survives the near-symmetric strict-re-warm sensitivity (0.617x, 0 failures).",
   "2_reactive_react_point": "FAILS burst3. Its 16,083.740 ms is partly a readiness-model artifact: the same policy under the forecast arm's own warm-pool actuation reads 1,999.773 ms \u2014 still a failure, 8x smaller.",
   "3_reactive_plus_warm_floor_M4": "FAILS burst3 at 2,083.830 ms and 0.863x static. Under warm-pool readiness M=4 passes at 0.887x \u2014 still dearer than forecast. No floor in the family reaches forecast's cost.",
   "4_static_C8_deployable": "PASSES every episode at 1.000x static by construction; the cost reference.",
-  "5_perfect_future_oracle_H0": "0.292x static. As shipped it fails burst3, but ONLY through a window-boundary clamp the forecast arm does not carry; with that single asymmetry repaired it passes every episode at the same 0.292x. It is the frontier leader and the honest bound."
+  "5_perfect_future_oracle_H0": "0.292x static. As shipped it fails burst3, but ONLY through a window-boundary clamp the forecast arm does not carry; with that single asymmetry repaired it passes every episode at the same 0.292x. It is the frontier leader and the perfect-information reference (not a schedule-optimal lower bound)."
  },
  "caveats": [
   "the 1.67x headline is NOT robust to the readiness-model repair \u2014 it collapses to 1.20x. The defensible claim is 'forecast is 1.2-1.7x cheaper than the best warm-floor reactive at equal compliance'.",
   "'even the perfect-future oracle fails burst3' is FALSE and must not be published: the clamped oracle's burst3 failure is a window-boundary artifact; the warm-start oracle passes every episode at the same aggregate cost.",
   "'buying enough standing capacity costs more than the static fleet' holds only under the strict-re-warm actuation; under warm-pool the M=2 floor passes at 0.746x, cheaper than static. The conclusion (a floor alone never reaches forecast's cost) is unaffected.",
-  "the comparison is conservative in reactive's favour: forecast is a single frozen policy, the floor family is an ex-post best-of-family read on the evaluation span.",
+  "the comparison is conservative in reactive's favour: forecast is a single pre-frozen arm (rho=15 chosen ex post earlier, disclosed), the floor family is an ex-post best-of-family read on the evaluation span.",
   "R2 is decided entirely by the L=300 s calibration column; the arm is deployed at L=30 s.",
   "p99 cross-quoting: the forecast and reactive aggregate p99s recomputed here (589.301 ms) are EXACTLY the archived / DB-ingested values (provenance run_ids encoder_hybrid:fc and encoder_hybrid:re, 589.301 ms) \u2014 no fork. The manuscript's '588 ms plateau' label (tex/closedloop.tex:441,455-461) traces to a 588.37 ms measurement from a different EncoderCostModel build (0.158% below), which the manuscript itself footnotes as the '588/589 ms floor' (tex/closedloop.tex:534). Static IS forked: 646.943 ms here vs the archived rerun_verify:week_static_C8 644.440 ms (+0.389%) and vs the table's 644 (+0.457%) \u2014 inside the repo's declared 0.5% bound. All worker-seconds and cost ratios match the manuscript and the DB exactly (2,410,754.7 / 2,611,319.7 / 3,869,278.8).",
   "single trace; rho=15 and the 15-s control bin are not swept here."
@@ -1256,7 +1256,7 @@
  "independent_recomputation": {
   "method": "delay_i = timestamp_i(ms) - arrival_i(ms), index = hash_ids[0]//100000; percentile = the converter's own rule s[min(n-1,int(n*p/100))]; worker-s = schedule integral to t_end = max(last_arrival, max_i(ts_i - handoff(n_img_i))), handoff(n) = 0.2 + n*196*4096*2/(25e9/8)*1e3 ms. Imports nothing from simulation/ or workload/.",
   "script": "simulation/results/comparator_frontier/build_frontier_summary.py",
-  "eval_cells_recomputed": 169,
+  "eval_cells_recomputed": 313,
   "calibration_cells_recomputed": 132,
   "mismatches_vs_stats_json": 0
  },

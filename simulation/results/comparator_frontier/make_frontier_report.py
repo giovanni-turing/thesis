@@ -370,9 +370,9 @@ summary = {
     },
     "headline": headline,
     "verdicts": {
-        "1_forecast_p90_issue_time": ("PASSES every evaluation episode at 0.623x static; the only "
-                                      "autoscaling arm that does. Win survives the symmetric "
-                                      f"strict-re-warm repair ({FCS/STATIC_REF:.3f}x, 0 failures)."),
+        "1_forecast_p90_issue_time": ("PASSES every evaluation window at 0.623x static; the only "
+                                      "autoscaling arm that does. Win survives the near-symmetric "
+                                      f"strict-re-warm sensitivity ({FCS/STATIC_REF:.3f}x, 0 failures)."),
         "2_reactive_react_point": ("FAILS burst3. Its 16,083.740 ms is partly a readiness-model "
                                    "artifact: the same policy under the forecast arm's own warm-pool "
                                    "actuation reads 1,999.773 ms — still a failure, 8x smaller."),
@@ -584,7 +584,7 @@ fig.text(0.5, -0.105,
          "the static-C=8 cost reference.  Both panels share log–log axes.\n"
          "Panel A is the frontier as run.  Panel B removes the one undisclosed asymmetry — the "
          "forecast/oracle arms actuate through a warm pool, the reactive family through strict "
-         "re-warm — by giving every arm the warm-pool readiness model,\nand lets the oracle order "
+         "re-warm — by giving every arm the warm-pool readiness model (the strict forecast\nvariant shown is a near-symmetric sensitivity, not an equalized arm),\nand lets the oracle order "
          "before its window opens.  Even on that most-favourable-to-reactive footing the cheapest "
          f"passing floor (M=2, {WP/MS:.2f} Mworker-s) costs {WP/FC:.2f}× the forecast arm.",
          ha="center", va="top", fontsize=7.4, color=MUTED)

@@ -86,6 +86,9 @@ _DIR_EXP_SPECIFIC = [
     # across calib/, eval/, eval_family/ and adversarial/. The 313 pre-mapping rows are
     # renamed by schema/36_scope_comparator_frontier_runids.sql.
     ("/comparator_frontier/", "comparator_frontier", True),
+    # composed-coverage fill campaign (2026-07-26, "no economy" directive): request-linked
+    # composed cells for static/steady24h/full-trace arms; scoped, stems repeat per window.
+    ("/composed_fill/", "composed_fill", True),
 ]
 
 # Directory names that hold a run's artifacts BY KIND rather than identifying a run:

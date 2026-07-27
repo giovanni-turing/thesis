@@ -85,11 +85,15 @@ reconstruction puts the ingress-to-first-token p99 at
 ${\approx}\SI{1.3}{\second}$, which the \emph{measured} request-linked join
 of Chapter~\ref{cap:closedloop} (Table~\ref{tab:cl-ledger-joint}) confirms.
 
-\paragraph{Units of evidence.} The evaluation unit is the burst
-\emph{episode} or the day --- never the request, the rolling forecast
-origin, or the factorial cell (two of the five evaluation windows overlap
-slightly, so they are windows rather than fully independent units;
-Chapter~\ref{cap:closedloop} discloses the overlap). A burst episode is a contiguous above-p99
+\paragraph{Units of evidence.} The evaluation unit is the
+\emph{evaluation window} --- the padded trace slice a replay runs, enclosing
+a burst episode or a calm day --- never the request, the rolling forecast
+origin, or the factorial cell. ``Episode'' names the burst \emph{event}
+itself (the contiguous above-p99 excursion); every graded p99, worker-time
+and pass/fail quantity is computed on the enclosing padded window as declared
+in \texttt{simulation/windows.json}. Two of the five evaluation windows
+overlap slightly, so they are windows rather than fully independent units;
+Chapter~\ref{cap:closedloop} discloses the overlap. A burst episode is a contiguous above-p99
 excursion of the image signal as defined in Chapter~\ref{cap:trace-eda}; a
 \emph{scenario window} is the trace slice a simulation runs, enveloping an
 episode with calm margin. Configuration counts therefore report
@@ -798,5 +802,5 @@ whether request rate is an adequate proxy for vision demand
 (Chapter~\ref{cap:trace-eda}), whether encoder demand is forecastable at
 replica-startup horizons (Chapter~\ref{cap:predictors}), and whether
 forecast-informed capacity placement under startup delay improves the
-episode-level trade-off between tail SLA and resource-time
+window-level trade-off between tail SLA and resource-time
 (Chapter~\ref{cap:closedloop}).

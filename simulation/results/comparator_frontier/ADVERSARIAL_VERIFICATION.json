@@ -17,6 +17,6 @@
   "oracleWS": "oracle with pre-window ordering allowed (order_t = ts-L, may be negative) = the fc arm's convention",
   "oracleWSH3": "both",
   "reWPm{1,2,3,4}": "reactive react_point + floor M under the WARM-POOL readiness model used by fc/oracle",
-  "fcSTRICT": "forecast p90 issue-time under --strict-rewarm (the symmetric fix)"
+  "fcSTRICT": "the forecast strict-re-warm variant (near-symmetric sensitivity: 165 s matured-order hold, not identical with reactive trailing-window re-warm; label corrected 2026-07-26 per D19)"
  }
 }

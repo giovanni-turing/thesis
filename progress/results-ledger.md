@@ -23,6 +23,94 @@ defect. Run a ledger-vs-tex sweep before any submission build.
 
 ---
 
+### composed-arm fill — 9 new request-linked cells (20 -> 29 arms)  (2026-07-26)
+artifact:   simulation/results/composed_fill/ — per cell: <window>_static_C8.jsonl{,.stats.json,.series.json}
+            (encoder half), <cell>.requests.jsonl + <cell>.report.json (language half),
+            composed_fill_joined.json (the 9 joined records), composed_fill_arms.json
+            (provenance.composed_e2e column shape); stage_e.sh, stage_l_static.sh,
+            stage_l_planner.sh (drivers); validate_join.py, key_sensitivity.py (join gates);
+            new join script simulation/composed_fill_join.py
+command:    Stage E (encoder, static C8, 5 windows): AIC .venv python
+            defense/anim/build/a2_conv_snapshot.py --encoder-workers 8 --offset <W> --max-requests <N>
+            (bare -C, NO --worker-schedule — the composed convention of gen_a6_runs.py:70-73,
+            gen_a13_fulltrace.py:44-49; TESE_WINDOWS=simulation/windows.json).
+            Stage L (language): RUST_LOG=warn AIC_TP=2 AIC_VER=0.19.0 STARTUP_TIME=60
+            REPLAY_PY=ai-dynamo/dynamo/.venv/bin/python simulation/run_replay.sh <trace> aic
+            <report> 2 --report-jsonl <recs>; steady24h forecast adds
+            REPLAY_ENTRY=simulation/replay_with_forecast.py FORECAST_T0="2024-10-19 00:00:00"
+            MODEL=chronos QUANTILE=p90 RESOLUTION=15s REQ_SCALE=8.0 + planner_forecast_smoke.json;
+            steady24h reactive adds --planner-config simulation/results/riders44/planner_ladder_t200_20.json.
+            Stage J: simulation/composed_fill_join.py <cell> (full-trace cells run strictly
+            sequentially, alone; measured 8.5-8.8 s and 1.8 GB RSS each, not the 8-12 GB budgeted).
+feeds:      closedloop.tex §sec:cl-ledger-joint tab:cl-ledger-joint (5 windows x 4 arms -> 9 more
+            cells); closedloop.tex:936-937 (RETIRES the "for the four windows and the full trace
+            with no composed replay it is not reported" disclosure); closedloop.tex:957
+            ("exactly 20 request-linked arms" -> 29). All three need the Integrate agent.
+supersedes: new — no existing arm was recomputed or overwritten. The 20 published arms were only
+            READ, as validation targets.
+result:     9/9 cells green. Populations exact (64804/3093/25639/8983/88260/1000000, joined ==
+            windows.json max_requests == completed_requests == jsonl lines); arrival-alignment
+            drift 0.0 ms on every cell (guard is < 1.0 ms). Joined p99s:
+              burst1/3/4/5 static-C8   e2e 1508.7 / 1481.0 / 1505.6 / 1471.0
+              steady24h static-C8      e2e  805.8   (enc 417.3 + ttft 388.6)
+              steady24h fc-p90 chronos e2e 1122.2   (enc 677.4 + ttft 399.0)
+              steady24h reactive       e2e 1143.5   (enc 682.1 + ttft 494.3)
+              fulltrace static-C8      e2e 1328.6   (enc 677.5 + ttft 655.2), 1,000,000 requests
+              fulltrace reactive       e2e 1681.9   (enc 588.4 + ttft 1144.8), 1,000,000 requests
+            Encoder halves reproduce the Chapter-5 C8 grid ledger EXACTLY (delta 0.000 ms on all
+            four bursts, incl. burst5's queue_divergent=true and every max); steady24h has no C8
+            grid row, and reads 417.274 vs the non-shim frontier 418.205 (-0.931 ms, the expected
+            sign/size for the dropped post-thesis patch-embed op).
+            THREE findings recorded rather than smoothed:
+            (1) BLOCKER + fix. --report-jsonl emits session_id only on the PLANNER path
+            (replay/main.py:963-989); the plain path (:1006-1032) emits null, so extract_a12's
+            request_<N> key does not exist on any static arm. Static cells are keyed instead by
+            (arrival_time_ms, min(input_length, len(hash_ids)*512), requested_output_length) with a
+            FIFO deque — the same idiom extract_a12.py:76-87 already uses on the encoder side.
+            Validated, not assumed: on 6 published planner arms the new join reproduces
+            a12_data.json's enc_p99/e2e_p99/e2e_max exactly, and the FIFO key is bit-identical to
+            session_id on all statistics; at 1M scale (fulltrace reactive) the 162 index
+            disagreements — all inside groups whose key is shared, i.e. interchangeable by
+            construction — move e2e_p99/e2e_max/ttft_p99 by exactly 0.000 ms.
+            (2) CONVENTION SEAM. The replay report's p99 index is round((n-1)*99/100)
+            (mocker/src/replay/collector.rs:1075); extract_a12's CONV is min(n-1, int(n*99/100)).
+            They land 0-1 order statistics apart — identical on every arm published so far, but NOT
+            on burst3/burst5 static. Mixing them makes burst3's "naive sum" read 1476.1 < e2e
+            1481.0 (0.9967x), a spurious violation of the thesis's "naive sum always overstates".
+            Under one consistent estimator it is 1481.2 (1.0001x). Both are stored
+            (naive_sum/error_ratio vs naive_sum_conv/error_ratio_conv); the relation-bearing column
+            must use the self-consistent one.
+            (3) REAL COUNTEREXAMPLE (estimator-independent, survives both conventions).
+            steady24h forecast-p90 has e2e_p99 1122.2 ABOVE its naive sum 1076.4 (0.9592x): the
+            joined tail EXCEEDS the sum of the per-pool p99s by 45.8 ms. Verified by direct
+            exceedance count — 998 of 88260 requests (1.131%) sit above the naive sum, where 1%
+            would be 882. Mechanism: steady24h is 57.317% text-only (NumImages==0), so the joined
+            encoder delay carries a majority atom at exactly 0 (measured 56.309%) and its p99 sits
+            in a thin upper tail, while corr(enc, ttft) is only 0.458 — ordinary VaR
+            non-subadditivity. This CONTRADICTS closedloop.tex's "the naive sum always
+            overstates the measured tail", which held only because all 20 published arms had the
+            encoder pinned at its service plateau. The sentence needs the Integrate agent.
+            (4) INHERITED-KEY PRECISION (pre-existing, NOT introduced here, NOT changed).
+            extract_a12's encoder key is (ContextTokens, GeneratedTokens) only — it does not carry
+            NumImages. On steady24h 38.13% of rows share a (ctx,gen) group and 1.81% sit in a group
+            that MIXES image counts, so the FIFO reconstruction can hand a text row an image row's
+            delay and vice versa. That is exactly the size of the observed 1.0 pp gap between the
+            57.317% text-only fraction and the 56.309% zero-delay atom. Left as is deliberately:
+            the key is the published convention and this join reproduces all 6 validated a12 arms
+            to the digit; adding NumImages would fork the convention for all 29 arms and should be
+            a separate, deliberate decision.
+            Also noted (benign): composed e2e_max coincides across unrelated arms (2572.5 on
+            burst4-fc/burst5-fc/burst5-static; 4365.9 on both steady24h static and forecast)
+            because the max-e2e request is a TEXT-ONLY 124,292-token-context request with encoder
+            delay exactly 0.000 — the composed maximum is language-pool-bound, not seam-bound.
+            EXCLUSIONS HELD: burst2/burst6 composed (calibration split) not run; no full-trace
+            forecast arm (the archive's first 1.4 days are its own context — unavailable without
+            leakage). Environment repair required and made: the aiconfigurator .venv interpreter
+            symlink pointed at snap revision 247, garbage-collected; repointed to
+            snap/code/current (byte-identical cpython-3.13.7, md5 3be561bc...), pyvenv.cfg home
+            likewise. No package changed; the exact reproduction of the C8 grid ledger is the proof.
+commit:     (pending — RUN agent made no commits)
+
 ### provenance GROUP C — riders knee/belief derivation + 3 answer-artifacts  (2026-07-20)
 artifact:   provenance/schema/25_group_c.sql, provenance/schema/26_group_c_checks.sql,
             provenance/loader/load_group_c.py (kind K31);

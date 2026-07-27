@@ -333,6 +333,26 @@ if [ $FR_RC -eq 0 ] && printf '%s' "$FR_LOG" | grep -qF "$FR_WANT"; then
 else
   bad "frontier raw recompute FAILED (rc=$FR_RC): $(printf '%s' "$FR_LOG" | grep 'cells=' | tail -1)"
 fi
+# D20 round 3 (reviewer escalation, 2026-07-26): PURE-DERIVATION EQUALITY.
+# Incremental field checks proved omission-prone three times, so the gate now
+# regenerates the ENTIRE summary from the recomputed cell tables in an isolated
+# mirror and requires byte-identity with the tracked object (regeneration is
+# deterministic; reviewer-verified SHA-stable). Any mutation of ANY
+# result-bearing field -- core, diagnostics, envelope, worst-window, headline,
+# calibration record -- breaks byte-identity. Figures compared by SHA too.
+CFDIR=$TESE/simulation/results/comparator_frontier
+FRMIR=$(mktemp -d "$TMP/cfmirror.XXXX")
+cp -as "$CFDIR/" "$FRMIR/cf" 2>/dev/null
+rm -f "$FRMIR/cf/frontier_summary.json" "$FRMIR/cf/make_frontier_report.py" \
+      "$FRMIR/cf/frontier_worktime_vs_worstp99.pdf" "$FRMIR/cf/frontier_worktime_vs_worstp99.png"
+cp "$CFDIR/make_frontier_report.py" "$FRMIR/cf/"
+if SOURCE_DATE_EPOCH=0 "$TESE/eda/.venv/bin/python" "$FRMIR/cf/make_frontier_report.py" >/dev/null 2>&1 \
+   && cmp -s "$FRMIR/cf/frontier_summary.json" "$CFDIR/frontier_summary.json" \
+   && cmp -s "$FRMIR/cf/frontier_worktime_vs_worstp99.pdf" "$CFDIR/frontier_worktime_vs_worstp99.pdf"; then
+  ok "frontier pure-derivation equality: regenerated summary+figure byte-identical to tracked"
+else
+  bad "frontier pure-derivation equality FAILED: tracked summary/figure is not the pure derivation of the recomputed cells"
+fi
 # verb-convention regression (protocol R-C)
 BILLMISUSE=$(grep -rcE "billed at (forecast-)?issue" $TEXSET | grep -v ':0' | wc -l)
 [ "$BILLMISUSE" -eq 0 ] && ok "no billing-verb misuse (billed-at-issue: 0; R-C)" || bad "billing-verb misuse present (R-C)"

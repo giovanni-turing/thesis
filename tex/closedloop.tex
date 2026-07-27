@@ -18,7 +18,7 @@
 \chaptermark{Control payoff}
 
 RQ3 asks whether forecast-driven vision provisioning improves the
-\emph{episode-level} tail-SLA/resource trade-off over the two controls a
+\emph{window-level} tail-SLA/resource trade-off over the two controls a
 practitioner would reach for: the best static fleet and a reactive autoscaler.
 This chapter establishes those comparators on the platform of
 Chapter~\ref{cap:metodologia}, drives the same platform from the zero-shot
@@ -56,7 +56,7 @@ reactive warm floor is calibrated there by forecast-free replays
 solely to calibrate the language operating point (Section~\ref{sec:cl-llm}),
 never as evaluation results.
 \item[Primary endpoint.] Encoder-delay p99 $<$ \SI{1}{\second} \emph{in every
-episode}, jointly with provisioned encoder worker-time over the span. The
+evaluation window}, jointly with provisioned encoder worker-time over the span. The
 percentile is taken over \emph{all} requests of the window, so text-only
 requests contribute exactly zero encoder delay: a user-population tail, not a
 vision-pool-conditional one. Language-pool endpoints (TTFT p99 $<$
@@ -70,9 +70,9 @@ and mechanics --- a bound on the signal-quality axis, not on the space of
 admissible SLA-passing schedules; and, on the language pool, Dynamo's shipped
 SLA planner.
 \item[Success criterion.] An arm succeeds only if it holds the endpoint in
-\emph{every} episode \emph{and} in aggregate; cost is compared only among arms
+\emph{every} evaluation window \emph{and} in aggregate; cost is compared only among arms
 that pass. Aggregate-only compliance is explicitly not sufficient --- the
-aggregate p99 masks sub-1\% episodes (Section~\ref{sec:cl-aggregate}).
+aggregate p99 masks sub-1\% windows (Section~\ref{sec:cl-aggregate}).
 \item[Denominators and scope.] Resource-time is provisioned worker/GPU time
 \emph{per hardware class}: RTX~5090-class worker-seconds for the encoder pool,
 H100 GPU-hours for the language pool, never summed. Three denominators are
@@ -330,15 +330,15 @@ measurement or swept with all values reported. The headline rating $\rho{=}15$
 is chosen \emph{ex post} as the conservative operating point, with the whole
 frontier reported rather than a value selected to flatter.
 
-\section{Encoder pool: episode compliance and the dials}
+\section{Encoder pool: window compliance and the dials}
 \label{sec:cl-matrix}
 
-The p90-forecast policy at $\rho{=}15$ is graded on a per-episode factorial ---
-the 5 in-span episodes $\times$ 3 TSFMs $\times$ 4 realizable issued leads
+The p90-forecast policy at $\rho{=}15$ is graded on a per-window factorial ---
+the 5 in-span evaluation windows $\times$ 3 TSFMs $\times$ 4 realizable issued leads
 $\{15,30,45,165\}$\,s, each a two-pool replay under \emph{issue-time}
 actuation --- and \textbf{meets the SLA in all 60 of its cells}, under
 \emph{both} a warm-pool and a strict re-warm readiness model (the four burst
-episodes pinned at the \SI{588}{\milli\second} no-queue plateau; the calm day
+windows pinned at the \SI{588}{\milli\second} no-queue plateau; the calm day
 548--\SI{734}{\milli\second}). Those 60 cells are a
 \emph{parameter-robustness} grid, not 60 samples: the evidential units remain
 the five evaluation windows, each replayed under twelve settings, so 60/60 licenses
@@ -351,7 +351,7 @@ issued lead. The identically informed reactive controller, by contrast, loses
 burst3 at every lead and burst5 beyond 45 seconds, though burst4 still passes
 at $L{=}\SI{165}{\second}$ (\SI{904.7}{\milli\second}).
 
-On the burst episodes the p90 schedule's p99 encoder delay is pinned at
+On the burst windows the p90 schedule's p99 encoder delay is pinned at
 \SI{588}{\milli\second}, the \emph{observed no-queue plateau} this harness
 reproduces whenever provisioned capacity keeps the queue empty; the ``service
 plateau'' shorthand throughout this chapter names that observation, and two
@@ -368,7 +368,7 @@ sizes to the mean, allocates one worker and reproduces the reactive planner's
 mean-sizing defect; the calibrated p90 band edge (empirical coverage 0.88--0.90
 at this cadence, Chapter~\ref{cap:predictors}) converts a point forecast into
 provisionable headroom. \textbf{Lead-invariance separates placement from
-reaction}: actuated on true issue time the p90 policy holds its per-episode p99
+reaction}: actuated on true issue time the p90 policy holds its per-window p99
 unchanged from $L{=}15$ to \SI{165}{\second} under both readiness models, while
 the reactive twin degrades monotonically toward its never-scaled limit (burst3:
 9{,}481 to 54{,}170\,\si{\milli\second}). \textbf{Model choice is
@@ -380,7 +380,7 @@ forecasts onto the same schedule; the signal, the conversion and the band
 \emph{shape} are not second-order (Table~\ref{tab:cl-ewma}). \textbf{Capacity
 rating trades cost against fragility}: at $\rho \in \{10,15,20\}$ the p90
 policy clears all 60 cells under both readiness models, though margin tightens
-(per-episode p99 rises to \SI{746}{}/\SI{860}{\milli\second} warm/strict at
+(per-window p99 rises to \SI{746}{}/\SI{860}{\milli\second} warm/strict at
 $\rho{=}20$); only $\rho{=}25$ drops cells --- 9 of 60, all on burst5, via
 backlog it never drains. Reactive control is insensitive to $\rho$ (13--14 of
 20 cells at every rating): no capacity rating repairs late information.
@@ -415,9 +415,9 @@ the identical encoder loop with a forward EWMA point path --- its p90
 calibrated on the 1.4-day context to the same 0.88--0.90 coverage by three
 standard schemes --- exposes a coverage-versus-cost bind: the two cheap
 calibrations clear the burst-masked week aggregate but fail the fast and
-high-volume onsets under per-episode grading, and the one calibration that
-clears every episode over-provisions at 1.09$\times$ static. Only the zero-shot
-foundation-model band clears every episode \emph{and} beats static
+high-volume onsets under per-window grading, and the one calibration that
+clears every evaluation window over-provisions at 1.09$\times$ static. Only the zero-shot
+foundation-model band clears every evaluation window \emph{and} beats static
 (0.62$\times$). Forecast \emph{accuracy} is therefore second-order (ARIMA is
 statistically indistinguishable from Chronos on matched origins,
 Chapter~\ref{cap:predictors}) while the calibrated band \emph{shape} is not ---
@@ -431,11 +431,11 @@ not.
 policy]{Forward-EWMA calibrated-p90 versus the foundation-model policy through
 the \emph{identical} encoder loop ($\rho{=}15$, issue-time actuation,
 warm-pool; each EWMA p90 calibrated on the 1.4-day context to 0.88--0.90
-coverage). Per-episode encoder-delay p99 is lead-invariant over
+coverage). Per-window encoder-delay p99 is lead-invariant over
 $L\in\{15,\ldots,165\}$\,s; ``agg'' is the week-scale resource-time versus the
 deployable static $C{=}8$ fleet. \emph{Every} policy clears the aggregate p99
 at the \SI{589}{\milli\second} plateau --- the burst-masking of
-Section~\ref{sec:cl-aggregate} --- so the operative verdict is per-episode.
+Section~\ref{sec:cl-aggregate} --- so the operative verdict is per-window.
 (This harness's replay normalization reads the shared plateau
 \SI{1}{\milli\second} above the main issue-time artifacts'
 \SI{588}{\milli\second}; it is the same plateau.)}
@@ -445,7 +445,7 @@ Section~\ref{sec:cl-aggregate} --- so the operative verdict is per-episode.
 \begin{tabular}{@{}lrrrrrrl@{}}
 \toprule
 Forecaster (p90) & b1 & b3 & b4 & b5 & steady & agg &
-per-episode \\
+per-window \\
  & \multicolumn{5}{c}{encoder-delay p99 (\si{\milli\second})} &
 $\times$static & verdict \\
 \midrule
@@ -493,18 +493,20 @@ Figure~\ref{fig:cl-frontier} give the resulting frontier.
 \centering
 \caption[Comparator frontier over the 5.60-day evaluation span]{Comparator
 frontier over the 5.60-day evaluation span (\num{749601} requests, 11.4M
-images): aggregate and worst-episode encoder-delay p99, provisioned encoder
-worker-time, and how many of the five evaluation episodes miss the
+images): aggregate and worst-window encoder-delay p99, provisioned encoder
+worker-time, and how many of the five evaluation windows miss the
 \SI{1}{\second} bound. Cost is compared only among arms with zero failed
-episodes; the failing episode is burst3 in every case, and \emph{agg.}\ marks
+windows; the failing window is burst3 in every case, and \emph{agg.}\ marks
 an arm that misses the bound in aggregate as well. The three
 589/588/\SI{566}{\milli\second} aggregate readings coincide at the observed
 all-request no-queue plateau of Section~\ref{sec:cl-matrix} --- \emph{not} a
 physical floor; rows above it carry queueing on top of that plateau. Upper
-block: the frozen five-arm protocol, one evaluation pass, one
-harness build. Lower block: the archived issue-time family, same span and
+block: the five pre-frozen arms, one evaluation pass, one harness build (the
+oracle as shipped, window-boundary clamp in place). Middle block: post-hoc
+sensitivity and repair rows --- \emph{not} frozen-protocol arms. Lower
+block: the archived issue-time family, same span and
 mechanics but an earlier cost-model build, whose p99s sit within 0.5\% of the
-upper block's (worker-time and every ratio agree exactly); their per-episode
+upper block's (worker-time and every ratio agree exactly); their per-window
 verdicts are in Section~\ref{sec:cl-matrix} and
 Table~\ref{tab:base-react-enc}. Its $L{=}\SI{165}{\second}$ row is the largest
 forecast-issued lead the $H{=}12$ archive supports. Forecast policies use
@@ -515,7 +517,7 @@ Chronos-2 at $\rho{=}15$.}
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
-Arm & agg.\ p99 & worst-ep & Mworker & vs. & ep. \\
+Arm & agg.\ p99 & worst-win & Mworker & vs. & win. \\
     & (ms)      & p99 (ms) & -s      & static & fail \\
 \midrule
 \textbf{Forecast p90}, $L{=}30$\,s & 589 & 681 & 2.41 &
@@ -558,28 +560,28 @@ Figure~\ref{fig:cl-frontier}B).}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figuras/sim/sim_frontier}
-\caption[Encoder worker-time versus worst-episode tail]{Provisioned encoder
-worker-time against worst-episode encoder-delay p99 over the 5.60-day
-evaluation span; filled markers pass all five episodes, hollow markers fail at
+\caption[Encoder worker-time versus worst-window tail]{Provisioned encoder
+worker-time against worst-window encoder-delay p99 over the 5.60-day
+evaluation span; filled markers pass all five evaluation windows, hollow markers fail at
 least one; the dashed line is the \SI{1}{\second} gate and the dotted line the
 static-$C{=}8$ cost reference. \textbf{(A)} the frontier as run, including the
 whole warm-floor family $M{=}1\ldots32$ as an envelope. \textbf{(B)} the
-readiness models equalised: giving every arm the warm-pool model (the footing
-most favourable to reactive) and letting the oracle order before its window
-opens. On both footings the forecast arm is cheaper than every warm floor that
+readiness repairs: the warm-pool model applied to every arm (the footing most
+favourable to reactive) plus the near-symmetric strict forecast sensitivity,
+and the oracle allowed to order before its window opens. On both footings the forecast arm is cheaper than every warm floor that
 passes.}
 \label{fig:cl-frontier}
 \end{figure}
 
 \paragraph{The calibrated floor fails held out.} The floor $M$ is selected on
-the calibration episodes alone, by the cheapest setting holding the gate on
+the calibration windows alone, by the cheapest setting holding the gate on
 both of them at \emph{every} declared cold-start lead --- a rule that yields
 $M{=}4$, decided entirely by the $L{=}\SI{300}{\second}$ column (every $M$
 passes at 15/30/45\,s) with a thin \SI{4.0}{\milli\second} margin at its
 binding cell. Evaluated once on held-out data, that calibrated floor
 \textbf{fails burst3 at \SI{2084}{\milli\second}} --- the language pool's
 calibration story exactly (Section~\ref{sec:cl-llm}): a point selected honestly
-on the calibration split does not survive per-episode grading on the evaluation
+on the calibration split does not survive per-window grading on the evaluation
 split, and the cheapest all-passing member of the family can only be identified
 \emph{after} the fact. That member is $M{=}6$, at 4.03 Mworker-s ---
 1.042$\times$ the static fleet it was meant to undercut, and 1.67$\times$ the
@@ -600,19 +602,19 @@ forecast's strict re-warm variant retains matured orders as reusable for a
 arm's trailing-window re-warm semantics --- so that endpoint is a sensitivity,
 not a fully equalized model. Under it the
 forecast arm costs 2.39 Mworker-s (\textbf{0.617$\times$} static) with zero
-failed episodes. Under warm-pool readiness the reactive family improves
+failed windows. Under warm-pool readiness the reactive family improves
 materially: its unfloored burst3 p99 is \SI{2000}{\milli\second} rather than
 16{,}084 (that figure is inflated ${\approx}8\times$ by the asymmetry and must
 always be quoted with its warm-pool counterpart), and the floor $M{=}2$ now
-\emph{passes} every episode at 2.89 Mworker-s (0.746$\times$ static), cheaper
+\emph{passes} every evaluation window at 2.89 Mworker-s (0.746$\times$ static), cheaper
 than static. Even on that most-favourable-to-reactive footing the forecast arm
 is cheaper: \textbf{forecasting is 1.20$\times$ cheaper than the best
 warm-floor reactive at equal compliance on the symmetric warm-pool footing},
 and 1.67$\times$ under the shipped mechanics; the strict-direction figure is
 a sensitivity (see the caveat above), and the single number 1.67$\times$ must
 never be quoted alone. Two honesty points travel with the frontier. The
-comparison is conservative in reactive's favour --- the forecast is one frozen
-policy, the floor family an ex-post best-of-family read on the evaluation span.
+comparison is conservative in reactive's favour --- the forecast is one
+pre-frozen arm ($\rho{=}15$ chosen \emph{ex post} earlier, disclosed), the floor family an ex-post best-of-family read on the evaluation span.
 And the perfect-information oracle reference prices the signal-quality axis
 at \textbf{0.292$\times$} static under the same fixed point conversion
 (its scale-down runs $H{=}0$ where the frozen arms use 3-minute hysteresis,
@@ -1294,9 +1296,9 @@ under a held forecast cursor --- its own forecast passes bursts under realistic
 replica leads only through the tail-aware capacity conversion, which repairs
 the mean-based sizing defect shared by every reactive configuration tested.
 Priced over the covered week, the policy meets the SLA in aggregate and in each
-of the four declared in-span burst episodes at \textbf{0.62 times the
+of the four declared in-span burst windows at \textbf{0.62 times the
 deployable static encoder fleet's worker-time} --- a week-scale SLA/resource
 trade-off, since per burst episode every arm costs more than static, and since
-on four of the five composed episodes the forecast and reactive tails tie
+on four of the five evaluation windows the forecast and reactive tails tie
 exactly. The finer daily-fold grain surfaces the one missed covered onset, e13,
 recovered at 0.76$\times$ by the post-hoc hybrid.

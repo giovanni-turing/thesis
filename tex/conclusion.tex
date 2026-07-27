@@ -38,16 +38,15 @@ effects small enough that engineering considerations can decide the choice
 --- accuracy underwrites the operating point without deciding it.
 
 \paragraph{RQ3 --- Control payoff: a trade-off with an identified failure
-mode, not universal superiority.} On four of the five composed evaluation
-episodes the forecast and reactive tail latencies \emph{tie exactly}; the
+mode, not universal superiority.} On four of the five evaluation windows the forecast and reactive tail latencies \emph{tie exactly}; the
 latency advantage lives in the one-minute onset, which the identically
 informed reactive controller loses at every lead. What forecasting buys at
 week scale is resource-time at equal compliance. Under a pre-frozen five-arm replay
 protocol (arm mechanics frozen before the frontier replay; the forecast arm's
 $\rho{=}15$ had been chosen \emph{ex post} earlier and is disclosed as such,
 Section~\ref{sec:cl-frontier}), the p90 forecast arm holds the
-encoder bound in every episode at \textbf{0.623$\times$} the deployable
-static fleet's provisioned worker-time with zero failed episodes; a reactive
+encoder bound in every evaluation window at \textbf{0.623$\times$} the deployable
+static fleet's provisioned worker-time with zero failed windows; a reactive
 controller granted a minimum warm floor calibrated on the calibration split
 \emph{fails} held-out burst3, and the cheapest all-passing member of that
 floor family --- identifiable only after the fact --- costs
@@ -138,8 +137,8 @@ forecast arm's \SI{162326}{} &
 Place headroom where the uncertainty is, not everywhere \\
 \addlinespace
 \textbf{Nothing responds} &
-$U \approx 0$ \emph{and} the watched signal is decoupled from the pool's
-work &
+the watched signal is decoupled from the pool's work (no usable forecast
+path exists or none is deployed) &
 locked $2{\times}2$ topology: the encoder misses its 5\,s tail at 29\%
 mean utilization while aggregate rate and utilization read healthy (no
 forecast path ran, so $U$ is unmeasured here, and no aggregate-signal scaler
