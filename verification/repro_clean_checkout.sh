@@ -128,6 +128,7 @@ R=""
 say() { echo "$1"; R+="$1"$'\n'; }
 ok()  { pass=$((pass+1)); say "PASS  $1"; }
 bad() { fail=$((fail+1)); say "FAIL  $1"; }
+PUB_HELPER=$SELF/repro_publish.py   # pre-checkout seam; upgraded once W exists
 publish() {
   # D58: publication is INODE-BOUND via repro_publish.py -- an exclusively
   # created mkstemp temp whose OPEN fd is verified (lstat==fstat) immediately
@@ -136,7 +137,18 @@ publish() {
   # WITHOUT touching the destination. CONTRACT: the destination directory is
   # single-writer; only the final lstat->rename syscall gap is outside the
   # detection, and no unconditional preservation claim is made for it.
-  if printf '%s' "$R" | "$PY" "$SELF/repro_publish.py" "$REPORT"; then
+  # D58 round 2: NO pipeline -- the content is materialized to a runner-owned
+  # file first and its write status checked BEFORE the helper runs, so
+  # producer failure is part of publication status by construction; the
+  # helper (from the detached checkout on normal runs) reads it on stdin.
+  if [ "$PUB_HELPER" = "$SELF/repro_publish.py" ]; then
+    say "publisher: outer copy (no checkout at publication time)"
+  fi
+  if ! printf '%s' "$R" > "$RUN/report_content"; then
+    echo "FATAL: could not materialize report content" >&2
+    exit 1
+  fi
+  if "$PY" "$PUB_HELPER" "$REPORT" < "$RUN/report_content"; then
     PUBLISHED=1
     echo "report: $REPORT"
   else
@@ -174,6 +186,16 @@ if [ "$(sha256sum "$SELF/repro_clean_checkout.sh" | cut -d' ' -f1)" = \
 else
   say "runner: WARNING -- invoking runner differs from the HEAD copy; this report reflects the invoking runner"
 fi
+# D58 round 2: for normal runs the PUBLISHER also comes from the detached
+# checkout; the outer copy is used only on failure paths before W exists,
+# and that seam is recorded. Outer-vs-HEAD hashes are compared for BOTH.
+if [ "$(sha256sum "$SELF/repro_publish.py" | cut -d' ' -f1)" = \
+     "$(sha256sum "$W/verification/repro_publish.py" | cut -d' ' -f1)" ]; then
+  say "publisher: byte-identical to the HEAD copy"
+else
+  say "publisher: WARNING -- outer publisher differs from the HEAD copy"
+fi
+PUB_HELPER=$W/verification/repro_publish.py
 COMMITTED=$W/simulation/results/composed_fill/composed_fill_joined.json
 
 # ---- H1 + H2: frontier 313-cell recomputation ----

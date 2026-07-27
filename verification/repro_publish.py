@@ -10,18 +10,20 @@ rename semantics cannot close that last gap, and no unconditional
 preservation claim is made for it.
 
 Mechanism: the temp is created by mkstemp (O_EXCL) and its file descriptor
-kept OPEN; content is written through that fd. Immediately before rename the
-temp pathname is verified to still name OUR inode (lstat == fstat) -- a
-post-create replacement (the D58 probe) fails here, destination untouched,
-and the foreign object at the temp pathname is left alone. After rename the
-destination must hold our inode, else a nonzero exit reports the concurrent
-writer.
+kept OPEN; content is written through that fd by write_all (memoryview loop,
+EVERY byte accounted, zero-progress rejected). Immediately before rename the
+temp pathname is verified to still name OUR inode (lstat == fstat); after
+rename the destination must hold our inode. SIGTERM/SIGHUP/SIGINT are
+converted to exits that unwind through the cleanup path, so an owned temp
+never survives a signalled publication.
 
 Usage: repro_publish.py <dest>   (report content on stdin)
+       repro_publish.py --selftest
 Test hook: REPRO_PUB_PAUSE_MARKER=<path> -- after writing the temp, touch
 the marker and sleep 2 s so a test can deterministically interpose.
 """
 import os
+import signal
 import sys
 import tempfile
 import time
@@ -31,13 +33,33 @@ def same_inode(a, b):
     return (a.st_dev, a.st_ino) == (b.st_dev, b.st_ino)
 
 
-def main():
-    dest = sys.argv[1]
-    data = sys.stdin.buffer.read()
+def write_all(fd, data, writer=os.write):
+    """Write EVERY byte, looping on a memoryview; a zero-progress write is an
+    error, and the total is verified against the payload length."""
+    view = memoryview(data)
+    total = 0
+    while total < len(view):
+        n = writer(fd, view[total:])
+        if n is None or n <= 0:
+            raise OSError(f"zero-progress write at {total}/{len(view)} bytes")
+        total += n
+    if total != len(view):
+        raise OSError(f"short write: {total}/{len(view)} bytes")
+    return total
+
+
+def _install_signal_unwind():
+    def _sig(num, _frame):
+        raise SystemExit(128 + num)
+    for s in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
+        signal.signal(s, _sig)
+
+
+def publish(dest, data):
     fd, tmp = tempfile.mkstemp(prefix=".repro881_pub.", dir=os.path.dirname(dest) or ".")
     ours = True
     try:
-        os.write(fd, data)
+        write_all(fd, data)
         os.fsync(fd)
         marker = os.environ.get("REPRO_PUB_PAUSE_MARKER")
         if marker:
@@ -76,6 +98,49 @@ def main():
             except OSError:
                 pass
         os.close(fd)
+
+
+def _selftest():
+    ok = True
+
+    def t(name, good):
+        nonlocal ok
+        ok &= good
+        print(f"{'PASS' if good else 'FAIL'}: {name}")
+
+    # short-write writer: dribbles <=7 bytes per call; every byte must land
+    with tempfile.TemporaryDirectory() as td:
+        p = os.path.join(td, "f")
+        fd = os.open(p, os.O_WRONLY | os.O_CREAT, 0o600)
+        payload = b"0123456789" * 11 + b"tail"
+        n = write_all(fd, payload, writer=lambda f, v: os.write(f, v[:7]))
+        os.close(fd)
+        t("short-write-dribble-completes",
+          n == len(payload) and open(p, "rb").read() == payload)
+        # zero-progress writer must raise, not publish
+        fd = os.open(p, os.O_WRONLY | os.O_TRUNC, 0o600)
+        try:
+            write_all(fd, b"abc", writer=lambda f, v: 0)
+            t("zero-progress-raises", False)
+        except OSError:
+            t("zero-progress-raises", True)
+        finally:
+            os.close(fd)
+        # end-to-end publish through the real path
+        dest = os.path.join(td, "out.md")
+        rc = publish(dest, b"CONTENT-OK")
+        t("publish-roundtrip", rc == 0 and open(dest, "rb").read() == b"CONTENT-OK")
+    print("PUBLISH-SELFTEST:", "ALL PASS" if ok else "FAIL")
+    return 0 if ok else 1
+
+
+def main():
+    _install_signal_unwind()
+    if sys.argv[1:2] == ["--selftest"]:
+        return _selftest()
+    dest = sys.argv[1]
+    data = sys.stdin.buffer.read()
+    return publish(dest, data)
 
 
 if __name__ == "__main__":

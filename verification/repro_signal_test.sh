@@ -229,5 +229,35 @@ else
 fi
 rm -rf "$scratch"
 
+# D58 round 2: helper unit selftest (short-write dribble, zero-progress) and
+# a publication-phase PROCESS-GROUP TERM -- the helper's signal unwind must
+# clean its own temp; nothing advertised, zero residue of any kind.
+if python3 "$SELF/repro_publish.py" --selftest | grep -q "ALL PASS"; then
+  ok "publisher selftest (write_all dribble + zero-progress + roundtrip)"
+else
+  bad "publisher selftest failed"
+fi
+scratch=$(mktemp -d) || exit 1
+marker=$scratch/pub.marker
+REPRO_SCRATCH=$scratch REPRO_PUB_PAUSE_MARKER=$marker "$RUNNER" >"$scratch/out.log" 2>&1 &
+pid=$!
+waited=0
+until [ -e "$marker" ]; do
+  sleep 0.1; waited=$((waited + 1))
+  [ "$waited" -gt 6000 ] && { bad "pgroup-TERM: publisher pause marker never appeared"; kill -9 "$pid" 2>/dev/null; break; }
+done
+kill -TERM -- "-$pid" 2>/dev/null || kill -TERM "$pid"
+wait "$pid"; rc=$?
+temps=$(find "$scratch" -maxdepth 1 -name '.repro881_pub.*' | wc -l)
+dirs=$(find "$scratch" -maxdepth 1 -type d -name 'repro881.*' | wc -l)
+reports=$(find "$scratch" -maxdepth 1 -type f -name 'repro881_report.*' | wc -l)
+if [ "$rc" -eq 143 ] && ! grep -q "^report:" "$scratch/out.log" \
+   && [ "$temps" -eq 0 ] && [ "$dirs" -eq 0 ] && [ "$reports" -eq 0 ]; then
+  ok "publication-phase pgroup TERM: exit 143, nothing advertised, zero temp/run/report residue"
+else
+  bad "pgroup-TERM: rc=$rc temps=$temps dirs=$dirs reports=$reports"
+fi
+rm -rf "$scratch"
+
 echo "SIGNAL-TEST: $pass passed, $fail failed"
 [ "$fail" -eq 0 ]
