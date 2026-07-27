@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T15:52:55-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-27T16:13:30-03:00, protocol v2.1)
 
-messages: 258  errors: 0
+messages: 269  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -126,18 +126,26 @@ messages: 258  errors: 0
     - 040_d28_fixed (claude, response)
     - 080_d28_false_green_residuals (reviewer, response)
     - 081_d28_escalation (reviewer, escalation)
-- **D29-composed-exact-identity**: 2 msgs, 1/2 evidence rounds
+- **D29-composed-exact-identity**: 4 msgs, 2/2 evidence rounds
     - 070_composed_exact_identity (reviewer, finding)
     - 085_d29_exact_identity_fix (claude, response)
-- **D30-composed-mixed-estimators**: 2 msgs, 1/2 evidence rounds
+    - 170_d29_fix_verified (reviewer, response)
+    - 171_d29_terminal_verification (reviewer, verification)
+- **D30-composed-mixed-estimators**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 090_adjudication_d30_d31)
     - 071_composed_mixed_estimators (reviewer, finding)
     - 086_d30_estimator_fix (claude, response)
-- **D31-composed-coverage-integration**: 2 msgs, 1/2 evidence rounds
+    - 172_d30_view_residuals (reviewer, response)
+    - 178_d30_escalation (reviewer, escalation)
+- **D31-composed-coverage-integration**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 090_adjudication_d30_d31)
     - 072_composed_coverage_integration (reviewer, finding)
     - 087_d31_coverage_fix (claude, response)
-- **D32-burst5-lower-bound-resurrected**: 2 msgs, 1/2 evidence rounds
+    - 173_d31_integration_residuals (reviewer, response)
+    - 179_d31_escalation (reviewer, escalation)
+- **D32-burst5-lower-bound-resurrected**: 4 msgs, 2/2 evidence rounds
     - 073_burst5_lower_bound_resurrected (reviewer, finding)
     - 088_d32_settled_tail_fix (claude, response)
+    - 174_d32_fix_verified (reviewer, response)
+    - 175_d32_terminal_verification (reviewer, verification)
 - **D33-schema37-clean-start-namespace**: 1 msgs, 0/2 evidence rounds
     - 079_schema37_clean_start_namespace (reviewer, finding)
 - **D34-calibration-type-finiteness**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 049_adjudication_d34_d37)
@@ -272,9 +280,11 @@ messages: 258  errors: 0
     - 165_d58_helper_integration_residuals (reviewer, response)
     - 166_d58_escalation (reviewer, escalation)
     - 169_d58_terminal_verification (reviewer, verification)
-- **D59-stale-archive-pin**: 2 msgs, 1/2 evidence rounds
+- **D59-stale-archive-pin**: 4 msgs, 2/2 evidence rounds
     - 168_stale_archive_pin (reviewer, finding)
     - 089_d59_pin_fix (claude, response)
+    - 176_d59_fix_verified (reviewer, response)
+    - 177_d59_terminal_verification (reviewer, verification)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
