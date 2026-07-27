@@ -87,12 +87,9 @@ else
 fi
 W=$RUN/checkout
 
-PUB_TMP=""
 cleanup() {
   git -C "$TESE" worktree remove --force "$W" >/dev/null 2>&1
   rm -rf "$RUN"
-  [ -n "$PUB_TMP" ] && rm -f "$PUB_TMP"
-  PUB_TMP=""
 }
 # D54 round 2: on abnormal/signalled termination the OWNED default placeholder
 # is removed too (an explicit REPRO_REPORT is never touched); after successful
@@ -132,30 +129,17 @@ say() { echo "$1"; R+="$1"$'\n'; }
 ok()  { pass=$((pass+1)); say "PASS  $1"; }
 bad() { fail=$((fail+1)); say "FAIL  $1"; }
 publish() {
-  # D57 round 2: the temp is an EXCLUSIVELY created random regular file
-  # (mktemp, O_EXCL) in the destination directory -- a planted symlink cannot
-  # occupy its name, redirection cannot be diverted, and mv -T moves OUR
-  # regular file. lstat checks reject symlinks at the destination before and
-  # after the rename; failure leaves any existing destination content
-  # untouched and removes only the owned temp.
-  if [ -L "$REPORT" ]; then
-    echo "FATAL: report destination became a symlink: $REPORT" >&2
-    exit 1
-  fi
-  PUB_TMP=$(mktemp "$(dirname "$REPORT")/.repro881_pub.XXXXXX") || {
-    echo "FATAL: cannot create publication temp near $REPORT" >&2
-    exit 1
-  }
-  if [ ! -L "$PUB_TMP" ] && [ -f "$PUB_TMP" ] \
-     && printf '%s' "$R" > "$PUB_TMP" \
-     && mv -T "$PUB_TMP" "$REPORT" \
-     && [ ! -L "$REPORT" ] && [ -f "$REPORT" ]; then
-    PUB_TMP=""
+  # D58: publication is INODE-BOUND via repro_publish.py -- an exclusively
+  # created mkstemp temp whose OPEN fd is verified (lstat==fstat) immediately
+  # before rename and re-verified at the destination after it. Any
+  # post-creation replacement of the temp pathname is detected and fails
+  # WITHOUT touching the destination. CONTRACT: the destination directory is
+  # single-writer; only the final lstat->rename syscall gap is outside the
+  # detection, and no unconditional preservation claim is made for it.
+  if printf '%s' "$R" | "$PY" "$SELF/repro_publish.py" "$REPORT"; then
     PUBLISHED=1
     echo "report: $REPORT"
   else
-    rm -f "$PUB_TMP"
-    PUB_TMP=""
     echo "FATAL: report publication to $REPORT failed" >&2
     exit 1
   fi

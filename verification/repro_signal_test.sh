@@ -196,5 +196,38 @@ else
 fi
 rm -rf "$scratch"
 
+# D58 deterministic post-create replacement probe: swap the publication temp
+# DURING the publisher's pause window (after exclusive creation + write,
+# before the inode-bind check). The bind must fail, the prior explicit
+# report must stay byte-identical, and the foreign object at the temp path
+# must be left alone.
+scratch=$(mktemp -d) || exit 1
+echo "PRIOR58" > "$scratch/r.md"
+echo "SAFE-VICTIM58" > "$scratch/victim58"
+marker=$scratch/pub.marker
+REPRO_SCRATCH=$scratch REPRO_PUB_PAUSE_MARKER=$marker \
+  REPRO_REPORT=$scratch/r.md "$RUNNER" >"$scratch/out.log" 2>&1 &
+pid=$!
+waited=0
+until [ -e "$marker" ]; do
+  sleep 0.1; waited=$((waited + 1))
+  [ "$waited" -gt 6000 ] && { bad "D58-swap: publisher pause marker never appeared"; kill -9 "$pid" 2>/dev/null; break; }
+done
+tmp=$(find "$scratch" -maxdepth 1 -name '.repro881_pub.*' ! -name '*.moved' | head -1)
+if [ -n "$tmp" ]; then
+  mv "$tmp" "$tmp.moved" && ln -s "$scratch/victim58" "$tmp"
+fi
+wait "$pid"; rc=$?
+if [ "$rc" -ne 0 ] && grep -q "no longer names the exclusively" "$scratch/out.log" \
+   && ! grep -q "^report:" "$scratch/out.log" \
+   && [ "$(cat "$scratch/r.md")" = "PRIOR58" ] \
+   && [ "$(cat "$scratch/victim58")" = "SAFE-VICTIM58" ] \
+   && [ -L "$tmp" ]; then
+  ok "D58 post-create swap: bind check failed publication, prior report byte-identical, victim and foreign object untouched"
+else
+  bad "D58 post-create swap: rc=$rc"; tail -3 "$scratch/out.log"
+fi
+rm -rf "$scratch"
+
 echo "SIGNAL-TEST: $pass passed, $fail failed"
 [ "$fail" -eq 0 ]
