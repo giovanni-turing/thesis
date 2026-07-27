@@ -99,6 +99,13 @@ if (cd "$LOADER" && "$TESE/eda/.venv/bin/python" selftest.py >"$TMP/self.log" 2>
   ok "loader selftest (collision guard, dir coverage, run_id injectivity)"
 else bad "loader selftest FAILED"; sed 's/^/        /' "$TMP/self.log" | tail -6; fi
 
+# A5b K16 guard negative-suite (D44/D46/D47, D48-isolated: temp-tree copy,
+# mocked generator, DB interception; canonical artifact+generator asserted
+# byte-unchanged on exit -- safe to run continuously).
+if (cd "$LOADER" && "$TESE/eda/.venv/bin/python" selftest_d44.py >"$TMP/self_d44.log" 2>&1); then
+  ok "K16 guard negative-suite (corrupt/settled/gen-fail/exclusion/freshness zero-write)"
+else bad "K16 guard negative-suite FAILED"; sed 's/^/        /' "$TMP/self_d44.log" | tail -8; fi
+
 # A6 idempotency -- a re-run must CHANGE NOTHING.
 #
 # Judge by content hashes, not by main.py's stdout counters. SCHEMA_GUIDE §6.14: three
