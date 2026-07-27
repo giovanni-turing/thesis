@@ -2861,3 +2861,24 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   quickstart/manifest rows for `tab:cl-ledger-*` (updated to name the join
   script and the `.zst` inflate step); `supplementary/SUPPLEMENTARY.md` S7;
   `supplementary/manifest_full.md` composed row.
+
+### phase3.5-style-pass (2026-07-27)
+
+- **Artifact:** commits 42d9074, fa1b897, 4391d94, 43e98a4 (tex/);
+  harness `verification/style_immutability.py` + baseline.
+- **Command:** multi-agent copy-edit (4 opus reviewers, defects-only brief)
+  + direct review of intro/related/conclusion/tese/apendice*; every finding
+  verified against source before applying; per-batch immutability check.
+- **Result:** ~43 verified fixes, zero numeric/ref/cite/env drift (2
+  documented deliberate baseline regens). **Claim correction:** the tie
+  sentence at five loci said "four of the five evaluation windows";
+  frontier per-window p99 adjudicates exact ties on {aggregate, burst1,
+  burst4, burst5} with the calm day near-tying only (681.117 vs
+  684.999 ms) -> corrected to "four of the five composed windows"
+  (closedloop x2, intro, conclusion, EN+PT abstracts). Also: workload
+  windows cover (not are) episodes; trace-eda's "evaluation windows"
+  misuse for the 6+1 replay set -> "workload windows"; predictors
+  "burst episodes" -> "burst windows" where the evidence is the window
+  split. Build: 0 errors, 0 undefined refs.
+- **Feeds:** tex/ manuscript (defense readiness); supersedes nothing --
+  no result value changed.
