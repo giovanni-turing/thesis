@@ -1,0 +1,153 @@
+{
+ "cell": "engine__hf_fa2",
+ "rep": 3,
+ "engine": "hf_fa2",
+ "type": "fn_sweep",
+ "wall_s": 316.0,
+ "rows": [
+  {
+   "n_images": 1,
+   "mean_ms": 11.128,
+   "ci95_ms": 0.0439,
+   "p50_ms": 11.1101,
+   "min_ms": 11.0263,
+   "ms_per_img": 11.128,
+   "sm_clock_mhz": 2377,
+   "aic_ms": 8.162,
+   "ratio_meas_over_aic": 1.3634
+  },
+  {
+   "n_images": 2,
+   "mean_ms": 17.3966,
+   "ci95_ms": 0.0255,
+   "p50_ms": 17.3947,
+   "min_ms": 17.192,
+   "ms_per_img": 8.6983,
+   "sm_clock_mhz": 2377,
+   "aic_ms": 13.271,
+   "ratio_meas_over_aic": 1.3109
+  },
+  {
+   "n_images": 4,
+   "mean_ms": 30.4892,
+   "ci95_ms": 0.0642,
+   "p50_ms": 30.4857,
+   "min_ms": 30.318,
+   "ms_per_img": 7.6223,
+   "sm_clock_mhz": 2385,
+   "aic_ms": 23.127,
+   "ratio_meas_over_aic": 1.3183
+  },
+  {
+   "n_images": 6,
+   "mean_ms": 43.2275,
+   "ci95_ms": 0.0034,
+   "p50_ms": 43.2264,
+   "min_ms": 43.053,
+   "ms_per_img": 7.2046,
+   "sm_clock_mhz": 2385,
+   "aic_ms": 31.792,
+   "ratio_meas_over_aic": 1.3597
+  },
+  {
+   "n_images": 8,
+   "mean_ms": 58.2782,
+   "ci95_ms": 0.0347,
+   "p50_ms": 58.2737,
+   "min_ms": 58.1006,
+   "ms_per_img": 7.2848,
+   "sm_clock_mhz": 2385,
+   "aic_ms": 43.126,
+   "ratio_meas_over_aic": 1.3513
+  },
+  {
+   "n_images": 16,
+   "mean_ms": 122.9765,
+   "ci95_ms": 0.0288,
+   "p50_ms": 122.9692,
+   "min_ms": 122.8034,
+   "ms_per_img": 7.686,
+   "sm_clock_mhz": 2385,
+   "aic_ms": 82.217,
+   "ratio_meas_over_aic": 1.4958
+  },
+  {
+   "n_images": 32,
+   "mean_ms": 253.1388,
+   "ci95_ms": 0.1102,
+   "p50_ms": 253.1193,
+   "min_ms": 252.7229,
+   "ms_per_img": 7.9106,
+   "sm_clock_mhz": 2385,
+   "aic_ms": 160.196,
+   "ratio_meas_over_aic": 1.5802
+  },
+  {
+   "n_images": 64,
+   "mean_ms": 510.5419,
+   "ci95_ms": 0.3571,
+   "p50_ms": 510.4758,
+   "min_ms": 509.5502,
+   "ms_per_img": 7.9772,
+   "sm_clock_mhz": 2392,
+   "aic_ms": 316.369,
+   "ratio_meas_over_aic": 1.6138
+  }
+ ],
+ "protocol": {
+  "ns": [
+   1,
+   2,
+   4,
+   6,
+   8,
+   16,
+   32,
+   64
+  ],
+  "nruns": 5,
+  "iters": 50,
+  "warmup": 10
+ },
+ "reference": "collector_artifacts/phaseE_physical_anchor/anchor_flash_attention_2_5x50.json",
+ "clock_start": {
+  "sm_mhz": 2392,
+  "mem_mhz": 13801,
+  "max_sm_mhz": 3105,
+  "persistence": "Enabled",
+  "throttle_hex": "0x0000000000000000",
+  "temp_c": 60,
+  "power_w": 402.3,
+  "mem_used_mib": 5134,
+  "util_pct": 100,
+  "compute_apps": [
+   {
+    "pid": 2618277,
+    "mib": 5110
+   }
+  ],
+  "utc": "2026-07-27T17:21:21Z"
+ },
+ "clock_end": {
+  "sm_mhz": 2392,
+  "mem_mhz": 13801,
+  "max_sm_mhz": 3105,
+  "persistence": "Enabled",
+  "throttle_hex": "0x0000000000000004",
+  "temp_c": 62,
+  "power_w": 400.55,
+  "mem_used_mib": 5134,
+  "util_pct": 99,
+  "compute_apps": [
+   {
+    "pid": 2618277,
+    "mib": 5110
+   }
+  ],
+  "utc": "2026-07-27T17:26:37Z"
+ },
+ "encoder": {
+  "attn": "flash_attention_2",
+  "n_params": 576388336
+ }
+}

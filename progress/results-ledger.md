@@ -2941,7 +2941,7 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
 - **Feeds:** bridge D29/D30 closure (msgs 085/086); v_joint_e2e comment;
   supersedes the 2026-07-26 join artifact and schema 38's 14/2/13 comment.
 
-### silicon-anchor-tier5-engine-adjudication (2026-07-27)
+### silicon-anchor-tier5-engine-adjudication (2026-07-27)  [v1 -- IMPRECISE, superseded by the v2 entry below; bridge D63]
 
 - **Artifact:** `simulation/results/silicon_anchor/reps/engine__hf_sdpa/rep001-005/`,
   `engine__hf_fa2/rep001-005/` (daemon fn-sweeps);
@@ -2970,3 +2970,39 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
 - **Feeds:** the physical-anchor manuscript section (pending; trigger was
   tier-5 landing per author directive "so tier 5 should come first");
   static-C8 engine-sensitivity caveat; tier-1 ledger entry above.
+
+
+### silicon-anchor-tier5-engine-adjudication-v2 (2026-07-27, supersedes v1)
+
+- **Corrections (bridge D63):** the v1 entry overstated four exact claims;
+  the qualitative conclusion (static C8 feasible under the vLLM engine)
+  survives every correction.
+- **Artifact:** the ten HF repetition directories are NOW COMMITTED
+  (`reps/engine__hf_sdpa/rep001-005/`, `reps/engine__hf_fa2/rep001-005/`,
+  rep.json each) alongside the previously committed
+  `engine__vllm_serving/vllm_eager_dense_rerun.{py,json}`.
+- **vLLM replication bound:** the rerun agrees with the canonical phase-E
+  artifact within <=0.51% at the four anchor shapes (worst N=1:
+  7.9899 vs 8.0305 ms = 0.5056%). Across the dense N<=64 grid the
+  rerun/AIC ratio spans 0.9174 (N=5) to 1.1292 (N=52); the N=52 cell is
+  12.92%, OUTSIDE the manuscript's 12.8% replication envelope. The rerun
+  is tier-5 adjudication evidence ONLY -- the manuscript's replication
+  artifact remains the original phase-E measurement backing
+  tab:app-engine and the 12.8% envelope; no manuscript propagation is
+  made or claimed from the rerun.
+- **HF engines (5 reps each, committed):** hf_sdpa median ratios span
+  1.31-1.61, increasing at compute-dominant N but NON-monotone at small N
+  (1.3673 at N=1 -> 1.3077 at N=2; 1.3613 at N=6 -> 1.3540 at N=8).
+  Requested-FA2 differs from SDPA by at most 0.173% (N=2) and by
+  <=0.006% only at N=32/64 -- consistent with the same kernels running
+  at the compute-dominant shapes; the fa2 label records the REQUEST
+  (transformers attn_implementation not engaged for this tower), as v1
+  correctly diagnosed.
+- **Static-C8 burst3, EXACT queue retimes** (runner's own `retime` over
+  the frozen dispatch; reproduced independently by reviewer and author,
+  digit-identical): stored sim p99 717.755 ms; direct vLLM per-batch
+  service p99 **746.994 ms**; per-N simulator-scaled **748.409 ms** --
+  both PASS the 1 s bound. v1's "~759 ms" was an N=64 scalar
+  multiplication, a rough bound only, superseded by these retimes.
+- **Feeds:** bridge D63 closure; the physical-anchor manuscript section
+  (pending) must cite the retimed values, not the scalar.

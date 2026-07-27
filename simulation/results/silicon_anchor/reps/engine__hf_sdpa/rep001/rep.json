@@ -1,0 +1,153 @@
+{
+ "cell": "engine__hf_sdpa",
+ "rep": 1,
+ "engine": "hf_sdpa",
+ "type": "fn_sweep",
+ "wall_s": 316.15,
+ "rows": [
+  {
+   "n_images": 1,
+   "mean_ms": 11.1868,
+   "ci95_ms": 0.0246,
+   "p50_ms": 11.1795,
+   "min_ms": 11.035,
+   "ms_per_img": 11.1868,
+   "sm_clock_mhz": 2377,
+   "aic_ms": 8.162,
+   "ratio_meas_over_aic": 1.3706
+  },
+  {
+   "n_images": 2,
+   "mean_ms": 17.3767,
+   "ci95_ms": 0.0362,
+   "p50_ms": 17.3899,
+   "min_ms": 17.1651,
+   "ms_per_img": 8.6884,
+   "sm_clock_mhz": 2377,
+   "aic_ms": 13.271,
+   "ratio_meas_over_aic": 1.3094
+  },
+  {
+   "n_images": 4,
+   "mean_ms": 30.4889,
+   "ci95_ms": 0.017,
+   "p50_ms": 30.5008,
+   "min_ms": 30.2871,
+   "ms_per_img": 7.6222,
+   "sm_clock_mhz": 2385,
+   "aic_ms": 23.127,
+   "ratio_meas_over_aic": 1.3183
+  },
+  {
+   "n_images": 6,
+   "mean_ms": 43.1736,
+   "ci95_ms": 0.0216,
+   "p50_ms": 43.1874,
+   "min_ms": 42.8973,
+   "ms_per_img": 7.1956,
+   "sm_clock_mhz": 2377,
+   "aic_ms": 31.792,
+   "ratio_meas_over_aic": 1.358
+  },
+  {
+   "n_images": 8,
+   "mean_ms": 58.3283,
+   "ci95_ms": 0.0138,
+   "p50_ms": 58.3318,
+   "min_ms": 58.1458,
+   "ms_per_img": 7.291,
+   "sm_clock_mhz": 2385,
+   "aic_ms": 43.126,
+   "ratio_meas_over_aic": 1.3525
+  },
+  {
+   "n_images": 16,
+   "mean_ms": 122.988,
+   "ci95_ms": 0.0156,
+   "p50_ms": 122.9883,
+   "min_ms": 122.7853,
+   "ms_per_img": 7.6867,
+   "sm_clock_mhz": 2385,
+   "aic_ms": 82.217,
+   "ratio_meas_over_aic": 1.4959
+  },
+  {
+   "n_images": 32,
+   "mean_ms": 252.9141,
+   "ci95_ms": 0.0433,
+   "p50_ms": 252.9253,
+   "min_ms": 252.5396,
+   "ms_per_img": 7.9036,
+   "sm_clock_mhz": 2385,
+   "aic_ms": 160.196,
+   "ratio_meas_over_aic": 1.5788
+  },
+  {
+   "n_images": 64,
+   "mean_ms": 509.9546,
+   "ci95_ms": 0.1307,
+   "p50_ms": 509.9195,
+   "min_ms": 509.1858,
+   "ms_per_img": 7.968,
+   "sm_clock_mhz": 2392,
+   "aic_ms": 316.369,
+   "ratio_meas_over_aic": 1.6119
+  }
+ ],
+ "protocol": {
+  "ns": [
+   1,
+   2,
+   4,
+   6,
+   8,
+   16,
+   32,
+   64
+  ],
+  "nruns": 5,
+  "iters": 50,
+  "warmup": 10
+ },
+ "reference": "collector_artifacts/phaseE_physical_anchor/anchor_sdpa_locked2400.json",
+ "clock_start": {
+  "sm_mhz": 2392,
+  "mem_mhz": 14001,
+  "max_sm_mhz": 3105,
+  "persistence": "Enabled",
+  "throttle_hex": "0x0000000000000000",
+  "temp_c": 35,
+  "power_w": 53.4,
+  "mem_used_mib": 1806,
+  "util_pct": 0,
+  "compute_apps": [
+   {
+    "pid": 2618277,
+    "mib": 1782
+   }
+  ],
+  "utc": "2026-07-27T16:44:28Z"
+ },
+ "clock_end": {
+  "sm_mhz": 2392,
+  "mem_mhz": 13801,
+  "max_sm_mhz": 3105,
+  "persistence": "Enabled",
+  "throttle_hex": "0x0000000000000000",
+  "temp_c": 58,
+  "power_w": 398.18,
+  "mem_used_mib": 5134,
+  "util_pct": 94,
+  "compute_apps": [
+   {
+    "pid": 2618277,
+    "mib": 5110
+   }
+  ],
+  "utc": "2026-07-27T16:49:44Z"
+ },
+ "encoder": {
+  "attn": "sdpa",
+  "n_params": 576388336
+ }
+}
