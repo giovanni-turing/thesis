@@ -89,14 +89,11 @@ of Chapter~\ref{cap:closedloop} (Table~\ref{tab:cl-ledger-joint}) confirms.
 \emph{evaluation window} --- the padded trace slice a replay runs, enclosing
 a burst episode or a calm day --- never the request, the rolling forecast
 origin, or the factorial cell. ``Episode'' names the burst \emph{event}
-itself (the contiguous above-p99 excursion); every graded p99, worker-time
+itself (the contiguous above-p99 excursion); every graded p99, worker-time,
 and pass/fail quantity is computed on the enclosing padded window as declared
 in \texttt{simulation/windows.json}. Two of the five evaluation windows
-overlap slightly, so they are windows rather than fully independent units;
-Chapter~\ref{cap:closedloop} discloses the overlap. A burst episode is a contiguous above-p99
-excursion of the image signal as defined in Chapter~\ref{cap:trace-eda}; a
-\emph{scenario window} is the trace slice a simulation runs, enveloping an
-episode with calm margin. Configuration counts therefore report
+overlap slightly, so they are correlated rather than fully independent units;
+Chapter~\ref{cap:closedloop} discloses the overlap. Configuration counts therefore report
 \emph{parameter robustness}, never sample size. Resource use is reported as
 provisioned worker- or replica-time (``resource-time''); time on different
 GPU classes is never merged into one economic figure without an explicit,
@@ -328,8 +325,8 @@ variants than vLLM's path). Two modules sit outside AIC's graph altogether
 its FLOPs suggest) and the DeepStack gather --- and, removed, leave
 AIC-comparable work within ${\approx}12\%$ of prediction. The DeepStack
 merger MLPs themselves \emph{are} modeled: forcing the projector instance
-count from four to one scales predicted projector cost by exactly
-$4.00\times$. Consistently, the gap shrinks from $1.45\times$ at $448^2$ to
+count from four to one rescales predicted projector cost by exactly the
+$4.00\times$ instance ratio. Consistent with this, the gap shrinks from $1.45\times$ at $448^2$ to
 $1.14$--$1.16\times$ at larger images as fixed per-layer dispatch overhead
 amortizes over longer kernels. Per-term kernel figures are in the provenance
 manifest (Appendix~\ref{ap:artifacts}).
@@ -581,7 +578,7 @@ contribution.
 \subsection{Setup}
 \label{sec:val-setup}
 
-The anchor window is burst3, the one-minute-onset episode and the hardest
+The anchor window is burst3, the one-minute-onset window and the hardest
 case in the fleet matrix, replayed in real time (\SI{27}{\minute}, 3{,}093
 scheduled requests) by a fixed-schedule load client (aiperf) that
 synthesizes each request at its trace timestamp with its exact token counts
@@ -639,14 +636,14 @@ the forecast policy passes the tail SLA live exactly as simulated, the
 reactive policy fails likewise with its p99 within 1.1\% of the simulation,
 and provisioned replica-time agrees within 8\%. The agreement extends below
 the aggregates. The \emph{demand} path is byte-identical: for the first
-twelve planner ticks live and offline planners log the same predicted demand
+twelve planner ticks, live and offline planners log the same predicted demand
 to the second decimal (first tick \texttt{29.86 rps} in both, both computing
 \texttt{6 replicas}), predictor, registry, construction order, and demand
 conversion being the same code with only the clock differing. The
 \emph{capacity} belief already differs at the first tick (live \texttt{5.71}
 versus offline \texttt{5.30 engine\_rps}, both still yielding 6 replicas)
 and drifts within its expected band throughout, its regression being tuned
-from sampled forward passes that arrive in different order live; but the
+from sampled forward passes that arrive in a different order live; but the
 \emph{applied} capacity, after the budget cap, tracks the same trajectory.
 Client-observed TTFT tails land within 1.1--6.8\% of the simulated ones (a
 single live run per policy, so this is a point difference between two
@@ -731,7 +728,7 @@ prefills that decide the burst-window TTFT tail.
 
 \emph{Per-request token accounting mixes conventions, with aligned biases.}
 The simulation costs encoder work as a full $448^2$ forward per image and
-ships $196 \times 4096$ post-merge tokens per image across the seam, but
+ships $196 \times 4096$ post-merge values per image across the seam, but
 sets the language pool's prefill length to the trace's
 \texttt{ContextTokens} verbatim --- which embeds the \emph{traced} model's
 vision tokenization (${\approx}66$ tokens per image,
@@ -748,9 +745,10 @@ both-conventions sensitivity run remains future work.
 \emph{Image size is assumed, not recorded.} All encoder timing derives from
 a single RTX~5090 node (locked clocks), so cross-unit silicon variance is
 unquantified, and because the trace records no image sizes the uniform
-$448^2$ assumption can only be stress-tested, not validated. Repriced at
-other resolutions through the collected operator database (per-cell numbers
-in Appendix~\ref{ap:artifacts}), the burst-window verdict holds at $448^2$
+$448^2$ assumption can only be stress-tested, not validated. When the
+encoder is repriced at other resolutions through the collected operator
+database (per-cell numbers in Appendix~\ref{ap:artifacts}), the
+burst-window verdict holds at $448^2$
 and below on both modeled fabrics, with the no-queue service time crossing
 the bound near 690--705\,px, so the assumed resolution sits just below it.
 The structural finding is more useful: provisioned worker-time is

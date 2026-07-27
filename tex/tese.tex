@@ -11,7 +11,9 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{siunitx}
-\sisetup{round-mode=none}
+% Uniform digit grouping (phase 3.5): one separator style everywhere ---
+% commas, from four digits --- matching the manuscript's manual {,} usage.
+\sisetup{round-mode=none, group-separator={,}, group-minimum-digits=4}
 \DeclareSIUnit{\flop}{FLOP}  % used by the aiconfigurator chapter (TFLOP/s)
 \usepackage{array}
 \usepackage{booktabs}

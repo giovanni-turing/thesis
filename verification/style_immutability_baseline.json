@@ -1156,7 +1156,7 @@
    "96,128,192,256,512": 1,
    "97": 1,
    "98": 1,
-   "99": 34
+   "99": 33
   },
   "refs": {
    "ap:artifacts": 7,
@@ -1165,7 +1165,7 @@
    "cap:closedloop": 8,
    "cap:metodologia": 1,
    "cap:predictors": 2,
-   "cap:trace-eda": 4,
+   "cap:trace-eda": 3,
    "cap:twopool": 1,
    "cap:validation": 1,
    "fig:aic-fn": 2,
@@ -1640,7 +1640,7 @@
    "32": 1,
    "34": 1,
    "3698038.3698564": 1,
-   "4": 1,
+   "4": 2,
    "5": 2,
    "5,60": 1,
    "5.60": 1,
