@@ -34,10 +34,11 @@ EXPECTED_MISSING = {
     "fulltrace_reactive": "defense/anim/data/a13_runs/ft_reactive_L30.jsonl",
 }
 EVAL_WINDOWS = {"burst1", "burst3", "burst4", "burst5", "steady24h"}
-# D50 round 2: the error is parsed EXACTLY -- full-line match, exact exception
-# type token, exact quoted missing path. Substring containment is not accepted.
+# D50 round 2 + D55: the error is parsed EXACTLY -- full-STRING match (\Z, so
+# not even a terminal newline is accepted), exact exception type token, exact
+# quoted missing path. Substring containment is not accepted.
 FNF_RE = re.compile(
-    r"^([A-Za-z_][A-Za-z0-9_]*): \[Errno 2\] No such file or directory: '([^']*)'$")
+    r"([A-Za-z_][A-Za-z0-9_]*): \[Errno 2\] No such file or directory: '([^']*)'\Z")
 
 
 def frontier_verdict_ok(rc: int, verdict_line: str) -> bool:
@@ -45,9 +46,11 @@ def frontier_verdict_ok(rc: int, verdict_line: str) -> bool:
 
 
 def fresh_output_ok(path: str) -> bool:
-    """D50 round 2: the join PRELOADS an existing --out, so a run is valid only
-    if the output path is absent at invocation time."""
-    return not os.path.exists(path)
+    """D50 round 2 + D55: the join PRELOADS an existing --out, so a run is
+    valid only if the output path is absent at invocation time -- including
+    dangling-symlink residue, which os.path.exists reports as absent; lexists
+    catches it."""
+    return not os.path.lexists(path)
 
 
 def stage_a_ok(rc: int, got: dict, committed: dict, checkout_root: str) -> str:
@@ -69,7 +72,7 @@ def stage_a_ok(rc: int, got: dict, committed: dict, checkout_root: str) -> str:
         if got[c] != committed[c]:
             return f"BAD value-drift {c}"
     for c, rel in EXPECTED_MISSING.items():
-        m = FNF_RE.match(got[c].get("error", ""))
+        m = FNF_RE.fullmatch(got[c].get("error", ""))
         if not m:
             return f"BAD error-form {c}"
         if m.group(1) != "FileNotFoundError":
@@ -194,6 +197,8 @@ def _selftest() -> int:
     t("stageA-wrong-type", stage_a_ok(0, evil, committed, root).startswith("BAD error-type"), True)
     marker = {**got, c0: {"error": f"FileNotFoundError: [Errno 2] No such file or directory: '{root}/other.json' (cf {want0})"}}
     t("stageA-marker-injection", stage_a_ok(0, marker, committed, root).startswith("BAD"), True)
+    newline = {**got, c0: {"error": got[c0]["error"] + "\n"}}
+    t("stageA-terminal-newline", stage_a_ok(0, newline, committed, root).startswith("BAD error-form"), True)
     unrelated = {**got, c0: fnf(f"{root}/some/unrelated/path.json")}
     t("stageA-unrelated-missing-path", stage_a_ok(0, unrelated, committed, root).startswith("BAD error-path"), True)
     tenth = {**got, "extra_cell": {"v": 99}}
@@ -210,6 +215,11 @@ def _selftest() -> int:
         t("fresh-output-absent", fresh_output_ok(stale), True)
         open(stale, "w").write("{}")
         t("fresh-output-stale-preload", fresh_output_ok(stale), False)
+        os.unlink(stale)
+        dangling = os.path.join(td, "dangling.json")
+        os.symlink(os.path.join(td, "no-such-target"), dangling)
+        t("fresh-output-dangling-symlink", fresh_output_ok(dangling), False)
+        os.unlink(dangling)
 
         cp, jp = _synthetic(td)
         h = headlines(cp, jp)

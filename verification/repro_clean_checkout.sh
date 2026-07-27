@@ -54,17 +54,30 @@ else PY=$(command -v python3); fi
 # mktemp aborts instead of running in an unowned location.
 RUN=$(mktemp -d "${REPRO_SCRATCH:-${TMPDIR:-/tmp}}/repro881.XXXXXX") \
   || { echo "FATAL: cannot create run directory" >&2; exit 1; }
-REPORT=${REPRO_REPORT:-$RUN/repro_clean_checkout_report.md}
+# D54: the default report lives OUTSIDE the run directory removed at EXIT, so
+# a successful default run's advertised report survives cleanup.
+if [ -n "${REPRO_REPORT:-}" ]; then REPORT=$REPRO_REPORT
+else
+  REPORT=$(mktemp "${REPRO_SCRATCH:-${TMPDIR:-/tmp}}/repro881_report.XXXXXX.md") \
+    || { echo "FATAL: cannot create report file" >&2; rm -rf "$RUN"; exit 1; }
+fi
 W=$RUN/checkout
 
 cleanup() {
   git -C "$TESE" worktree remove --force "$W" >/dev/null 2>&1
   rm -rf "$RUN"
 }
-on_sig() { trap - EXIT; cleanup; exit $((128 + $1)); }
-trap 'on_sig 2' INT
-trap 'on_sig 15' TERM
+# D54: no-argument handlers (no arithmetic, no positional refs), so the trap
+# body cannot mis-parse regardless of what the shell was executing when the
+# signal arrived; each disables all traps, cleans, and exits 128+signal.
+on_int()  { trap - EXIT INT TERM; cleanup; exit 130; }
+on_term() { trap - EXIT INT TERM; cleanup; exit 143; }
+trap on_int INT
+trap on_term TERM
 trap cleanup EXIT
+# Test-only hook (repro_signal_test.sh): REPRO_PAUSE_AT=tools|worktree inserts
+# a 5 s pause at that phase so signal delivery is deterministic.
+pause_at() { [ "${REPRO_PAUSE_AT:-}" = "$1" ] && sleep 5; return 0; }
 
 pass=0; fail=0
 R=""
@@ -82,14 +95,19 @@ publish() {
 }
 
 HEAD_SHA=$(git -C "$TESE" rev-parse HEAD)
+pause_at tools
+PYV=$("$PY" -c 'import sys, numpy, pandas; print(f"python {sys.version.split()[0]}, numpy {numpy.__version__}, pandas {pandas.__version__}")' 2>/dev/null) || PYV="PYTHON ENV UNUSABLE"
+ZV=$(zstd --version 2>&1 | sed 's/\*\*\* //;s/, by.*//' | head -1)
+GV=$(git --version)
 say "# Clean-checkout reproduction of three headline results (§8.8-1, runner v2)"
 say ""
 say "repo: $TESE"
 say "HEAD: $HEAD_SHA  ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
-say "tools: $("$PY" -c 'import sys, numpy, pandas; print(f"python {sys.version.split()[0]}, numpy {numpy.__version__}, pandas {pandas.__version__}")' 2>/dev/null || echo 'PYTHON ENV UNUSABLE'); $(zstd --version 2>&1 | sed 's/\*\*\* //;s/, by.*//' | head -1); $(git --version)"
+say "tools: $PYV; $ZV; $GV"
 say ""
 
 # ---- fresh detached worktree (unique scratch; trap-cleaned) ----
+pause_at worktree
 if git -C "$TESE" worktree add --detach "$W" HEAD >/dev/null 2>&1 \
    && [ "$(git -C "$W" status --porcelain | wc -l)" -eq 0 ]; then
   ok "diagnostic: clean detached worktree at HEAD"
@@ -140,8 +158,10 @@ for f in defense/anim/data/a2_runs/steady24h_forecast_L30.jsonl \
          defense/anim/data/a13_runs/ft_llm_reactive.requests.jsonl; do
   zstd -d -q -f "$W/$f.zst" -o "$W/$f" || { ZOK=0; bad "inflating $f.zst"; }
 done
-rm -f "$RUN/composed_B.json"
-[ -e "$RUN/composed_B.json" ] && { bad "stale composed_B.json could not be removed"; publish; exit 1; }
+rm -f "$RUN/composed_B.json" || { bad "removal of composed_B.json failed"; publish; exit 1; }
+if [ -e "$RUN/composed_B.json" ] || [ -L "$RUN/composed_B.json" ]; then
+  bad "stale composed_B.json residue (incl symlink) after removal"; publish; exit 1
+fi
 TESE_ROOT=$W "$PY" "$W/simulation/composed_fill_join.py" \
   --out "$RUN/composed_B.json" >"$RUN/composed_B.log" 2>&1
 brc=$?
@@ -174,14 +194,26 @@ else
   bad "headline predicate failure"
 fi
 
+# ---- Diagnostic: archive manifest verifies from tracked .zst alone ----
+say ""
+say "## Diagnostic — replay-archive manifest (tracked archives only)"
+if (cd "$W" && "$PY" verification/make_replay_archive_manifest.py --verify \
+      >"$RUN/manifest_verify.log" 2>&1); then
+  ok "manifest --verify inside the clean checkout: recomputed-from-stream fields equal the tracked manifest"
+else
+  bad "manifest --verify in clean checkout (see $RUN/manifest_verify.log)"
+fi
+
 # ---- Diagnostic: Stage-A tracked-only boundary (archives deflated) ----
 say ""
 say "## Diagnostic — tracked-only boundary (all six .zst deflated)"
 for f in "$W"/defense/anim/data/a2_runs/*.jsonl "$W"/defense/anim/data/a13_runs/*.jsonl; do
   [ -e "$f" ] && rm -f "$f"
 done
-rm -f "$RUN/composed_A.json"
-[ ! -e "$RUN/composed_A.json" ] || { bad "stale composed_A.json could not be removed (join would PRELOAD it)"; publish; exit 1; }
+rm -f "$RUN/composed_A.json" || { bad "removal of composed_A.json failed"; publish; exit 1; }
+if [ -e "$RUN/composed_A.json" ] || [ -L "$RUN/composed_A.json" ]; then
+  bad "stale composed_A.json residue (incl symlink; join would PRELOAD it)"; publish; exit 1
+fi
 TESE_ROOT=$W "$PY" "$W/simulation/composed_fill_join.py" \
   --out "$RUN/composed_A.json" >"$RUN/composed_A.log" 2>&1
 arc=$?

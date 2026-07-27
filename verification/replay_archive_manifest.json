@@ -1,6 +1,6 @@
 {
  "package": "composed-join replay inputs (tab:cl-ledger-* / K16 pipeline)",
- "generator": "verification/make_replay_archive_manifest.py (tracked; --verify recomputes and compares)",
+ "generator": "verification/make_replay_archive_manifest.py (tracked; --verify recomputes from the tracked archives alone and compares)",
  "lineage": "Replay outputs derived from AzureLMMInferenceDataset2025 (Microsoft/ModServe public production trace, CC-BY; see data/source/README.md) via the simulation pipeline of tex/metodologia.tex; no raw trace rows are redistributed beyond what the tracked trace file already carries.",
  "terms": "Derived data package, distributed with the thesis repository under the same terms as its source attribution (CC-BY for trace-derived content); cite the thesis and the dataset.",
  "files": [
@@ -19,7 +19,7 @@
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
+   "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   },
   {
    "path": "defense/anim/data/a2_runs/steady24h_reactive_L30.jsonl.zst",
@@ -36,7 +36,7 @@
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
+   "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   },
   {
    "path": "defense/anim/data/a13_runs/ft_static_C8.jsonl.zst",
@@ -53,7 +53,7 @@
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
+   "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   },
   {
    "path": "defense/anim/data/a13_runs/ft_llm_static.requests.jsonl.zst",
@@ -70,7 +70,7 @@
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
+   "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   },
   {
    "path": "defense/anim/data/a13_runs/ft_reactive_L30.jsonl.zst",
@@ -87,7 +87,7 @@
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
+   "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   },
   {
    "path": "defense/anim/data/a13_runs/ft_llm_reactive.requests.jsonl.zst",
@@ -104,7 +104,7 @@
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
+   "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   }
  ]
 }
