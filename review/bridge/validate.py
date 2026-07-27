@@ -169,8 +169,11 @@ def main():
                     continue
                 tkey, verdict = mm.group(1), mm.group(2)
                 prev = adjudicated_threads.get(tkey)
-                if prev is not None and prev[1] != verdict:
-                    errors.append(f"{m['file']}: conflicting ruling for {tkey}: {verdict} vs {prev[1]} in {prev[0]}")
+                if prev is not None:
+                    if prev[1] != verdict:
+                        errors.append(f"{m['file']}: conflicting ruling for {tkey}: {verdict} vs {prev[1]} in {prev[0]}")
+                    else:
+                        errors.append(f"{m['file']}: duplicate ruling for {tkey} (already ruled in {prev[0]}) -- one ruling, one source")
                     continue
                 n_rulings += 1
                 adjudicated_threads[tkey] = (m["file"], verdict)

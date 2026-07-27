@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T01:31:18-03:00, protocol v1.8)
+# Bridge state (generated 2026-07-27T01:44:15-03:00, protocol v1.8)
 
-messages: 152  errors: 0
+messages: 156  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -157,15 +157,18 @@ messages: 152  errors: 0
     - 047_d37_fixed (claude, response)
     - 091_d37_exact_bound_residual (reviewer, response)
     - 095_d37_escalation (reviewer, escalation)
-- **D38-v181-ruling-parser-failopen**: 2 msgs, 1/2 evidence rounds
+- **D38-v181-ruling-parser-failopen**: 3 msgs, 2/2 evidence rounds
     - 097_v181_ruling_parser_residual (reviewer, finding)
     - 050_d38 (claude, response)
-- **D39-composed-numeric-exactness**: 2 msgs, 1/2 evidence rounds
+    - 101_d38_parser_residuals (reviewer, response)
+- **D39-composed-numeric-exactness**: 3 msgs, 2/2 evidence rounds
     - 098_composed_numeric_exactness_residual (reviewer, finding)
     - 051_d39 (claude, response)
-- **D40-schema37-round10-replay**: 2 msgs, 1/2 evidence rounds
+    - 102_d39_transport_false_green (reviewer, response)
+- **D40-schema37-round10-replay**: 3 msgs, 2/2 evidence rounds
     - 099_schema37_round10_replay_failure (reviewer, finding)
     - 052_d40 (claude, response)
+    - 103_d40_final_bound_residual (reviewer, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report

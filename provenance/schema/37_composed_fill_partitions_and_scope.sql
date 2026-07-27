@@ -247,6 +247,13 @@ BEGIN
         (('provenance.encoder_series_composed_fill')::regclass,   ('provenance.encoder_series')::regclass))) <> 3 THEN
     RAISE EXCEPTION 'D37 post-condition: composed_fill relations are not all true partitions';
   END IF;
+  IF (SELECT count(*) FROM pg_class c
+      WHERE c.oid IN (('provenance.composed_request_composed_fill')::regclass,
+                      ('provenance.llm_request_composed_fill')::regclass,
+                      ('provenance.encoder_series_composed_fill')::regclass)
+        AND pg_get_expr(c.relpartbound, c.oid) = 'FOR VALUES IN (''composed_fill'')') <> 3 THEN
+    RAISE EXCEPTION 'D40/D37 post-condition: a composed_fill child has a non-exact partition bound';
+  END IF;
   RAISE NOTICE '37_composed_fill: C306, C601 and D27-preservation post-conditions hold (%/%/% rows)', a, b, c;
 END $$;
 

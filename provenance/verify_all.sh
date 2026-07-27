@@ -400,22 +400,28 @@ art = json.load(open("/home/gio/tese/simulation/results/composed_fill/composed_f
 env = dict(os.environ)
 import math
 CANON = "/home/gio/tese/simulation/results/composed_fill/composed_fill_joined.json"
-q = ("select window_name||'_'||arm, requests, enc_p99_ms, ttft_p99_ms, e2e_p99_ms, "
-     "e2e_max_ms, itl_p99_ms, gpu_hours, composed_trace, (model is null)::text, coalesce(model,''), policy, "
-     "window_name_as_ingested from provenance.composed_e2e "
-     "where source_path = '" + CANON + "'")
+q = ("select row_to_json(t) from (select window_name, arm, requests, enc_p99_ms, "
+     "ttft_p99_ms, e2e_p99_ms, e2e_max_ms, itl_p99_ms, gpu_hours, composed_trace, "
+     "model, policy, window_name_as_ingested from provenance.composed_e2e "
+     "where source_path = '" + CANON + "') t")
 out = subprocess.run(["psql","-h","localhost","-p","5433","-U","goku","-d","postgres","-tAc",q],
                      capture_output=True, text=True, env=env).stdout
 db = {}
-for line in out.strip().splitlines():
-    f = line.split("|")
-    db[f[0]] = dict(requests=int(f[1]), enc_p99=float(f[2]), ttft_p99=float(f[3]),
-                    e2e_p99=float(f[4]), e2e_max=float(f[5]), itl_p99=float(f[6]),
-                    gpu_h=float(f[7]), composed_trace=f[8], model_null=(f[9]=="true"),
-                    model=f[10], policy=f[11], wnai=f[12])
+rows = [json.loads(l) for l in out.strip().splitlines() if l.strip()]
+if len(rows) != 9:
+    print("FAIL:rowcount=%d" % len(rows)); raise SystemExit
+for r in rows:
+    if set(r) != {"window_name","arm","requests","enc_p99_ms","ttft_p99_ms","e2e_p99_ms",
+                  "e2e_max_ms","itl_p99_ms","gpu_hours","composed_trace","model","policy",
+                  "window_name_as_ingested"}:
+        print("FAIL:fieldset"); raise SystemExit
+    db[r["window_name"]+"_"+r["arm"]] = dict(
+        requests=int(r["requests"]), enc_p99=float(r["enc_p99_ms"]), ttft_p99=float(r["ttft_p99_ms"]),
+        e2e_p99=float(r["e2e_p99_ms"]), e2e_max=float(r["e2e_max_ms"]), itl_p99=float(r["itl_p99_ms"]),
+        gpu_h=float(r["gpu_hours"]), composed_trace=r["composed_trace"],
+        model_null=(r["model"] is None), model=r["model"] or "", policy=r["policy"],
+        wnai=r["window_name_as_ingested"])
 bad = []
-if len(db) != 9:
-    bad.append(f"rowcount={len(db)}")
 for cell, d in art.items():
     key = d["window"] + "_" + d["arm"]
     row = db.get(key)
