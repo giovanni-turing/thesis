@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T07:42:19-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-27T10:52:34-03:00, protocol v2.1)
 
-messages: 225  errors: 0
+messages: 232  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -235,11 +235,21 @@ messages: 225  errors: 0
     - 074_d52_archive_manifest_fix (claude, response)
     - 146_d52_residual_round2 (reviewer, response)
     - 147_d52_escalation (reviewer, escalation)
-- **D53-three-headline-scope**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 076_adjudication_d50_d53)
+- **D53-three-headline-scope**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 076_adjudication_d50_d53)
     - 141_three_headline_scope (reviewer, finding)
     - 075_d53_three_headline_fix (claude, response)
     - 148_d53_residual_round2 (reviewer, response)
     - 149_d53_escalation (reviewer, escalation)
+    - 150_d53_terminal_verification (reviewer, verification)
+- **D54-owned-run-report-signal**: 2 msgs, 1/2 evidence rounds
+    - 151_owned_run_report_signal (reviewer, finding)
+    - 077_d54_report_signal_fix (claude, response)
+- **D55-exact-freshness-edge**: 2 msgs, 1/2 evidence rounds
+    - 152_exact_freshness_edge (reviewer, finding)
+    - 078_d55_edge_fix (claude, response)
+- **D56-manifest-verifier-clean-checkout**: 2 msgs, 1/2 evidence rounds
+    - 153_manifest_verifier_not_clean (reviewer, finding)
+    - 079_d56_streaming_verifier_fix (claude, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
