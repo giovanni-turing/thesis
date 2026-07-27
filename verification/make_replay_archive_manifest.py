@@ -65,6 +65,11 @@ FILES = {
 ROUND_TRIP_TEXT = ("decoded stream sha256/bytes/rows computed with decoder exit "
                    "status REQUIRED zero; at generation the stream is additionally "
                    "byte-compared chunkwise against the plain file")
+# D56 round 2: the archive-CREATION decoder version is FIXED provenance -- it
+# is never replaced by runtime metadata, so --verify equality holds under any
+# supported decoder (repro_requirements.txt permits zstd >= 1.5).
+ARCHIVE_ZSTD_VERSION = ("*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet *** "
+                        "(archive creation; any zstd >= 1.5 verifies)")
 
 
 class DecoderError(RuntimeError):
@@ -109,8 +114,6 @@ def stream_archive(comp_path, plain_path=None):
 
 
 def build(compare_plain):
-    zv = subprocess.run(["zstd", "--version"], capture_output=True,
-                        text=True).stdout.strip()
     rows = []
     for rel, meta in FILES.items():
         comp_p = os.path.join(TESE, rel) + ".zst"
@@ -130,7 +133,7 @@ def build(compare_plain):
             "ledger_anchor": meta["ledger_anchor"],
             "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
             "compression": "zstd -19 -T8",
-            "zstd_version": zv,
+            "zstd_version": ARCHIVE_ZSTD_VERSION,
             "round_trip_cmp": ROUND_TRIP_TEXT,
         })
     return {
@@ -173,6 +176,25 @@ def _selftest():
         except RuntimeError as e:
             print(f"FAIL: nonzero-decoder (wrong error: {e})")
             ok = False
+        # D56 round 2 compatibility probe: --verify equality must not depend on
+        # the RUNTIME decoder version. A shim zstd that reports a fake version
+        # but decodes normally must leave verification green.
+        shim = os.path.join(td, "bin")
+        os.makedirs(shim)
+        real = subprocess.run(["which", "zstd"], capture_output=True,
+                              text=True).stdout.strip()
+        with open(os.path.join(shim, "zstd"), "w") as f:
+            f.write('#!/bin/sh\nif [ "$1" = "--version" ]; then '
+                    'echo "*** Zstandard CLI (64-bit) v9.9.9, by Nobody ***"; '
+                    f'exit 0; fi\nexec {real} "$@"\n')
+        os.chmod(os.path.join(shim, "zstd"), 0o755)
+        env = dict(os.environ, PATH=shim + os.pathsep + os.environ["PATH"])
+        r = subprocess.run([sys.executable, os.path.abspath(__file__), "--verify"],
+                           capture_output=True, text=True, env=env, cwd=TESE)
+        good = r.returncode == 0
+        print(f"{'PASS' if good else 'FAIL'}: decoder-version-compat "
+              f"(shim v9.9.9 verify rc={r.returncode})")
+        ok &= good
     print("MANIFEST-SELFTEST:", "ALL PASS" if ok else "FAIL")
     return 0 if ok else 1
 

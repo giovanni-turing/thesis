@@ -37,8 +37,11 @@
 #                  pins a minimal env that needs no GPU wheel)
 #   REPRO_SCRATCH  scratch root; a unique owned run directory is created
 #                  beneath it (default: mktemp -d under $TMPDIR)
-#   REPRO_REPORT   report destination (default: <run dir>/report.md; published
-#                  atomically, publication failure is fatal).
+#   REPRO_REPORT   report destination (always preserved). Default: an OWNED
+#                  placeholder file in the scratch root, outside the run
+#                  directory -- preserved after successful publication,
+#                  removed on abnormal/signalled termination. Publication is
+#                  atomic and its failure fatal.
 # No live-tree DATA INPUTS are read: every input resolves inside the worktree.
 # Writes outside the run directory are limited to the source repository's
 # .git/worktrees admin area (worktree add/remove) and, when REPRO_REPORT
@@ -56,10 +59,13 @@ RUN=$(mktemp -d "${REPRO_SCRATCH:-${TMPDIR:-/tmp}}/repro881.XXXXXX") \
   || { echo "FATAL: cannot create run directory" >&2; exit 1; }
 # D54: the default report lives OUTSIDE the run directory removed at EXIT, so
 # a successful default run's advertised report survives cleanup.
+REPORT_OWNED=0
+PUBLISHED=0
 if [ -n "${REPRO_REPORT:-}" ]; then REPORT=$REPRO_REPORT
 else
   REPORT=$(mktemp "${REPRO_SCRATCH:-${TMPDIR:-/tmp}}/repro881_report.XXXXXX.md") \
     || { echo "FATAL: cannot create report file" >&2; rm -rf "$RUN"; exit 1; }
+  REPORT_OWNED=1
 fi
 W=$RUN/checkout
 
@@ -67,17 +73,32 @@ cleanup() {
   git -C "$TESE" worktree remove --force "$W" >/dev/null 2>&1
   rm -rf "$RUN"
 }
+# D54 round 2: on abnormal/signalled termination the OWNED default placeholder
+# is removed too (an explicit REPRO_REPORT is never touched); after successful
+# publication the report always survives.
+drop_owned_report() {
+  [ "$REPORT_OWNED" = 1 ] && [ "$PUBLISHED" = 0 ] && rm -f "$REPORT"
+  return 0
+}
 # D54: no-argument handlers (no arithmetic, no positional refs), so the trap
 # body cannot mis-parse regardless of what the shell was executing when the
 # signal arrived; each disables all traps, cleans, and exits 128+signal.
-on_int()  { trap - EXIT INT TERM; cleanup; exit 130; }
-on_term() { trap - EXIT INT TERM; cleanup; exit 143; }
+on_int()  { trap - EXIT INT TERM; cleanup; drop_owned_report; exit 130; }
+on_term() { trap - EXIT INT TERM; cleanup; drop_owned_report; exit 143; }
 trap on_int INT
 trap on_term TERM
 trap cleanup EXIT
-# Test-only hook (repro_signal_test.sh): REPRO_PAUSE_AT=tools|worktree inserts
-# a 5 s pause at that phase so signal delivery is deterministic.
-pause_at() { [ "${REPRO_PAUSE_AT:-}" = "$1" ] && sleep 5; return 0; }
+# Test-only hook (repro_signal_test.sh): REPRO_PAUSE_AT=tools|worktree pauses
+# 5 s INSIDE the named active context (tools: within a command substitution;
+# worktree: with the worktree REGISTERED), after touching REPRO_PAUSE_MARKER
+# so the test can synchronize on readiness instead of guessing delays.
+pause_at() {
+  if [ "${REPRO_PAUSE_AT:-}" = "$1" ]; then
+    [ -n "${REPRO_PAUSE_MARKER:-}" ] && : > "$REPRO_PAUSE_MARKER"
+    sleep 5
+  fi
+  return 0
+}
 
 pass=0; fail=0
 R=""
@@ -86,6 +107,7 @@ ok()  { pass=$((pass+1)); say "PASS  $1"; }
 bad() { fail=$((fail+1)); say "FAIL  $1"; }
 publish() {
   if printf '%s' "$R" > "$REPORT.tmp.$$" && mv "$REPORT.tmp.$$" "$REPORT"; then
+    PUBLISHED=1
     echo "report: $REPORT"
   else
     echo "FATAL: report publication to $REPORT failed" >&2
@@ -95,8 +117,7 @@ publish() {
 }
 
 HEAD_SHA=$(git -C "$TESE" rev-parse HEAD)
-pause_at tools
-PYV=$("$PY" -c 'import sys, numpy, pandas; print(f"python {sys.version.split()[0]}, numpy {numpy.__version__}, pandas {pandas.__version__}")' 2>/dev/null) || PYV="PYTHON ENV UNUSABLE"
+PYV=$(pause_at tools; "$PY" -c 'import sys, numpy, pandas; print(f"python {sys.version.split()[0]}, numpy {numpy.__version__}, pandas {pandas.__version__}")' 2>/dev/null) || PYV="PYTHON ENV UNUSABLE"
 ZV=$(zstd --version 2>&1 | sed 's/\*\*\* //;s/, by.*//' | head -1)
 GV=$(git --version)
 say "# Clean-checkout reproduction of three headline results (§8.8-1, runner v2)"
@@ -107,9 +128,9 @@ say "tools: $PYV; $ZV; $GV"
 say ""
 
 # ---- fresh detached worktree (unique scratch; trap-cleaned) ----
-pause_at worktree
 if git -C "$TESE" worktree add --detach "$W" HEAD >/dev/null 2>&1 \
    && [ "$(git -C "$W" status --porcelain | wc -l)" -eq 0 ]; then
+  pause_at worktree   # signal test: worktree is REGISTERED at this point
   ok "diagnostic: clean detached worktree at HEAD"
 else
   bad "worktree creation not clean"; publish; exit 1
@@ -144,6 +165,27 @@ then
   ok "frontier: exact verdict (cells=313, zero missing/mismatched stats, calib-selection/calib-table/summary-link OK). Scope: the builder independently recomputes all 313 cells and confirms the LINKED summary fields; whole-summary byte identity is established by the delivery gate's make_frontier_report comparison, not here"
 else
   bad "frontier recomputation verdict (see $RUN/frontier_build.log)"
+fi
+
+# ---- Diagnostic: manifest verifies from tracked .zst alone (ZERO plain) ----
+say ""
+say "## Diagnostic — replay-archive manifest (tracked archives only, pre-inflation)"
+NPLAIN=0
+for f in defense/anim/data/a2_runs/steady24h_forecast_L30.jsonl \
+         defense/anim/data/a2_runs/steady24h_reactive_L30.jsonl \
+         defense/anim/data/a13_runs/ft_static_C8.jsonl \
+         defense/anim/data/a13_runs/ft_llm_static.requests.jsonl \
+         defense/anim/data/a13_runs/ft_reactive_L30.jsonl \
+         defense/anim/data/a13_runs/ft_llm_reactive.requests.jsonl; do
+  [ -e "$W/$f" ] && NPLAIN=$((NPLAIN+1))
+done
+if [ "$NPLAIN" -ne 0 ]; then
+  bad "clean-checkout precondition violated: $NPLAIN plain replay files present before inflation"
+elif (cd "$W" && "$PY" verification/make_replay_archive_manifest.py --verify \
+      >"$RUN/manifest_verify.log" 2>&1); then
+  ok "manifest --verify with ZERO plain files present (all six paths asserted absent): recomputed-from-stream fields equal the tracked manifest"
+else
+  bad "manifest --verify in zero-plain clean checkout (see $RUN/manifest_verify.log)"
 fi
 
 # ---- H3 + Stage B: composed join from tracked .zst, byte-identity ----
@@ -192,16 +234,6 @@ if echo "$HL" | grep -q "^HEADLINES: OK$"; then
   ok "all three headline predicates hold on the recomputed artifacts"
 else
   bad "headline predicate failure"
-fi
-
-# ---- Diagnostic: archive manifest verifies from tracked .zst alone ----
-say ""
-say "## Diagnostic — replay-archive manifest (tracked archives only)"
-if (cd "$W" && "$PY" verification/make_replay_archive_manifest.py --verify \
-      >"$RUN/manifest_verify.log" 2>&1); then
-  ok "manifest --verify inside the clean checkout: recomputed-from-stream fields equal the tracked manifest"
-else
-  bad "manifest --verify in clean checkout (see $RUN/manifest_verify.log)"
 fi
 
 # ---- Diagnostic: Stage-A tracked-only boundary (archives deflated) ----

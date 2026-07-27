@@ -18,7 +18,7 @@
    "ledger_anchor": "progress/results-ledger.md: 'Defense animation A2 v2: episode selector + live tickers; 40-run fleet' (2026-07-19)",
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
-   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet *** (archive creation; any zstd >= 1.5 verifies)",
    "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   },
   {
@@ -35,7 +35,7 @@
    "ledger_anchor": "progress/results-ledger.md: 'Defense animation A2 v2: episode selector + live tickers; 40-run fleet' (2026-07-19)",
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
-   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet *** (archive creation; any zstd >= 1.5 verifies)",
    "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   },
   {
@@ -52,7 +52,7 @@
    "ledger_anchor": "progress/results-ledger.md: 'Full-trace coverage GUARANTEE MET -- every request, both pools (A13)' (2026-07-19)",
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
-   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet *** (archive creation; any zstd >= 1.5 verifies)",
    "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   },
   {
@@ -69,7 +69,7 @@
    "ledger_anchor": "progress/results-ledger.md: 'Full-trace coverage GUARANTEE MET -- every request, both pools (A13)' (2026-07-19)",
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
-   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet *** (archive creation; any zstd >= 1.5 verifies)",
    "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   },
   {
@@ -86,7 +86,7 @@
    "ledger_anchor": "progress/results-ledger.md: 'Full-trace coverage GUARANTEE MET -- every request, both pools (A13)' (2026-07-19)",
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
-   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet *** (archive creation; any zstd >= 1.5 verifies)",
    "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   },
   {
@@ -103,7 +103,7 @@
    "ledger_anchor": "progress/results-ledger.md: 'Full-trace coverage GUARANTEE MET -- every request, both pools (A13)' (2026-07-19)",
    "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
-   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
+   "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet *** (archive creation; any zstd >= 1.5 verifies)",
    "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
   }
  ]
