@@ -34,6 +34,7 @@ OUT = os.path.join(TESE, "verification/replay_archive_manifest.json")
 CHUNK = 1 << 20
 
 A2_GEN = {
+    "archive_commit": "ba5e4a3",
     "generation_command": ("python3 defense/anim/build/gen_a2_fleet.py && "
                            "eda/.venv/bin/python defense/anim/build/extract_a2_fleet.py"),
     "generation_commit": "e9b84ad (A2 generator history)",
@@ -41,6 +42,7 @@ A2_GEN = {
                       "episode selector + live tickers; 40-run fleet' (2026-07-19)"),
 }
 A13_GEN = {
+    "archive_commit": "ba5e4a3",
     "generation_command": ("python3 defense/anim/build/gen_a13_fulltrace.py && "
                            "python3 defense/anim/build/build_coverage_manifest.py"),
     "generation_commit": ("bb1b7cb (A13 generator introduction); "
@@ -49,6 +51,7 @@ A13_GEN = {
                       "GUARANTEE MET -- every request, both pools (A13)' (2026-07-19)"),
 }
 G1_GEN = {
+    "archive_commit": "947005c",
     "generation_command": "python3 defense/anim/build/gen_g1_burst26.py",
     "generation_commit": "e386f02 (g1 generator introduction: gap-closure tracks)",
     "ledger_anchor": ("out-of-frozen-scope evidence (bridge D31): burst2/6 "
@@ -132,6 +135,14 @@ def build(compare_plain):
     rows = []
     for rel, meta in FILES.items():
         comp_p = os.path.join(TESE, rel) + ".zst"
+        # D60: the claimed archive commit must actually CONTAIN the archive --
+        # a hardcoded commit string can never again outrun the tree.
+        rc = subprocess.run(["git", "-C", TESE, "cat-file", "-e",
+                             f"{meta['archive_commit']}:{rel}.zst"],
+                            capture_output=True).returncode
+        if rc != 0:
+            sys.exit(f"FATAL: claimed archive commit {meta['archive_commit']} "
+                     f"does not contain {rel}.zst")
         plain_p = os.path.join(TESE, rel) if compare_plain else None
         sha, nbytes, nrows = stream_archive(comp_p, plain_p)
         rows.append({
@@ -146,7 +157,8 @@ def build(compare_plain):
             "generation_command": meta["generation_command"],
             "generation_commit": meta["generation_commit"],
             "ledger_anchor": meta["ledger_anchor"],
-            "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
+            "archived_in_commit": meta["archive_commit"]
+                + " (compression/archive commit, distinct from generation)",
             "compression": "zstd -19 -T8",
             "zstd_version": ARCHIVE_ZSTD_VERSION,
             "round_trip_cmp": ROUND_TRIP_TEXT,

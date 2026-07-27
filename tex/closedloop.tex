@@ -26,10 +26,11 @@ forecasts of Chapter~\ref{cap:predictors}, and grades every arm under a pre-froz
 replay protocol (arm mechanics frozen before the frontier replay;
 $\rho{=}15$ disclosed as an earlier ex-post choice). The answer is a
 demonstrated failure mode and a trade-off, not
-universal superiority: on four of the five composed windows
-forecast and reactive tail latencies \emph{tie exactly}, the latency advantage
-lives in the one-minute onset, and what forecasting buys at week scale is
-resource-time at equal compliance.
+universal superiority: the forecast and reactive tail latencies \emph{tie
+exactly} on three of the five evaluation windows (burst1/4/5) and on the
+aggregate span, the calm day within \SI{5}{\milli\second}; the latency
+advantage lives in the one-minute onset, and what forecasting buys at week
+scale is resource-time at equal compliance.
 
 \section{Evaluation contract}
 \label{sec:cl-contract}
@@ -1272,9 +1273,14 @@ wall-clock, 9.96\% of requests. On the calm day's composed arm
 not a universal one.
 \textbf{And it costs more, not less}: the forecast policy is 2--6$\times$
 \emph{more} expensive than reactive in language-pool resource-time. That is not
-a defect --- reactive is cheap precisely because it under-provisions decode
-capacity, which is why it fails the tail on every window, so the apparent
-saving \emph{is} the violation and must never be quoted as a win. The
+a defect --- on the aggregate and burst rows reactive is cheap precisely
+because it under-provisions decode capacity, the same under-provisioning that
+fails the tail there, so the apparent saving \emph{is} the violation on those
+rows and must never be quoted as a win. The calm day is the scoping
+exception that confirms the mechanism: with no burst to under-provision
+against, reactive both passes (\SI{494.3}{\milli\second}) and costs less
+(48.22 vs.\ 106.0 GPU-h) --- the forecast premium there buys headroom
+against bursts that do not come. The
 defensible language cost statement is the one above, against the burst-sized
 static shape: a break-even at the p90 band edge, lifted to a modest, e13-robust
 saving (0.82$\times$) by the post-hoc p90/s6 sensitivity. The division of

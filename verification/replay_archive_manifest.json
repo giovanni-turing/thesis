@@ -16,7 +16,7 @@
    "generation_command": "python3 defense/anim/build/gen_g1_burst26.py",
    "generation_commit": "e386f02 (g1 generator introduction: gap-closure tracks)",
    "ledger_anchor": "out-of-frozen-scope evidence (bridge D31): burst2/6 forecast-free static composed halves; not part of the frozen 29-arm campaign",
-   "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
+   "archived_in_commit": "947005c (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet *** (archive creation; any zstd >= 1.5 verifies)",
    "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
@@ -33,7 +33,7 @@
    "generation_command": "python3 defense/anim/build/gen_g1_burst26.py",
    "generation_commit": "e386f02 (g1 generator introduction: gap-closure tracks)",
    "ledger_anchor": "out-of-frozen-scope evidence (bridge D31): burst2/6 forecast-free static composed halves; not part of the frozen 29-arm campaign",
-   "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
+   "archived_in_commit": "947005c (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet *** (archive creation; any zstd >= 1.5 verifies)",
    "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
@@ -50,7 +50,7 @@
    "generation_command": "python3 defense/anim/build/gen_g1_burst26.py",
    "generation_commit": "e386f02 (g1 generator introduction: gap-closure tracks)",
    "ledger_anchor": "out-of-frozen-scope evidence (bridge D31): burst2/6 forecast-free static composed halves; not part of the frozen 29-arm campaign",
-   "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
+   "archived_in_commit": "947005c (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet *** (archive creation; any zstd >= 1.5 verifies)",
    "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"
@@ -67,7 +67,7 @@
    "generation_command": "python3 defense/anim/build/gen_g1_burst26.py",
    "generation_commit": "e386f02 (g1 generator introduction: gap-closure tracks)",
    "ledger_anchor": "out-of-frozen-scope evidence (bridge D31): burst2/6 forecast-free static composed halves; not part of the frozen 29-arm campaign",
-   "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
+   "archived_in_commit": "947005c (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet *** (archive creation; any zstd >= 1.5 verifies)",
    "round_trip_cmp": "decoded stream sha256/bytes/rows computed with decoder exit status REQUIRED zero; at generation the stream is additionally byte-compared chunkwise against the plain file"

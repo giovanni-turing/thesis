@@ -278,7 +278,9 @@ repo derived from the script's own location; `REPRO_PY`/`REPRO_SCRATCH`/
 `verification/repro_predicates.py` with `--selftest` negative probes),
 `verification/repro_requirements.txt` (minimal pinned environment, no GPU
 wheel), `verification/replay_archive_manifest.json` (per-file provenance of
-the six archives), and `verification/repro_clean_checkout_report.md` (a
+all ten tracked replay archives -- the six composed-join inputs plus the four
+burst2/6 forecast-free halves, each row's archive commit gated to contain its
+path), and `verification/repro_clean_checkout_report.md` (a
 committed report labeled with the exact HEAD it observed — regenerate rather
 than trust it as current).
 

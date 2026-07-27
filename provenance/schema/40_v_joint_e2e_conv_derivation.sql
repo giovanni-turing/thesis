@@ -11,9 +11,13 @@
 --     rows carrying producer evidence classify from conv_sum_relation
 --     ('coincides' -> coincides_with_sum, else strictly_differs_from_sum);
 --     only the 20 legacy a12 rows (NULL evidence) fall back to the rounded
---     display-precision CASE. This retires the two false labels the rounded
---     CASE produced on fill rows (burst3/static mixed-estimator, calm/static
---     display rounding): both now read from the persisted relation.
+--     display-precision CASE. Effect on the two artifact rows (D61 wording
+--     correction, same commit as migration 41): calm/static's binary label
+--     FLIPS to coincides_with_sum (the rounded CASE had mislabeled it);
+--     burst3/static's binary label rightly REMAINS strictly_differs_from_sum
+--     -- what the persisted relation corrects there is the DIRECTION (a
+--     +0.127588 ms overstate under the single estimator, not the apparent
+--     understate the mixed-estimator display read suggested).
 --   * Postconditions gate the VIEW: both columns present, the migration-39
 --     worked query executes and returns exactly the one genuine understates
 --     row (steady24h/fc_chronos), and the fill-row classification THROUGH THE
