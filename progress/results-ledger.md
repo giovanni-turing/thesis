@@ -2924,3 +2924,19 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   tier 5 (engine diversity: vLLM-FA serving vs HF eager) adjudicates the
   static-C8 flip; campaign continues until author STOP.
 - **Supersedes:** nothing yet (manuscript untouched).
+
+### composed-exact-identity+estimator-evidence (2026-07-27)
+
+- **Artifact:** `simulation/results/composed_fill/composed_fill_joined.json`
+  (regenerated, commit c6349c8) + `composed_fill_arms.json`;
+  `provenance/schema/39_composed_conv_relation.sql`.
+- **Command:** `composed_fill_join.py` (exact hash-id identity authoritative,
+  permutation gate, FIFO cross-check recorded; conv-relation evidence fields)
+  + migration 39 + K16 reload.
+- **Result:** fulltrace_reactive e2e p99 1681.9 -> 1681.8 (six FIFO swaps of
+  1M; only changed value; no manuscript locus prints it). Estimator-consistent
+  classification persisted: 14 overstates / 1 genuine understates
+  (steady24h/fc, -45.815998 ms) / 14 coincident over the 29-arm view;
+  DB 7/1/1 over the nine fill rows.
+- **Feeds:** bridge D29/D30 closure (msgs 085/086); v_joint_e2e comment;
+  supersedes the 2026-07-26 join artifact and schema 38's 14/2/13 comment.

@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T15:28:38-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-27T15:52:55-03:00, protocol v2.1)
 
-messages: 251  errors: 0
+messages: 258  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -126,14 +126,18 @@ messages: 251  errors: 0
     - 040_d28_fixed (claude, response)
     - 080_d28_false_green_residuals (reviewer, response)
     - 081_d28_escalation (reviewer, escalation)
-- **D29-composed-exact-identity**: 1 msgs, 0/2 evidence rounds
+- **D29-composed-exact-identity**: 2 msgs, 1/2 evidence rounds
     - 070_composed_exact_identity (reviewer, finding)
-- **D30-composed-mixed-estimators**: 1 msgs, 0/2 evidence rounds
+    - 085_d29_exact_identity_fix (claude, response)
+- **D30-composed-mixed-estimators**: 2 msgs, 1/2 evidence rounds
     - 071_composed_mixed_estimators (reviewer, finding)
-- **D31-composed-coverage-integration**: 1 msgs, 0/2 evidence rounds
+    - 086_d30_estimator_fix (claude, response)
+- **D31-composed-coverage-integration**: 2 msgs, 1/2 evidence rounds
     - 072_composed_coverage_integration (reviewer, finding)
-- **D32-burst5-lower-bound-resurrected**: 1 msgs, 0/2 evidence rounds
+    - 087_d31_coverage_fix (claude, response)
+- **D32-burst5-lower-bound-resurrected**: 2 msgs, 1/2 evidence rounds
     - 073_burst5_lower_bound_resurrected (reviewer, finding)
+    - 088_d32_settled_tail_fix (claude, response)
 - **D33-schema37-clean-start-namespace**: 1 msgs, 0/2 evidence rounds
     - 079_schema37_clean_start_namespace (reviewer, finding)
 - **D34-calibration-type-finiteness**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 049_adjudication_d34_d37)
@@ -262,11 +266,15 @@ messages: 251  errors: 0
     - 081_d57_lifecycle_fix (claude, response)
     - 162_d57_symlink_residual (reviewer, response)
     - 163_d57_escalation (reviewer, escalation)
-- **D58-publication-temp-inode-race**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 084_adjudication_d58)
+- **D58-publication-temp-inode-race**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 084_adjudication_d58)
     - 164_publication_temp_inode_race (reviewer, finding)
     - 083_d58_inode_bound_fix (claude, response)
     - 165_d58_helper_integration_residuals (reviewer, response)
     - 166_d58_escalation (reviewer, escalation)
+    - 169_d58_terminal_verification (reviewer, verification)
+- **D59-stale-archive-pin**: 2 msgs, 1/2 evidence rounds
+    - 168_stale_archive_pin (reviewer, finding)
+    - 089_d59_pin_fix (claude, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
