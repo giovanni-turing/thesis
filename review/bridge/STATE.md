@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-26T23:38:22-03:00, protocol v1.6)
+# Bridge state (generated 2026-07-27T00:26:43-03:00, protocol v1.7)
 
-messages: 111  errors: 0
+messages: 122  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -99,22 +99,31 @@ messages: 111  errors: 0
     - 046_response_thread_ids_mismatch (reviewer, finding)
     - 031_d23_already_fixed (claude, response)
     - 054_d23_verified (reviewer, response)
-- **D24-d22-adjudication-residue**: 3 msgs, 2/2 evidence rounds
+- **D24-d22-adjudication-residue**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
     - 060_d22_adjudication_residue (reviewer, finding)
     - 034_d24_semantic_sweep (claude, response)
     - 064_d24_semantic_residuals (reviewer, response)
-- **D25-d20-calibration-promoted-gap**: 3 msgs, 2/2 evidence rounds
+    - 074_d24_escalation (reviewer, escalation)
+- **D25-d20-calibration-promoted-gap**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
     - 061_d20_calibration_promoted_gap (reviewer, finding)
     - 035_d25_chain_closed (claude, response)
     - 065_d25_schema_residuals (reviewer, response)
-- **D26-v15-verification-unimplemented**: 3 msgs, 2/2 evidence rounds
+    - 075_d25_escalation (reviewer, escalation)
+- **D26-v15-verification-unimplemented**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
     - 062_v15_verification_unimplemented (reviewer, finding)
     - 036_d26_v15_enforced (claude, response)
     - 066_d26_terminal_authority_residuals (reviewer, response)
-- **D27-composed-migration-rerun-loss**: 1 msgs, 0/2 evidence rounds
+    - 076_d26_escalation (reviewer, escalation)
+- **D27-composed-migration-rerun-loss**: 4 msgs, 2/2 evidence rounds
     - 068_composed_migration_rerun_loss (reviewer, finding)
-- **D28-composed-k16-false-green**: 1 msgs, 0/2 evidence rounds
+    - 039_d27_fixed (claude, response)
+    - 077_d27_current_state_verified (reviewer, response)
+    - 078_d27_terminal_verification (reviewer, verification)
+- **D28-composed-k16-false-green**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
     - 069_composed_k16_false_green (reviewer, finding)
+    - 040_d28_fixed (claude, response)
+    - 080_d28_false_green_residuals (reviewer, response)
+    - 081_d28_escalation (reviewer, escalation)
 - **D29-composed-exact-identity**: 1 msgs, 0/2 evidence rounds
     - 070_composed_exact_identity (reviewer, finding)
 - **D30-composed-mixed-estimators**: 1 msgs, 0/2 evidence rounds
@@ -123,3 +132,8 @@ messages: 111  errors: 0
     - 072_composed_coverage_integration (reviewer, finding)
 - **D32-burst5-lower-bound-resurrected**: 1 msgs, 0/2 evidence rounds
     - 073_burst5_lower_bound_resurrected (reviewer, finding)
+- **D33-schema37-clean-start-namespace**: 1 msgs, 0/2 evidence rounds
+    - 079_schema37_clean_start_namespace (reviewer, finding)
+
+## Unthreaded verifications (terminal attestations)
+- 038_suite_attestation (claude) re: 037_status_report

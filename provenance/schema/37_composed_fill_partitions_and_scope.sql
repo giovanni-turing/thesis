@@ -26,7 +26,7 @@
 --   new run_id  = 'composed_fill:' || <stem>            (10 old ids -> 10 distinct new ids)
 BEGIN;
 
-DROP TABLE IF EXISTS _mig;
+DROP TABLE IF EXISTS pg_temp._mig;
 CREATE TEMP TABLE _mig(old_id text PRIMARY KEY, new_id text, new_exp text) ON COMMIT DROP;
 
 INSERT INTO _mig(old_id, new_id, new_exp)
@@ -128,32 +128,49 @@ SET LOCAL session_replication_role = DEFAULT;
 -- guarded no-op when the default holds no composed_fill rows, and the
 -- post-condition asserts dedicated-partition preservation.
 DO $$
-DECLARE t text; n bigint; pre_dedicated bigint; post_dedicated bigint;
+-- D33 (2026-07-27): clean-start order restored -- DRAIN the default child BEFORE
+-- attaching the dedicated partition (attach is rejected while the default holds
+-- rows belonging to the new partition, SQLSTATE 23514); delete stays scoped to
+-- the default child (D27); pre/post preservation asserted in every branch.
+DECLARE t text; n bigint; pre_dedicated bigint; post_dedicated bigint; part_exists boolean;
         parts text[] := ARRAY['composed_request','llm_request','encoder_series'];
 BEGIN
   FOREACH t IN ARRAY parts LOOP
     EXECUTE format('SELECT count(*) FROM provenance.%I WHERE run_id LIKE %L',
                    t||'_default', 'composed_fill:%') INTO n;
-    EXECUTE format('CREATE TABLE IF NOT EXISTS provenance.%I PARTITION OF provenance.%I '
-                   'FOR VALUES IN (%L)', t||'_composed_fill', t, 'composed_fill');
+    EXECUTE format('SELECT to_regclass(%L) IS NOT NULL', 'provenance.'||t||'_composed_fill')
+      INTO part_exists;
+    IF part_exists THEN
+      EXECUTE format('SELECT count(*) FROM provenance.%I', t||'_composed_fill') INTO pre_dedicated;
+    ELSE
+      pre_dedicated := 0;
+    END IF;
     IF n = 0 THEN
-      RAISE NOTICE '37_composed_fill: %_default holds no composed_fill rows -- step is a no-op', t;
+      IF NOT part_exists THEN
+        EXECUTE format('CREATE TABLE provenance.%I PARTITION OF provenance.%I '
+                       'FOR VALUES IN (%L)', t||'_composed_fill', t, 'composed_fill');
+      END IF;
+      RAISE NOTICE '37_composed_fill: %_default holds no composed_fill rows -- step is a no-op (partition %)',
+        t, CASE WHEN part_exists THEN 'existed' ELSE 'created' END;
       CONTINUE;
     END IF;
-    EXECUTE format('SELECT count(*) FROM provenance.%I', t||'_composed_fill') INTO pre_dedicated;
-    EXECUTE format('CREATE TEMP TABLE _cf AS SELECT * FROM provenance.%I WHERE run_id LIKE %L',
+    EXECUTE format('CREATE TEMP TABLE pg_temp._cf37 AS SELECT * FROM provenance.%I WHERE run_id LIKE %L',
                    t||'_default', 'composed_fill:%');
-    EXECUTE 'UPDATE _cf SET experiment = ''composed_fill''';
-    -- delete scoped to the DEFAULT CHILD only; the dedicated partition is untouchable here
+    EXECUTE 'UPDATE pg_temp._cf37 SET experiment = ''composed_fill''';
+    -- drain FIRST, scoped to the DEFAULT CHILD only (D27)
     EXECUTE format('DELETE FROM provenance.%I WHERE run_id LIKE %L', t||'_default', 'composed_fill:%');
-    EXECUTE format('INSERT INTO provenance.%I SELECT * FROM _cf', t);
+    IF NOT part_exists THEN
+      EXECUTE format('CREATE TABLE provenance.%I PARTITION OF provenance.%I '
+                     'FOR VALUES IN (%L)', t||'_composed_fill', t, 'composed_fill');
+    END IF;
+    EXECUTE format('INSERT INTO provenance.%I SELECT * FROM pg_temp._cf37', t);
     EXECUTE format('SELECT count(*) FROM provenance.%I', t||'_composed_fill') INTO post_dedicated;
     IF post_dedicated <> pre_dedicated + n THEN
       RAISE EXCEPTION '37_composed_fill: %_composed_fill preservation violated (pre=% moved=% post=%)',
         t, pre_dedicated, n, post_dedicated;
     END IF;
     RAISE NOTICE '37_composed_fill: % row(s) relocated into %_composed_fill (now %)', n, t, post_dedicated;
-    EXECUTE 'DROP TABLE _cf';
+    EXECUTE 'DROP TABLE pg_temp._cf37';
   END LOOP;
 END $$;
 

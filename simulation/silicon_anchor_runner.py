@@ -171,8 +171,34 @@ def gate_verdict(snap: dict, gate: dict, own_pid: int) -> tuple[bool, list[str]]
                    f"[{gate['sm_mhz_min']},{gate['sm_mhz_max']}]")
     if snap["mem_mhz"] not in gate["mem_mhz_allowed"]:
         bad.append(f"MEM {snap['mem_mhz']} MHz not in {gate['mem_mhz_allowed']}")
-    if gate.get("throttle_hex_required") and snap["throttle_hex"] != gate["throttle_hex_required"]:
-        bad.append(f"throttle reasons {snap['throttle_hex']} != {gate['throttle_hex_required']}")
+    # Throttle reasons. The BINDING physical criterion is the delivered SM band
+    # above: a card sitting at its power cap while still delivering a clock
+    # inside [sm_mhz_min, sm_mhz_max] is measuring exactly the locked physics the
+    # author specified. Only *slowdown* bits (HW slowdown / thermal / power
+    # brake / sync boost) mean the delivered clock is no longer the locked one
+    # and must stop the measurement. Benign, expected-under-load bits --
+    # GpuIdle 0x1, ApplicationsClocksSetting 0x2, SwPowerCap 0x4,
+    # DisplayClockSetting 0x100 -- are recorded as evidence, not treated as
+    # violations. (Requiring throttle_hex == 0x0 exactly, as the first cut did,
+    # makes the gate self-defeating: sustained 380 W load raises SwPowerCap,
+    # the runner idles 60 s, the card cools, the bit clears, and the cycle
+    # repeats -- burning ~40% of wall time without protecting anything the SM
+    # band check does not already protect.)
+    fatal_mask = int(str(gate.get("throttle_fatal_bits_hex", "0xf8")), 16)
+    try:
+        active = int(str(snap["throttle_hex"]), 16)
+    except (TypeError, ValueError):
+        active = -1
+    if active < 0:
+        bad.append(f"unparseable throttle reasons {snap['throttle_hex']}")
+    elif active & fatal_mask:
+        bad.append(f"throttle SLOWDOWN bits {hex(active & fatal_mask)} active "
+                   f"(raw {snap['throttle_hex']}, fatal mask {hex(fatal_mask)})")
+    elif gate.get("throttle_hex_required") and snap["throttle_hex"] != gate["throttle_hex_required"]:
+        # legacy strict mode: only honoured when the queue does NOT declare a
+        # fatal-bit mask, so old queue files keep their old behaviour.
+        if "throttle_fatal_bits_hex" not in gate:
+            bad.append(f"throttle reasons {snap['throttle_hex']} != {gate['throttle_hex_required']}")
     if gate.get("require_persistence_mode") and snap["persistence"].lower() not in ("enabled", "1"):
         bad.append(f"persistence mode {snap['persistence']}")
     if gate.get("require_single_tenant"):
@@ -218,6 +244,24 @@ class CellSkipped(Exception):
 
 def stop_requested(root: Path) -> bool:
     return _stop_signal or (root / "STOP").exists()
+
+
+def live_sibling(root: Path) -> int | None:
+    """Pid of another *live* runner holding this root, or None. A stale pidfile
+    (left by a hard kill) is not a sibling; only a running process whose cmdline
+    still names this script is."""
+    pf = root / "daemon.pid"
+    try:
+        pid = int(pf.read_text().strip())
+    except (OSError, ValueError):
+        return None
+    if pid == os.getpid():
+        return None
+    try:
+        cmd = Path(f"/proc/{pid}/cmdline").read_bytes().decode("utf-8", "replace")
+    except OSError:
+        return None  # not running -> stale pidfile
+    return pid if "silicon_anchor_runner.py" in cmd else None
 
 
 # --------------------------------------------------------------------------
@@ -537,6 +581,49 @@ def request_delays(members, fins, reqs_meta):
     return delays + [0.0] * pad, len(finish)
 
 
+def throttle_evidence(clocks_path: Path) -> dict:
+    """Summarise every clock snapshot taken during this rep. Because the gate no
+    longer stops on the benign SwPowerCap bit, the bit must still be visible in
+    the record: this is what makes 'we measured at locked clocks' auditable
+    rather than asserted."""
+    snaps = []
+    try:
+        with open(clocks_path) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    snaps.append(json.loads(line))
+                except json.JSONDecodeError:
+                    pass
+    except OSError:
+        return {"snapshots": 0}
+    sm = [s["sm_mhz"] for s in snaps if "sm_mhz" in s]
+    mem = sorted({s["mem_mhz"] for s in snaps if "mem_mhz" in s})
+    bits = {}
+    n_cap = 0
+    for s in snaps:
+        try:
+            a = int(str(s.get("throttle_hex", "0x0")), 16)
+        except ValueError:
+            continue
+        bits[hex(a)] = bits.get(hex(a), 0) + 1
+        if a & 0x4:
+            n_cap += 1
+    return {"snapshots": len(snaps),
+            "sm_mhz_min": min(sm) if sm else None,
+            "sm_mhz_max": max(sm) if sm else None,
+            "mem_mhz_seen": mem,
+            "throttle_hex_histogram": bits,
+            "sw_power_cap_snapshots": n_cap,
+            "fatal_slowdown_snapshots": sum(v for k, v in bits.items()
+                                            if int(k, 16) & 0xF8),
+            "note": "sw_power_cap is benign and expected at ~380 W: the delivered "
+                    "SM clock stayed inside the locked band throughout, which is "
+                    "the physical criterion. fatal_slowdown_snapshots must be 0."}
+
+
 def pct(vals, ps=(50, 90, 99)):
     if not vals:
         return {f"p{p}": 0.0 for p in ps}
@@ -569,6 +656,22 @@ def run_trace_replay(q, cid, spec, rep, enc, j, gate, root) -> dict:
     d.mkdir(parents=True, exist_ok=True)
     partial = d / "batches.csv"
     clocks = d / "clock.jsonl"
+
+    # ---- crash window: the rep finished (rep.json + batches.csv.gz written,
+    # ---- batches.csv unlinked) but the process died before main() could append
+    # ---- rep_done. Re-measuring 19 GPU-min of already-measured silicon would
+    # ---- be pure waste, so recover the banked summary instead.
+    if not partial.exists() and (d / "rep.json").exists() and (d / "batches.csv.gz").exists():
+        try:
+            recovered = json.load(open(d / "rep.json"))
+        except (OSError, json.JSONDecodeError):
+            recovered = None
+        if recovered and recovered.get("n_batches") == n_b:
+            j.log(f"[rep] {cid} rep{rep}: complete on disk but unrecorded "
+                  f"(crash between finalize and checkpoint); recovering summary")
+            j.event("rep_recovered_from_disk", cell=cid, rep=rep, n_batches=n_b)
+            recovered["recovered_from_disk"] = True
+            return recovered
 
     # ---- resume: how many batches are already banked for this rep? ----
     done_rows = []
@@ -642,6 +745,12 @@ def run_trace_replay(q, cid, spec, rep, enc, j, gate, root) -> dict:
                 if stop_requested(root):
                     interrupted = True
                     break
+    except StopRequested:
+        # STOP observed from inside the mid-rep clock gate rather than at the
+        # segment boundary. Same outcome -- bank the partial rep and record it
+        # -- so route it through the one interrupted path below instead of
+        # escaping without a rep_interrupted checkpoint.
+        interrupted = True
     finally:
         if buf:
             fh.writelines(buf)
@@ -732,6 +841,7 @@ def run_trace_replay(q, cid, spec, rep, enc, j, gate, root) -> dict:
         "membership_recovery_requests_matched": n_req,
         "membership_recovery_requests_total": len(reqs_meta["reqs"]),
         "warmup": warm,
+        "throttle_evidence": throttle_evidence(clocks),
         "clock_start": snap0, "clock_end": snap1,
         "encoder": {"model_dir": q["execution"]["model_dir"], "attn": q["execution"]["attn"],
                     "n_params": enc.n_params, "load_s": enc.load_s,
@@ -871,6 +981,20 @@ def main() -> int:
 
     signal.signal(signal.SIGTERM, _on_signal)
     signal.signal(signal.SIGINT, _on_signal)
+
+    # --- single-instance guard -------------------------------------------
+    # "GPU work is strictly sequential: one process" is a guarantee, so it has
+    # to be enforced, not assumed. A hard kill leaves a stale daemon.pid behind
+    # (the finally-clause never runs), so a stale file must not block a
+    # restart -- only a LIVE sibling may.
+    other = live_sibling(root)
+    if other:
+        j.log(f"[daemon] REFUSING to start: another runner is already live on this "
+              f"GPU (pid {other}); one process at a time. Stop it first "
+              f"(touch {root/'STOP'}) or kill {other}.")
+        j.event("daemon_refused", reason="live_sibling", other_pid=other,
+                pid=os.getpid())
+        return 2
     (root / "daemon.pid").write_text(str(os.getpid()))
     j.event("daemon_start", pid=os.getpid(), host=socket.gethostname(),
             argv=sys.argv, python=sys.executable, queue=str(QUEUE_PATH))

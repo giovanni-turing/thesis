@@ -609,6 +609,10 @@ def load_composed_e2e_fill(idx, reload):
                              f"extra={sorted(got_cells-EXPECTED_CELLS)}")
     rows = []
     for cell, d in sorted(data.items()):
+        # D28.r1 (2026-07-27): outer key must equal window_arm -- inner-identity swap fails
+        if cell != d.get("window","") + "_" + d.get("arm",""):
+            raise AssertionError(f"K16: outer/inner identity mismatch: {cell} vs "
+                                 f"{d.get('window')}_{d.get('arm')}")
         # D28.2: a broken cell is an error, never a silent skip
         if "error" in d:
             raise AssertionError(f"K16: cell {cell} carries error: {d['error']!r}")
@@ -634,12 +638,16 @@ def load_composed_e2e_fill(idx, reload):
                      "source_path": path, "window_name_as_ingested": d["window"]})
     if len(rows) != 9:
         raise AssertionError(f"K16: expected exactly 9 rows, built {len(rows)}")
-    # D28.4: source-scoped REPLACEMENT, not bare upsert -- rows removed from the
-    # artifact must not survive in the store.
-    db.run_sql("DELETE FROM provenance.composed_e2e WHERE source_path = '%s';" % path.replace("'","''"))
-    db.run_sql(ic.multi_upsert_sql("composed_e2e", cols, rows,
-               ["source_path", "window_name", "arm"]))
-    db.run_sql(ic.ingest_sql(path, sha, "K16", len(rows), None, nbytes))
+    # D28.4 + D28.r4 (2026-07-27): source-scoped REPLACEMENT executed ATOMICALLY --
+    # delete, insert and ingest-log land in ONE transaction in ONE psql session, so
+    # a mid-sequence failure can never leave the store drained or half-replaced.
+    stmts = ["BEGIN",
+             "DELETE FROM provenance.composed_e2e WHERE source_path = '%s'" % path.replace("'", "''"),
+             ic.multi_upsert_sql("composed_e2e", cols, rows,
+                                 ["source_path", "window_name", "arm"]),
+             ic.ingest_sql(path, sha, "K16", len(rows), None, nbytes),
+             "COMMIT"]
+    db.run_sql(";\n".join(stmts) + ";")
     return 1, len(rows)
 
 

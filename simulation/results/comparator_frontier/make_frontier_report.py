@@ -462,7 +462,7 @@ def point(ax, x, y, failed, color, marker="o", ms=9):
 
 def tag(a, name, short=False):
     f = a["episodes_failed"]
-    st = "PASS" if f == 0 else (f"FAIL {f} ep · {a['episodes_failed_names'][0]}")
+    st = "PASS" if f == 0 else (f"FAIL {f} win · {a['episodes_failed_names'][0]}")
     if short:
         return f"{name}  {a['vs_static']:.3f}×  {st}"
     return (f"{name}\n{a['cost_worker_s_eval_span']/MS:.2f} Mworker-s"

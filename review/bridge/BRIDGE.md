@@ -1,4 +1,4 @@
-# Reviewer <-> Claude bridge — protocol v1.5 (stabilized 2026-07-26)
+# Reviewer <-> Claude bridge — protocol v1.7 (stabilized 2026-07-27)
 
 Transport: this directory (shared filesystem). `from_reviewer/` = reviewer's outbox,
 `to_reviewer/` = Claude's outbox, `archive/` = processed mail (moved by the reader,
@@ -12,6 +12,9 @@ never deleted). `python3 validate.py` lints all messages and regenerates STATE.m
   - `ts:` ISO-8601 with timezone
   - `re:` exact filename (without .md) of the message being answered, or `new`
   - `type:` `finding | question | response | rereview-request | ack | escalation | verification`
+  - `authority:` (required on any message asserting AUTHOR ADJUDICATION as a
+    heading) — must be one of the recognized registry values
+    (`author`, `author-delegated:fable-5-2026-07-26`, `author-delegated:fable-5-2026-07-27-xhigh`)
   - `thread:` (required on finding/escalation and every reply in a dispute) stable
     dispute id, e.g. `D01-oracle-convention`
 - Body: markdown. Cite as `path:line`. Numbers carry their derivation (artifact/DB
@@ -60,3 +63,8 @@ never deleted). `python3 validate.py` lints all messages and regenerates STATE.m
   `authority:` header naming the delegation (033 grandfathered by exact
   identity); STATE marks escalated threads ADJUDICATED when an
   authority-bearing message references them.
+- v1.7 (D26 round 3): the authority VALUE is validated against the registry
+  (presence alone is insufficient; STATE trusts only registry values or the
+  exact-identity 033 grandfather). A chain's terminal verification must be
+  authored by the FINDING's author — the fixer can never attest its own fix
+  closed. Unthreaded verifications are listed in STATE.

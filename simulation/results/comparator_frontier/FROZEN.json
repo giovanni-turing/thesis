@@ -1,17 +1,18 @@
 {
- "experiment": "thesis_shortening_plan_v3.md §8.2 — decisive baseline experiment (encoder pool)",
+ "experiment": "thesis_shortening_plan_v3.md \u00a78.2 \u2014 decisive baseline experiment (encoder pool)",
  "frozen_on": "2026-07-26",
  "frozen_by": "simulation/comparator_frontier_calibrate.sh",
- "status": "CALIBRATION COMPLETE — evaluation span NOT yet touched",
-
+ "status": "CALIBRATION COMPLETE \u2014 evaluation span NOT yet touched",
  "declared_sla_gate": {
   "metric": "encoder delay p99 (queue + service + handoff), taken over ALL requests of the window",
   "bound_ms": 1000,
   "relation": "strict <",
-  "source": ["tex/twopool.tex:185-194", "tex/baselines.tex:14-17"],
+  "source": [
+   "tex/twopool.tex:185-194",
+   "tex/baselines.tex:14-17"
+  ],
   "note": "text-only requests contribute a zero delay: a user-population tail, not a vision-pool-conditional one (tex/twopool.tex:192-194). Queue-non-divergence is NOT part of the declared gate (progress/results-ledger.md:717)."
  },
-
  "frozen_mechanics": {
   "rho_img_per_s": 15,
   "control_bin_s": 15,
@@ -21,65 +22,116 @@
   "max_workers": 32,
   "conversion": "workers = clamp(ceil(demand / rho), min_workers, max_workers)",
   "startup_convention": "up-lead / down-now: capacity ordered at t is ready at t+L; decreases take effect immediately",
-  "source": ["tex/closedloop.tex:30-32", "tex/baselines.tex:193-195",
-             "simulation/forecast_schedule.py:13-17", "simulation/forecast_schedule.py:146-150",
-             "verification/scripts/forecast_schedule_issuetime.py:19-30",
-             "simulation/run_encoder_hybrid.sh:19"],
+  "source": [
+   "tex/closedloop.tex:30-32",
+   "tex/baselines.tex:193-195",
+   "simulation/forecast_schedule.py:13-17",
+   "simulation/forecast_schedule.py:146-150",
+   "verification/scripts/forecast_schedule_issuetime.py:19-30",
+   "simulation/run_encoder_hybrid.sh:19"
+  ],
   "replay": "workload/trace_to_two_pool.py --encoder-workers 2 --worker-schedule <sched>",
   "interpreter": "/home/gio/tese/ai-dynamo/dynamo/.venv/bin/python (the interpreter that produced the existing fc/re/hybrid arms; the aiconfigurator venv is dead and its EncoderCostModel build differs by ~0.16% on the tail)"
  },
-
  "split": {
-  "calibration": {"span": "trace's first 1.4 days", "episodes": ["burst2", "burst6"],
-                  "source": "tex/closedloop.tex:43-53"},
-  "evaluation": {"span": "5.60-day forecast-covered aggregate window",
-                 "episodes": ["burst1", "burst3", "burst4", "burst5", "steady24h"],
-                 "source": "tex/closedloop.tex:43-53, tex/closedloop.tex:423-430"}
+  "calibration": {
+   "span": "trace's first 1.4 days",
+   "episodes": [
+    "burst2",
+    "burst6"
+   ],
+   "source": "tex/closedloop.tex:43-53"
+  },
+  "evaluation": {
+   "span": "5.60-day forecast-covered aggregate window",
+   "episodes": [
+    "burst1",
+    "burst3",
+    "burst4",
+    "burst5",
+    "steady24h"
+   ],
+   "source": "tex/closedloop.tex:43-53, tex/closedloop.tex:423-430"
+  }
  },
-
  "arm_3_reactive_plus_warm_floor": {
   "policy": "same-image-signal reactive (trailing observed point image rate) + minimum standing worker floor M",
   "implementation": "verification/scripts/reactive_quantile_schedule.py --mode react_point --min-workers M (no forked mechanics: --min-workers (:83) already enters the shared conversion at :114, so hysteresis, cold-start and step emission are the shipped _emit verbatim)",
-  "grid_M": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 20, 24, 32],
+  "grid_M": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   12,
+   14,
+   16,
+   20,
+   24,
+   32
+  ],
   "rule_R1": {
-   "statement": "cheapest M holding the declared gate on BOTH calibration episodes at the frontier's frozen lead L=30 s",
+   "statement": "cheapest M holding the declared gate on BOTH calibration windows at the frontier's frozen lead L=30 s",
    "selected_M": 1,
-   "verdict": "DEGENERATE — the un-floored reactive policy already passes both calibration episodes at L=30 s (burst2 589.301 ms, burst6 749.607 ms), so the calibration split cannot justify any floor. M=1 makes arm 3 identical to arm 2."
+   "verdict": "DEGENERATE \u2014 the un-floored reactive policy already passes both calibration windows at L=30 s (burst2 589.301 ms, burst6 749.607 ms), so the calibration split cannot justify any floor. M=1 makes arm 3 identical to arm 2."
   },
   "rule_R2": {
-   "statement": "cheapest M holding the declared gate on BOTH calibration episodes at EVERY lead of the thesis's declared encoder cold-start lead grid {15, 30, 45, 300} s (tex/baselines.tex tab:base-react-enc, simulation/run_burst26_reactive.sh:9)",
+   "statement": "cheapest M holding the declared gate on BOTH calibration windows at EVERY lead of the thesis's declared encoder cold-start lead grid {15, 30, 45, 300} s (tex/baselines.tex tab:base-react-enc, simulation/run_burst26_reactive.sh:9)",
    "selected_M": 4,
-   "binding_cell": {"window": "burst2", "L_s": 300, "p99_ms": 995.959, "margin_ms": 4.041},
-   "verdict": "NON-DEGENERATE — used as the frontier's warm-floor arm. Margin at the binding cell is thin (4.0 ms); M=5 is the cheapest floor with >=93 ms margin at every declared lead and is the disclosed margin-robust alternative."
+   "binding_cell": {
+    "window": "burst2",
+    "L_s": 300,
+    "p99_ms": 995.959,
+    "margin_ms": 4.041
+   },
+   "verdict": "NON-DEGENERATE \u2014 used as the frontier's warm-floor arm. Margin at the binding cell is thin (4.0 ms); M=5 is the cheapest floor with >=93 ms margin at every declared lead and is the disclosed margin-robust alternative."
   },
   "frozen_M": 4,
   "frozen_rule": "R2"
  },
-
  "arm_5_perfect_future_oracle": {
   "policy": "schedule computed from the TRUE future per-bin image demand of the trace, headroom-free (point, not quantile), identical conversion, identical startup physics: every order placed exactly L ahead of the bin that needs it and never before window start",
   "implementation": "simulation/comparator_frontier_oracle.py",
   "free_parameter": "hysteresis H (the only mechanically admissible dial); H=3 min = identical mechanics to the other arms, H=0 = no scale-down damping",
   "rule_R3": {
-   "statement": "cheapest H in {0, 3} min holding the declared gate on BOTH calibration episodes at L=30 s",
+   "statement": "cheapest H in {0, 3} min holding the declared gate on BOTH calibration windows at L=30 s",
    "selected_H": 0,
    "calibration": {
-    "H0": {"burst2": {"p99_ms": 906.600, "worker_s": 60159.9},
-           "burst6": {"p99_ms": 906.600, "worker_s": 31933.8}},
-    "H3": {"burst2": {"p99_ms": 589.301, "worker_s": 134374.6},
-           "burst6": {"p99_ms": 589.301, "worker_s": 90943.2}}
+    "H0": {
+     "burst2": {
+      "p99_ms": 906.6,
+      "worker_s": 60159.9
+     },
+     "burst6": {
+      "p99_ms": 906.6,
+      "worker_s": 31933.8
+     }
+    },
+    "H3": {
+     "burst2": {
+      "p99_ms": 589.301,
+      "worker_s": 134374.6
+     },
+     "burst6": {
+      "p99_ms": 589.301,
+      "worker_s": 90943.2
+     }
+    }
    }
   },
   "frozen_H": 0,
   "scope_of_the_bound": "zero-forecast-error reference: it bounds the SIGNAL-QUALITY axis, not the headroom axis. A quantile forecast that over-predicts can beat the oracle's p99 by paying more worker-time; nothing can beat the oracle's placement at the same point conversion."
  },
-
  "verification": {
   "independent_recomputation": "simulation/comparator_frontier_summarize.py recomputes every p99 from the emitted mooncake JSONL (delay_i = timestamp_i - arrival_i, request index from hash_ids[0]//100000) and every provisioned worker-second by integrating the schedule to the simulated end; both cross-checked against each run's stats.json",
   "cells_checked": 144,
   "mismatches": 0,
   "artifacts": "simulation/results/comparator_frontier/calib/ (*.jsonl.zst, *.sched.json, *.jsonl.stats.json), summary in calib_summary.txt / calib_summary.json"
  },
-
- "next_step": "simulation/comparator_frontier_eval.sh — the SINGLE evaluation run. No parameter above may change after it is read."
+ "next_step": "simulation/comparator_frontier_eval.sh \u2014 the SINGLE evaluation run. No parameter above may change after it is read."
 }

@@ -70,7 +70,7 @@ L   M
     24.0   589.301   589.301      164399.4  118065.2
     32.0   589.301   589.301      218779.1  157420.3
 
--- rule R1 (mandated): cheapest M passing BOTH calibration episodes at the frozen frontier lead L=30s --
+-- rule R1 (mandated): cheapest M passing BOTH calibration windows at the frozen frontier lead L=30s --
    M=1.0  burst2: p99=   589.3 ms (PASS)  burst6: p99=   749.6 ms (PASS)   sum worker-s=    215164.8   -> PASS
    M=2.0  burst2: p99=   589.3 ms (PASS)  burst6: p99=   589.3 ms (PASS)   sum worker-s=    215836.9   -> PASS
    M=3.0  burst2: p99=   589.3 ms (PASS)  burst6: p99=   589.3 ms (PASS)   sum worker-s=    217034.1   -> PASS
@@ -89,7 +89,7 @@ L   M
    M=32.0  burst2: p99=   589.3 ms (PASS)  burst6: p99=   589.3 ms (PASS)   sum worker-s=    376199.4   -> PASS
    R1 selects M = 1.0
 
--- rule R2 (disclosed secondary): cheapest M passing BOTH calibration episodes at EVERY declared lead [15.0, 30.0, 45.0, 300.0] --
+-- rule R2 (disclosed secondary): cheapest M passing BOTH calibration windows at EVERY declared lead [15.0, 30.0, 45.0, 300.0] --
    M=1.0  L=15: PASS  L=30: PASS  L=45: PASS  L=300: FAIL   -> FAIL
    M=2.0  L=15: PASS  L=30: PASS  L=45: PASS  L=300: FAIL   -> FAIL
    M=3.0  L=15: PASS  L=30: PASS  L=45: PASS  L=300: FAIL   -> FAIL

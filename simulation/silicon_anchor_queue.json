@@ -22,6 +22,8 @@
    14001
   ],
   "throttle_hex_required": "0x0000000000000000",
+  "throttle_fatal_bits_hex": "0x00000000000000f8",
+  "throttle_policy": "The delivered SM band is the binding criterion. Only slowdown bits stop a measurement: HwSlowdown 0x8 | SyncBoost 0x10 | SwThermalSlowdown 0x20 | HwThermalSlowdown 0x40 | HwPowerBrake 0x80 (mask 0xf8). Benign bits seen under normal locked load -- GpuIdle 0x1, ApplicationsClocksSetting 0x2, SwPowerCap 0x4, DisplayClockSetting 0x100 -- are RECORDED as evidence (clock.jsonl + rep.json throttle_evidence) but do not gate, because at 380 W the card raises SwPowerCap while still delivering 2385 MHz, i.e. inside the locked band. Measured live 2026-07-27: strict throttle_hex==0 idled the runner 60 s out of every ~140 s of measuring while protecting nothing the SM band did not already protect.",
   "require_persistence_mode": true,
   "require_single_tenant": true,
   "foreign_compute_app_mib_tolerance": 64,

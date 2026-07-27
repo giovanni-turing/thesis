@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bridge protocol v1.6 linter + thread-state generator. Run from review/bridge/.
+"""Bridge protocol v1.7 linter + thread-state generator. Run from review/bridge/.
 v1.3 (2026-07-26, threads D01/D02): re:-graph dispute-chain machine (one root
 finding, linear, <=2 responses, escalation only after the 2nd response and
 terminal); strict header grammar (no YAML claim); nonempty bounded values;
@@ -17,6 +17,10 @@ THREAD_RE = re.compile(r"^D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*$")
 # v1.6 (D26): exact-identity exception -- message 033 predates the authority-header rule;
 # its delegated authority is documented in BRIDGE.md and the session transcript.
 ADJUDICATION_EXCEPTIONS = {"033_adjudication_d19_d22"}
+# v1.7 (D26 round 3): the only authorities this bridge recognizes. A heading-level
+# adjudication with any other value is an error; STATE trusts only these.
+VALID_AUTHORITIES = {"author", "author-delegated:fable-5-2026-07-26",
+                     "author-delegated:fable-5-2026-07-27-xhigh"}
 THREADED_TYPES = {"finding","response","escalation","verification"}
 
 def parse_header(path, errs):
@@ -101,9 +105,11 @@ def main():
             errors.append(f"{m['file']}: verification must name its exact target ('re: new' is invalid)")
         _asserts_adj = any(ln.lstrip().startswith("#") and "AUTHOR ADJUDICATION" in ln
                            for ln in m.get("body","").splitlines())
-        if _asserts_adj and "authority" not in m["hdr"] \
-                and m["file"] not in ADJUDICATION_EXCEPTIONS:
-            errors.append(f"{m['file']}: claims AUTHOR ADJUDICATION without an 'authority:' header")
+        if _asserts_adj and m["file"] not in ADJUDICATION_EXCEPTIONS:
+            if "authority" not in m["hdr"]:
+                errors.append(f"{m['file']}: claims AUTHOR ADJUDICATION without an 'authority:' header")
+            elif m["hdr"]["authority"] not in VALID_AUTHORITIES:
+                errors.append(f"{m['file']}: authority '{m['hdr']['authority']}' not in the recognized registry")
     # sequences per sender: start 001, contiguous, no duplicates
     for who in SENDERS:
         seqs = sorted(int(m["file"][:3]) for m in msgs
@@ -154,6 +160,10 @@ def main():
                     if ty == "verification":
                         if i != len(types)-1:
                             errors.append(f"thread {t}: verification {chain[i]} must be terminal"); bad=True
+                        vfrom = by_name[chain[i]]["hdr"].get("from")
+                        ffrom = by_name[chain[0]]["hdr"].get("from")
+                        if vfrom != ffrom:
+                            errors.append(f"thread {t}: terminal verification by '{vfrom}' -- only the finding's author ('{ffrom}') may attest its resolution"); bad=True
                         prev = types[i-1]
                         nresp_before = types[1:i].count("response")
                         if not (prev == "escalation" or nresp_before >= 2):
@@ -177,7 +187,7 @@ def main():
     if os.path.islink("STATE.md"):
         errors.append("STATE.md is a symlink — refusing to write"); state_ok = False
     else: state_ok = True
-    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v1.6)\n",
+    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v1.7)\n",
            f"\nmessages: {len(msgs)}  errors: {len(errors)}\n", "\n## Dispute threads\n"]
     if not threads: out.append("(none)\n")
     for t in sorted(threads):
@@ -185,13 +195,17 @@ def main():
             chain, types = thread_state[t]
             nresp = types.count("response"); esc = "escalation" in types
             adjudicated = esc and any(
-                (("authority" in m["hdr"]) or (m["file"] in ADJUDICATION_EXCEPTIONS))
+                ((m["hdr"].get("authority") in VALID_AUTHORITIES) or (m["file"] in ADJUDICATION_EXCEPTIONS))
                 and t in m.get("body", "") for m in msgs)
             tag = ", ADJUDICATED (author ruling on record)" if adjudicated else (", ESCALATED - awaiting author" if esc else "")
             out.append(f"- **{t}**: {len(chain)} msgs, {nresp}/2 evidence rounds{tag}\n")
             for n in chain: out.append(f"    - {n} ({by_name[n]['hdr'].get('from')}, {by_name[n]['hdr'].get('type')})\n")
         else:
             out.append(f"- **{t}**: INVALID CHAIN (see errors)\n")
+    unv=[m for m in msgs if m["hdr"].get("type")=="verification" and not m["hdr"].get("thread")]
+    if unv:
+        out.append("\n## Unthreaded verifications (terminal attestations)\n")
+        for m in unv: out.append(f"- {m['file']} ({m['hdr'].get('from')}) re: {m['hdr'].get('re')}\n")
     if errors: out.append("\n## Protocol errors\n" + "".join(f"- {e}\n" for e in errors))
     if state_ok:
         fd, tmp = tempfile.mkstemp(dir=".", prefix=".state.", suffix=".tmp")

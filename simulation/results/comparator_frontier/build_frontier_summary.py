@@ -283,7 +283,8 @@ def main() -> None:
                 exp_M = int(mM.group(1)) if mM else None
                 exp_L = int(mM.group(2)) if mM else int(_re2.search(r"_L(\d+)_H", tag).group(1))
                 tr_M = None if tr.get("M") is None else int(tr["M"])
-                if (tr.get("window") != fr["window"] or tr_M != exp_M
+                exp_arm = "warm_floor" if mM else ("oracle_H" + _re2.search(r"_H(\d+)$", tag).group(1))
+                if (tr.get("arm") != exp_arm or tr.get("window") != fr["window"] or tr_M != exp_M
                         or int(tr.get("L", -1)) != exp_L or tr.get("stats_agrees") is not True
                         or abs(tr["p99"] - fr["p99"]) > 1e-2 or abs(tr["worker_s"] - fr["worker_s"]) > 0.15
                         or int(tr["violations_1000ms"]) != int(fr["violations_1000ms"])

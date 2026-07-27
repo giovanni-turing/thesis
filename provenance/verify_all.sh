@@ -116,6 +116,7 @@ DIGEST() { Q "select md5(string_agg(x,'|' order by x)) from (
     union all select 'il='||md5(string_agg(file_path||'#'||sha256||'#'||n_rows::text||'#'||coalesce(run_id,''), '\n' order by file_path)) from provenance.ingest_log
     union all select 'runs='||md5(string_agg(run_id||'#'||coalesce(runtime_build,'')||'#'||coalesce(runtime_version,'')||'#'||coalesce(window_name,'')||'#'||coalesce(tp::text,'')||'#'||coalesce(artifact_commit_sha,'')||'#'||coalesce(model_checkpoint,'')||'#'||coalesce(arrival_speedup::text,'')||'#'||coalesce(config_provenance::text,''), '\n' order by run_id)) from provenance.runs
     union all select t||'='||(xpath('/r/c/text()',query_to_xml('select count(*) c from provenance.'||t,false,true,''))::text[])[1] from unnest(array['llm_request','composed_request','encoder_series','forecast','worker_schedule','factorial_cell']) t
+    union all select 'ce2e='||md5(string_agg(window_name||'#'||arm||'#'||requests::text||'#'||e2e_p99_ms::text||'#'||coalesce(source_path,''), '\n' order by window_name, arm)) from provenance.composed_e2e
   ) s"; }
 # Two-run form: the FIRST run may legitimately absorb a genuinely-changed file on disk (e.g.
 # K13 re-loads results-ledger.md whenever its sha moves -- §6.14). Idempotency is the property
@@ -366,14 +367,21 @@ fi
 CFJ_TMP="$TMP/cf_regen.json"
 if "$TESE/eda/.venv/bin/python" "$TESE/simulation/composed_fill_join.py" --out "$CFJ_TMP" >/dev/null 2>&1 \
    && "$TESE/eda/.venv/bin/python" - "$CFJ_TMP" <<'CFPY'
-import json, sys
+import json, sys, math
 tracked = json.load(open("/home/gio/tese/simulation/results/composed_fill/composed_fill_joined.json"))
 fresh = json.load(open(sys.argv[1]))
 assert set(tracked) == set(fresh) and len(tracked) == 9, "cell identity mismatch"
 for c in tracked:
-    for k in ("enc_p99", "e2e_p99", "e2e_max", "ttft_p99", "requests"):
-        if k in tracked[c] or k in fresh[c]:
-            assert abs(float(tracked[c][k]) - float(fresh[c][k])) < 1e-6, f"{c}.{k}"
+    tc, fc = tracked[c], fresh[c]
+    assert set(tc) == set(fc), f"{c}: field-set mismatch"
+    assert c == tc.get("window","")+"_"+tc.get("arm",""), f"{c}: outer/inner identity"
+    for k in set(tc):
+        tv, fv = tc[k], fc[k]
+        if isinstance(tv, (int, float)) and not isinstance(tv, bool):
+            assert math.isfinite(float(tv)) and math.isfinite(float(fv)), f"{c}.{k} non-finite"
+            assert abs(float(tv) - float(fv)) < 1e-6, f"{c}.{k}"
+        else:
+            assert tv == fv, f"{c}.{k} string mismatch"
 CFPY
 then
   ok "composed nine-cell join: regenerated from raw, artifact field-identical"
@@ -390,17 +398,35 @@ CFNUM=$("$TESE/eda/.venv/bin/python" - <<'CFDBPY'
 import json, subprocess, os
 art = json.load(open("/home/gio/tese/simulation/results/composed_fill/composed_fill_joined.json"))
 env = dict(os.environ)
-q = ("select window_name||'_'||arm, e2e_p99_ms from provenance.composed_e2e "
-     "where source_path like '%composed_fill%'")
+import math
+CANON = "/home/gio/tese/simulation/results/composed_fill/composed_fill_joined.json"
+q = ("select window_name||'_'||arm, requests, enc_p99_ms, ttft_p99_ms, e2e_p99_ms, "
+     "e2e_max_ms, itl_p99_ms, gpu_hours, composed_trace from provenance.composed_e2e "
+     "where source_path = '" + CANON + "'")
 out = subprocess.run(["psql","-h","localhost","-p","5433","-U","goku","-d","postgres","-tAc",q],
                      capture_output=True, text=True, env=env).stdout
-db = dict((l.split("|")[0], float(l.split("|")[1])) for l in out.strip().splitlines())
+db = {}
+for line in out.strip().splitlines():
+    f = line.split("|")
+    db[f[0]] = dict(requests=int(f[1]), enc_p99=float(f[2]), ttft_p99=float(f[3]),
+                    e2e_p99=float(f[4]), e2e_max=float(f[5]), itl_p99=float(f[6]),
+                    gpu_h=float(f[7]), composed_trace=f[8])
 bad = []
+if len(db) != 9:
+    bad.append(f"rowcount={len(db)}")
 for cell, d in art.items():
     key = d["window"] + "_" + d["arm"]
-    if key not in db or abs(db[key] - d["e2e_p99"]) > 1e-3:
-        bad.append(cell)
-print("OK" if not bad else "FAIL:" + ",".join(bad))
+    row = db.get(key)
+    if row is None:
+        bad.append(cell); continue
+    for k in ("requests", "enc_p99", "ttft_p99", "e2e_p99", "e2e_max", "itl_p99", "gpu_h"):
+        av, dv = float(d[k]), float(row[k])
+        if not (math.isfinite(av) and math.isfinite(dv)) or abs(av - dv) > 1e-3:
+            bad.append(f"{cell}.{k}"); break
+    else:
+        if row["composed_trace"] != d["composed_trace"]:
+            bad.append(f"{cell}.composed_trace")
+print("OK" if not bad else "FAIL:" + ",".join(bad[:4]))
 CFDBPY
 )
 if [ "$CFNUM" = "OK" ]; then
