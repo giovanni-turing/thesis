@@ -28,6 +28,8 @@ real_run = subprocess.run
 real_wt = ingest_common.is_worktree
 real_loads = json.loads
 real_SIM = loaders.SIM
+real_tempdir = tempfile.tempdir
+REAL_GLOBAL_TMP = tempfile.gettempdir()
 
 gen_calls = []
 
@@ -62,6 +64,10 @@ try:
 
         loaders.SIM = SIM_ISO
         ingest_common.is_worktree = lambda p: False   # deterministic; probe 5 overrides
+        # D49: own the loader's regeneration namespace -- k16_regen_* dirs from
+        # THIS process land under TD, so hygiene asserts only owned paths and a
+        # concurrent K16 elsewhere cannot false-fail the gate.
+        tempfile.tempdir = TD
 
         def reset():
             open(PATH, "wb").write(ORIG)
@@ -146,10 +152,32 @@ try:
         print(f"settled-clean-skip: ret={n} generator_calls={len(gen_calls)} db_calls={len(calls)}")
         ok &= n == (0, 0) and len(gen_calls) == 1 and len(calls) == 0
 
-        # 8. Tempdir hygiene: no k16_regen_* leftovers from any probe above.
-        left = [d for d in os.listdir(tempfile.gettempdir()) if d.startswith("k16_regen_")]
-        print(f"tempdir-hygiene: leftovers={len(left)}")
+        # 8. Tempdir hygiene, OWNED namespace only (D49): loader regen dirs are
+        #    forced under TD, so the assertion covers exactly the directories
+        #    this process created -- nothing global.
+        def owned_leftovers():
+            return [d for d in os.listdir(TD) if d.startswith("k16_regen_")]
+        left = owned_leftovers()
+        print(f"tempdir-hygiene(owned): leftovers={len(left)}")
         ok &= not left
+
+        # 8b. Concurrency control: an unrelated k16_regen_* in the GLOBAL temp
+        #     root (a legitimate concurrent K16 run) must not affect the result.
+        foreign = tempfile.mkdtemp(prefix="k16_regen_", dir=REAL_GLOBAL_TMP)
+        try:
+            unaffected = not owned_leftovers()
+            print(f"foreign-regen-dir-ignored: {unaffected}")
+            ok &= unaffected
+        finally:
+            os.rmdir(foreign)
+
+        # 8c. Detection not weakened: an OWNED leaked directory still fails.
+        plant = os.path.join(TD, "k16_regen_leak")
+        os.mkdir(plant)
+        detected = bool(owned_leftovers())
+        os.rmdir(plant)
+        print(f"owned-leak-detected: {detected}")
+        ok &= detected
 
         # 9. Integration control (READ-ONLY on canonical files): the REAL
         #    generator, run with a temp-child --out, reproduces the repository
@@ -165,6 +193,7 @@ finally:
     ingest_common.is_worktree = real_wt
     json.loads = real_loads
     loaders.SIM = real_SIM
+    tempfile.tempdir = real_tempdir
 
 # 10. Canonical shared-tree files untouched -- the suite's isolation contract.
 art_ok = open(REPO_ARTIFACT, "rb").read() == CANON_ART
