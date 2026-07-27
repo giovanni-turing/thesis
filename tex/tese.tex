@@ -84,8 +84,9 @@ order of magnitude apart, and the encoder pool misses its tail bound at the
 trace's own recorded rate, invisibly to rate- and utilization-based monitors.
 
 Closing the loop under a single pre-frozen replay protocol yields a
-trade-off with an identified failure mode, not universal superiority: on four of the five
-composed windows the forecast and reactive tails tie exactly,
+trade-off with an identified failure mode, not universal superiority: on three of the five
+evaluation windows and the aggregate span the forecast and reactive tails tie
+exactly (the calm day within 5 ms),
 and the latency advantage lives in the one-minute onset. What forecasting
 buys at week scale is resource-time at equal compliance. Over the 5.60-day
 evaluation span the p90-forecast schedule holds the encoder tail bound in
@@ -161,8 +162,9 @@ taxa e utiliza\c{c}\~ao.
 
 Fechando o la\c{c}o sob um protocolo \'unico de replay pr\'e-congelado, o resultado \'e um
 compromisso com um modo de falha identificado, e n\~ao superioridade
-universal: em quatro das cinco janelas compostas as
-caudas da previs\~ao e do reativo \emph{empatam exatamente}, e a vantagem de
+universal: em tr\^es das cinco janelas de avalia\c{c}\~ao e no intervalo
+agregado as caudas da previs\~ao e do reativo \emph{empatam exatamente} (o
+dia calmo a menos de 5\,ms), e a vantagem de
 lat\^encia reside no in\'icio de um minuto. O que a previs\~ao compra em
 escala semanal \'e tempo de recurso a igual conformidade. No intervalo de
 avalia\c{c}\~ao de 5,60 dias o cronograma de previs\~ao p90 sustenta o

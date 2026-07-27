@@ -799,7 +799,9 @@ static/reactive pair. Two gaps remain, and both follow from the evaluation
 contract rather than from effort. \textbf{burst2 and burst6 carry no composed
 forecast arm}: they are the calibration split (Section~\ref{sec:cl-contract}),
 and a forecast graded there would be graded on its own context data ---
-forecast-free composed halves for both windows exist in the archive, and the
+forecast-free composed halves for both windows are archived compressed in
+the repository (\texttt{defense/anim/data/g1\_runs/}, tracked
+\texttt{.zst} with manifest provenance), and the
 two windows enter results grading through the forecast-free comparators of
 Section~\ref{sec:cl-comparators}; their static joins simply sit outside the
 frozen fill-campaign arm set. \textbf{The full trace carries no forecast
@@ -817,8 +819,10 @@ run populations were still growing when the tables were frozen.
 
 \begin{table}[htbp]
 \centering
-\caption[Encoder-pool ledger on the request-linked arm set]{Encoder-pool ledger
-on the request-linked arm set (forecast = Chronos p90, $\rho{=}15$,
+\caption[Encoder-pool ledger, a12 request-linked arm set]{Encoder-pool ledger
+on the a12 request-linked arm set --- aggregate + the four forecast-covered
+burst windows + the full-trace family; the calm-day and burst-static composed
+rows are in Table~\ref{tab:cl-ledger-joint} (forecast = Chronos p90, $\rho{=}15$,
 $L{=}30$\,\si{\second}, issue-time, warm-pool; reactive = the identically
 informed strawman at the same lead); bold marks a p99 over the
 \SI{1000}{\milli\second} encoder-delay bound. Worker-time is provisioned
@@ -872,9 +876,11 @@ mechanism of Section~\ref{sec:cl-matrix}: at 2.2--3.2\% encoder utilization the
 queue is empty for essentially every request, so delay collapses onto the
 observed \SI{588}{\milli\second} no-queue plateau every adequately provisioned
 policy reaches. \textbf{On the graded encoder statistic, forecasting does not
-beat reactive control on four of the five composed windows --- they tie
-exactly, at the plateau. The whole encoder-latency advantage on this arm set
-lives in burst3}, where the reactive p99 of 16{,}079 is 15$\times$ over the
+beat reactive control anywhere the pool is adequately provisioned: the two
+arms tie exactly on the aggregate span and on three of the five evaluation
+windows (burst1/4/5), and sit \SI{5}{\milli\second} apart on the calm day
+(677.4 vs.\ 682.1). The whole encoder-latency advantage lives in burst3},
+where the reactive p99 of 16{,}079 is 15$\times$ over the
 bound while forecast holds the plateau. (Reactive also fails the two
 out-of-span windows --- which no archived forecast covers --- at long lead,
 Table~\ref{tab:base-react-enc}.) Where the arms \emph{do} separate on every window is
@@ -1204,8 +1210,10 @@ repeated-trial noise band).}
 
 \begin{table}[htbp]
 \centering
-\caption[Language-pool ledger on the request-linked arm set]{Language-pool
-ledger on the same request-linked arm set (forecast = Chronos p90 under the
+\caption[Language-pool ledger, a12 request-linked arm set]{Language-pool
+ledger on the same a12 request-linked arm set as Table~\ref{tab:cl-ledger-enc}
+--- the calm-day and burst-static composed rows are in
+Table~\ref{tab:cl-ledger-joint} (forecast = Chronos p90 under the
 tail-aware conversion). ``Over'' is the fraction of requests exceeding the
 \SI{1000}{\milli\second} TTFT bound and ``in viol.'' the fraction of wall-clock
 time the bound was breached; the SLA is graded on p99, so a sub-1\%
@@ -1254,10 +1262,14 @@ grade TTFT only.}
 Unlike on the encoder pool, TTFT is retained per request, so infraction \emph{duration}
 is real here. \textbf{This pool separates on every window, and the separation
 is compliance, not thrift.} Forecast holds TTFT p99 at \SI{651}{\milli\second}
-and ITL p99 at 5.1--6.3\,\si{\milli\second} on all five windows; reactive
-violates TTFT on \emph{all five} and ITL on four (the aggregate-window ITL pass
-is the masking of Section~\ref{sec:cl-aggregate} again), leaving burst3's bound
-breached for 87 seconds --- 5.37\% of wall-clock, 9.96\% of requests.
+and ITL p99 at 5.1--6.3\,\si{\milli\second} on all five windows of this arm
+set; reactive violates TTFT on \emph{all five of them} and ITL on four (the
+aggregate-window ITL pass is the masking of Section~\ref{sec:cl-aggregate}
+again), leaving burst3's bound breached for 87 seconds --- 5.37\% of
+wall-clock, 9.96\% of requests. On the calm day's composed arm
+(Table~\ref{tab:cl-ledger-joint}) reactive \emph{passes} TTFT at
+\SI{494.3}{\milli\second}: the compliance failure is a burst phenomenon,
+not a universal one.
 \textbf{And it costs more, not less}: the forecast policy is 2--6$\times$
 \emph{more} expensive than reactive in language-pool resource-time. That is not
 a defect --- reactive is cheap precisely because it under-provisions decode
@@ -1284,8 +1296,11 @@ closed-loop evidence covers the largest burst (all leads, both conversions),
 the fastest onset (carried live in Section~\ref{sec:val-results}), the binding
 mix, every forecast-covered burst window end-to-end, the full evaluation
 span, and the calm day (its three composed arms replayed end-to-end,
-Section~\ref{sec:cl-ledger-joint}); burst2/6 (uncovered) are priced by the
-grid and the knee formula rather than replayed end-to-end. The replay is open-loop: arrivals
+Section~\ref{sec:cl-ledger-joint}); burst2/6 carry no forecast-policy
+evaluation (the calibration split) --- their forecast-free static halves were
+replayed through both pools and are archived out of frozen scope --- and enter
+grading only through the forecast-free comparators, priced by the grid and the
+knee formula. The replay is open-loop: arrivals
 follow the trace regardless of experienced latency, so overload cannot shed or
 defer demand as clients would --- policies are compared under identical offered
 load, and real clients' abandonment, backpressure or retries could shift
@@ -1374,6 +1389,7 @@ Priced over the covered week, the policy meets the SLA in aggregate and in each
 of the four declared in-span burst windows at \textbf{0.62 times the
 deployable static encoder fleet's worker-time} --- a week-scale SLA/resource
 trade-off, since per burst window every arm costs more than static, and since
-on four of the five composed windows the forecast and reactive tails tie
-exactly. The finer daily-fold grain surfaces the one missed covered onset, e13,
+the forecast and reactive tails tie exactly on three of the five evaluation
+windows (burst1/4/5) and on the aggregate span, the calm day within
+\SI{5}{\milli\second}. The finer daily-fold grain surfaces the one missed covered onset, e13,
 recovered at 0.76$\times$ by the post-hoc hybrid.

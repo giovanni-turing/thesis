@@ -97,7 +97,11 @@ simulation/results/rerun_verify/week_static_C8.jsonl
 /defense/anim/data/a16_decode/
 /defense/anim/data/a16_decode_spread/
 /defense/anim/data/a16_controller_cost/
-/defense/anim/data/g1_runs/
+/defense/anim/data/g1_runs/*
+!/defense/anim/data/g1_runs/burst2_enc_static_C8.jsonl.zst
+!/defense/anim/data/g1_runs/burst2_lang_static_C8.requests.jsonl.zst
+!/defense/anim/data/g1_runs/burst6_enc_static_C8.jsonl.zst
+!/defense/anim/data/g1_runs/burst6_lang_static_C8.requests.jsonl.zst
 /defense/anim/data/g2_runs/
 /defense/anim/data/g3_32b/
 /defense/anim/data/g4_folds/

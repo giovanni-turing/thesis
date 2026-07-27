@@ -48,7 +48,22 @@ A13_GEN = {
     "ledger_anchor": ("progress/results-ledger.md: 'Full-trace coverage "
                       "GUARANTEE MET -- every request, both pools (A13)' (2026-07-19)"),
 }
+G1_GEN = {
+    "generation_command": "python3 defense/anim/build/gen_g1_burst26.py",
+    "generation_commit": "e386f02 (g1 generator introduction: gap-closure tracks)",
+    "ledger_anchor": ("out-of-frozen-scope evidence (bridge D31): burst2/6 "
+                      "forecast-free static composed halves; not part of the "
+                      "frozen 29-arm campaign"),
+}
 FILES = {
+    "defense/anim/data/g1_runs/burst2_enc_static_C8.jsonl": dict(
+        G1_GEN, generating_source="g1 burst2 static C=8 encoder composed half (forecast-free, out of frozen scope)"),
+    "defense/anim/data/g1_runs/burst2_lang_static_C8.requests.jsonl": dict(
+        G1_GEN, generating_source="g1 burst2 static language per-request records (forecast-free, out of frozen scope)"),
+    "defense/anim/data/g1_runs/burst6_enc_static_C8.jsonl": dict(
+        G1_GEN, generating_source="g1 burst6 static C=8 encoder composed half (forecast-free, out of frozen scope)"),
+    "defense/anim/data/g1_runs/burst6_lang_static_C8.requests.jsonl": dict(
+        G1_GEN, generating_source="g1 burst6 static language per-request records (forecast-free, out of frozen scope)"),
     "defense/anim/data/a2_runs/steady24h_forecast_L30.jsonl": dict(
         A2_GEN, generating_source="a2 steady24h forecast_L30 composed replay trace (A2 v2 fleet campaign)"),
     "defense/anim/data/a2_runs/steady24h_reactive_L30.jsonl": dict(
@@ -137,7 +152,9 @@ def build(compare_plain):
             "round_trip_cmp": ROUND_TRIP_TEXT,
         })
     return {
-        "package": "composed-join replay inputs (tab:cl-ledger-* / K16 pipeline)",
+        "package": ("composed-join replay inputs (tab:cl-ledger-* / K16 pipeline; "
+                    "six archives) + burst2/6 forecast-free static halves "
+                    "(out-of-frozen-scope evidence, bridge D31; four archives)"),
         "generator": ("verification/make_replay_archive_manifest.py (tracked; "
                       "--verify recomputes from the tracked archives alone and compares)"),
         "lineage": ("Replay outputs derived from AzureLMMInferenceDataset2025 "
@@ -216,7 +233,7 @@ def main():
         json.dump(manifest, f, indent=1)
     tot_c = sum(r["compressed_bytes"] for r in manifest["files"])
     tot_p = sum(r["plain_bytes"] for r in manifest["files"])
-    print(f"manifest written: 6 files, compressed {tot_c:,} B "
+    print(f"manifest written: {len(manifest['files'])} files, compressed {tot_c:,} B "
           f"({tot_c / 2**20:.3f} MiB), plain {tot_p:,} B ({tot_p / 2**30:.5f} GiB)")
     return 0
 
