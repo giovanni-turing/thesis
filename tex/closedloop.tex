@@ -797,13 +797,17 @@ deployable $C{=}8$ fleet over the same span. Composed coverage therefore spans
 calm day --- static arms included, plus the aggregate span and the full-trace
 static/reactive pair. Two gaps remain, and both follow from the evaluation
 contract rather than from effort. \textbf{burst2 and burst6 carry no composed
-arm}: they are the calibration split (Section~\ref{sec:cl-contract}), and
-replaying them as composed evaluation cells would grade a result on
-forecast-context data. \textbf{The full trace carries no forecast arm}: the
-archive's first 1.4 days are that forecast's own context, so a full-trace
-forecast cannot be constructed without leaking context into the graded span ---
-the same reason the full-trace family is graded in aggregate only. Neither gap
-is a missing replay that could be run; each is a cell the protocol forbids.
+forecast arm}: they are the calibration split (Section~\ref{sec:cl-contract}),
+and a forecast graded there would be graded on its own context data ---
+forecast-free composed halves for both windows exist in the archive, and the
+two windows enter results grading through the forecast-free comparators of
+Section~\ref{sec:cl-comparators}; their static joins simply sit outside the
+frozen fill-campaign arm set. \textbf{The full trace carries no forecast
+arm}: the archive's first 1.4 days are that forecast's own context, so a
+full-trace forecast cannot be constructed without leaking context into the
+graded span --- the same reason the full-trace family is graded in aggregate
+only. The forecast cells are protocol-forbidden; the burst2/6 static cells are
+out of frozen scope, not impossible.
 Four experiment families (a16, g2, g3\_32b, g6) are excluded from every table
 here, an exclusion fixed at the 2026-07-26 manuscript snapshot because their
 run populations were still growing when the tables were frozen.
@@ -914,10 +918,12 @@ operational meaning, since the two percentiles are attained by different
 requests --- shown only to quantify the error it would introduce. All latencies
 in \si{\milli\second}. ``Error'' is naive sum divided by E2E p99: above
 $1.000\times$ the sum overstates the measured tail, below it the sum
-\emph{understates} it. Naive sum and error are computed at full precision from
-the unrounded per-pool p99s and rounded only for display, so a printed sum may
-differ by \SI{1}{\milli\second} from the sum of the printed operands (burst4
-and full-trace static). The Chronos forecast arm reads identically on the
+\emph{understates} it. The naive sum adds the replay report's TTFT p99 at its
+native \SI{0.1}{\milli\second} precision to the unrounded encoder p99, and
+sum and error are rounded only for display, so a printed sum may differ by
+\SI{1}{\milli\second} from the sum of the printed operands (burst4 and
+full-trace static); the estimator-consistent full-precision relation is
+persisted per cell in the join artifact itself. The Chronos forecast arm reads identically on the
 aggregate span and the four burst windows and is given once there; the Toto and
 TimesFM arms coincide with it except on burst1, where they read 1{,}259 and
 1{,}258\,\si{\milli\second} (errors $1.0006\times$ and $1.0010\times$). The
@@ -926,10 +932,12 @@ calm-day forecast arm is Chronos p90 at the same lead. Populations are
 \num{88260} on the calm day, \num{749601} on the aggregate span and
 \num{1000000} on the full trace, per pool, with every language record
 terminating \texttt{completed}; composed maxima are in the provenance manifest.
-$^{\dagger}$burst5's static $C{=}8$ encoder half ends the window with a
-non-empty queue (\num{501} images, the backlog-divergence flag its
-Chapter~\ref{cap:twopool} grid row also carries), so its composed p99 is a
-lower bound on that arm, not a settled tail.}
+$^{\dagger}$burst5's static $C{=}8$ encoder half ends its \emph{arrival}
+span with \num{501} images still queued (the boundary flag its
+Chapter~\ref{cap:twopool} grid row also carries); the queue drains
+\SI{0.386}{\second} later and every request completes, so the composed p99
+is the settled tail of the declared finite window --- the flag marks an
+endpoint artifact, not divergence.}
 \label{tab:cl-ledger-joint}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -991,8 +999,9 @@ estimator and is the genuine counterexample. An end-to-end tail must therefore
 come from the join in both directions --- the sum bounds nothing.
 
 The join now covers all five evaluation windows and the full trace, so no
-composed number is withheld for want of a replay; the two cells still absent
-are the ones the evaluation contract forbids. This also settles the
+composed number is withheld for want of a replay; the forecast cells still
+absent are the ones the evaluation contract forbids, and the permissible
+burst2/6 static joins sit outside the frozen arm set. This also settles the
 reconstruction of Section~\ref{sec:sim-knees}: the measured composed p99 on the
 aggregate window is \SI{1240}{\milli\second}, in line with the
 ${\approx}\SI{1.24}{\second}$ estimate built there. Read jointly, forecast
@@ -1273,9 +1282,10 @@ bound under bursty within-bin arrivals, not mean throughput --- the
 encoder-side analogue of the language pool's belief-to-knee gap. Language-pool
 closed-loop evidence covers the largest burst (all leads, both conversions),
 the fastest onset (carried live in Section~\ref{sec:val-results}), the binding
-mix, every forecast-covered burst window end-to-end, and the full evaluation
-span; burst2/6 (uncovered) and the calm day are priced by the grid and the knee
-formula rather than replayed end-to-end. The replay is open-loop: arrivals
+mix, every forecast-covered burst window end-to-end, the full evaluation
+span, and the calm day (its three composed arms replayed end-to-end,
+Section~\ref{sec:cl-ledger-joint}); burst2/6 (uncovered) are priced by the
+grid and the knee formula rather than replayed end-to-end. The replay is open-loop: arrivals
 follow the trace regardless of experienced latency, so overload cannot shed or
 defer demand as clients would --- policies are compared under identical offered
 load, and real clients' abandonment, backpressure or retries could shift
