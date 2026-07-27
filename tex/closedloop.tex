@@ -26,7 +26,7 @@ forecasts of Chapter~\ref{cap:predictors}, and grades every arm under a pre-froz
 replay protocol (arm mechanics frozen before the frontier replay;
 $\rho{=}15$ disclosed as an earlier ex-post choice). The answer is a
 demonstrated failure mode and a trade-off, not
-universal superiority: on four of the five evaluation windows
+universal superiority: on four of the five composed windows
 forecast and reactive tail latencies \emph{tie exactly}, the latency advantage
 lives in the one-minute onset, and what forecasting buys at week scale is
 resource-time at equal compliance.
@@ -90,7 +90,7 @@ one 5.60-day span.
 \subsection{Protocol and actuation mechanics}
 \label{sec:base-protocol}
 
-The workload windows are the six largest burst episodes of
+The workload windows cover the six largest burst episodes of
 Chapter~\ref{cap:trace-eda} (onsets 1--404 minutes) plus the calmest full day
 of the trace (2024-10-19; peak \SI{57}{img/s}) as the steady reference --- all
 shaded on the week in Figure~\ref{fig:eda-windows}. Each burst window brackets
@@ -175,7 +175,7 @@ tuning knobs (35 corner re-runs; no frontier movement).
 \centering
 \caption[Iso-cost tensor parallelism on the language pool]{Iso-cost tensor
 parallelism on the language pool: TP1$\times$4 and TP2$\times$2 both cost four
-H100s. TTFT p99 per burst window under the \SI{1000}{\milli\second} SLO (ITL
+H100s. TTFT p99 per burst window under the \SI{1000}{\milli\second} SLA (ITL
 p99 within bound in both columns); AIC timing on each window's composed trace
 at its archived grid encoder count --- burst1--4 at the window optimum, burst5
 archived at $C{=}16$ (predating its corrected $C^{*}{=}8$).}
@@ -233,7 +233,7 @@ operating rating ($\rho{=}15$), and the pattern tracks onset speed. Slow ramps
 \SI{45}{\second}, below what pod-scheduled GPU workers realistically offer. The
 one fast onset, burst3, ramps baseline-to-peak in a minute and defeats the
 controller at \emph{every} lead including \SI{15}{\second} (p99 encoder delay
-9.5--54\,\si{\second}) --- while burst6, at a comparable peak (\SI{337}{} vs
+9.5--54\,\si{\second}) --- while burst6, at a comparable peak (\SI{337}{} vs.\
 burst3's \SI{355}{img/s}) and essentially the same mean image rate, request
 rate and per-request image density, is caught at short leads
 ($L^{*}{=}$\SI{45}{\second}), consistent with its much slower merged onset (53
@@ -344,7 +344,7 @@ windows pinned at the \SI{588}{\milli\second} no-queue plateau; the calm day
 the five evaluation windows, each replayed under twelve settings, so 60/60 licenses
 insensitivity to model and lead, not statistical power. The broader exploratory
 grid that located the operating point is superseded for the forecast headline:
-the H=12 15-second archive supplies at most $(12{-}1)\times15 =
+the $H{=}12$ 15-second archive supplies at most $(12{-}1)\times15 =
 \SI{165}{\second}$ of forecast-issued lead, and the \SI{300}{\second} cell
 reached the plateau only by target-time indexing --- an upper bound, not an
 issued lead. The identically informed reactive controller, by contrast, loses
@@ -616,9 +616,9 @@ never be quoted alone. Two honesty points travel with the frontier. The
 comparison is conservative in reactive's favor --- the forecast is one
 pre-frozen arm ($\rho{=}15$ chosen \emph{ex post} earlier, disclosed), the floor family an ex-post best-of-family read on the evaluation span.
 And the perfect-information oracle reference prices the signal-quality axis
-at \textbf{0.292$\times$} static under the same fixed point conversion
+at \textbf{0.292$\times$} static under the same fixed conversion
 (its scale-down runs $H{=}0$ where the frozen arms use 3-minute hysteresis,
-so the shared surface is the conversion, not every mechanic); it does not minimize worker-time subject to the SLA, so it is a
+so the shared surface is the conversion, not every mechanism); it does not minimize worker-time subject to the SLA, so it is a
 reference, not a lower bound over admissible schedules. Its lone burst3 miss
 under the shipped run is a window-boundary artifact (released at identical
 cost, Table~\ref{tab:cl-frontier}). The forecast arm captures 53\% of the
@@ -627,7 +627,7 @@ these mechanics.
 
 The mechanism behind the gap is where each arm puts the same idea. A standing
 floor sized for burst3 holds those workers for the entire span, including the
-calm day on which it triples its own bill (\SI{518710}{} worker-s at $M{=}6$
+calm day on which it triples the forecast's bill (\SI{518710}{} worker-s at $M{=}6$
 against the forecast's \SI{162326}{}); the forecast places the same headroom
 only when the predictive distribution widens. That is what
 \emph{forecast-informed capacity placement under startup delay} means
@@ -704,7 +704,7 @@ warm-pool readiness, and passes every one of the seven daily folds
 forecast covers, it degenerates to the reactive arm by construction, so the
 seven-fold replay is six informative folds plus one designed fallback ---
 no-regression evidence for a controller designed on F6, not independent
-workload validation. The decomposition $\max(fc,re)=fc+(re-fc)^{+}$ makes the
+workload validation. The decomposition $\max(C_{\text{fc}},C_{\text{re}})=C_{\text{fc}}+(C_{\text{re}}-C_{\text{fc}})^{+}$ makes the
 premium over the pure forecast exactly the forecast-error correction --- paid
 only where observed load outruns the band (35\% of the span; 13.8\% of static
 in worker-time) and shrinking to zero at a perfect forecast. The encoder thus
@@ -855,7 +855,7 @@ full trace & static $C{=}2$ & 8.9 & 119.8 & \textbf{2{,}905} & 28{,}246 & 1{,}20
 \vspace{2pt}
 {\footnotesize ``n/m'' = not measured. Cold-start accounting covers 40 (window,
 policy, lead) cells and excludes the aggregate window and the full trace: the
-warm-up component there is \emph{unmeasured, not zero}. It carries no
+warm-up component there is \emph{unmeasured, not zero}. That accounting carries no
 forecast-model dimension, so the warm-up columns are trustworthy for the
 Chronos and reactive arms only.}
 \end{table}
@@ -872,8 +872,8 @@ beat reactive control on four of the five composed windows --- they tie
 exactly, at the plateau. The whole encoder-latency advantage on this arm set
 lives in burst3}, where the reactive p99 of 16{,}079 is 15$\times$ over the
 bound while forecast holds the plateau. (Reactive also fails the two
-out-of-span windows at long lead, Table~\ref{tab:base-react-enc}, which no
-archived forecast covers.) Where the arms \emph{do} separate on every window is
+out-of-span windows --- which no archived forecast covers --- at long lead,
+Table~\ref{tab:base-react-enc}.) Where the arms \emph{do} separate on every window is
 the worst case, which the p99 does not see: reactive's worst excursion above
 the bound runs $1.9$--$19.2\times$ across the burst windows against
 $0$--$0.3\times$ for the forecast --- except on the aggregate window, where all
@@ -888,8 +888,8 @@ backlog-divergent, so none is a lower bound on an unbounded quantity.
 
 \paragraph{Cold start, and the denominator it hides.} The warm-up columns
 separate what an operator is billed from \emph{readiness} from what it is
-billed from \emph{order}, and the difference grows with lead and
-asymmetrically: at $L{=}165$\,\si{\second} the reactive controller spends up to
+billed from \emph{order}, and the difference grows with lead, and
+asymmetrically so: at $L{=}165$\,\si{\second} the reactive controller spends up to
 73.7\% of its bill (burst3) on workers not yet serving, while the forecast
 arm's warm-up fraction never exceeds 9.4\%. Placing capacity ahead of demand
 converts cold start from a dominant cost term into a rounding error, and it
@@ -1090,7 +1090,7 @@ mix-dependent and replays show ${\approx}4\%$ p99 noise. Detailed sweeps behind
 these constants are in the supplementary archive.
 
 \paragraph{The quantile dial, on the language pool too.} On burst1's slow onset
-the p50 forecast sufficed; on the fastest onset it does not. Replaying burst3
+the p50 forecast suffices; on the fastest onset it does not. Replaying burst3
 end-to-end (60-second replica lead, tail-aware conversion throughout) mirrors
 the encoder quantile result: reactive fails at TTFT p99
 3{,}495\,\si{\milli\second}, the p50 forecast fails at
@@ -1178,7 +1178,7 @@ every one of its 48 week-scale cells.
 \includegraphics[width=\linewidth]{figuras/pred/pred_framework_diff}
 \caption[Why the framework differs, in three measurements]{Why the framework
 differs, in three measurements. \textbf{(a)} At provisioning cadence the
-predictors are near-parity: the foundation models (blue) and Dynamo's shipped
+predictors are at near-parity: the foundation models (blue) and Dynamo's shipped
 predictors (yellow) cluster within $0.02$ WAPE. \textbf{(b)} Yet on the burst3
 closed loop the verdict is categorical: every mean-conversion policy fails the
 SLA and only the p90 forecast with a tail-aware conversion passes --- the
@@ -1242,7 +1242,7 @@ not computable --- ITL has no per-request backing --- so the duration columns
 grade TTFT only.}
 \end{table}
 
-Unlike the encoder, TTFT is retained per request, so infraction \emph{duration}
+Unlike on the encoder pool, TTFT is retained per request, so infraction \emph{duration}
 is real here. \textbf{This pool separates on every window, and the separation
 is compliance, not thrift.} Forecast holds TTFT p99 at \SI{651}{\milli\second}
 and ITL p99 at 5.1--6.3\,\si{\milli\second} on all five windows; reactive
@@ -1280,7 +1280,7 @@ follow the trace regardless of experienced latency, so overload cannot shed or
 defer demand as clients would --- policies are compared under identical offered
 load, and real clients' abandonment, backpressure or retries could shift
 realized demand in either direction. Per-pool leads are swept as constants, not
-stochastic; the two out-of-span windows (burst2/6) enter results grading only
+as stochastic draws; the two out-of-span windows (burst2/6) enter results grading only
 through the forecast-free comparators of Section~\ref{sec:cl-comparators},
 forecast policies replaying them solely as the calibration split, never as
 evaluation results --- a hole a deployed system entering the week with prior
@@ -1307,7 +1307,7 @@ silicon-representative for the engine it targets: vLLM's own Qwen3-VL vision
 tower matches AIC to within 12.8\% across the whole $N\le64$ serving regime,
 because AIC's collected operators \emph{are} vLLM's kernels. Replaying the
 winning p90/$\rho{=}15$ schedule with the encoder repriced at the
-directly-measured vLLM $f(N)$ leaves the schedule's provisioned worker-time ---
+directly measured vLLM $f(N)$ leaves the schedule's provisioned worker-time ---
 the cost-ratio numerator --- unchanged and the static $C{=}8$
 \emph{denominator} feasible, so the reported \textbf{0.62$\times$} holds on
 measured standalone vLLM cost, not only the AIC model; a live-worker
@@ -1317,7 +1317,7 @@ span, representative of the span, not of an arbitrary day inside it. Splitting
 the expanding-context span (\num{999599} requests over 6.998 days, longer than
 the span the headline is priced on, and reproducing its aggregate ratio at
 0.612$\times$) into seven disjoint 24-hour folds leaves the headline quantities
-\emph{not fold-invariant}: the encoder cost ratio against the deployed $C{=}8$
+\emph{not fold-invariant}: the encoder cost ratio against the deployable $C{=}8$
 fleet ranges 0.47--1.10$\times$ over the five burst-bearing folds, $\rho{=}15$
 is feasible in six of seven folds but cheapest in none, and the policy misses
 the bound on the fold containing the e13 onset (encoder-delay p99
@@ -1364,6 +1364,6 @@ Priced over the covered week, the policy meets the SLA in aggregate and in each
 of the four declared in-span burst windows at \textbf{0.62 times the
 deployable static encoder fleet's worker-time} --- a week-scale SLA/resource
 trade-off, since per burst window every arm costs more than static, and since
-on four of the five evaluation windows the forecast and reactive tails tie
+on four of the five composed windows the forecast and reactive tails tie
 exactly. The finer daily-fold grain surfaces the one missed covered onset, e13,
 recovered at 0.76$\times$ by the post-hoc hybrid.
