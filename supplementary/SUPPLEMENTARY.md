@@ -15,11 +15,15 @@ repository.** The manuscript's in-document mapping (Appendix A,
 
 | Ref | Commit | What it pins |
 |---|---|---|
-| Manuscript baseline | `67bd44a` | `thesis: remediate all 34 adversarial-review findings, evidence-backed` — the corrected full-length manuscript, i.e. the rollback baseline for the shortening campaign. Every claim in the shortened thesis must be traceable to evidence present at or before this commit. |
+| Manuscript baseline | `67bd44a` | `thesis: remediate all 34 adversarial-review findings, evidence-backed` — the corrected full-length manuscript, i.e. the ROLLBACK BASELINE for the shortening campaign: no shortened passage may weaken a claim corrected here. It is not an upper bound on evidence — results and archives added after it (e.g. the composed fill campaign, the G1 burst2/6 halves) carry their own later immutable pins, listed in Appendix A (`c6349c8`, `947005c`, `f7a64be`). |
 | Comparator frontier | `4babe1c` | `experiment: warm-floor comparator frontier (plan §8.2)` — the frozen-protocol 5-arm comparator experiment (forecast / same-signal reactive / reactive + calibrated warm floor / deployable static / oracle) and its independent adversarial recomputation. |
 
-Everything in S1–S6 is reachable from a checkout at `4babe1c` (which contains
-`67bd44a`). Paths below are relative to the repository root.
+The pre-restructure evidence paths of S1–S5 are reachable from a checkout at
+`4babe1c` (which contains `67bd44a`). This index itself and its companion
+files (`SUPPLEMENTARY.md`, `manifest_full.md`, `kernel_collection_history.md`)
+first appear at `3c56418` (the Phase-2 restructure commit); evidence added
+later carries the later pins listed in Appendix A. Paths below are relative
+to the repository root.
 
 ---
 
@@ -139,7 +143,7 @@ the calibration split and one evaluation pass.
 
 | File | Content |
 |---|---|
-| `SUPPLEMENTARY.md` | this index (S1–S6, pinned commits, quickstart, displacement record) |
+| `SUPPLEMENTARY.md` | this index (S1–S7, pinned commits, quickstart, displacement record) |
 | `manifest_full.md` | expanded reproduction manifest: the in-thesis mapping plus the explanatory prose and workspace layout displaced from the appendix |
 | `kernel_collection_history.md` | phase-by-phase AIC collection history, file inventory, ledger cross-index, and the displaced engine-sensitivity detail |
 
@@ -159,7 +163,9 @@ Two invariants held throughout and were verified after the fact:
   `verification/adversarial_review_resolution.md` remain *in* the thesis text,
   preserved in meaning (post-hoc labels, plateau-not-floor, the zero-startup
   reactive label, matched-origin ARIMA framing, onset 6.5 min, dispatch-cap vs
-  frames-class, census wording, the 4-of-5 tie). Displacement moved *depth*,
+  frames-class, census wording, the tie population -- exact on three of the
+  five evaluation windows, burst1/4/5, plus the non-independent aggregate
+  view, the calm day within 5 ms). Displacement moved *depth*,
   never a claim, a caveat or a retraction.
 * **Nothing displaced left the repository.** Every item below is still on disk
   at the pinned commits above; the four chapter sources retired by the merge
