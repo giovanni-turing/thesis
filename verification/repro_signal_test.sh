@@ -75,8 +75,37 @@ probe() { # phase, signal, expected-rc
 
 probe tools INT 130
 probe tools TERM 143
+probe tools HUP 129
 probe worktree INT 130
 probe worktree TERM 143
+
+# D57 negative probes: publication failure and directory destination must be
+# fatal UP FRONT, leave zero residue, and never false-advertise a report.
+scratch=$(mktemp -d) || exit 1
+if out=$(REPRO_SCRATCH=$scratch REPRO_REPORT=$scratch/no/such/parent/r.md "$RUNNER" 2>&1); then
+  bad "publication-failure probe: runner succeeded (rc=0)"
+else
+  if echo "$out" | grep -q "^FATAL: report parent" && ! echo "$out" | grep -q "^report:" \
+     && [ "$(find "$scratch" -maxdepth 1 -name 'repro881*' | wc -l)" -eq 0 ]; then
+    ok "publication-failure: fatal up front, no report advertised, zero residue"
+  else
+    bad "publication-failure: wrong failure shape"; echo "$out" | head -3
+  fi
+fi
+rm -rf "$scratch"
+scratch=$(mktemp -d) || exit 1
+mkdir "$scratch/destdir"
+if out=$(REPRO_SCRATCH=$scratch REPRO_REPORT=$scratch/destdir "$RUNNER" 2>&1); then
+  bad "dir-destination probe: runner succeeded (rc=0)"
+else
+  if echo "$out" | grep -q "^FATAL: report destination is a directory" \
+     && [ -d "$scratch/destdir" ] && [ -z "$(ls -A "$scratch/destdir")" ]; then
+    ok "dir-destination: rejected, directory untouched and empty"
+  else
+    bad "dir-destination: wrong failure shape"; echo "$out" | head -3
+  fi
+fi
+rm -rf "$scratch"
 
 # Control: a successful default run's report SURVIVES (placeholder promoted
 # by publication), while its run directory is still cleaned.

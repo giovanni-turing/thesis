@@ -44,8 +44,9 @@
 #                  atomic and its failure fatal.
 # No live-tree DATA INPUTS are read: every input resolves inside the worktree.
 # Writes outside the run directory are limited to the source repository's
-# .git/worktrees admin area (worktree add/remove) and, when REPRO_REPORT
-# says so, the report destination.
+# .git/worktrees admin area (worktree add/remove) and the report: an OWNED
+# scratch-root placeholder on every default run (kept only after successful
+# publication), or the explicit REPRO_REPORT destination when set.
 set -u
 SELF=$(cd "$(dirname "$0")" && pwd)
 TESE=$(cd "$SELF/.." && pwd)
@@ -61,7 +62,20 @@ RUN=$(mktemp -d "${REPRO_SCRATCH:-${TMPDIR:-/tmp}}/repro881.XXXXXX") \
 # a successful default run's advertised report survives cleanup.
 REPORT_OWNED=0
 PUBLISHED=0
-if [ -n "${REPRO_REPORT:-}" ]; then REPORT=$REPRO_REPORT
+if [ -n "${REPRO_REPORT:-}" ]; then
+  # D57: reject directory/non-regular destinations and unwritable parents UP
+  # FRONT, so publication cannot false-succeed by mv-ing INTO a directory.
+  if [ -d "$REPRO_REPORT" ]; then
+    echo "FATAL: report destination is a directory: $REPRO_REPORT" >&2; rm -rf "$RUN"; exit 1
+  fi
+  if [ -e "$REPRO_REPORT" ] && [ ! -f "$REPRO_REPORT" ]; then
+    echo "FATAL: report destination exists and is not a regular file" >&2; rm -rf "$RUN"; exit 1
+  fi
+  _rp=$(dirname "$REPRO_REPORT")
+  if [ ! -d "$_rp" ] || [ ! -w "$_rp" ]; then
+    echo "FATAL: report parent directory missing or unwritable: $_rp" >&2; rm -rf "$RUN"; exit 1
+  fi
+  REPORT=$REPRO_REPORT
 else
   REPORT=$(mktemp "${REPRO_SCRATCH:-${TMPDIR:-/tmp}}/repro881_report.XXXXXX.md") \
     || { echo "FATAL: cannot create report file" >&2; rm -rf "$RUN"; exit 1; }
@@ -83,11 +97,16 @@ drop_owned_report() {
 # D54: no-argument handlers (no arithmetic, no positional refs), so the trap
 # body cannot mis-parse regardless of what the shell was executing when the
 # signal arrived; each disables all traps, cleans, and exits 128+signal.
-on_int()  { trap - EXIT INT TERM; cleanup; drop_owned_report; exit 130; }
-on_term() { trap - EXIT INT TERM; cleanup; drop_owned_report; exit 143; }
+on_int()  { trap - EXIT INT TERM HUP; cleanup; drop_owned_report; exit 130; }
+on_term() { trap - EXIT INT TERM HUP; cleanup; drop_owned_report; exit 143; }
+on_hup()  { trap - EXIT INT TERM HUP; cleanup; drop_owned_report; exit 129; }
 trap on_int INT
 trap on_term TERM
-trap cleanup EXIT
+trap on_hup HUP
+# D57: the ordinary EXIT path also drops an UNPUBLISHED owned placeholder
+# (successful publication sets PUBLISHED=1 and keeps it; an explicit
+# REPRO_REPORT is never REPORT_OWNED and is never deleted).
+trap 'cleanup; drop_owned_report' EXIT
 # Test-only hook (repro_signal_test.sh): REPRO_PAUSE_AT=tools|worktree pauses
 # 5 s INSIDE the named active context (tools: within a command substitution;
 # worktree: with the worktree REGISTERED), after touching REPRO_PAUSE_MARKER
@@ -106,7 +125,8 @@ say() { echo "$1"; R+="$1"$'\n'; }
 ok()  { pass=$((pass+1)); say "PASS  $1"; }
 bad() { fail=$((fail+1)); say "FAIL  $1"; }
 publish() {
-  if printf '%s' "$R" > "$REPORT.tmp.$$" && mv "$REPORT.tmp.$$" "$REPORT"; then
+  if printf '%s' "$R" > "$REPORT.tmp.$$" && mv -T "$REPORT.tmp.$$" "$REPORT" \
+     && [ -f "$REPORT" ]; then
     PUBLISHED=1
     echo "report: $REPORT"
   else
