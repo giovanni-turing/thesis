@@ -28,6 +28,7 @@ import argparse
 import collections
 import json
 import math
+import os
 import re
 import sys
 from pathlib import Path
@@ -35,7 +36,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path("/home/gio/tese")
+# TESE_ROOT override (2026-07-27, repro test §8.8-1): lets a clean checkout
+# resolve its OWN inputs; default unchanged for the live tree (and for the K16
+# pre-ingest guard, which invokes this script without the override).
+ROOT = Path(os.environ.get("TESE_ROOT", "/home/gio/tese"))
 OUT = ROOT / "simulation/results/composed_fill"
 BLOCK = 512  # --trace-block-size, run_replay.sh
 

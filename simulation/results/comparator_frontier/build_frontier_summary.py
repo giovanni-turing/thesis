@@ -25,7 +25,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path("/home/gio/tese")
+# TESE_ROOT override (2026-07-27, repro test §8.8-1): lets a clean checkout
+# resolve its OWN inputs; default unchanged for the live tree.
+ROOT = Path(os.environ.get("TESE_ROOT", "/home/gio/tese"))
 HERE = Path(__file__).resolve().parent
 TRACE = ROOT / "data/AzureLMMInferenceTrace_multimodal.csv.gz"
 WINDOWS = json.loads((ROOT / "simulation/windows.json").read_text())

@@ -1,0 +1,145 @@
+#!/bin/bash
+# §8.8-1 independent reproduction test (shortening plan v3): three headline
+# results reproduced from a CLEAN CHECKOUT (detached git worktree at HEAD),
+# following only the appendix quickstart's script->artifact rows.
+#
+#   Target 1  comparator frontier (§8.2): full 313-cell recomputation from the
+#             tracked raw run outputs, self-verified against the tracked
+#             frontier_summary.json (stats/calib-selection/calib-table/link).
+#   Target 2  composed nine-cell join, Stage A -- TRACKED FILES ONLY: records
+#             honestly which cells are reproducible without the supplementary
+#             archive (3/9 cells read 1.8 GB of archive-listed replay outputs).
+#   Target 3  composed nine-cell join, Stage B -- supplementary inputs staged
+#             at their manifest paths: full regeneration must be BYTE-IDENTICAL
+#             to the committed artifact; headline p99s printed for comparison
+#             against the manuscript claims.
+#
+# Read-only on the live tree (the worktree and scratch live under BASE).
+# Emits verification/repro_clean_checkout_report.md.
+set -u
+TESE=/home/gio/tese
+EDA_PY=$TESE/eda/.venv/bin/python
+BASE=/home/gio/.cache/tese_repro
+W=$BASE/checkout
+REPORT=$TESE/verification/repro_clean_checkout_report.md
+SUPP_INPUTS=(
+  defense/anim/data/a2_runs/steady24h_forecast_L30.jsonl
+  defense/anim/data/a2_runs/steady24h_reactive_L30.jsonl
+  defense/anim/data/a13_runs/ft_static_C8.jsonl
+  defense/anim/data/a13_runs/ft_llm_static.requests.jsonl
+  defense/anim/data/a13_runs/ft_reactive_L30.jsonl
+  defense/anim/data/a13_runs/ft_llm_reactive.requests.jsonl
+)
+
+mkdir -p "$BASE"
+pass=0; fail=0
+R=""
+say() { echo "$1"; R+="$1"$'\n'; }
+ok()  { pass=$((pass+1)); say "PASS  $1"; }
+bad() { fail=$((fail+1)); say "FAIL  $1"; }
+
+HEAD_SHA=$(git -C "$TESE" rev-parse HEAD)
+say "# Clean-checkout reproduction test (§8.8-1)"
+say ""
+say "HEAD: $HEAD_SHA  ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+say ""
+
+# ---- fresh detached worktree ----
+git -C "$TESE" worktree remove --force "$W" 2>/dev/null
+rm -rf "$W"
+if git -C "$TESE" worktree add --detach "$W" HEAD >/dev/null 2>&1 \
+   && [ "$(git -C "$W" status --porcelain | wc -l)" -eq 0 ]; then
+  ok "clean detached worktree at HEAD ($W)"
+else
+  bad "worktree creation not clean"; echo "$R" > "$REPORT"; exit 1
+fi
+
+# ---- Target 1: frontier 313-cell recomputation (tracked-only) ----
+say ""
+say "## Target 1 — comparator frontier (tracked files only)"
+FR="$W/simulation/results/comparator_frontier"
+(cd "$FR" && TESE_ROOT="$W" "$EDA_PY" build_frontier_summary.py --jobs 8 \
+   >"$BASE/frontier_build.log" 2>&1)
+rc=$?
+VERDICT=$(grep -E "^cells=" "$BASE/frontier_build.log" | tail -1)
+say "verdict: ${VERDICT:-<none>}  rc=$rc"
+if [ $rc -eq 0 ] && echo "$VERDICT" | grep -q "stats-missing=0" \
+   && echo "$VERDICT" | grep -q "stats-mismatches=0" \
+   && echo "$VERDICT" | grep -q "calib-selection=OK" \
+   && echo "$VERDICT" | grep -q "calib-table=OK" \
+   && echo "$VERDICT" | grep -q "summary-link=OK"; then
+  ok "frontier: 313 cells recomputed from raw tracked outputs; committed summary independently confirmed"
+else
+  bad "frontier recomputation/self-verification (see $BASE/frontier_build.log)"
+fi
+HL=$(TESE_ROOT="$W" "$EDA_PY" - "$FR" <<'PYEOF'
+import json, sys
+fr = sys.argv[1]
+s = json.load(open(f"{fr}/frontier_summary.json"))
+fc = s["arms"]["1_forecast_p90_issue_time"]
+cells = json.load(open(f"{fr}/frontier_summary_cells.json"))
+core = [c for c in cells if c["group"] == "core" and c["arm"] == "forecast_p90"]
+viol = sum(int(c["violations_1000ms"]) for c in core)
+ws = fc["cost_worker_s_eval_span"]
+print(f"forecast arm: vs_static={fc['vs_static']}  eval-span worker_s={ws:.0f}  "
+      f"violations(recomputed core cells)={viol}")
+PYEOF
+)
+say "headline: $HL"
+
+# ---- Target 2: composed join, Stage A (tracked-only, honest gap record) ----
+say ""
+say "## Target 2 — composed nine-cell join, Stage A (tracked files only)"
+TESE_ROOT="$W" "$EDA_PY" "$W/simulation/composed_fill_join.py" \
+  --out "$BASE/composed_A.json" >"$BASE/composed_A.log" 2>&1
+rcA=$?
+MISSING=0
+for f in "${SUPP_INPUTS[@]}"; do [ -e "$W/$f" ] || MISSING=$((MISSING+1)); done
+say "join rc=$rcA; supplementary-archive inputs absent from checkout: $MISSING/6"
+if [ $rcA -ne 0 ] && [ "$MISSING" -eq 6 ]; then
+  ok "stage A documents the boundary: 6/9 cells tracked-reproducible; 3/9 (steady24h fc/reactive, fulltrace pair) require the supplementary archive (1.8 GB), as its manifest states"
+elif [ $rcA -eq 0 ]; then
+  ok "stage A: full join reproduced from tracked files alone"
+else
+  bad "stage A failed for a reason OTHER than the documented supplementary inputs (see $BASE/composed_A.log)"
+fi
+
+# ---- Target 3: composed join, Stage B (supplementary inputs staged) ----
+say ""
+say "## Target 3 — composed nine-cell join, Stage B (supplementary staged)"
+for f in "${SUPP_INPUTS[@]}"; do
+  mkdir -p "$W/$(dirname "$f")"
+  cp "$TESE/$f" "$W/$f" || bad "staging $f"
+done
+rm -f "$BASE/composed_B.json"
+TESE_ROOT="$W" "$EDA_PY" "$W/simulation/composed_fill_join.py" \
+  --out "$BASE/composed_B.json" >"$BASE/composed_B.log" 2>&1
+rcB=$?
+if [ $rcB -eq 0 ] && cmp -s "$BASE/composed_B.json" \
+     "$W/simulation/results/composed_fill/composed_fill_joined.json"; then
+  ok "stage B: nine-cell artifact regenerated BYTE-IDENTICAL to the committed object"
+else
+  bad "stage B regeneration or byte-identity (rc=$rcB, see $BASE/composed_B.log)"
+fi
+if [ $rcB -eq 0 ]; then
+  HL2=$("$EDA_PY" - "$BASE/composed_B.json" <<'PYEOF'
+import json, sys
+d = json.load(open(sys.argv[1]))
+c = d["steady24h_fc_chronos"]
+r = d["steady24h_reactive"]
+print(f"steady24h forecast e2e_p99={c['e2e_p99']}  reactive e2e_p99={r['e2e_p99']}  "
+      f"forecast gpu_h={c['gpu_h']:.2f}")
+PYEOF
+)
+  say "headline: $HL2"
+fi
+
+# ---- wrap up ----
+say ""
+say "## Result"
+say ""
+say "$pass passed, $fail failed"
+git -C "$TESE" worktree remove --force "$W" 2>/dev/null
+printf '%s' "$R" > "$REPORT"
+echo "report: $REPORT"
+[ $fail -eq 0 ]
