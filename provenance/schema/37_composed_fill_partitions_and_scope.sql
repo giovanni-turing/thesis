@@ -158,9 +158,9 @@ BEGIN
       IF NOT FOUND THEN
         RAISE EXCEPTION '37/D37: provenance.%_composed_fill exists but is NOT a partition of provenance.%', t, t;
       END IF;
-      IF pg_get_expr(c.relpartbound, c.oid) NOT LIKE '%''composed_fill''%' FROM pg_class c
+      IF pg_get_expr(c.relpartbound, c.oid) IS DISTINCT FROM 'FOR VALUES IN (''composed_fill'')' FROM pg_class c
          WHERE c.oid = ('provenance.'||t||'_composed_fill')::regclass THEN
-        RAISE EXCEPTION '37/D37: provenance.%_composed_fill has the wrong partition bound', t;
+        RAISE EXCEPTION '37/D37: provenance.%_composed_fill partition bound is not exactly FOR VALUES IN (composed_fill)', t;
       END IF;
       RAISE NOTICE '37_composed_fill: %_default holds no composed_fill rows -- step is a no-op (partition %, edge+bound verified)',
         t, CASE WHEN part_exists THEN 'existed' ELSE 'created' END;
@@ -181,6 +181,10 @@ BEGIN
         AND i.inhparent = ('provenance.'||t)::regclass;
     IF NOT FOUND THEN
       RAISE EXCEPTION '37/D37: provenance.%_composed_fill is NOT a partition of provenance.%', t, t;
+    END IF;
+    IF pg_get_expr(c.relpartbound, c.oid) IS DISTINCT FROM 'FOR VALUES IN (''composed_fill'')' FROM pg_class c
+       WHERE c.oid = ('provenance.'||t||'_composed_fill')::regclass THEN
+      RAISE EXCEPTION '37/D37: relocation-branch bound is not exactly FOR VALUES IN (composed_fill)', t;
     END IF;
     EXECUTE format('INSERT INTO provenance.%I SELECT * FROM pg_temp._cf37', t);
     EXECUTE format('SELECT count(*) FROM provenance.%I', t||'_composed_fill') INTO post_dedicated;

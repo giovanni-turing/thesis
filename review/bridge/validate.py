@@ -128,7 +128,7 @@ def main():
             else:
                 errors.append(f"{m['file']}: grandfathered file missing")
             for t in threads_in_body(body):
-                adjudicated_threads.setdefault(t, m["file"])
+                adjudicated_threads.setdefault(t, (m["file"], "CLOSED-FIXED"))
             continue
         if not heading:
             continue
@@ -138,10 +138,29 @@ def main():
                    and "thread" not in m["hdr"])
         if not ok_auth:
             continue  # header/registry errors are raised elsewhere
+        in_fence = False
         for ln in body.splitlines():
-            mm = re.match(r"^RULING\s+(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)\s*:\s*(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)\s*$", ln.strip())
-            if mm:
-                adjudicated_threads.setdefault(mm.group(1), m["file"])
+            if ln.strip().startswith("```"):
+                in_fence = not in_fence
+                continue
+            if in_fence:
+                continue
+            st = ln.strip()
+            if st.startswith("RULING "):
+                mm = re.match(r"^RULING\s+(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)\s*:\s*(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)\s*$", st)
+                if not mm:
+                    errors.append(f"{m['file']}: malformed RULING line: {st[:60]!r}")
+                    continue
+                tkey, verdict = mm.group(1), mm.group(2)
+                prev = adjudicated_threads.get(tkey)
+                if prev is not None and prev[1] != verdict:
+                    errors.append(f"{m['file']}: conflicting ruling for {tkey}: {verdict} vs {prev[1]} in {prev[0]}")
+                    continue
+                adjudicated_threads[tkey] = (m["file"], verdict)
+    _all_thread_ids = {m["hdr"].get("thread") for m in msgs if m["hdr"].get("thread")}
+    for t, (src, verdict) in list(adjudicated_threads.items()):
+        if t not in _all_thread_ids:
+            errors.append(f"{src}: RULING names unknown thread '{t}'")
     verif_names = {m["file"] for m in msgs if m["hdr"].get("type") == "verification"}
     for m in msgs:
         r = m["hdr"].get("re","")
@@ -154,6 +173,12 @@ def main():
             u = ln.upper().lstrip("#").strip()
             return ln.lstrip().startswith("#") and u.startswith("AUTHOR ADJUDICATION") \
                    and "REQUIRED" not in u and "REQUEST" not in u
+        if "authority" in m["hdr"]:
+            _a = m["hdr"]["authority"]
+            if _a not in VALID_AUTHORITIES:
+                errors.append(f"{m['file']}: authority '{_a}' not in the recognized registry")
+            elif m["hdr"].get("from") not in AUTHORITY_SENDER.get(_a, set()):
+                errors.append(f"{m['file']}: authority '{_a}' not valid for sender '{m['hdr'].get('from')}'")
         _asserts_adj = any(_is_assert(ln) for ln in m.get("body","").splitlines())
         if _asserts_adj and m["file"] not in ADJUDICATION_EXCEPTIONS:
             if "authority" not in m["hdr"]:
@@ -220,8 +245,9 @@ def main():
                             errors.append(f"thread {t}: terminal verification by '{vfrom}' -- only the finding's author ('{ffrom}') may attest its resolution"); bad=True
                         prev = types[i-1]
                         nresp_before = types[1:i].count("response")
-                        if prev == "escalation" and t not in adjudicated_threads:
-                            errors.append(f"thread {t}: post-escalation verification requires a recognized author ruling first"); bad=True
+                        _adj = adjudicated_threads.get(t)
+                        if prev == "escalation" and (_adj is None or _adj[1] == "REOPENED"):
+                            errors.append(f"thread {t}: post-escalation verification requires a recognized CLOSED ruling (none or REOPENED)"); bad=True
                         if not (prev == "escalation" or nresp_before >= 2):
                             errors.append(f"thread {t}: verification {chain[i]} only permitted after the second response or an escalation"); bad=True
                         continue
@@ -250,8 +276,10 @@ def main():
         if t in thread_state:
             chain, types = thread_state[t]
             nresp = types.count("response"); esc = "escalation" in types
-            adjudicated = esc and t in adjudicated_threads
-            tag = ", ADJUDICATED (author ruling on record)" if adjudicated else (", ESCALATED - awaiting author" if esc else "")
+            _adj = adjudicated_threads.get(t)
+            adjudicated = esc and _adj is not None and _adj[1] != "REOPENED"
+            reopened = esc and _adj is not None and _adj[1] == "REOPENED"
+            tag = (f", ADJUDICATED {_adj[1]} (ruling in {_adj[0]})" if adjudicated else (f", REOPENED by author (ruling in {_adj[0]})" if reopened else (", ESCALATED - awaiting author" if esc else "")))
             out.append(f"- **{t}**: {len(chain)} msgs, {nresp}/2 evidence rounds{tag}\n")
             for n in chain: out.append(f"    - {n} ({by_name[n]['hdr'].get('from')}, {by_name[n]['hdr'].get('type')})\n")
         else:

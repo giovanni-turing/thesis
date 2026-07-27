@@ -291,6 +291,8 @@ def main() -> None:
                 exp_arm = "warm_floor" if mM else ("oracle_H" + _re2.search(r"_H(\d+)$", tag).group(1))
                 if exp_M is not None and not _intlike(tr.get("M")):
                     calib_tbl_ok = f"FAIL({tag}: M not integral: {tr.get('M')!r})"; break
+                if exp_M is None and ("M" not in tr or tr.get("M") is not None):
+                    calib_tbl_ok = f"FAIL({tag}: oracle M must be present and null, got {('<absent>' if 'M' not in tr else repr(tr.get('M')))})"; break
                 if not _intlike(tr.get("L")):
                     calib_tbl_ok = f"FAIL({tag}: L not integral: {tr.get('L')!r})"; break
                 if not all(_finite(tr.get(k)) for k in ("p99", "worker_s")) \
@@ -300,7 +302,8 @@ def main() -> None:
                 if (tr.get("arm") != exp_arm or tr.get("window") != fr["window"]
                         or (exp_M is not None and tr_M != float(exp_M))
                         or float(tr.get("L")) != float(exp_L) or tr.get("stats_agrees") is not True
-                        or abs(tr["p99"] - fr["p99"]) > 1e-2 or abs(tr["worker_s"] - fr["worker_s"]) > 0.15
+                        or float(tr["p99"]) != float(fr["p99"])
+                        or float(tr["worker_s"]) != float(fr["worker_s"])
                         or int(tr["violations_1000ms"]) != int(fr["violations_1000ms"])
                         or int(tr["n_requests"]) != int(fr["n_requests"])):
                     calib_tbl_ok = f"FAIL({tag})"; break

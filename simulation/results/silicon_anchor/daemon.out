@@ -33,3 +33,9 @@
 2026-07-27T03:37:57Z [encoder] loaded /home/gio/tese/models/Qwen3-VL-8B-ViT attn=sdpa params=576.4M in 0.23s; buffer 50176x1536 bf16 (0.14 GiB), n_max=64
 2026-07-27T03:37:57Z [rep] burst3__re rep1: RESUMING at batch 675/3098
 2026-07-27T03:38:01Z [encoder] warmup 6x[64, 8, 1] in 3.83s
+2026-07-27T03:53:04Z [daemon] burst3__re rep1 DONE in 902.71s (1 reps this process)
+2026-07-27T03:53:04Z [daemon] next: burst3__staticC8 rep1 (tier1) est [1110, 1202] GPU-s
+2026-07-27T03:53:07Z [encoder] warmup 6x[64, 8, 1] in 3.5s
+2026-07-27T04:12:11Z [daemon] burst3__staticC8 rep1 DONE in 1143.27s (2 reps this process)
+2026-07-27T04:12:11Z [daemon] next: burst3__fc rep2 (tier1) est [1110, 1202] GPU-s
+2026-07-27T04:12:14Z [encoder] warmup 6x[64, 8, 1] in 3.49s
