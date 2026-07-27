@@ -122,5 +122,79 @@ else
 fi
 rm -rf "$scratch"
 
+# D57 round 2: symlink destination (incl dangling) rejected with lstat
+# semantics; planted temp-name symlinks cannot divert publication; a mid-run
+# publication failure leaves existing explicit content byte-identical.
+scratch=$(mktemp -d) || exit 1
+echo "VICTIM" > "$scratch/victim"
+ln -s "$scratch/victim" "$scratch/link.md"
+if out=$(REPRO_SCRATCH=$scratch REPRO_REPORT=$scratch/link.md "$RUNNER" 2>&1); then
+  bad "symlink-destination probe: runner succeeded"
+else
+  if echo "$out" | grep -q "^FATAL: report destination is a symlink" \
+     && [ "$(cat "$scratch/victim")" = "VICTIM" ]; then
+    ok "symlink-destination: rejected up front (lstat), victim untouched"
+  else
+    bad "symlink-destination: wrong failure shape"; echo "$out" | head -2
+  fi
+fi
+ln -s "$scratch/nowhere" "$scratch/dangling.md"
+if out=$(REPRO_SCRATCH=$scratch REPRO_REPORT=$scratch/dangling.md "$RUNNER" 2>&1); then
+  bad "dangling-symlink probe: runner succeeded"
+else
+  if echo "$out" | grep -q "^FATAL: report destination is a symlink"; then
+    ok "dangling-symlink destination: rejected up front (lstat)"
+  else
+    bad "dangling-symlink: wrong failure shape"; echo "$out" | head -2
+  fi
+fi
+rm -rf "$scratch"
+
+# temp-collision flood: pre-plant symlinks under the publication temp prefix;
+# the exclusive random mktemp temp must dodge them all, publish successfully,
+# and never write through any planted link.
+scratch=$(mktemp -d) || exit 1
+echo "VICTIM2" > "$scratch/victim2"
+for i in 1 2 3 4 5 6 7 8; do ln -s "$scratch/victim2" "$scratch/.repro881_pub.plant$i"; done
+if out=$(REPRO_SCRATCH=$scratch REPRO_REPORT=$scratch/r.md "$RUNNER" 2>&1); then
+  if [ -f "$scratch/r.md" ] && [ ! -L "$scratch/r.md" ] \
+     && [ "$(cat "$scratch/victim2")" = "VICTIM2" ]; then
+    ok "temp-collision flood: exclusive temp dodged planted links, report regular, victim untouched"
+  else
+    bad "temp-collision flood: report/victim state wrong"
+  fi
+else
+  bad "temp-collision flood: runner failed"; echo "$out" | tail -2
+fi
+rm -rf "$scratch"
+
+# mid-run publication failure: destination parent made unwritable AFTER the
+# upfront validation (readiness marker), existing explicit content must
+# survive byte-identical and the failure must be fatal with no advertisement.
+scratch=$(mktemp -d) || exit 1
+mkdir "$scratch/ro"
+echo "PRIOR CONTENT" > "$scratch/ro/r.md"
+marker=$scratch/ready.marker
+REPRO_SCRATCH=$scratch REPRO_PAUSE_AT=tools REPRO_PAUSE_MARKER=$marker \
+  REPRO_REPORT=$scratch/ro/r.md "$RUNNER" >"$scratch/out.log" 2>&1 &
+pid=$!
+waited=0
+until [ -e "$marker" ]; do
+  sleep 0.1; waited=$((waited + 1))
+  [ "$waited" -gt 1200 ] && { bad "mid-run-pubfail: marker never appeared"; kill -9 "$pid"; break; }
+done
+chmod 500 "$scratch/ro"
+wait "$pid"; rc=$?
+chmod 700 "$scratch/ro"
+if [ "$rc" -ne 0 ] && grep -q "^FATAL:" "$scratch/out.log" \
+   && ! grep -q "^report:" "$scratch/out.log" \
+   && [ "$(cat "$scratch/ro/r.md")" = "PRIOR CONTENT" ] \
+   && [ "$(find "$scratch/ro" -name '.repro881_pub.*' | wc -l)" -eq 0 ]; then
+  ok "mid-run publication failure: fatal, nothing advertised, prior content byte-identical, no temp residue"
+else
+  bad "mid-run-pubfail: rc=$rc"; tail -2 "$scratch/out.log"
+fi
+rm -rf "$scratch"
+
 echo "SIGNAL-TEST: $pass passed, $fail failed"
 [ "$fail" -eq 0 ]
