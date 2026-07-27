@@ -267,3 +267,24 @@ one forward, map the file to its absorbing chapter — `aiconfigurator`,
 `twopool`, `validation` → `tex/metodologia.tex`; `baselines` →
 `tex/closedloop.tex` — and find the label named in the same sentence; every
 label of the four survived the move.
+
+---
+
+## S7 — Clean-checkout reproduction test (plan §8.8-1)
+
+**Path:** `verification/repro_clean_checkout.sh` (runner) and
+`verification/repro_clean_checkout_report.md` (latest report).
+
+Independent reproduction of headline results from a **detached clean worktree
+at HEAD**, no live-tree state: (1) the §8.2 comparator frontier recomputed
+cell-by-cell (313 cells) from the tracked raw run outputs and self-verified
+against the tracked `frontier_summary.json` (stats, calibration selection,
+calibration table, summary link); (2) the request-linked composed nine-cell
+join, first from plain tracked files only (five cells reproduce and equal the
+committed artifact; the boundary is recorded exactly), then (3) with the four
+archive-dependent cells' replay inputs inflated from their **tracked
+`.jsonl.zst` archives inside the checkout** (`zstd -d`), after which the
+regenerated nine-cell artifact must be **byte-identical** to the committed
+object. The bulky replay inputs (1.8 GB plain) are therefore carried by the
+repository itself at ~192 MB compressed; this archive keeps its pointer-only
+contract.

@@ -229,8 +229,11 @@ Daily folds (\S\ref{sec:cl-limits}) & fold split + per-fold replay &
   \texttt{defense/anim/data/ g4\_folds/} & \texttt{g4:*} \\
 Tabs.~\ref{tab:cl-ledger-enc}--\ref{tab:cl-ledger-joint},
   \ref{tab:cl-ledger-llm} &
-  composed replays joined one-to-one by artifact path &
-  provenance views \texttt{v\_joint\_e2e}, \texttt{v\_pool\_latency},
+  \texttt{simulation/ composed\_fill\_join.py} (request-linked join; bulky
+  replay inputs ship as tracked \texttt{.jsonl.zst}, inflate with
+  \texttt{zstd -d}) &
+  \texttt{results/composed\_fill/ composed\_fill\_joined.json}; provenance
+  views \texttt{v\_joint\_e2e}, \texttt{v\_pool\_latency},
   \texttt{v\_pool\_cost} & (joined views) \\
 Tab.~\ref{tab:conc-regimes} & synthesis; no new run &
   rows read from Tabs.~\ref{tab:base-react-enc},~\ref{tab:cl-frontier},

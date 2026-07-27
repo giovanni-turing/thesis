@@ -9,10 +9,10 @@
 #   Target 2  composed nine-cell join, Stage A -- TRACKED FILES ONLY: records
 #             honestly which cells are reproducible without the supplementary
 #             archive (3/9 cells read 1.8 GB of archive-listed replay outputs).
-#   Target 3  composed nine-cell join, Stage B -- supplementary inputs staged
-#             at their manifest paths: full regeneration must be BYTE-IDENTICAL
-#             to the committed artifact; headline p99s printed for comparison
-#             against the manuscript claims.
+#   Target 3  composed nine-cell join, Stage B -- the four replay-input files
+#             inflated from their TRACKED .zst archives inside the checkout
+#             (zstd -d, no live-tree or external dependency): full regeneration
+#             must be BYTE-IDENTICAL to the committed artifact.
 #
 # Read-only on the live tree (the worktree and scratch live under BASE).
 # Emits verification/repro_clean_checkout_report.md.
@@ -122,17 +122,20 @@ PYEOF
 )
 say "supplementary inputs absent from checkout: $MISSING/6; $AVERDICT"
 if [ "$MISSING" -eq 6 ] && echo "$AVERDICT" | grep -q "^OK"; then
-  ok "stage A boundary exact: 5/9 cells reproduced tracked-only (values equal the committed artifact); 4/9 (steady24h fc/reactive + fulltrace pair) fail ONLY on the archive-listed inputs"
+  ok "stage A boundary exact: 5/9 cells reproduced from plain tracked files (values equal the committed artifact); 4/9 (steady24h fc/reactive + fulltrace pair) fail ONLY on inputs that ship as tracked .zst archives (Stage B inflates them)"
 else
   bad "stage A boundary not as documented (see $BASE/composed_A.log)"
 fi
 
-# ---- Target 3: composed join, Stage B (supplementary inputs staged) ----
+# ---- Target 3: composed join, Stage B (inflate tracked .zst in-checkout) ----
 say ""
-say "## Target 3 — composed nine-cell join, Stage B (supplementary staged)"
+say "## Target 3 — composed nine-cell join, Stage B (tracked .zst inflated)"
 for f in "${SUPP_INPUTS[@]}"; do
-  mkdir -p "$W/$(dirname "$f")"
-  cp "$TESE/$f" "$W/$f" || bad "staging $f"
+  if [ -e "$W/$f.zst" ]; then
+    zstd -d -q -f "$W/$f.zst" -o "$W/$f" || bad "inflating $f.zst"
+  else
+    bad "tracked archive missing in checkout: $f.zst"
+  fi
 done
 rm -f "$BASE/composed_B.json"
 TESE_ROOT="$W" "$EDA_PY" "$W/simulation/composed_fill_join.py" \

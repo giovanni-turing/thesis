@@ -2834,3 +2834,30 @@ result:     FIRST SILICON NUMBER, one rep, NOT yet cross-verified: burst3 fc-p90
             extension after; author stops via touch .../silicon_anchor/STOP.
 commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed with git add -A
             mid-campaign; deliberate post-hoc review of those insertions done this entry).
+
+### repro-clean-checkout (2026-07-27)
+
+- **Artifact:** `verification/repro_clean_checkout_report.md` (runner:
+  `verification/repro_clean_checkout.sh`; scratch under
+  `/home/gio/.cache/tese_repro/`).
+- **Command:** `verification/repro_clean_checkout.sh` (detached worktree at
+  HEAD; frontier `build_frontier_summary.py --jobs 8` under `TESE_ROOT`;
+  composed `composed_fill_join.py` Stage A tracked-only / Stage B after
+  `zstd -d` of the six tracked `.jsonl.zst` replay inputs).
+- **Result:** 4/4 PASS — frontier 313-cell recomputation confirms the tracked
+  summary (`stats-mismatches=0`, `calib-selection=OK`, `calib-table=OK`,
+  `summary-link=OK`; forecast `vs_static=0.6231`, eval-span
+  `worker_s=2410755`); composed Stage A boundary exact (5/9 cells reproduce
+  from plain tracked files, field-equal to the committed artifact; 4/9 fail
+  only on the archive inputs); Stage B nine-cell artifact **byte-identical**
+  to the committed object.
+- **New tracked data:** the six bulky replay inputs now ship compressed
+  in-repo (`defense/anim/data/a2_runs/*.jsonl.zst`,
+  `defense/anim/data/a13_runs/*.jsonl.zst`, 192 MB total vs 1.8 GB plain;
+  round-trip `cmp`-verified). `TESE_ROOT` env override added to
+  `composed_fill_join.py` and `build_frontier_summary.py` (defaults
+  unchanged; K16 guard byte-identity re-proven by `selftest_d44.py`).
+- **Feeds:** plan §8.8-1 (independent reproduction test); Appendix A
+  quickstart/manifest rows for `tab:cl-ledger-*` (updated to name the join
+  script and the `.zst` inflate step); `supplementary/SUPPLEMENTARY.md` S7;
+  `supplementary/manifest_full.md` composed row.
