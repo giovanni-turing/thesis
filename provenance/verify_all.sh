@@ -319,10 +319,19 @@ fi
 # schedules and replay stats (not from frontier_summary.json) and cross-checks
 # each cell's stats agreement; any mismatch or nonzero exit fails the gate.
 FR_LOG=$("$TESE/eda/.venv/bin/python"   "$TESE/simulation/results/comparator_frontier/build_frontier_summary.py"   --jobs 8 2>&1 >/dev/null); FR_RC=$?
-if [ $FR_RC -eq 0 ] && printf '%s' "$FR_LOG" | grep -q 'stats-mismatches=0'; then
-  ok "frontier raw recompute: 169 cells from schedules+stats, 0 mismatches"
+# D20 (2026-07-26): the builder now fails on missing stats, recomputes the
+# calibration selection against FROZEN.json, and cross-links the raw cells to
+# frontier_summary.json. The gate pins the EXACT expected signature -- a
+# shortened inventory, absent evidence, selection drift, or a summary/cells
+# divergence all break the pinned line. Cell count 313 = 25 core + 90 family
+# + 48 adversarial + 128 calib floor + 16 calib oracle + 5 eval-window
+# variants + 1 path-identity check; adjudicate any legitimate inventory
+# change here with a dated comment.
+FR_WANT='cells=313  stats-missing=0  stats-mismatches=0  calib-selection=OK  summary-link=OK'
+if [ $FR_RC -eq 0 ] && printf '%s' "$FR_LOG" | grep -qF "$FR_WANT"; then
+  ok "frontier raw recompute: 313 cells (incl. calib grid), selection + summary-link verified"
 else
-  bad "frontier raw recompute FAILED (rc=$FR_RC): $(printf '%s' "$FR_LOG" | tail -1)"
+  bad "frontier raw recompute FAILED (rc=$FR_RC): $(printf '%s' "$FR_LOG" | grep 'cells=' | tail -1)"
 fi
 # verb-convention regression (protocol R-C)
 BILLMISUSE=$(grep -rcE "billed at (forecast-)?issue" $TEXSET | grep -v ':0' | wc -l)

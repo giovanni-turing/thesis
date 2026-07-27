@@ -136,7 +136,9 @@ FROZEN = {
                    "simulation/forecast_schedule.py:146-150",
                    "simulation/run_encoder_hybrid.sh:19"],
         "asymmetry_disclosure": ("the two readiness models are NOT the same dial; the frontier's "
-                                 "shipped arms mix them. Both symmetric repairs are measured below "
+                                 "shipped arms mix them. Both directions are repaired and measured below (the warm-pool "
+                                 "direction is algorithmically symmetric; the strict direction is near-symmetric — "
+                                 "the forecast variant retains matured orders for a 165 s hold) "
                                  "(forecast under strict re-warm; reactive family under warm-pool)."),
     },
     "replay": {
@@ -286,7 +288,7 @@ headline = {
          "reactive_worker_s": FAM, "reactive_vs_static": round(FAM / STATIC_REF, 4),
          "forecast_worker_s": FC, "forecast_vs_static": round(FC / STATIC_REF, 4),
          "forecast_advantage_x": round(FAM / FC, 3)},
-        {"basis": "both arms under strict re-warm (symmetric, conservative to forecast)",
+        {"basis": "both arms under strict re-warm variants (near-symmetric sensitivity, NOT identical semantics: forecast retains matured orders for a 165 s hold vs reactive trailing-window re-warm; conservative to forecast)",
          "cheapest_passing_reactive": cheapest_fam,
          "reactive_worker_s": FAM, "reactive_vs_static": round(FAM / STATIC_REF, 4),
          "forecast_worker_s": FCS, "forecast_vs_static": round(FCS / STATIC_REF, 4),
@@ -304,7 +306,7 @@ headline = {
          "forecast_advantage_x": round(repairs["reactive_warmpool_M4"]["cost_worker_s_eval_span"] / FC, 3)},
     ],
     "defensible_range_x": [round(WP / FC, 2), round(FAM / FCS, 2)],
-    "oracle_bound": {
+    "oracle_reference": {
         "shipped_boundary_clamped": {
             "worker_s": arms["5_perfect_future_oracle_H0"]["cost_worker_s_eval_span"],
             "vs_static": arms["5_perfect_future_oracle_H0"]["vs_static"],
@@ -321,9 +323,9 @@ headline = {
             "burst3_p99_ms": repairs["oracle_warmstart_H0"]["p99_ms_per_window"]["burst3"],
             "note": ("with the single asymmetry removed (order_t = ts - L, may precede window start) "
                      "the oracle passes EVERY evaluation episode; aggregate schedule is unchanged. "
-                     "This — not the clamped variant — is the honest signal-quality bound."),
+                     "This — not the clamped variant — is the perfect-information fixed-conversion reference on the signal-quality axis (its scale-down runs H=0; not a lower bound over admissible SLA-passing schedules)."),
         },
-        "fraction_of_achievable_saving_captured_by_forecast": round(
+        "fraction_of_measured_gap_to_reference_captured_by_forecast": round(
             (STATIC_REF - FC) / (STATIC_REF - ORC_WS), 4),
     },
 }
@@ -339,7 +341,7 @@ summary = {
                f"favourable to reactive — forecast is {WP/FC:.2f}x to {FAM/FCS:.2f}x cheaper, and is "
                "cheaper than EVERY member of the warm-floor family, passing or failing."),
     "date": "2026-07-26",
-    "status": "COMPLETE — single evaluation pass, frozen parameters, zero retuning",
+    "status": "COMPLETE — single evaluation pass; arm mechanics pre-frozen before the frontier replay (rho=15 was an earlier ex-post choice, disclosed); no retuning during the replay",
     "gate_and_frozen_parameters": FROZEN,
     "calibration": calib_record(),
     "static_reference_worker_s": STATIC_REF,
@@ -360,7 +362,7 @@ summary = {
         "members": family,
     },
     "symmetry_repair_diagnostics": {
-        "note": ("adversarial diagnostics, NOT frontier arms. They equalise the one undisclosed "
+        "note": ("adversarial diagnostics, NOT frontier arms. They repair the one readiness "
                  "asymmetry (readiness model) and the oracle's window-boundary clamp. All were run "
                  "after the frontier was fixed and change no frozen parameter."),
         "cheapest_warmpool_reactive_passing_all_episodes": cheapest_wp,
@@ -381,7 +383,7 @@ summary = {
         "5_perfect_future_oracle_H0": ("0.292x static. As shipped it fails burst3, but ONLY through a "
                                        "window-boundary clamp the forecast arm does not carry; with "
                                        "that single asymmetry repaired it passes every episode at the "
-                                       "same 0.292x. It is the frontier leader and the honest bound."),
+                                       "same 0.292x. It is the frontier leader and the perfect-information reference (not a schedule-optimal lower bound)."),
     },
     "caveats": [
         "the 1.67x headline is NOT robust to the readiness-model repair — it collapses to 1.20x. "
@@ -393,7 +395,7 @@ summary = {
         "'buying enough standing capacity costs more than the static fleet' holds only under the "
         "strict-re-warm actuation; under warm-pool the M=2 floor passes at 0.746x, cheaper than static. "
         "The conclusion (a floor alone never reaches forecast's cost) is unaffected.",
-        "the comparison is conservative in reactive's favour: forecast is a single frozen policy, the "
+        "the comparison is conservative in reactive's favour: forecast is a single pre-frozen arm (rho=15 chosen ex post earlier, disclosed), the "
         "floor family is an ex-post best-of-family read on the evaluation span.",
         "R2 is decided entirely by the L=300 s calibration column; the arm is deployed at L=30 s.",
         "p99 cross-quoting: the forecast and reactive aggregate p99s recomputed here (589.301 ms) "
@@ -562,7 +564,7 @@ for nm, pos in zip(ORDER_B, LAB_B):
     label(axB, (a["cost_worker_s_eval_span"] / MS, a["worst_episode_p99_ms"]), pos,
           tag(a, nm), c if c != MUTED else INK,
           weight="bold" if nm.startswith("forecast p90 · warm-pool") else "normal")
-frame(axB, "B · readiness models equalised (adversarial repair)")
+frame(axB, "B · readiness repairs (warm-pool symmetric; strict near-symmetric)")
 
 handles = [
     Line2D([], [], marker="o", color=C_BLUE, ls="none", ms=8, label="forecast p90"),

@@ -175,7 +175,11 @@ Tab.~\ref{tab:base-grid} (burst5 $C^{*}$ corrected 16$\to$8) &
   \texttt{simulation/ sweep\_grid.py}; \texttt{verification/scripts/
   burst5\_stability.py} &
   \texttt{results/grid/ grid\_summary.json}; superseding
-  \texttt{verification/ rerun-stability-e2e.md} & \texttt{grid:*} \\
+  \texttt{verification/ rerun-stability-e2e.md}. \emph{Caveat:} this JSON's
+  onset metadata predates the episode merge fix (burst1 220, burst6 1\,min);
+  authoritative onsets are \texttt{i\_burst\_anatomy\_stats.json}
+  (404/53\,min) --- window spans and $C^{*}$ values are unaffected &
+  \texttt{grid:*} \\
 Reactive planner (\S\ref{sec:base-reactive-llm}) &
   \texttt{simulation/ run\_32\_reactive.sh} & \texttt{results/reactive32/} &
   \texttt{reactive:*} \\

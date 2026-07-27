@@ -22,9 +22,11 @@ RQ3 asks whether forecast-driven vision provisioning improves the
 practitioner would reach for: the best static fleet and a reactive autoscaler.
 This chapter establishes those comparators on the platform of
 Chapter~\ref{cap:metodologia}, drives the same platform from the zero-shot
-forecasts of Chapter~\ref{cap:predictors}, and grades every arm under one
-frozen protocol. The answer is a demonstrated failure mode and a trade-off, not
-universal superiority: on four of the five composed evaluation episodes
+forecasts of Chapter~\ref{cap:predictors}, and grades every arm under a pre-frozen
+replay protocol (arm mechanics frozen before the frontier replay;
+$\rho{=}15$ disclosed as an earlier ex-post choice). The answer is a
+demonstrated failure mode and a trade-off, not
+universal superiority: on four of the five evaluation windows
 forecast and reactive tail latencies \emph{tie exactly}, the latency advantage
 lives in the one-minute onset, and what forecasting buys at week scale is
 resource-time at equal compliance.
@@ -386,7 +388,10 @@ backlog it never drains. Reactive control is insensitive to $\rho$ (13--14 of
 \paragraph{Mechanism: anticipation on burst4, standing headroom on burst3.}
 Read as a burst detector at true issue time, the p90 band crosses \emph{ahead}
 of the observed rate on the gradual onset --- burst4, a \SI{345}{\second}
-usable issue-lead, \textbf{anticipation} in the strict sense --- but
+usable issue-lead at the 60\,s/224-images-per-second detection threshold
+(\SI{15}{\second} at the strictest crossing --- positive anticipation at
+every threshold, a full startup lead only at the coarse one),
+\textbf{anticipation} in the strict sense --- but
 \emph{lags} the fastest onset (burst3, issued at $h{=}1$, no usable lead). The
 closed-loop pass on burst3 is therefore \emph{not} anticipation and must never
 be described as such: it is the better \textbf{placement of standing
@@ -471,12 +476,14 @@ slow onset (burst1) and week scale yet \emph{fails} burst3 (p99
 $1{,}973$--$11{,}568$\,\si{\milli\second} against the forecast's
 \SI{588}{\milli\second}): headroom calibrated to past load cannot place the
 replicas a sub-minute spike demands. The stronger test gives the reactive arm
-\emph{standing} capacity instead. Five arms therefore run under identical
-mechanics on a single frozen protocol --- gate, windows, control law,
-$\rho{=}15$, 15-second control bin, 3-minute hysteresis,
-$L{=}\SI{30}{\second}$, percentile rule --- every parameter read off the
-protocol above and the warm floor frozen on the calibration split before a
-single evaluation replay: (1) the p90 forecast policy; (2) the identically
+\emph{standing} capacity instead. Five arms therefore run under shared
+mechanics --- gate, windows, control law, $\rho{=}15$, 15-second control
+bin, 3-minute hysteresis, $L{=}\SI{30}{\second}$, percentile rule ---
+identical except the disclosed readiness asymmetry
+(repaired and measured below) and the oracle's $H{=}0$; arm mechanics were
+pre-frozen before the frontier replay ($\rho{=}15$ itself was an earlier
+ex-post choice, disclosed above) and the warm floor was frozen on the
+calibration split before a single evaluation replay: (1) the p90 forecast policy; (2) the identically
 informed reactive controller; (3) that controller plus a calibrated minimum
 warm floor of $M$ standing workers; (4) the deployable static fleet; (5) a
 perfect-future oracle. Table~\ref{tab:cl-frontier} and
@@ -607,8 +614,9 @@ never be quoted alone. Two honesty points travel with the frontier. The
 comparison is conservative in reactive's favour --- the forecast is one frozen
 policy, the floor family an ex-post best-of-family read on the evaluation span.
 And the perfect-information oracle reference prices the signal-quality axis
-at \textbf{0.292$\times$} static under the same fixed point conversion and
-mechanics; it does not minimize worker-time subject to the SLA, so it is a
+at \textbf{0.292$\times$} static under the same fixed point conversion
+(its scale-down runs $H{=}0$ where the frozen arms use 3-minute hysteresis,
+so the shared surface is the conversion, not every mechanic); it does not minimize worker-time subject to the SLA, so it is a
 reference, not a lower bound over admissible schedules. Its lone burst3 miss
 under the shipped run is a window-boundary artifact (released at identical
 cost, Table~\ref{tab:cl-frontier}). The forecast arm captures 53\% of the

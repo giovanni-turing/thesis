@@ -143,6 +143,22 @@ def cells() -> list[dict]:
             out.append(dict(group="adversarial", window=w, arm=arm,
                             M=int(suf[-1]) if suf.startswith("reWP") else None,
                             tag=f"{w}_{suf}", dir=HERE / "adversarial"))
+    # D20 (2026-07-26): the calibration grid is part of the evidential chain --
+    # M4's selection must be recomputable. Inventory every calib schedule.
+    import glob as _glob, re as _re
+    for spx in sorted(_glob.glob(str(HERE / "calib" / "*.sched.json"))):
+        base = Path(spx).name[:-len(".sched.json")]
+        m = _re.match(r"^(burst[26])_floorM(\d+)_L(\d+)$", base)
+        mo = _re.match(r"^(burst[26])_oracle_L(\d+)_H(\d+)$", base)
+        if m:
+            out.append(dict(group="calib", window=m.group(1), arm=f"calib_floorM{m.group(2)}_L{m.group(3)}",
+                            M=int(m.group(2)), tag=base, dir=HERE / "calib"))
+        elif mo:
+            out.append(dict(group="calib_oracle", window=mo.group(1),
+                            arm=f"calib_oracle_L{mo.group(2)}_H{mo.group(3)}", M=None,
+                            tag=base, dir=HERE / "calib"))
+        else:
+            raise SystemExit(f"unrecognized calib cell name: {base}")
     out.append(dict(group="check", window=COST_WINDOW, arm="static_C8_encworkers_path", M=8,
                     tag="aggregate_encworkers8", dir=HERE / "checks"))
     return out
@@ -202,11 +218,61 @@ def main() -> None:
         rows = pool.map(work, cs, chunksize=1)
     df = pd.DataFrame(rows)
     bad = df[df["stats_agrees"] == False]  # noqa: E712
-    print(f"cells={len(df)}  stats-mismatches={len(bad)}", file=sys.stderr)
+    missing = df[df["stats_agrees"].isna()]
+    fail = False
+    # D20.1: absent evidence is a failure, not a silent None
+    if len(missing):
+        print("MISSING stats files for cells:", file=sys.stderr)
+        print(missing[["group", "tag"]].to_string(), file=sys.stderr)
+        fail = True
+    # D20.3: recompute the calibration selection and compare with FROZEN.json
+    calib = df[df["group"] == "calib"]
+    sel_ok = "SKIP"
+    if len(calib):
+        import re as _re
+        passing = []
+        for M, g in calib.groupby("M"):
+            if (g["p99"] < 1000.0).all() and set(g["window"]) == {"burst2", "burst6"}:
+                passing.append(int(M))
+        recomputed_M = min(passing) if passing else None
+        frozen = json.loads((HERE / "FROZEN.json").read_text())
+        frozen_M = frozen["arm_3_reactive_plus_warm_floor"]["frozen_M"]
+        sel_ok = "OK" if (recomputed_M is not None and recomputed_M == frozen_M) else f"FAIL(recomputed={recomputed_M},frozen={frozen_M})"
+        if sel_ok != "OK":
+            fail = True
+    # D20.4: link the raw cells to the summary object the gate reads
+    link_ok = "OK"
+    try:
+        summ = json.loads((HERE / "frontier_summary.json").read_text())
+        static_ref = summ["static_reference_worker_s"]
+        agg = df[(df["group"].isin(["core", "family"])) & (df["window"] == COST_WINDOW)]
+        by_arm = {r["arm"]: r["worker_s"] for _, r in agg.iterrows()}
+        for key, arm in [("1_forecast_p90_issue_time", "forecast_p90"),
+                         ("2_reactive_react_point", "reactive"),
+                         ("3_reactive_plus_warm_floor_M4", "warm_floor_M4"),
+                         ("4_static_C8_deployable", "static_C8"),
+                         ("5_perfect_future_oracle_H0", "oracle_H0")]:
+            want = summ["arms"][key]["cost_worker_s_eval_span"]
+            got_ws = by_arm.get(arm)
+            if got_ws is None or abs(got_ws - want) > 0.15:
+                link_ok = f"FAIL({arm}:{got_ws} vs {want})"; fail = True; break
+            r = round(got_ws / static_ref, 4)
+            if abs(r - summ["arms"][key]["vs_static"]) > 5e-4:
+                link_ok = f"FAIL(ratio {arm})"; fail = True; break
+        m6 = summ["warm_floor_family_envelope"]["members"]["warm_floor_M6"]["cost_worker_s_eval_span"]
+        if link_ok == "OK" and abs(by_arm.get("warm_floor_M6", -1) - m6) > 0.15:
+            link_ok = "FAIL(M6)"; fail = True
+    except Exception as e:
+        link_ok = f"FAIL({e})"; fail = True
     if len(bad):
         print(bad.to_string(), file=sys.stderr)
+        fail = True
+    print(f"cells={len(df)}  stats-missing={len(missing)}  stats-mismatches={len(bad)}  "
+          f"calib-selection={sel_ok}  summary-link={link_ok}", file=sys.stderr)
     df.to_json(HERE / "frontier_summary_cells.json", orient="records", indent=1)
     print("wrote frontier_summary_cells.json", file=sys.stderr)
+    if fail:
+        sys.exit(2)
 
 
 if __name__ == "__main__":

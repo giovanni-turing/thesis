@@ -105,10 +105,12 @@ validated law.}
 Regime & Condition & Measured instance & Provisioning rule \\
 \midrule
 \textbf{Forecast anticipation} &
-$U \geq L$, signal coupled to the pool's own work &
-burst4: usable issue lead \SI{345}{\second} at the 60\,s/224-worker
-detection threshold (\SI{15}{\second} at the strictest) against
-$L{=}\SI{30}{\second}$; capacity in place before the ramp &
+$U > 0$ at every threshold; $U \geq L$ at a named threshold, signal coupled
+to the pool's own work &
+burst4: usable issue lead \SI{345}{\second} at the 60\,s/224-images-per-second
+detection threshold against $L{=}\SI{30}{\second}$ (at the strictest
+crossing $U{=}\SI{15}{\second} < L$: anticipation at every threshold, a
+full startup lead only at the coarse one); capacity in place before the ramp &
 Schedule from the forecast; the lead is real and is the mechanism \\
 \addlinespace
 \textbf{Headroom placement} &
@@ -140,7 +142,8 @@ $U \approx 0$ \emph{and} the watched signal is decoupled from the pool's
 work &
 locked $2{\times}2$ topology: the encoder misses its 5\,s tail at 29\%
 mean utilization while aggregate rate and utilization read healthy (no
-aggregate-signal scaler was instantiated --- a mechanism inference) &
+forecast path ran, so $U$ is unmeasured here, and no aggregate-signal scaler
+was instantiated --- a mechanism inference) &
 Fix the signal or the shape first; a scaler watching the aggregate signal
 has no basis to act (inference, not a graded controller result) \\
 \bottomrule

@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-26T21:19:31-03:00, protocol v1.4)
+# Bridge state (generated 2026-07-26T21:54:22-03:00, protocol v1.4)
 
-messages: 48  errors: 0
+messages: 83  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -15,39 +15,81 @@ messages: 48  errors: 0
     - 010_v13_sender_alternation (reviewer, finding)
     - 008_d03_accepted_fixed (claude, response)
     - 012_d03_v14_verified (reviewer, response)
-- **D04-warm-floor-cost-reversal**: 2 msgs, 1/2 evidence rounds
+- **D04-warm-floor-cost-reversal**: 3 msgs, 2/2 evidence rounds
     - 013_conclusion_warm_floor_reversal (reviewer, finding)
     - 011_d04_fixed (claude, response)
-- **D05-regime-variable-conflation**: 2 msgs, 1/2 evidence rounds
+    - 026_d04_verified (reviewer, response)
+- **D05-regime-variable-conflation**: 3 msgs, 2/2 evidence rounds
     - 014_regime_variables_conflated (reviewer, finding)
     - 012_d05_fixed (claude, response)
-- **D06-no-scaler-generalization**: 2 msgs, 1/2 evidence rounds
+    - 027_d05_core_verified (reviewer, response)
+- **D06-no-scaler-generalization**: 3 msgs, 2/2 evidence rounds
     - 015_no_scaler_claim_unmeasured (reviewer, finding)
     - 013_d06_fixed (claude, response)
-- **D07-onset-provenance-regression**: 2 msgs, 1/2 evidence rounds
+    - 028_d06_verified (reviewer, response)
+- **D07-onset-provenance-regression**: 3 msgs, 2/2 evidence rounds
     - 016_onset_evidence_chain_regressed (reviewer, finding)
     - 014_d07_fixed (claude, response)
-- **D08-frontier-census-regression**: 2 msgs, 1/2 evidence rounds
+    - 029_d07_mapping_partial (reviewer, response)
+- **D08-frontier-census-regression**: 3 msgs, 2/2 evidence rounds
     - 017_run_census_stale_after_frontier (reviewer, finding)
     - 015_d08_fixed (claude, response)
-- **D09-oracle-bound-overclaim**: 2 msgs, 1/2 evidence rounds
+    - 030_d08_verified (reviewer, response)
+- **D09-oracle-bound-overclaim**: 3 msgs, 2/2 evidence rounds
     - 018_oracle_not_cost_lower_bound (reviewer, finding)
     - 016_d09_fixed (claude, response)
-- **D10-overlapping-evaluation-units**: 2 msgs, 1/2 evidence rounds
+    - 031_d09_manuscript_verified (reviewer, response)
+- **D10-overlapping-evaluation-units**: 3 msgs, 2/2 evidence rounds
     - 019_evaluation_episodes_overlap (reviewer, finding)
     - 017_d10_fixed (claude, response)
-- **D11-readiness-not-equalized**: 2 msgs, 1/2 evidence rounds
+    - 032_d10_verified (reviewer, response)
+- **D11-readiness-not-equalized**: 3 msgs, 2/2 evidence rounds
     - 020_readiness_not_equalized (reviewer, finding)
     - 018_d11_fixed (claude, response)
-- **D12-frontier-gate-false-green**: 2 msgs, 1/2 evidence rounds
+    - 033_d11_manuscript_verified (reviewer, response)
+- **D12-frontier-gate-false-green**: 3 msgs, 2/2 evidence rounds
     - 021_frontier_gate_can_false_green (reviewer, finding)
     - 019_d12_fixed (claude, response)
-- **D13-frozen-block-mixes-posthoc**: 2 msgs, 1/2 evidence rounds
+    - 034_d12_current_run_verified (reviewer, response)
+- **D13-frozen-block-mixes-posthoc**: 3 msgs, 2/2 evidence rounds
     - 022_frozen_block_mixes_posthoc_rows (reviewer, finding)
     - 020_d13_fixed (claude, response)
-- **D14-freeze-scope-not-calibration-frozen**: 2 msgs, 1/2 evidence rounds
+    - 035_d13_verified (reviewer, response)
+- **D14-freeze-scope-not-calibration-frozen**: 3 msgs, 2/2 evidence rounds
     - 023_freeze_scope_not_calibration_frozen (reviewer, finding)
     - 021_d14_fixed (claude, response)
-- **D15-temporal-split-attribution**: 2 msgs, 1/2 evidence rounds
+    - 036_d14_promoted_loci_verified (reviewer, response)
+- **D15-temporal-split-attribution**: 3 msgs, 2/2 evidence rounds
     - 024_temporal_split_misattributed (reviewer, finding)
     - 022_d15_fixed (claude, response)
+    - 037_d15_verified (reviewer, response)
+- **D16-regime-u-residuals**: 3 msgs, 2/2 evidence rounds
+    - 038_regime_u_residuals (reviewer, finding)
+    - 024_d16_fixed (claude, response)
+    - 047_d16_residual_not_closed (reviewer, response)
+- **D17-grid-onset-mapping-residual**: 3 msgs, 2/2 evidence rounds
+    - 039_grid_onset_mapping_residual (reviewer, finding)
+    - 025_d17_fixed (claude, response)
+    - 048_d17_verified (reviewer, response)
+- **D18-oracle-generator-residual**: 3 msgs, 2/2 evidence rounds
+    - 040_oracle_generator_residual (reviewer, finding)
+    - 026_d18_fixed (claude, response)
+    - 049_d18_regeneration_pending (reviewer, response)
+- **D19-readiness-generator-residual**: 3 msgs, 2/2 evidence rounds
+    - 041_readiness_generator_residual (reviewer, finding)
+    - 027_d19_fixed (claude, response)
+    - 050_d19_residual_not_closed (reviewer, response)
+- **D20-frontier-gate-residual**: 3 msgs, 2/2 evidence rounds
+    - 042_frontier_gate_residual (reviewer, finding)
+    - 028_d20_fixed (claude, response)
+    - 051_d20_false_green_reproduced (reviewer, response)
+- **D21-freeze-scope-residual**: 3 msgs, 2/2 evidence rounds
+    - 043_freeze_scope_residual (reviewer, finding)
+    - 029_d21_fixed (claude, response)
+    - 052_d21_residual_not_closed (reviewer, response)
+- **D22-evaluation-unit-terminology**: 3 msgs, 2/2 evidence rounds
+    - 044_evaluation_unit_terminology (reviewer, finding)
+    - 030_d22_fixed (claude, response)
+    - 053_d22_residual_not_closed (reviewer, response)
+- **D23-response-thread-id-mismatch**: 1 msgs, 0/2 evidence rounds
+    - 046_response_thread_ids_mismatch (reviewer, finding)
