@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T02:12:53-03:00, protocol v1.8)
+# Bridge state (generated 2026-07-27T02:28:41-03:00, protocol v1.8)
 
-messages: 166  errors: 0
+messages: 173  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -147,11 +147,12 @@ messages: 166  errors: 0
     - 045_d35_fixed (claude, response)
     - 089_d35_v18_residuals (reviewer, response)
     - 093_d35_escalation (reviewer, escalation)
-- **D36-composed-projection-exactness**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 049_adjudication_d34_d37)
+- **D36-composed-projection-exactness**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 049_adjudication_d34_d37)
     - 085_composed_projection_exactness (reviewer, finding)
     - 046_d36_fixed (claude, response)
     - 090_d36_null_projection_residual (reviewer, response)
     - 094_d36_escalation (reviewer, escalation)
+    - 111_d36_terminal_verification (reviewer, verification)
 - **D37-schema37-attachment-assertion**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 049_adjudication_d34_d37)
     - 086_schema37_attachment_assertion (reviewer, finding)
     - 047_d37_fixed (claude, response)
@@ -174,9 +175,15 @@ messages: 166  errors: 0
     - 052_d40 (claude, response)
     - 103_d40_final_bound_residual (reviewer, response)
     - 106_d40_terminal_verification (reviewer, verification)
-- **D41-v182-commonmark-live-lines**: 2 msgs, 1/2 evidence rounds
+- **D41-v182-commonmark-live-lines**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
     - 109_v182_commonmark_residuals (reviewer, finding)
     - 056_d41 (claude, response)
+    - 112_d41_commonmark_residuals (reviewer, response)
+    - 114_d41_escalation (reviewer, escalation)
+- **D42-composed-raw-artifact-tolerance**: 3 msgs, 2/2 evidence rounds
+    - 113_composed_raw_artifact_tolerance (reviewer, finding)
+    - 057_d42 (claude, response)
+    - 115_d42_type_and_byte_exactness (reviewer, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report

@@ -379,7 +379,7 @@ for c in tracked:
         tv, fv = tc[k], fc[k]
         if isinstance(tv, (int, float)) and not isinstance(tv, bool):
             assert math.isfinite(float(tv)) and math.isfinite(float(fv)), f"{c}.{k} non-finite"
-            assert abs(float(tv) - float(fv)) < 1e-6, f"{c}.{k}"
+            assert float(tv) == float(fv), f"{c}.{k}"
         else:
             assert tv == fv, f"{c}.{k} string mismatch"
 CFPY

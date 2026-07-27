@@ -57,6 +57,8 @@ def live_lines(body):
     opening length closes. Excludes 4-space/tab-indented lines and HTML comments."""
     import re as _r
     body = _r.sub(r"<!--.*?-->", "", body, flags=_r.S)
+    if "<!--" in body:                      # unterminated comment: nothing after it is live
+        body = body[:body.index("<!--")]
     out, fence_char, fence_len = [], None, 0
     for raw in body.splitlines():
         if fence_char is None:
@@ -69,7 +71,12 @@ def live_lines(body):
             if cm and len(cm.group(1)) >= fence_len:
                 fence_char, fence_len = None, 0
             continue
-        if raw.startswith("    ") or raw.startswith("\t"):
+        _ind = 0
+        for _ch in raw:
+            if _ch == " ": _ind += 1
+            elif _ch == "\t": _ind += 4 - (_ind % 4)
+            else: break
+        if _ind >= 4:
             continue
         out.append(raw)
     return out
