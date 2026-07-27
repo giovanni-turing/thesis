@@ -184,7 +184,7 @@ BEGIN
     END IF;
     IF pg_get_expr(c.relpartbound, c.oid) IS DISTINCT FROM 'FOR VALUES IN (''composed_fill'')' FROM pg_class c
        WHERE c.oid = ('provenance.'||t||'_composed_fill')::regclass THEN
-      RAISE EXCEPTION '37/D37: relocation-branch bound is not exactly FOR VALUES IN (composed_fill)', t;
+      RAISE EXCEPTION '37/D37: %_composed_fill relocation-branch bound is not exactly FOR VALUES IN (composed_fill)', t;
     END IF;
     EXECUTE format('INSERT INTO provenance.%I SELECT * FROM pg_temp._cf37', t);
     EXECUTE format('SELECT count(*) FROM provenance.%I', t||'_composed_fill') INTO post_dedicated;

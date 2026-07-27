@@ -114,9 +114,19 @@ def main():
         body = m.get("body", "")
         def _is_assert0(ln):
             u = ln.upper().lstrip("#").strip()
-            return ln.lstrip().startswith("#") and u.startswith("AUTHOR ADJUDICATION") \
-                   and "REQUIRED" not in u and "REQUEST" not in u
-        heading = any(_is_assert0(ln) for ln in body.splitlines())
+            return ln.lstrip().startswith("#") and u == "AUTHOR ADJUDICATION"
+        _lines_live = []
+        _f = None
+        for _raw in body.splitlines():
+            _fm = re.match(r"^\s*(```+|~~~+)", _raw)
+            if _fm:
+                _tok = _fm.group(1)[0] * 3
+                if _f is None: _f = _tok
+                elif _f == _tok: _f = None
+                continue
+            if _f is None and not _raw.startswith("    "):
+                _lines_live.append(_raw)
+        heading = any(_is_assert0(ln) for ln in _lines_live)
         if m["file"] in ADJUDICATION_EXCEPTIONS:
             import os as _os
             for d in ("to_reviewer", "from_reviewer", "archive"):
@@ -138,15 +148,21 @@ def main():
                    and "thread" not in m["hdr"])
         if not ok_auth:
             continue  # header/registry errors are raised elsewhere
-        in_fence = False
-        for ln in body.splitlines():
-            if ln.strip().startswith("```"):
-                in_fence = not in_fence
+        in_fence = None
+        n_rulings = 0
+        for raw in body.splitlines():
+            fm = re.match(r"^\s*(```+|~~~+)", raw)
+            if fm:
+                tok = fm.group(1)[0] * 3
+                if in_fence is None: in_fence = tok
+                elif in_fence == tok: in_fence = None
                 continue
-            if in_fence:
+            if in_fence is not None:
                 continue
-            st = ln.strip()
-            if st.startswith("RULING "):
+            if raw.startswith("    "):    # 4-space indented example, not live
+                continue
+            st = raw.strip()
+            if re.match(r"^RULING\b", st):
                 mm = re.match(r"^RULING\s+(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)\s*:\s*(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)\s*$", st)
                 if not mm:
                     errors.append(f"{m['file']}: malformed RULING line: {st[:60]!r}")
@@ -156,11 +172,18 @@ def main():
                 if prev is not None and prev[1] != verdict:
                     errors.append(f"{m['file']}: conflicting ruling for {tkey}: {verdict} vs {prev[1]} in {prev[0]}")
                     continue
+                n_rulings += 1
                 adjudicated_threads[tkey] = (m["file"], verdict)
+        if n_rulings == 0:
+            errors.append(f"{m['file']}: asserted adjudication contains no valid RULING line")
     _all_thread_ids = {m["hdr"].get("thread") for m in msgs if m["hdr"].get("thread")}
+    _escalated_ids = {m["hdr"].get("thread") for m in msgs
+                      if m["hdr"].get("type") == "escalation" and m["hdr"].get("thread")}
     for t, (src, verdict) in list(adjudicated_threads.items()):
         if t not in _all_thread_ids:
             errors.append(f"{src}: RULING names unknown thread '{t}'")
+        elif t not in _escalated_ids and src not in ADJUDICATION_EXCEPTIONS:
+            errors.append(f"{src}: RULING for '{t}' which was never escalated")
     verif_names = {m["file"] for m in msgs if m["hdr"].get("type") == "verification"}
     for m in msgs:
         r = m["hdr"].get("re","")

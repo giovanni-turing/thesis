@@ -423,7 +423,7 @@ for cell, d in art.items():
         bad.append(cell); continue
     for k in ("requests", "enc_p99", "ttft_p99", "e2e_p99", "e2e_max", "itl_p99", "gpu_h"):
         av, dv = float(d[k]), float(row[k])
-        if not (math.isfinite(av) and math.isfinite(dv)) or abs(av - dv) > 1e-3:
+        if not (math.isfinite(av) and math.isfinite(dv)) or av != dv:
             bad.append(f"{cell}.{k}"); break
     else:
         arm = d["arm"]

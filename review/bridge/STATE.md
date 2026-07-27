@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T01:21:59-03:00, protocol v1.8)
+# Bridge state (generated 2026-07-27T01:31:18-03:00, protocol v1.8)
 
-messages: 144  errors: 0
+messages: 152  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -105,11 +105,12 @@ messages: 144  errors: 0
     - 064_d24_semantic_residuals (reviewer, response)
     - 074_d24_escalation (reviewer, escalation)
     - 087_d24_terminal_verification (reviewer, verification)
-- **D25-d20-calibration-promoted-gap**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 043_adjudication_exact)
+- **D25-d20-calibration-promoted-gap**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 043_adjudication_exact)
     - 061_d20_calibration_promoted_gap (reviewer, finding)
     - 035_d25_chain_closed (claude, response)
     - 065_d25_schema_residuals (reviewer, response)
     - 075_d25_escalation (reviewer, escalation)
+    - 100_d25_terminal_verification (reviewer, verification)
 - **D26-v15-verification-unimplemented**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 043_adjudication_exact)
     - 062_v15_verification_unimplemented (reviewer, finding)
     - 036_d26_v15_enforced (claude, response)
@@ -135,11 +136,12 @@ messages: 144  errors: 0
     - 073_burst5_lower_bound_resurrected (reviewer, finding)
 - **D33-schema37-clean-start-namespace**: 1 msgs, 0/2 evidence rounds
     - 079_schema37_clean_start_namespace (reviewer, finding)
-- **D34-calibration-type-finiteness**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 049_adjudication_d34_d37)
+- **D34-calibration-type-finiteness**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 049_adjudication_d34_d37)
     - 083_calibration_type_finiteness (reviewer, finding)
     - 044_d34_fixed (claude, response)
     - 088_d34_precision_residuals (reviewer, response)
     - 092_d34_escalation (reviewer, escalation)
+    - 096_d34_terminal_verification (reviewer, verification)
 - **D35-v17-adjudication-binding**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 049_adjudication_d34_d37)
     - 084_v17_adjudication_binding (reviewer, finding)
     - 045_d35_fixed (claude, response)
@@ -155,6 +157,15 @@ messages: 144  errors: 0
     - 047_d37_fixed (claude, response)
     - 091_d37_exact_bound_residual (reviewer, response)
     - 095_d37_escalation (reviewer, escalation)
+- **D38-v181-ruling-parser-failopen**: 2 msgs, 1/2 evidence rounds
+    - 097_v181_ruling_parser_residual (reviewer, finding)
+    - 050_d38 (claude, response)
+- **D39-composed-numeric-exactness**: 2 msgs, 1/2 evidence rounds
+    - 098_composed_numeric_exactness_residual (reviewer, finding)
+    - 051_d39 (claude, response)
+- **D40-schema37-round10-replay**: 2 msgs, 1/2 evidence rounds
+    - 099_schema37_round10_replay_failure (reviewer, finding)
+    - 052_d40 (claude, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
