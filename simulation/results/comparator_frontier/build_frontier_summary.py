@@ -276,16 +276,30 @@ def main() -> None:
             calib_tbl_ok = (f"FAIL(identities: {len(tags_list)} rows vs {len(expected_tracked)} expected; "
                             f"missing {sorted(expected_tracked-set(tags_list))[:2]} extra {sorted(set(tags_list)-expected_tracked)[:2]})")
         else:
-            import re as _re2
+            import re as _re2, math as _math
+            def _intlike(v):
+                # D34: exact integral check BEFORE any coercion -- 4.5 / 300.5 / NaN all fail
+                return isinstance(v, (int, float)) and not isinstance(v, bool) \
+                       and _math.isfinite(float(v)) and float(v).is_integer()
+            def _finite(v):
+                return isinstance(v, (int, float)) and not isinstance(v, bool) and _math.isfinite(float(v))
             for tag, tr in tracked.items():
                 fr = fresh[tag]
                 mM = _re2.search(r"floorM(\d+)_L(\d+)$", tag)
                 exp_M = int(mM.group(1)) if mM else None
                 exp_L = int(mM.group(2)) if mM else int(_re2.search(r"_L(\d+)_H", tag).group(1))
-                tr_M = None if tr.get("M") is None else int(tr["M"])
                 exp_arm = "warm_floor" if mM else ("oracle_H" + _re2.search(r"_H(\d+)$", tag).group(1))
-                if (tr.get("arm") != exp_arm or tr.get("window") != fr["window"] or tr_M != exp_M
-                        or int(tr.get("L", -1)) != exp_L or tr.get("stats_agrees") is not True
+                if exp_M is not None and not _intlike(tr.get("M")):
+                    calib_tbl_ok = f"FAIL({tag}: M not integral: {tr.get('M')!r})"; break
+                if not _intlike(tr.get("L")):
+                    calib_tbl_ok = f"FAIL({tag}: L not integral: {tr.get('L')!r})"; break
+                if not all(_finite(tr.get(k)) for k in ("p99", "worker_s")) \
+                        or not _intlike(tr.get("violations_1000ms")) or not _intlike(tr.get("n_requests")):
+                    calib_tbl_ok = f"FAIL({tag}: non-finite/non-integral numeric)"; break
+                tr_M = None if tr.get("M") is None else float(tr["M"])
+                if (tr.get("arm") != exp_arm or tr.get("window") != fr["window"]
+                        or (exp_M is not None and tr_M != float(exp_M))
+                        or float(tr.get("L")) != float(exp_L) or tr.get("stats_agrees") is not True
                         or abs(tr["p99"] - fr["p99"]) > 1e-2 or abs(tr["worker_s"] - fr["worker_s"]) > 0.15
                         or int(tr["violations_1000ms"]) != int(fr["violations_1000ms"])
                         or int(tr["n_requests"]) != int(fr["n_requests"])):

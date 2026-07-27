@@ -25,3 +25,11 @@
 2026-07-27T03:33:39Z [daemon] burst3__fc rep1 DONE in 781.81s (1 reps this process)
 2026-07-27T03:33:39Z [daemon] next: burst3__re rep1 (tier1) est [1110, 1202] GPU-s
 2026-07-27T03:33:42Z [encoder] warmup 6x[64, 8, 1] in 3.49s
+/home/gio/snap/code/current/.local/share/uv/python/cpython-3.14.0rc2-linux-x86_64-gnu/lib/python3.14/multiprocessing/resource_tracker.py:297: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/loky-1549240-7fgvivna'}
+  warnings.warn(
+2026-07-27T03:37:55Z [daemon] pid=1595986 python=/home/gio/tese/eda/.venv/bin/python root=/home/gio/tese/simulation/results/silicon_anchor STOP=/home/gio/tese/simulation/results/silicon_anchor/STOP
+2026-07-27T03:37:55Z [daemon] next: burst3__re rep1 (tier1) est [1110, 1202] GPU-s
+Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 20393.98it/s]
+2026-07-27T03:37:57Z [encoder] loaded /home/gio/tese/models/Qwen3-VL-8B-ViT attn=sdpa params=576.4M in 0.23s; buffer 50176x1536 bf16 (0.14 GiB), n_max=64
+2026-07-27T03:37:57Z [rep] burst3__re rep1: RESUMING at batch 675/3098
+2026-07-27T03:38:01Z [encoder] warmup 6x[64, 8, 1] in 3.83s

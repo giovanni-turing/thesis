@@ -598,21 +598,33 @@ def load_composed_e2e_fill(idx, reload):
             "e2e_p99_ms", "e2e_max_ms", "itl_p99_ms", "gpu_hours", "composed_trace",
             "source_path", "window_name_as_ingested"]
     # D28.3: the nine cell identities are pinned -- a shortened/altered artifact fails
-    EXPECTED_CELLS = {
-        "burst1_static_C8", "burst3_static_C8", "burst4_static_C8", "burst5_static_C8",
-        "steady24h_static_C8", "steady24h_fc_chronos", "steady24h_reactive",
-        "fulltrace_static_C8", "fulltrace_reactive"}
+    # D36 (2026-07-27): exact tuple pinning -- outer key, inner cell, window and arm
+    # are each independently asserted against the expected map, never derived from
+    # one another by concatenation.
+    EXPECTED_TUPLES = {
+        "burst1_static_C8":      ("burst1",    "static_C8"),
+        "burst3_static_C8":      ("burst3",    "static_C8"),
+        "burst4_static_C8":      ("burst4",    "static_C8"),
+        "burst5_static_C8":      ("burst5",    "static_C8"),
+        "steady24h_static_C8":   ("steady24h", "static_C8"),
+        "steady24h_fc_chronos":  ("steady24h", "fc_chronos"),
+        "steady24h_reactive":    ("steady24h", "reactive"),
+        "fulltrace_static_C8":   ("fulltrace", "static_C8"),
+        "fulltrace_reactive":    ("fulltrace", "reactive"),
+    }
     data = json.load(open(path))
     got_cells = set(data)
-    if got_cells != EXPECTED_CELLS:
-        raise AssertionError(f"K16: cell identity mismatch: missing={sorted(EXPECTED_CELLS-got_cells)} "
-                             f"extra={sorted(got_cells-EXPECTED_CELLS)}")
+    if got_cells != set(EXPECTED_TUPLES):
+        raise AssertionError(f"K16: cell identity mismatch: missing={sorted(set(EXPECTED_TUPLES)-got_cells)} "
+                             f"extra={sorted(got_cells-set(EXPECTED_TUPLES))}")
+    for outer, (ew, ea) in EXPECTED_TUPLES.items():
+        d0 = data[outer]
+        if d0.get("cell") != outer or d0.get("window") != ew or d0.get("arm") != ea:
+            raise AssertionError(f"K16: tuple mismatch at {outer}: cell={d0.get('cell')!r} "
+                                 f"window={d0.get('window')!r} arm={d0.get('arm')!r} "
+                                 f"expected ({outer!r}, {ew!r}, {ea!r})")
     rows = []
     for cell, d in sorted(data.items()):
-        # D28.r1 (2026-07-27): outer key must equal window_arm -- inner-identity swap fails
-        if cell != d.get("window","") + "_" + d.get("arm",""):
-            raise AssertionError(f"K16: outer/inner identity mismatch: {cell} vs "
-                                 f"{d.get('window')}_{d.get('arm')}")
         # D28.2: a broken cell is an error, never a silent skip
         if "error" in d:
             raise AssertionError(f"K16: cell {cell} carries error: {d['error']!r}")

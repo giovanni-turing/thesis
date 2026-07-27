@@ -2814,3 +2814,23 @@ result:     ALL 9 CONFIRMED by adversarial recomputation under three independent
             Full-trace composed: static 1328.6 / reactive 1681.9 ms e2e p99 (no forecast arm by
             construction). 882-guard adjudicated digit-boundary (88,260 collision).
 commit:     pending (with round-5 reviewer fixes)
+
+## Silicon anchor — first banked rep, campaign live (2026-07-27)
+date:       2026-07-27 (daemon PID 1595986, unbounded, STOP-file controlled)
+artifact:   simulation/results/silicon_anchor/reps/burst3__fc/rep001/ (3,179 batches, 143,240
+            images, real RTX-5090 forwards at locked clocks: delivered SM 2385-2392, MEM 13801,
+            f(64) CoV 0.00102 over 20 min / 3 process restarts — lock proven by dispersion);
+            runner/extract/status/queue under simulation/silicon_anchor_*.
+command:    silicon_anchor_runner.py (trace-driven physical replay of each arm's regenerated
+            dispatch sequence, gated vs banked stats; preemption-proven: kill -9 mid-cell ->
+            resume 0 dup / 0 gap).
+result:     FIRST SILICON NUMBER, one rep, NOT yet cross-verified: burst3 fc-p90 silicon-retimed
+            encoder-delay p99 782.9 ms vs simulated 589.3 ms (+32.9%); per-batch service ratio
+            p50 1.607 while the f(64) anchor shape ties back at -0.25% -- i.e. the deviation
+            lives in the dispatched (small/mixed-N) shapes, echoing the known AIC ViT
+            under-modeling band (1.3-1.6x). Whether ARM VERDICTS survive retiming is exactly
+            what the remaining arms + reps will answer; no thesis text touched.
+            Queue: tier-1 burst3 {fc,re,static} first; est 258 h for full min-rep grid, unbounded
+            extension after; author stops via touch .../silicon_anchor/STOP.
+commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed with git add -A
+            mid-campaign; deliberate post-hoc review of those insertions done this entry).

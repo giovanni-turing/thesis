@@ -150,7 +150,19 @@ BEGIN
         EXECUTE format('CREATE TABLE provenance.%I PARTITION OF provenance.%I '
                        'FOR VALUES IN (%L)', t||'_composed_fill', t, 'composed_fill');
       END IF;
-      RAISE NOTICE '37_composed_fill: %_default holds no composed_fill rows -- step is a no-op (partition %)',
+      -- D37: a same-named relation is NOT the required partition; assert the exact
+      -- pg_inherits edge to THIS parent and the intended list bound, in this branch too.
+      PERFORM 1 FROM pg_inherits i
+        WHERE i.inhrelid = ('provenance.'||t||'_composed_fill')::regclass
+          AND i.inhparent = ('provenance.'||t)::regclass;
+      IF NOT FOUND THEN
+        RAISE EXCEPTION '37/D37: provenance.%_composed_fill exists but is NOT a partition of provenance.%', t, t;
+      END IF;
+      IF pg_get_expr(c.relpartbound, c.oid) NOT LIKE '%''composed_fill''%' FROM pg_class c
+         WHERE c.oid = ('provenance.'||t||'_composed_fill')::regclass THEN
+        RAISE EXCEPTION '37/D37: provenance.%_composed_fill has the wrong partition bound', t;
+      END IF;
+      RAISE NOTICE '37_composed_fill: %_default holds no composed_fill rows -- step is a no-op (partition %, edge+bound verified)',
         t, CASE WHEN part_exists THEN 'existed' ELSE 'created' END;
       CONTINUE;
     END IF;
@@ -162,6 +174,13 @@ BEGIN
     IF NOT part_exists THEN
       EXECUTE format('CREATE TABLE provenance.%I PARTITION OF provenance.%I '
                      'FOR VALUES IN (%L)', t||'_composed_fill', t, 'composed_fill');
+    END IF;
+    -- D37: same exact-edge + bound assertion on the relocation branch
+    PERFORM 1 FROM pg_inherits i
+      WHERE i.inhrelid = ('provenance.'||t||'_composed_fill')::regclass
+        AND i.inhparent = ('provenance.'||t)::regclass;
+    IF NOT FOUND THEN
+      RAISE EXCEPTION '37/D37: provenance.%_composed_fill is NOT a partition of provenance.%', t, t;
     END IF;
     EXECUTE format('INSERT INTO provenance.%I SELECT * FROM pg_temp._cf37', t);
     EXECUTE format('SELECT count(*) FROM provenance.%I', t||'_composed_fill') INTO post_dedicated;
@@ -215,6 +234,14 @@ BEGIN
   SELECT count(*) INTO c FROM provenance.encoder_series_composed_fill;
   IF a = 0 OR b = 0 OR c = 0 THEN
     RAISE EXCEPTION 'D27 preservation post-condition: dedicated partition empty (composed=% llm=% enc=%)', a, b, c;
+  END IF;
+  -- D37 final: the populated relations must be TRUE partitions of their parents
+  IF (SELECT count(*) FROM pg_inherits i
+      WHERE (i.inhrelid, i.inhparent) IN (
+        (('provenance.composed_request_composed_fill')::regclass, ('provenance.composed_request')::regclass),
+        (('provenance.llm_request_composed_fill')::regclass,      ('provenance.llm_request')::regclass),
+        (('provenance.encoder_series_composed_fill')::regclass,   ('provenance.encoder_series')::regclass))) <> 3 THEN
+    RAISE EXCEPTION 'D37 post-condition: composed_fill relations are not all true partitions';
   END IF;
   RAISE NOTICE '37_composed_fill: C306, C601 and D27-preservation post-conditions hold (%/%/% rows)', a, b, c;
 END $$;

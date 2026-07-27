@@ -116,7 +116,7 @@ DIGEST() { Q "select md5(string_agg(x,'|' order by x)) from (
     union all select 'il='||md5(string_agg(file_path||'#'||sha256||'#'||n_rows::text||'#'||coalesce(run_id,''), '\n' order by file_path)) from provenance.ingest_log
     union all select 'runs='||md5(string_agg(run_id||'#'||coalesce(runtime_build,'')||'#'||coalesce(runtime_version,'')||'#'||coalesce(window_name,'')||'#'||coalesce(tp::text,'')||'#'||coalesce(artifact_commit_sha,'')||'#'||coalesce(model_checkpoint,'')||'#'||coalesce(arrival_speedup::text,'')||'#'||coalesce(config_provenance::text,''), '\n' order by run_id)) from provenance.runs
     union all select t||'='||(xpath('/r/c/text()',query_to_xml('select count(*) c from provenance.'||t,false,true,''))::text[])[1] from unnest(array['llm_request','composed_request','encoder_series','forecast','worker_schedule','factorial_cell']) t
-    union all select 'ce2e='||md5(string_agg(window_name||'#'||arm||'#'||requests::text||'#'||e2e_p99_ms::text||'#'||coalesce(source_path,''), '\n' order by window_name, arm)) from provenance.composed_e2e
+    union all select 'ce2e='||md5(string_agg(window_name||'#'||arm||'#'||coalesce(model,'')||'#'||policy||'#'||requests::text||'#'||enc_p99_ms::text||'#'||ttft_p99_ms::text||'#'||e2e_p99_ms::text||'#'||e2e_max_ms::text||'#'||itl_p99_ms::text||'#'||gpu_hours::text||'#'||coalesce(composed_trace,'')||'#'||coalesce(window_name_as_ingested,'')||'#'||coalesce(source_path,''), '\n' order by window_name, arm)) from provenance.composed_e2e
   ) s"; }
 # Two-run form: the FIRST run may legitimately absorb a genuinely-changed file on disk (e.g.
 # K13 re-loads results-ledger.md whenever its sha moves -- §6.14). Idempotency is the property
@@ -401,7 +401,8 @@ env = dict(os.environ)
 import math
 CANON = "/home/gio/tese/simulation/results/composed_fill/composed_fill_joined.json"
 q = ("select window_name||'_'||arm, requests, enc_p99_ms, ttft_p99_ms, e2e_p99_ms, "
-     "e2e_max_ms, itl_p99_ms, gpu_hours, composed_trace from provenance.composed_e2e "
+     "e2e_max_ms, itl_p99_ms, gpu_hours, composed_trace, coalesce(model,''), policy, "
+     "window_name_as_ingested from provenance.composed_e2e "
      "where source_path = '" + CANON + "'")
 out = subprocess.run(["psql","-h","localhost","-p","5433","-U","goku","-d","postgres","-tAc",q],
                      capture_output=True, text=True, env=env).stdout
@@ -410,7 +411,8 @@ for line in out.strip().splitlines():
     f = line.split("|")
     db[f[0]] = dict(requests=int(f[1]), enc_p99=float(f[2]), ttft_p99=float(f[3]),
                     e2e_p99=float(f[4]), e2e_max=float(f[5]), itl_p99=float(f[6]),
-                    gpu_h=float(f[7]), composed_trace=f[8])
+                    gpu_h=float(f[7]), composed_trace=f[8], model=f[9], policy=f[10],
+                    wnai=f[11])
 bad = []
 if len(db) != 9:
     bad.append(f"rowcount={len(db)}")
@@ -424,8 +426,13 @@ for cell, d in art.items():
         if not (math.isfinite(av) and math.isfinite(dv)) or abs(av - dv) > 1e-3:
             bad.append(f"{cell}.{k}"); break
     else:
+        arm = d["arm"]
+        exp_model = arm[3:] if arm.startswith("fc_") else ""
+        exp_policy = "forecast" if arm.startswith("fc_") else ("static" if arm.startswith("static") else arm)
         if row["composed_trace"] != d["composed_trace"]:
             bad.append(f"{cell}.composed_trace")
+        elif row["model"] != exp_model or row["policy"] != exp_policy or row["wnai"] != d["window"]:
+            bad.append(f"{cell}.semantic-fields")
 print("OK" if not bad else "FAIL:" + ",".join(bad[:4]))
 CFDBPY
 )

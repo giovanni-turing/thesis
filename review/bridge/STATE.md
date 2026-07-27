@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T00:26:43-03:00, protocol v1.7)
+# Bridge state (generated 2026-07-27T00:50:09-03:00, protocol v1.8)
 
-messages: 122  errors: 0
+messages: 133  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -99,17 +99,17 @@ messages: 122  errors: 0
     - 046_response_thread_ids_mismatch (reviewer, finding)
     - 031_d23_already_fixed (claude, response)
     - 054_d23_verified (reviewer, response)
-- **D24-d22-adjudication-residue**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
+- **D24-d22-adjudication-residue**: 4 msgs, 2/2 evidence rounds, ADJUDICATED (author ruling on record)
     - 060_d22_adjudication_residue (reviewer, finding)
     - 034_d24_semantic_sweep (claude, response)
     - 064_d24_semantic_residuals (reviewer, response)
     - 074_d24_escalation (reviewer, escalation)
-- **D25-d20-calibration-promoted-gap**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
+- **D25-d20-calibration-promoted-gap**: 4 msgs, 2/2 evidence rounds, ADJUDICATED (author ruling on record)
     - 061_d20_calibration_promoted_gap (reviewer, finding)
     - 035_d25_chain_closed (claude, response)
     - 065_d25_schema_residuals (reviewer, response)
     - 075_d25_escalation (reviewer, escalation)
-- **D26-v15-verification-unimplemented**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
+- **D26-v15-verification-unimplemented**: 4 msgs, 2/2 evidence rounds, ADJUDICATED (author ruling on record)
     - 062_v15_verification_unimplemented (reviewer, finding)
     - 036_d26_v15_enforced (claude, response)
     - 066_d26_terminal_authority_residuals (reviewer, response)
@@ -119,7 +119,7 @@ messages: 122  errors: 0
     - 039_d27_fixed (claude, response)
     - 077_d27_current_state_verified (reviewer, response)
     - 078_d27_terminal_verification (reviewer, verification)
-- **D28-composed-k16-false-green**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
+- **D28-composed-k16-false-green**: 4 msgs, 2/2 evidence rounds, ADJUDICATED (author ruling on record)
     - 069_composed_k16_false_green (reviewer, finding)
     - 040_d28_fixed (claude, response)
     - 080_d28_false_green_residuals (reviewer, response)
@@ -134,6 +134,18 @@ messages: 122  errors: 0
     - 073_burst5_lower_bound_resurrected (reviewer, finding)
 - **D33-schema37-clean-start-namespace**: 1 msgs, 0/2 evidence rounds
     - 079_schema37_clean_start_namespace (reviewer, finding)
+- **D34-calibration-type-finiteness**: 2 msgs, 1/2 evidence rounds
+    - 083_calibration_type_finiteness (reviewer, finding)
+    - 044_d34_fixed (claude, response)
+- **D35-v17-adjudication-binding**: 2 msgs, 1/2 evidence rounds
+    - 084_v17_adjudication_binding (reviewer, finding)
+    - 045_d35_fixed (claude, response)
+- **D36-composed-projection-exactness**: 2 msgs, 1/2 evidence rounds
+    - 085_composed_projection_exactness (reviewer, finding)
+    - 046_d36_fixed (claude, response)
+- **D37-schema37-attachment-assertion**: 2 msgs, 1/2 evidence rounds
+    - 086_schema37_attachment_assertion (reviewer, finding)
+    - 047_d37_fixed (claude, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report

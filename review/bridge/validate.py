@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bridge protocol v1.7 linter + thread-state generator. Run from review/bridge/.
+"""Bridge protocol v1.8 linter + thread-state generator. Run from review/bridge/.
 v1.3 (2026-07-26, threads D01/D02): re:-graph dispute-chain machine (one root
 finding, linear, <=2 responses, escalation only after the 2nd response and
 terminal); strict header grammar (no YAML claim); nonempty bounded values;
@@ -17,6 +17,15 @@ THREAD_RE = re.compile(r"^D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*$")
 # v1.6 (D26): exact-identity exception -- message 033 predates the authority-header rule;
 # its delegated authority is documented in BRIDGE.md and the session transcript.
 ADJUDICATION_EXCEPTIONS = {"033_adjudication_d19_d22"}
+GRANDFATHER_SHA = {"033_adjudication_d19_d22":
+                   "c7c02dba550c1fd1ad9fe173ea5e005e0db62805de0b099c53903eba2e34ee01"}
+# v1.8 (D35): authority values are BOUND to senders; rulings are expressed only
+# through exact 'RULING <full-thread-id>: <verdict>' lines inside a valid
+# unthreaded adjudication message. Mentions confer nothing.
+AUTHORITY_SENDER = {"author": {"claude", "reviewer"},
+                    "author-delegated:fable-5-2026-07-26": {"claude"},
+                    "author-delegated:fable-5-2026-07-27-xhigh": {"claude"}}
+RULING_RE = None
 # v1.7 (D26 round 3): the only authorities this bridge recognizes. A heading-level
 # adjudication with any other value is an error; STATE trusts only these.
 VALID_AUTHORITIES = {"author", "author-delegated:fable-5-2026-07-26",
@@ -41,6 +50,9 @@ def parse_header(path, errs):
     for k in REQ_KEYS:
         if k not in hdr: errs.append(f"{path}: missing header '{k}'")
     return hdr
+
+def threads_in_body(body):
+    return set(re.findall(r"D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*", body))
 
 def valid_ts(s):
     try:
@@ -95,6 +107,41 @@ def main():
             errors.append(f"{m['file']}: replies to threaded '{target}' (thread {tthread}) "
                           f"but carries thread '{m['hdr'].get('thread')}'")
     # v1.6 (D26): verification semantics enforced globally, not only in chains.
+    # v1.8: build the recognized-adjudication set FIRST (chain rules consult it)
+    import hashlib as _hl
+    adjudicated_threads = {}
+    for m in msgs:
+        body = m.get("body", "")
+        def _is_assert0(ln):
+            u = ln.upper().lstrip("#").strip()
+            return ln.lstrip().startswith("#") and u.startswith("AUTHOR ADJUDICATION") \
+                   and "REQUIRED" not in u and "REQUEST" not in u
+        heading = any(_is_assert0(ln) for ln in body.splitlines())
+        if m["file"] in ADJUDICATION_EXCEPTIONS:
+            import os as _os
+            for d in ("to_reviewer", "from_reviewer", "archive"):
+                fp = _os.path.join(d, m["file"] + ".md")
+                if _os.path.exists(fp):
+                    if _hl.sha256(open(fp, "rb").read()).hexdigest() != GRANDFATHER_SHA[m["file"]]:
+                        errors.append(f"{m['file']}: grandfathered adjudication MUTATED (sha mismatch)")
+                    break
+            else:
+                errors.append(f"{m['file']}: grandfathered file missing")
+            for t in threads_in_body(body):
+                adjudicated_threads.setdefault(t, m["file"])
+            continue
+        if not heading:
+            continue
+        auth = m["hdr"].get("authority")
+        ok_auth = (auth in VALID_AUTHORITIES
+                   and m["hdr"].get("from") in AUTHORITY_SENDER.get(auth, set())
+                   and "thread" not in m["hdr"])
+        if not ok_auth:
+            continue  # header/registry errors are raised elsewhere
+        for ln in body.splitlines():
+            mm = re.match(r"^RULING\s+(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)\s*:\s*(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)\s*$", ln.strip())
+            if mm:
+                adjudicated_threads.setdefault(mm.group(1), m["file"])
     verif_names = {m["file"] for m in msgs if m["hdr"].get("type") == "verification"}
     for m in msgs:
         r = m["hdr"].get("re","")
@@ -103,13 +150,20 @@ def main():
             errors.append(f"{m['file']}: replies to verification '{target}' -- verifications are terminal, nothing may answer them")
         if m["hdr"].get("type") == "verification" and (not r or r == "new"):
             errors.append(f"{m['file']}: verification must name its exact target ('re: new' is invalid)")
-        _asserts_adj = any(ln.lstrip().startswith("#") and "AUTHOR ADJUDICATION" in ln
-                           for ln in m.get("body","").splitlines())
+        def _is_assert(ln):
+            u = ln.upper().lstrip("#").strip()
+            return ln.lstrip().startswith("#") and u.startswith("AUTHOR ADJUDICATION") \
+                   and "REQUIRED" not in u and "REQUEST" not in u
+        _asserts_adj = any(_is_assert(ln) for ln in m.get("body","").splitlines())
         if _asserts_adj and m["file"] not in ADJUDICATION_EXCEPTIONS:
             if "authority" not in m["hdr"]:
                 errors.append(f"{m['file']}: claims AUTHOR ADJUDICATION without an 'authority:' header")
             elif m["hdr"]["authority"] not in VALID_AUTHORITIES:
                 errors.append(f"{m['file']}: authority '{m['hdr']['authority']}' not in the recognized registry")
+            elif m["hdr"].get("from") not in AUTHORITY_SENDER.get(m["hdr"]["authority"], set()):
+                errors.append(f"{m['file']}: authority '{m['hdr']['authority']}' not valid for sender '{m['hdr'].get('from')}'")
+            elif "thread" in m["hdr"]:
+                errors.append(f"{m['file']}: adjudications must be unthreaded")
     # sequences per sender: start 001, contiguous, no duplicates
     for who in SENDERS:
         seqs = sorted(int(m["file"][:3]) for m in msgs
@@ -166,6 +220,8 @@ def main():
                             errors.append(f"thread {t}: terminal verification by '{vfrom}' -- only the finding's author ('{ffrom}') may attest its resolution"); bad=True
                         prev = types[i-1]
                         nresp_before = types[1:i].count("response")
+                        if prev == "escalation" and t not in adjudicated_threads:
+                            errors.append(f"thread {t}: post-escalation verification requires a recognized author ruling first"); bad=True
                         if not (prev == "escalation" or nresp_before >= 2):
                             errors.append(f"thread {t}: verification {chain[i]} only permitted after the second response or an escalation"); bad=True
                         continue
@@ -187,16 +243,14 @@ def main():
     if os.path.islink("STATE.md"):
         errors.append("STATE.md is a symlink — refusing to write"); state_ok = False
     else: state_ok = True
-    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v1.7)\n",
+    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v1.8)\n",
            f"\nmessages: {len(msgs)}  errors: {len(errors)}\n", "\n## Dispute threads\n"]
     if not threads: out.append("(none)\n")
     for t in sorted(threads):
         if t in thread_state:
             chain, types = thread_state[t]
             nresp = types.count("response"); esc = "escalation" in types
-            adjudicated = esc and any(
-                ((m["hdr"].get("authority") in VALID_AUTHORITIES) or (m["file"] in ADJUDICATION_EXCEPTIONS))
-                and t in m.get("body", "") for m in msgs)
+            adjudicated = esc and t in adjudicated_threads
             tag = ", ADJUDICATED (author ruling on record)" if adjudicated else (", ESCALATED - awaiting author" if esc else "")
             out.append(f"- **{t}**: {len(chain)} msgs, {nresp}/2 evidence rounds{tag}\n")
             for n in chain: out.append(f"    - {n} ({by_name[n]['hdr'].get('from')}, {by_name[n]['hdr'].get('type')})\n")

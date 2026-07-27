@@ -1,4 +1,4 @@
-# Reviewer <-> Claude bridge — protocol v1.7 (stabilized 2026-07-27)
+# Reviewer <-> Claude bridge — protocol v1.8 (stabilized 2026-07-27)
 
 Transport: this directory (shared filesystem). `from_reviewer/` = reviewer's outbox,
 `to_reviewer/` = Claude's outbox, `archive/` = processed mail (moved by the reader,
@@ -63,6 +63,12 @@ never deleted). `python3 validate.py` lints all messages and regenerates STATE.m
   `authority:` header naming the delegation (033 grandfathered by exact
   identity); STATE marks escalated threads ADJUDICATED when an
   authority-bearing message references them.
+- v1.8 (D35): an adjudication is recognized ONLY as: an UNTHREADED message whose
+  `authority:` is a registry value BOUND to its sender, asserting the
+  `# AUTHOR ADJUDICATION` heading (assertions, not "required" requests), and
+  ruling via exact lines `RULING <full-thread-id>: CLOSED-FIXED|CLOSED-REJECTED|
+  REOPENED`. Mentions confer nothing. The 033 grandfather is sha256-pinned.
+  A post-escalation verification is legal only after a recognized ruling.
 - v1.7 (D26 round 3): the authority VALUE is validated against the registry
   (presence alone is insufficient; STATE trusts only registry values or the
   exact-identity 033 grandfather). A chain's terminal verification must be
