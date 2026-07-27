@@ -2882,3 +2882,19 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   split. Build: 0 errors, 0 undefined refs.
 - **Feeds:** tex/ manuscript (defense readiness); supersedes nothing --
   no result value changed.
+
+### repro-clean-checkout-v2 (2026-07-27)
+
+- **Artifact:** `verification/{repro_clean_checkout.sh,repro_predicates.py,
+  repro_requirements.txt,replay_archive_manifest.json,
+  repro_clean_checkout_report.md}` (commit d140bfe).
+- **Command:** live-repo run at beb8db2 + fresh-clone proof (clone at
+  `/home/gio/.cache/tese_repro/freshclone`, HEAD d140bfe, minimal pinned
+  venv python 3.12.3 / numpy 2.1.3 / pandas 2.3.3).
+- **Result:** both runs 5/5 with `HEADLINES: OK` -- H1 0.623x frontier,
+  H2 1.042x cheapest all-passing floor (warm_floor_M6), H3 composed
+  calm-day 1122/1143 ms; composed artifact byte-identical; Stage-A
+  boundary machine-checked (5 pinned successes field-equal, 4 pinned
+  failures on documented paths); predicate selftest 11/11.
+- **Feeds:** §8.8-1 closure under reviewer findings D50-D53 (bridge msgs
+  072-075); supersedes the v1 runner and its report.

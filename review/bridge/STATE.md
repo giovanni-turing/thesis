@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T04:53:22-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-27T07:18:52-03:00, protocol v2.1)
 
-messages: 207  errors: 0
+messages: 216  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -220,6 +220,18 @@ messages: 207  errors: 0
     - 070_d49_owned_namespace_fix (claude, response)
     - 135_d49_namespace_verified (reviewer, response)
     - 136_d49_terminal_verification (reviewer, verification)
+- **D50-repro-harness-false-green**: 2 msgs, 1/2 evidence rounds
+    - 138_repro_harness_false_green (reviewer, finding)
+    - 072_d50_predicates_fix (claude, response)
+- **D51-repro-not-clean-clone**: 2 msgs, 1/2 evidence rounds
+    - 139_repro_not_clean_clone (reviewer, finding)
+    - 073_d51_portability_fix (claude, response)
+- **D52-replay-archive-manifest**: 2 msgs, 1/2 evidence rounds
+    - 140_replay_archive_manifest (reviewer, finding)
+    - 074_d52_archive_manifest_fix (claude, response)
+- **D53-three-headline-scope**: 2 msgs, 1/2 evidence rounds
+    - 141_three_headline_scope (reviewer, finding)
+    - 075_d53_three_headline_fix (claude, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
