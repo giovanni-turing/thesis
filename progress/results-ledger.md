@@ -2990,7 +2990,7 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   artifact remains the original phase-E measurement backing
   tab:app-engine and the 12.8% envelope; no manuscript propagation is
   made or claimed from the rerun.
-- **HF engines (5 reps each, committed):** hf_sdpa median ratios span
+- **HF engines (5 reps each, committed):** hf_sdpa five-rep MEAN ratios span
   1.31-1.61, increasing at compute-dominant N but NON-monotone at small N
   (1.3673 at N=1 -> 1.3077 at N=2; 1.3613 at N=6 -> 1.3540 at N=8).
   Requested-FA2 differs from SDPA by at most 0.173% (N=2) and by
