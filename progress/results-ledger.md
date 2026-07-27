@@ -2683,3 +2683,24 @@ decision:   author accepted 84 main / 119 total (targets were 55-65/80-95 estima
             findings -> Phase 3.5 Fable style pass (immutability harness) -> Phase 4
             (institutional template, D1 draft-note removal, reveal-deck sync).
 commit:     3c56418
+
+## Re-review round 2 — all 12 findings (D04-D15) fixed same-session (2026-07-26)
+date:       2026-07-26 (evening)
+artifact:   tex/{conclusion,closedloop,tese,metodologia,apendice}.tex, simulation/run_lang_calib.sh,
+            provenance/verify_all.sh. Reviewer re-review of 3c56418 via review/bridge (msgs 013-025):
+            32/34 old items preserved; 12 new findings, ALL CONFIRMED on my independent check and fixed:
+            D04 conclusion regime row REVERSED the frontier cost ordering (floor 0.746x vs forecast
+            0.623x -> row now 'not instantiated on this trace'); D05 regime conditions rebuilt on
+            usable issue lead U (not L vs T; burst4 345s@60s-thr / 15s@strictest); D06 'no scaler'
+            labeled mechanism inference; D07 appendix onset mapping caveat -> authoritative
+            i_burst_anatomy artifacts (404/53); D08 census 2666->2979 (+313 frontier); D09 oracle
+            reframed perfect-information reference (signal-quality axis, 53% of measured gap);
+            D10 burst4/5 overlap 1705 req (6.7%/19.0%) disclosed, 'windows' not 'independent units';
+            D11 readiness claim rests on symmetric 1.20x endpoint, strict direction disclosed as
+            near-symmetric sensitivity; D12 gate DERIVED_RC abort path fixed + in-gate 169-cell raw
+            recompute (build_frontier_summary.py, 6s); D13 frontier table split frozen-five/post-hoc
+            blocks, shipped oracle shown as frozen (fails burst3 1979 clamp artifact); D14 'pre-frozen
+            replay protocol' wording (rho=15 ex post disclosed); D15 warm-floor calibration correctly
+            attributed to forecast-free replays. Build 121pp clean. Bridge protocol v1.4; threads
+            D01-D03 closed bilaterally.
+commit:     pending (after gate confirmation)

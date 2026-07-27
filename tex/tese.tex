@@ -81,8 +81,8 @@ reproduces the decoupling mechanically: the pools' saturation knees sit an
 order of magnitude apart, and the encoder pool misses its tail bound at the
 trace's own recorded rate, invisibly to rate- and utilization-based monitors.
 
-Closing the loop under one frozen protocol yields a trade-off with an
-identified failure mode, not universal superiority: on four of the five
+Closing the loop under a single pre-frozen replay protocol yields a
+trade-off with an identified failure mode, not universal superiority: on four of the five
 composed evaluation episodes the forecast and reactive tails tie exactly,
 and the latency advantage lives in the one-minute onset. What forecasting
 buys at week scale is resource-time at equal compliance. Over the 5.60-day
@@ -91,8 +91,10 @@ every episode at 0.62$\times$ the deployable static encoder fleet's
 provisioned worker-time, while a reactive controller granted a warm floor
 calibrated on the calibration split fails a held-out episode and its
 cheapest all-passing member costs 1.042$\times$ static --- forecast-informed
-placement is 1.20--1.69$\times$ cheaper at equal compliance across both
-readiness models, against a perfect-future oracle bound of 0.292$\times$.
+placement is 1.20$\times$ cheaper at equal compliance even under the
+readiness model most favourable to reactive (1.67$\times$ under the shipped
+mechanics), with a perfect-information reference at 0.292$\times$ marking the
+remaining signal-quality headroom.
 Resource-time is reported per hardware class and never summed. As a
 secondary result, the language pool holds its SLA only through a tail-aware
 capacity conversion of the same forecast, near break-even against static
@@ -155,7 +157,7 @@ magnitude, e o \emph{pool} codificador viola seu limite de cauda \emph{na
 pr\'opria taxa registrada pelo trace}, de forma invis\'ivel a monitores de
 taxa e utiliza\c{c}\~ao.
 
-Fechando o la\c{c}o sob um protocolo \'unico e congelado, o resultado \'e um
+Fechando o la\c{c}o sob um protocolo \'unico de replay pr\'e-congelado, o resultado \'e um
 compromisso com um modo de falha identificado, e n\~ao superioridade
 universal: em quatro dos cinco epis\'odios de avalia\c{c}\~ao compostos as
 caudas da previs\~ao e do reativo \emph{empatam exatamente}, e a vantagem de
@@ -167,9 +169,11 @@ tempo de \emph{workers} provisionado da frota est\'atica de codificadores
 implant\'avel, enquanto um controlador reativo dotado de um piso quente
 calibrado no conjunto de calibra\c{c}\~ao falha em um epis\'odio reservado e
 seu membro mais barato que passa custa 1,042$\times$ o est\'atico --- a
-coloca\c{c}\~ao informada por previs\~ao \'e 1,20--1,69$\times$ mais barata
-a igual conformidade sob ambos os modelos de prontid\~ao, contra um limite
-de or\'aculo de futuro perfeito de 0,292$\times$. O tempo de recurso \'e
+coloca\c{c}\~ao informada por previs\~ao \'e 1,20$\times$ mais barata a
+igual conformidade mesmo sob o modelo de prontid\~ao mais favor\'avel ao
+reativo (1,67$\times$ sob a mec\^anica original), com uma refer\^encia de
+informa\c{c}\~ao perfeita a 0,292$\times$ marcando a margem restante de
+qualidade de sinal. O tempo de recurso \'e
 reportado por classe de \emph{hardware} e nunca somado. Como resultado
 secund\'ario, o \emph{pool} de linguagem sustenta sua SLA apenas por meio de
 uma convers\~ao de capacidade ciente de cauda da mesma previs\~ao, perto do

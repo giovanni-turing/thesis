@@ -42,20 +42,26 @@ mode, not universal superiority.} On four of the five composed evaluation
 episodes the forecast and reactive tail latencies \emph{tie exactly}; the
 latency advantage lives in the one-minute onset, which the identically
 informed reactive controller loses at every lead. What forecasting buys at
-week scale is resource-time at equal compliance. Under one frozen five-arm
-protocol (Section~\ref{sec:cl-frontier}), the p90 forecast arm holds the
+week scale is resource-time at equal compliance. Under a pre-frozen five-arm replay
+protocol (arm mechanics frozen before the frontier replay; the forecast arm's
+$\rho{=}15$ had been chosen \emph{ex post} earlier and is disclosed as such,
+Section~\ref{sec:cl-frontier}), the p90 forecast arm holds the
 encoder bound in every episode at \textbf{0.623$\times$} the deployable
 static fleet's provisioned worker-time with zero failed episodes; a reactive
 controller granted a minimum warm floor calibrated on the calibration split
 \emph{fails} held-out burst3, and the cheapest all-passing member of that
 floor family --- identifiable only after the fact --- costs
-\textbf{1.042$\times$} static. Equalising the two readiness models in both
-directions leaves the ordering intact, so forecast-informed placement is
-\textbf{1.20--1.69$\times$} cheaper than the best warm-floor reactive at
-equal compliance; the single figure 1.67$\times$ must never be quoted alone.
-A perfect-future oracle bounds what any forecast could buy at
-\textbf{0.292$\times$}, so the forecast arm captures 53\% of the achievable
-saving. The headline schedule prices the covered span at \textbf{0.62 times
+\textbf{1.042$\times$} static. Under the symmetric warm-pool
+model --- the footing most favourable to reactive --- forecast-informed
+placement remains \textbf{1.20$\times$} cheaper than the best warm-floor
+reactive at equal compliance, and 1.67$\times$ under the shipped mechanics;
+the strict-readiness repair is not fully symmetric between arms, so the pair
+is a sensitivity range, not an equalized interval, and the single figure
+1.67$\times$ must never be quoted alone.
+A perfect-information reference under the same fixed conversion prices the
+signal-quality axis at \textbf{0.292$\times$}; the forecast arm captures
+53\% of the measured gap to that reference --- a bound on forecast quality
+under these mechanics, not on all admissible SLA-passing schedules. The headline schedule prices the covered span at \textbf{0.62 times
 the deployable static encoder fleet's worker-time}, with the finer
 daily-fold grain surfacing the one missed covered onset (e13), recovered at
 0.76$\times$ by a hybrid forecast--reactive schedule designed post hoc on
@@ -83,9 +89,11 @@ test rather than as externally validated law.
 \centering
 \caption[Regime conditions for forecast-informed pool
 provisioning]{Regime conditions for forecast-informed pool provisioning.
-$L$ is the replica startup lead, $T$ the burst onset time, $\pi$ the ratio
-of episode peak demand to the capacity standing between episodes, and
-$\kappa$ the fraction of the span spent outside episodes. Each row names the
+$L$ is the replica startup lead, $U$ the \emph{usable forecast issue lead}
+(how far before the demand rise the forecast path actually issues it; $U$
+depends on the detection threshold used to read it, named per instance),
+$\pi$ the ratio of episode peak demand to the capacity standing between
+episodes, and $\kappa$ the fraction of the span spent outside episodes. Each row names the
 measured instance it was read from; all instances come from the single trace
 of Chapter~\ref{cap:trace-eda}, so these are design hypotheses to test, not
 validated law.}
@@ -97,14 +105,15 @@ validated law.}
 Regime & Condition & Measured instance & Provisioning rule \\
 \midrule
 \textbf{Forecast anticipation} &
-$L < T$, signal coupled to the pool's own work &
-burst4: \SI{60}{\minute} onset against a \SI{345}{\second} usable issue
-lead; capacity in place before the ramp &
+$U \geq L$, signal coupled to the pool's own work &
+burst4: usable issue lead \SI{345}{\second} at the 60\,s/224-worker
+detection threshold (\SI{15}{\second} at the strictest) against
+$L{=}\SI{30}{\second}$; capacity in place before the ramp &
 Schedule from the forecast; the lead is real and is the mechanism \\
 \addlinespace
 \textbf{Headroom placement} &
-$L \geq T$ (no usable lead), but the predictive band has already widened
-before the spike &
+$U \approx 0$ (no usable issued lead), but the predictive band has already
+widened before the spike &
 burst3: one-minute onset; the p90 band already holds ${\approx}21$ workers
 pre-spike and passes where reactive fails at every lead &
 Schedule from the band's \emph{upper edge}, not from onset detection \\
@@ -112,9 +121,12 @@ Schedule from the band's \emph{upper edge}, not from onset detection \\
 \textbf{Warm floor suffices} &
 $\pi$ small, or $\kappa$ small enough that carrying the floor between
 episodes is cheap &
-floor family $M{=}1\ldots32$: $M{=}2$ passes at 0.746$\times$ static under
-warm-pool readiness &
-Stand a fixed floor; a forecast adds cost, not compliance \\
+\emph{not instantiated on this trace}: the cheapest all-passing floor
+(warm-pool $M{=}2$, 0.746$\times$) still costs 1.20$\times$ the forecast
+arm; the nearest measured analogue is the language pool's near-break-even
+conversion result &
+Stand a fixed floor; forecasting adds little where the floor is cheap to
+carry \\
 \addlinespace
 \textbf{Forecast beats floor} &
 $\kappa$ large: a floor sized for the worst episode is carried through every
@@ -124,10 +136,13 @@ forecast arm's \SI{162326}{} &
 Place headroom where the uncertainty is, not everywhere \\
 \addlinespace
 \textbf{Nothing responds} &
-$L \geq T$ \emph{and} the watched signal is decoupled from the pool's work &
-aggregate-signal control: the encoder pool misses its bound at the trace's
-own recorded rate, invisibly to rate monitors &
-Fix the signal or the shape first; no scaler recovers this \\
+$U \approx 0$ \emph{and} the watched signal is decoupled from the pool's
+work &
+locked $2{\times}2$ topology: the encoder misses its 5\,s tail at 29\%
+mean utilization while aggregate rate and utilization read healthy (no
+aggregate-signal scaler was instantiated --- a mechanism inference) &
+Fix the signal or the shape first; a scaler watching the aggregate signal
+has no basis to act (inference, not a graded controller result) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -137,9 +152,10 @@ a forecast is worth its complexity when the pool's own demand signal is
 decoupled from the aggregate one, when onsets are fast relative to replica
 startup, and when the span is mostly calm --- so that standing capacity
 sized for the worst episode is paid for continuously while a predictive band
-is paid for episodically. Where any of those fails, the cheaper instrument
-is a fixed floor, and this thesis measured a case of that too, on the
-language pool.
+is paid for episodically. Where any of those fails, a fixed floor or a static fleet becomes
+competitive --- on this trace no floor beat the forecast, and the closest
+measured analogue of that regime is the language pool's near-break-even
+conversion result.
 
 \paragraph{What bounds these claims.} The evidence is one seven-day
 production trace with an offered-work upper bound on decode demand

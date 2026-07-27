@@ -36,17 +36,23 @@ Everything below is graded against this contract, fixed before the prose and
 unchanged by any result in it.
 
 \begin{description}
-\item[Population and independent unit.] The unit is an \emph{evaluation
-episode} --- a burst block or a calm day --- not a request, a rolling origin or
+\item[Population and evaluation unit.] The unit is an \emph{evaluation
+window} --- a burst block or a calm day --- not a request, a rolling origin or
 a factorial cell. The evaluation span is the 5.60-day forecast-covered stretch
 of the trace (\num{749601} requests, 11.4M images) and carries \textbf{five
-episodes}: burst1, burst3, burst4, burst5 and the calm day (steady, 24\,h); the
-span as a whole is a sixth, \emph{non-independent} view. The trace's first 1.4
+evaluation windows}: burst1, burst3, burst4, burst5 and the calm day (steady,
+24\,h); the span as a whole is a sixth, \emph{non-independent} view. The
+windows are not fully disjoint: burst4 and burst5 overlap by \num{1705}
+requests (6.7\% of burst4, 19.0\% of burst5, from the declared window
+offsets), so they are five evaluation windows rather than five independent
+units; no arm's pass/fail verdict changes under either attribution of the
+shared requests. The trace's first 1.4
 days are the calibration split (forecast context, episodes burst2 and burst6):
-they enter results grading only through the forecast-free policies; forecast
-policies do replay them, but solely to calibrate the warm floor
-(Section~\ref{sec:cl-aggregate}) and the language operating point
-(Section~\ref{sec:cl-llm}), never as evaluation results.
+they enter results grading only through the forecast-free policies. The
+reactive warm floor is calibrated there by forecast-free replays
+(Section~\ref{sec:cl-aggregate}); forecast policies replay these episodes
+solely to calibrate the language operating point (Section~\ref{sec:cl-llm}),
+never as evaluation results.
 \item[Primary endpoint.] Encoder-delay p99 $<$ \SI{1}{\second} \emph{in every
 episode}, jointly with provisioned encoder worker-time over the span. The
 percentile is taken over \emph{all} requests of the window, so text-only
@@ -57,8 +63,10 @@ vision-pool-conditional one. Language-pool endpoints (TTFT p99 $<$
 \item[Comparators.] (i) the deployable static fleet; (ii) an \emph{identically
 informed} reactive controller on the same observed image signal, worker-mapping
 law, lead and hysteresis; (iii) that controller plus a minimum warm floor
-calibrated on the calibration split; (iv) a perfect-future oracle bounding what
-any forecast could buy; and, on the language pool, Dynamo's shipped SLA planner.
+calibrated on the calibration split; (iv) a perfect-information oracle reference under the same fixed conversion
+and mechanics --- a bound on the signal-quality axis, not on the space of
+admissible SLA-passing schedules; and, on the language pool, Dynamo's shipped
+SLA planner.
 \item[Success criterion.] An arm succeeds only if it holds the endpoint in
 \emph{every} episode \emph{and} in aggregate; cost is compared only among arms
 that pass. Aggregate-only compliance is explicitly not sufficient --- the
@@ -303,10 +311,11 @@ production actuation path end to end.
 \paragraph{Temporal split.} The trace's first 1.4 days are consumed as forecast
 \emph{context} and never graded as evaluation results. The two pre-coverage
 episodes (burst2/6) enter \emph{results} grading only through the forecast-free
-policies of Section~\ref{sec:cl-comparators}; forecast policies do replay them,
-using the expanding-context archive, but solely as the \emph{calibration} split
-for the warm floor (Section~\ref{sec:cl-aggregate}) and the language operating
-point (Section~\ref{sec:cl-llm}), never as evaluation results. No information
+policies of Section~\ref{sec:cl-comparators}. They are the \emph{calibration}
+split: the reactive warm floor is calibrated on them by forecast-free replays
+(Section~\ref{sec:cl-aggregate}), and forecast policies replay them, using the
+expanding-context archive, solely to calibrate the language operating point
+(Section~\ref{sec:cl-llm}) --- never as evaluation results. No information
 flows backward across the split or within it: every forecast value is issued at
 or before the bin it predicts --- issue time $=$ target
 $-\,(h{-}1){\cdot}15$\,s, so the $h{=}1$ nowcast carries zero usable lead and
@@ -330,7 +339,7 @@ actuation --- and \textbf{meets the SLA in all 60 of its cells}, under
 episodes pinned at the \SI{588}{\milli\second} no-queue plateau; the calm day
 548--\SI{734}{\milli\second}). Those 60 cells are a
 \emph{parameter-robustness} grid, not 60 samples: the evidential units remain
-the five episodes, each replayed under twelve settings, so 60/60 licenses
+the five evaluation windows, each replayed under twelve settings, so 60/60 licenses
 insensitivity to model and lead, not statistical power. The broader exploratory
 grid that located the operating point is superseded for the forecast headline:
 the H=12 15-second archive supplies at most $(12{-}1)\times15 =
@@ -502,17 +511,23 @@ Chronos-2 at $\rho{=}15$.}
 Arm & agg.\ p99 & worst-ep & Mworker & vs. & ep. \\
     & (ms)      & p99 (ms) & -s      & static & fail \\
 \midrule
-Oracle (perfect future)$^{\ddagger}$ & 613 & 907 & 1.13 & 0.292$\times$ & 0 \\
 \textbf{Forecast p90}, $L{=}30$\,s & 589 & 681 & 2.41 &
 \textbf{0.623}$\times$ & \textbf{0} \\
-Forecast p90, strict re-warm & 589 & 733 & 2.39 & 0.617$\times$ & 0 \\
 Reactive (same image signal) & 589 & \textbf{16{,}084} & 2.61 &
 0.675$\times$ & 1 \\
 Reactive $+$ floor $M{=}4$ (calib.) & 589 & \textbf{2{,}084} &
 3.34 & 0.863$\times$ & 1 \\
+Static $C{=}8$ (deployable) & 647 & 808 & 3.87 & 1.000$\times$ & 0 \\
+Oracle (perfect future, as shipped) & 613 & \textbf{1{,}979} & 1.13 &
+0.292$\times$ & 1 \\
+\midrule
+\multicolumn{6}{@{}l}{\emph{post-hoc sensitivity and repairs (not
+frozen-protocol arms)}}\\
+Oracle, boundary clamp released$^{\ddagger}$ & 613 & 907 & 1.13 &
+0.292$\times$ & 0 \\
+Forecast p90, strict re-warm & 589 & 733 & 2.39 & 0.617$\times$ & 0 \\
 Reactive $+$ floor $M{=}6$ (ex post) & 566 & 907 & 4.03 &
 1.042$\times$ & 0 \\
-Static $C{=}8$ (deployable) & 647 & 808 & 3.87 & 1.000$\times$ & 0 \\
 \midrule
 \multicolumn{6}{@{}l}{\emph{archived issue-time family, same span and
 mechanics}}\\
@@ -526,10 +541,10 @@ Static $C{=}2$ (calm-day optimum) & \textbf{2{,}953} & --- & 0.97 &
 \end{tabular}
 
 \vspace{2pt}
-{\footnotesize $^{\ddagger}$ Oracle row with the window-boundary clamp
-released, i.e.\ allowed to order before its window opens. As shipped, the same
-oracle misses burst3 at \SI{1978.6}{\milli\second} at the same cost --- an
-artifact of that clamp, not of perfect information (text below and
+{\footnotesize $^{\ddagger}$ The shipped oracle's burst3 miss
+(\SI{1978.6}{\milli\second}) is a window-boundary artifact: it cannot order
+before its window opens, while the forecast arm's orders are absolute-epoch.
+The released row lifts only that clamp, at identical cost (text below and
 Figure~\ref{fig:cl-frontier}B).}
 \end{table}
 
@@ -570,8 +585,13 @@ cost.
 \paragraph{The result survives equalising the readiness models.} One asymmetry
 sits inside the shipped mechanics and must be disclosed: the forecast and
 oracle arms actuate through a warm pool (a scaled-down replica returns without
-re-paying cold start) while the reactive family re-warms strictly. Both repairs
-were measured (Figure~\ref{fig:cl-frontier}B). Under strict re-warm the
+re-paying cold start) while the reactive family re-warms strictly. Both
+directions were repaired and measured (Figure~\ref{fig:cl-frontier}B), with
+one caveat: the warm-pool direction is algorithmically symmetric, but the
+forecast's strict re-warm variant retains matured orders as reusable for a
+\SI{165}{\second} hold --- close to, though not identical with, the reactive
+arm's trailing-window re-warm semantics --- so that endpoint is a sensitivity,
+not a fully equalized model. Under it the
 forecast arm costs 2.39 Mworker-s (\textbf{0.617$\times$} static) with zero
 failed episodes. Under warm-pool readiness the reactive family improves
 materially: its unfloored burst3 p99 is \SI{2000}{\milli\second} rather than
@@ -579,17 +599,21 @@ materially: its unfloored burst3 p99 is \SI{2000}{\milli\second} rather than
 always be quoted with its warm-pool counterpart), and the floor $M{=}2$ now
 \emph{passes} every episode at 2.89 Mworker-s (0.746$\times$ static), cheaper
 than static. Even on that most-favourable-to-reactive footing the forecast arm
-is cheaper: \textbf{forecasting is 1.20--1.69$\times$ cheaper than the best
-warm-floor reactive at equal compliance}, and the single number 1.67$\times$
-must never be quoted alone. Two honesty points travel with the frontier. The
+is cheaper: \textbf{forecasting is 1.20$\times$ cheaper than the best
+warm-floor reactive at equal compliance on the symmetric warm-pool footing},
+and 1.67$\times$ under the shipped mechanics; the strict-direction figure is
+a sensitivity (see the caveat above), and the single number 1.67$\times$ must
+never be quoted alone. Two honesty points travel with the frontier. The
 comparison is conservative in reactive's favour --- the forecast is one frozen
 policy, the floor family an ex-post best-of-family read on the evaluation span.
-And the perfect-future oracle bounds what \emph{any} forecast could buy at
-\textbf{0.292$\times$} static; its lone burst3 miss under the shipped run is a
-window-boundary artifact (the oracle cannot order before its window opens,
-while the forecast arm's orders are absolute-epoch), and with that clamp
-released it passes every episode at the same cost, so the forecast arm captures
-53\% of the achievable saving --- a real margin left on the table.
+And the perfect-information oracle reference prices the signal-quality axis
+at \textbf{0.292$\times$} static under the same fixed point conversion and
+mechanics; it does not minimize worker-time subject to the SLA, so it is a
+reference, not a lower bound over admissible schedules. Its lone burst3 miss
+under the shipped run is a window-boundary artifact (released at identical
+cost, Table~\ref{tab:cl-frontier}). The forecast arm captures 53\% of the
+measured gap to that reference --- real headroom for better forecasts under
+these mechanics.
 
 The mechanism behind the gap is where each arm puts the same idea. A standing
 floor sized for burst3 holds those workers for the entire span, including the
@@ -914,12 +938,14 @@ $17.6\times$ worse on the same window, worst on the one-minute onset.
 \subsection{The volume of evidence, and what volume is not}
 \label{sec:cl-ledger-scale}
 
-At the 2026-07-26 snapshot the provenance store behind every number above held
-\num{2666} current run records --- mostly simulation replays, plus 41
-forecasting, 16 EDA and 10 live-validation records --- and is exercised by 75
-defined automated consistency checks, 74 of them enabled, of which 69 passed
-and five failed at that snapshot (one error-level, four warn-level, each
-carrying a documented note in the check registry); against this store the
+At the 2026-07-26 post-frontier snapshot the provenance store behind every
+number above held \num{2979} current run records --- mostly simulation
+replays, including the 313 comparator-frontier runs of
+Section~\ref{sec:cl-frontier}, plus 41 forecasting, 16 EDA and 10
+live-validation records --- and is exercised by 75 defined automated
+consistency checks, 74 of them enabled, of which 69 passed and five failed at
+that snapshot (one error-level, four warn-level, each carrying a documented
+note in the check registry); against this store the
 composed arm set resolves to exactly 20 request-linked arms matched one-to-one
 by artifact path. The aggregate window replays \num{749601} requests \emph{per
 pool} and the full trace \num{1000000}. The live validation of
@@ -1248,13 +1274,14 @@ at the calibrated p90 edge holds the tail SLA at every forecast-issued lead,
 including the one-minute onset that defeats an identically informed reactive
 controller at \emph{every} lead --- and that pass is the better \emph{placement
 of standing probabilistic headroom}, not anticipation, which is what the
-gradual onset (burst4) demonstrates instead. Under one frozen protocol the
+gradual onset (burst4) demonstrates instead. Under the pre-frozen replay protocol the
 five-arm frontier settles the standing-capacity objection: at equal compliance
 the forecast arm costs 0.623$\times$ the deployable static fleet while the
 calibrated warm floor fails held-out burst3 and the cheapest all-passing floor
-costs 1.042$\times$, so forecasting is 1.20--1.69$\times$ cheaper than the best
-warm-floor reactive, with a perfect-future oracle bounding the achievable
-saving at 0.292$\times$. On the language pool --- a secondary result, tested
+costs 1.042$\times$ --- 1.20$\times$ the forecast even on the
+reactive-favourable warm-pool footing (1.67$\times$ as shipped) --- with a
+perfect-information reference at 0.292$\times$ marking the remaining
+signal-quality headroom. On the language pool --- a secondary result, tested
 under a held forecast cursor --- its own forecast passes bursts under realistic
 replica leads only through the tail-aware capacity conversion, which repairs
 the mean-based sizing defect shared by every reactive configuration tested.

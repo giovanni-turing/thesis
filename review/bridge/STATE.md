@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-26T20:10:44-03:00, protocol v1.4)
+# Bridge state (generated 2026-07-26T21:19:31-03:00, protocol v1.4)
 
-messages: 20  errors: 0
+messages: 48  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -15,3 +15,39 @@ messages: 20  errors: 0
     - 010_v13_sender_alternation (reviewer, finding)
     - 008_d03_accepted_fixed (claude, response)
     - 012_d03_v14_verified (reviewer, response)
+- **D04-warm-floor-cost-reversal**: 2 msgs, 1/2 evidence rounds
+    - 013_conclusion_warm_floor_reversal (reviewer, finding)
+    - 011_d04_fixed (claude, response)
+- **D05-regime-variable-conflation**: 2 msgs, 1/2 evidence rounds
+    - 014_regime_variables_conflated (reviewer, finding)
+    - 012_d05_fixed (claude, response)
+- **D06-no-scaler-generalization**: 2 msgs, 1/2 evidence rounds
+    - 015_no_scaler_claim_unmeasured (reviewer, finding)
+    - 013_d06_fixed (claude, response)
+- **D07-onset-provenance-regression**: 2 msgs, 1/2 evidence rounds
+    - 016_onset_evidence_chain_regressed (reviewer, finding)
+    - 014_d07_fixed (claude, response)
+- **D08-frontier-census-regression**: 2 msgs, 1/2 evidence rounds
+    - 017_run_census_stale_after_frontier (reviewer, finding)
+    - 015_d08_fixed (claude, response)
+- **D09-oracle-bound-overclaim**: 2 msgs, 1/2 evidence rounds
+    - 018_oracle_not_cost_lower_bound (reviewer, finding)
+    - 016_d09_fixed (claude, response)
+- **D10-overlapping-evaluation-units**: 2 msgs, 1/2 evidence rounds
+    - 019_evaluation_episodes_overlap (reviewer, finding)
+    - 017_d10_fixed (claude, response)
+- **D11-readiness-not-equalized**: 2 msgs, 1/2 evidence rounds
+    - 020_readiness_not_equalized (reviewer, finding)
+    - 018_d11_fixed (claude, response)
+- **D12-frontier-gate-false-green**: 2 msgs, 1/2 evidence rounds
+    - 021_frontier_gate_can_false_green (reviewer, finding)
+    - 019_d12_fixed (claude, response)
+- **D13-frozen-block-mixes-posthoc**: 2 msgs, 1/2 evidence rounds
+    - 022_frozen_block_mixes_posthoc_rows (reviewer, finding)
+    - 020_d13_fixed (claude, response)
+- **D14-freeze-scope-not-calibration-frozen**: 2 msgs, 1/2 evidence rounds
+    - 023_freeze_scope_not_calibration_frozen (reviewer, finding)
+    - 021_d14_fixed (claude, response)
+- **D15-temporal-split-attribution**: 2 msgs, 1/2 evidence rounds
+    - 024_temporal_split_misattributed (reviewer, finding)
+    - 022_d15_fixed (claude, response)

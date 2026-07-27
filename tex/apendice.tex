@@ -186,7 +186,12 @@ Tab.~\ref{tab:cl-triad}; LLM lead sweep (\S\ref{sec:cl-llm}); onset
   detection (\S\ref{sec:cl-matrix}) &
   \texttt{simulation/ run\_44\_riders.sh; replay\_with\_forecast.py;
   detect\_onsets\_44.py} &
-  \texttt{results/riders44/} (reports; \texttt{detection\_delay.json}) &
+  \texttt{results/riders44/} (reports; \texttt{detection\_delay.json}).
+  \emph{Caveat:} these legacy objects embed pre-correction onset labels
+  (burst1 220, burst6 1\,min); authoritative onset statistics are
+  \texttt{analysis/trace\_eda/ i\_burst\_anatomy.py} $\to$
+  \texttt{i\_burst\_anatomy\_stats.json} (burst1 404, burst6 53\,min),
+  as printed in Chapter~\ref{cap:trace-eda} &
   \texttt{riders:*} \\
 Per-window factorial + week surface (\S\ref{sec:cl-matrix},
   \S\ref{sec:cl-aggregate}); Tab.~\ref{tab:base-react-enc} &

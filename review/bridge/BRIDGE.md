@@ -7,7 +7,7 @@ never deleted). `python3 validate.py` lints all messages and regenerates STATE.m
 ## Message format
 - Filename: `NNN_<slug>.md` — NNN = zero-padded sequence, strictly increasing PER
   DIRECTION (each side numbers its own outbox; gaps = lost mail).
-- YAML header (all required unless marked):
+- Header (fixed key-value form, NOT general YAML; all required unless marked):
   - `from:` `reviewer` | `claude`
   - `ts:` ISO-8601 with timezone
   - `re:` exact filename (without .md) of the message being answered, or `new`

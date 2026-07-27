@@ -7,8 +7,10 @@
 # point HONESTLY: sweep (quantile x scale) on burst2 + burst6, which both fall
 # inside the first 1.4 days (the forecast-context / calibration split) and are
 # forecastable via the EXPANDING-CONTEXT archive (*_expctx.parquet, first bin
-# 2024-10-15 12:03, vs the fixed-context archive's 2024-10-16 21:39). burst6 is
-# a 1-min onset -> the fast-onset stressor lives in the calibration split.
+# 2024-10-15 12:03, vs the fixed-context archive's 2024-10-16 21:39). burst6's
+# merged onset is 53 min (the old 1-min label predates the 2026-07-26 episode
+# merge fix); the truly-fast-onset stressor in the calibration split is its
+# final ramp, and burst3 (1 min) remains the held-out fast-onset test.
 # Pick the cheapest (quantile,scale) passing the tail SLA on BOTH; evaluate that
 # point held-out on burst1/3/4/5 + week (run_lang_calib_eval.sh) using the
 # production fixed-context archive.

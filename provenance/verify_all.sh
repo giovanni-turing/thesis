@@ -306,6 +306,24 @@ DERIVED_RC=$?
 while IFS= read -r line; do
   case "$line" in PASS*) ok "derived: ${line#PASS }";; FAIL*) bad "derived: ${line#FAIL }";; esac
 done <<< "$DERIVED"
+# D12 FIX (reviewer 2026-07-26): an evaluator abort must never pass silently.
+# If the embedded Python exited nonzero without emitting a formatted FAIL line
+# (unexpected exception path), or emitted nothing at all, this gate is
+# UNEVALUATED and per the design rule (line 11-13) that is a failure.
+if [ "$DERIVED_RC" -ne 0 ] && ! printf '%s' "$DERIVED" | grep -q '^FAIL'; then
+  bad "derived-value evaluator aborted (rc=$DERIVED_RC) without a formatted FAIL -- gate unevaluated"
+fi
+[ -z "$DERIVED" ] && bad "derived-value evaluator produced no output -- gate unevaluated"
+# D12 FIX part 2: raw frontier recomputation, not summary-reading. The
+# independent builder recomputes all 169 evaluation cells from the emitted
+# schedules and replay stats (not from frontier_summary.json) and cross-checks
+# each cell's stats agreement; any mismatch or nonzero exit fails the gate.
+FR_LOG=$("$TESE/eda/.venv/bin/python"   "$TESE/simulation/results/comparator_frontier/build_frontier_summary.py"   --jobs 8 2>&1 >/dev/null); FR_RC=$?
+if [ $FR_RC -eq 0 ] && printf '%s' "$FR_LOG" | grep -q 'stats-mismatches=0'; then
+  ok "frontier raw recompute: 169 cells from schedules+stats, 0 mismatches"
+else
+  bad "frontier raw recompute FAILED (rc=$FR_RC): $(printf '%s' "$FR_LOG" | tail -1)"
+fi
 # verb-convention regression (protocol R-C)
 BILLMISUSE=$(grep -rcE "billed at (forecast-)?issue" $TEXSET | grep -v ':0' | wc -l)
 [ "$BILLMISUSE" -eq 0 ] && ok "no billing-verb misuse (billed-at-issue: 0; R-C)" || bad "billing-verb misuse present (R-C)"
