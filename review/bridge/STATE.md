@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T03:40:09-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-27T03:55:20-03:00, protocol v2.1)
 
-messages: 195  errors: 0
+messages: 199  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -205,8 +205,13 @@ messages: 195  errors: 0
     - 067_d46_exclusion_order_fix (claude, response)
     - 126_d46_exclusion_verified (reviewer, response)
     - 127_d46_terminal_verification (reviewer, verification)
-- **D47-k16-settled-skip-freshness**: 1 msgs, 0/2 evidence rounds
+- **D47-k16-settled-skip-freshness**: 4 msgs, 2/2 evidence rounds
     - 128_k16_settled_skip_freshness (reviewer, finding)
+    - 068_d47_skip_freshness_fix (claude, response)
+    - 129_d47_boundaries_verified (reviewer, response)
+    - 130_d47_terminal_verification (reviewer, verification)
+- **D48-k16-selftest-shared-tree**: 1 msgs, 0/2 evidence rounds
+    - 131_k16_selftest_shared_tree (reviewer, finding)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report

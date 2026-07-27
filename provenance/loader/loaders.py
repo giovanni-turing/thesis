@@ -615,6 +615,12 @@ def load_composed_e2e_fill(idx, reload):
         _sh.rmtree(_td, ignore_errors=True)
     sha = _hl.sha256(_buf).hexdigest()
     nbytes = len(_buf)
+    # D47 (2026-07-27): freshness at the SKIP boundary -- returning (0,0) on the
+    # indexed sha attests "index still matches disk", so disk must still equal
+    # the validated capture at the moment of that decision. Without this, a swap
+    # during regeneration false-greens behind the settled sha.
+    if open(path, "rb").read() != _buf:
+        raise AssertionError("K16: tracked artifact changed during validation; refusing to attest settled state")
     if not reload and idx.get(path) == sha:
         return 0, 0
     cols = ["window_name", "arm", "model", "policy", "requests", "enc_p99_ms", "ttft_p99_ms",
@@ -673,9 +679,10 @@ def load_composed_e2e_fill(idx, reload):
                      "source_path": path, "window_name_as_ingested": d["window"]})
     if len(rows) != 9:
         raise AssertionError(f"K16: expected exactly 9 rows, built {len(rows)}")
-    # D46 (2026-07-27): path-freshness -- if the tracked file changed after the
-    # validated capture, refuse rather than record ingest metadata that is stale
-    # relative to the current on-disk bytes.
+    # D46/D47 (2026-07-27): path-freshness at the pre-DB boundary -- catches
+    # mutations during parsing/row building. Freshness is enforced at the two
+    # check boundaries (pre-skip and here); absent a lock or atomic producer
+    # protocol, a swap between this read and COMMIT is not excluded.
     if open(path, "rb").read() != _buf:
         raise AssertionError("K16: tracked artifact changed mid-validation; refusing to write")
     # D28.4 + D28.r4 (2026-07-27): source-scoped REPLACEMENT executed ATOMICALLY --

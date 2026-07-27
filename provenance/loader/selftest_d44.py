@@ -90,6 +90,31 @@ try:
     left = _glob.glob(os.path.join(_tf.gettempdir(), "k16_regen_*"))
     print(f"tempdir-hygiene: leftovers={len(left)}")
     ok &= not left
+
+    # 8. D47: settled-skip freshness. reload=False with the CANONICAL sha
+    #    pre-seeded in the index, while the (real) generator run is wrapped to
+    #    swap the tracked path after it emits canonical regen bytes. The guard
+    #    passes against the captured _buf; the skip branch must then REFUSE to
+    #    attest the settled state, never silently return (0,0) over changed disk.
+    canon_sha = hashlib.sha256(ORIG).hexdigest()
+    real_run2 = _sp.run
+    def _swapping_run(*a, **kw):
+        r = real_run2(*a, **kw)
+        open(PATH, "wb").write(b"{}")
+        return r
+    _sp.run = _swapping_run
+    try:
+        ok &= expect_raise("settled-skip-freshness", {PATH: canon_sha}, False)
+    finally:
+        _sp.run = real_run2
+        open(PATH, "wb").write(ORIG)
+
+    # 8b. Clean settled control: same pre-seeded canonical index, untouched
+    #     disk -> guard runs, then (0,0) skip with zero DB calls.
+    calls.clear()
+    n = loaders.load_composed_e2e_fill({PATH: canon_sha}, False)
+    print(f"settled-clean-skip: ret={n} db_calls={len(calls)}")
+    ok &= n == (0, 0) and len(calls) == 0
 finally:
     open(PATH, "wb").write(ORIG)
     restored = open(PATH, "rb").read() == ORIG
