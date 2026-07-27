@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bridge protocol v1.8 linter + thread-state generator. Run from review/bridge/.
+"""Bridge protocol v2.0 linter + thread-state generator. Run from review/bridge/.
 v1.3 (2026-07-26, threads D01/D02): re:-graph dispute-chain machine (one root
 finding, linear, <=2 responses, escalation only after the 2nd response and
 terminal); strict header grammar (no YAML claim); nonempty bounded values;
@@ -10,13 +10,30 @@ import os, re, sys, glob, datetime, tempfile
 TYPES = {"finding","question","response","rereview-request","ack","escalation","verification"}
 SENDERS = {"claude","reviewer"}
 LIVE_DIR_OWNER = {"to_reviewer":"claude","from_reviewer":"reviewer"}
-HDR_KEYS = ["from","ts","re","type","thread","authority"]  # thread/authority optional
+HDR_KEYS = ["from","ts","re","type","thread","authority","rulings"]  # last three optional
 REQ_KEYS = ["from","ts","re","type"]
 FNAME_RE = re.compile(r"^\d{3}_[A-Za-z0-9][A-Za-z0-9_-]*$")
 THREAD_RE = re.compile(r"^D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*$")
 # v1.6 (D26): exact-identity exception -- message 033 predates the authority-header rule;
 # its delegated authority is documented in BRIDGE.md and the session transcript.
 ADJUDICATION_EXCEPTIONS = {"033_adjudication_d19_d22"}
+# v2.0 GRANDFATHER: historical body-form adjudications recognized by exact sha,
+# carrying their (already reviewer-verified) rulings as data.
+GRANDFATHER_RULINGS = {
+ "033_adjudication_d19_d22": ("c7c02dba550c1fd1ad9fe173ea5e005e0db62805de0b099c53903eba2e34ee01",
+   {"D19-readiness-generator-residual":"CLOSED-FIXED","D20-frontier-gate-residual":"CLOSED-FIXED",
+    "D21-freeze-scope-residual":"CLOSED-FIXED","D22-evaluation-unit-terminology":"CLOSED-FIXED"}),
+ "043_adjudication_exact": ("506f28002dbe97fec3c2e38b0fb1d628f6eb53c4bcfda99b59cf94b73b79ae26",
+   {"D24-d22-adjudication-residue":"CLOSED-FIXED","D25-d20-calibration-promoted-gap":"CLOSED-FIXED",
+    "D26-v15-verification-unimplemented":"CLOSED-FIXED","D28-composed-k16-false-green":"CLOSED-FIXED"}),
+ "049_adjudication_d34_d37": ("5cf1e32c191bedeff5956564740b9f9c70c3e7ecf4bce8d521be590cf0b5a8fc",
+   {"D34-calibration-type-finiteness":"CLOSED-FIXED","D35-v17-adjudication-binding":"CLOSED-FIXED",
+    "D36-composed-projection-exactness":"CLOSED-FIXED","D37-schema37-attachment-assertion":"CLOSED-FIXED"}),
+ "054_adjudication_d38_d39": ("cdfd5c47db0fe830d431a56a71523c38a30696f08850dfeccc77278f38085ea0",
+   {"D38-v181-ruling-parser-failopen":"CLOSED-FIXED","D39-composed-numeric-exactness":"CLOSED-FIXED"}),
+ "059_adjudication_d41": ("25ee762d850d4d43d743533a36ab97c9e046ddef5912664444dbf1545942b51b",
+   {"D41-v182-commonmark-live-lines":"CLOSED-FIXED"}),
+}
 GRANDFATHER_SHA = {"033_adjudication_d19_d22":
                    "c7c02dba550c1fd1ad9fe173ea5e005e0db62805de0b099c53903eba2e34ee01"}
 # v1.8 (D35): authority values are BOUND to senders; rulings are expressed only
@@ -150,61 +167,64 @@ def main():
             errors.append(f"{m['file']}: replies to threaded '{target}' (thread {tthread}) "
                           f"but carries thread '{m['hdr'].get('thread')}'")
     # v1.6 (D26): verification semantics enforced globally, not only in chains.
-    # v1.8: build the recognized-adjudication set FIRST (chain rules consult it)
-    import hashlib as _hl
+    # v2.0: adjudications are STRUCTURED. rulings live in the 'rulings:' header
+    # ("<thread-id>=<verdict>; ..."), valid only on an unthreaded message whose
+    # authority is registry-listed and sender-bound. Bodies carry NO recognition
+    # semantics -- the Markdown attack surface is gone. Historical body-form
+    # adjudications are recognized by exact sha with their rulings as data.
+    import hashlib as _hl, os as _os
     adjudicated_threads = {}
+    for gf, (sha, rmap) in GRANDFATHER_RULINGS.items():
+        for d in ("to_reviewer", "from_reviewer", "archive"):
+            fp = _os.path.join(d, gf + ".md")
+            if _os.path.exists(fp):
+                if _hl.sha256(open(fp, "rb").read()).hexdigest() != sha:
+                    errors.append(f"{gf}: grandfathered adjudication MUTATED (sha mismatch)")
+                else:
+                    for t, verdict in rmap.items():
+                        adjudicated_threads.setdefault(t, (gf, verdict))
+                break
+        else:
+            errors.append(f"{gf}: grandfathered adjudication missing")
+    RULE_RE = re.compile(r"^(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)=(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)$")
     for m in sorted(msgs, key=lambda x: x["file"]):
-        body = m.get("body", "")
-        heading = any(is_adjudication_heading(ln) for ln in live_lines(body))
-        if m["file"] in ADJUDICATION_EXCEPTIONS:
-            import os as _os
-            for d in ("to_reviewer", "from_reviewer", "archive"):
-                fp = _os.path.join(d, m["file"] + ".md")
-                if _os.path.exists(fp):
-                    if _hl.sha256(open(fp, "rb").read()).hexdigest() != GRANDFATHER_SHA[m["file"]]:
-                        errors.append(f"{m['file']}: grandfathered adjudication MUTATED (sha mismatch)")
-                    break
-            else:
-                errors.append(f"{m['file']}: grandfathered file missing")
-            for t in threads_in_body(body):
-                adjudicated_threads.setdefault(t, (m["file"], "CLOSED-FIXED"))
-            continue
-        if not heading:
+        if "rulings" not in m["hdr"]:
+            # fail-closed lint: body-form ruling/adjudication syntax is deprecated
+            if m["file"] not in GRANDFATHER_RULINGS:
+                for ln in m.get("body", "").splitlines():
+                    if re.match(r"^RULING\s+D\d{2,}-", ln) or ln.strip().upper().rstrip("# ").lstrip("# ") == "AUTHOR ADJUDICATION":
+                        errors.append(f"{m['file']}: body-form adjudication syntax is deprecated -- use the rulings: header")
+                        break
             continue
         auth = m["hdr"].get("authority")
-        ok_auth = (auth in VALID_AUTHORITIES
-                   and m["hdr"].get("from") in AUTHORITY_SENDER.get(auth, set())
-                   and "thread" not in m["hdr"])
-        if not ok_auth:
-            continue  # header/registry errors are raised elsewhere
-        n_rulings = 0
-        for raw in live_lines(body):
-            st = raw.strip()
-            if re.match(r"^RULING[\W_]", st) or st == "RULING":
-                mm = re.match(r"^RULING\s+(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)\s*:\s*(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)\s*$", st)
-                if not mm:
-                    errors.append(f"{m['file']}: malformed RULING line: {st[:60]!r}")
-                    continue
-                tkey, verdict = mm.group(1), mm.group(2)
-                prev = adjudicated_threads.get(tkey)
-                if prev is not None:
-                    if prev[1] != verdict:
-                        errors.append(f"{m['file']}: conflicting ruling for {tkey}: {verdict} vs {prev[1]} in {prev[0]}")
-                    else:
-                        errors.append(f"{m['file']}: duplicate ruling for {tkey} (already ruled in {prev[0]}) -- one ruling, one source")
-                    continue
-                n_rulings += 1
-                adjudicated_threads[tkey] = (m["file"], verdict)
-        if n_rulings == 0:
-            errors.append(f"{m['file']}: asserted adjudication contains no valid RULING line")
-    _all_thread_ids = {m["hdr"].get("thread") for m in msgs if m["hdr"].get("thread")}
-    _escalated_ids = {m["hdr"].get("thread") for m in msgs
-                      if m["hdr"].get("type") == "escalation" and m["hdr"].get("thread")}
+        if auth not in VALID_AUTHORITIES or m["hdr"].get("from") not in AUTHORITY_SENDER.get(auth, set()):
+            errors.append(f"{m['file']}: rulings header requires a registry authority bound to the sender")
+            continue
+        if "thread" in m["hdr"]:
+            errors.append(f"{m['file']}: rulings header must be on an unthreaded message")
+            continue
+        for pair in [p.strip() for p in m["hdr"]["rulings"].split(";") if p.strip()]:
+            pm = RULE_RE.match(pair)
+            if not pm:
+                errors.append(f"{m['file']}: malformed rulings pair {pair!r}")
+                continue
+            tkey, verdict = pm.group(1), pm.group(2)
+            prev = adjudicated_threads.get(tkey)
+            if prev is not None:
+                if prev[1] != verdict:
+                    errors.append(f"{m['file']}: conflicting ruling for {tkey}: {verdict} vs {prev[1]} in {prev[0]}")
+                else:
+                    errors.append(f"{m['file']}: duplicate ruling for {tkey} (already ruled in {prev[0]})")
+                continue
+            adjudicated_threads[tkey] = (m["file"], verdict)
+    _all_ids = {m["hdr"].get("thread") for m in msgs if m["hdr"].get("thread")}
+    _esc_ids = {m["hdr"].get("thread") for m in msgs
+                if m["hdr"].get("type") == "escalation" and m["hdr"].get("thread")}
     for t, (src, verdict) in list(adjudicated_threads.items()):
-        if t not in _all_thread_ids:
-            errors.append(f"{src}: RULING names unknown thread '{t}'")
-        elif t not in _escalated_ids and src not in ADJUDICATION_EXCEPTIONS:
-            errors.append(f"{src}: RULING for '{t}' which was never escalated")
+        if t not in _all_ids:
+            errors.append(f"{src}: ruling names unknown thread '{t}'")
+        elif t not in _esc_ids and src not in GRANDFATHER_RULINGS:
+            errors.append(f"{src}: ruling for '{t}' which was never escalated")
     verif_names = {m["file"] for m in msgs if m["hdr"].get("type") == "verification"}
     for m in msgs:
         r = m["hdr"].get("re","")
@@ -309,7 +329,7 @@ def main():
     if os.path.islink("STATE.md"):
         errors.append("STATE.md is a symlink — refusing to write"); state_ok = False
     else: state_ok = True
-    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v1.8)\n",
+    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v2.0)\n",
            f"\nmessages: {len(msgs)}  errors: {len(errors)}\n", "\n## Dispute threads\n"]
     if not threads: out.append("(none)\n")
     for t in sorted(threads):

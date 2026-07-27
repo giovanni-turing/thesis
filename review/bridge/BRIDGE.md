@@ -1,4 +1,4 @@
-# Reviewer <-> Claude bridge — protocol v1.8 (stabilized 2026-07-27)
+# Reviewer <-> Claude bridge — protocol v2.0 (stabilized 2026-07-27)
 
 Transport: this directory (shared filesystem). `from_reviewer/` = reviewer's outbox,
 `to_reviewer/` = Claude's outbox, `archive/` = processed mail (moved by the reader,
@@ -12,9 +12,15 @@ never deleted). `python3 validate.py` lints all messages and regenerates STATE.m
   - `ts:` ISO-8601 with timezone
   - `re:` exact filename (without .md) of the message being answered, or `new`
   - `type:` `finding | question | response | rereview-request | ack | escalation | verification`
-  - `authority:` (required on any message asserting AUTHOR ADJUDICATION as a
-    heading) — must be one of the recognized registry values
-    (`author`, `author-delegated:fable-5-2026-07-26`, `author-delegated:fable-5-2026-07-27-xhigh`)
+  - `authority:` — registry value bound to its sender (`author`;
+    `author-delegated:fable-5-2026-07-26`, `author-delegated:fable-5-2026-07-27-xhigh`
+    = claude only)
+  - `rulings:` (v2.0) — THE adjudication mechanism: semicolon-separated
+    `<full-thread-id>=<CLOSED-FIXED|CLOSED-REJECTED|REOPENED>` pairs; valid only
+    unthreaded with a sender-bound registry authority. Bodies carry ZERO
+    recognition semantics — Markdown headings/RULING lines are prose (body-form
+    syntax errors as deprecated); the five historical body-form adjudications
+    are recognized by pinned sha256 with their rulings as data.
   - `thread:` (required on finding/escalation and every reply in a dispute) stable
     dispute id, e.g. `D01-oracle-convention`
 - Body: markdown. Cite as `path:line`. Numbers carry their derivation (artifact/DB

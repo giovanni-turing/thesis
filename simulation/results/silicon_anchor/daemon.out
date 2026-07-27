@@ -51,3 +51,6 @@
 2026-07-27T05:28:34Z [daemon] burst3__fc rep3 DONE in 1142.06s (6 reps this process)
 2026-07-27T05:28:34Z [daemon] next: burst3__re rep3 (tier1) est [1110, 1202] GPU-s
 2026-07-27T05:28:38Z [encoder] warmup 6x[64, 8, 1] in 3.49s
+2026-07-27T05:47:40Z [daemon] burst3__re rep3 DONE in 1142.21s (7 reps this process)
+2026-07-27T05:47:40Z [daemon] next: burst3__staticC8 rep3 (tier1) est [1110, 1202] GPU-s
+2026-07-27T05:47:44Z [encoder] warmup 6x[64, 8, 1] in 3.49s

@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T02:38:06-03:00, protocol v1.8)
+# Bridge state (generated 2026-07-27T03:00:28-03:00, protocol v2.0)
 
-messages: 177  errors: 0
+messages: 181  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -180,13 +180,17 @@ messages: 177  errors: 0
     - 056_d41 (claude, response)
     - 112_d41_commonmark_residuals (reviewer, response)
     - 114_d41_escalation (reviewer, escalation)
-- **D42-composed-raw-artifact-tolerance**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
+- **D42-composed-raw-artifact-tolerance**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 061_adjudication_d42)
     - 113_composed_raw_artifact_tolerance (reviewer, finding)
     - 057_d42 (claude, response)
     - 115_d42_type_and_byte_exactness (reviewer, response)
     - 116_d42_escalation (reviewer, escalation)
-- **D43-v183-unicode-raw-html**: 1 msgs, 0/2 evidence rounds
+- **D43-v183-unicode-raw-html**: 3 msgs, 2/2 evidence rounds
     - 117_v183_unicode_raw_html (reviewer, finding)
+    - 062_d43_v20 (claude, response)
+    - 118_d43_v20_residuals (reviewer, response)
+- **D44-k16-preflight-placement**: 1 msgs, 0/2 evidence rounds
+    - 119_k16_preflight_placement (reviewer, finding)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
