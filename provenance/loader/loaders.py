@@ -590,28 +590,31 @@ def load_composed_e2e_fill(idx, reload):
     # D28.1: the artifact is a committed repo object -- absence is corruption, not a skip
     if not os.path.exists(path):
         raise FileNotFoundError(f"K16: committed artifact missing: {path}")
+    # D46 (2026-07-27): worktree/SKIP_DIRS exclusion honored FIRST -- an active
+    # half-written artifact is skipped before any read or regeneration.
+    if ic.is_worktree(path):
+        return 0, 0
     # D44 (2026-07-27): ONE read of the tracked artifact; the SAME immutable buffer
     # feeds the pre-ingest byte-identity guard, the sha for skip logic + ingest
     # metadata, and json parsing -- no split view. Guard runs BEFORE sha-skip.
-    import subprocess as _sp, tempfile as _tf, hashlib as _hl
+    import shutil as _sh, subprocess as _sp, tempfile as _tf, hashlib as _hl
     _buf = open(path, "rb").read()
-    _tmp = _tf.NamedTemporaryFile(suffix=".json", delete=False)
-    _tmp.close(); os.unlink(_tmp.name)      # join script preloads an EXISTING --out
+    # D46: never-created child in a private tempdir -- the join script preloads
+    # an EXISTING --out, and there is no create-then-unlink window to leak.
+    _td = _tf.mkdtemp(prefix="k16_regen_")
+    _out = os.path.join(_td, "regen.json")
     try:
         _rc = _sp.run(["/home/gio/tese/eda/.venv/bin/python",
-                       "/home/gio/tese/simulation/composed_fill_join.py", "--out", _tmp.name],
+                       "/home/gio/tese/simulation/composed_fill_join.py", "--out", _out],
                       capture_output=True, text=True, cwd="/home/gio/tese").returncode
         if _rc != 0:
             raise AssertionError(f"K16: pre-ingest regeneration failed (rc={_rc}); refusing to write")
-        if open(_tmp.name, "rb").read() != _buf:
+        if open(_out, "rb").read() != _buf:
             raise AssertionError("K16: tracked artifact is NOT byte-identical to fresh regeneration; refusing to write")
     finally:
-        if os.path.exists(_tmp.name):
-            os.unlink(_tmp.name)
+        _sh.rmtree(_td, ignore_errors=True)
     sha = _hl.sha256(_buf).hexdigest()
     nbytes = len(_buf)
-    if ic.is_worktree(path):
-        return 0, 0
     if not reload and idx.get(path) == sha:
         return 0, 0
     cols = ["window_name", "arm", "model", "policy", "requests", "enc_p99_ms", "ttft_p99_ms",
@@ -670,6 +673,11 @@ def load_composed_e2e_fill(idx, reload):
                      "source_path": path, "window_name_as_ingested": d["window"]})
     if len(rows) != 9:
         raise AssertionError(f"K16: expected exactly 9 rows, built {len(rows)}")
+    # D46 (2026-07-27): path-freshness -- if the tracked file changed after the
+    # validated capture, refuse rather than record ingest metadata that is stale
+    # relative to the current on-disk bytes.
+    if open(path, "rb").read() != _buf:
+        raise AssertionError("K16: tracked artifact changed mid-validation; refusing to write")
     # D28.4 + D28.r4 (2026-07-27): source-scoped REPLACEMENT executed ATOMICALLY --
     # delete, insert and ingest-log land in ONE transaction in ONE psql session, so
     # a mid-sequence failure can never leave the store drained or half-replaced.

@@ -45,14 +45,23 @@ AUTHORITY_SENDER = {"author": {"claude", "reviewer"},
                     "author-delegated:fable-5-2026-07-27-xhigh": {"claude"}}
 # v2.1 (D43): strict whole-value rulings grammar -- PAIR (';' PAIR)*, at least one
 # pair, nothing else. Empty/dangling components are a grammar violation, not noise.
+# v2.1.1 (D45): separator whitespace is ASCII space/tab only, matching the doc.
 _PAIR = r"D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*=(?:CLOSED-FIXED|CLOSED-REJECTED|REOPENED)"
-RULINGS_VALUE_RE = re.compile(rf"^{_PAIR}(?:\s*;\s*{_PAIR})*$")
+RULINGS_VALUE_RE = re.compile(rf"^{_PAIR}(?:[ \t]*;[ \t]*{_PAIR})*$")
 RULINGS_PAIR_RE = re.compile(r"(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)=(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)")
 # v2.1 (D43): bodies are semantically inert EVERYWHERE. The retired Markdown
 # heading/authority parser is gone; ONE narrow, unconditional lexical lint marks
-# exact legacy line-forms deprecated outside the sha-pinned grandfather corpus.
-DEPRECATED_BODY = [re.compile(r"^RULING\s+D\d{2,}-"),
-                   re.compile(r"^ {0,3}#{1,6}\s+AUTHOR ADJUDICATION\s*(?:#+\s*)?$", re.I)]
+# legacy line-forms deprecated outside the sha-pinned grandfather corpus.
+# v2.1.1 (D45): the lint reserves ONLY the exact retired canonical forms --
+# flush-left, literal ASCII space separators, space-separated closing hashes,
+# and a COMPLETE 'RULING <full-id>: <verdict>' line. Prose lookalikes (leading
+# whitespace, unspaced trailing hashes, NBSP separators, ruling prefixes inside
+# sentences) are inert prose, exactly as the retired grammar classified them.
+DEPRECATED_BODY = [
+    re.compile(r"^RULING D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*: "
+               r"(?:CLOSED-FIXED|CLOSED-REJECTED|REOPENED)[ \t]*$"),
+    re.compile(r"^#{1,6} AUTHOR ADJUDICATION(?: #+)?[ \t]*$", re.I),
+]
 # v1.7 (D26 round 3): the only authorities this bridge recognizes. A heading-level
 # adjudication with any other value is an error; STATE trusts only these.
 VALID_AUTHORITIES = {"author", "author-delegated:fable-5-2026-07-26",

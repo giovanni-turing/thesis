@@ -123,8 +123,12 @@ s = s.replace('{"D41-v182-commonmark-live-lines":"CLOSED-FIXED"}',
 open("validate_probe.py","w").write(s)
 PYEOF
 out=$(python3 validate_probe.py 2>&1); rm -f validate_probe.py
-# NOTE: sha pin fires too (059 content unchanged but map mutated is source-side).
-if echo "$out" | grep -q "never escalated"; then
+# The injected map entry must be rejected. Before D43 was escalated+ruled the
+# rejection read "never escalated"; once a legitimate structured ruling for D43
+# exists, the injected grandfather entry instead collides with it ("duplicate"/
+# "conflicting ruling"). Either way the probe corpus errors -- accept any of the
+# three rejection signatures, but require errors!=0.
+if echo "$out" | grep -qE "never escalated|duplicate ruling|conflicting ruling" && ! echo "$out" | grep -q "errors=0"; then
   echo "PASS: R4-map-probe-rejected"; pass=$((pass+1))
 else
   echo "FAIL: R4-map-probe-rejected"; echo "$out" | grep ERROR | head -5; fail=$((fail+1))
@@ -169,6 +173,77 @@ if echo "$out" | grep -q "voided transactionally" && ! grep -q "ADJUDICATED.*${N
 else
   echo "FAIL: R5b-eligibility-transactional"; echo "$out" | grep ERROR | head -3; fail=$((fail+1))
 fi
+
+# --- D45 (v2.1.1): the lint reserves ONLY exact retired canonical forms ---
+
+# lookalikes must be inert prose
+probe_ok "D45-unspaced-trailing-hashes" "to_reviewer/${NX}_probe.md" <<EOF
+---
+from: claude
+ts: 2026-07-27T04:00:00-03:00
+re: new
+type: ack
+---
+# AUTHOR ADJUDICATION###
+EOF
+
+{ cat <<EOF
+---
+from: claude
+ts: 2026-07-27T04:00:00-03:00
+re: new
+type: ack
+---
+EOF
+printf '#\302\240AUTHOR ADJUDICATION\n'; } > "to_reviewer/${NX}_probe.md"
+out=$(python3 validate.py 2>&1); rm -f "to_reviewer/${NX}_probe.md"
+if echo "$out" | grep -q "errors=0"; then
+  echo "PASS: D45-nbsp-separator"; pass=$((pass+1))
+else
+  echo "FAIL: D45-nbsp-separator"; echo "$out" | grep ERROR | head -3; fail=$((fail+1))
+fi
+
+probe_ok "D45-leading-space-heading" "to_reviewer/${NX}_probe.md" <<EOF
+---
+from: claude
+ts: 2026-07-27T04:00:00-03:00
+re: new
+type: ack
+---
+ # AUTHOR ADJUDICATION
+   ## AUTHOR ADJUDICATION
+EOF
+
+probe_ok "D45-ruling-prefix-in-sentence" "to_reviewer/${NX}_probe.md" <<EOF
+---
+from: claude
+ts: 2026-07-27T04:00:00-03:00
+re: new
+type: ack
+---
+RULING D43-v183-unicode-raw-html is discussed here as ordinary prose.
+EOF
+
+# exact retired canonical forms must still be deprecated
+probe "D45-canonical-ruling-line" "deprecated" "to_reviewer/${NX}_probe.md" <<EOF
+---
+from: claude
+ts: 2026-07-27T04:00:00-03:00
+re: new
+type: ack
+---
+RULING D43-v183-unicode-raw-html: CLOSED-FIXED
+EOF
+
+probe "D45-canonical-heading-closing-hashes" "deprecated" "to_reviewer/${NX}_probe.md" <<EOF
+---
+from: claude
+ts: 2026-07-27T04:00:00-03:00
+re: new
+type: ack
+---
+## AUTHOR ADJUDICATION ##
+EOF
 
 # Control: the untouched corpus is clean under v2.1
 out=$(python3 validate.py 2>&1)

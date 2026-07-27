@@ -12,20 +12,24 @@ never deleted). `python3 validate.py` lints all messages and regenerates STATE.m
   - `ts:` ISO-8601 with timezone
   - `re:` exact filename (without .md) of the message being answered, or `new`
   - `type:` `finding | question | response | rereview-request | ack | escalation | verification`
-  - `authority:` — registry value bound to its sender (`author`;
+  - `authority:` (conditional — required with `rulings:`, otherwise optional) —
+    registry value bound to its sender (`author`;
     `author-delegated:fable-5-2026-07-26`, `author-delegated:fable-5-2026-07-27-xhigh`
     = claude only)
-  - `rulings:` (v2.0/v2.1) — THE adjudication mechanism, and the ONLY one. Strict
-    whole-value grammar `PAIR(';' PAIR)*` with at least one pair, where PAIR =
+  - `rulings:` (conditional — adjudications only; v2.0/v2.1) — THE adjudication
+    mechanism, and the ONLY one. Strict whole-value grammar `PAIR (';' PAIR)*`
+    with at least one pair and optional ASCII space/tab around `';'`, where PAIR =
     `<full-thread-id>=<CLOSED-FIXED|CLOSED-REJECTED|REOPENED>`; empty/dangling
     components violate the grammar. Valid only unthreaded with a sender-bound
     registry authority, and only for threads that exist and were escalated.
     Validation is TRANSACTIONAL: one bad component (grammar, duplicate, conflict,
     unknown thread, never escalated) voids the entire header — no pair applies.
     Bodies carry ZERO recognition semantics everywhere: there is no Markdown
-    parsing; one unconditional lexical lint marks the exact legacy line-forms
-    (`RULING D..-...`, an `AUTHOR ADJUDICATION` heading) deprecated in every
-    message. The five historical body-form adjudications are recognized by
+    parsing; one unconditional lexical lint marks ONLY the exact retired
+    canonical line forms deprecated (flush-left complete
+    `RULING <full-id>: <verdict>` lines; flush-left ASCII-separated
+    `AUTHOR ADJUDICATION` headings, closing hashes space-separated) — prose
+    lookalikes are inert. The five historical body-form adjudications are recognized by
     pinned sha256 with their rulings as data; only 033 (pre-escalation-grammar)
     is exempt from the escalation-eligibility requirement.
   - `thread:` (required on finding/escalation and every reply in a dispute) stable

@@ -50,6 +50,46 @@ try:
     n = loaders.load_composed_e2e_fill({}, True)
     print(f"clean-control: rows={n} db_calls={len(calls)} (>0 expected)")
     ok &= len(calls) > 0
+
+    # --- D46 probes ---
+    import ingest_common, subprocess as _sp, tempfile as _tf, glob as _glob
+
+    # 5. Worktree/SKIP_DIRS exclusion honored BEFORE any read/regeneration:
+    #    even a CORRUPT excluded path returns (0,0) with zero generator calls.
+    gen_calls = []
+    real_run = _sp.run
+    _sp.run = lambda *a, **kw: (gen_calls.append(a), real_run(*a, **kw))[1]
+    real_wt = ingest_common.is_worktree
+    ingest_common.is_worktree = lambda p: True
+    try:
+        open(PATH, "wb").write(ORIG.replace(b'"e2e_p99"', b'"BROKEN"', 1))
+        calls.clear()
+        n = loaders.load_composed_e2e_fill({}, True)
+        print(f"excluded-corrupt-path: ret={n} generator_calls={len(gen_calls)} db_calls={len(calls)}")
+        ok &= n == (0, 0) and len(gen_calls) == 0 and len(calls) == 0
+    finally:
+        ingest_common.is_worktree = real_wt
+        _sp.run = real_run
+        open(PATH, "wb").write(ORIG)
+
+    # 6. Path-freshness: file swapped after validation (during json parse) ->
+    #    refuse before the DB write.
+    real_loads = json.loads
+    def _swapping_loads(s, *a, **kw):
+        json.loads = real_loads
+        open(PATH, "wb").write(ORIG + b"\n")
+        return real_loads(s, *a, **kw)
+    json.loads = _swapping_loads
+    try:
+        ok &= expect_raise("mid-run-swap-freshness", {}, True)
+    finally:
+        json.loads = real_loads
+        open(PATH, "wb").write(ORIG)
+
+    # 7. Tempdir hygiene: no k16_regen_* leftovers after clean + failure runs.
+    left = _glob.glob(os.path.join(_tf.gettempdir(), "k16_regen_*"))
+    print(f"tempdir-hygiene: leftovers={len(left)}")
+    ok &= not left
 finally:
     open(PATH, "wb").write(ORIG)
     restored = open(PATH, "rb").read() == ORIG
