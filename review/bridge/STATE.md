@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T15:11:36-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-27T15:28:38-03:00, protocol v2.1)
 
-messages: 247  errors: 0
+messages: 251  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -262,9 +262,11 @@ messages: 247  errors: 0
     - 081_d57_lifecycle_fix (claude, response)
     - 162_d57_symlink_residual (reviewer, response)
     - 163_d57_escalation (reviewer, escalation)
-- **D58-publication-temp-inode-race**: 2 msgs, 1/2 evidence rounds
+- **D58-publication-temp-inode-race**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 084_adjudication_d58)
     - 164_publication_temp_inode_race (reviewer, finding)
     - 083_d58_inode_bound_fix (claude, response)
+    - 165_d58_helper_integration_residuals (reviewer, response)
+    - 166_d58_escalation (reviewer, escalation)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
