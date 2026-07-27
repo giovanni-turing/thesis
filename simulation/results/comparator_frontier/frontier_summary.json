@@ -1,7 +1,7 @@
 {
  "experiment": "thesis_shortening_plan_v3.md \u00a78.2 \u2014 decisive encoder-pool baseline experiment",
- "question": "does forecasting improve the achievable worker-time vs worst-episode-p99 frontier over a calibrated warm-floor reactive autoscaler, at equal compliance?",
- "answer": "YES. At 0 failed episodes on the 5.60-day evaluation span the p90 forecast arm costs 2,410,754.7 worker-s (0.623x static), while the cheapest warm-floor reactive that also passes costs 4,033,184.1 (1.042x static) under the shipped mechanics and 2,886,614.5 (0.746x) under the readiness model most favourable to reactive \u2014 forecast is 1.20x to 1.69x cheaper, and is cheaper than EVERY member of the warm-floor family, passing or failing.",
+ "question": "does forecasting improve the achievable worker-time vs worst-window-p99 frontier over a calibrated warm-floor reactive autoscaler, at equal compliance?",
+ "answer": "YES. At 0 failed windows on the 5.60-day evaluation span the p90 forecast arm costs 2,410,754.7 worker-s (0.623x static), while the cheapest warm-floor reactive that also passes costs 4,033,184.1 (1.042x static) under the shipped mechanics and 2,886,614.5 (0.746x) under the readiness model most favourable to reactive \u2014 forecast is 1.20x to 1.69x cheaper, and is cheaper than EVERY member of the warm-floor family, passing or failing.",
  "date": "2026-07-26",
  "status": "COMPLETE \u2014 single evaluation pass; arm mechanics pre-frozen before the frontier replay (rho=15 was an earlier ex-post choice, disclosed); no retuning during the replay",
  "gate_and_frozen_parameters": {
@@ -17,8 +17,8 @@
   },
   "windows": {
    "file": "simulation/windows.json (READ-ONLY; not modified by this experiment)",
-   "calibration_span": "trace's first 1.4 days (forecast context), episodes burst2 + burst6",
-   "evaluation_span": "5.60-day forecast-covered aggregate window [2024-10-16 21:39:00 .. trace end], 749,601 requests; episodes burst1 / burst3 / burst4 / burst5 / steady24h (calm day)",
+   "calibration_span": "trace's first 1.4 days (forecast context), calibration windows burst2 + burst6",
+   "evaluation_span": "5.60-day forecast-covered aggregate window [2024-10-16 21:39:00 .. trace end], 749,601 requests; evaluation windows burst1 / burst3 / burst4 / burst5 / steady24h (calm day)",
    "source": [
     "tex/closedloop.tex:43-53",
     "tex/closedloop.tex:423-427"
@@ -60,7 +60,7 @@
   "cells_recomputed": 132,
   "recomputation_mismatches": 0,
   "rule_R1": {
-   "statement": "cheapest floor M holding the gate on BOTH calibration episodes at L=30 s",
+   "statement": "cheapest floor M holding the gate on BOTH calibration windows at L=30 s",
    "passing_set": [
     1,
     2,
@@ -80,10 +80,10 @@
     32
    ],
    "selected_M": 1,
-   "verdict": "DEGENERATE \u2014 the un-floored reactive already passes both calibration episodes at L=30 s (burst2 589.301 ms, burst6 749.607 ms), so M=1 makes arm 3 identical to arm 2"
+   "verdict": "DEGENERATE \u2014 the un-floored reactive already passes both calibration windows at L=30 s (burst2 589.301 ms, burst6 749.607 ms), so M=1 makes arm 3 identical to arm 2"
   },
   "rule_R2": {
-   "statement": "cheapest floor M holding the gate on BOTH calibration episodes at EVERY declared encoder cold-start lead L in {15, 30, 45, 300} s (tex/baselines.tex tab:base-react-enc, simulation/run_burst26_reactive.sh:9)",
+   "statement": "cheapest floor M holding the gate on BOTH calibration windows at EVERY declared encoder cold-start lead L in {15, 30, 45, 300} s (tex/baselines.tex tab:base-react-enc, simulation/run_burst26_reactive.sh:9)",
    "passing_set": [
     4,
     5,
@@ -116,7 +116,7 @@
    ]
   },
   "rule_R3": {
-   "statement": "cheapest oracle hysteresis H in {0, 3} min holding the gate on BOTH calibration episodes at L=30 s",
+   "statement": "cheapest oracle hysteresis H in {0, 3} min holding the gate on BOTH calibration windows at L=30 s",
    "selected_H": 0,
    "calibration": {
     "H0": {
@@ -1176,7 +1176,7 @@
   }
  },
  "headline": {
-  "equal_compliance_basis": "0 failed episodes on the 5.60-day evaluation span (encoder p99 < 1 s per window)",
+  "equal_compliance_basis": "0 failed windows on the 5.60-day evaluation span (encoder p99 < 1 s per window)",
   "comparisons": [
    {
     "basis": "shipped mechanics (reactive family under strict re-warm)",
@@ -1232,7 +1232,7 @@
     "vs_static": 0.2921,
     "episodes_failed": 0,
     "burst3_p99_ms": 748.581,
-    "note": "with the single asymmetry removed (order_t = ts - L, may precede window start) the oracle passes EVERY evaluation episode; aggregate schedule is unchanged. This \u2014 not the clamped variant \u2014 is the perfect-information fixed-conversion reference on the signal-quality axis (its scale-down runs H=0; not a lower bound over admissible SLA-passing schedules)."
+    "note": "with the single asymmetry removed (order_t = ts - L, may precede window start) the oracle passes EVERY evaluation window; aggregate schedule is unchanged. This \u2014 not the clamped variant \u2014 is the perfect-information fixed-conversion reference on the signal-quality axis (its scale-down runs H=0; not a lower bound over admissible SLA-passing schedules)."
    },
    "fraction_of_measured_gap_to_reference_captured_by_forecast": 0.5325
   }
@@ -1241,12 +1241,12 @@
   "1_forecast_p90_issue_time": "PASSES every evaluation window at 0.623x static; the only autoscaling arm that does. Win survives the near-symmetric strict-re-warm sensitivity (0.617x, 0 failures).",
   "2_reactive_react_point": "FAILS burst3. Its 16,083.740 ms is partly a readiness-model artifact: the same policy under the forecast arm's own warm-pool actuation reads 1,999.773 ms \u2014 still a failure, 8x smaller.",
   "3_reactive_plus_warm_floor_M4": "FAILS burst3 at 2,083.830 ms and 0.863x static. Under warm-pool readiness M=4 passes at 0.887x \u2014 still dearer than forecast. No floor in the family reaches forecast's cost.",
-  "4_static_C8_deployable": "PASSES every episode at 1.000x static by construction; the cost reference.",
-  "5_perfect_future_oracle_H0": "0.292x static. As shipped it fails burst3, but ONLY through a window-boundary clamp the forecast arm does not carry; with that single asymmetry repaired it passes every episode at the same 0.292x. It is the frontier leader and the perfect-information reference (not a schedule-optimal lower bound)."
+  "4_static_C8_deployable": "PASSES every evaluation window at 1.000x static by construction; the cost reference.",
+  "5_perfect_future_oracle_H0": "0.292x static. As shipped it fails burst3, but ONLY through a window-boundary clamp the forecast arm does not carry; with that single asymmetry repaired it passes every evaluation window at the same 0.292x. It is the frontier leader and the perfect-information reference (not a schedule-optimal lower bound)."
  },
  "caveats": [
   "the 1.67x headline is NOT robust to the readiness-model repair \u2014 it collapses to 1.20x. The defensible claim is 'forecast is 1.2-1.7x cheaper than the best warm-floor reactive at equal compliance'.",
-  "'even the perfect-future oracle fails burst3' is FALSE and must not be published: the clamped oracle's burst3 failure is a window-boundary artifact; the warm-start oracle passes every episode at the same aggregate cost.",
+  "'even the perfect-future oracle fails burst3' is FALSE and must not be published: the clamped oracle's burst3 failure is a window-boundary artifact; the warm-start oracle passes every evaluation window at the same aggregate cost.",
   "'buying enough standing capacity costs more than the static fleet' holds only under the strict-re-warm actuation; under warm-pool the M=2 floor passes at 0.746x, cheaper than static. The conclusion (a floor alone never reaches forecast's cost) is unaffected.",
   "the comparison is conservative in reactive's favour: forecast is a single pre-frozen arm (rho=15 chosen ex post earlier, disclosed), the floor family is an ex-post best-of-family read on the evaluation span.",
   "R2 is decided entirely by the L=300 s calibration column; the arm is deployed at L=30 s.",

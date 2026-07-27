@@ -2792,3 +2792,25 @@ artifact:   tex/{conclusion,closedloop,tese,metodologia,apendice}.tex, simulatio
             attributed to forecast-free replays. Build 121pp clean. Bridge protocol v1.4; threads
             D01-D03 closed bilaterally.
 commit:     pending (after gate confirmation)
+
+## Composed coverage fill — 9 cells, NO ECONOMY directive (2026-07-26)
+date:       2026-07-26 (night)
+artifact:   simulation/results/composed_fill/ (9 request-linked composed cells: static_C8 on
+            burst1/3/4/5/steady24h; fc_chronos + reactive on steady24h; static_C8 + reactive on
+            the full 1M-request trace); tex/closedloop.tex composed-ledger section extended
+            (arm count 20 -> 29) + disclosure rewritten: remaining gaps are burst2/6 (protocol:
+            calibration split) and full-trace forecast (construction: context split) ONLY.
+command:    composed-coverage workflow wf_0895329e-387 (discover/run/verify agents complete;
+            integrate finished manually after a permission stall). Static arms joined via
+            (arrival_time_ms, input-len, output-len)+FIFO key — validated bit-identical to
+            session_id join at 1M scale; --report-jsonl session_id null on plain path documented.
+result:     ALL 9 CONFIRMED by adversarial recomputation under three independent join rules
+            (positional / session_id / FIFO), zero mismatches; populations exact
+            (88,260 calm day; 1,000,000 full trace); arrival drift 0.000 ms on all cells.
+            Encoder halves reproduce the C8 grid ledger EXACTLY (0.000 ms on all four bursts).
+            KEY SCIENCE: steady24h fc-p90 is a real naive-sum COUNTEREXAMPLE — composed e2e p99
+            1122.2 ms EXCEEDS the marginal sum 1076.4 (998/88,260 = 1.13% exceedances): the
+            additive approximation is not conservative on the calm day; now stated in the tex.
+            Full-trace composed: static 1328.6 / reactive 1681.9 ms e2e p99 (no forecast arm by
+            construction). 882-guard adjudicated digit-boundary (88,260 collision).
+commit:     pending (with round-5 reviewer fixes)

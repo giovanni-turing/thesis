@@ -251,6 +251,32 @@ def main() -> None:
         sel_ok = "OK" if (recomputed_M is not None and recomputed_M == frozen_M) else f"FAIL(recomputed={recomputed_M},frozen={frozen_M})"
         if sel_ok != "OK":
             fail = True
+    # D25 (2026-07-26): the report generator consumes the tracked
+    # calib_recheck_cells.json -- verify that intermediate against the freshly
+    # recomputed calibration rows (tag -> p99/worker_s/violations/n_requests),
+    # missing/extra/mismatched rows are a hard fail. Oracle calib cells are not
+    # in that table by design (floor grid only).
+    calib_tbl_ok = "OK"
+    try:
+        tracked = {r["tag"]: r for r in json.loads((HERE / "calib_recheck_cells.json").read_text())}
+        fresh = {r["tag"]: r for _, r in df[df["group"].isin(["calib", "calib_oracle"])].iterrows()}
+        floor_fresh = {t for t, r in fresh.items() if "floorM" in t}
+        floor_tracked = {t for t in tracked if "floorM" in t}
+        if not set(tracked) <= set(fresh):
+            calib_tbl_ok = f"FAIL(tracked tags not recomputed: {sorted(set(tracked)-set(fresh))[:3]})"
+        elif floor_tracked != floor_fresh:
+            calib_tbl_ok = f"FAIL(floor grid: missing {len(floor_fresh-floor_tracked)}, extra {len(floor_tracked-floor_fresh)})"
+        else:
+            for tag, tr in tracked.items():
+                fr = fresh[tag]
+                if (abs(tr["p99"] - fr["p99"]) > 1e-2 or abs(tr["worker_s"] - fr["worker_s"]) > 0.15
+                        or int(tr["violations_1000ms"]) != int(fr["violations_1000ms"])
+                        or int(tr["n_requests"]) != int(fr["n_requests"])):
+                    calib_tbl_ok = f"FAIL({tag})"; break
+    except Exception as e:
+        calib_tbl_ok = f"FAIL({e})"
+    if calib_tbl_ok != "OK":
+        fail = True
     # D20.4: link the raw cells to the summary object the gate reads
     link_ok = "OK"
     try:
@@ -294,7 +320,7 @@ def main() -> None:
         print(bad.to_string(), file=sys.stderr)
         fail = True
     print(f"cells={len(df)}  stats-missing={len(missing)}  stats-mismatches={len(bad)}  "
-          f"calib-selection={sel_ok}  summary-link={link_ok}", file=sys.stderr)
+          f"calib-selection={sel_ok}  calib-table={calib_tbl_ok}  summary-link={link_ok}", file=sys.stderr)
     df.to_json(HERE / "frontier_summary_cells.json", orient="records", indent=1)
     print("wrote frontier_summary_cells.json", file=sys.stderr)
     if fail:

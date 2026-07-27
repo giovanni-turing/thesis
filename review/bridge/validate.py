@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bridge protocol v1.4 linter + thread-state generator. Run from review/bridge/.
+"""Bridge protocol v1.5 linter + thread-state generator. Run from review/bridge/.
 v1.3 (2026-07-26, threads D01/D02): re:-graph dispute-chain machine (one root
 finding, linear, <=2 responses, escalation only after the 2nd response and
 terminal); strict header grammar (no YAML claim); nonempty bounded values;
@@ -7,14 +7,14 @@ end-to-end qualified references; symlink-safe atomic STATE.md; the claude/003
 threading defect is a DOCUMENTED EXCEPTION in BRIDGE.md, not an allowlist."""
 import os, re, sys, glob, datetime, tempfile
 
-TYPES = {"finding","question","response","rereview-request","ack","escalation"}
+TYPES = {"finding","question","response","rereview-request","ack","escalation","verification"}
 SENDERS = {"claude","reviewer"}
 LIVE_DIR_OWNER = {"to_reviewer":"claude","from_reviewer":"reviewer"}
 HDR_KEYS = ["from","ts","re","type","thread"]          # thread optional, order free
 REQ_KEYS = ["from","ts","re","type"]
 FNAME_RE = re.compile(r"^\d{3}_[A-Za-z0-9][A-Za-z0-9_-]*$")
 THREAD_RE = re.compile(r"^D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*$")
-THREADED_TYPES = {"finding","response","escalation"}
+THREADED_TYPES = {"finding","response","escalation","verification"}
 
 def parse_header(path, errs):
     lines = open(path).read().splitlines()
@@ -132,6 +132,10 @@ def main():
                 root_from = by_name[chain[0]]["hdr"].get("from")
                 other = ({"claude","reviewer"} - {root_from}).pop() if root_from in ("claude","reviewer") else None
                 for i, ty in enumerate(types[1:], 1):
+                    if ty == "verification":
+                        if i != len(types)-1:
+                            errors.append(f"thread {t}: verification {chain[i]} must be terminal"); bad=True
+                        continue
                     if ty == "response":
                         if i > 2: errors.append(f"thread {t}: third response {chain[i]} exceeds the two-round ceiling"); bad=True
                         want = other if i == 1 else root_from
@@ -141,7 +145,8 @@ def main():
                                           f"alternation requires '{want}'"); bad=True
                     elif ty == "escalation":
                         if i != 3: errors.append(f"thread {t}: escalation {chain[i]} only permitted after the second response"); bad=True
-                        if i != len(types)-1: errors.append(f"thread {t}: escalation must be terminal"); bad=True
+                        if i != len(types)-1 and types[i+1] != "verification":
+                            errors.append(f"thread {t}: escalation must be terminal (or followed only by a single verification)"); bad=True
                     else:
                         errors.append(f"thread {t}: type '{ty}' invalid inside a chain"); bad = True
                 thread_state[t] = (chain, types)
@@ -149,7 +154,7 @@ def main():
     if os.path.islink("STATE.md"):
         errors.append("STATE.md is a symlink — refusing to write"); state_ok = False
     else: state_ok = True
-    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v1.4)\n",
+    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v1.5)\n",
            f"\nmessages: {len(msgs)}  errors: {len(errors)}\n", "\n## Dispute threads\n"]
     if not threads: out.append("(none)\n")
     for t in sorted(threads):

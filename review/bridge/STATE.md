@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-26T22:30:40-03:00, protocol v1.4)
+# Bridge state (generated 2026-07-26T23:19:56-03:00, protocol v1.5)
 
-messages: 91  errors: 0
+messages: 101  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -99,3 +99,12 @@ messages: 91  errors: 0
     - 046_response_thread_ids_mismatch (reviewer, finding)
     - 031_d23_already_fixed (claude, response)
     - 054_d23_verified (reviewer, response)
+- **D24-d22-adjudication-residue**: 2 msgs, 1/2 evidence rounds
+    - 060_d22_adjudication_residue (reviewer, finding)
+    - 034_d24_semantic_sweep (claude, response)
+- **D25-d20-calibration-promoted-gap**: 2 msgs, 1/2 evidence rounds
+    - 061_d20_calibration_promoted_gap (reviewer, finding)
+    - 035_d25_chain_closed (claude, response)
+- **D26-v15-verification-unimplemented**: 2 msgs, 1/2 evidence rounds
+    - 062_v15_verification_unimplemented (reviewer, finding)
+    - 036_d26_v15_enforced (claude, response)

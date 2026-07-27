@@ -105,10 +105,10 @@ FROZEN = {
     },
     "windows": {
         "file": "simulation/windows.json (READ-ONLY; not modified by this experiment)",
-        "calibration_span": "trace's first 1.4 days (forecast context), episodes burst2 + burst6",
+        "calibration_span": "trace's first 1.4 days (forecast context), calibration windows burst2 + burst6",
         "evaluation_span": ("5.60-day forecast-covered aggregate window "
                             "[2024-10-16 21:39:00 .. trace end], 749,601 requests; "
-                            "episodes burst1 / burst3 / burst4 / burst5 / steady24h (calm day)"),
+                            "evaluation windows burst1 / burst3 / burst4 / burst5 / steady24h (calm day)"),
         "source": ["tex/closedloop.tex:43-53", "tex/closedloop.tex:423-427"],
     },
     "control_law": {
@@ -180,15 +180,15 @@ def calib_record() -> dict:
         "cells_recomputed": int(len(calib)),
         "recomputation_mismatches": int((~calib.stats_agrees).sum()),
         "rule_R1": {
-            "statement": "cheapest floor M holding the gate on BOTH calibration episodes at L=30 s",
+            "statement": "cheapest floor M holding the gate on BOTH calibration windows at L=30 s",
             "passing_set": r1, "selected_M": min(r1),
             "verdict": ("DEGENERATE — the un-floored reactive already passes both calibration "
-                        f"episodes at L=30 s (burst2 {float(fl[(fl.M==1)&(fl.L==30)&(fl.window=='burst2')].p99.iloc[0])} ms, "
+                        f"windows at L=30 s (burst2 {float(fl[(fl.M==1)&(fl.L==30)&(fl.window=='burst2')].p99.iloc[0])} ms, "
                         f"burst6 {float(fl[(fl.M==1)&(fl.L==30)&(fl.window=='burst6')].p99.iloc[0])} ms), "
                         "so M=1 makes arm 3 identical to arm 2"),
         },
         "rule_R2": {
-            "statement": ("cheapest floor M holding the gate on BOTH calibration episodes at EVERY "
+            "statement": ("cheapest floor M holding the gate on BOTH calibration windows at EVERY "
                           "declared encoder cold-start lead L in {15, 30, 45, 300} s "
                           "(tex/baselines.tex tab:base-react-enc, simulation/run_burst26_reactive.sh:9)"),
             "passing_set": r2, "selected_M": M2,
@@ -208,7 +208,7 @@ def calib_record() -> dict:
         },
         "rule_R3": {
             "statement": ("cheapest oracle hysteresis H in {0, 3} min holding the gate on BOTH "
-                          "calibration episodes at L=30 s"),
+                          "calibration windows at L=30 s"),
             "selected_H": 0, "calibration": h,
         },
         "no_evaluation_data_used": True,
@@ -281,7 +281,7 @@ WP = repairs[cheapest_wp]["cost_worker_s_eval_span"]
 ORC_WS = repairs["oracle_warmstart_H0"]["cost_worker_s_eval_span"]
 
 headline = {
-    "equal_compliance_basis": "0 failed episodes on the 5.60-day evaluation span (encoder p99 < 1 s per window)",
+    "equal_compliance_basis": "0 failed windows on the 5.60-day evaluation span (encoder p99 < 1 s per window)",
     "comparisons": [
         {"basis": "shipped mechanics (reactive family under strict re-warm)",
          "cheapest_passing_reactive": cheapest_fam,
@@ -322,7 +322,7 @@ headline = {
             "episodes_failed": repairs["oracle_warmstart_H0"]["episodes_failed"],
             "burst3_p99_ms": repairs["oracle_warmstart_H0"]["p99_ms_per_window"]["burst3"],
             "note": ("with the single asymmetry removed (order_t = ts - L, may precede window start) "
-                     "the oracle passes EVERY evaluation episode; aggregate schedule is unchanged. "
+                     "the oracle passes EVERY evaluation window; aggregate schedule is unchanged. "
                      "This — not the clamped variant — is the perfect-information fixed-conversion reference on the signal-quality axis (its scale-down runs H=0; not a lower bound over admissible SLA-passing schedules)."),
         },
         "fraction_of_measured_gap_to_reference_captured_by_forecast": round(
@@ -332,9 +332,9 @@ headline = {
 
 summary = {
     "experiment": "thesis_shortening_plan_v3.md §8.2 — decisive encoder-pool baseline experiment",
-    "question": ("does forecasting improve the achievable worker-time vs worst-episode-p99 frontier "
+    "question": ("does forecasting improve the achievable worker-time vs worst-window-p99 frontier "
                  "over a calibrated warm-floor reactive autoscaler, at equal compliance?"),
-    "answer": ("YES. At 0 failed episodes on the 5.60-day evaluation span the p90 forecast arm costs "
+    "answer": ("YES. At 0 failed windows on the 5.60-day evaluation span the p90 forecast arm costs "
                f"{FC:,.1f} worker-s ({FC/STATIC_REF:.3f}x static), while the cheapest warm-floor "
                f"reactive that also passes costs {FAM:,.1f} ({FAM/STATIC_REF:.3f}x static) under the "
                f"shipped mechanics and {WP:,.1f} ({WP/STATIC_REF:.3f}x) under the readiness model most "
@@ -379,10 +379,10 @@ summary = {
         "3_reactive_plus_warm_floor_M4": ("FAILS burst3 at 2,083.830 ms and 0.863x static. Under "
                                           "warm-pool readiness M=4 passes at 0.887x — still dearer "
                                           "than forecast. No floor in the family reaches forecast's cost."),
-        "4_static_C8_deployable": "PASSES every episode at 1.000x static by construction; the cost reference.",
+        "4_static_C8_deployable": "PASSES every evaluation window at 1.000x static by construction; the cost reference.",
         "5_perfect_future_oracle_H0": ("0.292x static. As shipped it fails burst3, but ONLY through a "
                                        "window-boundary clamp the forecast arm does not carry; with "
-                                       "that single asymmetry repaired it passes every episode at the "
+                                       "that single asymmetry repaired it passes every evaluation window at the "
                                        "same 0.292x. It is the frontier leader and the perfect-information reference (not a schedule-optimal lower bound)."),
     },
     "caveats": [
@@ -391,7 +391,7 @@ summary = {
         "equal compliance'.",
         "'even the perfect-future oracle fails burst3' is FALSE and must not be published: the "
         "clamped oracle's burst3 failure is a window-boundary artifact; the warm-start oracle passes "
-        "every episode at the same aggregate cost.",
+        "every evaluation window at the same aggregate cost.",
         "'buying enough standing capacity costs more than the static fleet' holds only under the "
         "strict-re-warm actuation; under warm-pool the M=2 floor passes at 0.746x, cheaper than static. "
         "The conclusion (a floor alone never reaches forecast's cost) is unaffected.",
@@ -440,10 +440,10 @@ print("wrote frontier_summary.json")
 
 # ==================================================================== figure
 #
-# Frontier scatter: provisioned worker-time (x) vs worst-episode encoder-delay
+# Frontier scatter: provisioned worker-time (x) vs worst-window encoder-delay
 # p99 (y), one point per arm. Both panels share log-log axes so positions are
-# directly comparable. Filled marker = passes all 5 evaluation episodes;
-# hollow = fails at least one (count + episode name in the label).
+# directly comparable. Filled marker = passes all 5 evaluation windows;
+# hollow = fails at least one (count + window name in the label).
 MS = 1e6
 LEADER = dict(arrowstyle="-", color="#b9bec7", lw=0.7, shrinkA=2, shrinkB=5)
 BBOX = dict(facecolor="white", edgecolor="none", alpha=0.78, pad=1.2)
@@ -522,7 +522,7 @@ for lab, key, c, _m, _ms in core_pts:
 
 m6 = family[cheapest_fam]
 axA.annotate(f"warm-floor family M = 1…32 (envelope, not a selection); cheapest member passing "
-             f"all 5 episodes:\nM={cheapest_fam.split('M')[1]} at "
+             f"all 5 windows:\nM={cheapest_fam.split('M')[1]} at "
              f"{m6['cost_worker_s_eval_span']/MS:.2f} Mworker-s = {m6['vs_static']:.3f}× static — "
              f"dearer than the static fleet, and {m6['cost_worker_s_eval_span']/FC:.2f}× the "
              f"forecast arm",
@@ -533,7 +533,7 @@ axA.annotate("M = 9…32: saturated at the no-queue plateau", xy=(11.0, 589.301)
              xytext=(4.9, 730), textcoords="data", fontsize=7.2, color=C_YELLOW,
              ha="left", va="center", arrowprops=LEADER, bbox=BBOX, zorder=6)
 frame(axA, "A · shipped mechanics (the §8.2 frontier)")
-axA.set_ylabel("worst-episode encoder-delay p99 (ms)", color=INK)
+axA.set_ylabel("worst-window encoder-delay p99 (ms)", color=INK)
 
 # ---------------------------------------------------------------- panel B
 rep_pts = [
@@ -572,14 +572,14 @@ handles = [
     Line2D([], [], marker="D", color=C_YELLOW, ls="none", ms=7, label="reactive + warm floor"),
     Line2D([], [], marker="^", color=MUTED, ls="none", ms=8, label="static C=8"),
     Line2D([], [], marker="*", color=C_VIOLET, ls="none", ms=12, label="perfect-future oracle"),
-    Line2D([], [], marker="o", color=INK, ls="none", ms=8, mfc=INK, label="passes all 5 episodes"),
+    Line2D([], [], marker="o", color=INK, ls="none", ms=8, mfc=INK, label="passes all 5 evaluation windows"),
     Line2D([], [], marker="o", color=INK, ls="none", ms=8, mfc="white", mew=1.6,
-           label="fails ≥ 1 episode"),
+           label="fails ≥ 1 window"),
 ]
 fig.legend(handles=handles, loc="lower center", ncol=7, frameon=False, fontsize=8.2,
            bbox_to_anchor=(0.5, -0.055))
 fig.text(0.5, -0.105,
-         "Filled marker = passes all 5 evaluation episodes; hollow = fails (count and episode named "
+         "Filled marker = passes all 5 evaluation windows; hollow = fails (count and window named "
          "in the label).  Dashed red = the declared gate, encoder-delay p99 < 1 s;  dotted grey = "
          "the static-C=8 cost reference.  Both panels share log–log axes.\n"
          "Panel A is the frontier as run.  Panel B removes the one undisclosed asymmetry — the "
@@ -588,9 +588,9 @@ fig.text(0.5, -0.105,
          "before its window opens.  Even on that most-favourable-to-reactive footing the cheapest "
          f"passing floor (M=2, {WP/MS:.2f} Mworker-s) costs {WP/FC:.2f}× the forecast arm.",
          ha="center", va="top", fontsize=7.4, color=MUTED)
-fig.suptitle("§8.2 encoder-pool frontier — provisioned worker-time vs worst-episode tail over the "
-             "5.60-day evaluation span\n(gate: encoder-delay p99 < 1 s in every episode; "
-             "episodes burst1 / burst3 / burst4 / burst5 / calm day)",
+fig.suptitle("§8.2 encoder-pool frontier — provisioned worker-time vs worst-window tail over the "
+             "5.60-day evaluation span\n(gate: encoder-delay p99 < 1 s in every evaluation window; "
+             "evaluation windows burst1 / burst3 / burst4 / burst5 / calm day)",
              fontsize=10.5, color=INK, y=1.03)
 fig.tight_layout()
 out = HERE / "frontier_worktime_vs_worstp99.pdf"

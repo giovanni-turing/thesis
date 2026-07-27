@@ -22,6 +22,7 @@ PROJ = [("K9", "windows", L.load_windows), ("K1", "llm_reports", L.load_llm_repo
         ("K10m", "forecast_metrics", L.load_forecast_metrics),
         ("K12", "collector", L.load_collector), ("K14", "cost_accounting", L.load_cost_accounting),
         ("K15", "composed_e2e", L.load_composed_e2e),
+        ("K16", "composed_e2e_fill", L.load_composed_e2e_fill),
         ("K13", "ledger", L.load_ledger),
         # projection-layer loaders that live in their own modules
         ("K20", "grid", load_grid.load_grid),

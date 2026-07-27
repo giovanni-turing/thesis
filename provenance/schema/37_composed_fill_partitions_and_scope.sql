@@ -1,0 +1,178 @@
+-- 37_composed_fill_partitions_and_scope.sql -- land the composed-coverage fill campaign
+-- (2026-07-26, "no economy" directive; 9 request-linked composed cells for the static
+-- arms, the calm day and the full trace) as a first-class experiment family.
+--
+-- WHAT WENT WRONG AND WHY THIS FILE EXISTS. The campaign's encoder-side artifacts were
+-- ingested at 2026-07-27 01:13 UTC, two minutes BEFORE loader/runid.py gained
+-- ("/composed_fill/", "composed_fill", True). Ten runs therefore landed as 'misc:<stem>'
+-- and their raw rows in the *_default partitions; the two planner cells ingested at 01:27
+-- carried the correct 'composed_fill:' ids but still landed in *_default because no
+-- partition existed. Post-ingest the store reported two regressions against the a2854e0
+-- snapshot: C306 (10 runs under experiment = misc) and C601 (default-partition rows --
+-- composed=190779 llm=367299 encoder_series=134156).
+--
+-- Structure follows 36_scope_comparator_frontier_runids.sql (copy -> repoint FK children
+-- -> fix ingest_log -> delete old), with one addition it did not need: comparator_frontier
+-- has no rows in the partitioned raw tables, this family has ~692k. A partition cannot be
+-- attached while the DEFAULT partition holds rows that would belong to it, so part 5
+-- drains, attaches, and refills, in that order.
+--
+-- Idempotent: the JOIN on the old ids matches nothing on a second run, the partition
+-- creations are IF NOT EXISTS, and the drain/refill selects an empty set once done.
+--
+-- New id derivation (verified against loader/runid.run_id_of over all 31 files):
+--   old run_id  = 'misc:' || <stem>;  files sit directly under composed_fill/ (depth 0,
+--   no artifact-by-kind segment), so the scoped mapping yields
+--   new run_id  = 'composed_fill:' || <stem>            (10 old ids -> 10 distinct new ids)
+BEGIN;
+
+CREATE TEMP TABLE _mig(old_id text PRIMARY KEY, new_id text, new_exp text) ON COMMIT DROP;
+
+INSERT INTO _mig(old_id, new_id, new_exp)
+SELECT r.run_id, 'composed_fill:' || substr(r.run_id, 6), 'composed_fill'
+FROM provenance.runs r
+WHERE r.experiment = 'misc'
+  AND r.run_id LIKE 'misc:%'
+  AND r.source_path LIKE '%/composed_fill/%';
+
+-- fail closed rather than half-migrate: every misc row must be a composed_fill row, and
+-- the derived ids must stay injective and not collide with ids already present.
+DO $$
+DECLARE n_mig bigint; n_misc bigint; n_new bigint; n_clash bigint;
+BEGIN
+  SELECT count(*) INTO n_mig FROM _mig;
+  SELECT count(*) INTO n_misc FROM provenance.runs WHERE experiment = 'misc';
+  SELECT count(DISTINCT new_id) INTO n_new FROM _mig;
+  SELECT count(*) INTO n_clash FROM _mig m JOIN provenance.runs r ON r.run_id = m.new_id;
+  IF n_mig <> n_misc THEN
+    RAISE EXCEPTION 'misc partition holds % rows but only % are composed_fill; '
+                    'register the remaining families in loader/runid.py first',
+                    n_misc, n_mig;
+  END IF;
+  IF n_new <> n_mig THEN
+    RAISE EXCEPTION 'derived run_ids are not injective: % rows -> % ids', n_mig, n_new;
+  END IF;
+  IF n_clash > 0 THEN
+    RAISE EXCEPTION '% derived run_id(s) already exist in provenance.runs', n_clash;
+  END IF;
+  RAISE NOTICE '37_composed_fill: rescoping % run(s)', n_mig;
+END $$;
+
+-- 1. copy runs rows under the new ids (all other columns unchanged)
+INSERT INTO provenance.runs
+SELECT (jsonb_populate_record(NULL::provenance.runs,
+        to_jsonb(r) || jsonb_build_object('run_id', m.new_id, 'experiment', m.new_exp))).*
+FROM provenance.runs r JOIN _mig m ON r.run_id = m.old_id;
+
+-- 2. repoint every FK child (generic over the catalog; NOTICE per touched table)
+DO $$
+DECLARE c record; n bigint;
+BEGIN
+  FOR c IN
+    SELECT ct.conrelid::regclass AS tbl, a.attname AS col
+    FROM pg_constraint ct
+    JOIN pg_attribute a ON a.attrelid = ct.conrelid AND a.attnum = ANY (ct.conkey)
+    WHERE ct.confrelid = 'provenance.runs'::regclass AND ct.contype = 'f'
+  LOOP
+    EXECUTE format('UPDATE %s t SET %I = m.new_id FROM _mig m WHERE t.%I = m.old_id',
+                   c.tbl, c.col, c.col);
+    GET DIAGNOSTICS n = ROW_COUNT;
+    IF n > 0 THEN RAISE NOTICE '%.%: % row(s) repointed', c.tbl, c.col, n; END IF;
+  END LOOP;
+END $$;
+
+-- 3. bookkeeping references that are not FK-enforced
+UPDATE provenance.ingest_log t SET run_id = m.new_id FROM _mig m WHERE t.run_id = m.old_id;
+UPDATE provenance.runs t SET supersedes    = m.new_id FROM _mig m WHERE t.supersedes    = m.old_id;
+UPDATE provenance.runs t SET superseded_by = m.new_id FROM _mig m WHERE t.superseded_by = m.old_id;
+
+-- 4. prove no child still points at a pre-rescope id, then drop the old rows.
+--    RI triggers are suppressed for the same reason as in 36: step 2 is exhaustive over
+--    pg_constraint, so integrity holds by construction, and a plain DELETE would fire
+--    10 x 125 RI probes across ~30 GB of unindexed children.
+DO $$
+DECLARE c record; bad bigint; touched int := 0;
+BEGIN
+  FOR c IN
+    SELECT ct.conrelid::regclass AS tbl, a.attname AS col
+    FROM pg_constraint ct
+    JOIN pg_attribute a ON a.attrelid = ct.conrelid AND a.attnum = ANY (ct.conkey)
+    WHERE ct.confrelid = 'provenance.runs'::regclass AND ct.contype = 'f'
+  LOOP
+    EXECUTE format('SELECT count(*) FROM %s t JOIN _mig m ON t.%I = m.old_id', c.tbl, c.col)
+      INTO bad;
+    IF bad > 0 THEN
+      RAISE EXCEPTION '%.% still holds % row(s) pointing at a pre-rescope run_id',
+                      c.tbl, c.col, bad;
+    END IF;
+    touched := touched + 1;
+  END LOOP;
+  RAISE NOTICE '37_composed_fill: % FK child column(s) verified clean', touched;
+END $$;
+
+SET LOCAL session_replication_role = replica;
+DELETE FROM provenance.runs r USING _mig m WHERE r.run_id = m.old_id;
+SET LOCAL session_replication_role = DEFAULT;
+
+-- 5. partitions. Drain the default partition of every composed_fill row, attach the
+--    dedicated partition, refill through the parent so the rows route to it. Draining
+--    FIRST is not optional: ATTACH/CREATE ... FOR VALUES IN ('composed_fill') is rejected
+--    while the DEFAULT partition still holds a row that would belong to the new one.
+--    The experiment column is rewritten in the temp copy, not in place, so no row is ever
+--    updated across a partition boundary.
+DO $$
+DECLARE t text; n bigint; parts text[] := ARRAY['composed_request','llm_request','encoder_series'];
+BEGIN
+  FOREACH t IN ARRAY parts LOOP
+    EXECUTE format('CREATE TEMP TABLE _cf AS SELECT * FROM provenance.%I WHERE run_id LIKE %L',
+                   t||'_default', 'composed_fill:%');
+    EXECUTE 'UPDATE _cf SET experiment = ''composed_fill''';
+    GET DIAGNOSTICS n = ROW_COUNT;
+    EXECUTE format('DELETE FROM provenance.%I WHERE run_id LIKE %L', t, 'composed_fill:%');
+    EXECUTE format('CREATE TABLE IF NOT EXISTS provenance.%I PARTITION OF provenance.%I '
+                   'FOR VALUES IN (%L)', t||'_composed_fill', t, 'composed_fill');
+    EXECUTE format('INSERT INTO provenance.%I SELECT * FROM _cf', t);
+    RAISE NOTICE '37_composed_fill: %_composed_fill attached, % row(s) relocated', t, n;
+    EXECUTE 'DROP TABLE _cf';
+  END LOOP;
+END $$;
+
+-- 6. record the rescope the way IC003 recorded its own (32/36 skipped this; there is no
+--    reason to, and run_id_alias is what makes an old id in a notebook still resolvable).
+INSERT INTO provenance.ingest_correction
+  (correction_id, table_name, field, original_value, corrected_value, n_rows, source_path,
+   evidence, rationale)
+VALUES ('IC037', 'runs', 'experiment/run_id', 'misc:<stem>', 'composed_fill:<stem>', 10,
+        '/home/gio/tese/simulation/results/composed_fill/',
+        'loader/selftest.py test B reported these files under experiment misc; check C306 '
+        'reported 10 runs under misc and C601 reported 692,234 rows in the *_default '
+        'partitions, both regressions against the a2854e0 snapshot.',
+        'The composed-coverage fill campaign (2026-07-26 "no economy" directive: 9 '
+        'request-linked composed cells -- static C=8 on burst1/3/4/5 and the calm day, '
+        'forecast-p90 and reactive on the calm day, and the full-trace static C=8 / '
+        'reactive pair) was ingested at 01:13 UTC, before loader/runid.py mapped '
+        '/composed_fill/. Ten runs fell through to the misc catch-all. This correction '
+        'renames them, attaches composed_request/llm_request/encoder_series partitions for '
+        'the family, and relocates the raw rows out of the default partitions.')
+ON CONFLICT (correction_id) DO NOTHING;
+
+INSERT INTO provenance.run_id_alias (old_run_id, new_run_id, correction_id)
+SELECT old_id, new_id, 'IC037' FROM _mig
+ON CONFLICT (old_run_id) DO NOTHING;
+
+-- 7. post-conditions: the two regressions this file exists to close.
+DO $$
+DECLARE n_misc bigint; a bigint; b bigint; c bigint;
+BEGIN
+  SELECT count(*) INTO n_misc FROM provenance.runs WHERE experiment = 'misc';
+  SELECT count(*) INTO a FROM provenance.composed_request_default;
+  SELECT count(*) INTO b FROM provenance.llm_request_default;
+  SELECT count(*) INTO c FROM provenance.encoder_series_default;
+  IF n_misc <> 0 THEN RAISE EXCEPTION 'C306 would still fail: % runs under misc', n_misc; END IF;
+  IF (a+b+c) <> 0 THEN
+    RAISE EXCEPTION 'C601 would still fail: default rows composed=% llm=% encoder_series=%', a, b, c;
+  END IF;
+  RAISE NOTICE '37_composed_fill: C306 and C601 post-conditions hold';
+END $$;
+
+COMMIT;

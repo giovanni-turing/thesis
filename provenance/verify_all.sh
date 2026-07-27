@@ -180,10 +180,15 @@ NTEX=$(printf '%s\n' $TEXSET | grep -c .)
 if [ "${NTEX:-0}" -ge 7 ]; then ok "built chapter set resolved from tese.tex: $NTEX files ($(printf '%s ' $TEXSET | sed 's|tex/||g'))"
 else bad "built chapter set UNRESOLVABLE from tese.tex ($NTEX files) -- every tex gate below would be vacuous"; fi
 
-# B2 rejected-fix audit -- these were overturned for cause and must never reappear
+# B2 rejected-fix audit -- these were overturned for cause and must never reappear.
+# ADJUDICATED 2026-07-26: patterns are now digit-boundary-anchored -- the composed
+# steady24h cells legitimately introduced \num{88260} (calm-day population, verified
+# against three composed_fill artifacts), which the bare substring '882' matched.
+# The rejected values were standalone numbers; substring hits inside longer numbers
+# are not reappearances.
 declare -A MUST_BE=( ["882"]=0 ["783"]=0 )
 for pat in "${!MUST_BE[@]}"; do
-  n=$(grep -rho "$pat" $TEXSET 2>/dev/null | wc -l)
+  n=$(grep -rhoE "(^|[^0-9])${pat}([^0-9]|$)" $TEXSET 2>/dev/null | wc -l)
   [ "$n" -eq "${MUST_BE[$pat]}" ] && ok "rejected fix absent: '$pat' ($n occurrences)" \
                                   || bad "REJECTED FIX PRESENT: '$pat' appears $n time(s)"
 done
@@ -327,7 +332,7 @@ FR_LOG=$("$TESE/eda/.venv/bin/python"   "$TESE/simulation/results/comparator_fro
 # + 48 adversarial + 128 calib floor + 16 calib oracle + 5 eval-window
 # variants + 1 path-identity check; adjudicate any legitimate inventory
 # change here with a dated comment.
-FR_WANT='cells=313  stats-missing=0  stats-mismatches=0  calib-selection=OK  summary-link=OK'
+FR_WANT='cells=313  stats-missing=0  stats-mismatches=0  calib-selection=OK  calib-table=OK  summary-link=OK'
 if [ $FR_RC -eq 0 ] && printf '%s' "$FR_LOG" | grep -qF "$FR_WANT"; then
   ok "frontier raw recompute: 313 cells (incl. calib grid), selection + summary-link verified"
 else
@@ -352,6 +357,14 @@ if SOURCE_DATE_EPOCH=0 "$TESE/eda/.venv/bin/python" "$FRMIR/cf/make_frontier_rep
   ok "frontier pure-derivation equality: regenerated summary+figure byte-identical to tracked"
 else
   bad "frontier pure-derivation equality FAILED: tracked summary/figure is not the pure derivation of the recomputed cells"
+fi
+# D25.b: the PROMOTED manuscript figure (what Chapter 6 embeds) must equal the
+# regenerated figure too -- a swapped figuras/sim copy must not stay green.
+if cmp -s "$FRMIR/cf/frontier_worktime_vs_worstp99.pdf" "$TESE/figuras/sim/sim_frontier.pdf" \
+   && cmp -s "$FRMIR/cf/frontier_worktime_vs_worstp99.png" "$TESE/figuras/sim/sim_frontier.png"; then
+  ok "promoted manuscript figure byte-identical to regenerated frontier figure"
+else
+  bad "promoted figuras/sim/sim_frontier is NOT the regenerated frontier figure"
 fi
 # verb-convention regression (protocol R-C)
 BILLMISUSE=$(grep -rcE "billed at (forecast-)?issue" $TEXSET | grep -v ':0' | wc -l)

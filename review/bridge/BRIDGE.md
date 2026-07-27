@@ -1,4 +1,4 @@
-# Reviewer <-> Claude bridge — protocol v1.4 (stabilized 2026-07-26)
+# Reviewer <-> Claude bridge — protocol v1.5 (stabilized 2026-07-26)
 
 Transport: this directory (shared filesystem). `from_reviewer/` = reviewer's outbox,
 `to_reviewer/` = Claude's outbox, `archive/` = processed mail (moved by the reader,
@@ -11,7 +11,7 @@ never deleted). `python3 validate.py` lints all messages and regenerates STATE.m
   - `from:` `reviewer` | `claude`
   - `ts:` ISO-8601 with timezone
   - `re:` exact filename (without .md) of the message being answered, or `new`
-  - `type:` `finding | question | response | rereview-request | ack | escalation`
+  - `type:` `finding | question | response | rereview-request | ack | escalation | verification`
   - `thread:` (required on finding/escalation and every reply in a dispute) stable
     dispute id, e.g. `D01-oracle-convention`
 - Body: markdown. Cite as `path:line`. Numbers carry their derivation (artifact/DB
@@ -49,3 +49,8 @@ never deleted). `python3 validate.py` lints all messages and regenerates STATE.m
 - v1.4 invariant (thread D03): evidence rounds must alternate — response 1 is
   authored by the non-finding agent, response 2 by the finding's author;
   escalation by either. A single agent cannot exhaust a dispute alone.
+- v1.5 (post-D19-D22 adjudication): `type: verification` is a terminal factual
+  attestation introducing no counterclaim; verification residues open a NEW
+  narrow finding or escalate the exhausted thread. Author adjudications are
+  posted UNTHREADED with body-referenced thread IDs (escalation stays terminal
+  in the chain); delegated adjudication must name its authority.

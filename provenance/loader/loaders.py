@@ -568,6 +568,60 @@ def load_composed_e2e(idx, reload):
     return 1, len(rows)
 
 
+# ======================================================================== K16
+def load_composed_e2e_fill(idx, reload):
+    """Composed-coverage fill campaign: 9 more request-linked cells (2026-07-26).
+
+    Same table, same key, same semantics as K15 -- a SEPARATE kind only because the
+    rows come from a different artifact (simulation/composed_fill_join.py's output
+    rather than defense/anim/build/extract_a12.py's), and composed_e2e is keyed by
+    (source_path, window_name, arm) so the two sources coexist without collision.
+
+    The cells: static C=8 on burst1/3/4/5 and the calm day, forecast-p90 (Chronos)
+    and reactive on the calm day, and the full-trace static C=8 / reactive pair.
+    Absent by protocol, not by omission: burst2/burst6 (the calibration split) and
+    any full-trace forecast (the archive's first 1.4 days are that forecast's own
+    context). Backs tex/closedloop.tex tab:cl-ledger-joint.
+
+    The policy vocabulary is K15's, not the artifact's: 'forecast' (not
+    'forecast_p90') so v_joint_e2e reads uniformly across all 29 arms.
+    """
+    path = f"{SIM}/composed_fill/composed_fill_joined.json"
+    prep = _prep(path, idx, reload) if os.path.exists(path) else None
+    if not prep:
+        return 0, 0
+    sha, nbytes = prep
+    cols = ["window_name", "arm", "model", "policy", "requests", "enc_p99_ms", "ttft_p99_ms",
+            "e2e_p99_ms", "e2e_max_ms", "itl_p99_ms", "gpu_hours", "composed_trace",
+            "source_path", "window_name_as_ingested"]
+    rows = []
+    for cell, d in sorted(json.load(open(path)).items()):
+        if "error" in d or "e2e_p99" not in d:
+            continue
+        arm = d["arm"]
+        model = arm[3:] if arm.startswith("fc_") else None
+        policy = "forecast" if arm.startswith("fc_") else (
+            "static" if arm.startswith("static") else arm)
+        # the join asserts these itself; re-assert here so a silently truncated
+        # artifact cannot reach the store
+        if d.get("requests") != d.get("expected") or d.get("requests") != d.get("completed_requests"):
+            raise AssertionError("%s: population disagreement trace=%r window=%r report=%r"
+                                 % (cell, d.get("requests"), d.get("expected"),
+                                    d.get("completed_requests")))
+        if abs(float(d.get("alignment_drift_ms", 1e9))) >= 1.0:
+            raise AssertionError("%s: arrival alignment drift %r ms" % (cell, d["alignment_drift_ms"]))
+        rows.append({"window_name": d["window"], "arm": arm, "model": model, "policy": policy,
+                     "requests": d["requests"], "enc_p99_ms": d["enc_p99"],
+                     "ttft_p99_ms": d["ttft_p99"], "e2e_p99_ms": d["e2e_p99"],
+                     "e2e_max_ms": d["e2e_max"], "itl_p99_ms": d["itl_p99"],
+                     "gpu_hours": d["gpu_h"], "composed_trace": d["composed_trace"],
+                     "source_path": path, "window_name_as_ingested": d["window"]})
+    db.run_sql(ic.multi_upsert_sql("composed_e2e", cols, rows,
+               ["source_path", "window_name", "arm"]))
+    db.run_sql(ic.ingest_sql(path, sha, "K16", len(rows), None, nbytes))
+    return 1, len(rows)
+
+
 # ======================================================================== K14
 def load_cost_accounting(idx, reload):
     import csv as _csv
