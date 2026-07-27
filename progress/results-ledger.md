@@ -2940,3 +2940,33 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   DB 7/1/1 over the nine fill rows.
 - **Feeds:** bridge D29/D30 closure (msgs 085/086); v_joint_e2e comment;
   supersedes the 2026-07-26 join artifact and schema 38's 14/2/13 comment.
+
+### silicon-anchor-tier5-engine-adjudication (2026-07-27)
+
+- **Artifact:** `simulation/results/silicon_anchor/reps/engine__hf_sdpa/rep001-005/`,
+  `engine__hf_fa2/rep001-005/` (daemon fn-sweeps);
+  `engine__vllm_serving/vllm_eager_dense_rerun.{py,json}` (manual run inside
+  the pinned `vllm/vllm-openai:v0.22.0` container, GPU idle -- the daemon
+  refuses containers by design; its queue reps are recorded rep_skip/abandoned).
+- **Command:** daemon fn_sweep cells (hf engines) + `docker run --rm --gpus all
+  -v /home/gio/tese:/ws --entrypoint python3 vllm/vllm-openai:v0.22.0
+  /ws/.../vllm_eager_dense_rerun.py` (output redirected so the ledgered
+  phase-E artifact is not overwritten).
+- **Result:** the like-for-like vLLM-FLASH_ATTN engine REPRODUCES the
+  appendix column to <=0.5% at every anchor shape (N=1: 7.99 vs 8.03;
+  N=8: 42.24 vs 42.18; N=32: 178.80 vs 178.41; N=64: 334.52 vs 333.61 ms)
+  and sits at 0.98-1.12x AIC -- the appendix band. hf_sdpa (5 reps)
+  reproduces both tab:app-engine's HF column and tier 1's in-replay fn
+  table (1.31-1.61x, monotone in N). **Static-C8 burst3 adjudication:
+  sim 717.8 ms x 1.057 ~= 759 ms -> PASS on the calibrated engine**; the
+  tier-1 flip (1,397 ms FAIL under HF eager) is engine-stack sensitivity,
+  now measured on both engines by two independent campaigns. CAVEAT:
+  the daemon's hf_fa2 cell produced timings identical to hf_sdpa
+  (<=0.006% at all N) -- the transformers attn_implementation request did
+  not engage FA2 for this vision tower; the cell's label records the
+  request, not the effective backend. Treat hf_fa2 daemon reps as a second
+  SDPA measurement; the appendix's genuine FA2 column (distinct numbers)
+  is unaffected.
+- **Feeds:** the physical-anchor manuscript section (pending; trigger was
+  tier-5 landing per author directive "so tier 5 should come first");
+  static-C8 engine-sensitivity caveat; tier-1 ledger entry above.
