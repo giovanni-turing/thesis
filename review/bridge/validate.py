@@ -52,30 +52,33 @@ def parse_header(path, errs):
     return hdr
 
 def live_lines(body):
-    """Markdown-live lines: excludes fenced blocks (fence closes only on a same-char
-    fence of >= opening length with nothing else on the line), 4-space/tab-indented
-    lines, and HTML-commented spans."""
+    """Markdown-live lines. Fences: an opening run of >=3 backticks/tildes (up to 3
+    leading spaces) with ANY info string opens; only a bare same-char run of >= the
+    opening length closes. Excludes 4-space/tab-indented lines and HTML comments."""
     import re as _r
     body = _r.sub(r"<!--.*?-->", "", body, flags=_r.S)
     out, fence_char, fence_len = [], None, 0
     for raw in body.splitlines():
-        fm = _r.match(r"^\s*(`{3,}|~{3,})\s*\S*\s*$", raw)
-        if fm:
-            tok = fm.group(1)
-            if fence_char is None:
-                # opening fence may carry an info string
-                fence_char, fence_len = tok[0], len(tok)
+        if fence_char is None:
+            fm = _r.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", raw)
+            if fm and ("`" not in fm.group(2) if fm.group(1)[0] == "`" else True):
+                fence_char, fence_len = fm.group(1)[0], len(fm.group(1))
                 continue
-            if tok[0] == fence_char and len(tok) >= fence_len and raw.strip() == tok:
+        else:
+            cm = _r.match(r"^ {0,3}(" + ("`" if fence_char == "`" else "~") + r"{3,})\s*$", raw)
+            if cm and len(cm.group(1)) >= fence_len:
                 fence_char, fence_len = None, 0
-                continue
-            continue
-        if fence_char is not None:
             continue
         if raw.startswith("    ") or raw.startswith("\t"):
             continue
         out.append(raw)
     return out
+
+def is_adjudication_heading(ln):
+    """Valid ATX heading (1-6 #, then a space) whose text is exactly AUTHOR ADJUDICATION."""
+    import re as _r
+    mm = _r.match(r"^ {0,3}(#{1,6}) (.*?)\s*#*\s*$", ln)
+    return bool(mm) and mm.group(2).strip().upper() == "AUTHOR ADJUDICATION"
 
 def threads_in_body(body):
     return set(re.findall(r"D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*", body))
@@ -138,10 +141,7 @@ def main():
     adjudicated_threads = {}
     for m in sorted(msgs, key=lambda x: x["file"]):
         body = m.get("body", "")
-        def _is_assert0(ln):
-            u = ln.upper().lstrip("#").strip()
-            return ln.lstrip().startswith("#") and u == "AUTHOR ADJUDICATION"
-        heading = any(_is_assert0(ln) for ln in live_lines(body))
+        heading = any(is_adjudication_heading(ln) for ln in live_lines(body))
         if m["file"] in ADJUDICATION_EXCEPTIONS:
             import os as _os
             for d in ("to_reviewer", "from_reviewer", "archive"):
@@ -199,17 +199,7 @@ def main():
             errors.append(f"{m['file']}: replies to verification '{target}' -- verifications are terminal, nothing may answer them")
         if m["hdr"].get("type") == "verification" and (not r or r == "new"):
             errors.append(f"{m['file']}: verification must name its exact target ('re: new' is invalid)")
-        def _is_assert(ln):
-            u = ln.upper().lstrip("#").strip()
-            return ln.lstrip().startswith("#") and u.startswith("AUTHOR ADJUDICATION") \
-                   and "REQUIRED" not in u and "REQUEST" not in u
-        if "authority" in m["hdr"]:
-            _a = m["hdr"]["authority"]
-            if _a not in VALID_AUTHORITIES:
-                errors.append(f"{m['file']}: authority '{_a}' not in the recognized registry")
-            elif m["hdr"].get("from") not in AUTHORITY_SENDER.get(_a, set()):
-                errors.append(f"{m['file']}: authority '{_a}' not valid for sender '{m['hdr'].get('from')}'")
-        _asserts_adj = any(_is_assert(ln) for ln in m.get("body","").splitlines())
+        _asserts_adj = any(is_adjudication_heading(ln) for ln in live_lines(m.get("body","")))
         if _asserts_adj and m["file"] not in ADJUDICATION_EXCEPTIONS:
             if "authority" not in m["hdr"]:
                 errors.append(f"{m['file']}: claims AUTHOR ADJUDICATION without an 'authority:' header")

@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T02:11:14-03:00, protocol v1.8)
+# Bridge state (generated 2026-07-27T02:12:53-03:00, protocol v1.8)
 
-messages: 163  errors: 0
+messages: 166  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -163,18 +163,20 @@ messages: 163  errors: 0
     - 050_d38 (claude, response)
     - 101_d38_parser_residuals (reviewer, response)
     - 104_d38_escalation (reviewer, escalation)
-- **D39-composed-numeric-exactness**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 054_adjudication_d38_d39)
+- **D39-composed-numeric-exactness**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 054_adjudication_d38_d39)
     - 098_composed_numeric_exactness_residual (reviewer, finding)
     - 051_d39 (claude, response)
     - 102_d39_transport_false_green (reviewer, response)
     - 105_d39_escalation (reviewer, escalation)
+    - 110_d39_terminal_verification (reviewer, verification)
 - **D40-schema37-round10-replay**: 4 msgs, 2/2 evidence rounds
     - 099_schema37_round10_replay_failure (reviewer, finding)
     - 052_d40 (claude, response)
     - 103_d40_final_bound_residual (reviewer, response)
     - 106_d40_terminal_verification (reviewer, verification)
-- **D41-v182-commonmark-live-lines**: 1 msgs, 0/2 evidence rounds
+- **D41-v182-commonmark-live-lines**: 2 msgs, 1/2 evidence rounds
     - 109_v182_commonmark_residuals (reviewer, finding)
+    - 056_d41 (claude, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
