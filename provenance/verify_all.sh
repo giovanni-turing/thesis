@@ -366,23 +366,7 @@ fi
 # loader skip all fail here.
 CFJ_TMP="$TMP/cf_regen.json"
 if "$TESE/eda/.venv/bin/python" "$TESE/simulation/composed_fill_join.py" --out "$CFJ_TMP" >/dev/null 2>&1 \
-   && "$TESE/eda/.venv/bin/python" - "$CFJ_TMP" <<'CFPY'
-import json, sys, math
-tracked = json.load(open("/home/gio/tese/simulation/results/composed_fill/composed_fill_joined.json"))
-fresh = json.load(open(sys.argv[1]))
-assert set(tracked) == set(fresh) and len(tracked) == 9, "cell identity mismatch"
-for c in tracked:
-    tc, fc = tracked[c], fresh[c]
-    assert set(tc) == set(fc), f"{c}: field-set mismatch"
-    assert c == tc.get("window","")+"_"+tc.get("arm",""), f"{c}: outer/inner identity"
-    for k in set(tc):
-        tv, fv = tc[k], fc[k]
-        if isinstance(tv, (int, float)) and not isinstance(tv, bool):
-            assert math.isfinite(float(tv)) and math.isfinite(float(fv)), f"{c}.{k} non-finite"
-            assert float(tv) == float(fv), f"{c}.{k}"
-        else:
-            assert tv == fv, f"{c}.{k} string mismatch"
-CFPY
+   && cmp -s "$CFJ_TMP" "$TESE/simulation/results/composed_fill/composed_fill_joined.json"
 then
   ok "composed nine-cell join: regenerated from raw, artifact field-identical"
 else

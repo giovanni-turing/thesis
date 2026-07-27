@@ -56,7 +56,10 @@ def live_lines(body):
     leading spaces) with ANY info string opens; only a bare same-char run of >= the
     opening length closes. Excludes 4-space/tab-indented lines and HTML comments."""
     import re as _r
-    body = _r.sub(r"<!--.*?-->", "", body, flags=_r.S)
+    body = _r.sub(r"<script\b.*?</script>", "\x00", body, flags=_r.S | _r.I)
+    if _r.search(r"<script\b", body, _r.I):
+        body = body[:_r.search(r"<script\b", body, _r.I).start()]
+    body = _r.sub(r"<!--.*?-->", "\x00", body, flags=_r.S)   # placeholder prevents token splicing
     if "<!--" in body:                      # unterminated comment: nothing after it is live
         body = body[:body.index("<!--")]
     out, fence_char, fence_len = [], None, 0
@@ -78,13 +81,17 @@ def live_lines(body):
             else: break
         if _ind >= 4:
             continue
+        if raw[:1] in (" ", "\t"):
+            # grammar rule: rulings and headings must be flush-left; any leading
+            # whitespace demotes the line to prose (kills nested-list fence edges)
+            continue
         out.append(raw)
     return out
 
 def is_adjudication_heading(ln):
     """Valid ATX heading (1-6 #, then a space) whose text is exactly AUTHOR ADJUDICATION."""
     import re as _r
-    mm = _r.match(r"^ {0,3}(#{1,6}) (.*?)\s*#*\s*$", ln)
+    mm = _r.match(r"^(#{1,6}) (.*?)(?: #+)?\s*$", ln)
     return bool(mm) and mm.group(2).strip().upper() == "AUTHOR ADJUDICATION"
 
 def threads_in_body(body):
@@ -206,6 +213,12 @@ def main():
             errors.append(f"{m['file']}: replies to verification '{target}' -- verifications are terminal, nothing may answer them")
         if m["hdr"].get("type") == "verification" and (not r or r == "new"):
             errors.append(f"{m['file']}: verification must name its exact target ('re: new' is invalid)")
+        if "authority" in m["hdr"]:
+            _a = m["hdr"]["authority"]
+            if _a not in VALID_AUTHORITIES:
+                errors.append(f"{m['file']}: authority '{_a}' not in the recognized registry")
+            elif m["hdr"].get("from") not in AUTHORITY_SENDER.get(_a, set()):
+                errors.append(f"{m['file']}: authority '{_a}' not valid for sender '{m['hdr'].get('from')}'")
         _asserts_adj = any(is_adjudication_heading(ln) for ln in live_lines(m.get("body","")))
         if _asserts_adj and m["file"] not in ADJUDICATION_EXCEPTIONS:
             if "authority" not in m["hdr"]:

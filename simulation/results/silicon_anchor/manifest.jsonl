@@ -154,3 +154,16 @@
 {"ev": "rep_start", "ts": 1785130114.839093, "utc": "2026-07-27T05:28:34Z", "cell": "burst3__re", "rep": 3, "n_batches": 3098, "dispatch_sha_meta": "simulation/results/silicon_anchor/dispatch/burst3__re.meta.json", "clock": {"sm_mhz": 2392, "mem_mhz": 13801, "max_sm_mhz": 3105, "persistence": "Enabled", "throttle_hex": "0x0000000000000000", "temp_c": 58, "power_w": 394.2, "mem_used_mib": 4888, "util_pct": 99, "compute_apps": [{"pid": 1595986, "mib": 4864}], "utc": "2026-07-27T05:28:34Z"}}
 {"ev": "segment", "ts": 1785130178.5082302, "utc": "2026-07-27T05:29:38Z", "cell": "burst3__re", "rep": 3, "batches_done": 137, "n_batches": 3098, "elapsed_s": 60.2}
 {"ev": "segment", "ts": 1785130238.5896688, "utc": "2026-07-27T05:30:38Z", "cell": "burst3__re", "rep": 3, "batches_done": 337, "n_batches": 3098, "elapsed_s": 120.2}
+{"ev": "segment", "ts": 1785130298.6591105, "utc": "2026-07-27T05:31:38Z", "cell": "burst3__re", "rep": 3, "batches_done": 496, "n_batches": 3098, "elapsed_s": 180.3}
+{"ev": "segment", "ts": 1785130359.1357203, "utc": "2026-07-27T05:32:39Z", "cell": "burst3__re", "rep": 3, "batches_done": 676, "n_batches": 3098, "elapsed_s": 240.8}
+{"ev": "segment", "ts": 1785130419.4563763, "utc": "2026-07-27T05:33:39Z", "cell": "burst3__re", "rep": 3, "batches_done": 845, "n_batches": 3098, "elapsed_s": 301.1}
+{"ev": "segment", "ts": 1785130479.6668344, "utc": "2026-07-27T05:34:39Z", "cell": "burst3__re", "rep": 3, "batches_done": 980, "n_batches": 3098, "elapsed_s": 361.3}
+{"ev": "segment", "ts": 1785130539.9723105, "utc": "2026-07-27T05:35:39Z", "cell": "burst3__re", "rep": 3, "batches_done": 1114, "n_batches": 3098, "elapsed_s": 421.6}
+{"ev": "segment", "ts": 1785130600.1936011, "utc": "2026-07-27T05:36:40Z", "cell": "burst3__re", "rep": 3, "batches_done": 1294, "n_batches": 3098, "elapsed_s": 481.8}
+{"ev": "segment", "ts": 1785130660.5556884, "utc": "2026-07-27T05:37:40Z", "cell": "burst3__re", "rep": 3, "batches_done": 1468, "n_batches": 3098, "elapsed_s": 542.2}
+{"ev": "segment", "ts": 1785130720.725496, "utc": "2026-07-27T05:38:40Z", "cell": "burst3__re", "rep": 3, "batches_done": 1637, "n_batches": 3098, "elapsed_s": 602.4}
+{"ev": "segment", "ts": 1785130780.8917022, "utc": "2026-07-27T05:39:40Z", "cell": "burst3__re", "rep": 3, "batches_done": 1798, "n_batches": 3098, "elapsed_s": 662.5}
+{"ev": "segment", "ts": 1785130841.207528, "utc": "2026-07-27T05:40:41Z", "cell": "burst3__re", "rep": 3, "batches_done": 1961, "n_batches": 3098, "elapsed_s": 722.9}
+{"ev": "segment", "ts": 1785130901.70065, "utc": "2026-07-27T05:41:41Z", "cell": "burst3__re", "rep": 3, "batches_done": 2121, "n_batches": 3098, "elapsed_s": 783.4}
+{"ev": "segment", "ts": 1785130962.0982463, "utc": "2026-07-27T05:42:42Z", "cell": "burst3__re", "rep": 3, "batches_done": 2294, "n_batches": 3098, "elapsed_s": 843.8}
+{"ev": "segment", "ts": 1785131022.4360707, "utc": "2026-07-27T05:43:42Z", "cell": "burst3__re", "rep": 3, "batches_done": 2468, "n_batches": 3098, "elapsed_s": 904.1}
