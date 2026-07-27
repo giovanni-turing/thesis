@@ -30,13 +30,13 @@ inventoried in Appendix~\ref{ap:artifacts}.
 \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
 \item[Population.] The seven-day trace (2024-10-15 to 2024-10-22, UTC),
 \num{1000000} requests, and its four demand series at one-minute bins --- the
-provisioning cadence --- \num{10080} bins; binning sensitivity is swept over
+provisioning cadence --- \num{10080} of them; binning sensitivity is swept over
 \SI{1}{\second}--\SI{1}{\hour}.
 \item[Independent unit.] The burst \emph{episode} (18 in the week) and the
 \emph{day} (7). Minute bins are the measurement grid, not replicates, and
 requests are never the unit of a burst claim.
-\item[Endpoints.] Primary: the share of vision demand request rate accounts
-for, as the through-origin constant-fraction $R^2$ of image rate on request
+\item[Endpoints.] Primary: the share of vision demand that request rate
+accounts for, as the through-origin constant-fraction $R^2$ of image rate on request
 rate. Secondary: burst onset time, the budget a controller has.
 \item[Comparator.] Request rate --- what a conventional autoscaler observes ---
 against the image rate that drives encoder work, with the decode series as the
@@ -60,7 +60,7 @@ mass relative to the median. Every result describes \emph{this} trace
 
 Each request carries an arrival timestamp (millisecond precision), an image
 count, a context-token count, and a generated-token count. Coverage is
-continuous (largest gap \SI{39}{\second}; median inter-arrival
+continuous (largest gap \SI{39}{\second}; median inter-arrival time
 \SI{312}{\milli\second}), and the 151 fully duplicated rows
 ($1.5\times10^{-4}$) are \emph{retained} as indistinguishable from legitimate
 simultaneous arrivals, ties processed in file order. Three structural facts
@@ -234,7 +234,7 @@ and the highest image-rate windows are not the highest request-rate windows.}
 The image-rate signal exceeds its 99th percentile (\num{224}~images/s) in 101
 one-minute windows that merge into 18 burst episodes once each run is extended
 to its surrounding median crossings; the six largest, plus the calmest day, form
-the evaluation windows of Chapter~\ref{cap:closedloop}
+the workload windows of Chapter~\ref{cap:closedloop}
 (Figure~\ref{fig:eda-windows}). The largest episode peaks at \num{370}~images/s,
 $15.6\times$ the mean image rate; the request rate at that same minute,
 \num{4.48} requests/s, does sit above its own p99 (\num{4.35}) but at only
@@ -253,8 +253,8 @@ images--context correlation $r=0.89$). Decode is the mirror image --- the
 generated-token rate rises only $1.78\times$ across the same bursts and
 per-request generation \emph{shortens} (median 84 vs.\ 99 tokens) --- so the
 decode pool is nearly burst-neutral while the vision and prefill stages are not.
-Onsets are fast: baseline-to-peak in a median of \SI{6.5}{\minute}, a third of
-the 18 episodes (6) peaking within one to two minutes, comparable to or faster
+Onsets are fast: baseline-to-peak in a median of \SI{6.5}{\minute}, with a third
+of the 18 episodes (6) peaking within one to two minutes, comparable to or faster
 than replica cold-starts of tens of seconds to minutes
 (Figure~\ref{fig:eda-onsets}). That onset time is the budget for any scaling
 decision.
