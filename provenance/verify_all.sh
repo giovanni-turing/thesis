@@ -404,8 +404,11 @@ q = ("select row_to_json(t) from (select window_name, arm, requests, enc_p99_ms,
      "ttft_p99_ms, e2e_p99_ms, e2e_max_ms, itl_p99_ms, gpu_hours, composed_trace, "
      "model, policy, window_name_as_ingested from provenance.composed_e2e "
      "where source_path = '" + CANON + "') t")
-out = subprocess.run(["psql","-h","localhost","-p","5433","-U","goku","-d","postgres","-tAc",q],
-                     capture_output=True, text=True, env=env).stdout
+proc = subprocess.run(["psql","-h","localhost","-p","5433","-U","goku","-d","postgres","-tAc",q],
+                      capture_output=True, text=True, env=env)
+if proc.returncode != 0:
+    print("FAIL:psql-rc=%d" % proc.returncode); raise SystemExit
+out = proc.stdout
 db = {}
 rows = [json.loads(l) for l in out.strip().splitlines() if l.strip()]
 if len(rows) != 9:
@@ -415,7 +418,7 @@ for r in rows:
                   "e2e_max_ms","itl_p99_ms","gpu_hours","composed_trace","model","policy",
                   "window_name_as_ingested"}:
         print("FAIL:fieldset"); raise SystemExit
-    db[r["window_name"]+"_"+r["arm"]] = dict(
+    db[(r["window_name"], r["arm"])] = dict(
         requests=int(r["requests"]), enc_p99=float(r["enc_p99_ms"]), ttft_p99=float(r["ttft_p99_ms"]),
         e2e_p99=float(r["e2e_p99_ms"]), e2e_max=float(r["e2e_max_ms"]), itl_p99=float(r["itl_p99_ms"]),
         gpu_h=float(r["gpu_hours"]), composed_trace=r["composed_trace"],
@@ -423,7 +426,7 @@ for r in rows:
         wnai=r["window_name_as_ingested"])
 bad = []
 for cell, d in art.items():
-    key = d["window"] + "_" + d["arm"]
+    key = (d["window"], d["arm"])
     row = db.get(key)
     if row is None:
         bad.append(cell); continue

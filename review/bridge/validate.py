@@ -51,6 +51,32 @@ def parse_header(path, errs):
         if k not in hdr: errs.append(f"{path}: missing header '{k}'")
     return hdr
 
+def live_lines(body):
+    """Markdown-live lines: excludes fenced blocks (fence closes only on a same-char
+    fence of >= opening length with nothing else on the line), 4-space/tab-indented
+    lines, and HTML-commented spans."""
+    import re as _r
+    body = _r.sub(r"<!--.*?-->", "", body, flags=_r.S)
+    out, fence_char, fence_len = [], None, 0
+    for raw in body.splitlines():
+        fm = _r.match(r"^\s*(`{3,}|~{3,})\s*\S*\s*$", raw)
+        if fm:
+            tok = fm.group(1)
+            if fence_char is None:
+                # opening fence may carry an info string
+                fence_char, fence_len = tok[0], len(tok)
+                continue
+            if tok[0] == fence_char and len(tok) >= fence_len and raw.strip() == tok:
+                fence_char, fence_len = None, 0
+                continue
+            continue
+        if fence_char is not None:
+            continue
+        if raw.startswith("    ") or raw.startswith("\t"):
+            continue
+        out.append(raw)
+    return out
+
 def threads_in_body(body):
     return set(re.findall(r"D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*", body))
 
@@ -110,23 +136,12 @@ def main():
     # v1.8: build the recognized-adjudication set FIRST (chain rules consult it)
     import hashlib as _hl
     adjudicated_threads = {}
-    for m in msgs:
+    for m in sorted(msgs, key=lambda x: x["file"]):
         body = m.get("body", "")
         def _is_assert0(ln):
             u = ln.upper().lstrip("#").strip()
             return ln.lstrip().startswith("#") and u == "AUTHOR ADJUDICATION"
-        _lines_live = []
-        _f = None
-        for _raw in body.splitlines():
-            _fm = re.match(r"^\s*(```+|~~~+)", _raw)
-            if _fm:
-                _tok = _fm.group(1)[0] * 3
-                if _f is None: _f = _tok
-                elif _f == _tok: _f = None
-                continue
-            if _f is None and not _raw.startswith("    "):
-                _lines_live.append(_raw)
-        heading = any(_is_assert0(ln) for ln in _lines_live)
+        heading = any(_is_assert0(ln) for ln in live_lines(body))
         if m["file"] in ADJUDICATION_EXCEPTIONS:
             import os as _os
             for d in ("to_reviewer", "from_reviewer", "archive"):
@@ -148,21 +163,10 @@ def main():
                    and "thread" not in m["hdr"])
         if not ok_auth:
             continue  # header/registry errors are raised elsewhere
-        in_fence = None
         n_rulings = 0
-        for raw in body.splitlines():
-            fm = re.match(r"^\s*(```+|~~~+)", raw)
-            if fm:
-                tok = fm.group(1)[0] * 3
-                if in_fence is None: in_fence = tok
-                elif in_fence == tok: in_fence = None
-                continue
-            if in_fence is not None:
-                continue
-            if raw.startswith("    "):    # 4-space indented example, not live
-                continue
+        for raw in live_lines(body):
             st = raw.strip()
-            if re.match(r"^RULING\b", st):
+            if re.match(r"^RULING[\W_]", st) or st == "RULING":
                 mm = re.match(r"^RULING\s+(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)\s*:\s*(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)\s*$", st)
                 if not mm:
                     errors.append(f"{m['file']}: malformed RULING line: {st[:60]!r}")
