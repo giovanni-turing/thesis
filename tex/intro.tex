@@ -44,7 +44,10 @@ Service quality is specified against this anatomy: bounds on time to first
 token (TTFT, dominated by
 queueing and prefill) and time per output token (TPOT, decode; reported here
 as the equivalent per-gap inter-token latency, ITL). Such bounds are
-service-level \emph{objectives} (SLOs); following serving-systems usage,
+service-level \emph{objectives} (SLOs), conventionally stated on upper-tail
+percentiles --- the field's standard contract
+statistic~\cite{Dean2013TailAtScale,DeCandia2007Dynamo}; following
+serving-systems usage,
 this document writes ``the evaluation SLA'' for the specific tail bounds it
 grades every policy against, and SLO for the general concept. Meeting them
 economically on shared GPU fleets is what pushed serving from replicated

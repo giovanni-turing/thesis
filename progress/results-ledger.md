@@ -3034,3 +3034,24 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   candidate tab for §8.2 (violations/intensity/worker-hours) + per-arm
   distribution presentation. Reviewer note: manuscript integration would
   reopen review for that delta only (bridge 196 scope boundary).
+
+### metric-stack-manuscript-integration (2026-07-27)
+
+- **Artifact:** tex/closedloop.tex (tab:cl-metric-stack +
+  fig:cl-metric-frontier + "Convention-free grading" paragraph),
+  tex/conclusion.tex (robustness sentence), tex/intro.tex (tail-convention
+  citations Dean2013TailAtScale + DeCandia2007Dynamo), tex/tese.tex (2
+  bibitems), tex/apendice.tex (manifest row);
+  figuras/sim/sim_metric_frontier.pdf (vector, from
+  make_metric_stack_figure.py); verify_all.sh gate A5c.
+- **Command:** author directive ("results should be based on aggregate
+  metrics or tail behavior... tail should have a couple of references");
+  values from metric_stack.json (compute entry above), regeneration-gated.
+- **Result:** the evaluation SLA presented as one threshold on a swept
+  curve; strict forecast-over-reactive dominance stated convention-free
+  (every threshold, 3688.0 vs 6709.7 req-s excess, 7.7% less worker-time);
+  reactive == floor M1; forecast the only SLA-passing schedule below the
+  standing-capacity curve; p99-tie scoped to the plateau (p99.99 6705.9 vs
+  14724.0). Build 0/0; suite 58/0/5 (new A5c gate green).
+- **Feeds:** sec:cl-frontier, conclusion RQ3; reopens review for this
+  delta only (bridge 196 scope).

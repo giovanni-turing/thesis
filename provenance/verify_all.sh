@@ -99,6 +99,31 @@ if (cd "$LOADER" && "$TESE/eda/.venv/bin/python" selftest.py >"$TMP/self.log" 2>
   ok "loader selftest (collision guard, dir coverage, run_id injectivity)"
 else bad "loader selftest FAILED"; sed 's/^/        /' "$TMP/self.log" | tail -6; fi
 
+# A5c metric-stack regeneration gate (D-metric integration, 2026-07-27):
+# tab:cl-metric-stack's artifact must equal a fresh recomputation from the
+# tracked raw traces, and three printed table values must match the artifact.
+if (cd "$TESE/simulation/results/comparator_frontier" \
+    && "$TESE/eda/.venv/bin/python" metric_stack.py --check >"$TMP/mstack.log" 2>&1) \
+   && "$TESE/eda/.venv/bin/python" - <<'PYEOF' >>"$TMP/mstack.log" 2>&1
+import json, re
+ms = json.load(open("$TESE/simulation/results/comparator_frontier/metric_stack.json".replace("$TESE", "/home/gio/tese")))
+arms = {r["arm"]: r for r in ms["arms"]}
+tex = open("/home/gio/tese/tex/closedloop.tex").read()
+want = [("forecast_p90", "1000", "count", "2{,}650"),
+        ("reactive", "1000", "count", "3{,}299"),
+        ("forecast_p90", "1000", "excess_mass_request_s", "3{,}688.0"),
+        ("reactive", "1000", "excess_mass_request_s", "6{,}709.7")]
+for arm, t, k, printed in want:
+    v = arms[arm]["violations"][t][k]
+    lit = printed.replace("{,}", "")
+    assert float(lit) == float(v), f"{arm}/{t}/{k}: artifact {v} vs printed {printed}"
+    assert printed in tex, f"printed form {printed!r} not found in closedloop.tex"
+print("metric-stack tex values match artifact")
+PYEOF
+then
+  ok "metric-stack: recomputed == tracked; printed table values match artifact"
+else bad "metric-stack gate FAILED"; sed 's/^/        /' "$TMP/mstack.log" | tail -6; fi
+
 # A5b K16 guard negative-suite (D44/D46/D47, D48-isolated: temp-tree copy,
 # mocked generator, DB interception; canonical artifact+generator asserted
 # byte-unchanged on exit -- safe to run continuously).

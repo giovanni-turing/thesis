@@ -86,6 +86,7 @@ def dist_row(cell):
 
 
 def main():
+    check = "--check" in sys.argv
     want = [c for c in B.cells()
             if c["window"] == B.COST_WINDOW and c["group"] in ("core", "family")]
     rows = [dist_row(c) for c in want]
@@ -99,6 +100,12 @@ def main():
         "thresholds_ms": THRESHOLDS_MS,
         "arms": rows,
     }
+    if check:
+        tracked = json.loads((HERE / "metric_stack.json").read_text())
+        if tracked == out:
+            print("metric_stack --check: OK (recomputed == tracked)")
+            return
+        raise SystemExit("metric_stack --check: MISMATCH against tracked artifact")
     (HERE / "metric_stack.json").write_text(json.dumps(out, indent=1))
     print(f"{'arm':<28}{'worker_h':>9}{'vs_stat':>8}{'p99':>9}"
           + "".join(f"{'v>' + str(t):>9}" for t in THRESHOLDS_MS)

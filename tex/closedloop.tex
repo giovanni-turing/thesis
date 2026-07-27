@@ -635,6 +635,80 @@ only when the predictive distribution widens. That is what
 operationally: not detecting onsets earlier, but paying for probabilistic
 headroom where the uncertainty is rather than everywhere.
 
+\paragraph{Convention-free grading: the bound as one point on a swept
+curve.} The SLA's \SI{1000}{\milli\second} bound and the burst windows are
+conventions; the ordering they report is not. Table~\ref{tab:cl-metric-stack}
+grades every arm on the aggregate span alone --- all \num{749601} requests,
+no burst definition in any cell --- by swept violation thresholds, violation
+\emph{intensity} (excess mass above the threshold), and provisioned
+worker-time; upper-tail percentile bounds are the field's standard contract
+statistic~\cite{Dean2013TailAtScale,DeCandia2007Dynamo}, and the table
+recovers the evaluation SLA as its \SI{1}{\second} column. Three
+convention-free facts follow. First, the forecast arm records fewer
+violations than the identically informed reactive controller at \emph{every}
+threshold, with roughly half the excess mass (\num{3688.0} against
+\num{6709.7} request-seconds above \SI{1}{\second}) at 7.7\% less
+worker-time --- strict dominance, no threshold choice required. Second,
+reactive is identically the $M{=}1$ endpoint of the warm-floor family, whose
+members trace the standing-capacity trade-off
+(Figure~\ref{fig:cl-metric-frontier}): more standing workers, thinner tail,
+larger bill. Third, the forecast arm sits off that curve on the oracle side:
+at its worker-time no floor exists at all, and at its violation mass the
+linearly interpolated floor costs about 13\% more. The separation grows with
+tail depth --- the arms are indistinguishable through p95 (the no-queue
+plateau), part at p99.5, and differ twofold by p99.99 (\num{6705.9} against
+\SI{14724.0}{\milli\second}) --- so the p99 tie of
+Section~\ref{sec:cl-ledger-enc} is a statement about the plateau, not about
+the distributions. Static $C{=}8$ and the deeper floors carry lighter tails
+than the forecast arm --- that is what their 1.6--1.7$\times$ bill buys ---
+and every one of them meets the graded bound; the forecast arm is the only
+SLA-passing schedule \emph{below} the standing-capacity curve.
+
+\begin{table}[htbp]
+\centering
+\caption[Convention-free metric stack, aggregate span]{Convention-free
+grading on the aggregate span (\num{749601} requests; no burst definition
+enters any cell). Violations count requests whose encoder delay exceeds the
+threshold; excess mass is $\sum(\text{delay}-\SI{1}{\second})^{+}$ in
+request-seconds; worker-hours are provisioned resource-time. The
+\SI{1}{\second} column is the evaluation SLA's threshold. Reactive is
+identically the warm-floor family's $M{=}1$ member. Artifact:
+\texttt{comparator\_frontier/metric\_stack.json}, regeneration-gated by the
+delivery suite.}
+\label{tab:cl-metric-stack}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+& worker- & \multicolumn{3}{c}{violations above threshold} & excess mass \\
+\cmidrule(lr){3-5}
+Arm & hours & \SI{0.5}{\second} & \SI{1}{\second} & \SI{2}{\second} &
+(req$\cdot$s $>$ \SI{1}{\second}) \\
+\midrule
+oracle              & 314.0   & 20{,}123 & 1{,}872 & 42    & 562.9 \\
+forecast p90        & 669.6   & 20{,}512 & 2{,}650 & 1{,}005 & 3{,}688.0 \\
+reactive ($=M{=}1$) & 725.4   & 20{,}988 & 3{,}299 & 1{,}414 & 6{,}709.7 \\
+warm floor $M{=}2$  & 769.4   & 19{,}684 & 2{,}034 & 644   & 2{,}376.5 \\
+static $C{=}8$      & 1{,}074.8 & 17{,}154 & 599   & 21    & 289.9 \\
+warm floor $M{=}6$  & 1{,}120.3 & 16{,}827 & 489   & 26    & 286.9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\linewidth]{figuras/sim/sim_metric_frontier}
+\caption[Cost versus violation intensity, aggregate span]{Cost versus
+violation intensity on the aggregate span, every frontier arm on one canvas
+(log--log). The warm-floor family traces the standing-capacity trade-off;
+static $C{=}8$ sits on that curve. The forecast arm lies below it --- less
+violation mass than any floor of equal cost, less cost than any floor of
+equal violation mass --- and only the perfect-future oracle is beyond it.
+Derived from \texttt{metric\_stack.json}
+(Table~\ref{tab:cl-metric-stack}).}
+\label{fig:cl-metric-frontier}
+\end{figure}
+
 \subsection{The week-scale resource-time headline}
 \label{sec:cl-headline}
 
