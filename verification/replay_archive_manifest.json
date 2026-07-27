@@ -1,7 +1,8 @@
 {
  "package": "composed-join replay inputs (tab:cl-ledger-* / K16 pipeline)",
- "lineage": "Replay outputs derived from AzureLMMInferenceDataset2025 (Microsoft/ModServe public production trace, CC-BY-4.0; see data/source/README.md) via the simulation pipeline of tex/metodologia.tex; no raw trace rows are redistributed beyond what the tracked trace file already carries.",
- "terms": "Derived data package, distributed with the thesis repository under the same terms as its source attribution (CC-BY-4.0 for trace-derived content); cite the thesis and the dataset.",
+ "generator": "verification/make_replay_archive_manifest.py (tracked; --verify recomputes and compares)",
+ "lineage": "Replay outputs derived from AzureLMMInferenceDataset2025 (Microsoft/ModServe public production trace, CC-BY; see data/source/README.md) via the simulation pipeline of tex/metodologia.tex; no raw trace rows are redistributed beyond what the tracked trace file already carries.",
+ "terms": "Derived data package, distributed with the thesis repository under the same terms as its source attribution (CC-BY for trace-derived content); cite the thesis and the dataset.",
  "files": [
   {
    "path": "defense/anim/data/a2_runs/steady24h_forecast_L30.jsonl.zst",
@@ -11,11 +12,14 @@
    "plain_bytes": 13114544,
    "compressed_bytes": 1478333,
    "rows": 88260,
-   "generating_source": "a2 steady24h forecast_L30 composed replay trace (gen_a2 fleet campaign; see ledger 'a2 fleet' entries)",
-   "archived_in_commit": "ba5e4a3",
+   "generating_source": "a2 steady24h forecast_L30 composed replay trace (A2 v2 fleet campaign)",
+   "generation_command": "python3 defense/anim/build/gen_a2_fleet.py && eda/.venv/bin/python defense/anim/build/extract_a2_fleet.py",
+   "generation_commit": "e9b84ad (A2 generator history)",
+   "ledger_anchor": "progress/results-ledger.md: 'Defense animation A2 v2: episode selector + live tickers; 40-run fleet' (2026-07-19)",
+   "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (this manifest generation re-verified)"
+   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
   },
   {
    "path": "defense/anim/data/a2_runs/steady24h_reactive_L30.jsonl.zst",
@@ -25,11 +29,14 @@
    "plain_bytes": 13114571,
    "compressed_bytes": 1476891,
    "rows": 88260,
-   "generating_source": "a2 steady24h reactive_L30 composed replay trace (gen_a2 fleet campaign; see ledger 'a2 fleet' entries)",
-   "archived_in_commit": "ba5e4a3",
+   "generating_source": "a2 steady24h reactive_L30 composed replay trace (A2 v2 fleet campaign)",
+   "generation_command": "python3 defense/anim/build/gen_a2_fleet.py && eda/.venv/bin/python defense/anim/build/extract_a2_fleet.py",
+   "generation_commit": "e9b84ad (A2 generator history)",
+   "ledger_anchor": "progress/results-ledger.md: 'Defense animation A2 v2: episode selector + live tickers; 40-run fleet' (2026-07-19)",
+   "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (this manifest generation re-verified)"
+   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
   },
   {
    "path": "defense/anim/data/a13_runs/ft_static_C8.jsonl.zst",
@@ -39,11 +46,14 @@
    "plain_bytes": 164494623,
    "compressed_bytes": 16779235,
    "rows": 1000000,
-   "generating_source": "a13 full-trace static C=8 composed replay trace (a13 full-trace campaign; see ledger 'a13' entries)",
-   "archived_in_commit": "ba5e4a3",
+   "generating_source": "a13 full-trace static C=8 composed replay trace",
+   "generation_command": "python3 defense/anim/build/gen_a13_fulltrace.py && python3 defense/anim/build/build_coverage_manifest.py",
+   "generation_commit": "bb1b7cb (A13 generator introduction); a073840 (full-trace coverage result evidence)",
+   "ledger_anchor": "progress/results-ledger.md: 'Full-trace coverage GUARANTEE MET -- every request, both pools (A13)' (2026-07-19)",
+   "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (this manifest generation re-verified)"
+   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
   },
   {
    "path": "defense/anim/data/a13_runs/ft_llm_static.requests.jsonl.zst",
@@ -53,11 +63,14 @@
    "plain_bytes": 767449032,
    "compressed_bytes": 77509978,
    "rows": 1000000,
-   "generating_source": "a13 full-trace static language-pool per-request records (dynamo.replay output)",
-   "archived_in_commit": "ba5e4a3",
+   "generating_source": "a13 full-trace static language-pool per-request records (dynamo.replay, source-build patch)",
+   "generation_command": "python3 defense/anim/build/gen_a13_fulltrace.py && python3 defense/anim/build/build_coverage_manifest.py",
+   "generation_commit": "bb1b7cb (A13 generator introduction); a073840 (full-trace coverage result evidence)",
+   "ledger_anchor": "progress/results-ledger.md: 'Full-trace coverage GUARANTEE MET -- every request, both pools (A13)' (2026-07-19)",
+   "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (this manifest generation re-verified)"
+   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
   },
   {
    "path": "defense/anim/data/a13_runs/ft_reactive_L30.jsonl.zst",
@@ -67,11 +80,14 @@
    "plain_bytes": 164487566,
    "compressed_bytes": 17266009,
    "rows": 1000000,
-   "generating_source": "a13 full-trace reactive_L30 composed replay trace (a13 full-trace campaign)",
-   "archived_in_commit": "ba5e4a3",
+   "generating_source": "a13 full-trace reactive_L30 composed replay trace",
+   "generation_command": "python3 defense/anim/build/gen_a13_fulltrace.py && python3 defense/anim/build/build_coverage_manifest.py",
+   "generation_commit": "bb1b7cb (A13 generator introduction); a073840 (full-trace coverage result evidence)",
+   "ledger_anchor": "progress/results-ledger.md: 'Full-trace coverage GUARANTEE MET -- every request, both pools (A13)' (2026-07-19)",
+   "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (this manifest generation re-verified)"
+   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
   },
   {
    "path": "defense/anim/data/a13_runs/ft_llm_reactive.requests.jsonl.zst",
@@ -81,11 +97,14 @@
    "plain_bytes": 778638944,
    "compressed_bytes": 85813122,
    "rows": 1000000,
-   "generating_source": "a13 full-trace reactive language-pool per-request records (dynamo.replay output)",
-   "archived_in_commit": "ba5e4a3",
+   "generating_source": "a13 full-trace reactive language-pool per-request records (dynamo.replay, source-build patch)",
+   "generation_command": "python3 defense/anim/build/gen_a13_fulltrace.py && python3 defense/anim/build/build_coverage_manifest.py",
+   "generation_commit": "bb1b7cb (A13 generator introduction); a073840 (full-trace coverage result evidence)",
+   "ledger_anchor": "progress/results-ledger.md: 'Full-trace coverage GUARANTEE MET -- every request, both pools (A13)' (2026-07-19)",
+   "archived_in_commit": "ba5e4a3 (compression/archive commit, distinct from generation)",
    "compression": "zstd -19 -T8",
    "zstd_version": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***",
-   "round_trip_cmp": "identical (this manifest generation re-verified)"
+   "round_trip_cmp": "identical (decompressed and byte-compared by make_replay_archive_manifest.py before this row was written)"
   }
  ]
 }

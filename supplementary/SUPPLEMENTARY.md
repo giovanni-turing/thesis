@@ -283,7 +283,9 @@ committed report labeled with the exact HEAD it observed — regenerate rather
 than trust it as current).
 
 Independent reproduction of headline results from a **detached clean worktree
-at HEAD**, no live-tree state: (1) the §8.2 comparator frontier recomputed
+at HEAD** — no live-tree data inputs; writes outside the run directory are
+limited to the source repository's `.git/worktrees` admin area (and an
+explicitly requested report destination): (1) the §8.2 comparator frontier recomputed
 cell-by-cell (313 cells) from the tracked raw run outputs and self-verified
 against the tracked `frontier_summary.json` (stats, calibration selection,
 calibration table, summary link); (2) the request-linked composed nine-cell
