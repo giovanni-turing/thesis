@@ -2898,3 +2898,29 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   failures on documented paths); predicate selftest 11/11.
 - **Feeds:** §8.8-1 closure under reviewer findings D50-D53 (bridge msgs
   072-075); supersedes the v1 runner and its report.
+
+### silicon-anchor-tier1 (2026-07-27)
+
+- **Artifact:** `simulation/results/silicon_anchor/reps/burst3__{fc,re,staticC8}/rep001-005/`
+  (rep.json + batches.csv.gz + clock.jsonl each); extracts gated by
+  `silicon_anchor_extract.py`; manifest `simulation/results/silicon_anchor/manifest.jsonl`.
+- **Command:** `simulation/silicon_anchor_runner.py` daemon (locked clocks
+  SM 2377-2400 / MEM 13801; HF-SDPA eager encoder, Qwen3-VL 576M tower,
+  448^2), trace-driven retiming of the sim dispatch timeline with measured
+  per-batch service times; 5 reps per cell.
+- **Result:** RQ3 verdict SURVIVES on silicon -- forecast p99 782.5+-0.3 ms
+  (PASS 5/5, sim 589.3), reactive 22,565+-1 ms (FAIL 5/5, sim 16,084).
+  Static C8 flips PASS->FAIL (1,397+-1 ms vs sim 717.8): its 1.39x headroom
+  sits inside the HF-eager engine band. Deviation fully attributed: measured
+  f(N) reproduces tab:app-engine's HF-SDPA column (N=64: 510.4 ms vs 511.6;
+  ratio 1.613 vs 1.617; monotone 1.39->1.61), i.e. the documented
+  execution-stack gap, not a cost-model error. Reconstruction gate exact
+  (0.0 ms) and membership 1241/1241 on all 15 reps. Early tier 2: burst4
+  fc AND re both PASS at the same 782 ms plateau, agreeing with sim (11/11
+  rep-verdict agreement outside the engine-marginal static case).
+- **Feeds:** pending manuscript decision -- candidates: metodologia
+  (physical anchor section), intro/conclusion "remains future work"
+  softening, closedloop static-C8 engine-sensitivity caveat. HOLD until
+  tier 5 (engine diversity: vLLM-FA serving vs HF eager) adjudicates the
+  static-C8 flip; campaign continues until author STOP.
+- **Supersedes:** nothing yet (manuscript untouched).
