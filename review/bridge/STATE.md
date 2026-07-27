@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T16:59:03-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-27T19:28:53-03:00, protocol v2.1)
 
-messages: 292  errors: 0
+messages: 293  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
