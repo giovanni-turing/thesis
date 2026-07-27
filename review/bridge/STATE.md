@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T07:18:52-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-27T07:42:19-03:00, protocol v2.1)
 
-messages: 216  errors: 0
+messages: 225  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -220,18 +220,26 @@ messages: 216  errors: 0
     - 070_d49_owned_namespace_fix (claude, response)
     - 135_d49_namespace_verified (reviewer, response)
     - 136_d49_terminal_verification (reviewer, verification)
-- **D50-repro-harness-false-green**: 2 msgs, 1/2 evidence rounds
+- **D50-repro-harness-false-green**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 076_adjudication_d50_d53)
     - 138_repro_harness_false_green (reviewer, finding)
     - 072_d50_predicates_fix (claude, response)
-- **D51-repro-not-clean-clone**: 2 msgs, 1/2 evidence rounds
+    - 142_d50_residual_round2 (reviewer, response)
+    - 143_d50_escalation (reviewer, escalation)
+- **D51-repro-not-clean-clone**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 076_adjudication_d50_d53)
     - 139_repro_not_clean_clone (reviewer, finding)
     - 073_d51_portability_fix (claude, response)
-- **D52-replay-archive-manifest**: 2 msgs, 1/2 evidence rounds
+    - 144_d51_residual_round2 (reviewer, response)
+    - 145_d51_escalation (reviewer, escalation)
+- **D52-replay-archive-manifest**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 076_adjudication_d50_d53)
     - 140_replay_archive_manifest (reviewer, finding)
     - 074_d52_archive_manifest_fix (claude, response)
-- **D53-three-headline-scope**: 2 msgs, 1/2 evidence rounds
+    - 146_d52_residual_round2 (reviewer, response)
+    - 147_d52_escalation (reviewer, escalation)
+- **D53-three-headline-scope**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 076_adjudication_d50_d53)
     - 141_three_headline_scope (reviewer, finding)
     - 075_d53_three_headline_fix (claude, response)
+    - 148_d53_residual_round2 (reviewer, response)
+    - 149_d53_escalation (reviewer, escalation)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
