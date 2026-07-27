@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Bridge protocol v2.0 linter + thread-state generator. Run from review/bridge/.
+"""Bridge protocol v2.1 linter + thread-state generator. Run from review/bridge/.
+v2.1 (2026-07-27, D43): strict whole-value rulings grammar (>=1 pair, no empty
+components), transactional header validation (one bad pair voids all), the
+retired Markdown heading/authority parser removed (one unconditional lexical
+deprecation lint), never-escalated exemption narrowed to exactly 033.
 v1.3 (2026-07-26, threads D01/D02): re:-graph dispute-chain machine (one root
 finding, linear, <=2 responses, escalation only after the 2nd response and
 terminal); strict header grammar (no YAML claim); nonempty bounded values;
@@ -14,9 +18,6 @@ HDR_KEYS = ["from","ts","re","type","thread","authority","rulings"]  # last thre
 REQ_KEYS = ["from","ts","re","type"]
 FNAME_RE = re.compile(r"^\d{3}_[A-Za-z0-9][A-Za-z0-9_-]*$")
 THREAD_RE = re.compile(r"^D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*$")
-# v1.6 (D26): exact-identity exception -- message 033 predates the authority-header rule;
-# its delegated authority is documented in BRIDGE.md and the session transcript.
-ADJUDICATION_EXCEPTIONS = {"033_adjudication_d19_d22"}
 # v2.0 GRANDFATHER: historical body-form adjudications recognized by exact sha,
 # carrying their (already reviewer-verified) rulings as data.
 GRANDFATHER_RULINGS = {
@@ -42,7 +43,16 @@ GRANDFATHER_SHA = {"033_adjudication_d19_d22":
 AUTHORITY_SENDER = {"author": {"claude", "reviewer"},
                     "author-delegated:fable-5-2026-07-26": {"claude"},
                     "author-delegated:fable-5-2026-07-27-xhigh": {"claude"}}
-RULING_RE = None
+# v2.1 (D43): strict whole-value rulings grammar -- PAIR (';' PAIR)*, at least one
+# pair, nothing else. Empty/dangling components are a grammar violation, not noise.
+_PAIR = r"D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*=(?:CLOSED-FIXED|CLOSED-REJECTED|REOPENED)"
+RULINGS_VALUE_RE = re.compile(rf"^{_PAIR}(?:\s*;\s*{_PAIR})*$")
+RULINGS_PAIR_RE = re.compile(r"(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)=(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)")
+# v2.1 (D43): bodies are semantically inert EVERYWHERE. The retired Markdown
+# heading/authority parser is gone; ONE narrow, unconditional lexical lint marks
+# exact legacy line-forms deprecated outside the sha-pinned grandfather corpus.
+DEPRECATED_BODY = [re.compile(r"^RULING\s+D\d{2,}-"),
+                   re.compile(r"^ {0,3}#{1,6}\s+AUTHOR ADJUDICATION\s*(?:#+\s*)?$", re.I)]
 # v1.7 (D26 round 3): the only authorities this bridge recognizes. A heading-level
 # adjudication with any other value is an error; STATE trusts only these.
 VALID_AUTHORITIES = {"author", "author-delegated:fable-5-2026-07-26",
@@ -67,52 +77,6 @@ def parse_header(path, errs):
     for k in REQ_KEYS:
         if k not in hdr: errs.append(f"{path}: missing header '{k}'")
     return hdr
-
-def live_lines(body):
-    """Markdown-live lines. Fences: an opening run of >=3 backticks/tildes (up to 3
-    leading spaces) with ANY info string opens; only a bare same-char run of >= the
-    opening length closes. Excludes 4-space/tab-indented lines and HTML comments."""
-    import re as _r
-    body = _r.sub(r"<script\b.*?</script>", "\x00", body, flags=_r.S | _r.I)
-    if _r.search(r"<script\b", body, _r.I):
-        body = body[:_r.search(r"<script\b", body, _r.I).start()]
-    body = _r.sub(r"<!--.*?-->", "\x00", body, flags=_r.S)   # placeholder prevents token splicing
-    if "<!--" in body:                      # unterminated comment: nothing after it is live
-        body = body[:body.index("<!--")]
-    out, fence_char, fence_len = [], None, 0
-    for raw in body.splitlines():
-        if fence_char is None:
-            fm = _r.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", raw)
-            if fm and ("`" not in fm.group(2) if fm.group(1)[0] == "`" else True):
-                fence_char, fence_len = fm.group(1)[0], len(fm.group(1))
-                continue
-        else:
-            cm = _r.match(r"^ {0,3}(" + ("`" if fence_char == "`" else "~") + r"{3,})\s*$", raw)
-            if cm and len(cm.group(1)) >= fence_len:
-                fence_char, fence_len = None, 0
-            continue
-        _ind = 0
-        for _ch in raw:
-            if _ch == " ": _ind += 1
-            elif _ch == "\t": _ind += 4 - (_ind % 4)
-            else: break
-        if _ind >= 4:
-            continue
-        if raw[:1] in (" ", "\t"):
-            # grammar rule: rulings and headings must be flush-left; any leading
-            # whitespace demotes the line to prose (kills nested-list fence edges)
-            continue
-        out.append(raw)
-    return out
-
-def is_adjudication_heading(ln):
-    """Valid ATX heading (1-6 #, then a space) whose text is exactly AUTHOR ADJUDICATION."""
-    import re as _r
-    mm = _r.match(r"^(#{1,6}) (.*?)(?: #+)?\s*$", ln)
-    return bool(mm) and mm.group(2).strip().upper() == "AUTHOR ADJUDICATION"
-
-def threads_in_body(body):
-    return set(re.findall(r"D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*", body))
 
 def valid_ts(s):
     try:
@@ -186,15 +150,22 @@ def main():
                 break
         else:
             errors.append(f"{gf}: grandfathered adjudication missing")
-    RULE_RE = re.compile(r"^(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)=(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)$")
+    # v2.1 (D43): unconditional narrow deprecation lint -- legacy body line-forms
+    # are errors in EVERY non-grandfathered message, with or without a rulings
+    # header. This is a lexical lint, not a Markdown model.
+    for m in msgs:
+        if m["file"] in GRANDFATHER_RULINGS:
+            continue
+        for ln in m.get("body", "").splitlines():
+            if any(rx.match(ln) for rx in DEPRECATED_BODY):
+                errors.append(f"{m['file']}: legacy body-form adjudication syntax is deprecated -- "
+                              f"the rulings: header is the only adjudication mechanism")
+                break
+    _all_ids = {m["hdr"].get("thread") for m in msgs if m["hdr"].get("thread")}
+    _esc_ids = {m["hdr"].get("thread") for m in msgs
+                if m["hdr"].get("type") == "escalation" and m["hdr"].get("thread")}
     for m in sorted(msgs, key=lambda x: x["file"]):
         if "rulings" not in m["hdr"]:
-            # fail-closed lint: body-form ruling/adjudication syntax is deprecated
-            if m["file"] not in GRANDFATHER_RULINGS:
-                for ln in m.get("body", "").splitlines():
-                    if re.match(r"^RULING\s+D\d{2,}-", ln) or ln.strip().upper().rstrip("# ").lstrip("# ") == "AUTHOR ADJUDICATION":
-                        errors.append(f"{m['file']}: body-form adjudication syntax is deprecated -- use the rulings: header")
-                        break
             continue
         auth = m["hdr"].get("authority")
         if auth not in VALID_AUTHORITIES or m["hdr"].get("from") not in AUTHORITY_SENDER.get(auth, set()):
@@ -203,27 +174,48 @@ def main():
         if "thread" in m["hdr"]:
             errors.append(f"{m['file']}: rulings header must be on an unthreaded message")
             continue
-        for pair in [p.strip() for p in m["hdr"]["rulings"].split(";") if p.strip()]:
-            pm = RULE_RE.match(pair)
-            if not pm:
-                errors.append(f"{m['file']}: malformed rulings pair {pair!r}")
+        # v2.1 (D43): TRANSACTIONAL. Whole-value grammar first; then every pair is
+        # validated (in-message duplicates, prior duplicates/conflicts, thread
+        # existence, escalation eligibility) BEFORE any pair is applied. One bad
+        # component voids the entire header -- no partial application to STATE.
+        val = m["hdr"]["rulings"]
+        if not RULINGS_VALUE_RE.match(val):
+            errors.append(f"{m['file']}: rulings header violates the whole-value grammar "
+                          f"PAIR(';' PAIR)* with >=1 pair: {val!r}")
+            continue
+        pairs = [(t, v) for t, v in RULINGS_PAIR_RE.findall(val)]
+        msg_errs, seen_in_msg = [], set()
+        for tkey, verdict in pairs:
+            if tkey in seen_in_msg:
+                msg_errs.append(f"{m['file']}: thread {tkey} ruled twice in one header")
                 continue
-            tkey, verdict = pm.group(1), pm.group(2)
+            seen_in_msg.add(tkey)
             prev = adjudicated_threads.get(tkey)
             if prev is not None:
                 if prev[1] != verdict:
-                    errors.append(f"{m['file']}: conflicting ruling for {tkey}: {verdict} vs {prev[1]} in {prev[0]}")
+                    msg_errs.append(f"{m['file']}: conflicting ruling for {tkey}: {verdict} vs {prev[1]} in {prev[0]}")
                 else:
-                    errors.append(f"{m['file']}: duplicate ruling for {tkey} (already ruled in {prev[0]})")
+                    msg_errs.append(f"{m['file']}: duplicate ruling for {tkey} (already ruled in {prev[0]})")
                 continue
+            if tkey not in _all_ids:
+                msg_errs.append(f"{m['file']}: ruling names unknown thread '{tkey}'")
+            elif tkey not in _esc_ids:
+                msg_errs.append(f"{m['file']}: ruling for '{tkey}' which was never escalated")
+        if msg_errs:
+            errors.extend(msg_errs)
+            errors.append(f"{m['file']}: rulings header voided transactionally -- no pair applied")
+            continue
+        for tkey, verdict in pairs:
             adjudicated_threads[tkey] = (m["file"], verdict)
-    _all_ids = {m["hdr"].get("thread") for m in msgs if m["hdr"].get("thread")}
-    _esc_ids = {m["hdr"].get("thread") for m in msgs
-                if m["hdr"].get("type") == "escalation" and m["hdr"].get("thread")}
+    # Grandfather-map eligibility: pinned rulings are data, but their targets must
+    # still exist; the never-escalated exemption is EXACTLY message 033 (its
+    # threads predate the escalation grammar), not the whole grandfather corpus.
     for t, (src, verdict) in list(adjudicated_threads.items()):
+        if src not in GRANDFATHER_RULINGS:
+            continue
         if t not in _all_ids:
             errors.append(f"{src}: ruling names unknown thread '{t}'")
-        elif t not in _esc_ids and src not in GRANDFATHER_RULINGS:
+        elif t not in _esc_ids and src != "033_adjudication_d19_d22":
             errors.append(f"{src}: ruling for '{t}' which was never escalated")
     verif_names = {m["file"] for m in msgs if m["hdr"].get("type") == "verification"}
     for m in msgs:
@@ -239,16 +231,6 @@ def main():
                 errors.append(f"{m['file']}: authority '{_a}' not in the recognized registry")
             elif m["hdr"].get("from") not in AUTHORITY_SENDER.get(_a, set()):
                 errors.append(f"{m['file']}: authority '{_a}' not valid for sender '{m['hdr'].get('from')}'")
-        _asserts_adj = any(is_adjudication_heading(ln) for ln in live_lines(m.get("body","")))
-        if _asserts_adj and m["file"] not in ADJUDICATION_EXCEPTIONS:
-            if "authority" not in m["hdr"]:
-                errors.append(f"{m['file']}: claims AUTHOR ADJUDICATION without an 'authority:' header")
-            elif m["hdr"]["authority"] not in VALID_AUTHORITIES:
-                errors.append(f"{m['file']}: authority '{m['hdr']['authority']}' not in the recognized registry")
-            elif m["hdr"].get("from") not in AUTHORITY_SENDER.get(m["hdr"]["authority"], set()):
-                errors.append(f"{m['file']}: authority '{m['hdr']['authority']}' not valid for sender '{m['hdr'].get('from')}'")
-            elif "thread" in m["hdr"]:
-                errors.append(f"{m['file']}: adjudications must be unthreaded")
     # sequences per sender: start 001, contiguous, no duplicates
     for who in SENDERS:
         seqs = sorted(int(m["file"][:3]) for m in msgs
@@ -329,7 +311,7 @@ def main():
     if os.path.islink("STATE.md"):
         errors.append("STATE.md is a symlink — refusing to write"); state_ok = False
     else: state_ok = True
-    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v2.0)\n",
+    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v2.1)\n",
            f"\nmessages: {len(msgs)}  errors: {len(errors)}\n", "\n## Dispute threads\n"]
     if not threads: out.append("(none)\n")
     for t in sorted(threads):

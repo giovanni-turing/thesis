@@ -1,4 +1,4 @@
-# Reviewer <-> Claude bridge — protocol v2.0 (stabilized 2026-07-27)
+# Reviewer <-> Claude bridge — protocol v2.1 (stabilized 2026-07-27)
 
 Transport: this directory (shared filesystem). `from_reviewer/` = reviewer's outbox,
 `to_reviewer/` = Claude's outbox, `archive/` = processed mail (moved by the reader,
@@ -15,12 +15,19 @@ never deleted). `python3 validate.py` lints all messages and regenerates STATE.m
   - `authority:` — registry value bound to its sender (`author`;
     `author-delegated:fable-5-2026-07-26`, `author-delegated:fable-5-2026-07-27-xhigh`
     = claude only)
-  - `rulings:` (v2.0) — THE adjudication mechanism: semicolon-separated
-    `<full-thread-id>=<CLOSED-FIXED|CLOSED-REJECTED|REOPENED>` pairs; valid only
-    unthreaded with a sender-bound registry authority. Bodies carry ZERO
-    recognition semantics — Markdown headings/RULING lines are prose (body-form
-    syntax errors as deprecated); the five historical body-form adjudications
-    are recognized by pinned sha256 with their rulings as data.
+  - `rulings:` (v2.0/v2.1) — THE adjudication mechanism, and the ONLY one. Strict
+    whole-value grammar `PAIR(';' PAIR)*` with at least one pair, where PAIR =
+    `<full-thread-id>=<CLOSED-FIXED|CLOSED-REJECTED|REOPENED>`; empty/dangling
+    components violate the grammar. Valid only unthreaded with a sender-bound
+    registry authority, and only for threads that exist and were escalated.
+    Validation is TRANSACTIONAL: one bad component (grammar, duplicate, conflict,
+    unknown thread, never escalated) voids the entire header — no pair applies.
+    Bodies carry ZERO recognition semantics everywhere: there is no Markdown
+    parsing; one unconditional lexical lint marks the exact legacy line-forms
+    (`RULING D..-...`, an `AUTHOR ADJUDICATION` heading) deprecated in every
+    message. The five historical body-form adjudications are recognized by
+    pinned sha256 with their rulings as data; only 033 (pre-escalation-grammar)
+    is exempt from the escalation-eligibility requirement.
   - `thread:` (required on finding/escalation and every reply in a dispute) stable
     dispute id, e.g. `D01-oracle-convention`
 - Body: markdown. Cite as `path:line`. Numbers carry their derivation (artifact/DB
@@ -64,17 +71,14 @@ never deleted). `python3 validate.py` lints all messages and regenerates STATE.m
   terminality); its `re:` must name an exact target (never `new`); in a chain
   it is valid only after the second response or an escalation, and only
   terminal. Escalation is terminal EXCEPT for a single following verification.
-  Author adjudications are posted UNTHREADED with body-referenced thread IDs;
-  a body asserting AUTHOR ADJUDICATION (as a heading) MUST carry an
-  `authority:` header naming the delegation (033 grandfathered by exact
-  identity); STATE marks escalated threads ADJUDICATED when an
-  authority-bearing message references them.
-- v1.8 (D35): an adjudication is recognized ONLY as: an UNTHREADED message whose
-  `authority:` is a registry value BOUND to its sender, asserting the
-  `# AUTHOR ADJUDICATION` heading (assertions, not "required" requests), and
-  ruling via exact lines `RULING <full-thread-id>: CLOSED-FIXED|CLOSED-REJECTED|
-  REOPENED`. Mentions confer nothing. The 033 grandfather is sha256-pinned.
-  A post-escalation verification is legal only after a recognized ruling.
+  [HISTORICAL — the v1.5-v1.8 body-form adjudication mechanism (AUTHOR
+  ADJUDICATION headings + `RULING <thread>: <verdict>` lines) is RETIRED as of
+  v2.0. It survives only as data: the five sha256-pinned grandfather messages.
+  Everything adjudication-related now lives in the `rulings:` header above.]
+- v1.8 (D35, retired mechanics; surviving principles): authority values are
+  BOUND to senders; mentions confer nothing; a post-escalation verification is
+  legal only after a recognized CLOSED ruling. The body-form recognition it
+  defined was replaced wholesale by the v2.0 `rulings:` header.
 - v1.7 (D26 round 3): the authority VALUE is validated against the registry
   (presence alone is insufficient; STATE trusts only registry values or the
   exact-identity 033 grandfather). A chain's terminal verification must be

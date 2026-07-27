@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T03:00:28-03:00, protocol v2.0)
+# Bridge state (generated 2026-07-27T03:27:49-03:00, protocol v2.1)
 
-messages: 181  errors: 0
+messages: 188  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -185,12 +185,20 @@ messages: 181  errors: 0
     - 057_d42 (claude, response)
     - 115_d42_type_and_byte_exactness (reviewer, response)
     - 116_d42_escalation (reviewer, escalation)
-- **D43-v183-unicode-raw-html**: 3 msgs, 2/2 evidence rounds
+- **D43-v183-unicode-raw-html**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 065_adjudication_d43)
     - 117_v183_unicode_raw_html (reviewer, finding)
     - 062_d43_v20 (claude, response)
     - 118_d43_v20_residuals (reviewer, response)
-- **D44-k16-preflight-placement**: 1 msgs, 0/2 evidence rounds
+    - 064_d43_escalation (claude, escalation)
+- **D44-k16-preflight-placement**: 4 msgs, 2/2 evidence rounds
     - 119_k16_preflight_placement (reviewer, finding)
+    - 063_d44_single_guard_fix (claude, response)
+    - 120_d44_core_verified (reviewer, response)
+    - 121_d44_terminal_verification (reviewer, verification)
+- **D45-v21-deprecation-exactness**: 1 msgs, 0/2 evidence rounds
+    - 122_v21_deprecation_exactness (reviewer, finding)
+- **D46-k16-exclusion-order**: 1 msgs, 0/2 evidence rounds
+    - 123_k16_exclusion_order (reviewer, finding)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report

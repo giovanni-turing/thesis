@@ -48,26 +48,6 @@ def load_windows(idx, reload):
     prep = _prep(path, idx, reload)
     if not prep:
         return 0, 0
-    # D42 (2026-07-27, escalation): byte-identity is a PRE-INGEST prerequisite.
-    # Before any DB write, regenerate the nine-cell join from raw operands and
-    # require the tracked artifact to be byte-identical -- a corrupt artifact or
-    # a generator failure means ZERO K16 writes, in every invocation path
-    # (gate A6, --data, manual). ~18 s, and only on write-bearing invocations.
-    import subprocess as _sp, tempfile as _tf
-    _tmp = _tf.NamedTemporaryFile(suffix=".json", delete=False)
-    _tmp.close()
-    os.unlink(_tmp.name)          # join script preloads an EXISTING --out; hand it a fresh path
-    try:
-        _rc = _sp.run(["/home/gio/tese/eda/.venv/bin/python",
-                       "/home/gio/tese/simulation/composed_fill_join.py", "--out", _tmp.name],
-                      capture_output=True, text=True, cwd="/home/gio/tese").returncode
-        if _rc != 0:
-            raise AssertionError(f"K16: pre-ingest regeneration failed (rc={_rc}); refusing to write")
-        if open(_tmp.name, "rb").read() != open(path, "rb").read():
-            raise AssertionError("K16: tracked artifact is NOT byte-identical to fresh regeneration; refusing to write")
-    finally:
-        if os.path.exists(_tmp.name):
-            os.unlink(_tmp.name)
     sha, nbytes = prep
     d = json.load(open(path))
     rows = []
@@ -401,26 +381,6 @@ def load_coverage(idx, reload):
     prep = _prep(path, idx, reload)
     if not prep:
         return 0, 0
-    # D42 (2026-07-27, escalation): byte-identity is a PRE-INGEST prerequisite.
-    # Before any DB write, regenerate the nine-cell join from raw operands and
-    # require the tracked artifact to be byte-identical -- a corrupt artifact or
-    # a generator failure means ZERO K16 writes, in every invocation path
-    # (gate A6, --data, manual). ~18 s, and only on write-bearing invocations.
-    import subprocess as _sp, tempfile as _tf
-    _tmp = _tf.NamedTemporaryFile(suffix=".json", delete=False)
-    _tmp.close()
-    os.unlink(_tmp.name)          # join script preloads an EXISTING --out; hand it a fresh path
-    try:
-        _rc = _sp.run(["/home/gio/tese/eda/.venv/bin/python",
-                       "/home/gio/tese/simulation/composed_fill_join.py", "--out", _tmp.name],
-                      capture_output=True, text=True, cwd="/home/gio/tese").returncode
-        if _rc != 0:
-            raise AssertionError(f"K16: pre-ingest regeneration failed (rc={_rc}); refusing to write")
-        if open(_tmp.name, "rb").read() != open(path, "rb").read():
-            raise AssertionError("K16: tracked artifact is NOT byte-identical to fresh regeneration; refusing to write")
-    finally:
-        if os.path.exists(_tmp.name):
-            os.unlink(_tmp.name)
     sha, nbytes = prep
     j = json.load(open(path))
     rows = [{"manifest_path": path, "fleet": r.get("fleet"), "run": r.get("run"),
@@ -630,30 +590,30 @@ def load_composed_e2e_fill(idx, reload):
     # D28.1: the artifact is a committed repo object -- absence is corruption, not a skip
     if not os.path.exists(path):
         raise FileNotFoundError(f"K16: committed artifact missing: {path}")
-    prep = _prep(path, idx, reload)
-    if not prep:
-        return 0, 0
-    # D42 (2026-07-27, escalation): byte-identity is a PRE-INGEST prerequisite.
-    # Before any DB write, regenerate the nine-cell join from raw operands and
-    # require the tracked artifact to be byte-identical -- a corrupt artifact or
-    # a generator failure means ZERO K16 writes, in every invocation path
-    # (gate A6, --data, manual). ~18 s, and only on write-bearing invocations.
-    import subprocess as _sp, tempfile as _tf
+    # D44 (2026-07-27): ONE read of the tracked artifact; the SAME immutable buffer
+    # feeds the pre-ingest byte-identity guard, the sha for skip logic + ingest
+    # metadata, and json parsing -- no split view. Guard runs BEFORE sha-skip.
+    import subprocess as _sp, tempfile as _tf, hashlib as _hl
+    _buf = open(path, "rb").read()
     _tmp = _tf.NamedTemporaryFile(suffix=".json", delete=False)
-    _tmp.close()
-    os.unlink(_tmp.name)          # join script preloads an EXISTING --out; hand it a fresh path
+    _tmp.close(); os.unlink(_tmp.name)      # join script preloads an EXISTING --out
     try:
         _rc = _sp.run(["/home/gio/tese/eda/.venv/bin/python",
                        "/home/gio/tese/simulation/composed_fill_join.py", "--out", _tmp.name],
                       capture_output=True, text=True, cwd="/home/gio/tese").returncode
         if _rc != 0:
             raise AssertionError(f"K16: pre-ingest regeneration failed (rc={_rc}); refusing to write")
-        if open(_tmp.name, "rb").read() != open(path, "rb").read():
+        if open(_tmp.name, "rb").read() != _buf:
             raise AssertionError("K16: tracked artifact is NOT byte-identical to fresh regeneration; refusing to write")
     finally:
         if os.path.exists(_tmp.name):
             os.unlink(_tmp.name)
-    sha, nbytes = prep
+    sha = _hl.sha256(_buf).hexdigest()
+    nbytes = len(_buf)
+    if ic.is_worktree(path):
+        return 0, 0
+    if not reload and idx.get(path) == sha:
+        return 0, 0
     cols = ["window_name", "arm", "model", "policy", "requests", "enc_p99_ms", "ttft_p99_ms",
             "e2e_p99_ms", "e2e_max_ms", "itl_p99_ms", "gpu_hours", "composed_trace",
             "source_path", "window_name_as_ingested"]
@@ -672,7 +632,7 @@ def load_composed_e2e_fill(idx, reload):
         "fulltrace_static_C8":   ("fulltrace", "static_C8"),
         "fulltrace_reactive":    ("fulltrace", "reactive"),
     }
-    data = json.load(open(path))
+    data = json.loads(_buf)
     got_cells = set(data)
     if got_cells != set(EXPECTED_TUPLES):
         raise AssertionError(f"K16: cell identity mismatch: missing={sorted(set(EXPECTED_TUPLES)-got_cells)} "
@@ -730,26 +690,6 @@ def load_cost_accounting(idx, reload):
     prep = _prep(path, idx, reload)
     if not prep:
         return 0, 0
-    # D42 (2026-07-27, escalation): byte-identity is a PRE-INGEST prerequisite.
-    # Before any DB write, regenerate the nine-cell join from raw operands and
-    # require the tracked artifact to be byte-identical -- a corrupt artifact or
-    # a generator failure means ZERO K16 writes, in every invocation path
-    # (gate A6, --data, manual). ~18 s, and only on write-bearing invocations.
-    import subprocess as _sp, tempfile as _tf
-    _tmp = _tf.NamedTemporaryFile(suffix=".json", delete=False)
-    _tmp.close()
-    os.unlink(_tmp.name)          # join script preloads an EXISTING --out; hand it a fresh path
-    try:
-        _rc = _sp.run(["/home/gio/tese/eda/.venv/bin/python",
-                       "/home/gio/tese/simulation/composed_fill_join.py", "--out", _tmp.name],
-                      capture_output=True, text=True, cwd="/home/gio/tese").returncode
-        if _rc != 0:
-            raise AssertionError(f"K16: pre-ingest regeneration failed (rc={_rc}); refusing to write")
-        if open(_tmp.name, "rb").read() != open(path, "rb").read():
-            raise AssertionError("K16: tracked artifact is NOT byte-identical to fresh regeneration; refusing to write")
-    finally:
-        if os.path.exists(_tmp.name):
-            os.unlink(_tmp.name)
     sha, nbytes = prep
     cols = ["window_name", "policy", "lead_s", "p99_ms", "provisioned_ws", "warmup_ws",
             "total_from_order_ws", "warmup_frac", "source_path"]
@@ -774,26 +714,6 @@ def load_ledger(idx, reload):
     prep = _prep(path, idx, reload)
     if not prep:
         return 0, 0
-    # D42 (2026-07-27, escalation): byte-identity is a PRE-INGEST prerequisite.
-    # Before any DB write, regenerate the nine-cell join from raw operands and
-    # require the tracked artifact to be byte-identical -- a corrupt artifact or
-    # a generator failure means ZERO K16 writes, in every invocation path
-    # (gate A6, --data, manual). ~18 s, and only on write-bearing invocations.
-    import subprocess as _sp, tempfile as _tf
-    _tmp = _tf.NamedTemporaryFile(suffix=".json", delete=False)
-    _tmp.close()
-    os.unlink(_tmp.name)          # join script preloads an EXISTING --out; hand it a fresh path
-    try:
-        _rc = _sp.run(["/home/gio/tese/eda/.venv/bin/python",
-                       "/home/gio/tese/simulation/composed_fill_join.py", "--out", _tmp.name],
-                      capture_output=True, text=True, cwd="/home/gio/tese").returncode
-        if _rc != 0:
-            raise AssertionError(f"K16: pre-ingest regeneration failed (rc={_rc}); refusing to write")
-        if open(_tmp.name, "rb").read() != open(path, "rb").read():
-            raise AssertionError("K16: tracked artifact is NOT byte-identical to fresh regeneration; refusing to write")
-    finally:
-        if os.path.exists(_tmp.name):
-            os.unlink(_tmp.name)
     sha, nbytes = prep
     text = open(path).read()
     section = None
@@ -1040,26 +960,6 @@ def load_measured(idx, reload):
     prep = _prep(path, idx, reload)
     if not prep:
         return 0, 0
-    # D42 (2026-07-27, escalation): byte-identity is a PRE-INGEST prerequisite.
-    # Before any DB write, regenerate the nine-cell join from raw operands and
-    # require the tracked artifact to be byte-identical -- a corrupt artifact or
-    # a generator failure means ZERO K16 writes, in every invocation path
-    # (gate A6, --data, manual). ~18 s, and only on write-bearing invocations.
-    import subprocess as _sp, tempfile as _tf
-    _tmp = _tf.NamedTemporaryFile(suffix=".json", delete=False)
-    _tmp.close()
-    os.unlink(_tmp.name)          # join script preloads an EXISTING --out; hand it a fresh path
-    try:
-        _rc = _sp.run(["/home/gio/tese/eda/.venv/bin/python",
-                       "/home/gio/tese/simulation/composed_fill_join.py", "--out", _tmp.name],
-                      capture_output=True, text=True, cwd="/home/gio/tese").returncode
-        if _rc != 0:
-            raise AssertionError(f"K16: pre-ingest regeneration failed (rc={_rc}); refusing to write")
-        if open(_tmp.name, "rb").read() != open(path, "rb").read():
-            raise AssertionError("K16: tracked artifact is NOT byte-identical to fresh regeneration; refusing to write")
-    finally:
-        if os.path.exists(_tmp.name):
-            os.unlink(_tmp.name)
     sha, nbytes = prep
     tcols = [c for c, in db.rows(
         "select column_name from information_schema.columns "
