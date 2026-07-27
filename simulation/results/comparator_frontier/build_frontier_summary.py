@@ -258,18 +258,34 @@ def main() -> None:
     # in that table by design (floor grid only).
     calib_tbl_ok = "OK"
     try:
-        tracked = {r["tag"]: r for r in json.loads((HERE / "calib_recheck_cells.json").read_text())}
+        raw_tracked = json.loads((HERE / "calib_recheck_cells.json").read_text())
+        tags_list = [r["tag"] for r in raw_tracked]
+        tracked = {r["tag"]: r for r in raw_tracked}
         fresh = {r["tag"]: r for _, r in df[df["group"].isin(["calib", "calib_oracle"])].iterrows()}
-        floor_fresh = {t for t, r in fresh.items() if "floorM" in t}
-        floor_tracked = {t for t in tracked if "floorM" in t}
-        if not set(tracked) <= set(fresh):
-            calib_tbl_ok = f"FAIL(tracked tags not recomputed: {sorted(set(tracked)-set(fresh))[:3]})"
-        elif floor_tracked != floor_fresh:
-            calib_tbl_ok = f"FAIL(floor grid: missing {len(floor_fresh-floor_tracked)}, extra {len(floor_tracked-floor_fresh)})"
+        floor_fresh = {t for t in fresh if "floorM" in t}
+        # D25 round 3: exact cardinality, unique tags, exact identity sets, and
+        # equality of EVERY generator-consumed schema field (window/arm/M/L/
+        # stats_agrees) in addition to the numerics -- metadata mutation of the
+        # binding row (e.g. L=300 -> 301) must fail here, where truth is
+        # recomputed from raw, not downstream where the corruption propagates.
+        ORACLE_L30 = {f"{w}_oracle_L30_H{h}" for w in ("burst2", "burst6") for h in (0, 3)}
+        expected_tracked = floor_fresh | ORACLE_L30
+        if len(tags_list) != len(set(tags_list)):
+            calib_tbl_ok = "FAIL(duplicate tags in tracked table)"
+        elif len(tags_list) != len(expected_tracked) or set(tags_list) != expected_tracked:
+            calib_tbl_ok = (f"FAIL(identities: {len(tags_list)} rows vs {len(expected_tracked)} expected; "
+                            f"missing {sorted(expected_tracked-set(tags_list))[:2]} extra {sorted(set(tags_list)-expected_tracked)[:2]})")
         else:
+            import re as _re2
             for tag, tr in tracked.items():
                 fr = fresh[tag]
-                if (abs(tr["p99"] - fr["p99"]) > 1e-2 or abs(tr["worker_s"] - fr["worker_s"]) > 0.15
+                mM = _re2.search(r"floorM(\d+)_L(\d+)$", tag)
+                exp_M = int(mM.group(1)) if mM else None
+                exp_L = int(mM.group(2)) if mM else int(_re2.search(r"_L(\d+)_H", tag).group(1))
+                tr_M = None if tr.get("M") is None else int(tr["M"])
+                if (tr.get("window") != fr["window"] or tr_M != exp_M
+                        or int(tr.get("L", -1)) != exp_L or tr.get("stats_agrees") is not True
+                        or abs(tr["p99"] - fr["p99"]) > 1e-2 or abs(tr["worker_s"] - fr["worker_s"]) > 0.15
                         or int(tr["violations_1000ms"]) != int(fr["violations_1000ms"])
                         or int(tr["n_requests"]) != int(fr["n_requests"])):
                     calib_tbl_ok = f"FAIL({tag})"; break

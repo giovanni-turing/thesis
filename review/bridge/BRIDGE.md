@@ -49,8 +49,14 @@ never deleted). `python3 validate.py` lints all messages and regenerates STATE.m
 - v1.4 invariant (thread D03): evidence rounds must alternate — response 1 is
   authored by the non-finding agent, response 2 by the finding's author;
   escalation by either. A single agent cannot exhaust a dispute alone.
-- v1.5 (post-D19-D22 adjudication): `type: verification` is a terminal factual
-  attestation introducing no counterclaim; verification residues open a NEW
-  narrow finding or escalate the exhausted thread. Author adjudications are
-  posted UNTHREADED with body-referenced thread IDs (escalation stays terminal
-  in the chain); delegated adjudication must name its authority.
+- v1.5/v1.6 (D26): `type: verification` is a terminal factual attestation
+  introducing no counterclaim (body semantics not machine-checkable; the
+  mechanical rules are): NOTHING may reply to a verification (global
+  terminality); its `re:` must name an exact target (never `new`); in a chain
+  it is valid only after the second response or an escalation, and only
+  terminal. Escalation is terminal EXCEPT for a single following verification.
+  Author adjudications are posted UNTHREADED with body-referenced thread IDs;
+  a body asserting AUTHOR ADJUDICATION (as a heading) MUST carry an
+  `authority:` header naming the delegation (033 grandfathered by exact
+  identity); STATE marks escalated threads ADJUDICATED when an
+  authority-bearing message references them.

@@ -502,7 +502,7 @@ labelled \texttt{head2k} --- distinct from the 24-hour steady window) the
 vision pool stays under its bound through $s{=}32$, and at the calibrated
 language knee the encoder idles at 4.5\% utilization. On the burst window
 (green) both calibrated curves start \emph{above} their bounds at the
-episode's own rate: language at 1.9$\times$ its TTFT bound, vision at
+window's own rate: language at 1.9$\times$ its TTFT bound, vision at
 5$\times$ its delay bound.}
 \label{fig:sim-knees}
 \end{figure}
@@ -521,7 +521,7 @@ stresses further.
 
 Inside the burst window, calibrated timing overturns the polynomial's
 language verdict: the polynomial has the pool skirting its bound at the
-episode's own rate (\SI{910}{\milli\second}, 9\% under), while the same run
+window's own rate (\SI{910}{\milli\second}, 9\% under), while the same run
 under AIC timing reads \SI{1868}{\milli\second} --- the frames-class
 requests' ${\approx}36$k-token prefills alone exceed the TTFT budget at TP1,
 a \emph{prefill floor} persisting at any worker count (the baseline

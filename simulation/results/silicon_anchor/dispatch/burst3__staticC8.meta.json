@@ -1,0 +1,79 @@
+{
+ "cell": "burst3__staticC8",
+ "window": "burst3",
+ "arm": "static_C8",
+ "tier": 1,
+ "generated_utc": "2026-07-27T02:38:07Z",
+ "git_sha": "cc5ccfe4406ce6ec484e621eefe2e341c71a3936",
+ "provenance": {
+  "schedule": "simulation/results/comparator_frontier/eval/burst3_staticC8_L30.sched.json",
+  "schedule_sha256": "ef6a25bcb30d1ef24b8331685cf9c4550ade7660914749cf87c83fe79016362a",
+  "banked_stats": "simulation/results/comparator_frontier/eval/burst3_staticC8_L30.jsonl.stats.json",
+  "banked_stats_sha256": "1bb10e2b4b405ee4162357cc9f44e39ad91061fb28b6030fea6a9ebfa3ad7e70",
+  "converter": "workload/trace_to_two_pool.py",
+  "converter_sha256": "45d8ae7c14e97bb497f207a730bce80841b2f868828c0a42ef31e804514143f6",
+  "interpreter": "/home/gio/tese/ai-dynamo/dynamo/.venv/bin/python",
+  "source_run": "simulation/comparator_frontier_eval.sh (the frozen \u00a78.2 decisive-baseline evaluation run; replay() at line ~64)",
+  "command": "/home/gio/tese/ai-dynamo/dynamo/.venv/bin/python /home/gio/tese/workload/trace_to_two_pool.py --out /dev/null --stats /home/gio/tese/simulation/results/silicon_anchor/dispatch/burst3__staticC8.regen.stats.json --offset 531966 --max-requests 3093 --encoder-workers 2 --worker-schedule /home/gio/tese/simulation/results/comparator_frontier/eval/burst3_staticC8_L30.sched.json --batches-out /home/gio/tese/simulation/results/silicon_anchor/dispatch/burst3__staticC8.batches.jsonl",
+  "converter_wall_s": 1.8
+ },
+ "gate": {
+  "pass": true,
+  "fields": [
+   "requests",
+   "requests_with_images",
+   "total_images",
+   "batches",
+   "encoder_forwards",
+   "busy_worker_seconds",
+   "provisioned_worker_seconds",
+   "requests_chunked",
+   "encoder_delay_ms",
+   "encoder_batch_service_ms",
+   "images_per_batch"
+  ],
+  "diffs": []
+ },
+ "dispatch": {
+  "batches": 3156,
+  "distinct_batch_sizes": 24,
+  "max_batch_images": 64,
+  "total_images": 143240,
+  "sim_busy_s": 713.894,
+  "est_measured_busy_s": 1144.7,
+  "est_ratio_measured_over_sim": 1.6034,
+  "batch_size_hist": {
+   "1": 474,
+   "2": 18,
+   "4": 63,
+   "5": 3,
+   "9": 166,
+   "10": 4,
+   "11": 2,
+   "16": 35,
+   "17": 92,
+   "25": 105,
+   "26": 3,
+   "29": 2,
+   "33": 8,
+   "34": 1,
+   "35": 1,
+   "36": 77,
+   "41": 27,
+   "46": 1,
+   "49": 27,
+   "50": 1,
+   "53": 1,
+   "57": 77,
+   "61": 1,
+   "64": 1967
+  }
+ },
+ "files": {
+  "batches": "simulation/results/silicon_anchor/dispatch/burst3__staticC8.batches.jsonl",
+  "reqs": "simulation/results/silicon_anchor/dispatch/burst3__staticC8.batches.jsonl.reqs.json",
+  "regen_stats": "simulation/results/silicon_anchor/dispatch/burst3__staticC8.regen.stats.json",
+  "meta": "simulation/results/silicon_anchor/dispatch/burst3__staticC8.meta.json",
+  "conv_log": "simulation/results/silicon_anchor/dispatch/burst3__staticC8.conv.log"
+ }
+}

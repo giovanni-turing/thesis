@@ -95,7 +95,7 @@ if [ -z "$PGPASSWORD" ]; then bad "cannot reach postgres (no password from docke
 fi
 
 # A5 loader selftest
-if (cd "$LOADER" && python3 selftest.py >"$TMP/self.log" 2>&1); then
+if (cd "$LOADER" && "$TESE/eda/.venv/bin/python" selftest.py >"$TMP/self.log" 2>&1); then
   ok "loader selftest (collision guard, dir coverage, run_id injectivity)"
 else bad "loader selftest FAILED"; sed 's/^/        /' "$TMP/self.log" | tail -6; fi
 
@@ -121,10 +121,10 @@ DIGEST() { Q "select md5(string_agg(x,'|' order by x)) from (
 # K13 re-loads results-ledger.md whenever its sha moves -- §6.14). Idempotency is the property
 # that, ONCE SETTLED, a further run changes nothing. So settle first, then assert the SECOND run
 # leaves the digest byte-identical.
-if (cd "$LOADER" && timeout 3600 python3 main.py >"$TMP/ingest1.log" 2>&1); then :
+if (cd "$LOADER" && timeout 3600 "$TESE/eda/.venv/bin/python" main.py >"$TMP/ingest1.log" 2>&1); then :
 else bad "main.py (settle pass) exited non-zero"; tail -5 "$TMP/ingest1.log" | sed 's/^/        /'; fi
 D_BEFORE=$(DIGEST)
-if (cd "$LOADER" && timeout 3600 python3 main.py >"$TMP/ingest.log" 2>&1); then
+if (cd "$LOADER" && timeout 3600 "$TESE/eda/.venv/bin/python" main.py >"$TMP/ingest.log" 2>&1); then
   D_AFTER=$(DIGEST)
   if [ -n "$D_BEFORE" ] && [ "$D_BEFORE" = "$D_AFTER" ]; then
     ok "ingest idempotent (settled re-run changes nothing -- content digest byte-stable; §6.14)"
@@ -357,6 +357,56 @@ if SOURCE_DATE_EPOCH=0 "$TESE/eda/.venv/bin/python" "$FRMIR/cf/make_frontier_rep
   ok "frontier pure-derivation equality: regenerated summary+figure byte-identical to tracked"
 else
   bad "frontier pure-derivation equality FAILED: tracked summary/figure is not the pure derivation of the recomputed cells"
+fi
+# D28 (reviewer 2026-07-26): composed nine-cell chain -- regenerate the ENTIRE
+# nine-cell request-linked join from raw operands (~18 s), field-compare against
+# the tracked artifact, then compare the database projection against the artifact
+# and pin the 20+9 arm split. A truncated artifact, stale DB row, or silent
+# loader skip all fail here.
+CFJ_TMP="$TMP/cf_regen.json"
+if "$TESE/eda/.venv/bin/python" "$TESE/simulation/composed_fill_join.py" --out "$CFJ_TMP" >/dev/null 2>&1 \
+   && "$TESE/eda/.venv/bin/python" - "$CFJ_TMP" <<'CFPY'
+import json, sys
+tracked = json.load(open("/home/gio/tese/simulation/results/composed_fill/composed_fill_joined.json"))
+fresh = json.load(open(sys.argv[1]))
+assert set(tracked) == set(fresh) and len(tracked) == 9, "cell identity mismatch"
+for c in tracked:
+    for k in ("enc_p99", "e2e_p99", "e2e_max", "ttft_p99", "requests"):
+        if k in tracked[c] or k in fresh[c]:
+            assert abs(float(tracked[c][k]) - float(fresh[c][k])) < 1e-6, f"{c}.{k}"
+CFPY
+then
+  ok "composed nine-cell join: regenerated from raw, artifact field-identical"
+else
+  bad "composed nine-cell join FAILED (regen error or artifact drift)"
+fi
+CFDB=$(Q "select count(*) filter (where source_path like '%composed_fill%'), count(*) from provenance.composed_e2e")
+if [ "$CFDB" = "9|29" ]; then
+  ok "composed_e2e projection: 9 fill + 20 legacy = 29 arms (source split pinned)"
+else
+  bad "composed_e2e projection WRONG: got '$CFDB', expected '9|29'"
+fi
+CFNUM=$("$TESE/eda/.venv/bin/python" - <<'CFDBPY'
+import json, subprocess, os
+art = json.load(open("/home/gio/tese/simulation/results/composed_fill/composed_fill_joined.json"))
+env = dict(os.environ)
+q = ("select window_name||'_'||arm, e2e_p99_ms from provenance.composed_e2e "
+     "where source_path like '%composed_fill%'")
+out = subprocess.run(["psql","-h","localhost","-p","5433","-U","goku","-d","postgres","-tAc",q],
+                     capture_output=True, text=True, env=env).stdout
+db = dict((l.split("|")[0], float(l.split("|")[1])) for l in out.strip().splitlines())
+bad = []
+for cell, d in art.items():
+    key = d["window"] + "_" + d["arm"]
+    if key not in db or abs(db[key] - d["e2e_p99"]) > 1e-3:
+        bad.append(cell)
+print("OK" if not bad else "FAIL:" + ",".join(bad))
+CFDBPY
+)
+if [ "$CFNUM" = "OK" ]; then
+  ok "composed_e2e numeric identity: DB rows equal artifact e2e_p99 per cell"
+else
+  bad "composed_e2e numeric identity FAILED: $CFNUM"
 fi
 # D25.b: the PROMOTED manuscript figure (what Chapter 6 embeds) must equal the
 # regenerated figure too -- a swapped figuras/sim copy must not stay green.

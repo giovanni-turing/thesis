@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bridge protocol v1.5 linter + thread-state generator. Run from review/bridge/.
+"""Bridge protocol v1.6 linter + thread-state generator. Run from review/bridge/.
 v1.3 (2026-07-26, threads D01/D02): re:-graph dispute-chain machine (one root
 finding, linear, <=2 responses, escalation only after the 2nd response and
 terminal); strict header grammar (no YAML claim); nonempty bounded values;
@@ -10,10 +10,13 @@ import os, re, sys, glob, datetime, tempfile
 TYPES = {"finding","question","response","rereview-request","ack","escalation","verification"}
 SENDERS = {"claude","reviewer"}
 LIVE_DIR_OWNER = {"to_reviewer":"claude","from_reviewer":"reviewer"}
-HDR_KEYS = ["from","ts","re","type","thread"]          # thread optional, order free
+HDR_KEYS = ["from","ts","re","type","thread","authority"]  # thread/authority optional
 REQ_KEYS = ["from","ts","re","type"]
 FNAME_RE = re.compile(r"^\d{3}_[A-Za-z0-9][A-Za-z0-9_-]*$")
 THREAD_RE = re.compile(r"^D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*$")
+# v1.6 (D26): exact-identity exception -- message 033 predates the authority-header rule;
+# its delegated authority is documented in BRIDGE.md and the session transcript.
+ADJUDICATION_EXCEPTIONS = {"033_adjudication_d19_d22"}
 THREADED_TYPES = {"finding","response","escalation","verification"}
 
 def parse_header(path, errs):
@@ -53,6 +56,8 @@ def main():
             if not FNAME_RE.match(name):
                 errors.append(f"{p}: filename must be NNN_<nonempty-slug>.md")
             hdr = parse_header(p, errors) or {}
+            _txt = open(p).read()
+            body = _txt.split("---", 2)[2] if _txt.count("---") >= 2 else ""
             if hdr:
                 if hdr.get("from") and hdr["from"] not in SENDERS:
                     errors.append(f"{p}: sender '{hdr['from']}' not in {sorted(SENDERS)}")
@@ -66,7 +71,7 @@ def main():
                     errors.append(f"{p}: thread id '{hdr.get('thread')}' not DNN-<slug>")
                 if hdr.get("type") in ("finding","escalation") and "thread" not in hdr:
                     errors.append(f"{p}: type {hdr['type']} requires 'thread'")
-            msgs.append({"file":name,"dir":d,"hdr":hdr})
+            msgs.append({"file":name,"dir":d,"hdr":hdr,"body":body})
     by_name = {m["file"]: m for m in msgs}
     # re: resolution incl. end-to-end qualified form
     for m in msgs:
@@ -85,6 +90,20 @@ def main():
         if tthread and m["hdr"].get("thread") != tthread:
             errors.append(f"{m['file']}: replies to threaded '{target}' (thread {tthread}) "
                           f"but carries thread '{m['hdr'].get('thread')}'")
+    # v1.6 (D26): verification semantics enforced globally, not only in chains.
+    verif_names = {m["file"] for m in msgs if m["hdr"].get("type") == "verification"}
+    for m in msgs:
+        r = m["hdr"].get("re","")
+        target = (r.split(":",1)[1] if ":" in r else r) if r else ""
+        if target in verif_names:
+            errors.append(f"{m['file']}: replies to verification '{target}' -- verifications are terminal, nothing may answer them")
+        if m["hdr"].get("type") == "verification" and (not r or r == "new"):
+            errors.append(f"{m['file']}: verification must name its exact target ('re: new' is invalid)")
+        _asserts_adj = any(ln.lstrip().startswith("#") and "AUTHOR ADJUDICATION" in ln
+                           for ln in m.get("body","").splitlines())
+        if _asserts_adj and "authority" not in m["hdr"] \
+                and m["file"] not in ADJUDICATION_EXCEPTIONS:
+            errors.append(f"{m['file']}: claims AUTHOR ADJUDICATION without an 'authority:' header")
     # sequences per sender: start 001, contiguous, no duplicates
     for who in SENDERS:
         seqs = sorted(int(m["file"][:3]) for m in msgs
@@ -135,6 +154,10 @@ def main():
                     if ty == "verification":
                         if i != len(types)-1:
                             errors.append(f"thread {t}: verification {chain[i]} must be terminal"); bad=True
+                        prev = types[i-1]
+                        nresp_before = types[1:i].count("response")
+                        if not (prev == "escalation" or nresp_before >= 2):
+                            errors.append(f"thread {t}: verification {chain[i]} only permitted after the second response or an escalation"); bad=True
                         continue
                     if ty == "response":
                         if i > 2: errors.append(f"thread {t}: third response {chain[i]} exceeds the two-round ceiling"); bad=True
@@ -154,15 +177,18 @@ def main():
     if os.path.islink("STATE.md"):
         errors.append("STATE.md is a symlink — refusing to write"); state_ok = False
     else: state_ok = True
-    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v1.5)\n",
+    out = [f"# Bridge state (generated {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}, protocol v1.6)\n",
            f"\nmessages: {len(msgs)}  errors: {len(errors)}\n", "\n## Dispute threads\n"]
     if not threads: out.append("(none)\n")
     for t in sorted(threads):
         if t in thread_state:
             chain, types = thread_state[t]
             nresp = types.count("response"); esc = "escalation" in types
-            out.append(f"- **{t}**: {len(chain)} msgs, {nresp}/2 evidence rounds"
-                       f"{', ESCALATED - awaiting author' if esc else ''}\n")
+            adjudicated = esc and any(
+                (("authority" in m["hdr"]) or (m["file"] in ADJUDICATION_EXCEPTIONS))
+                and t in m.get("body", "") for m in msgs)
+            tag = ", ADJUDICATED (author ruling on record)" if adjudicated else (", ESCALATED - awaiting author" if esc else "")
+            out.append(f"- **{t}**: {len(chain)} msgs, {nresp}/2 evidence rounds{tag}\n")
             for n in chain: out.append(f"    - {n} ({by_name[n]['hdr'].get('from')}, {by_name[n]['hdr'].get('type')})\n")
         else:
             out.append(f"- **{t}**: INVALID CHAIN (see errors)\n")

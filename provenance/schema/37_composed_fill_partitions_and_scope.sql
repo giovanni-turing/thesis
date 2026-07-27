@@ -26,6 +26,7 @@
 --   new run_id  = 'composed_fill:' || <stem>            (10 old ids -> 10 distinct new ids)
 BEGIN;
 
+DROP TABLE IF EXISTS _mig;
 CREATE TEMP TABLE _mig(old_id text PRIMARY KEY, new_id text, new_exp text) ON COMMIT DROP;
 
 INSERT INTO _mig(old_id, new_id, new_exp)
@@ -120,19 +121,38 @@ SET LOCAL session_replication_role = DEFAULT;
 --    while the DEFAULT partition still holds a row that would belong to the new one.
 --    The experiment column is rewritten in the temp copy, not in place, so no row is ever
 --    updated across a partition boundary.
+-- D27 FIX (reviewer 2026-07-26, thread D27): the original delete went through the
+-- partitioned PARENT, so a second run -- with the default already drained -- would
+-- have deleted every row in the dedicated partition and restored nothing (692,234
+-- rows). The delete is now scoped to the *_default* child, the whole step is a
+-- guarded no-op when the default holds no composed_fill rows, and the
+-- post-condition asserts dedicated-partition preservation.
 DO $$
-DECLARE t text; n bigint; parts text[] := ARRAY['composed_request','llm_request','encoder_series'];
+DECLARE t text; n bigint; pre_dedicated bigint; post_dedicated bigint;
+        parts text[] := ARRAY['composed_request','llm_request','encoder_series'];
 BEGIN
   FOREACH t IN ARRAY parts LOOP
+    EXECUTE format('SELECT count(*) FROM provenance.%I WHERE run_id LIKE %L',
+                   t||'_default', 'composed_fill:%') INTO n;
+    EXECUTE format('CREATE TABLE IF NOT EXISTS provenance.%I PARTITION OF provenance.%I '
+                   'FOR VALUES IN (%L)', t||'_composed_fill', t, 'composed_fill');
+    IF n = 0 THEN
+      RAISE NOTICE '37_composed_fill: %_default holds no composed_fill rows -- step is a no-op', t;
+      CONTINUE;
+    END IF;
+    EXECUTE format('SELECT count(*) FROM provenance.%I', t||'_composed_fill') INTO pre_dedicated;
     EXECUTE format('CREATE TEMP TABLE _cf AS SELECT * FROM provenance.%I WHERE run_id LIKE %L',
                    t||'_default', 'composed_fill:%');
     EXECUTE 'UPDATE _cf SET experiment = ''composed_fill''';
-    GET DIAGNOSTICS n = ROW_COUNT;
-    EXECUTE format('DELETE FROM provenance.%I WHERE run_id LIKE %L', t, 'composed_fill:%');
-    EXECUTE format('CREATE TABLE IF NOT EXISTS provenance.%I PARTITION OF provenance.%I '
-                   'FOR VALUES IN (%L)', t||'_composed_fill', t, 'composed_fill');
+    -- delete scoped to the DEFAULT CHILD only; the dedicated partition is untouchable here
+    EXECUTE format('DELETE FROM provenance.%I WHERE run_id LIKE %L', t||'_default', 'composed_fill:%');
     EXECUTE format('INSERT INTO provenance.%I SELECT * FROM _cf', t);
-    RAISE NOTICE '37_composed_fill: %_composed_fill attached, % row(s) relocated', t, n;
+    EXECUTE format('SELECT count(*) FROM provenance.%I', t||'_composed_fill') INTO post_dedicated;
+    IF post_dedicated <> pre_dedicated + n THEN
+      RAISE EXCEPTION '37_composed_fill: %_composed_fill preservation violated (pre=% moved=% post=%)',
+        t, pre_dedicated, n, post_dedicated;
+    END IF;
+    RAISE NOTICE '37_composed_fill: % row(s) relocated into %_composed_fill (now %)', n, t, post_dedicated;
     EXECUTE 'DROP TABLE _cf';
   END LOOP;
 END $$;
@@ -172,7 +192,14 @@ BEGIN
   IF (a+b+c) <> 0 THEN
     RAISE EXCEPTION 'C601 would still fail: default rows composed=% llm=% encoder_series=%', a, b, c;
   END IF;
-  RAISE NOTICE '37_composed_fill: C306 and C601 post-conditions hold';
+  -- D27: dedicated partitions must be POPULATED (a rerun that emptied them must abort)
+  SELECT count(*) INTO a FROM provenance.composed_request_composed_fill;
+  SELECT count(*) INTO b FROM provenance.llm_request_composed_fill;
+  SELECT count(*) INTO c FROM provenance.encoder_series_composed_fill;
+  IF a = 0 OR b = 0 OR c = 0 THEN
+    RAISE EXCEPTION 'D27 preservation post-condition: dedicated partition empty (composed=% llm=% enc=%)', a, b, c;
+  END IF;
+  RAISE NOTICE '37_composed_fill: C306, C601 and D27-preservation post-conditions hold (%/%/% rows)', a, b, c;
 END $$;
 
 COMMIT;

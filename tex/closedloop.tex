@@ -9,7 +9,7 @@
 % forecast closed loop under realistic leads", "4.4 weekly aggregate",
 % "Principled LLM capacity mapping", "Encoder model-side cold start (Phase D)",
 % and the 2026-07-26 entry "§8.2 DECISIVE BASELINE: encoder worker-time vs
-% worst-episode-p99 frontier".
+% worst-window-p99 frontier".
 % Artifacts: simulation/results/{grid/, reactive32/, riders44/, results_44.jsonl,
 % aggregate44/, encoder_hybrid/, lang_qsweep/, comparator_frontier/}.
 \chapter{Control Payoff: Forecast-Informed Vision-Pool Provisioning}
@@ -49,10 +49,10 @@ requests (6.7\% of burst4, 19.0\% of burst5, from the declared window
 offsets), so they are five evaluation windows rather than five independent
 units; no arm's pass/fail verdict changes under either attribution of the
 shared requests. The trace's first 1.4
-days are the calibration split (forecast context, episodes burst2 and burst6):
+days are the calibration split (forecast context, calibration windows burst2 and burst6):
 they enter results grading only through the forecast-free policies. The
 reactive warm floor is calibrated there by forecast-free replays
-(Section~\ref{sec:cl-aggregate}); forecast policies replay these episodes
+(Section~\ref{sec:cl-aggregate}); forecast policies replay these windows
 solely to calibrate the language operating point (Section~\ref{sec:cl-llm}),
 never as evaluation results.
 \item[Primary endpoint.] Encoder-delay p99 $<$ \SI{1}{\second} \emph{in every
@@ -312,7 +312,7 @@ production actuation path end to end.
 
 \paragraph{Temporal split.} The trace's first 1.4 days are consumed as forecast
 \emph{context} and never graded as evaluation results. The two pre-coverage
-episodes (burst2/6) enter \emph{results} grading only through the forecast-free
+windows (burst2/6) enter \emph{results} grading only through the forecast-free
 policies of Section~\ref{sec:cl-comparators}. They are the \emph{calibration}
 split: the reactive warm floor is calibrated on them by forecast-free replays
 (Section~\ref{sec:cl-aggregate}), and forecast policies replay them, using the
@@ -638,7 +638,7 @@ headroom where the uncertainty is rather than everywhere.
 \label{sec:cl-headline}
 
 \textbf{The p90-forecast schedule meets the tail SLA over the aggregate
-\emph{and} inside every declared in-span burst episode at 0.62 times the
+\emph{and} inside every declared in-span burst window at 0.62 times the
 deployable static encoder fleet's provisioned worker-time}
 (Table~\ref{tab:cl-frontier}) --- precisely an SLA/resource trade-off: equal
 compliance at less standing capacity, not a latency win
@@ -676,13 +676,13 @@ fails the SLA outright, consistent with its factorial clearing only 23--24 of
 60 cells.
 
 \paragraph{A finer grain, and the hybrid recovery.} Grading finer than the
-in-span burst episodes --- across the seven daily folds of the full seven-day
+in-span burst windows --- across the seven daily folds of the full seven-day
 trace (Section~\ref{sec:cl-limits}) --- shows the pure forecast failing two
 whole calendar folds, for different reasons. On fold~F2, which the issue-time
 archive covers only partially, the under-covered forecast schedule reads
 \SI{1319}{\milli\second} where the reactive arm passes at
 \SI{369}{\milli\second} --- a coverage failure, not an onset miss. Fold~F6
-contains the one onset the burst-episode and aggregate views both miss:
+contains the one onset the burst-window and aggregate views both miss:
 \textbf{e13} (a sharp fold-scale spike, 7-minute onset with a 1-minute peak),
 where the p90 schedule reads \SI{1264}{\milli\second}\footnote{Fixed-context
 issue-time archive; the expanding-context fold analysis of
@@ -736,7 +736,7 @@ Appendix~\ref{ap:artifacts}). The grid-SLA-minimal denominator gives the
 identical figure; there is no per-window-optimum denominator for the aggregate
 window, since $C^{*}$ is defined per window.
 \item \textbf{Encoder, per burst window --- the boundary condition.} Against
-the deployable static fleet over each burst episode's own span, \emph{every}
+the deployable static fleet over each burst window's own span, \emph{every}
 autoscaling arm costs \emph{more} than static: forecast 1.80--2.90$\times$
 across the three-model warm-readiness arms at issued leads 15--45\,\si{\second}
 and reactive 2.19--2.67$\times$ (per-window oracle optimum, 2.06--3.32$\times$
@@ -1101,7 +1101,7 @@ from fail on fast onsets on \emph{both} pools --- here the conversion dial
 under a held cursor, not a second anticipation test. (This configuration is the
 policy pair carried to the live-stack anchor of
 Section~\ref{sec:val-results}.) Nor is that particular to burst3: replaying
-every forecast-covered burst episode end-to-end, the p90 forecast passes each
+every forecast-covered burst window end-to-end, the p90 forecast passes each
 at the service plateau (TTFT p99 651--706\,\si{\milli\second} across onsets of
 1--404 minutes) while the reactive planner fails all four
 (1{,}615--3{,}495\,\si{\milli\second}).
@@ -1273,14 +1273,14 @@ bound under bursty within-bin arrivals, not mean throughput --- the
 encoder-side analogue of the language pool's belief-to-knee gap. Language-pool
 closed-loop evidence covers the largest burst (all leads, both conversions),
 the fastest onset (carried live in Section~\ref{sec:val-results}), the binding
-mix, every forecast-covered burst episode end-to-end, and the full evaluation
+mix, every forecast-covered burst window end-to-end, and the full evaluation
 span; burst2/6 (uncovered) and the calm day are priced by the grid and the knee
 formula rather than replayed end-to-end. The replay is open-loop: arrivals
 follow the trace regardless of experienced latency, so overload cannot shed or
 defer demand as clients would --- policies are compared under identical offered
 load, and real clients' abandonment, backpressure or retries could shift
 realized demand in either direction. Per-pool leads are swept as constants, not
-stochastic; the two out-of-span episodes (burst2/6) enter results grading only
+stochastic; the two out-of-span windows (burst2/6) enter results grading only
 through the forecast-free comparators of Section~\ref{sec:cl-comparators},
 forecast policies replaying them solely as the calibration split, never as
 evaluation results --- a hole a deployed system entering the week with prior

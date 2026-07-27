@@ -1,0 +1,51 @@
+{
+ "cell": "burst3__fc",
+ "rep": 0,
+ "pilot": true,
+ "n_batches": 40,
+ "wall_s": 13.8,
+ "measured_busy_s": 13.796,
+ "overhead_frac": 0.00016,
+ "median_f64_ms": 510.4107,
+ "anchor_f64_ms": 511.6829,
+ "f64_vs_anchor_pct": -0.249,
+ "sim_busy_s": 8.618,
+ "peak_mem_gb": 3.643,
+ "clock_start": {
+  "sm_mhz": 2392,
+  "mem_mhz": 14001,
+  "max_sm_mhz": 3105,
+  "persistence": "Enabled",
+  "throttle_hex": "0x0000000000000000",
+  "temp_c": 32,
+  "power_w": 53.1,
+  "mem_used_mib": 1806,
+  "util_pct": 0,
+  "compute_apps": [
+   {
+    "pid": 1451150,
+    "mib": 1782
+   }
+  ],
+  "utc": "2026-07-27T02:45:02Z"
+ },
+ "clock_end": {
+  "sm_mhz": 2392,
+  "mem_mhz": 13801,
+  "max_sm_mhz": 3105,
+  "persistence": "Enabled",
+  "throttle_hex": "0x0000000000000000",
+  "temp_c": 46,
+  "power_w": 381.13,
+  "mem_used_mib": 4888,
+  "util_pct": 99,
+  "compute_apps": [
+   {
+    "pid": 1451150,
+    "mib": 4864
+   }
+  ],
+  "utc": "2026-07-27T02:45:20Z"
+ },
+ "aic_f64_ms": 316.369
+}

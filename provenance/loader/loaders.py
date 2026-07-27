@@ -587,17 +587,33 @@ def load_composed_e2e_fill(idx, reload):
     'forecast_p90') so v_joint_e2e reads uniformly across all 29 arms.
     """
     path = f"{SIM}/composed_fill/composed_fill_joined.json"
-    prep = _prep(path, idx, reload) if os.path.exists(path) else None
+    # D28.1: the artifact is a committed repo object -- absence is corruption, not a skip
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"K16: committed artifact missing: {path}")
+    prep = _prep(path, idx, reload)
     if not prep:
         return 0, 0
     sha, nbytes = prep
     cols = ["window_name", "arm", "model", "policy", "requests", "enc_p99_ms", "ttft_p99_ms",
             "e2e_p99_ms", "e2e_max_ms", "itl_p99_ms", "gpu_hours", "composed_trace",
             "source_path", "window_name_as_ingested"]
+    # D28.3: the nine cell identities are pinned -- a shortened/altered artifact fails
+    EXPECTED_CELLS = {
+        "burst1_static_C8", "burst3_static_C8", "burst4_static_C8", "burst5_static_C8",
+        "steady24h_static_C8", "steady24h_fc_chronos", "steady24h_reactive",
+        "fulltrace_static_C8", "fulltrace_reactive"}
+    data = json.load(open(path))
+    got_cells = set(data)
+    if got_cells != EXPECTED_CELLS:
+        raise AssertionError(f"K16: cell identity mismatch: missing={sorted(EXPECTED_CELLS-got_cells)} "
+                             f"extra={sorted(got_cells-EXPECTED_CELLS)}")
     rows = []
-    for cell, d in sorted(json.load(open(path)).items()):
-        if "error" in d or "e2e_p99" not in d:
-            continue
+    for cell, d in sorted(data.items()):
+        # D28.2: a broken cell is an error, never a silent skip
+        if "error" in d:
+            raise AssertionError(f"K16: cell {cell} carries error: {d['error']!r}")
+        if "e2e_p99" not in d:
+            raise AssertionError(f"K16: cell {cell} lacks e2e_p99")
         arm = d["arm"]
         model = arm[3:] if arm.startswith("fc_") else None
         policy = "forecast" if arm.startswith("fc_") else (
@@ -616,6 +632,11 @@ def load_composed_e2e_fill(idx, reload):
                      "e2e_max_ms": d["e2e_max"], "itl_p99_ms": d["itl_p99"],
                      "gpu_hours": d["gpu_h"], "composed_trace": d["composed_trace"],
                      "source_path": path, "window_name_as_ingested": d["window"]})
+    if len(rows) != 9:
+        raise AssertionError(f"K16: expected exactly 9 rows, built {len(rows)}")
+    # D28.4: source-scoped REPLACEMENT, not bare upsert -- rows removed from the
+    # artifact must not survive in the store.
+    db.run_sql("DELETE FROM provenance.composed_e2e WHERE source_path = '%s';" % path.replace("'","''"))
     db.run_sql(ic.multi_upsert_sql("composed_e2e", cols, rows,
                ["source_path", "window_name", "arm"]))
     db.run_sql(ic.ingest_sql(path, sha, "K16", len(rows), None, nbytes))

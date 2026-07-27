@@ -1,0 +1,73 @@
+{
+ "cell": "trunc__fc",
+ "window": "burst3",
+ "arm": "fc_p90",
+ "tier": 1,
+ "generated_utc": "2026-07-27T02:38:03Z",
+ "git_sha": "cc5ccfe4406ce6ec484e621eefe2e341c71a3936",
+ "provenance": {
+  "schedule": "simulation/results/comparator_frontier/eval/burst3_fc_L30.sched.json",
+  "schedule_sha256": "b770d5389da25cbf84a57176a8a2e333339082ab2849c95e1d0ac88672144ffd",
+  "banked_stats": "simulation/results/comparator_frontier/eval/burst3_fc_L30.jsonl.stats.json",
+  "banked_stats_sha256": "7ef94d159ffbb1b8c2a53e1a2482a648a725018eb526bd034b857fa3fb1414da",
+  "converter": "workload/trace_to_two_pool.py",
+  "converter_sha256": "45d8ae7c14e97bb497f207a730bce80841b2f868828c0a42ef31e804514143f6",
+  "interpreter": "/home/gio/tese/ai-dynamo/dynamo/.venv/bin/python",
+  "source_run": "simulation/comparator_frontier_eval.sh (the frozen \u00a78.2 decisive-baseline evaluation run; replay() at line ~64)",
+  "command": "/home/gio/tese/ai-dynamo/dynamo/.venv/bin/python /home/gio/tese/workload/trace_to_two_pool.py --out /dev/null --stats /home/gio/tese/simulation/results/silicon_anchor/dispatch/burst3__fc.regen.stats.json --offset 531966 --max-requests 3093 --encoder-workers 2 --worker-schedule /home/gio/tese/simulation/results/comparator_frontier/eval/burst3_fc_L30.sched.json --batches-out /home/gio/tese/simulation/results/silicon_anchor/dispatch/burst3__fc.batches.jsonl",
+  "converter_wall_s": 1.8
+ },
+ "gate": {
+  "pass": true,
+  "fields": [
+   "requests",
+   "requests_with_images",
+   "total_images",
+   "batches",
+   "encoder_forwards",
+   "busy_worker_seconds",
+   "provisioned_worker_seconds",
+   "requests_chunked",
+   "encoder_delay_ms",
+   "encoder_batch_service_ms",
+   "images_per_batch"
+  ],
+  "diffs": []
+ },
+ "dispatch": {
+  "batches": 3179,
+  "distinct_batch_sizes": 18,
+  "max_batch_images": 64,
+  "total_images": 143240,
+  "sim_busy_s": 713.977,
+  "est_measured_busy_s": 1144.7,
+  "est_ratio_measured_over_sim": 1.6033,
+  "batch_size_hist": {
+   "1": 498,
+   "2": 11,
+   "4": 65,
+   "5": 3,
+   "9": 171,
+   "10": 4,
+   "16": 35,
+   "17": 92,
+   "25": 110,
+   "26": 2,
+   "29": 1,
+   "33": 8,
+   "34": 1,
+   "36": 78,
+   "41": 27,
+   "49": 29,
+   "57": 77,
+   "64": 1967
+  }
+ },
+ "files": {
+  "batches": "simulation/results/silicon_anchor_selftest/dispatch/trunc__fc.batches.jsonl",
+  "reqs": "simulation/results/silicon_anchor_selftest/dispatch/trunc__fc.batches.jsonl.reqs.json",
+  "regen_stats": "simulation/results/silicon_anchor_selftest/dispatch/trunc__fc.regen.stats.json",
+  "meta": "simulation/results/silicon_anchor_selftest/dispatch/trunc__fc.meta.json",
+  "conv_log": "simulation/results/silicon_anchor_selftest/dispatch/trunc__fc.conv.log"
+ }
+}

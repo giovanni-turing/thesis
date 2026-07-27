@@ -1,0 +1,83 @@
+{
+ "cell": "burst5__re",
+ "window": "burst5",
+ "arm": "reactive",
+ "tier": 2,
+ "generated_utc": "2026-07-27T02:38:26Z",
+ "git_sha": "cc5ccfe4406ce6ec484e621eefe2e341c71a3936",
+ "provenance": {
+  "schedule": "simulation/results/comparator_frontier/eval/burst5_re_L30.sched.json",
+  "schedule_sha256": "7c39b35e877c798b8402ca3af67783f219e02715bf1cade19fc0eed252406578",
+  "banked_stats": "simulation/results/comparator_frontier/eval/burst5_re_L30.jsonl.stats.json",
+  "banked_stats_sha256": "14268d4e7b4f2cbe44a45ddebccf22f91e0ab22870d605d6d12cf6acd2168d3b",
+  "converter": "workload/trace_to_two_pool.py",
+  "converter_sha256": "45d8ae7c14e97bb497f207a730bce80841b2f868828c0a42ef31e804514143f6",
+  "interpreter": "/home/gio/tese/ai-dynamo/dynamo/.venv/bin/python",
+  "source_run": "simulation/comparator_frontier_eval.sh (the frozen \u00a78.2 decisive-baseline evaluation run; replay() at line ~64)",
+  "command": "/home/gio/tese/ai-dynamo/dynamo/.venv/bin/python /home/gio/tese/workload/trace_to_two_pool.py --out /dev/null --stats /home/gio/tese/simulation/results/silicon_anchor/dispatch/burst5__re.regen.stats.json --offset 558386 --max-requests 8983 --encoder-workers 2 --worker-schedule /home/gio/tese/simulation/results/comparator_frontier/eval/burst5_re_L30.sched.json --batches-out /home/gio/tese/simulation/results/silicon_anchor/dispatch/burst5__re.batches.jsonl",
+  "converter_wall_s": 1.9
+ },
+ "gate": {
+  "pass": true,
+  "fields": [
+   "requests",
+   "requests_with_images",
+   "total_images",
+   "batches",
+   "encoder_forwards",
+   "busy_worker_seconds",
+   "provisioned_worker_seconds",
+   "requests_chunked",
+   "encoder_delay_ms",
+   "encoder_batch_service_ms",
+   "images_per_batch"
+  ],
+  "diffs": []
+ },
+ "dispatch": {
+  "batches": 11969,
+  "distinct_batch_sizes": 28,
+  "max_batch_images": 64,
+  "total_images": 554803,
+  "sim_busy_s": 2764.563,
+  "est_measured_busy_s": 4433.5,
+  "est_ratio_measured_over_sim": 1.6037,
+  "batch_size_hist": {
+   "1": 1679,
+   "2": 22,
+   "3": 1,
+   "4": 256,
+   "5": 4,
+   "9": 462,
+   "10": 7,
+   "16": 138,
+   "17": 356,
+   "18": 1,
+   "20": 1,
+   "25": 511,
+   "26": 19,
+   "29": 2,
+   "31": 1,
+   "32": 1,
+   "33": 68,
+   "34": 3,
+   "36": 400,
+   "41": 86,
+   "42": 1,
+   "43": 1,
+   "49": 82,
+   "50": 4,
+   "51": 1,
+   "57": 239,
+   "60": 1,
+   "64": 7622
+  }
+ },
+ "files": {
+  "batches": "simulation/results/silicon_anchor/dispatch/burst5__re.batches.jsonl",
+  "reqs": "simulation/results/silicon_anchor/dispatch/burst5__re.batches.jsonl.reqs.json",
+  "regen_stats": "simulation/results/silicon_anchor/dispatch/burst5__re.regen.stats.json",
+  "meta": "simulation/results/silicon_anchor/dispatch/burst5__re.meta.json",
+  "conv_log": "simulation/results/silicon_anchor/dispatch/burst5__re.conv.log"
+ }
+}

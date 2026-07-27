@@ -89,6 +89,10 @@ _DIR_EXP_SPECIFIC = [
     # composed-coverage fill campaign (2026-07-26, "no economy" directive): request-linked
     # composed cells for static/steady24h/full-trace arms; scoped, stems repeat per window.
     ("/composed_fill/", "composed_fill", True),
+    # silicon burst-anchor campaign (2026-07-26, unbounded runner): real-encoder
+    # physical replays; per-cell/rep artifacts in subdirectories.
+    ("/silicon_anchor_selftest/", "silicon_anchor_selftest", True),
+    ("/silicon_anchor/", "silicon_anchor", True),
 ]
 
 # Directory names that hold a run's artifacts BY KIND rather than identifying a run:

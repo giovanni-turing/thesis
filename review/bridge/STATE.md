@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-26T23:19:56-03:00, protocol v1.5)
+# Bridge state (generated 2026-07-26T23:38:22-03:00, protocol v1.6)
 
-messages: 101  errors: 0
+messages: 111  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -75,22 +75,22 @@ messages: 101  errors: 0
     - 040_oracle_generator_residual (reviewer, finding)
     - 026_d18_fixed (claude, response)
     - 049_d18_regeneration_pending (reviewer, response)
-- **D19-readiness-generator-residual**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
+- **D19-readiness-generator-residual**: 4 msgs, 2/2 evidence rounds, ADJUDICATED (author ruling on record)
     - 041_readiness_generator_residual (reviewer, finding)
     - 027_d19_fixed (claude, response)
     - 050_d19_residual_not_closed (reviewer, response)
     - 055_d19_escalation (reviewer, escalation)
-- **D20-frontier-gate-residual**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
+- **D20-frontier-gate-residual**: 4 msgs, 2/2 evidence rounds, ADJUDICATED (author ruling on record)
     - 042_frontier_gate_residual (reviewer, finding)
     - 028_d20_fixed (claude, response)
     - 051_d20_false_green_reproduced (reviewer, response)
     - 056_d20_escalation (reviewer, escalation)
-- **D21-freeze-scope-residual**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
+- **D21-freeze-scope-residual**: 4 msgs, 2/2 evidence rounds, ADJUDICATED (author ruling on record)
     - 043_freeze_scope_residual (reviewer, finding)
     - 029_d21_fixed (claude, response)
     - 052_d21_residual_not_closed (reviewer, response)
     - 057_d21_escalation (reviewer, escalation)
-- **D22-evaluation-unit-terminology**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
+- **D22-evaluation-unit-terminology**: 4 msgs, 2/2 evidence rounds, ADJUDICATED (author ruling on record)
     - 044_evaluation_unit_terminology (reviewer, finding)
     - 030_d22_fixed (claude, response)
     - 053_d22_residual_not_closed (reviewer, response)
@@ -99,12 +99,27 @@ messages: 101  errors: 0
     - 046_response_thread_ids_mismatch (reviewer, finding)
     - 031_d23_already_fixed (claude, response)
     - 054_d23_verified (reviewer, response)
-- **D24-d22-adjudication-residue**: 2 msgs, 1/2 evidence rounds
+- **D24-d22-adjudication-residue**: 3 msgs, 2/2 evidence rounds
     - 060_d22_adjudication_residue (reviewer, finding)
     - 034_d24_semantic_sweep (claude, response)
-- **D25-d20-calibration-promoted-gap**: 2 msgs, 1/2 evidence rounds
+    - 064_d24_semantic_residuals (reviewer, response)
+- **D25-d20-calibration-promoted-gap**: 3 msgs, 2/2 evidence rounds
     - 061_d20_calibration_promoted_gap (reviewer, finding)
     - 035_d25_chain_closed (claude, response)
-- **D26-v15-verification-unimplemented**: 2 msgs, 1/2 evidence rounds
+    - 065_d25_schema_residuals (reviewer, response)
+- **D26-v15-verification-unimplemented**: 3 msgs, 2/2 evidence rounds
     - 062_v15_verification_unimplemented (reviewer, finding)
     - 036_d26_v15_enforced (claude, response)
+    - 066_d26_terminal_authority_residuals (reviewer, response)
+- **D27-composed-migration-rerun-loss**: 1 msgs, 0/2 evidence rounds
+    - 068_composed_migration_rerun_loss (reviewer, finding)
+- **D28-composed-k16-false-green**: 1 msgs, 0/2 evidence rounds
+    - 069_composed_k16_false_green (reviewer, finding)
+- **D29-composed-exact-identity**: 1 msgs, 0/2 evidence rounds
+    - 070_composed_exact_identity (reviewer, finding)
+- **D30-composed-mixed-estimators**: 1 msgs, 0/2 evidence rounds
+    - 071_composed_mixed_estimators (reviewer, finding)
+- **D31-composed-coverage-integration**: 1 msgs, 0/2 evidence rounds
+    - 072_composed_coverage_integration (reviewer, finding)
+- **D32-burst5-lower-bound-resurrected**: 1 msgs, 0/2 evidence rounds
+    - 073_burst5_lower_bound_resurrected (reviewer, finding)

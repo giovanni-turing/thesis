@@ -439,6 +439,12 @@ def main() -> None:
                     help="restore the Phase-2 dispatch policy (an oversized request's "
                          "chunks run sequentially on one worker) instead of the default "
                          "parallel chunk dispatch across free workers")
+    ap.add_argument("--batches-out", default=None,
+                    help="optional dispatch-log dump: JSONL, one dispatched encoder batch "
+                         "per line as [start_ms, finish_ms, total_images, n_forwards] in "
+                         "dispatch order, plus a companion <path>.reqs.json with the "
+                         "image-bearing arrival list [[arrival_ms, req_index, n_images], ...]. "
+                         "Read-only side effect: nothing else in the run changes")
     ap.add_argument("--no-encoder-shift", action="store_true",
                     help="LLM-pool isolation: emit raw (speedup-compressed) arrivals — encoder "
                          "delay is NOT folded in; the vision pool is still simulated so stats/"
@@ -473,6 +479,20 @@ def main() -> None:
         img_reqs, args.encoder_workers, cap, encoder,
         parallel_chunks=not args.sequential_chunks,
         worker_schedule=schedule)
+
+    # Dispatch-log dump (opt-in, read-only): the exact batch sequence this arm
+    # dispatched, for physical replay on real silicon. Written before anything
+    # else so a dump is available even if downstream emission fails.
+    if args.batches_out:
+        with open(args.batches_out, "w") as bf:
+            for start, fin, total, n_fwd in batches:
+                bf.write(f"[{start!r}, {fin!r}, {total}, {n_fwd}]\n")
+        with open(f"{args.batches_out}.reqs.json", "w") as rf:
+            json.dump({"n_all_requests": len(df),
+                       "cap": cap,
+                       "handoff_rtt_ms": args.handoff_rtt_ms,
+                       "handoff_gbps": args.handoff_gbps,
+                       "reqs": [[a, i, n] for a, i, n in img_reqs]}, rf)
 
     # Handoff bound: post-merge embeddings cross pools (async; not worker time).
     def handoff_ms(n_img: int) -> float:

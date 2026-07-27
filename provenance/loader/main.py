@@ -91,17 +91,24 @@ def main():
         sel = ALL
     idx = load_ingest_index()
     tot_f = tot_r = 0
+    n_errors = 0
     for k, name, fn in sel:
         t0 = time.time()
         try:
             nf, nr = fn(idx, a.reload)
         except Exception as e:
+            # D28 (2026-07-26): a loader failure must be terminal for the PROCESS --
+            # printing and exiting zero let a broken source keep stale rows green.
             print(f"[{k:5} {name:16}] ERROR: {e}", file=sys.stderr, flush=True)
+            n_errors += 1
             continue
         print(f"[{k:5} {name:16}] files={nf:5d} rows={nr:13,d}  {time.time()-t0:7.1f}s", flush=True)
         tot_f += nf
         tot_r += nr
     print(f"TOTAL files={tot_f} rows={tot_r:,}", flush=True)
+    if n_errors:
+        print(f"FAILED: {n_errors} loader(s) errored", file=sys.stderr, flush=True)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
