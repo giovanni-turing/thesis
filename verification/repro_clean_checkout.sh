@@ -72,7 +72,7 @@ if [ $rc -eq 0 ] && echo "$VERDICT" | grep -q "stats-missing=0" \
 else
   bad "frontier recomputation/self-verification (see $BASE/frontier_build.log)"
 fi
-HL=$(TESE_ROOT="$W" "$EDA_PY" - "$FR" <<'PYEOF'
+HL=$("$EDA_PY" - "$FR" <<'PYEOF'
 import json, sys
 fr = sys.argv[1]
 s = json.load(open(f"{fr}/frontier_summary.json"))
@@ -81,27 +81,50 @@ cells = json.load(open(f"{fr}/frontier_summary_cells.json"))
 core = [c for c in cells if c["group"] == "core" and c["arm"] == "forecast_p90"]
 viol = sum(int(c["violations_1000ms"]) for c in core)
 ws = fc["cost_worker_s_eval_span"]
-print(f"forecast arm: vs_static={fc['vs_static']}  eval-span worker_s={ws:.0f}  "
-      f"violations(recomputed core cells)={viol}")
+print(f"forecast arm: vs_static={fc['vs_static']} (manuscript 0.623x)  "
+      f"eval-span worker_s={ws:.0f}  "
+      f"violations summed over ALL {len(core)} core windows={viol} (scope-labeled, no manuscript claim)")
 PYEOF
 )
 say "headline: $HL"
 
 # ---- Target 2: composed join, Stage A (tracked-only, honest gap record) ----
+# NOTE the join catches per-cell exceptions and exits 0 with {"error": ...}
+# cells, and it PRELOADS an existing --out -- so the verdict must come from a
+# fresh output's per-cell CONTENT, never from the exit code.
 say ""
 say "## Target 2 — composed nine-cell join, Stage A (tracked files only)"
+rm -f "$BASE/composed_A.json"
 TESE_ROOT="$W" "$EDA_PY" "$W/simulation/composed_fill_join.py" \
   --out "$BASE/composed_A.json" >"$BASE/composed_A.log" 2>&1
-rcA=$?
 MISSING=0
 for f in "${SUPP_INPUTS[@]}"; do [ -e "$W/$f" ] || MISSING=$((MISSING+1)); done
-say "join rc=$rcA; supplementary-archive inputs absent from checkout: $MISSING/6"
-if [ $rcA -ne 0 ] && [ "$MISSING" -eq 6 ]; then
-  ok "stage A documents the boundary: 6/9 cells tracked-reproducible; 3/9 (steady24h fc/reactive, fulltrace pair) require the supplementary archive (1.8 GB), as its manifest states"
-elif [ $rcA -eq 0 ]; then
-  ok "stage A: full join reproduced from tracked files alone"
+AVERDICT=$("$EDA_PY" - "$BASE/composed_A.json" \
+    "$W/simulation/results/composed_fill/composed_fill_joined.json" "$W" <<'PYEOF'
+import json, sys
+got = json.load(open(sys.argv[1]))
+committed = json.load(open(sys.argv[2]))
+wroot = sys.argv[3]
+SUPP_CELLS = {"steady24h_fc_chronos", "steady24h_reactive",
+              "fulltrace_static_C8", "fulltrace_reactive"}
+ok_cells = {c for c, v in got.items() if "error" not in v}
+err_cells = set(got) - ok_cells
+proper_errors = all(
+    got[c]["error"].startswith("FileNotFoundError") and wroot in got[c]["error"]
+    for c in err_cells)
+match = all(got[c] == committed[c] for c in ok_cells)
+verdict = (set(got) == set(committed) and ok_cells == set(committed) - SUPP_CELLS
+           and err_cells == SUPP_CELLS and proper_errors and match)
+print(f"{'OK' if verdict else 'BAD'} tracked_ok={len(ok_cells)}/9 "
+      f"supp_dependent={len(err_cells)}/9 errors_are_missing_checkout_files={proper_errors} "
+      f"tracked_cells_equal_committed={match}")
+PYEOF
+)
+say "supplementary inputs absent from checkout: $MISSING/6; $AVERDICT"
+if [ "$MISSING" -eq 6 ] && echo "$AVERDICT" | grep -q "^OK"; then
+  ok "stage A boundary exact: 5/9 cells reproduced tracked-only (values equal the committed artifact); 4/9 (steady24h fc/reactive + fulltrace pair) fail ONLY on the archive-listed inputs"
 else
-  bad "stage A failed for a reason OTHER than the documented supplementary inputs (see $BASE/composed_A.log)"
+  bad "stage A boundary not as documented (see $BASE/composed_A.log)"
 fi
 
 # ---- Target 3: composed join, Stage B (supplementary inputs staged) ----
