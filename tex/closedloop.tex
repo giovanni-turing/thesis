@@ -1,7 +1,7 @@
 %!TeX root=./tese.tex
 % RQ3 chapter -- control payoff. ABSORBS the former baselines chapter: the
 % labels cap:baselines, sec:base-protocol, sec:base-static, sec:base-reactive-*,
-% sec:base-summary, tab:base-grid, tab:base-tp, tab:base-react-enc travelled
+% sec:base-summary, tab:base-grid, tab:base-tp, tab:base-react-enc traveled
 % here with their content (tex/baselines.tex is retired at finalize).
 % Every number is ledgered in progress/results-ledger.md: "Static-optimal grid,
 % final", "3.1 close-out checks", "3.2 reactive LLM baseline", "4.4 rider (c)
@@ -567,7 +567,7 @@ least one; the dashed line is the \SI{1}{\second} gate and the dotted line the
 static-$C{=}8$ cost reference. \textbf{(A)} the frontier as run, including the
 whole warm-floor family $M{=}1\ldots32$ as an envelope. \textbf{(B)} the
 readiness repairs: the warm-pool model applied to every arm (the footing most
-favourable to reactive) plus the near-symmetric strict forecast sensitivity,
+favorable to reactive) plus the near-symmetric strict forecast sensitivity,
 and the oracle allowed to order before its window opens. On both footings the forecast arm is cheaper than every warm floor that
 passes.}
 \label{fig:cl-frontier}
@@ -591,7 +591,7 @@ forecast arm. Read as an envelope rather than a selection
 saturates at the no-queue plateau: \emph{no} member reaches the forecast arm's
 cost.
 
-\paragraph{The result survives equalising the readiness models.} One asymmetry
+\paragraph{The result survives equalizing the readiness models.} One asymmetry
 sits inside the shipped mechanics and must be disclosed: the forecast and
 oracle arms actuate through a warm pool (a scaled-down replica returns without
 re-paying cold start) while the reactive family re-warms strictly. Both
@@ -607,13 +607,13 @@ materially: its unfloored burst3 p99 is \SI{2000}{\milli\second} rather than
 16{,}084 (that figure is inflated ${\approx}8\times$ by the asymmetry and must
 always be quoted with its warm-pool counterpart), and the floor $M{=}2$ now
 \emph{passes} every evaluation window at 2.89 Mworker-s (0.746$\times$ static), cheaper
-than static. Even on that most-favourable-to-reactive footing the forecast arm
+than static. Even on that most-favorable-to-reactive footing the forecast arm
 is cheaper: \textbf{forecasting is 1.20$\times$ cheaper than the best
 warm-floor reactive at equal compliance on the symmetric warm-pool footing},
 and 1.67$\times$ under the shipped mechanics; the strict-direction figure is
 a sensitivity (see the caveat above), and the single number 1.67$\times$ must
 never be quoted alone. Two honesty points travel with the frontier. The
-comparison is conservative in reactive's favour --- the forecast is one
+comparison is conservative in reactive's favor --- the forecast is one
 pre-frozen arm ($\rho{=}15$ chosen \emph{ex post} earlier, disclosed), the floor family an ex-post best-of-family read on the evaluation span.
 And the perfect-information oracle reference prices the signal-quality axis
 at \textbf{0.292$\times$} static under the same fixed point conversion
@@ -741,7 +741,7 @@ autoscaling arm costs \emph{more} than static: forecast 1.80--2.90$\times$
 across the three-model warm-readiness arms at issued leads 15--45\,\si{\second}
 and reactive 2.19--2.67$\times$ (per-window oracle optimum, 2.06--3.32$\times$
 and 2.50--3.10$\times$). A short bursty window gives an autoscaler no runway to
-amortise spin-up, so the encoder saving is a \emph{week-scale} phenomenon: the
+amortize spin-up, so the encoder saving is a \emph{week-scale} phenomenon: the
 0.62$\times$ is a claim about the week, not a burst.
 \item \textbf{Encoder, full trace.} Over the 7-day trace the reactive
 controller reaches 0.687$\times$ the deployable $C{=}8$ fleet while holding the
@@ -864,7 +864,7 @@ Chronos and reactive arms only.}
 window, the reactive and forecast arms share \emph{identical} p50, p90 and p99
 on aggregate, burst1, burst4 and burst5 --- not a duplication artifact (the
 arms are distinct runs with distinct worker-time and worst cases) but the
-mechanism of Section~\ref{sec:cl-matrix}: at 2.2--3.2\% encoder utilisation the
+mechanism of Section~\ref{sec:cl-matrix}: at 2.2--3.2\% encoder utilization the
 queue is empty for essentially every request, so delay collapses onto the
 observed \SI{588}{\milli\second} no-queue plateau every adequately provisioned
 policy reaches. \textbf{On the graded encoder statistic, forecasting does not
@@ -977,7 +977,7 @@ sum at least \emph{overstates}. There the forecast arm's joined p99 is
 sum \emph{understates} the measured tail by \SI{46}{\milli\second}
 ($0.959\times$), and \num{998} of the window's \num{88260} requests --- 1.13\%
 --- land above it. This is not a join artifact but ordinary quantile
-behaviour. The calm day is 57.3\% text-only (\num{50588} of \num{88260}
+behavior. The calm day is 57.3\% text-only (\num{50588} of \num{88260}
 requests, exactly the zero-image requests, and exactly the requests whose
 encoder delay is zero), so the encoder-delay marginal is a majority atom at
 zero with a thin tail; its correlation with TTFT is only $0.458$; and a
@@ -1257,7 +1257,7 @@ saving \emph{is} the violation and must never be quoted as a win. The
 defensible language cost statement is the one above, against the burst-sized
 static shape: a break-even at the p90 band edge, lifted to a modest, e13-robust
 saving (0.82$\times$) by the post-hoc p90/s6 sensitivity. The division of
-labour is one of \emph{degree}: \textbf{the encoder pool's forecasting saving
+labor is one of \emph{degree}: \textbf{the encoder pool's forecasting saving
 is substantial; the language pool's is modest, and there forecasting's first
 job is compliance --- holding the tail where the cheaper reactive baseline
 fails it.}
@@ -1354,7 +1354,7 @@ five-arm frontier settles the standing-capacity objection: at equal compliance
 the forecast arm costs 0.623$\times$ the deployable static fleet while the
 calibrated warm floor fails held-out burst3 and the cheapest all-passing floor
 costs 1.042$\times$ --- 1.20$\times$ the forecast even on the
-reactive-favourable warm-pool footing (1.67$\times$ as shipped) --- with a
+reactive-favorable warm-pool footing (1.67$\times$ as shipped) --- with a
 perfect-information reference at 0.292$\times$ marking the remaining
 signal-quality headroom. On the language pool --- a secondary result, tested
 under a held forecast cursor --- its own forecast passes bursts under realistic

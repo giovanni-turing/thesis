@@ -80,7 +80,7 @@ so it is a user-population tail, not a vision-pool-conditional one; the
 stage-conditional (image-bearing) variant is reported alongside it where the
 distinction matters (Chapter~\ref{cap:closedloop}). And the two stage budgets
 sum to ${\approx}\SI{2}{\second}$ to first token at roughly the p98 level
-(a union bound over two p99s, not an end-to-end p99 guarantee); a modelled
+(a union bound over two p99s, not an end-to-end p99 guarantee); a modeled
 reconstruction puts the ingress-to-first-token p99 at
 ${\approx}\SI{1.3}{\second}$, which the \emph{measured} request-linked join
 of Chapter~\ref{cap:closedloop} (Table~\ref{tab:cl-ledger-joint}) confirms.
@@ -100,7 +100,7 @@ episode with calm margin. Configuration counts therefore report
 \emph{parameter robustness}, never sample size. Resource use is reported as
 provisioned worker- or replica-time (``resource-time''); time on different
 GPU classes is never merged into one economic figure without an explicit,
-labelled conversion model.
+labeled conversion model.
 
 \section{Pricing the vision stage on collected silicon}
 \label{sec:aic-collection}
@@ -498,7 +498,7 @@ encoder-delay p99 versus offered load per pool (log--log), swept by arrival
 speedup at the fixed 2$\times$2-worker topology. Knee markers apply the full
 evaluation SLA, so the steady-window language knees sit \emph{below} the
 TTFT line: the inter-token bound crosses first. On the steady head (blue,
-labelled \texttt{head2k} --- distinct from the 24-hour steady window) the
+labeled \texttt{head2k} --- distinct from the 24-hour steady window) the
 vision pool stays under its bound through $s{=}32$, and at the calibrated
 language knee the encoder idles at 4.5\% utilization. On the burst window
 (green) both calibrated curves start \emph{above} their bounds at the
@@ -751,7 +751,7 @@ unquantified, and because the trace records no image sizes the uniform
 $448^2$ assumption can only be stress-tested, not validated. Repriced at
 other resolutions through the collected operator database (per-cell numbers
 in Appendix~\ref{ap:artifacts}), the burst-window verdict holds at $448^2$
-and below on both modelled fabrics, with the no-queue service time crossing
+and below on both modeled fabrics, with the no-queue service time crossing
 the bound near 690--705\,px, so the assumed resolution sits just below it.
 The structural finding is more useful: provisioned worker-time is
 \emph{invariant} across image size, because the schedule is driven by image

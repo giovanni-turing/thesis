@@ -32,7 +32,7 @@ environment. Full package freezes live in each virtual environment. The AIC
 data-collection and GEMM-validation runs pin the GPU clocks via
 \texttt{nvidia-smi -lgc 2400,2400 -lmc 14001} (delivered SM
 2377--2400\,\si{\mega\hertz}, MEM \SI{13801}{\mega\hertz}; the AIC cost model
-itself is parameterised at the \SI{2407}{\mega\hertz} boost reference), while
+itself is parameterized at the \SI{2407}{\mega\hertz} boost reference), while
 the phase-E physical encoder anchor ran single-tenant persistence-mode
 (delivered SM 2377--2400\,\si{\mega\hertz}, not a hard lock).}
 \label{tab:ap-env}
@@ -107,7 +107,7 @@ file-only.
 \caption[Manuscript element $\to$ script $\to$ artifact $\to$ provenance
 run]{Manuscript element $\to$ generating script $\to$ primary artifact $\to$
 provenance run family. Paths are relative to the workspace root and elide
-directories shared with the neighbouring column; artifacts are given at
+directories shared with the neighboring column; artifacts are given at
 directory granularity, with the file-level lists and the row-level caveats in
 \texttt{supplementary/\allowbreak manifest\_full.md}. EDA scripts run under
 \texttt{eda/.venv} (GPU); simulation drivers under the aiconfigurator venv
@@ -378,7 +378,7 @@ snapshot for $N\le128$ and the composed model beyond
 \end{figure}
 
 \emph{Scope.} The check times eager vLLM's standalone vision-tower forward on
-synthetic GPU-resident inputs with randomly initialised weights (latency is
+synthetic GPU-resident inputs with randomly initialized weights (latency is
 shape-determined, so weight values are not expected to materially affect these
 dense-kernel timings): it is the forward compute, not the complete serving
 path (image preprocessing, host-to-device transfer, scheduling, prefill),
@@ -388,7 +388,7 @@ winning week schedule of Chapter~\ref{cap:closedloop} replayed with $f(N)$
 repriced at the measured vLLM curve --- it leaves the week-scale
 encoder-delay p99 at \SI{606}{\milli\second} (from \SI{589}{\milli\second}
 under AIC), non-divergent, so the AIC-priced cost ratio carries no separate
-silicon penalty. Agreement generalises across resolution ($224^2$--$896^2$),
+silicon penalty. Agreement generalizes across resolution ($224^2$--$896^2$),
 holding within $15.5\%$ at the two largest, where AIC slightly under-prices
 the largest forwards (the beyond-cap drift direction); per-resolution ratios
 are archived. A live-worker confirmation over the full serving path (with
@@ -399,7 +399,7 @@ encoder path were found and returned to the \texttt{aiconfigurator} project
 (draft PR). The operator graph omitted the pixel-to-hidden patch-embedding
 \textsc{gemm}; a \emph{subsequent} branch added a guarded
 \texttt{encoder\_patch\_embed\_gemm} ($\approx0.3\%$ of the forward at
-$N{=}64$; the DeepStack mergers were already modelled), an addition that
+$N{=}64$; the DeepStack mergers were already modeled), an addition that
 postdates the load-bearing simulation snapshot of the main text --- in which
 the operator is absent --- so the two are consistent. The perf tables also
 blanked the ViT's large-batch shapes, so past $N{\approx}42$ the model
