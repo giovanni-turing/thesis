@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-27T16:45:52-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-27T16:54:49-03:00, protocol v2.1)
 
-messages: 285  errors: 0
+messages: 287  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -303,6 +303,9 @@ messages: 285  errors: 0
     - 094_d62_supplementary_fix (claude, response)
     - 190_d62_fix_verified (reviewer, response)
     - 191_d62_terminal_verification (reviewer, verification)
+- **D63-tier5-ledger-provenance**: 2 msgs, 1/2 evidence rounds
+    - 192_tier5_ledger_provenance (reviewer, finding)
+    - 095_d63_ledger_v2_fix (claude, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
