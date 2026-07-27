@@ -625,7 +625,8 @@ def load_composed_e2e_fill(idx, reload):
         return 0, 0
     cols = ["window_name", "arm", "model", "policy", "requests", "enc_p99_ms", "ttft_p99_ms",
             "e2e_p99_ms", "e2e_max_ms", "itl_p99_ms", "gpu_hours", "composed_trace",
-            "source_path", "window_name_as_ingested"]
+            "source_path", "window_name_as_ingested",
+            "conv_sum_minus_e2e_ms", "conv_sum_relation"]
     # D28.3: the nine cell identities are pinned -- a shortened/altered artifact fails
     # D36 (2026-07-27): exact tuple pinning -- outer key, inner cell, window and arm
     # are each independently asserted against the expected map, never derived from
@@ -676,7 +677,11 @@ def load_composed_e2e_fill(idx, reload):
                      "ttft_p99_ms": d["ttft_p99"], "e2e_p99_ms": d["e2e_p99"],
                      "e2e_max_ms": d["e2e_max"], "itl_p99_ms": d["itl_p99"],
                      "gpu_hours": d["gpu_h"], "composed_trace": d["composed_trace"],
-                     "source_path": path, "window_name_as_ingested": d["window"]})
+                     "source_path": path, "window_name_as_ingested": d["window"],
+                     # D30: producer-persisted full-precision self-consistent
+                     # sum-vs-composed relation (evidence, not display)
+                     "conv_sum_minus_e2e_ms": d["conv_sum_minus_e2e_ms"],
+                     "conv_sum_relation": d["conv_sum_relation"]})
     if len(rows) != 9:
         raise AssertionError(f"K16: expected exactly 9 rows, built {len(rows)}")
     # D46/D47 (2026-07-27): path-freshness at the pre-DB boundary -- catches

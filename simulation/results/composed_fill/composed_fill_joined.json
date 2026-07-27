@@ -9,7 +9,8 @@
   "alignment_drift_ms": 0.0,
   "alignment_offset_ms": 0.0,
   "key_selftest": {
-   "ambiguous_key_records": 16
+   "ambiguous_key_records": 16,
+   "fifo_identity_agree": 64804
   },
   "enc_p99": 804.5,
   "ttft_p99": 726.2,
@@ -24,6 +25,8 @@
   "error_ratio": 1.0146,
   "naive_sum_conv": 1530.7,
   "error_ratio_conv": 1.0146,
+  "conv_sum_minus_e2e_ms": 22.063088,
+  "conv_sum_relation": "overstates",
   "composed_trace": "simulation/results/composed_fill/burst1_static_C8.jsonl",
   "language_records": "simulation/results/composed_fill/burst1_static.requests.jsonl",
   "report": "simulation/results/composed_fill/burst1_static.report.json"
@@ -38,7 +41,8 @@
   "alignment_drift_ms": 0.0,
   "alignment_offset_ms": 0.0,
   "key_selftest": {
-   "ambiguous_key_records": 0
+   "ambiguous_key_records": 0,
+   "fifo_identity_agree": 3093
   },
   "enc_p99": 716.4,
   "ttft_p99": 759.7,
@@ -53,6 +57,8 @@
   "error_ratio": 0.9967,
   "naive_sum_conv": 1481.2,
   "error_ratio_conv": 1.0001,
+  "conv_sum_minus_e2e_ms": 0.127588,
+  "conv_sum_relation": "overstates",
   "composed_trace": "simulation/results/composed_fill/burst3_static_C8.jsonl",
   "language_records": "simulation/results/composed_fill/burst3_static.requests.jsonl",
   "report": "simulation/results/composed_fill/burst3_static.report.json"
@@ -67,7 +73,8 @@
   "alignment_drift_ms": 0.0,
   "alignment_offset_ms": 0.0,
   "key_selftest": {
-   "ambiguous_key_records": 10
+   "ambiguous_key_records": 10,
+   "fifo_identity_agree": 25639
   },
   "enc_p99": 788.5,
   "ttft_p99": 757.0,
@@ -82,6 +89,8 @@
   "error_ratio": 1.0265,
   "naive_sum_conv": 1545.5,
   "error_ratio_conv": 1.0265,
+  "conv_sum_minus_e2e_ms": 39.92696,
+  "conv_sum_relation": "overstates",
   "composed_trace": "simulation/results/composed_fill/burst4_static_C8.jsonl",
   "language_records": "simulation/results/composed_fill/burst4_static.requests.jsonl",
   "report": "simulation/results/composed_fill/burst4_static.report.json"
@@ -96,7 +105,8 @@
   "alignment_drift_ms": 0.0,
   "alignment_offset_ms": 0.0,
   "key_selftest": {
-   "ambiguous_key_records": 0
+   "ambiguous_key_records": 0,
+   "fifo_identity_agree": 8983
   },
   "enc_p99": 759.5,
   "ttft_p99": 748.1,
@@ -111,6 +121,8 @@
   "error_ratio": 1.0249,
   "naive_sum_conv": 1508.6,
   "error_ratio_conv": 1.0255,
+  "conv_sum_minus_e2e_ms": 37.531898,
+  "conv_sum_relation": "overstates",
   "composed_trace": "simulation/results/composed_fill/burst5_static_C8.jsonl",
   "language_records": "simulation/results/composed_fill/burst5_static.requests.jsonl",
   "report": "simulation/results/composed_fill/burst5_static.report.json"
@@ -125,7 +137,8 @@
   "alignment_drift_ms": 0.0,
   "alignment_offset_ms": 0.0,
   "key_selftest": {
-   "ambiguous_key_records": 18
+   "ambiguous_key_records": 18,
+   "fifo_identity_agree": 88260
   },
   "enc_p99": 417.3,
   "ttft_p99": 388.6,
@@ -140,6 +153,8 @@
   "error_ratio": 1.0001,
   "naive_sum_conv": 805.8,
   "error_ratio_conv": 1.0,
+  "conv_sum_minus_e2e_ms": -0.0,
+  "conv_sum_relation": "coincides",
   "composed_trace": "simulation/results/composed_fill/steady24h_static_C8.jsonl",
   "language_records": "simulation/results/composed_fill/steady24h_static.requests.jsonl",
   "report": "simulation/results/composed_fill/steady24h_static.report.json"
@@ -156,7 +171,8 @@
   "key_selftest": {
    "agree": 88248,
    "of": 88260,
-   "ambiguous_key_records": 20
+   "ambiguous_key_records": 20,
+   "fifo_identity_agree": 88260
   },
   "enc_p99": 677.4,
   "ttft_p99": 399.0,
@@ -171,6 +187,8 @@
   "error_ratio": 0.9592,
   "naive_sum_conv": 1076.4,
   "error_ratio_conv": 0.9592,
+  "conv_sum_minus_e2e_ms": -45.815998,
+  "conv_sum_relation": "understates",
   "composed_trace": "defense/anim/data/a2_runs/steady24h_forecast_L30.jsonl",
   "language_records": "simulation/results/composed_fill/steady24h_fc_chronos.requests.jsonl",
   "report": "simulation/results/composed_fill/steady24h_fc_chronos.report.json"
@@ -187,7 +205,8 @@
   "key_selftest": {
    "agree": 88250,
    "of": 88260,
-   "ambiguous_key_records": 18
+   "ambiguous_key_records": 18,
+   "fifo_identity_agree": 88260
   },
   "enc_p99": 682.1,
   "ttft_p99": 494.3,
@@ -202,6 +221,8 @@
   "error_ratio": 1.0288,
   "naive_sum_conv": 1177.2,
   "error_ratio_conv": 1.0295,
+  "conv_sum_minus_e2e_ms": 33.720211,
+  "conv_sum_relation": "overstates",
   "composed_trace": "defense/anim/data/a2_runs/steady24h_reactive_L30.jsonl",
   "language_records": "simulation/results/composed_fill/steady24h_reactive.requests.jsonl",
   "report": "simulation/results/composed_fill/steady24h_reactive.report.json"
@@ -216,7 +237,8 @@
   "alignment_drift_ms": 0.0,
   "alignment_offset_ms": 0.0,
   "key_selftest": {
-   "ambiguous_key_records": 296
+   "ambiguous_key_records": 296,
+   "fifo_identity_agree": 1000000
   },
   "enc_p99": 677.5,
   "ttft_p99": 655.2,
@@ -231,6 +253,8 @@
   "error_ratio": 1.0031,
   "naive_sum_conv": 1332.7,
   "error_ratio_conv": 1.0031,
+  "conv_sum_minus_e2e_ms": 4.114161,
+  "conv_sum_relation": "overstates",
   "composed_trace": "defense/anim/data/a13_runs/ft_static_C8.jsonl",
   "language_records": "defense/anim/data/a13_runs/ft_llm_static.requests.jsonl",
   "report": "defense/anim/data/a13_runs/ft_llm_static.report.json"
@@ -247,12 +271,13 @@
   "key_selftest": {
    "agree": 999838,
    "of": 1000000,
-   "ambiguous_key_records": 319
+   "ambiguous_key_records": 319,
+   "fifo_identity_agree": 999994
   },
   "enc_p99": 588.4,
   "ttft_p99": 1144.8,
   "ttft_p99_conv_recompute": 1144.8,
-  "e2e_p99": 1681.9,
+  "e2e_p99": 1681.8,
   "e2e_max": 38049.5,
   "enc_max": 35807.1,
   "itl_p99": 22.2,
@@ -261,7 +286,9 @@
   "naive_sum": 1733.2,
   "error_ratio": 1.0305,
   "naive_sum_conv": 1733.2,
-  "error_ratio_conv": 1.0305,
+  "error_ratio_conv": 1.0306,
+  "conv_sum_minus_e2e_ms": 51.379499,
+  "conv_sum_relation": "overstates",
   "composed_trace": "defense/anim/data/a13_runs/ft_reactive_L30.jsonl",
   "language_records": "defense/anim/data/a13_runs/ft_llm_reactive.requests.jsonl",
   "report": "defense/anim/data/a13_runs/ft_llm_reactive.report.json"

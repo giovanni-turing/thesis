@@ -85,8 +85,11 @@ def raw_frame() -> pd.DataFrame:
 
 
 def read_trace(path: Path):
-    """composed trace -> (ts, input_length, output_length, clamped_input)."""
-    ts, il, ol, cl = [], [], [], []
+    """composed trace -> (ts, input_length, output_length, clamped_input,
+    raw_id). The converter embeds exact raw-row identity in every request
+    (workload/trace_to_two_pool.py: hash_ids[0] = request_index * 100000);
+    that id is the AUTHORITATIVE encoder mapping (D29)."""
+    ts, il, ol, cl, rid = [], [], [], [], []
     with open(path) as fh:
         for line in fh:
             r = json.loads(line)
@@ -94,8 +97,10 @@ def read_trace(path: Path):
             il.append(r["input_length"])
             ol.append(r["output_length"])
             cl.append(min(r["input_length"], len(r["hash_ids"]) * BLOCK))
+            rid.append(r["hash_ids"][0] // 100000)
     return (np.asarray(ts, dtype=np.float64), np.asarray(il, dtype=np.int64),
-            np.asarray(ol, dtype=np.int64), np.asarray(cl, dtype=np.int64))
+            np.asarray(ol, dtype=np.int64), np.asarray(cl, dtype=np.int64),
+            np.asarray(rid, dtype=np.int64))
 
 
 def read_records(path: Path):
@@ -151,20 +156,26 @@ def join_cell(cell: str) -> dict:
     w = raw_frame().iloc[win["offset"]:win["offset"] + N].reset_index(drop=True)
     rel_ms = ((w.ts - w.ts.iloc[0]).dt.total_seconds() * 1000.0).to_numpy()
 
-    # ---- encoder delays: composed-trace timestamps vs raw arrivals (a12 idiom) ----
-    t_ts, t_il, t_ol, t_cl = read_trace(trace_path)
+    # ---- encoder delays: composed-trace timestamps vs raw arrivals ----
+    # D29: the embedded hash-id identity is authoritative; the regeneration
+    # gate requires it to be a complete permutation of the window. The old
+    # token-pair FIFO reconstruction is kept as a recorded cross-check only.
+    t_ts, t_il, t_ol, t_cl, t_rid = read_trace(trace_path)
     n = len(t_ts)
     assert n == N, f"{cell}: composed trace has {n} lines, window expects {N}"
+    assert np.array_equal(np.sort(t_rid), np.arange(n)), \
+        f"{cell}: embedded hash-id identity is not a permutation of the window"
+    line2raw = t_rid
+    enc = np.full(n, np.nan)
+    enc[line2raw] = t_ts - rel_ms[line2raw]
+    assert not np.isnan(enc).any(), f"{cell}: unmatched encoder rows"
     key2idx = collections.defaultdict(collections.deque)
     for i, (ci, gi) in enumerate(zip(w["ContextTokens"], w["GeneratedTokens"])):
         key2idx[(max(1, int(ci)), max(1, int(gi)))].append(i)
-    enc = np.full(n, np.nan)
-    line2raw = np.empty(n, dtype=np.int64)
+    fifo = np.empty(n, dtype=np.int64)
     for li in range(n):
-        i = key2idx[(int(t_il[li]), int(t_ol[li]))].popleft()
-        enc[i] = t_ts[li] - rel_ms[i]
-        line2raw[li] = i
-    assert not np.isnan(enc).any(), f"{cell}: unmatched encoder rows"
+        fifo[li] = key2idx[(int(t_il[li]), int(t_ol[li]))].popleft()
+    fifo_identity_agree = int((fifo == line2raw).sum())
 
     # ---- language records -> trace line index ----
     sid, r_arr, r_ttft, r_il, r_ol = read_records(rec_path)
@@ -176,11 +187,13 @@ def join_cell(cell: str) -> dict:
         # cross-validate the static-cell key where both keys exist
         alt, amb = key_assign(t_ts, t_cl, t_ol, r_arr, r_il, r_ol)
         agree = int((alt == rec2line).sum())
-        selftest = {"agree": agree, "of": N, "ambiguous_key_records": amb}
+        selftest = {"agree": agree, "of": N, "ambiguous_key_records": amb,
+                    "fifo_identity_agree": fifo_identity_agree}
     else:
         assert all(s is None for s in sid), f"{cell}: expected null session_ids on the plain path"
         rec2line, amb = key_assign(t_ts, t_cl, t_ol, r_arr, r_il, r_ol)
-        selftest = {"ambiguous_key_records": amb}
+        selftest = {"ambiguous_key_records": amb,
+                    "fifo_identity_agree": fifo_identity_agree}
 
     assert len(set(rec2line.tolist())) == N, f"{cell}: line assignment not a bijection"
     ttft = np.full(n, np.nan)
@@ -216,6 +229,13 @@ def join_cell(cell: str) -> dict:
     ttft_p99_conv = p99(ttft)
     naive = ttft_p99 + enc_p99
     naive_conv = ttft_p99_conv + enc_p99
+    # D30: the sum-vs-composed relation is only meaningful under ONE estimator
+    # at FULL precision, so the producer persists it as evidence: the
+    # self-consistent CONV sum minus the composed p99, and its sign class
+    # (|delta| <= 1e-6 ms = numerically coincident).
+    _rel = naive_conv - e2e_p99
+    conv_sum_relation = ("coincides" if abs(_rel) <= 1e-6
+                         else ("overstates" if _rel > 0 else "understates"))
     return {
         "cell": cell, "window": win_key, "arm": cell[len(win_key) + 1:],
         "planner": planner,
@@ -236,6 +256,8 @@ def join_cell(cell: str) -> dict:
         "error_ratio": round(naive / e2e_p99, 4),
         "naive_sum_conv": round(naive_conv, 1),
         "error_ratio_conv": round(naive_conv / e2e_p99, 4),
+        "conv_sum_minus_e2e_ms": round(_rel, 6),
+        "conv_sum_relation": conv_sum_relation,
         "composed_trace": str(trace_path.relative_to(ROOT)),
         "language_records": str(rec_path.relative_to(ROOT)),
         "report": str(rep_path.relative_to(ROOT)),
