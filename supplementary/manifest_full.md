@@ -61,7 +61,7 @@ and open on the draft PR).
 
 Grouped as in Appendix A `tab:ap-manifest`, with the row-level caveats spelled
 out. `run_id` prefixes index `provenance.current_runs`; "—" means the
-artifacts are file-only (not ingested into the store).
+there is no `current_runs` spine prefix; the artifacts may be file-only or ingested in a non-run-keyed collector projection (`collector_*`, no `run_id`).
 
 ### Chapters 1–2
 
@@ -74,7 +74,7 @@ artifacts are file-only (not ingested into the store).
 
 | Element | Script | Artifact | `run_id` |
 |---|---|---|---|
-| `fig:eda-ctx-vs-img` … `fig:eda-multires` (nine figures); `tab:eda-archetypes`, `tab:eda-persistence` | `analysis/trace_eda/*.py` | `*_stats.json` in the same directory | `eda:*` |
+| `fig:eda-ctx-vs-img` … `fig:eda-multires` (six figures); `tab:eda-archetypes`, `tab:eda-persistence` | `analysis/trace_eda/*.py` | `*_stats.json` in the same directory | `eda:*` |
 
 Runs under `eda/.venv` (GPU). Each figure script writes its own `_stats.json`
 beside the figure, so every annotated number in the EDA chapter is re-readable

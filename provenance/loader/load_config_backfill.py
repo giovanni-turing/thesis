@@ -264,11 +264,19 @@ def run():
 
     # COALESCE keeps any value that was already ingested: this only FILLS NULLs,
     # so no archived measurement is overwritten (R40) and re-running is a no-op.
-    sets = ", ".join(
-        f"{c} = COALESCE(r.{c}, (s.vals ->> '{c}')"
-        + ("::integer" if c in _INT_COLS
-           else "::double precision" if c in _FLOAT_COLS else "") + ")"
-        for c in _COLS)
+    # EXCEPTION (D77, bridge 257): artifact_commit_sha is recomputed archival
+    # LINEAGE (`git log -1 -- source_path`), not a measurement -- when the
+    # staged Git SHA is non-null it must REFRESH the row, or a later artifact
+    # commit could never advance the pin. Staged-first COALESCE keeps the
+    # pass idempotent (same SHA rewrites itself) while measured/config
+    # fields retain fill-only semantics.
+    def _set(c):
+        cast = ("::integer" if c in _INT_COLS
+                else "::double precision" if c in _FLOAT_COLS else "")
+        if c == "artifact_commit_sha":
+            return f"{c} = COALESCE((s.vals ->> '{c}'){cast}, r.{c})"
+        return f"{c} = COALESCE(r.{c}, (s.vals ->> '{c}'){cast})"
+    sets = ", ".join(_set(c) for c in _COLS)
     db.run_sql(
         f"UPDATE provenance.runs r SET {sets}, "
         "config_provenance = COALESCE(r.config_provenance, '{}'::jsonb) || s.prov "

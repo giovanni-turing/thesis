@@ -5,8 +5,10 @@ truth + derived projections that are traceable back to them, row for row**, quer
 language. Replaces the flat-file + Markdown-ledger workflow (`progress/results-ledger.md`) with a
 relational store where retracted results are marked and excluded by default.
 
-- **71.4M rows / ~12 GB** across **91 tables** (13 result-kinds K1–K13 + per-experiment partitions),
-  **10 views**, from **1,961 source files (~15 GB)**.
+- (catalog snapshot 2026-07-28) **210 ordinary + 4 partitioned tables**,
+  **59 views + 5 materialized views**, from **5,051 distinct `ingest_log`
+  source paths**; drift audit: 185 rows, max |drift| 1.2375%, all with
+  matching row counts.
 - Engine: the `ssd2` **PostgreSQL 16** container — schema **`provenance`**.
 - Reachable two ways: locally at `localhost:5433` (user `goku`, db `postgres`) and via the
   **`technonous` MCP** (`postgres_query`) — the latter is the AI/NL→SQL path.
@@ -47,7 +49,7 @@ runs  (spine: one row per execution; all comparison dims denormalized; supersede
  └─ PROVENANCE   ledger_entry(results-ledger.md) · ingest_log(idempotency)
 ```
 
-Every projection and raw row carries `run_id → runs`, so a projected number is recomputable from
+Every RUN-KEYED projection and raw row carries `run_id → runs` (collector and other keyless projections are documented in `SCHEMA_GUIDE.md` §keyless), so a projected number is recomputable from
 that run's raw rows. Dimensions (pool, window, policy, model, quantile, resolution, ρ, lead, config
 C*, TP×N, gpu, engine, actuation, readiness…) live on `runs` / `factorial_cell`.
 
@@ -72,12 +74,16 @@ artifacts named in `results-ledger.md` as prose) is marked manually:
 ## (Re)build
 
 ```bash
-# 1. schema (idempotent). Reset with: psql ... -c 'DROP SCHEMA provenance CASCADE'
-psql -h localhost -p 5433 -U goku -d postgres -f schema/01_schema.sql
+# 1. schema: apply EVERY numbered migration in numeric order (idempotent;
+#    currently through 41_conv_relation_gate.sql). Reset with:
+#    psql ... -c 'DROP SCHEMA provenance CASCADE'
+for f in $(ls schema/[0-9]*.sql | sort -V); do
+  psql -h localhost -p 5433 -U goku -d postgres -f "$f"
+done
+# 2. loaders
 python3 loader/main.py --projections     # small typed layer (fast; NL queries usable after)
 python3 loader/main.py --raw             # heavy raw fact tables (COPY; ~3 min parallel)
-# 4. views + data dictionary + lineage
-for f in 02_views 04_lineage 03_comments; do psql ... -f schema/$f.sql; done
+python3 loader/main.py                   # full pass incl. POST (K34 lineage refresh etc.)
 ```
 
 Loader details: `loader/db.py` (psql transport — password from `docker inspect postgres` at

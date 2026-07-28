@@ -67,8 +67,10 @@ robustness**, never a sample size.
 
 ## S3 — Full provenance manifest depth
 
-**Paths:** `provenance/SCHEMA_GUIDE.md`, `provenance/schema/` (migrations
-`01`–`35` plus the read-only role/optimisation scripts), `provenance/loader/`
+**Paths:** `provenance/SCHEMA_GUIDE.md`, `provenance/schema/` (apply every
+numbered migration `provenance/schema/*.sql` in numeric order --- currently
+through `41_conv_relation_gate.sql` --- plus the read-only
+role/optimisation scripts), `provenance/loader/`
 (per-kind loaders + `selftest.py`), `provenance/verify_all.sh`,
 `provenance/README.md`
 
@@ -260,8 +262,9 @@ archive's index (`tab:ap-supp`).
 ### S6.8 — Reading the pre-restructure manuscript pointers in the provenance artifacts
 
 `simulation/results/comparator_frontier/frontier_summary.json` (its
-`source_ref` fields and caveat prose), the comments and `source_ref` values in
-`provenance/schema/{22,23,25,26,33}*.sql`, and the module docstrings of
+`gate_and_frozen_parameters.*.source[]` arrays and caveat prose), the
+embedded source-path literals and comments in
+`provenance/schema/{22,23,33}*.sql`, and the module docstrings of
 `provenance/loader/{main,load_live,load_group_c,load_collector_silicon}.py`
 cite manuscript loci of the form `tex/{twopool,baselines,validation,
 aiconfigurator}.tex:NNN`. Those four sources were retired by the merge on

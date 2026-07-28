@@ -120,6 +120,15 @@ if (cd "$LOADER" && "$TESE/eda/.venv/bin/python" selftest_d44.py >"$TMP/self_d44
   ok "K16 guard negative-suite (corrupt/settled/gen-fail/exclusion/freshness zero-write)"
 else bad "K16 guard negative-suite FAILED"; sed 's/^/        /' "$TMP/self_d44.log" | tail -8; fi
 
+# D77 (bridge 257): artifact_commit_sha is recomputed lineage -- staged-first
+# refresh in K34, a Git-vs-DB freshness gate, and the seeded-stale negative test.
+if (cd "$LOADER" && "$TESE/eda/.venv/bin/python" selftest_d77.py >"$TMP/self_d77.log" 2>&1); then
+  ok "K34 lineage-refresh negative-suite (seeded stale pin advances; second pass idempotent)"
+else bad "K34 lineage-refresh negative-suite FAILED"; sed 's/^/        /' "$TMP/self_d77.log" | tail -6; fi
+if "$TESE/eda/.venv/bin/python" "$TESE/verification/artifact_lineage_gate.py" >"$TMP/lineage.log" 2>&1; then
+  ok "artifact lineage: every repo-local pin matches live git log -1 (D77)"
+else bad "artifact lineage STALE"; sed 's/^/        /' "$TMP/lineage.log" | tail -6; fi
+
 # A6 idempotency -- a re-run must CHANGE NOTHING.
 #
 # Judge by content hashes, not by main.py's stdout counters. SCHEMA_GUIDE §6.14: three

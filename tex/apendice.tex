@@ -112,8 +112,10 @@ not listed are this appendix's own three tables (\ref{tab:ap-env},
 \ref{tab:ap-manifest}, \ref{tab:ap-supp}), which are self-describing. Where a
 family of runs was ingested,
 the last column gives its \texttt{run\_id} prefix in the provenance store
-(\texttt{provenance.current\_runs}); ``---'' marks elements whose artifacts are
-file-only.
+(\texttt{provenance.current\_runs}); ``---'' marks elements with no
+\texttt{current\_runs} spine prefix --- their artifacts may be file-only
+or ingested in a non-run-keyed collector projection
+(\texttt{collector\_*}, no \texttt{run\_id}).
 
 {\scriptsize\setlength{\tabcolsep}{2.5pt}
 \begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.215\linewidth}>{\raggedright\arraybackslash}p{0.245\linewidth}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedright\arraybackslash}p{0.155\linewidth}@{}}
