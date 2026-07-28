@@ -1046,7 +1046,11 @@ run populations were still growing when the tables were frozen.
 \caption[Encoder-pool ledger, request-linked composed arm set]{Encoder-pool
 ledger on the request-linked composed arm set --- aggregate +
 the four forecast-covered
-burst windows + the full-trace family; the calm-day and burst-static composed
+burst windows + the full-trace family. The full-trace rows are
+forecast-free by protocol: the trace's first 1.4 days are the
+forecaster's own context, so full-trace forecast cells would leak that
+context into the graded span (see text); forecast arms are graded on the
+forecast-covered evaluation span. The calm-day and burst-static composed
 rows are in Table~\ref{tab:cl-ledger-joint} (forecast = Chronos p90, $\rho{=}15$,
 $L{=}30$\,\si{\second}, issue-time, warm-pool; reactive = the identically
 informed strawman at the same lead); bold marks a p99 over the
