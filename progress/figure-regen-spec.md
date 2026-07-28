@@ -53,10 +53,26 @@ streams, PUA glyph corruption — with a per-figure target canvas:
 | 018 | sim_knees | ≈427×175 | \linewidth |
 | 019 | sim_burst_queue | ≈427×213 | \linewidth |
 | 020 | pred_forecast_band | ≈376×148 | 0.88\linewidth |
+| 021 | pred_horizon_wape | ≈367×245 | 0.86\linewidth |
+| 022 | sim_frontier | ≈427×234 | \linewidth |
+| 023 | sim_metric_frontier | ≈350 wide | 0.82\linewidth |
+| 024 | pred_framework_diff | ≈427×160 | \linewidth |
+| 025 | aic_fn_engines | ≈393×153 | 0.92\linewidth |
+| 026 | pred_wape_heatmap | ≈427×148 | \linewidth |
+| 027 | pred_models_burst | ≈376×148 | 0.88\linewidth |
 
 Figure-specific extras: 014 colorbar + axis-title glyphs; 017 the 12 PUA
-multiplier glyphs in numerical annotations; 020 PUA timestamp colons.
+multiplier glyphs in numerical annotations; 020/027 PUA timestamp/date
+colons; 024 vertical x-label wrapping corruption (3 panels); 025 PUA hyphens
++ vertical annotation streams; 026 the 200+ heatmap cell numbers must land
+≥7 pt on paper (currently 2.65 pt — worst legibility in the set).
 
-(Stream still in progress — append rows for the remaining packets, then the
+Verdict exceptions: 023 sim_metric_frontier is MINOR and already
+V01/V02-free (fonttype-42 clean) — canvas compaction only, and it is the
+byte-gated figure (script+PDF update together). 022 sim_frontier has no
+font/stream defect listed — canvas compaction only.
+
+FIGURE SERIES COMPLETE: 17 packets (011–027) cover the full included-figure
+set. 15 MAJOR + 1 MINOR-compaction (023) + 1 compaction-only (022). The
 regen agent must satisfy every packet's Required Action list plus the family
-requirements above, and each figure re-enters the mailbox for re-verdict.)
+requirements above; each figure re-enters the mailbox for re-verdict.
