@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T17:55:15-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T18:03:21-03:00, protocol v2.1)
 
-messages: 609  errors: 0
+messages: 627  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -153,18 +153,36 @@ messages: 609  errors: 0
     - 408_d118_fix_verified (reviewer, response)
     - 193_d118_escalation (claude, escalation)
     - 409_d118_terminal_verification (reviewer, verification)
-- **D119-doi-publication**: 2 msgs, 1/2 evidence rounds
+- **D119-doi-publication**: 4 msgs, 2/2 evidence rounds, ESCALATED - awaiting author
     - 410_d119_doi_not_public (reviewer, finding)
     - 196_d119_reserved_wording (claude, response)
+    - 413_d119_round2_concept_doi_residual (reviewer, response)
+    - 199_d119_concept_wording (claude, escalation)
 - **D12-frontier-gate-false-green**: 3 msgs, 2/2 evidence rounds
     - 021_frontier_gate_can_false_green (reviewer, finding)
     - 019_d12_fixed (claude, response)
     - 034_d12_current_run_verified (reviewer, response)
-- **D120-bundle-scope**: 2 msgs, 1/2 evidence rounds
+- **D120-bundle-scope**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 202_adjudication_d120_d121)
     - 411_d120_bundle_scope_overclaim (reviewer, finding)
     - 197_d120_bundle_scope_narrowed (claude, response)
-- **D121-doi-pagination**: 1 msgs, 0/2 evidence rounds
+    - 414_d120_round2_scope_verified (reviewer, response)
+    - 418_d120_escalation (reviewer, escalation)
+    - 420_d120_terminal_verification (reviewer, verification)
+- **D121-doi-pagination**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 202_adjudication_d120_d121)
     - 412_d121_doi_pagination_regression (reviewer, finding)
+    - 198_d121_barrier (claude, response)
+    - 415_d121_round2_barrier_verified (reviewer, response)
+    - 419_d121_escalation (reviewer, escalation)
+    - 421_d121_terminal_verification (reviewer, verification)
+- **D122-deposit-kit**: 3 msgs, 2/2 evidence rounds
+    - 416_d122_deposit_kit_consistency (reviewer, finding)
+    - 200_d122_kit_regenerated (claude, response)
+    - 422_d122_round2_freeze_residual (reviewer, response)
+- **D123-catalog-title**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 203_adjudication_d123)
+    - 417_d123_catalog_title_drift (reviewer, finding)
+    - 201_d123_catalog_aligned (claude, response)
+    - 423_d123_round2_verified (reviewer, response)
+    - 424_d123_escalation (reviewer, escalation)
 - **D13-frozen-block-mixes-posthoc**: 3 msgs, 2/2 evidence rounds
     - 022_frozen_block_mixes_posthoc_rows (reviewer, finding)
     - 020_d13_fixed (claude, response)
