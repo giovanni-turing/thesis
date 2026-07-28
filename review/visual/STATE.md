@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T04:58:27-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T05:02:20-03:00, protocol v2.1)
 
-messages: 1  errors: 0
+messages: 2  errors: 0
 
 ## Dispute threads
 (none)
