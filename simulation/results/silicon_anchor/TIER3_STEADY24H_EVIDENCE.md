@@ -89,6 +89,20 @@ calm day passes for every arm, in both service representations.
   dense N=1–64 vLLM tables (no interpolation exercised). The calm day
   exercises the small-N end of f(N) — the opposite corner from burst3.
 
+## Completed-rep inventory of the pinned snapshot (D111)
+
+Claim-bearing tier-1/tier-3 cells: 30 completed trace-replay reps —
+`burst3__{fc,re,staticC8}/rep001–005` and
+`steady24h__{fc,re,staticC8}/rep001–005`. Additionally tracked but
+**excluded broken-trio evidence, carrying no claim**: `burst4__fc/rep001`
+and `burst4__re/rep001` (completed; the window's static cell never
+completed, so the trio cannot support a comparison) and
+`burst4__staticC8/rep001` (partial banked artifact only — uncompressed
+`batches.csv` + `clock.jsonl`, no `rep.json`; the daemon STOPped mid-rep
+at batch 18,173/35,038). The full-campaign negative-gate sweep therefore
+verifies 32 completed reps (30 claim-bearing + 2 burst4), all clean, with
+the tier-5 engine fn_sweep reps counted separately.
+
 ## Manifest excerpt
 
 `steady24h_manifest_excerpt.jsonl` (1,245 events = all 8 `daemon_start`
