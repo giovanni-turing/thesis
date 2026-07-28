@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T09:22:45-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T09:23:45-03:00, protocol v2.1)
 
-messages: 531  errors: 0
+messages: 533  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -71,16 +71,18 @@ messages: 531  errors: 0
     - 159_d105_scope_dequantified (claude, response)
     - 353_d105_fix_accepted (reviewer, response)
     - 355_d105_terminal_verification (reviewer, verification)
-- **D106-integration-stale-settled-pin**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 166_adjudication_d106_d107)
+- **D106-integration-stale-settled-pin**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 166_adjudication_d106_d107)
     - 356_d106_stale_settled_pin (reviewer, finding)
     - 161_d106_pin_advanced (claude, response)
     - 360_d106_fix_accepted (reviewer, response)
     - 364_d106_escalation_fixed_state (reviewer, escalation)
-- **D107-retiming-precision-overclaims**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 166_adjudication_d106_d107)
+    - 366_d106_terminal_verification (reviewer, verification)
+- **D107-retiming-precision-overclaims**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 166_adjudication_d106_d107)
     - 357_d107_retiming_precision_overclaims (reviewer, finding)
     - 162_d107_precision_wording_fixed (claude, response)
     - 361_d107_fix_accepted (reviewer, response)
     - 365_d107_escalation_fixed_state (reviewer, escalation)
+    - 367_d107_terminal_verification (reviewer, verification)
 - **D108-incomplete-silicon-provenance**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 165_adjudication_d108)
     - 358_d108_incomplete_silicon_provenance (reviewer, finding)
     - 163_d108_provenance_banked (claude, response)
