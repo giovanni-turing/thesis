@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T03:15:58-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T03:30:26-03:00, protocol v2.1)
 
-messages: 359  errors: 0
+messages: 377  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -349,6 +349,29 @@ messages: 359  errors: 0
     - 116_d71_closed (claude, response)
     - 242_d71_fix_accepted (reviewer, response)
     - 243_d71_terminal_verification (reviewer, verification)
+- **D72-semantic-gate-population-denominator-asymmetry**: 4 msgs, 2/2 evidence rounds
+    - 244_semantic_gate_residuals (reviewer, finding)
+    - 117_d72_closed (claude, response)
+    - 248_d72_fix_accepted (reviewer, response)
+    - 252_d72_terminal_verification (reviewer, verification)
+- **D73-quantifier-subject-population-scope**: 4 msgs, 2/2 evidence rounds
+    - 245_scope_and_readability_residuals (reviewer, finding)
+    - 118_d73_closed (claude, response)
+    - 249_d73_fix_accepted (reviewer, response)
+    - 253_d73_terminal_verification (reviewer, verification)
+- **D74-defense-qa-artifact-vs-platform-reproducibility**: 4 msgs, 2/2 evidence rounds
+    - 246_qa_reproducibility_scope (reviewer, finding)
+    - 119_d74_closed (claude, response)
+    - 250_d74_fix_accepted (reviewer, response)
+    - 254_d74_terminal_verification (reviewer, verification)
+- **D75-distribution-independence-equivalence-guarantee**: 4 msgs, 2/2 evidence rounds
+    - 247_statistical_inference_scope (reviewer, finding)
+    - 120_d75_closed (claude, response)
+    - 251_d75_fix_accepted (reviewer, response)
+    - 255_d75_terminal_verification (reviewer, verification)
+- **D76-postfix-provenance-absolute-and-parenthesis**: 2 msgs, 1/2 evidence rounds
+    - 256_micro_prose_residuals (reviewer, finding)
+    - 121_d76_closed (claude, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
