@@ -187,25 +187,36 @@
   "path": "collector_artifacts/phaseB_batch_validation/aic_f_n_postinfill.csv",
   "sha256": "9efa0df865b378e48a2c081b11d2aee650562a88c5cf4d1ebdc555fa5efe12a0"
  },
- "headline_table_for_direct_and_per_n_scaled": "tier5_rerun",
- "table_choice_note": "The independently verified burst3__staticC8 pair (746.994 / 748.409 ms, ledger entry silicon-anchor-tier5-engine-adjudication-v2) reproduces DIGIT-EXACT only from the tier-5 rerun sweep vllm_eager_dense_rerun.json (mean_ms). The canonical phase-E manuscript artifact vllm_eager_dense.json gives 745.758 / 747.169 ms for the same cell under the same method. Both tables are reported per cell under by_vllm_table; the top-level direct_vllm_p99 / per_n_scaled_p99 fields use tier5_rerun so the steady24h numbers are LIKE-FOR-LIKE with the verified burst3 pair. Any manuscript propagation must state which table it used.",
+ "headline_table_for_direct_and_per_n_scaled": "phaseE_canonical",
+ "table_choice_note": "D109 ruling (bridge 369): the canonical phase-E artifact vllm_eager_dense.json, frozen for the manuscript before the second sample existed, GOVERNS every primary manuscript value (burst3__staticC8: 745.758 / 747.169 ms; it supplies the top-level direct_vllm_p99 / per_n_scaled_p99 fields here). The tier-5 rerun vllm_eager_dense_rerun.json is replication sensitivity, reported side by side under by_vllm_table. Provenance correction of record: the previously verified D63 pair 746.994 / 748.409 ms was computed (and independently reproduced) from the RERUN table; it remains the correct retime from that table and is retained in the two-table validation gate.",
  "validation_gate": {
   "cell": "burst3__staticC8",
   "expected": {
    "stored_sim_p99": 717.755,
-   "direct_vllm_p99": 746.994,
-   "per_n_scaled_p99": 748.409
+   "phaseE_canonical": {
+    "direct_vllm_p99": 745.758,
+    "per_n_scaled_p99": 747.169
+   },
+   "tier5_rerun": {
+    "direct_vllm_p99": 746.994,
+    "per_n_scaled_p99": 748.409
+   }
   },
   "actual": {
    "stored_sim_p99": 717.755,
-   "direct_vllm_p99": 746.994,
-   "per_n_scaled_p99": 748.409
+   "phaseE_canonical": {
+    "direct_vllm_p99": 745.758,
+    "per_n_scaled_p99": 747.169
+   },
+   "tier5_rerun": {
+    "direct_vllm_p99": 746.994,
+    "per_n_scaled_p99": 748.409
+   }
   },
   "digit_exact": true,
-  "table_used": "tier5_rerun",
-  "canonical_phaseE_for_same_cell": {
-   "direct_vllm_p99": 745.758,
-   "per_n_scaled_p99": 747.169
+  "roles": {
+   "phaseE_canonical": "governs manuscript values (D109)",
+   "tier5_rerun": "replication sensitivity; source of the D63-verified pair (provenance correction of record)"
   },
   "cell_detail": {
    "cell": "burst3__staticC8",
@@ -215,8 +226,8 @@
    "encoder_workers": 2,
    "schedule": "simulation/results/comparator_frontier/eval/burst3_staticC8_L30.sched.json",
    "stored_sim_p99": 717.755,
-   "direct_vllm_p99": 746.994,
-   "per_n_scaled_p99": 748.409,
+   "direct_vllm_p99": 745.758,
+   "per_n_scaled_p99": 747.169,
    "by_vllm_table": {
     "tier5_rerun": {
      "direct_vllm_p99": 746.994,
@@ -301,8 +312,8 @@
    "encoder_workers": 2,
    "schedule": "simulation/results/comparator_frontier/eval/steady24h_fc_L30.sched.json",
    "stored_sim_p99": 681.117,
-   "direct_vllm_p99": 741.987,
-   "per_n_scaled_p99": 745.833,
+   "direct_vllm_p99": 738.751,
+   "per_n_scaled_p99": 742.587,
    "by_vllm_table": {
     "tier5_rerun": {
      "direct_vllm_p99": 741.987,
@@ -385,8 +396,8 @@
    "encoder_workers": 2,
    "schedule": "simulation/results/comparator_frontier/eval/steady24h_re_L30.sched.json",
    "stored_sim_p99": 684.999,
-   "direct_vllm_p99": 741.987,
-   "per_n_scaled_p99": 745.833,
+   "direct_vllm_p99": 738.751,
+   "per_n_scaled_p99": 742.587,
    "by_vllm_table": {
     "tier5_rerun": {
      "direct_vllm_p99": 741.987,
@@ -469,8 +480,8 @@
    "encoder_workers": 2,
    "schedule": "simulation/results/comparator_frontier/eval/steady24h_staticC8_L30.sched.json",
    "stored_sim_p99": 418.205,
-   "direct_vllm_p99": 435.423,
-   "per_n_scaled_p99": 436.407,
+   "direct_vllm_p99": 434.516,
+   "per_n_scaled_p99": 435.497,
    "by_vllm_table": {
     "tier5_rerun": {
      "direct_vllm_p99": 435.423,
@@ -554,7 +565,7 @@
  },
  "notes": [
   "steady24h dispatches are dominated by N=1 batches (p50 = 1 image/batch) with a heavy tail to the cap (p99 = 64). Both vLLM tables are dense over N=1..64 and every dispatched N is an exact table key in all three cells, so no interpolation and no extrapolation is exercised (dispatch_n_not_in_table is empty everywhere).",
-  "steady24h__fc and steady24h__re return the SAME retimed p99 to full float precision (direct 741.987, per-N 745.833) even though their stored simulator p99 differ (681.117 vs 684.999), their dispatches differ (39906 vs 39899 batches) and 1686 of the 88260 per-request delays differ. It is a genuine order-statistic coincidence at the p99 index, not an input mix-up: the immediate neighbours of the p99 order statistic, the p99.9 and the max all differ between the two arms.",
+  "steady24h__fc and steady24h__re return the SAME retimed p99 to full float precision (direct 738.751, per-N 742.587) even though their stored simulator p99 differ (681.117 vs 684.999), their dispatches differ (39906 vs 39899 batches) and 1686 of the 88260 per-request delays differ. It is a genuine order-statistic coincidence at the p99 index, not an input mix-up: the immediate neighbours of the p99 order statistic, the p99.9 and the max all differ between the two arms.",
   "The static-C8 arm is the only steady24h cell whose retimed p99 sits far below the others; the reactive and forecast arms are provisioned more thinly in this window, which is why their p99 encoder delay is higher under every service representation."
  ]
 }

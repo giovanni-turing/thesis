@@ -67,9 +67,16 @@ ROOT = Path(__file__).resolve().parents[3]
 OUT = Path(__file__).resolve().parent / "steady24h_vllm_retimes.json"
 
 GATE_CELL = "burst3__staticC8"
+# D109 ruling: the canonical phase-E table GOVERNS manuscript values; the
+# tier-5 rerun is replication sensitivity. The gate checks BOTH tables by
+# role: the rerun must reproduce the D63/terminally-verified pair (a
+# provenance correction of record -- that pair was rerun-sourced), and the
+# canonical table must reproduce the governing manuscript pair.
 GATE_EXPECT = {"stored_sim_p99": 717.755,
-               "direct_vllm_p99": 746.994,
-               "per_n_scaled_p99": 748.409}
+               "phaseE_canonical": {"direct_vllm_p99": 745.758,
+                                    "per_n_scaled_p99": 747.169},
+               "tier5_rerun": {"direct_vllm_p99": 746.994,
+                               "per_n_scaled_p99": 748.409}}
 CELLS = ["steady24h__fc", "steady24h__re", "steady24h__staticC8"]
 
 VLLM_TABLES = {
@@ -182,8 +189,8 @@ def compute_cell(cid: str, spec: dict, tables: dict) -> dict:
         "encoder_workers": spec["encoder_workers"],
         "schedule": spec["schedule"],
         "stored_sim_p99": banked_p99,
-        "direct_vllm_p99": per_table["tier5_rerun"]["direct_vllm_p99"],
-        "per_n_scaled_p99": per_table["tier5_rerun"]["per_n_scaled_p99"],
+        "direct_vllm_p99": per_table["phaseE_canonical"]["direct_vllm_p99"],
+        "per_n_scaled_p99": per_table["phaseE_canonical"]["per_n_scaled_p99"],
         "by_vllm_table": per_table,
         "n_distribution": n_distribution(sizes),
         "n_forwards_per_batch_seen": n_fwd,
@@ -223,9 +230,11 @@ def main() -> int:
         }
 
     gate = compute_cell(GATE_CELL, cells[GATE_CELL], tables)
-    gate_actual = {"stored_sim_p99": gate["stored_sim_p99"],
-                   "direct_vllm_p99": gate["direct_vllm_p99"],
-                   "per_n_scaled_p99": gate["per_n_scaled_p99"]}
+    gate_actual = {"stored_sim_p99": gate["stored_sim_p99"]}
+    for tname in ("phaseE_canonical", "tier5_rerun"):
+        gate_actual[tname] = {
+            "direct_vllm_p99": gate["by_vllm_table"][tname]["direct_vllm_p99"],
+            "per_n_scaled_p99": gate["by_vllm_table"][tname]["per_n_scaled_p99"]}
     gate_pass = gate_actual == GATE_EXPECT
     if not gate_pass:
         sys.stderr.write("METHOD VALIDATION GATE FAILED\n"
@@ -270,26 +279,25 @@ def main() -> int:
         },
         "vllm_tables": table_meta,
         "aic_curve": {"path": AIC_CSV, "sha256": sha256(ROOT / AIC_CSV)},
-        "headline_table_for_direct_and_per_n_scaled": "tier5_rerun",
+        "headline_table_for_direct_and_per_n_scaled": "phaseE_canonical",
         "table_choice_note": (
-            "The independently verified burst3__staticC8 pair (746.994 / 748.409 ms, ledger "
-            "entry silicon-anchor-tier5-engine-adjudication-v2) reproduces DIGIT-EXACT only "
-            "from the tier-5 rerun sweep vllm_eager_dense_rerun.json (mean_ms). The canonical "
-            "phase-E manuscript artifact vllm_eager_dense.json gives 745.758 / 747.169 ms for "
-            "the same cell under the same method. Both tables are reported per cell under "
-            "by_vllm_table; the top-level direct_vllm_p99 / per_n_scaled_p99 fields use "
-            "tier5_rerun so the steady24h numbers are LIKE-FOR-LIKE with the verified "
-            "burst3 pair. Any manuscript propagation must state which table it used."),
+            "D109 ruling (bridge 369): the canonical phase-E artifact vllm_eager_dense.json, "
+            "frozen for the manuscript before the second sample existed, GOVERNS every primary "
+            "manuscript value (burst3__staticC8: 745.758 / 747.169 ms; it supplies the "
+            "top-level direct_vllm_p99 / per_n_scaled_p99 fields here). The tier-5 rerun "
+            "vllm_eager_dense_rerun.json is replication sensitivity, reported side by side "
+            "under by_vllm_table. Provenance correction of record: the previously verified "
+            "D63 pair 746.994 / 748.409 ms was computed (and independently reproduced) from "
+            "the RERUN table; it remains the correct retime from that table and is retained "
+            "in the two-table validation gate."),
         "validation_gate": {
             "cell": GATE_CELL,
             "expected": GATE_EXPECT,
             "actual": gate_actual,
             "digit_exact": gate_pass,
-            "table_used": "tier5_rerun",
-            "canonical_phaseE_for_same_cell": {
-                "direct_vllm_p99": gate["by_vllm_table"]["phaseE_canonical"]["direct_vllm_p99"],
-                "per_n_scaled_p99": gate["by_vllm_table"]["phaseE_canonical"]["per_n_scaled_p99"],
-            },
+            "roles": {"phaseE_canonical": "governs manuscript values (D109)",
+                      "tier5_rerun": "replication sensitivity; source of the "
+                                     "D63-verified pair (provenance correction of record)"},
             "cell_detail": gate,
         },
         "cells": {},
