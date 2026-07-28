@@ -37,29 +37,36 @@ def main():
     live = subprocess.run(["git", "-C", tese, "log", "-1", "--format=%H", "--", rel],
                           capture_output=True, text=True, check=True).stdout.strip()
 
-    db.run_sql(f"UPDATE provenance.runs SET artifact_commit_sha = '{STALE}' "
-               f"WHERE run_id = '{RID}'")
-    seeded, _ = current_pin()
-    if seeded != STALE:
-        print("FAIL: could not seed stale SHA")
-        return 1
-
-    load_config_backfill.load_config_backfill()
-    after, _ = current_pin()
-    good = after == live and after != STALE
-    print(f"{'PASS' if good else 'FAIL'}: K34 advances seeded stale pin "
-          f"({seeded[:8]} -> {after[:8]}, live {live[:8]})")
-    ok &= good
-
-    load_config_backfill.load_config_backfill()
-    again, _ = current_pin()
-    good = again == after
-    print(f"{'PASS' if good else 'FAIL'}: second K34 pass idempotent ({again[:8]})")
-    ok &= good
-
-    if not ok and sha0 == live:
-        db.run_sql(f"UPDATE provenance.runs SET artifact_commit_sha = '{sha0}' "
+    # FAILURE-SAFE (bridge 262): the live row is restored to the live Git
+    # SHA on EVERY exit path, including exceptions between seed and verify --
+    # a failing correctness test must never create the defect it detects.
+    try:
+        db.run_sql(f"UPDATE provenance.runs SET artifact_commit_sha = '{STALE}' "
                    f"WHERE run_id = '{RID}'")
+        seeded, _ = current_pin()
+        if seeded != STALE:
+            print("FAIL: could not seed stale SHA")
+            return 1
+
+        load_config_backfill.load_config_backfill()
+        after, _ = current_pin()
+        good = after == live and after != STALE
+        print(f"{'PASS' if good else 'FAIL'}: K34 advances seeded stale pin "
+              f"({seeded[:8]} -> {after[:8]}, live {live[:8]})")
+        ok &= good
+
+        load_config_backfill.load_config_backfill()
+        again, _ = current_pin()
+        good = again == after
+        print(f"{'PASS' if good else 'FAIL'}: second K34 pass idempotent ({again[:8]})")
+        ok &= good
+    finally:
+        db.run_sql(f"UPDATE provenance.runs SET artifact_commit_sha = '{live}' "
+                   f"WHERE run_id = '{RID}'")
+        restored, _ = current_pin()
+        print(f"restore: pin = {restored[:8]} (live {live[:8]})"
+              + ("" if restored == live else "  RESTORE FAILED"))
+        ok &= restored == live
     print("D77-SELFTEST:", "ALL PASS" if ok else "FAIL")
     return 0 if ok else 1
 

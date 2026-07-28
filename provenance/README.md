@@ -57,8 +57,7 @@ C*, TP×N, gpu, engine, actuation, readiness…) live on `runs` / `factorial_cel
 
 `v_llm_drift` recomputes p99 TTFT from raw `llm_request` and compares it to the stored
 `llm_run_summary` — the "is a chapter number still consistent with its artifact?" check. Current
-state: **worst 0.39% across all 71 runs, every rowcount matches** (the 0.39% is percentile-
-interpolation noise). Refresh after any K1/K2 reload:
+state: **worst |drift| 1.2375% across 185 audited rows, every rowcount matches** (drift is percentile-interpolation difference, not data error; snapshot 2026-07-28). Refresh after any K1/K2 reload:
 
 ```sql
 REFRESH MATERIALIZED VIEW provenance.mv_llm_p99_check;
@@ -98,5 +97,6 @@ Re-running is idempotent: a file whose sha256 is unchanged in `ingest_log` is sk
   at build time (load with a plain `main.py` re-run once on disk): **A15 language E2E, A12 TimesFM
   language arms, A11 `week_fc_timesfm_L60`** — per-request records are written only at run completion.
 - Unmatched experiments land in each partitioned table's `*_default` partition (correct, just not pruned).
-- `grid_summary.json` (static-optimal C*/TP*/N* per window) is not yet a dedicated table — the
-  individual grid runs are in `llm_run_summary`/`encoder_run_summary`; add a `grid_optimum` table if needed.
+- `grid_summary.json` (static-optimal C*/TP*/N* per window) IS a dedicated pair of tables:
+  `grid_run_summary` (1 row) and `grid_window` (7 rows), created by `schema/05_grid.sql`;
+  the individual grid runs remain in `llm_run_summary`/`encoder_run_summary`.
