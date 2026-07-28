@@ -285,7 +285,14 @@ SELECT 'mv_worker_seconds',
 UNION ALL
 SELECT 'mv_infraction',
        (SELECT count(*) FROM provenance.mv_infraction),
-       (SELECT count(*) FROM provenance.v_infraction);
+       (SELECT count(*) FROM provenance.v_infraction)
+UNION ALL
+-- D92 (bridge 283): the check-results cache was on the refresh contract but
+-- absent from this surface, so v_mv_stale could report clean while it was
+-- a week stale. Freshness proxy: one row per enabled check definition.
+SELECT 'mv_check_results',
+       (SELECT count(*) FROM provenance.mv_check_results),
+       (SELECT count(*) FROM provenance.check_definition WHERE is_enabled);
 
 CREATE OR REPLACE VIEW provenance.v_mv_stale AS
   SELECT *, materialized_rows = live_rows AS is_fresh

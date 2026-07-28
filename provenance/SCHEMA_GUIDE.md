@@ -1180,8 +1180,12 @@ deviation is a fixed property of the archived summary. Worst `p99` drift across 
 ### 6.4 RESOLVED — the matviews are fresh
 
 The old text reported `mv_llm_p99_check` at 101 materialized vs 125 live. All four matviews are now
-fresh and `v_mv_stale` is empty: `mv_llm_p99_check` 178/178, `mv_llm_percentiles` 178/178,
-`mv_worker_seconds` 234/234, `mv_infraction` 2337/2337. The refresh discipline in §5 still applies
+fresh and `v_mv_stale` is empty. Do not rely on point-in-time counts here:
+the invariant is `SELECT count(*) FROM provenance.v_mv_stale` = 0, and since
+D92 (2026-07-28) the surface includes `mv_check_results` (one row per enabled
+check definition), so a stale check cache also trips it. The delivery gate
+(`verify_all.sh` A3) enforces the zero-stale invariant on every run. The
+refresh discipline in §5 still applies
 after any future K1/K2 ingest.
 
 ### 6.5 306 `ingest_log` rows have no spine row — now characterised, and NOT a failed load

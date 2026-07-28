@@ -80,6 +80,11 @@ if [ -z "$PGPASSWORD" ]; then bad "cannot reach postgres (no password from docke
             where run_id in (select run_id from provenance.llm_run_summary)")
   [ "${MV:-0}" = "${LIVE:-1}" ] && ok "lineage matview fresh ($MV runs)" \
                                 || bad "lineage matview STALE ($MV materialized vs $LIVE live) -- REFRESH MATERIALIZED VIEW provenance.mv_llm_p99_check"
+  # D92 (bridge 283): EVERY evidence cache must be fresh, incl. mv_check_results.
+  STALEMV=$(Q "select count(*) from provenance.v_mv_stale")
+  [ "${STALEMV:-x}" = "0" ] && ok "all evidence caches fresh (v_mv_stale: 0 rows, incl. mv_check_results)" \
+                            || { bad "stale evidence caches: $STALEMV (see provenance.v_mv_stale)"; \
+                                 Q "select '        - '||matview||': '||materialized_rows||' vs '||live_rows from provenance.v_mv_stale"; }
   DRIFT=$(Q "select coalesce(max(ttft_pct_diff),0)::numeric(10,4) from provenance.v_llm_drift")
   awk -v d="${DRIFT:-99}" 'BEGIN{exit !(d<2.0)}' && ok "worst raw-vs-summary drift ${DRIFT}% (<2%)" \
                                                  || bad "worst drift ${DRIFT}% exceeds 2%"
