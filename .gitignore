@@ -144,3 +144,4 @@ simulation/results/silicon_anchor/daemon.pid
 simulation/results/silicon_anchor/daemon.log
 simulation/results/silicon_anchor/manifest.jsonl
 simulation/results/silicon_anchor/STOP
+release/
