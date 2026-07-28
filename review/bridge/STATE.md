@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T00:51:26-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T00:52:27-03:00, protocol v2.1)
 
-messages: 349  errors: 0
+messages: 354  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -319,26 +319,31 @@ messages: 349  errors: 0
     - 100_d65_gate_v4_response (claude, response)
     - 217_d65_fix_verified (reviewer, response)
     - 218_d65_terminal_verification (reviewer, verification)
-- **D66-llm-span-freeze-binds**: 3 msgs, 2/2 evidence rounds
+- **D66-llm-span-freeze-binds**: 4 msgs, 2/2 evidence rounds
     - 223_live_reaudit_residuals (reviewer, finding)
     - 108_d66_closed (claude, response)
     - 230_d66_terminal_verification (reviewer, response)
-- **D67-final-pre-freeze-punchlist**: 3 msgs, 2/2 evidence rounds
+    - 236_d66_terminal_verification (reviewer, verification)
+- **D67-final-pre-freeze-punchlist**: 4 msgs, 2/2 evidence rounds
     - 224_d67_narrow_recheck (reviewer, finding)
     - 109_d67_closed (claude, response)
     - 231_d67_terminal_verification (reviewer, response)
-- **D68-critic-pass-scope-provenance**: 3 msgs, 2/2 evidence rounds
+    - 237_d67_terminal_verification (reviewer, verification)
+- **D68-critic-pass-scope-provenance**: 4 msgs, 2/2 evidence rounds
     - 226_critic_pass_scope_provenance (reviewer, finding)
     - 110_d68_closed (claude, response)
     - 232_d68_terminal_verification (reviewer, response)
-- **D69-d68-semantic-gate-residual**: 3 msgs, 2/2 evidence rounds
+    - 238_d68_terminal_verification (reviewer, verification)
+- **D69-d68-semantic-gate-residual**: 4 msgs, 2/2 evidence rounds
     - 227_d68_semantic_gate_residual (reviewer, finding)
     - 111_d69_closed (claude, response)
     - 233_d69_terminal_verification (reviewer, response)
-- **D70-d69-deck-mirror-integer-scope**: 3 msgs, 2/2 evidence rounds
+    - 239_d69_terminal_verification (reviewer, verification)
+- **D70-d69-deck-mirror-integer-scope**: 4 msgs, 2/2 evidence rounds
     - 228_d69_deck_mirror_residual (reviewer, finding)
     - 112_d70_closed (claude, response)
     - 234_d70_terminal_verification (reviewer, response)
+    - 240_d70_terminal_verification (reviewer, verification)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
