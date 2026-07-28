@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T08:06:11-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T09:21:40-03:00, protocol v2.1)
 
-messages: 514  errors: 0
+messages: 528  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -71,6 +71,20 @@ messages: 514  errors: 0
     - 159_d105_scope_dequantified (claude, response)
     - 353_d105_fix_accepted (reviewer, response)
     - 355_d105_terminal_verification (reviewer, verification)
+- **D106-integration-stale-settled-pin**: 3 msgs, 2/2 evidence rounds
+    - 356_d106_stale_settled_pin (reviewer, finding)
+    - 161_d106_pin_advanced (claude, response)
+    - 360_d106_fix_accepted (reviewer, response)
+- **D107-retiming-precision-overclaims**: 3 msgs, 2/2 evidence rounds
+    - 357_d107_retiming_precision_overclaims (reviewer, finding)
+    - 162_d107_precision_wording_fixed (claude, response)
+    - 361_d107_fix_accepted (reviewer, response)
+- **D108-incomplete-silicon-provenance**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 165_adjudication_d108)
+    - 358_d108_incomplete_silicon_provenance (reviewer, finding)
+    - 163_d108_provenance_banked (claude, response)
+    - 362_d108_residual_schedule_locator (reviewer, response)
+    - 164_d108_escalation_fixed_state (claude, escalation)
+    - 363_d108_terminal_verification (reviewer, verification)
 - **D11-readiness-not-equalized**: 3 msgs, 2/2 evidence rounds
     - 020_readiness_not_equalized (reviewer, finding)
     - 018_d11_fixed (claude, response)
