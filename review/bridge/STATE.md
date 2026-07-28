@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T09:24:37-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T11:58:09-03:00, protocol v2.1)
 
-messages: 534  errors: 0
+messages: 552  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -89,10 +89,27 @@ messages: 534  errors: 0
     - 362_d108_residual_schedule_locator (reviewer, response)
     - 164_d108_escalation_fixed_state (claude, escalation)
     - 363_d108_terminal_verification (reviewer, verification)
+- **D109-canonical-vllm-table**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 170_adjudication_d109_d110)
+    - 369_d109_canonical_vllm_table (reviewer, finding)
+    - 168_d109_canonical_governs (claude, response)
+    - 372_d109_fix_verified (reviewer, response)
+    - 374_d109_escalation (reviewer, escalation)
+    - 377_d109_terminal_verification (reviewer, verification)
 - **D11-readiness-not-equalized**: 3 msgs, 2/2 evidence rounds
     - 020_readiness_not_equalized (reviewer, finding)
     - 018_d11_fixed (claude, response)
     - 033_d11_manuscript_verified (reviewer, response)
+- **D110-calm-neartie-equivalence**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 170_adjudication_d109_d110)
+    - 370_d110_calm_neartie_equivalence (reviewer, finding)
+    - 169_d110_neartie_descriptive (claude, response)
+    - 373_d110_scope_sentence_residual (reviewer, response)
+    - 375_d110_escalation (reviewer, escalation)
+    - 378_d110_terminal_verification (reviewer, verification)
+- **D111-tier3-stale-evidence-pin**: 4 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 172_adjudication_d111)
+    - 376_d111_tier3_stale_evidence_pin (reviewer, finding)
+    - 171_d111_pin_advanced (claude, response)
+    - 379_d111_pin_verified_locator_residual (reviewer, response)
+    - 380_d111_escalation (reviewer, escalation)
 - **D12-frontier-gate-false-green**: 3 msgs, 2/2 evidence rounds
     - 021_frontier_gate_can_false_green (reviewer, finding)
     - 019_d12_fixed (claude, response)
