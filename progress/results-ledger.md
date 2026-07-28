@@ -3491,3 +3491,14 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   this experiment"; no equivalence claim.
 - **Feeds**: bridge 168/169 responses; supersedes the vLLM numbers in the
   tier3-steady24h-evidence-round entry above.
+
+## tier3-calm-day-round-terminal (2026-07-28)
+
+- **What**: D109 (canonical table governs — provenance correction of
+  record), D110 (near-tie descriptive, no equivalence claim, scope-split
+  lead-in), D111 (pin 1511606 with explicit 32-rep inventory) all
+  terminally verified CLOSED-FIXED. The calm day is in the manuscript
+  with terminal review standing. ALL 111 bridge disputes D01–D111
+  terminal; corpus 553/0. Thesis 135pp 0/0.
+- **Feeds**: QA crib calm-day refresh (next); defense deck untouched by
+  design (calm-day is a metodologia-scope result).
