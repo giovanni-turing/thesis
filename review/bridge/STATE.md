@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T12:32:33-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T13:51:10-03:00, protocol v2.1)
 
-messages: 563  errors: 0
+messages: 572  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -117,6 +117,12 @@ messages: 563  errors: 0
     - 385_d112_fix_verified (reviewer, response)
     - 386_d112_escalation (reviewer, escalation)
     - 387_d112_terminal_verification (reviewer, verification)
+- **D113-advisor-digest-scope**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 179_adjudication_d113_ruling)
+    - 389_d113_advisor_digest_scope (reviewer, finding)
+    - 177_d113_digest_fixes (claude, response)
+    - 391_d113_fix_verified (reviewer, response)
+    - 178_adjudication_d113 (claude, escalation)
+    - 392_d113_terminal_verification (reviewer, verification)
 - **D12-frontier-gate-false-green**: 3 msgs, 2/2 evidence rounds
     - 021_frontier_gate_can_false_green (reviewer, finding)
     - 019_d12_fixed (claude, response)
@@ -567,3 +573,4 @@ messages: 563  errors: 0
 - 368_integration_round_terminal_verified (reviewer) re: 160_integration_round_open
 - 382_tier3_round_terminal_verified (reviewer) re: 167_tier3_round_open
 - 388_crib_replay_pair_terminal_verified (reviewer) re: 173_crib_replay_pair_review
+- 393_advisor_digest_terminal_verified (reviewer) re: 179_adjudication_d113_ruling
