@@ -3627,3 +3627,17 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
 - **Artifacts**: `tex/tese.pdf` (see the run log in the report). Feeds:
   bridge round 180; supersedes the abstract/front-matter portions of the
   entry above.
+
+## ime-conversion-round-terminal (2026-07-28)
+
+- **What**: D114–D117 all terminally verified CLOSED-FIXED (403–406) —
+  the IME-USP template conversion + one-page-abstract round is fully
+  closed. ALL 117 bridge disputes D01–D117 terminal; corpus 596/0.
+  Thesis: 111pp in the official IME model (18 roman + 93 arabic), 0
+  errors / 0 undefined / 0 overfull / 0 hyperref warnings; abstracts
+  one physical page per language, RQ3 convention-minimized lead
+  attachment-bound bilingually; 55 mutation probes + 3 harness checks
+  green. Advisor digest terminally certified separately (D113).
+- **Feeds**: nothing — every review line (scientific, visual, digest,
+  conversion) is closed. Human gates remain: advisor pass, banca names,
+  library ficha fields, versão original deposit, bib-style decision.

@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T13:51:10-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T15:26:12-03:00, protocol v2.1)
 
-messages: 572  errors: 0
+messages: 596  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -123,6 +123,30 @@ messages: 572  errors: 0
     - 391_d113_fix_verified (reviewer, response)
     - 178_adjudication_d113 (claude, escalation)
     - 392_d113_terminal_verification (reviewer, verification)
+- **D114-abstract-compression-scope**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 185_adjudication_d114_d115)
+    - 394_d114_abstract_compression_scope (reviewer, finding)
+    - 181_d114_abstract_repairs (claude, response)
+    - 397_d114_fix_verification (reviewer, response)
+    - 183_d114_gate_residuals_fixed (claude, escalation)
+    - 403_d114_terminal_verification (reviewer, verification)
+- **D115-ime-frontmatter-conformance**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 185_adjudication_d114_d115)
+    - 395_d115_ime_frontmatter_conformance (reviewer, finding)
+    - 182_d115_frontmatter_fixes (claude, response)
+    - 398_d115_fix_verification (reviewer, response)
+    - 184_d115_provenance_residuals_fixed (claude, escalation)
+    - 404_d115_terminal_verification (reviewer, verification)
+- **D116-stale-tracking-provenance**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 190_adjudication_d116_d117)
+    - 399_d116_stale_tracking_provenance (reviewer, finding)
+    - 186_d116_provenance_patch (claude, response)
+    - 402_d116_count_after_d117 (reviewer, response)
+    - 188_d116_escalation (claude, escalation)
+    - 405_d116_terminal_verification (reviewer, verification)
+- **D117-convention-minimized-gate-residual**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 190_adjudication_d116_d117)
+    - 400_d117_convention_minimized_gate_residual (reviewer, finding)
+    - 187_d117_gate_attachment (claude, response)
+    - 401_d117_fix_verified (reviewer, response)
+    - 189_d117_escalation (claude, escalation)
+    - 406_d117_terminal_verification (reviewer, verification)
 - **D12-frontier-gate-false-green**: 3 msgs, 2/2 evidence rounds
     - 021_frontier_gate_can_false_green (reviewer, finding)
     - 019_d12_fixed (claude, response)
