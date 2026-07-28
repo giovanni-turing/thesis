@@ -28,10 +28,13 @@ archives with their provenance manifest, and the S7 clean-checkout
 reproduction material), \texttt{947005c} (the four burst2/6
 forecast-free half archives), \texttt{f7a64be} (the corrected ten-row
 archive manifest -- per-family archive commits, each gated to contain its
-path), and \texttt{7fd894c} (the metric-stack correction: the
+path), \texttt{7fd894c} (the metric-stack correction: the
 readiness-separated full-span artifact with its \texttt{fc\_vs\_re} and
 \texttt{comparisons\_by\_readiness} blocks, generator, two-panel figure,
-and the column-ordered role-scoped structural gate).
+and the column-ordered role-scoped structural gate), and \texttt{1301a07}
+(the language span stack with its population/token/lead-bound generator,
+the aggregates-first hierarchy and readability freeze, and the gate
+extended over chapter, conclusion, and both defense-deck mirrors).
 
 \section{Environment}
 
@@ -260,6 +263,13 @@ Tab.~\ref{tab:conc-regimes} & synthesis; no new run &
 Language week replay (\S\ref{sec:cl-llm}) &
   \texttt{simulation/results/ llm\_week/launch.sh} &
   \texttt{llm\_week/ week\_*.report.json} & \texttt{planner:week\_*} \\
+Tab.~\ref{tab:cl-llm-week-stack} &
+  \texttt{simulation/results/ llm\_week/ llm\_week\_stack.py}
+  (\texttt{--check}; gated by
+  \texttt{verification/ metric\_stack\_gate.py}) &
+  \texttt{simulation/results/ llm\_week/ llm\_week\_stack.json}
+  (population, native token counters, and per-driver $L{=}60$
+  occurrence counts asserted) & (DB: cross-check only) \\
 Language operating point: $q\times s$ grid, held-out frontier, folds
   (\S\ref{sec:cl-llm}) &
   \texttt{simulation/ run\_lang\_calib\{,\_eval\}.sh; run\_lang\_folds.sh} &
