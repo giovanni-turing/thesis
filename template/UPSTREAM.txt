@@ -1,1 +1,24 @@
 upstream: https://github.com/ccsl-usp/modelo-latex @ cb57593 (2026-06-18), .git stripped for vendoring
+
+Completeness (verified 2026-07-28, D115.5) -- the earlier one-word claim
+"pristine" was not checkable and is replaced by this explicit statement:
+
+  * Every file of the pinned upstream tree is present under
+    template/modelo-latex/ with upstream content.
+  * ONE file is present on disk but NOT tracked by git:
+        pre-compilados/colinha.pdf   (md5 ab683823cb8f83cf710133ca93a72900)
+    It is byte-identical to
+    https://raw.githubusercontent.com/ccsl-usp/modelo-latex/cb57593/pre-compilados/colinha.pdf
+    (re-fetched and compared on 2026-07-28).  It is invisible to git only
+    because the VENDORED upstream .gitignore itself ignores it
+    (template/modelo-latex/.gitignore:36 -- upstream generates colinha.pdf
+    from colinha.tex and does not track the artifact either).  Tracking it
+    here therefore requires `git add -f`; that is a deliberate deviation
+    from upstream's own ignore rules, taken so the vendored snapshot is
+    complete without the reader having to rebuild anything.
+
+  * Nothing else was added, removed, or edited under template/.
+
+The vendored tree is a reference copy only: the thesis build never reads it
+(tex/tese.tex vendors imegoodies.sty / imelooks.sty / evenragged.sty /
+lstpseudocode.sty into tex/ instead).

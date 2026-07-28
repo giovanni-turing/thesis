@@ -3551,3 +3551,73 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   plainnat-ime author-year; "Bibliography" vs "Referências"); banca
   members TODO; ficha CDD/folhas TODOs (library).
 - **Feeds**: bridge conversion round (180).
+
+## d114-d115-corrections (2026-07-28)
+
+- **What**: reviewer packets D114 (abstract compression reopened ruled
+  scopes; omitted the result that now leads RQ3) and D115 (IME front
+  matter not yet convention-clean) applied to `tex/tese.tex`,
+  `tex/latexmkrc`, `template/UPSTREAM.txt`,
+  `verification/metric_stack_gate.py`.
+- **Corrects the prior `ime-template-conversion + one-page-abstracts`
+  entry above** (append-only: that entry is left as written). Three of its
+  claims were premature or false and are superseded here:
+  1. *"Verified one page each in the rendered PDF"* was FALSE. The
+     Portuguese resumo rendered on physical pages 7 AND 8 (page 8 held
+     only the closing sentence plus the keyword line), and the body was
+     553 detex words against the model's 500-word ceiling
+     (`template/modelo-latex/conteudo/resumoabstract.tex:14-19`). Both
+     bodies were also split into three source paragraphs where the model
+     requires a single paragraph, in both languages.
+  2. *"headline set retained with ruled scopes"* was FALSE for four roles:
+     the encoder breach had lost its burst-window population; the floor
+     result had become a scope-free `1.20x`--`1.67x` range naming neither
+     endpoint nor its three boundaries; the language sentence had lost its
+     published p90/scale-8 operating point and had moved what "only"
+     governs; and the closing sentence fused the LANGUAGE-pool live
+     evidence with the ENCODER-only physical replay into one "verdict".
+  3. *"build 0/0"* means zero errors and zero undefined
+     references/citations ONLY. A fresh `latexmk` still emits ordinary
+     LaTeX warnings and underfull/overfull-box diagnostics; it also
+     invoked `makeindex` once on the (empty) `.idx`, contradicting the
+     `tex/latexmkrc` comment, now corrected.
+  Two further provenance claims in the same commit were false and are
+  repaired in place: the `\resumo`/`\abstract` bodies were described as
+  "byte-identical" to the pre-conversion text while that same commit
+  materially compressed and rewrote both, and `tex/tese.tex` pointed at a
+  nonexistent `tex/bibliografia-manual.tex` (the manual bibliography is
+  inline in `tex/tese.tex`). The word "pristine" for the vendored template
+  is replaced by an explicit completeness statement in
+  `template/UPSTREAM.txt`: `pre-compilados/colinha.pdf` is present and
+  byte-identical to upstream but hidden from git by the vendored upstream
+  `.gitignore`, so it is now force-added.
+- **Abstracts (D114)**: both bodies rewritten as SINGLE paragraphs --- EN
+  362 and PT 475 detex words (were 439 / 553). All four reopened roles
+  repaired in both languages, and the convention-minimized full-span
+  forecast-versus-direct-reactive pair now LEADS the RQ3 portion:
+  `2,410,754.7` against `2,611,319.7` worker-seconds (7.7% less) and
+  `30,277.5` against `34,015.6` request-seconds of total encoder delay
+  (11.0% less) over all 749,601 requests of the 5.60-day span, with no
+  burst definition, SLA cutoff, or percentile selection in either operand
+  (operands re-verified against `tex/closedloop.tex:674-704` and
+  `tex/conclusion.tex:51-65`). To pay for it under the one-page and
+  500-word limits the reactive floor sweep was REMOVED WHOLE, with its
+  numbers, rather than kept as a scope-free range --- the alternative
+  D114.2 authorizes explicitly. The perfect-information reference
+  (`0.292x`), the autocorrelation half-life, the order-of-magnitude
+  burstiness and the "no ingredient is new" line also left the abstracts;
+  all remain chapter-grade.
+- **Front matter (D115)**: `\pagenumbering{roman}` after `\maketitle` so
+  the acknowledgments start at i; both titles in IME sentence case;
+  `\disablenewpage` removed from the real List of Figures / List of Tables
+  (it is a model device for "very short" example lists) so they paginate
+  normally instead of leaving an 80%-blank orphan tail page; abstract math
+  made PDF-safe via `\texorpdfstring` wrappers (`\vez`, `\rsq`) that touch
+  the METADATA path only --- the printed wording is unchanged.
+- **Gate**: `verification/metric_stack_gate.py` section 6h binds the four
+  repaired roles plus the new RQ3 lead operands in BOTH languages, and
+  asserts the ABSENCE of a scope-free floor range in either abstract; ten
+  new adversarial probes (one or more per role family) are in `PROBES`.
+- **Artifacts**: `tex/tese.pdf` (see the run log in the report). Feeds:
+  bridge round 180; supersedes the abstract/front-matter portions of the
+  entry above.

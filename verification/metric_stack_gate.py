@@ -67,6 +67,43 @@ def row_cells(line):
     return [c.strip() for c in line.split("&")]
 
 
+def abstract_bodies(tese: Path):
+    """Return (PT resumo body, EN abstract body), whitespace-normalized.
+
+    Bind the BODIES, never the whole tese.tex: the D114/D115 provenance
+    comments sitting above them legitimately quote the same ruled phrases,
+    so a file-wide bind could be satisfied by a comment while the printed
+    abstract had lost the scope.  Extraction is brace-balanced from a
+    line-initial \\resumo{ / \\abstract{ (comments mention the names but
+    never open a brace group)."""
+    src = (tese / "tex/tese.tex").read_text()
+    out = []
+    for cmd in ("resumo", "abstract"):
+        m = re.search(r"^\\" + cmd + r"\{", src, re.M)
+        if not m:
+            return None, None
+        j = m.end()
+        depth = 1
+        while depth:
+            if src[j] == "{":
+                depth += 1
+            elif src[j] == "}":
+                depth -= 1
+            j += 1
+        out.append(norm(src[m.end():j - 1]))
+    return out[0], out[1]
+
+
+def dec(s):
+    """'2{,}410{,}754.7' / '2\\,410\\,754,7' -> float (both abstract locales)."""
+    s = s.replace("{,}", "").replace("\\,", "").replace(",", ".")
+    # a trailing decimal comma became '.'; any earlier ones were separators
+    if s.count(".") > 1:
+        head, _, tail = s.rpartition(".")
+        s = head.replace(".", "") + "." + tail
+    return float(s)
+
+
 def bind(tese: Path) -> list:
     errs = []
     base = tese / "simulation/results/comparator_frontier"
@@ -461,16 +498,32 @@ def bind(tese: Path) -> list:
 
     # 6e. D72: abstract population roles, conclusion denominator label,
     # and the deck post-hoc disclosures -- multiset-invariant role reversals.
-    absn = norm((tese / "tex/tese.tex").read_text())
-    rx(r"\(Azure, one" + W + r"million requests over seven days\)", absn, errs,
+    # Re-anchored 2026-07-28 (D114/D115): the abstracts were rewritten as
+    # single paragraphs, so the population roles now attach to the new
+    # sentences.  Bound against the BODIES only (see abstract_bodies).
+    ptn, enn = abstract_bodies(tese)
+    if ptn is None:
+        return errs + ["abstract bodies not extractable from tex/tese.tex"]
+    rx(r"\(Azure, one million requests over seven days\), request rate"
+       r" misrepresents vision demand", enn, errs,
        "EN abstract: full-trace population attached to the trace description")
-    rx(r"Over the 5\.60-day," + W
-       + r"749\{,\}601-request evaluation span the p90-forecast schedule holds",
-       absn, errs, "EN abstract: evaluation population attached to the 0.62x claim")
-    rx(r"um milh\\~ao de requisi", absn, errs,
-       "PT abstract: full-trace population present")
-    rx(r"5,60 dias \(749\\,601 requisi", absn, errs,
-       "PT abstract: evaluation population attached to the p90 claim")
+    rx(r"over the 5\.60-day, 749\{,\}601-request evaluation span --- no burst"
+       r" definition, SLA cutoff, or percentile selection in either operand ---"
+       r" the p90-forecast schedule provisions", enn, errs,
+       "EN abstract: evaluation population attached to the full-span RQ3 lead")
+    rx(r"On the same span that schedule holds the encoder tail bound at"
+       r" 0\.62\\vez\{\}", enn, errs,
+       "EN abstract: 0.62x claim kept on the SAME evaluation span (anaphora)")
+    rx(r"\(Azure, um milhão de requisições em sete dias\), a taxa de requisições"
+       r" representa mal a demanda de visão", ptn, errs,
+       "PT abstract: full-trace population attached to the trace description")
+    rx(r"nos 5,60 dias e 749\\,601 requisições da avaliação --- sem definição de"
+       r" rajada, corte de SLA ou seleção de percentil em nenhum operando ---"
+       r" o cronograma de previsão p90 provisiona", ptn, errs,
+       "PT abstract: evaluation population attached to the full-span RQ3 lead")
+    rx(r"No mesmo intervalo esse cronograma sustenta o limite de cauda do"
+       r" codificador a 0,62\\vez\{\}", ptn, errs,
+       "PT abstract: 0.62x claim kept on the SAME evaluation span (anaphora)")
     rx(r"under request-matched normalization the" + W
        + r"published language point \(p90 at conversion scale 8\) reads 1\.03\$\\times\$",
        concn, errs, "conclusion: 1.03x bound to REQUEST-matched denominator + p90/s8")
@@ -521,6 +574,150 @@ def bind(tese: Path) -> list:
        metn, errs, "calm day: banked sim triple in the inside-the-bound sentence")
     rx(r"engine-band-conditional", metn, errs,
        "calm day: absolutes carry the engine-band-conditional role")
+
+    # 6h. D114: the four abstract roles the compression had reopened, plus
+    # the convention-minimized full-span pair that now LEADS RQ3 -- bound in
+    # BOTH languages against the abstract bodies (ptn/enn from 6e).  Before
+    # this section the abstract portion of the gate bound only the two
+    # population phrases, so none of these regressions was detectable.
+
+    # 6h-A. burst-window population of the encoder breach (D114.1).  The
+    # evidence is inside the burst window, never a full-trace or steady-head
+    # claim (tex/metodologia.tex:604-621,643-648).
+    rx(r"reproduces the decoupling: \\emph\{inside the burst window\} the encoder"
+       r" pool misses its tail bound at the trace's own recorded rate, invisibly"
+       r" to rate- and utilization monitors", enn, errs,
+       "EN abstract: burst-window qualifier on the encoder-breach claim (D114.1)")
+    rx(r"reproduz o desacoplamento: \\emph\{dentro da janela de rajada\} o"
+       r" \\emph\{pool\} codificador viola seu limite de cauda na taxa registrada"
+       r" pelo próprio \\emph\{trace\}, invisível a monitores de taxa e utilização",
+       ptn, errs,
+       "PT abstract: burst-window qualifier on the encoder-breach claim (D114.1)")
+
+    # 6h-B. floor endpoints + boundaries (D114.2).  The adjudicated choice
+    # here is REMOVAL-WHOLE: under the one-page/500-word limits the floor
+    # claim and its numbers left the abstracts together, which D114.2
+    # authorizes, rather than surviving as a scope-free range.  So the bind
+    # is conditional: if either endpoint literal EVER comes back, all three
+    # ruled boundaries must come back with it (forecast fixed at one
+    # operating point; no symmetric forecast-plus-floor family; the two
+    # named floor members).  A bare "1.20x to 1.67x" therefore fails.
+    floor_rules = (
+        ("EN", enn, (r"reactive-favorable", r"post-hoc",
+                     r"no symmetric forecast-plus-floor",
+                     r"M\{=\}2", r"M\{=\}6")),
+        ("PT", ptn, (r"favorável ao reativo", r"post hoc",
+                     r"nenhuma varredura simétrica de previsão-mais-piso",
+                     r"M\{=\}2", r"M\{=\}6")),
+    )
+    for lang, body, required in floor_rules:
+        if re.search(r"1[.,]20|1[.,]67", body):
+            for pat in required:
+                if not re.search(pat, body):
+                    errs.append(
+                        f"{lang} abstract: floor endpoints present without the "
+                        f"adjudicated boundary /{pat}/ -- a scope-free floor "
+                        f"range is exactly the D114.2 regression")
+
+    # 6h-C. language operating point (D114.3): the causal operator is that
+    # the SLA holds ONLY through tail-aware conversion, and the near-break-
+    # even operands belong to the published p90/scale-8 point -- other
+    # language points have different ratios (tex/closedloop.tex:1006-1018).
+    # The PT mirror must name the matching OPERATION, not just the axis.
+    rx(r"The secondary language policy holds its SLA only through tail-aware"
+       r" conversion and, at its published p90/scale-8 point, is near"
+       r" break-even against static \(0\.965\\vez\{\} time-matched, 1\.03\\vez\{\}"
+       r" request-matched\)", enn, errs,
+       "EN abstract: language SLA held ONLY-through tail-aware conversion, "
+       "operands bound to the p90/scale-8 point (D114.3)")
+    rx(r"A política secundária de linguagem sustenta seu SLA apenas por conversão"
+       r" ciente de cauda e, em seu ponto publicado p90/escala 8, fica em"
+       r" quase-equilíbrio face ao estático \(0,965\\vez\{\} pareado por tempo,"
+       r" 1,03\\vez\{\} pareado por requisições\)", ptn, errs,
+       "PT abstract: language ONLY-through operator, p90/escala 8 point, and "
+       "the matching-operation names 'pareado por tempo/requisições' (D114.3)")
+
+    # 6h-D. live-versus-physical separation (D114.4): live evidence is the
+    # fastest-onset LANGUAGE-pool p90/reactive result, one run per policy
+    # through the real control plane with mocked engines
+    # (tex/metodologia.tex:737-742,780-788); physical evidence is
+    # five-repetition ENCODER-ONLY frozen-dispatch retiming on one RTX 5090
+    # (tex/metodologia.tex:338-367,406-410).  Different pools, different
+    # estimands -- they must not fuse into one "verdict".
+    rx(r"The fastest-onset language-pool p90/reactive verdict agrees in one live"
+       r" Dynamo run per policy \(real control plane, mocked engines\);"
+       r" separately, five-repetition encoder-only frozen-dispatch retiming on"
+       r" one RTX~5090 preserves that window's simulated forecast/reactive"
+       r" verdict\. Week-scale economics remain simulated\.", enn, errs,
+       "EN abstract: live (LANGUAGE pool) and physical (ENCODER-only) evidence "
+       "separated, both pools named, week-scale still simulated (D114.4)")
+    rx(r"O veredicto p90/reativo do \\emph\{pool\} de linguagem na rajada de"
+       r" início mais rápido confirma-se em uma execução ao vivo do Dynamo por"
+       r" política \(plano de controle real, \\emph\{engines\} simulados\); em"
+       r" separado, a retemporização de despachos congelados, só do codificador,"
+       r" em cinco repetições numa RTX~5090, preserva o veredicto simulado"
+       r" previsão/reativo dessa janela\. A economia em escala semanal permanece"
+       r" simulada\.", ptn, errs,
+       "PT abstract: live (LANGUAGE pool) and physical (ENCODER-only) evidence "
+       "separated, both pools named, week-scale still simulated (D114.4)")
+
+    # 6h-E. the convention-minimized full-span RQ3 lead (D114.5).  Operands
+    # are role-scoped (which number provisions, which arm is the comparator,
+    # which pair is delay), the derived percentages are RECOMPUTED, the two
+    # languages must carry identical operands, and both must agree with the
+    # chapter locus tex/closedloop.tex:674-704.
+    en_lead = re.search(
+        r"the p90-forecast schedule provisions ([\d{},.]+) against the"
+        r" identically informed direct-reactive arm's ([\d{},.]+) worker-seconds"
+        r" \(([\d.]+)\\% less\) and accumulates ([\d{},.]+) against ([\d{},.]+)"
+        r" request-seconds of total encoder delay \(([\d.]+)\\% less\)", enn)
+    pt_lead = re.search(
+        r"o cronograma de previsão p90 provisiona ([\d\\,.]+)"
+        r" \\emph\{worker\}-segundos contra ([\d\\,.]+) do braço reativo direto"
+        r" identicamente informado \(([\d,]+)\\% a menos\) e acumula"
+        r" ([\d\\,.]+) contra ([\d\\,.]+) requisição-segundos de atraso total do"
+        r" codificador \(([\d,]+)\\% a menos\)", ptn)
+    if not en_lead:
+        errs.append("EN abstract: full-span RQ3 lead missing or role-scrambled "
+                    "(forecast worker-seconds / identically informed "
+                    "direct-reactive comparator / delay pair) (D114.5)")
+    if not pt_lead:
+        errs.append("PT abstract: full-span RQ3 lead missing or role-scrambled "
+                    "(forecast worker-seconds / identically informed "
+                    "direct-reactive comparator / delay pair) (D114.5)")
+    if en_lead and pt_lead:
+        en_v = [dec(g) for g in en_lead.groups()]
+        pt_v = [dec(g) for g in pt_lead.groups()]
+        if en_v != pt_v:
+            errs.append(f"abstract RQ3 lead: EN and PT operands disagree "
+                        f"{en_v} vs {pt_v} (D114.5)")
+        fc_ws, re_ws, pct_ws, fc_d, re_d, pct_d = en_v
+        # the chapter locus owns these numbers; the abstract may not drift
+        for val, lit in ((fc_ws, "2410754.7"), (re_ws, "2611319.7"),
+                         (fc_d, "30277.5"), (re_d, "34015.6")):
+            if f"\\num{{{lit}}}" not in tex:
+                errs.append(f"closedloop.tex lost the RQ3 lead operand {lit}")
+            if abs(val - float(lit)) > 1e-6:
+                errs.append(f"abstract RQ3 lead operand {val} != chapter {lit}")
+        if not (fc_ws < re_ws and fc_d < re_d):
+            errs.append("abstract RQ3 lead: polarity reversed -- the forecast "
+                        "arm must be the SMALLER of both operand pairs (D114.5)")
+        for got, a, b, what in ((pct_ws, fc_ws, re_ws, "worker-second"),
+                                (pct_d, fc_d, re_d, "total-delay")):
+            want = round((b - a) / b * 100, 1)
+            if abs(got - want) > 0.05:
+                errs.append(f"abstract RQ3 lead: {what} saving states {got}% "
+                            f"but the operands recompute to {want}%")
+        # the lead must stay convention-free in BOTH languages
+        rx(r"no burst definition, SLA cutoff, or percentile selection in either"
+           r" operand", enn, errs,
+           "EN abstract: RQ3 lead declares no burst/SLA/percentile convention")
+        rx(r"sem definição de rajada, corte de SLA ou seleção de percentil em"
+           r" nenhum operando", ptn, errs,
+           "PT abstract: RQ3 lead declares no burst/SLA/percentile convention")
+        rx(r"full-span", enn, errs, "EN abstract: RQ3 lead marked full-span")
+        rx(r"cobre todo o intervalo", ptn, errs,
+           "PT abstract: RQ3 lead marked full-span")
 
     # 7. figure byte-identity, restore in FINALLY (failure-safe)
     env_fig = tese / "figuras/sim/sim_metric_frontier.pdf"
@@ -667,8 +864,8 @@ PROBES = [
      "context-split"),
     ("abstract populations swapped (D72)",
      "tex/tese.tex",
-     lambda s: s.replace("(Azure, one\nmillion requests over seven days)",
-                         "(Azure, 749,601 requests over 5.60 days)", 1),
+     lambda s: s.replace("(Azure, one million requests",
+                         "(Azure, 749,601 requests over 5.60 days) (", 1),
      "full-trace population attached"),
     ("conclusion denominator relabeled time-matched (D72)",
      "tex/conclusion.tex",
@@ -700,6 +897,111 @@ PROBES = [
      "tex/metodologia.tex",
      lambda s: s.replace("1{,}121.004 \\pm 0.143", "1{,}121.0 \\pm 0.143", 1),
      "fc/re HF-eager estimand pair"),
+
+    # ---- D114 abstract role families (bilingual), one or more probe each ----
+    # A. burst-window population of the encoder breach
+    ("EN abstract: burst-window qualifier stripped from the breach (D114.1)",
+     "tex/tese.tex",
+     lambda s: s.replace(
+         "reproduces the decoupling: \\emph{inside the burst window} the encoder pool",
+         "reproduces the decoupling: the encoder pool", 1),
+     "burst-window qualifier"),
+    ("PT abstract: burst-window qualifier stripped from the breach (D114.1)",
+     "tex/tese.tex",
+     lambda s: s.replace(
+         "\\emph{dentro da janela de rajada} o \\emph{pool} codificador viola",
+         "o \\emph{pool} codificador viola", 1),
+     "burst-window qualifier"),
+
+    # B. floor endpoints must never return as a scope-free range
+    ("EN abstract: scope-free floor range reintroduced (D114.2)",
+     "tex/tese.tex",
+     lambda s: s.replace(
+         "worker-hours). The gain is a trade-off",
+         "worker-hours), while the cheapest evaluation-passing reactive warm"
+         " floor costs 1.20\\vez{} to 1.67\\vez{} the forecast's worker-time"
+         " depending on readiness model. The gain is a trade-off", 1),
+     "scope-free floor"),
+    ("PT abstract: scope-free floor range reintroduced (D114.2)",
+     "tex/tese.tex",
+     lambda s: s.replace(
+         "\\emph{worker}-horas). O\nganho",
+         "\\emph{worker}-horas), enquanto o piso quente reativo mais barato"
+         " custa de 1,20\\vez{} a 1,67\\vez{} a previsão conforme o modelo de"
+         " prontidão. O\nganho", 1),
+     "scope-free floor"),
+
+    # C. language operating point and what "only" governs
+    ("EN abstract: language 'only' moved off the conversion (D114.3)",
+     "tex/tese.tex",
+     lambda s: s.replace("policy holds its SLA only through",
+                         "policy reaches only near break-even through", 1),
+     "ONLY-through"),
+    ("EN abstract: language operating point (p90/scale-8) erased (D114.3)",
+     "tex/tese.tex",
+     lambda s: s.replace("at its published p90/scale-8 point, is near",
+                         "is near", 1),
+     "p90/scale-8"),
+    ("PT abstract: matching-operation names degraded to bare axes (D114.3)",
+     "tex/tese.tex",
+     lambda s: s.replace("pareado por tempo", "por tempo", 1)
+                .replace("pareado por requisições", "por requisições", 1),
+     "matching-operation names"),
+
+    # D. live (language pool) vs physical (encoder-only) separation
+    ("EN abstract: live and physical evidence fused into one verdict (D114.4)",
+     "tex/tese.tex",
+     lambda s: s.replace("mocked engines);\nseparately, five-repetition",
+                         "mocked engines) and survives five-repetition", 1),
+     "EN abstract: live"),
+    ("EN abstract: physical replay relabeled controller-in-loop (D114.4)",
+     "tex/tese.tex",
+     lambda s: s.replace("five-repetition encoder-only frozen-dispatch retiming",
+                         "five-repetition closed-loop re-simulation", 1),
+     "EN abstract: live"),
+    ("EN abstract: week-scale-simulated clause dropped (D114.4)",
+     "tex/tese.tex",
+     lambda s: s.replace("\nWeek-scale economics remain simulated.", "", 1),
+     "EN abstract: live"),
+    ("PT abstract: live evidence relabeled as the encoder pool (D114.4)",
+     "tex/tese.tex",
+     lambda s: s.replace(
+         "O veredicto p90/reativo do \\emph{pool} de linguagem",
+         "O veredicto p90/reativo do \\emph{pool} codificador", 1),
+     "PT abstract: live"),
+
+    # E. the convention-minimized full-span RQ3 lead
+    ("EN abstract: RQ3 lead worker-second operands swapped (D114.5)",
+     "tex/tese.tex",
+     lambda s: s.replace("2{,}410{,}754.7", "XSWAPX", 1)
+                .replace("2{,}611{,}319.7", "2{,}410{,}754.7", 1)
+                .replace("XSWAPX", "2{,}611{,}319.7", 1),
+     "polarity reversed"),
+    ("EN abstract: RQ3 lead saving fabricated 7.7% -> 17.7%",
+     "tex/tese.tex",
+     lambda s: s.replace("worker-seconds (7.7\\% less)",
+                         "worker-seconds (17.7\\% less)", 1),
+     "recompute"),
+    ("EN abstract: RQ3 lead convention-free clause removed (D114.5)",
+     "tex/tese.tex",
+     lambda s: s.replace("no burst definition, SLA cutoff, or\npercentile"
+                         " selection in either operand ---", "", 1),
+     "no burst/SLA/percentile convention"),
+    ("EN abstract: RQ3 lead comparator loses 'identically informed' (D114.5)",
+     "tex/tese.tex",
+     lambda s: s.replace("against the identically informed direct-reactive",
+                         "against the direct-reactive", 1),
+     "role-scrambled"),
+    ("PT abstract: RQ3 lead delay operands swapped (D114.5)",
+     "tex/tese.tex",
+     lambda s: s.replace("30\\,277,5 contra 34\\,015,6",
+                         "34\\,015,6 contra 30\\,277,5", 1),
+     "operands disagree"),
+    ("PT abstract: evaluation population detached from the RQ3 lead (D72)",
+     "tex/tese.tex",
+     lambda s: s.replace("nos 5,60\ndias e 749\\,601 requisições da avaliação",
+                         "na avaliação", 1),
+     "PT abstract: evaluation population"),
 ]
 
 

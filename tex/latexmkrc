@@ -2,8 +2,13 @@
 # Derived from the model's latexmkrc (../template/modelo-latex/latexmkrc),
 # trimmed to what this build actually needs:
 #   * no biber/bibtex run  -- the bibliography is a manual `thebibliography`
-#   * no makeindex run     -- the text uses no \index
 #   * no texlogsieve block -- that helper is not vendored here
+#
+# makeindex: CORRECTED 2026-07-28 (D115.5).  The earlier comment here claimed
+# "no makeindex run".  That was false: imelooks calls \makeindex, so a .idx
+# file is always emitted and a fresh `latexmk` does invoke makeindex on it
+# once.  The text uses no \index, so the .idx is empty, the resulting .ind is
+# empty, and no index is typeset -- the run is a no-op, not an absence.
 
 @default_files = ('tese');
 
