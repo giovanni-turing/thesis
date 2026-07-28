@@ -3502,3 +3502,16 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   terminal; corpus 553/0. Thesis 135pp 0/0.
 - **Feeds**: QA crib calm-day refresh (next); defense deck untouched by
   design (calm-day is a metodologia-scope result).
+
+## visual-review-full-close (2026-07-28)
+
+- **What**: the visual reviewer's complete re-verification pass is CLEAN
+  across every surface: 17/17 regenerated figures re-verdicted clean at
+  97ce588 (per-image deep protocol vs packets 011–027, incl. the stacked
+  sim_frontier and the 6.2pt aic_fn legend); deck slide 6 (onset 6.5 min
+  delta) clean at 36c9212; whole-manuscript layout sweep clean at the
+  135-page build (overfulls 24→19→2, both <1pt; §6.2/§6.7 running heads
+  verified; no float/collision findings). Visual corpus 63+ msgs, 0
+  validator errors.
+- **Feeds**: nothing — the visual line is fully green. Open review item:
+  D112 crib 2/2 (bridge).
