@@ -85,13 +85,15 @@ trace's own recorded rate, invisibly to rate- and utilization-based monitors.
 
 Closing the loop under a single pre-frozen replay protocol yields a
 trade-off with an identified failure mode, not universal superiority: on three of the five
-evaluation windows and the aggregate span the forecast and reactive tails tie
-exactly (the calm day within 5 ms),
+evaluation windows and the aggregate span the forecast and reactive window
+p99 values tie exactly (the calm day within 5 ms),
 and the latency advantage lives in the one-minute onset. What forecasting
-buys at week scale is resource-time at equal compliance. Over the 5.60-day
-evaluation span the p90-forecast schedule holds the encoder tail bound in
-every evaluation window at 0.62$\times$ the deployable static encoder fleet's
-provisioned worker-time, while a reactive controller granted a warm floor
+buys at week scale is resource-time at equal compliance. Over the 5.60-day,
+749{,}601-request evaluation span the p90-forecast schedule holds the
+encoder tail bound at
+0.62$\times$ the deployable static encoder fleet's provisioned worker-time
+(669.7 worker-hours; the latency ordering against reactive is
+readiness-dependent and reported per readiness model), while a reactive controller granted a warm floor
 calibrated on the calibration split fails a held-out window and its
 cheapest all-passing member costs 1.042$\times$ static --- forecast-informed
 placement is 1.20$\times$ cheaper at equal compliance even under the
@@ -163,14 +165,18 @@ taxa e utiliza\c{c}\~ao.
 Fechando o la\c{c}o sob um protocolo \'unico de replay pr\'e-congelado, o resultado \'e um
 compromisso com um modo de falha identificado, e n\~ao superioridade
 universal: em tr\^es das cinco janelas de avalia\c{c}\~ao e no intervalo
-agregado as caudas da previs\~ao e do reativo \emph{empatam exatamente} (o
+agregado os valores de p99 por janela da previs\~ao e do reativo
+\emph{empatam exatamente} (o
 dia calmo a menos de 5\,ms), e a vantagem de
 lat\^encia reside no in\'icio de um minuto. O que a previs\~ao compra em
 escala semanal \'e tempo de recurso a igual conformidade. No intervalo de
-avalia\c{c}\~ao de 5,60 dias o cronograma de previs\~ao p90 sustenta o
-limite de cauda do codificador em todas as janelas de avalia\c{c}\~ao a 0,62$\times$ o
+avalia\c{c}\~ao de 5,60 dias (749\,601 requisi\c{c}\~oes) o cronograma de
+previs\~ao p90 sustenta o
+limite de cauda do codificador a 0,62$\times$ o
 tempo de \emph{workers} provisionado da frota est\'atica de codificadores
-implant\'avel, enquanto um controlador reativo dotado de um piso quente
+implant\'avel (669,7 \emph{worker}-horas; a ordena\c{c}\~ao de lat\^encia
+frente ao reativo depende do modelo de prontid\~ao e \'e reportada por
+modelo), enquanto um controlador reativo dotado de um piso quente
 calibrado no conjunto de calibra\c{c}\~ao falha em uma janela reservada e
 seu membro mais barato que passa custa 1,042$\times$ o est\'atico --- a
 coloca\c{c}\~ao informada por previs\~ao \'e 1,20$\times$ mais barata a

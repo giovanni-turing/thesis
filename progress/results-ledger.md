@@ -2908,16 +2908,24 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   SM 2377-2400 / MEM 13801; HF-SDPA eager encoder, Qwen3-VL 576M tower,
   448^2), trace-driven retiming of the sim dispatch timeline with measured
   per-batch service times; 5 reps per cell.
-- **Result:** RQ3 verdict SURVIVES on silicon -- forecast p99 782.5+-0.3 ms
-  (PASS 5/5, sim 589.3), reactive 22,565+-1 ms (FAIL 5/5, sim 16,084).
-  Static C8 flips PASS->FAIL (1,397+-1 ms vs sim 717.8): its 1.39x headroom
-  sits inside the HF-eager engine band. Deviation fully attributed: measured
-  f(N) reproduces tab:app-engine's HF-SDPA column (N=64: 510.4 ms vs 511.6;
-  ratio 1.613 vs 1.617; monotone 1.39->1.61), i.e. the documented
-  execution-stack gap, not a cost-model error. Reconstruction gate exact
-  (0.0 ms) and membership 1241/1241 on all 15 reps. Early tier 2: burst4
-  fc AND re both PASS at the same 782 ms plateau, agreeing with sim (11/11
-  rep-verdict agreement outside the engine-marginal static case).
+- **Result [scope narrowed per bridge 211]:** on burst3, the
+  forecast-versus-reactive encoder-delay verdict survives trace-driven
+  physical retiming under the HF-SDPA execution stack (NOT a live
+  closed-loop GPU-cluster experiment). Five COMPLETE repetitions per cell
+  (fc rep001 and re rep001 were preemption-resumed, so complete, not
+  uninterrupted): forecast p99 782.455 +/- 0.270 ms (sample SD; PASS 5/5;
+  sim 589.3), reactive 22,565.317 +/- 0.935 ms (sample SD; FAIL 5/5; sim
+  16,084). Static C8 flips PASS->FAIL (1,397.413 +/- 1.140 ms, sample SD,
+  vs sim 717.8): its 1.39x headroom sits inside the HF-eager engine band.
+  Deviation consistent with the documented execution-stack gap (measured
+  f(N) reproduces tab:app-engine's HF-SDPA column; N=64: 510.4 ms vs
+  511.6; ratio 1.613 vs 1.617; trend 1.39->1.61 across the tested shapes,
+  not established as literally monotone at this N) -- consistency, not
+  full causal attribution. Reconstruction gate exact (0.0 ms), membership
+  1,241/1,241, zero fatal slowdowns, batch counts match declarations
+  (3,179/3,098/3,156) on all 15 reps [audited independently, bridge 211].
+  (Partial burst4/steady cells are preliminary campaign data and carry NO
+  claim here; see the campaign manifest.)
 - **Feeds:** pending manuscript decision -- candidates: metodologia
   (physical anchor section), intro/conclusion "remains future work"
   softening, closedloop static-C8 engine-sensitivity caveat. HOLD until
@@ -3016,10 +3024,17 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
 - **Command:** compute-only (author directive "compute first"); per-request
   delay/TTFT/E2E vectors from the same tracked raw inputs the frontier
   builder and composed join read; NO manuscript change.
-- **Result (frontier, aggregate span, convention-free):** forecast_p90
+- **Result (frontier, aggregate span, convention-free):** [SUPERSEDED by
+  metric-stack-203-208-readiness-hierarchy below: NOT strict dominance --
+  one empirical-survival reversal exists at [25.079583, 26.230949) s, the
+  sweep is a shipped-readiness sensitivity that reverses under common warm
+  readiness, and "convention-free" is now "convention-minimized"]
+  forecast_p90
   STRICTLY DOMINATES reactive on every swept threshold AND worker-time:
   669.6 vs 725.4 worker-h; violations >1000 ms 2,650 vs 3,299; excess mass
-  3,688 vs 6,710 request-s; identical at p50/p90 (the 589.3 plateau).
+  3,688 vs 6,710 request-s; identical through p99 (the 589.3 plateau)
+  [corrected per bridge D64: the shared plateau IS the all-request p99,
+  not p50/p90].
   reactive == warm_floor_M1 exactly. The floor family is monotone
   (worker-h up, violations down); cheapest floor with fewer v>1000 than
   forecast is M2 (2,034 at 769.4 h = 0.716x, i.e. +15% worker-time for
@@ -3047,7 +3062,9 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
 - **Command:** author directive ("results should be based on aggregate
   metrics or tail behavior... tail should have a couple of references");
   values from metric_stack.json (compute entry above), regeneration-gated.
-- **Result:** the evaluation SLA presented as one threshold on a swept
+- **Result:** [SUPERSEDED by metric-stack-203-208-readiness-hierarchy
+  below on "strict dominance"/"convention-free"] the evaluation SLA
+  presented as one threshold on a swept
   curve; strict forecast-over-reactive dominance stated convention-free
   (every threshold, 3688.0 vs 6709.7 req-s excess, 7.7% less worker-time);
   reactive == floor M1; forecast the only SLA-passing schedule below the
@@ -3055,3 +3072,115 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   14724.0). Build 0/0; suite 58/0/5 (new A5c gate green).
 - **Feeds:** sec:cl-frontier, conclusion RQ3; reopens review for this
   delta only (bridge 196 scope).
+
+
+### metric-stack-d64-d65-corrections (2026-07-27)
+
+- **Artifact:** metric_stack.json regenerated WITH p99.5/p99.99 in the
+  quantile ladder (generator QS extended -- the promoted tail values are
+  now artifact-generated, no NPZ side-channel);
+  figuras/sim/sim_metric_frontier.pdf regenerated (SOURCE_DATE_EPOCH
+  FORCED to 0 inside the generator; M12/label collision moved);
+  verification/metric_stack_gate.py (structural binder: all 30 table
+  cells row-scoped, promoted claims recomputed at their loci, figure
+  byte-identity, negative selftest incl row-swap and relocated-checkout
+  probes); verify_all.sh A5c rewired to it.
+- **Executable figure command:**
+  `/home/gio/tese/eda/.venv/bin/python
+  simulation/results/comparator_frontier/make_metric_stack_figure.py`
+  (matplotlib 3.11.0, eda venv; SOURCE_DATE_EPOCH=0 forced internally;
+  byte-deterministic -- gated by A5c on every suite run).
+- **Text corrections (D64):** dominance scoped to the six examined
+  thresholds 0.25--2 s + continuously within (one observed-breakpoint
+  reversal on the exact interval [25.079583, 26.230949) s -- "at 25.5 s"
+  in earlier drafts was a lossy compression [208] -- counts 3 vs 2;
+  maxima tie 35,902.5 ms); ties
+  identical through p99 (not p95); tail-ladder scoping with M2's p99.99
+  (6,933.1) above the forecast's; "only DEPLOYABLE (non-oracle)
+  SLA-passing schedule below the curve"; static "essentially on" the
+  curve (6.7% below M5--M6 interpolation); table worker-hours from
+  worker_s directly (669.7 / 769.3); conclusion "about half (45.0%
+  less)" at "each examined threshold".
+- **Supersedes:** the corresponding claims of the two metric-stack
+  entries above.
+
+## 2026-07-27 -- defense deck: span-level regrade slide + visual pass
+
+- **What:** new deck slide 11b, final title "Same resource-time
+  conclusion in the span-level synthesis" [209] (4 arms x 4 metrics:
+  worker-time, TOTAL DELAY, >1s count, p99.99 -- the excess-mass column
+  of the first draft was replaced by total delay in the 203-208 rework;
+  three takeaway tiles: threshold sweep 0.25--2 s as shipped-readiness
+  sensitivity, bound-robustness margins 682/808/907 ms, and
+  windows-as-the-VALIDITY-GATE with the warm-M1 counterexample -- the
+  frozen per-window grid remains the anti-masking success gate, not
+  merely a masking check) + conclusion tile 5 readiness-invariant
+  sentence + scope box: costs separated by declared readiness mechanics;
+  numbers DB-backed where ingested, otherwise re-derived from tracked
+  raw artifacts and gated generators [209]. All numbers transcribed from
+  simulation/results/comparator_frontier/metric_stack.json and
+  frontier_summary_cells.json (the A5c-gated artifacts).
+- **Visual pass:** 4x Gemini 3.1 Pro slide reviews (slides 9/11b/12/14);
+  applied: mmat header centering, cell-subtext 12.5px/650/ink-2, winner
+  fill #e9f2fd, linked-tile border unification (both blue), reactive
+  count de-redded, conclusion tile-5 copy compressed, global
+  --muted #6f6f6f -> #5c5c5c (projector safety). Two residual "blocker"
+  claims from the re-review refuted at pixel level (crops).
+- **Artifacts:** defense/reveal/index.html + rebuilt
+  defense/deck_single.html (build_single_deck.py, 5 anims embedded --
+  a1/a2/a6/a9/a11 untouched; the accelerated simultaneous week/race
+  views preserved by explicit instruction).
+- **Command:** `cd defense/reveal && python3 build_single_deck.py`
+- **Feeds:** defense presentation only; no manuscript claim.
+
+### metric-stack-203-208-readiness-hierarchy (2026-07-27)
+
+- **What:** reviewer msgs 203-208 escalation absorbed. The final RQ3 case
+  now rests on convention-minimized full-span absolutes with a
+  readiness-separated interpretation; total delay mass is the LEADING
+  THRESHOLD-INTEGRATED SYNTHESIS (sum_i d_i = integral N(d>t) dt), while
+  the frozen every-window p99 contract REMAINS the predeclared endpoint.
+- **Artifact (regenerated metric_stack.json):** per-arm
+  total_delay_request_s; fc_vs_re block (exact survival exception
+  [25.079583, 26.230949) s with counts 3 vs 2, maxima tie 35.902512 s,
+  request-paired 6,742 better / 738,027 ties / 4,832 worse);
+  comparisons_by_readiness block from the tracked adversarial repair
+  traces (aggregate_fcSTRICT, aggregate_reWPm1, aggregate_reWPm2).
+- **Verified numbers (all recomputed from raw traces, matching the
+  reviewer's independent recomputation):** shipped fc 2,410,754.7
+  worker-s (669.654 h) / 30,277.488 req-s total delay; shipped re
+  2,611,319.7 (725.367 h) / 34,015.615; saving 55.7125 h (7.6806%) and
+  3,738.127 req-s (10.9894%). fcSTRICT 2,387,924.7 / 30,620.548 (8.555%
+  cheaper, 9.981% less delay vs shipped re; diagnostic). reWPm1
+  2,743,484.6 / 28,014.638 (fc 12.128% cheaper, 8.077% more delay; M1
+  FAILS burst3 p99 1,999.773 ms). reWPm2 2,886,614.5 (801.837 h; passes;
+  1.20x fc). Total-delay floor interpolation M1-M2: 754.352 h = 12.648%
+  premium. Common-warm sweep reversal at ALL six thresholds (M1w counts
+  30,225/19,559/3,380/2,002/1,050/625 all below fc).
+- **Manuscript:** closedloop full-span paragraph rewritten (readiness
+  table tab:cl-readiness; invariant = efficiency at equal declared
+  compliance; latency ordering readiness-conditional; common-warm rows
+  labeled reactive-favorable post-hoc sensitivity with unexpanded
+  forecast design space [207]; forecast+floor family named as unrun
+  future work in sec:cl-limits); two-panel figure (a=threshold-integrated
+  synthesis, b=excess-1s sensitivity, print-safe marker shapes); 205
+  Phase-1 dedup (canonical locus in closedloop; conclusion compact claim
+  669.7 vs 801.8=1.20x vs 725.4; abstract EN+PT one-sentence RQ3 with
+  readiness caveat; intro/summary compaction; "window p99 values tie"
+  wording); headline reworded -- windows are the predeclared endpoint AND
+  the masking check, never "not the gate" [208].
+- **Gate (metric_stack_gate.py v4, per 208):** column-ORDERED table
+  parsing, role-scoped regex operand binding, polarity phrases bound;
+  selftest = clean relocated clone binds 0 errors (eda/.venv symlinked as
+  a directory so matplotlib imports) + all NINE reviewer corruption
+  probes fail for their intended semantic reason + artifact perturbation
+  probe; figure bytes restored in a finally path.
+- **Command:** `eda/.venv/bin/python
+  simulation/results/comparator_frontier/metric_stack.py` (regenerate) /
+  `--check` (verify); gate:
+  `python3 verification/metric_stack_gate.py /home/gio/tese
+  [--selftest]`.
+- **Feeds/supersedes:** supersedes the "strict dominance"/
+  "convention-free" claims of the two 2026-07-27 metric-stack entries
+  above (marked inline); feeds sec:cl-frontier, sec:cl-headline,
+  sec:cl-limits, conclusion RQ3, abstract, deck slide 11b.

@@ -242,11 +242,15 @@ Tabs.~\ref{tab:cl-ledger-enc}--\ref{tab:cl-ledger-joint},
   \texttt{results/composed\_fill/ composed\_fill\_joined.json}; provenance
   views \texttt{v\_joint\_e2e}, \texttt{v\_pool\_latency},
   \texttt{v\_pool\_cost} & (joined views) \\
-Tab.~\ref{tab:cl-metric-stack}, Fig.~\ref{fig:cl-metric-frontier} &
-  \texttt{comparator\_frontier/ \{metric\_stack,
-  make\_metric\_stack\_figure\}.py} &
-  \texttt{comparator\_frontier/ metric\_stack.json};
-  \texttt{figuras/sim/ sim\_metric\_frontier.pdf} & --- \\
+Tabs.~\ref{tab:cl-metric-stack},~\ref{tab:cl-readiness},
+  Fig.~\ref{fig:cl-metric-frontier} &
+  \texttt{simulation/results/ comparator\_frontier/ \{metric\_stack,
+  make\_metric\_stack\_figure\}.py} (gate:
+  \texttt{verification/ metric\_stack\_gate.py}) &
+  \texttt{simulation/results/ comparator\_frontier/ metric\_stack.json}
+  (incl.\ \texttt{fc\_vs\_re} and \texttt{comparisons\_by\_readiness}
+  blocks; readiness inputs under \texttt{comparator\_frontier/
+  adversarial/}) & (DB: cross-check only) \\
 Tab.~\ref{tab:conc-regimes} & synthesis; no new run &
   rows read from Tabs.~\ref{tab:base-react-enc},~\ref{tab:cl-frontier},
   \texttt{results/ comparator\_frontier/} & --- \\

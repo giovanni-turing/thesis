@@ -39,20 +39,28 @@ effects small enough that engineering considerations can decide the choice
 
 \paragraph{RQ3 --- Control payoff: a trade-off with an identified failure
 mode, not universal superiority.} On three of the five evaluation windows
-(burst1/4/5) and on the aggregate span the forecast and reactive tail
-latencies \emph{tie exactly}, the calm day within \SI{5}{\milli\second}; the
-latency advantage lives in the one-minute onset, which the identically
-informed reactive controller loses at every lead. What forecasting buys at
-week scale is resource-time at equal compliance --- and the verdict is
-convention-robust: graded on the aggregate span alone, with no burst
-definition and the violation threshold swept, the forecast arm records fewer
-violations than reactive at every cut, with half the excess violation mass at
-7.7\% less worker-time (Table~\ref{tab:cl-metric-stack}). Under a pre-frozen five-arm replay
+(burst1/4/5) and on the aggregate span the forecast and reactive window
+p99 values \emph{tie exactly} (the distributions separate above p99), the
+calm day within \SI{5}{\milli\second}; the latency advantage lives in the
+one-minute onset, which the identically informed reactive controller loses
+at every lead. What forecasting buys at week scale is resource-time at
+equal compliance, on convention-minimized absolutes: over the 5.60-day,
+\num{749601}-request evaluation span, forecast-informed placement uses
+669.7 provisioned worker-hours; under the frozen every-window p99
+compliance rule the cheapest passing common-warm reactive floor uses
+801.8 (1.20$\times$ the forecast), and the shipped reactive arm 725.4
+under different readiness mechanics. The resource-time advantage is
+robust across readiness interpretations, while the latency ordering is
+readiness-dependent (Table~\ref{tab:cl-readiness}). Under a pre-frozen five-arm replay
 protocol (arm mechanics frozen before the frontier replay; the forecast arm's
 $\rho{=}15$ had been chosen \emph{ex post} earlier and is disclosed as such,
 Section~\ref{sec:cl-frontier}), the p90 forecast arm holds the
-encoder bound in every evaluation window at \textbf{0.623$\times$} the deployable
-static fleet's provisioned worker-time with zero failed windows; a reactive
+encoder bound over the evaluation span at \textbf{0.623$\times$} the deployable
+static fleet's provisioned worker-time (\num{2650} of \num{749601}
+requests over the bound; the per-window grid, an analysis instrument kept as
+the masking check, shows zero failed windows) --- a pass that survives any
+bound down to \SI{682}{\milli\second}
+(Section~\ref{sec:cl-headline}); a reactive
 controller granted a minimum warm floor calibrated on the calibration split
 \emph{fails} held-out burst3, and the cheapest all-passing member of that
 floor family --- identifiable only after the fact --- costs

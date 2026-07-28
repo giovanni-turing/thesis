@@ -281,9 +281,9 @@ identically informed reactive controller, that controller with a warm floor
 calibrated outside the evaluation span, and a perfect-future oracle. The
 chain is graded under a pre-frozen replay protocol, and the result is reported as
 what it is: a trade-off with an identified failure mode, in which forecast
-and reactive tails tie exactly on three of the five evaluation windows and the
-aggregate span (the calm day within \SI{5}{\milli\second}) and the payoff is resource-time at equal compliance
-(Chapter~\ref{cap:closedloop}).
+and reactive window p99 values tie on most evaluation windows, the latency
+advantage concentrates in the fastest onset, and the payoff is
+resource-time at equal compliance (Chapter~\ref{cap:closedloop}).
 
 No ingredient of that chain is claimed as novel; modality disaggregation,
 image volume as the encoder's load signal, predictive and cold-start-aware

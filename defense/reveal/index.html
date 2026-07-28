@@ -11,7 +11,7 @@
   :root {
     --ink: #0b0b0b;
     --ink-2: #3c3c3c;
-    --muted: #6f6f6f;
+    --muted: #5c5c5c;
     --grid: #ececec;
     --green: #008300;      /* requests */
     --blue: #2a78d6;       /* images */
@@ -146,6 +146,18 @@
   .disclose { font-size: 0.5em !important; color: var(--ink-2); line-height: 1.5;
     border-left: 4px solid var(--critical); background: #fdf6f5; border-radius: 0 8px 8px 0;
     padding: 10px 14px; margin-top: 0.7em; }
+
+  /* span-level metric matrix (convention-free economics slide) */
+  .mmat { display: grid; grid-template-columns: 250px repeat(4, 1fr); gap: 7px 10px;
+    margin-top: 14px; align-items: stretch; }
+  .mmat .lhead { text-align: center; }
+  .mmat .lwin { justify-content: flex-end; text-align: right; padding-right: 6px; }
+  .mcell { font-size: 15.5px; font-weight: 750; border-radius: 9px; padding: 8px 6px;
+    background: #fff; border: 1px solid var(--grid); text-align: center; }
+  .mcell span { display: block; font-size: 12.5px; font-weight: 650; color: var(--ink-2);
+    margin-top: 2px; }
+  .mcell.win { border: 1.5px solid var(--blue); background: #e9f2fd; }
+  .mcell.hot { color: #b03030; }
 
   /* full-bleed animation slide */
   section.animslide { padding: 0 !important; }
@@ -437,6 +449,71 @@
       <iframe class="r-stretch" data-src="../anim/a6_the_week.html#t=0" allow="fullscreen"></iframe>
     </section>
 
+    <!-- 11b · the economics, regraded without windows -->
+    <section>
+      <div class="kicker">The economics, regraded</div>
+      <h2>Same resource-time conclusion in the <span style="color:var(--blue)">span-level synthesis</span></h2>
+      <p class="lead" style="margin-bottom:0.3em">The span-level totals establish <i>magnitude</i> — all
+        <b>749,601 requests as one population</b>: absolute worker-time, total delay, violation counts,
+        full quantile ladder, straight from the raw per-request traces — while the <b>frozen per-window
+        grid remains the anti-masking success gate</b>. The cost advantage holds under every readiness
+        model; the latency ordering is readiness-dependent (shipped mechanics shown).</p>
+
+      <div class="mmat">
+        <div class="lhead"></div>
+        <div class="lhead">provisioned worker-time</div>
+        <div class="lhead">total encoder delay</div>
+        <div class="lhead">requests over 1 s</div>
+        <div class="lhead">p99.99 delay</div>
+
+        <div class="lwin">static C8 <span>always-on</span></div>
+        <div class="mcell">1,074.8 h<span>1.60× forecast</span></div>
+        <div class="mcell">25,537 req·s</div>
+        <div class="mcell">599</div>
+        <div class="mcell">1.58 s</div>
+
+        <div class="lwin">reactive <span>same signal, no lead</span></div>
+        <div class="mcell">725.4 h</div>
+        <div class="mcell hot">34,016 req·s</div>
+        <div class="mcell">3,299</div>
+        <div class="mcell hot">14.72 s</div>
+
+        <div class="lwin" style="color:var(--blue)">forecast p90 <span>this thesis</span></div>
+        <div class="mcell win">669.7 h<span>7.7% under reactive</span></div>
+        <div class="mcell win">30,277 req·s<span>−11.0% vs reactive</span></div>
+        <div class="mcell win">2,650<span>−20% vs reactive</span></div>
+        <div class="mcell win">6.71 s<span>vs 14.72 s</span></div>
+
+        <div class="lwin">oracle <span>hindsight bound</span></div>
+        <div class="mcell">314.0 h</div>
+        <div class="mcell">27,353 req·s</div>
+        <div class="mcell">1,872</div>
+        <div class="mcell">1.90 s</div>
+      </div>
+
+      <div class="numrow">
+        <div class="numtile info fragment fade-up">
+          <div class="k">no privileged threshold</div>
+          <div class="d">Swept over SLA cutoffs <b>0.25–2 s</b> under the shipped mechanics: forecast
+            beats reactive on count and excess mass at <b>every examined threshold</b>. Static buys
+            its cleaner tail at 1.60× the spend.</div>
+        </div>
+        <div class="numtile info fragment fade-up">
+          <div class="k">no privileged bound either</div>
+          <div class="d">Tighten the 1 s bound: forecast's worst window still passes down to
+            <b>682 ms</b>; static holds to 808 ms, the cheapest passing floor to 907 ms.
+            The verdict is not a gift of the convention.</div>
+        </div>
+        <div class="numtile grn fragment fade-up">
+          <div class="k">windows = the validity gate</div>
+          <div class="d">The per-window grid proves no aggregate <b>hides a localized failure</b> —
+            and catches one: a warm reactive floor beats every aggregate delay metric yet
+            <b>fails burst3</b>. In the reactive-favorable post-hoc envelope, its cheapest passing
+            sibling costs <b>1.20×</b> the forecast (no symmetric forecast+floor sweep).</div>
+        </div>
+      </div>
+    </section>
+
     <!-- 12 · the language pool -->
     <section>
       <div class="kicker">The other pool</div>
@@ -537,16 +614,18 @@
         <div class="numtile ok fragment fade-up">
           <div class="k">5 · the closed loop — the contribution proper</div>
           <div class="d">The p90 path holds the SLA on <b>every covered window at every issued
-            lead</b>, at 0.62× the deployable static fleet — and the calibrated-EWMA control shows
-            the band <b>shape</b> is load-bearing, not point accuracy.</div>
+            lead</b> at 0.62× the deployable static fleet — and in the reactive-favorable post-hoc
+            floor envelope, the cheapest every-window-passing floor costs <b>1.20× the forecast</b>
+            (a symmetric forecast+floor family was not swept). The band <b>shape</b> is
+            load-bearing, not point accuracy.</div>
         </div>
       </div>
 
       <p class="disclose fragment fade-up" style="border-left-color:var(--blue); background:#f4f9ff">
         <b>Scope, stated plainly:</b> simulation-derived, one production trace, one infrastructure
-        model; cost = provisioned worker-time under symmetric warm-up accounting; the p90 band is
-        calibrated to ~90% coverage. Every number in this deck re-derives from the
-        provenance database.</p>
+        model; costs are separated by declared readiness mechanics; the p90 band is
+        calibrated to ~90% coverage. Every number is DB-backed where ingested, otherwise
+        re-derived from tracked raw artifacts and gated generators.</p>
 
       <p class="lead fragment fade-up" style="text-align:center; margin-top:0.9em; font-size:0.8em">
         <b>Obrigado.</b> <span style="color:var(--muted)">— questions welcome; every act has a live

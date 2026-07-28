@@ -91,7 +91,11 @@ a burst episode or a calm day --- never the request, the rolling forecast
 origin, or the factorial cell. ``Episode'' names the burst \emph{event}
 itself (the contiguous above-p99 excursion); every graded p99, worker-time,
 and pass/fail quantity is computed on the enclosing padded window as declared
-in \texttt{simulation/windows.json}. Two of the five evaluation windows
+in \texttt{simulation/windows.json}. Episodes and windows are measurement
+and analysis instruments --- they locate mechanisms and slice replays; the
+definitive grading also carries span-level absolute metrics
+(Section~\ref{sec:cl-frontier}), with the window grid serving as the check
+that no aggregate statistic masks a localized failure. Two of the five evaluation windows
 overlap slightly, so they are correlated rather than fully independent units;
 Chapter~\ref{cap:closedloop} discloses the overlap. Configuration counts therefore report
 \emph{parameter robustness}, never sample size. Resource use is reported as
@@ -767,10 +771,22 @@ beyond the collected batch axis, and every size distribution is
 \emph{assumed}).
 
 \emph{Scope of the simulated system.} The SLA's specific bounds
-(\SI{1}{\second}/\SI{100}{\milli\second}/\SI{1}{\second}) are a design
-choice: knee positions shift with them (under a lax TTFT-only
-\SI{2}{\second} bound the language knees sit one to two octaves higher),
-though the sweep curves are SLA-free and re-derivable under any bounds.
+(\SI{1}{\second}/\SI{100}{\milli\second}/\SI{1}{\second}) follow the
+interactive-serving convention rather than this trace: a first-token budget
+of about one second keeps an exchange conversational --- the classic
+interactive-latency envelope~\cite{Dean2013TailAtScale} and the TTFT range
+the disaggregated-serving literature grades
+against~\cite{Zhong2024DistServe,Patel2024Splitwise}; a
+\SI{100}{\milli\second} per-token gap sustains generation at or above
+human reading speed, the standard TPOT/ITL
+rationale~\cite{Zhong2024DistServe}; and the encoder bound reuses the same
+one-second budget because, through the composed seam, encoder delay
+postpones the first token one-for-one --- the pre-LLM stage is graded on the
+interactivity scale it consumes. They remain a design choice: knee positions
+shift with them (under a lax TTFT-only \SI{2}{\second} bound the language
+knees sit one to two octaves higher), though the sweep curves are SLA-free
+and re-derivable under any bounds, and Section~\ref{sec:cl-frontier} grades
+the frontier arms with the threshold swept.
 Language-pool results are reported for the 8B at TP1, with a TP2$\times$2
 spot-check on the burst window and a 235B-TP8 spot-check
 (Section~\ref{sec:sim-timing});

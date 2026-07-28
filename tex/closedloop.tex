@@ -26,7 +26,7 @@ forecasts of Chapter~\ref{cap:predictors}, and grades every arm under a pre-froz
 replay protocol (arm mechanics frozen before the frontier replay;
 $\rho{=}15$ disclosed as an earlier ex-post choice). The answer is a
 demonstrated failure mode and a trade-off, not
-universal superiority: the forecast and reactive tail latencies \emph{tie
+universal superiority: the forecast and reactive window p99 values \emph{tie
 exactly} on three of the five evaluation windows (burst1/4/5) and on the
 aggregate span, the calm day within \SI{5}{\milli\second}; the latency
 advantage lives in the one-minute onset, and what forecasting buys at week
@@ -635,62 +635,157 @@ only when the predictive distribution widens. That is what
 operationally: not detecting onsets earlier, but paying for probabilistic
 headroom where the uncertainty is rather than everywhere.
 
-\paragraph{Convention-free grading: the bound as one point on a swept
-curve.} The SLA's \SI{1000}{\milli\second} bound and the burst windows are
-conventions; the ordering they report is not. Table~\ref{tab:cl-metric-stack}
-grades every arm on the aggregate span alone --- all \num{749601} requests,
-no burst definition in any cell --- by swept violation thresholds, violation
-\emph{intensity} (excess mass above the threshold), and provisioned
-worker-time; upper-tail percentile bounds are the field's standard contract
-statistic~\cite{Dean2013TailAtScale,DeCandia2007Dynamo}, and the table
-recovers the evaluation SLA as its \SI{1}{\second} column. Three
-convention-free facts follow. First, the forecast arm records fewer
-violations than the identically informed reactive controller at \emph{every}
-threshold, with roughly half the excess mass (\num{3688.0} against
-\num{6709.7} request-seconds above \SI{1}{\second}) at 7.7\% less
-worker-time --- strict dominance, no threshold choice required. Second,
-reactive is identically the $M{=}1$ endpoint of the warm-floor family, whose
-members trace the standing-capacity trade-off
-(Figure~\ref{fig:cl-metric-frontier}): more standing workers, thinner tail,
-larger bill. Third, the forecast arm sits off that curve on the oracle side:
-at its worker-time no floor exists at all, and at its violation mass the
-linearly interpolated floor costs about 13\% more. The separation grows with
-tail depth --- the arms are indistinguishable through p95 (the no-queue
-plateau), part at p99.5, and differ twofold by p99.99 (\num{6705.9} against
+\paragraph{Full-span grading: absolute resource-time and
+threshold-integrated delay burden.} The SLA's \SI{1000}{\milli\second}
+bound and the burst windows are conventions; the final comparison should
+depend on as few of them as possible. The convention-minimized leading
+quantities are two absolute totals over the full 5.60-day evaluation span
+--- provisioned worker-seconds and total encoder-delay mass, computed over
+all \num{749601} requests with no burst definition, SLA cut, or percentile
+selection in either operand. Total delay mass is not another convention:
+it is exactly the area under the complete empirical exceedance-count
+curve, $\sum_i d_i = \int_0^\infty N(d_i > t)\,dt$, so it integrates every
+possible threshold instead of privileging one; it is a post-hoc,
+threshold-integrated synthesis that may lead the prose but does not
+replace the predeclared every-window compliance endpoint. Under the
+shipped mechanics the forecast schedule provisions \num{2410754.7}
+worker-seconds against reactive's \num{2611319.7} --- \num{55.7} fewer
+worker-hours (7.7\%) --- while accumulating 11.0\% less total delay
+(\num{30277.5} against \num{34015.6} request-seconds, a reduction of
+\num{3738.1}). The shipped pair is, however, not readiness-symmetric: the
+forecast and oracle arms mature workers on the warm-pool issue-time clock
+while the reactive family re-warms strictly (the declared asymmetry
+repaired and measured in ``The result survives equalizing the readiness
+models'' above), so Table~\ref{tab:cl-readiness} states the full-span
+comparison under each readiness interpretation.
+\textbf{The readiness-invariant result is efficiency: the forecast
+schedule provisions less worker-time than every reactive comparator under
+both readiness interpretations, at equal declared compliance.} The latency
+ordering is readiness-conditional and reported as such: under common
+warm-pool readiness the warm reactive floor $M{=}1$ carries 8.1\% less
+total delay than the forecast at 12.1\% more cost --- and \emph{fails}
+held-out burst3, the predeclared compliance gate, so the cheapest
+common-warm comparator that passes every window is $M{=}2$ at \num{801.8}
+worker-hours, 19.7\% above the forecast; under the near-symmetric strict
+diagnostic the forecast lowers both cost (8.6\%) and delay (10.0\%). The
+warm $M{=}1$ row is also the live demonstration that the every-window grid
+is a validity gate rather than mechanism color: an arm can look better in
+aggregate delay while failing the very burst that motivated the design.
+The common-warm rows are, moreover, a \emph{reactive-favorable post-hoc
+sensitivity with an unexpanded forecast design space}: selecting the
+cheapest evaluation-passing floor grants reactive an ex-post
+minimum-capacity sweep while the forecast remains one frozen operating
+point, so warm $M{=}2$'s lower delay mass describes a cost--delay
+trade-off between two operating points, not a comparison of the two
+policy classes; the symmetric extension --- a forecast-plus-minimum-floor
+family --- was not run and is named as future robustness work
+(Section~\ref{sec:cl-limits}), not claimed.
+Within the shipped pair, the underlying survival comparison is nearly
+ordered but not a first-order dominance law: the forecast arm has no more
+exceedances than reactive at every possible cut except the single
+interval $[\num{25.08}, \num{26.23})$~s, where it counts 3 against 2, and
+the two maxima tie at \SI{35902.5}{\milli\second} (request-paired
+outcomes: \num{6742} forecast-better, \num{738027} ties, \num{4832}
+forecast-worse). Both this near-ordering and the six-threshold sweep
+below are shipped-readiness sensitivities: under common warm readiness
+the violation-count ordering reverses at every examined threshold
+(Table~\ref{tab:cl-readiness}).
+
+The threshold-specific views are retained as sensitivity and
+interpretation, not as the proof. Table~\ref{tab:cl-metric-stack} prints
+six representative arms at three of the six swept thresholds --- the
+artifact and Figure~\ref{fig:cl-metric-frontier} carry all twenty arms and
+the full grid --- with upper-tail percentile bounds as the field's standard
+contract statistic~\cite{Dean2013TailAtScale,DeCandia2007Dynamo}; the
+table recovers the evaluation SLA as its \SI{1}{\second} column. Three
+facts follow. First, under the shipped mechanics the forecast arm records
+fewer violations than reactive at each of the six examined thresholds
+(0.25--\SI{2}{\second}), and continuously throughout that interval, with
+about half the excess mass (45.0\% less: \num{3688.0} against \num{6709.7}
+request-seconds above \SI{1}{\second}) --- a shipped-readiness
+sensitivity, per the reversal noted above. Second, reactive is identically the $M{=}1$ endpoint of
+the warm-floor family, whose members trace the standing-capacity trade-off
+(Figure~\ref{fig:cl-metric-frontier}): more standing workers, thinner
+tail, larger bill. Third, the forecast arm sits off that curve on the
+oracle side on the threshold-free axis as well: no warm floor exists at or
+below its cost ($M{=}1$ is already the family's cheapest member), and the
+floor interpolated to the forecast's total-delay burden costs \num{754.4}
+worker-hours, 12.6\% more. The separation grows across the reported tail
+ladder --- the arms are identical through p99 (the shared
+\num{589.301}-ms plateau), part at p99.5 (\num{752.8} against
+\num{906.6}), and differ twofold by p99.99 (\num{6705.9} against
 \SI{14724.0}{\milli\second}) --- so the p99 tie of
-Section~\ref{sec:cl-ledger-enc} is a statement about the plateau, not about
-the distributions. Static $C{=}8$ and the deeper floors carry lighter tails
-than the forecast arm --- that is what their 1.6--1.7$\times$ bill buys ---
-and every one of them meets the graded bound; the forecast arm is the only
+Section~\ref{sec:cl-ledger-enc} is a statement about the plateau, not
+about the distributions. Static $C{=}8$ and the deeper floors carry lighter
+tails across the examined grid and at p99.9, though not uniformly deeper
+($M{=}2$'s p99.99, \num{6933.1}, sits above the forecast's) --- that is
+what their 1.6--1.7$\times$ bill buys --- and every one of them meets the
+graded bound; the forecast arm is the only deployable (non-oracle)
 SLA-passing schedule \emph{below} the standing-capacity curve.
 
 \begin{table}[htbp]
 \centering
-\caption[Convention-free metric stack, aggregate span]{Convention-free
+\caption[Convention-minimized metric stack, aggregate span]{Full-span
 grading on the aggregate span (\num{749601} requests; no burst definition
-enters any cell). Violations count requests whose encoder delay exceeds the
-threshold; excess mass is $\sum(\text{delay}-\SI{1}{\second})^{+}$ in
-request-seconds; worker-hours are provisioned resource-time. The
-\SI{1}{\second} column is the evaluation SLA's threshold. Reactive is
-identically the warm-floor family's $M{=}1$ member. Artifact:
-\texttt{comparator\_frontier/metric\_stack.json}, regeneration-gated by the
-delivery suite.}
+enters any cell). Total delay is the leading threshold-integrated
+synthesis (the frozen endpoint remains every-window p99 compliance),
+$\sum_i d_i$ in request-seconds; violations count requests whose encoder
+delay exceeds the threshold; excess mass is
+$\sum(\text{delay}-\SI{1}{\second})^{+}$; worker-hours are provisioned
+resource-time. The \SI{1}{\second} column is the evaluation SLA's
+threshold. Reactive is identically the warm-floor family's $M{=}1$ member.
+The table prints six representative arms at three of the six swept
+thresholds; the artifact carries all twenty arms and the full grid.
+Artifact: \texttt{comparator\_frontier/metric\_stack.json},
+regeneration-gated by the delivery suite.}
 \label{tab:cl-metric-stack}
 \small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lrrrrr@{}}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrrr@{}}
 \toprule
-& worker- & \multicolumn{3}{c}{violations above threshold} & excess mass \\
-\cmidrule(lr){3-5}
-Arm & hours & \SI{0.5}{\second} & \SI{1}{\second} & \SI{2}{\second} &
+& worker- & total delay & \multicolumn{3}{c}{violations above threshold} & excess mass \\
+\cmidrule(lr){4-6}
+Arm & hours & (req$\cdot$s) & \SI{0.5}{\second} & \SI{1}{\second} & \SI{2}{\second} &
 (req$\cdot$s $>$ \SI{1}{\second}) \\
 \midrule
-oracle              & 314.0   & 20{,}123 & 1{,}872 & 42    & 562.9 \\
-forecast p90        & 669.6   & 20{,}512 & 2{,}650 & 1{,}005 & 3{,}688.0 \\
-reactive ($=M{=}1$) & 725.4   & 20{,}988 & 3{,}299 & 1{,}414 & 6{,}709.7 \\
-warm floor $M{=}2$  & 769.4   & 19{,}684 & 2{,}034 & 644   & 2{,}376.5 \\
-static $C{=}8$      & 1{,}074.8 & 17{,}154 & 599   & 21    & 289.9 \\
-warm floor $M{=}6$  & 1{,}120.3 & 16{,}827 & 489   & 26    & 286.9 \\
+oracle              & 314.0   & 27{,}353.1 & 20{,}123 & 1{,}872 & 42    & 562.9 \\
+forecast p90        & 669.7   & 30{,}277.5 & 20{,}512 & 2{,}650 & 1{,}005 & 3{,}688.0 \\
+reactive ($=M{=}1$) & 725.4   & 34{,}015.6 & 20{,}988 & 3{,}299 & 1{,}414 & 6{,}709.7 \\
+warm floor $M{=}2$  & 769.3   & 28{,}343.3 & 19{,}684 & 2{,}034 & 644   & 2{,}376.5 \\
+static $C{=}8$      & 1{,}074.8 & 25{,}536.9 & 17{,}154 & 599   & 21    & 289.9 \\
+warm floor $M{=}6$  & 1{,}120.3 & 24{,}318.3 & 16{,}827 & 489   & 26    & 286.9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption[Readiness-separated full-span comparison]{The full-span totals
+under each readiness interpretation (worker-hours / total delay in
+request-seconds). The shipped pair mixes readiness models; the common
+warm-pool and near-symmetric strict rows use the tracked repair
+diagnostics, which are \emph{not} frontier arms. Every-window compliance
+remains the predeclared endpoint: warm reactive $M{=}1$ improves aggregate
+delay yet fails held-out burst3, so the cheapest common-warm comparator
+passing every window is $M{=}2$. The common-warm rows are a
+reactive-favorable post-hoc envelope with an unexpanded forecast design
+space (Section~\ref{sec:cl-limits}). Artifact:
+\texttt{metric\_stack.json:comparisons\_by\_readiness}.}
+\label{tab:cl-readiness}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}lccp{3.3cm}@{}}
+\toprule
+Readiness footing & forecast (h / req$\cdot$s) & reactive (h / req$\cdot$s)
+& supported statement \\
+\midrule
+shipped (mixed)   & 669.7 / 30{,}277.5 & 725.4 / 34{,}015.6
+& lower cost \emph{and} delay \\
+common warm-pool  & 669.7 / 30{,}277.5 & 762.1 / 28{,}014.6
+& forecast 12.1\% cheaper, 8.1\% more delay; $M{=}1$ fails burst3;
+  passing floor $M{=}2$: 801.8\,h \\
+near-symm.\ strict & 663.3 / 30{,}620.5 & 725.4 / 34{,}015.6
+& 8.6\% cheaper, 10.0\% less delay (diagnostic) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -698,13 +793,19 @@ warm floor $M{=}6$  & 1{,}120.3 & 16{,}827 & 489   & 26    & 286.9 \\
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.82\linewidth]{figuras/sim/sim_metric_frontier}
-\caption[Cost versus violation intensity, aggregate span]{Cost versus
-violation intensity on the aggregate span, every frontier arm on one canvas
-(log--log). The warm-floor family traces the standing-capacity trade-off;
-static $C{=}8$ sits on that curve. The forecast arm lies below it --- less
-violation mass than any floor of equal cost, less cost than any floor of
-equal violation mass --- and only the perfect-future oracle is beyond it.
-Derived from \texttt{metric\_stack.json}
+\caption[Cost versus delay burden, aggregate span]{Cost versus
+encoder-delay burden on the aggregate span, every frontier arm on one
+canvas. Panel (a), the leading threshold-integrated synthesis: total
+delay mass (the area under the full exceedance-count curve; no SLA cut or
+percentile enters the axis; the frozen endpoint remains every-window p99
+compliance). Panel (b), sensitivity: excess mass over the
+\SI{1}{\second} evaluation SLA (log). The warm-floor family traces the
+standing-capacity trade-off; on panel (b) static $C{=}8$ sits essentially
+on that curve (6.7\% below its $M{=}5$--$M{=}6$ interpolation). On both
+axes the forecast arm lies below the family --- on the threshold-free
+axis the floor interpolated to its delay burden costs 12.6\% more, and no
+floor exists at or below its cost --- and only the perfect-future oracle
+is beyond it. Derived from \texttt{metric\_stack.json}
 (Table~\ref{tab:cl-metric-stack}).}
 \label{fig:cl-metric-frontier}
 \end{figure}
@@ -712,19 +813,39 @@ Derived from \texttt{metric\_stack.json}
 \subsection{The week-scale resource-time headline}
 \label{sec:cl-headline}
 
-\textbf{The p90-forecast schedule meets the tail SLA over the aggregate
-\emph{and} inside every declared in-span burst window at 0.62 times the
-deployable static encoder fleet's provisioned worker-time}
-(Table~\ref{tab:cl-frontier}) --- precisely an SLA/resource trade-off: equal
-compliance at less standing capacity, not a latency win
-(Section~\ref{sec:cl-ledger-enc}). Actuated on forecast issue time the cost is
+\textbf{The p90-forecast schedule meets the tail SLA over the evaluation
+span at 0.62 times the deployable static encoder fleet's provisioned
+worker-time} (Table~\ref{tab:cl-frontier}) --- precisely an SLA/resource
+trade-off: equal compliance at less standing capacity, not a latency win
+(Section~\ref{sec:cl-ledger-enc}). The validation rests on the span-level
+record of the full-span grading above (Tables~\ref{tab:cl-metric-stack}
+and~\ref{tab:cl-readiness}) together with the frozen every-window p99
+contract, which remains the predeclared endpoint; the per-window grid
+doubles as the \emph{masking check} on the aggregate statistics,
+confirming that no declared window conceals a failure the aggregates
+would hide (the windows are the analysis instrument that located the
+mechanism; Section~\ref{sec:cl-aggregate} shows why the check is
+necessary), and every declared window indeed passes. Actuated on forecast issue time the cost is
 essentially lead-invariant across the archive's realizable
 15--\SI{165}{\second} issued-lead range (indexing by target time is an
 optimistic bound no issue-time schedule realizes); under strict re-warm it is
 mildly lead-dependent (0.62$\times$ at $L{=}15$ falling to 0.59$\times$ at
 $L{=}165$), still passing at the \SI{588}{\milli\second} plateau at every lead,
 so \textbf{0.62$\times$} is the conservative figure across both readiness
-models. The forecaster does not carry the result --- though a cheaper forward
+models. The compliance clause itself is bound-robust in an ordered way: the
+forecast schedule's worst evaluation-window p99 is \num{681.1}~ms (the calm
+day), so its every-window pass survives any bound down to
+\SI{682}{\milli\second}, while the deployable static fleet's worst window
+is \num{807.6} (burst1) and the $M{=}6$ floor's \num{906.6} (burst3).
+Tightening the convention therefore flips the comparators \emph{before} the
+forecast arm: below \SI{907}{\milli\second} the 1.042$\times$ floor is no
+longer all-passing ($M{=}7$, at 1.139$\times$, replaces it; below
+\SI{750}{\milli\second}, $M{=}8$ at 1.239$\times$), and below
+\SI{808}{\milli\second} the static reference itself fails burst1 --- the
+forecast arm still passes. The \SI{1}{\second} convention is the standing
+arms' friend, not the forecast's: over the tested 682--\SI{1000}{\milli\second}
+interval no tightening erodes the forecast's advantage, and each comparator
+crossing (\num{907}, \num{808}, \SI{750}{\milli\second}) widens it. The forecaster does not carry the result --- though a cheaper forward
 forecaster does not suffice (Table~\ref{tab:cl-ewma}): Toto and TimesFM pass at
 the same plateau within the ${\leq}4\%$ cross-model cost spread. The table
 quotes Chronos-2 deliberately: at 120M parameters it is the \emph{smallest} of
@@ -1366,6 +1487,14 @@ fails it.}
 \section{Limitations}
 \label{sec:cl-limits}
 
+The post-hoc comparator design spaces are asymmetric: the warm-floor family
+grants reactive an ex-post minimum-capacity sweep, while the forecast arm is
+one frozen operating point. The symmetric extension --- a
+forecast-plus-minimum-floor family $\max(\text{forecast schedule}, M)$, its
+deployable minimum chosen on calibration and graded held-out, any post-hoc
+envelope labeled separately so selection leakage stays visible --- was not
+run; it is future robustness work, and no numerical claim is made about it.
+
 The schedules consume archived rolling-origin forecasts: honest with respect to
 information, but offline. The per-worker capacity rating $\rho$ is a swept
 control knob, not a first-principles derivation; its feasible settings sit far
@@ -1468,8 +1597,10 @@ the mean-based sizing defect shared by every reactive configuration tested.
 Priced over the covered week, the policy meets the SLA in aggregate and in each
 of the four declared in-span burst windows at \textbf{0.62 times the
 deployable static encoder fleet's worker-time} --- a week-scale SLA/resource
-trade-off, since per burst window every arm costs more than static, and since
-the forecast and reactive tails tie exactly on three of the five evaluation
-windows (burst1/4/5) and on the aggregate span, the calm day within
-\SI{5}{\milli\second}. The finer daily-fold grain surfaces the one missed covered onset, e13,
-recovered at 0.76$\times$ by the post-hoc hybrid.
+trade-off, not a latency win: window p99 values tie exactly on burst1/4/5
+and the aggregate span, the calm day within \SI{5}{\milli\second}, and the
+advantage concentrates in the fastest onset
+(Sections~\ref{sec:cl-frontier} and~\ref{sec:cl-headline} carry the
+full-span grading and its readiness-separated interpretation). The finer daily-fold grain surfaces
+the one missed covered onset, e13, recovered at 0.76$\times$ by the
+post-hoc hybrid.
