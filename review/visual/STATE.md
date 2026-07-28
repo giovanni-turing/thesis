@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T05:39:09-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T05:41:24-03:00, protocol v2.1)
 
-messages: 49  errors: 0
+messages: 59  errors: 0
 
 ## Dispute threads
 - **V01-figure-pua-corrupted-glyphs**: 2 msgs, 1/2 evidence rounds
