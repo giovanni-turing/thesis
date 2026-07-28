@@ -1,0 +1,118 @@
+{
+ "bound_ms": 1000.0,
+ "cells": {
+  "steady24h__fc": {
+   "mean_ms": 1120.967,
+   "mean_ms_3dp": "1120.967",
+   "membership_matched_total": [
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ]
+   ],
+   "n_reps": 5,
+   "per_rep_retimed_p99_ms": [
+    1120.988,
+    1121.338,
+    1120.953,
+    1120.22,
+    1121.334
+   ],
+   "reconstruction_gate_all_pass": true,
+   "sample_sd_ms": 0.456,
+   "sample_sd_ms_3dp": "0.456"
+  },
+  "steady24h__re": {
+   "mean_ms": 1121.004,
+   "mean_ms_3dp": "1121.004",
+   "membership_matched_total": [
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ]
+   ],
+   "n_reps": 5,
+   "per_rep_retimed_p99_ms": [
+    1120.794,
+    1121.115,
+    1121.157,
+    1120.989,
+    1120.966
+   ],
+   "reconstruction_gate_all_pass": true,
+   "sample_sd_ms": 0.143,
+   "sample_sd_ms_3dp": "0.143"
+  },
+  "steady24h__staticC8": {
+   "mean_ms": 610.596,
+   "mean_ms_3dp": "610.596",
+   "membership_matched_total": [
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ],
+    [
+     37672,
+     37672
+    ]
+   ],
+   "n_reps": 5,
+   "per_rep_retimed_p99_ms": [
+    610.397,
+    610.549,
+    610.513,
+    610.859,
+    610.663
+   ],
+   "reconstruction_gate_all_pass": true,
+   "sample_sd_ms": 0.175,
+   "sample_sd_ms_3dp": "0.175"
+  }
+ },
+ "dispersion": "sample standard deviation over 5 predeclared reps",
+ "estimand": "per-repetition retimed p99 of per-request encoder delay (ms); frozen-composition retiming"
+}

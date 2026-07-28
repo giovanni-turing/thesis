@@ -1,0 +1,560 @@
+{
+ "schema": "silicon-anchor/steady24h-vllm-retimes/1",
+ "title": "Exact vLLM queue retimes for the steady24h silicon-anchor cells",
+ "root": "simulation/results/silicon_anchor",
+ "generator": "simulation/results/silicon_anchor/make_steady24h_vllm_retimes.py",
+ "deterministic": "no timestamps, no environment capture; two runs are byte-identical",
+ "method": {
+  "retiming": "frozen-composition retiming with the runner's own functions (silicon_anchor_runner.recover_membership / retime / request_delays / pct / Piecewise / aic_curve), loaded through an importlib spec shim. Batch order, recovered membership and the worker schedule are held fixed; only per-batch SERVICE TIME changes.",
+  "stored_sim_p99": "banked simulator encoder-delay p99 from simulation/silicon_anchor_queue.json cells[cid].banked.encoder_delay_ms.p99; re-derived here by retiming under the simulator's own per-batch service times (reconstruction gate: max batch-finish deviation <= 1e-6 ms AND replayed p99 == banked p99).",
+  "direct_vllm_p99": "per-batch service := vllm_mean_ms(N) for that batch's image count N, taken from the dense vLLM sweep (mean_ms field) via runner.Piecewise. Every dispatched N is an exact dense-table key (N=1..64), so no interpolation is exercised.",
+  "per_n_scaled_p99": "per-batch service := sim_service_ms * (vllm_mean_ms(N) / aic_ms(N)), with aic_ms = runner.aic_curve() over collector_artifacts/phaseB_batch_validation/aic_f_n_postinfill.csv. Preserves the simulator's own per-batch service variation, re-levelled to the measured engine.",
+  "percentile_convention": "runner.pct: sorted[min(len-1, int(len*p/100))] over ALL window requests, text-only requests contributing 0 (request_delays pads to n_all_requests); rounded to 3 dp.",
+  "handoff_term": "request_delays adds the simulator's own handoff term rtt + (196*N*4096*2)*8/(gbps*1e9)*1e3 with the dispatch's banked rtt/gbps, identically in every representation.",
+  "sla_bound_ms": 1000.0
+ },
+ "vllm_tables": {
+  "tier5_rerun": {
+   "path": "simulation/results/silicon_anchor/reps/engine__vllm_serving/vllm_eager_dense_rerun.json",
+   "sha256": "9174d523e6d61b58db1395b66fbf072a02b7cd46fa5a8828137c6bc3fffbe5e3",
+   "attn_backend": "AttentionBackendEnum.FLASH_ATTN",
+   "protocol": {
+    "nruns": 5,
+    "iters": 50,
+    "warmup": 10,
+    "image_px": 448,
+    "grid": 28
+   },
+   "field_used": "mean_ms",
+   "n_keys": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    96,
+    128,
+    192,
+    256,
+    512
+   ]
+  },
+  "phaseE_canonical": {
+   "path": "collector_artifacts/phaseE_physical_anchor/vllm_eager_dense.json",
+   "sha256": "e7b124ec82923dbd6d4dbe57a0c8e1da2bc28b29a34ff6143b0907c1ab1628e1",
+   "attn_backend": "AttentionBackendEnum.FLASH_ATTN",
+   "protocol": {
+    "nruns": 5,
+    "iters": 50,
+    "warmup": 10,
+    "image_px": 448,
+    "grid": 28
+   },
+   "field_used": "mean_ms",
+   "n_keys": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    96,
+    128,
+    192,
+    256,
+    512
+   ]
+  }
+ },
+ "aic_curve": {
+  "path": "collector_artifacts/phaseB_batch_validation/aic_f_n_postinfill.csv",
+  "sha256": "9efa0df865b378e48a2c081b11d2aee650562a88c5cf4d1ebdc555fa5efe12a0"
+ },
+ "headline_table_for_direct_and_per_n_scaled": "tier5_rerun",
+ "table_choice_note": "The independently verified burst3__staticC8 pair (746.994 / 748.409 ms, ledger entry silicon-anchor-tier5-engine-adjudication-v2) reproduces DIGIT-EXACT only from the tier-5 rerun sweep vllm_eager_dense_rerun.json (mean_ms). The canonical phase-E manuscript artifact vllm_eager_dense.json gives 745.758 / 747.169 ms for the same cell under the same method. Both tables are reported per cell under by_vllm_table; the top-level direct_vllm_p99 / per_n_scaled_p99 fields use tier5_rerun so the steady24h numbers are LIKE-FOR-LIKE with the verified burst3 pair. Any manuscript propagation must state which table it used.",
+ "validation_gate": {
+  "cell": "burst3__staticC8",
+  "expected": {
+   "stored_sim_p99": 717.755,
+   "direct_vllm_p99": 746.994,
+   "per_n_scaled_p99": 748.409
+  },
+  "actual": {
+   "stored_sim_p99": 717.755,
+   "direct_vllm_p99": 746.994,
+   "per_n_scaled_p99": 748.409
+  },
+  "digit_exact": true,
+  "table_used": "tier5_rerun",
+  "canonical_phaseE_for_same_cell": {
+   "direct_vllm_p99": 745.758,
+   "per_n_scaled_p99": 747.169
+  },
+  "cell_detail": {
+   "cell": "burst3__staticC8",
+   "window": "burst3",
+   "arm": "static_C8",
+   "cap": 64,
+   "encoder_workers": 2,
+   "schedule": "simulation/results/comparator_frontier/eval/burst3_staticC8_L30.sched.json",
+   "stored_sim_p99": 717.755,
+   "direct_vllm_p99": 746.994,
+   "per_n_scaled_p99": 748.409,
+   "by_vllm_table": {
+    "tier5_rerun": {
+     "direct_vllm_p99": 746.994,
+     "per_n_scaled_p99": 748.409,
+     "direct_vllm_percentiles": {
+      "p50": 0.0,
+      "p90": 431.389,
+      "p99": 746.994,
+      "max": 1012.951
+     },
+     "per_n_scaled_percentiles": {
+      "p50": 0.0,
+      "p90": 433.08,
+      "p99": 748.409,
+      "max": 1016.886
+     },
+     "direct_vllm_busy_worker_s": 754.706,
+     "per_n_scaled_busy_worker_s": 756.931,
+     "dispatch_n_not_in_table": [],
+     "interpolation_used": false
+    },
+    "phaseE_canonical": {
+     "direct_vllm_p99": 745.758,
+     "per_n_scaled_p99": 747.169,
+     "direct_vllm_percentiles": {
+      "p50": 0.0,
+      "p90": 429.924,
+      "p99": 745.758,
+      "max": 1009.323
+     },
+     "per_n_scaled_percentiles": {
+      "p50": 0.0,
+      "p90": 431.607,
+      "p99": 747.169,
+      "max": 1013.247
+     },
+     "direct_vllm_busy_worker_s": 752.766,
+     "per_n_scaled_busy_worker_s": 754.985,
+     "dispatch_n_not_in_table": [],
+     "interpolation_used": false
+    }
+   },
+   "n_distribution": {
+    "n_batches": 3156,
+    "p50": 64,
+    "p90": 64,
+    "p99": 64,
+    "max": 64,
+    "min": 1,
+    "distinct_n": 24,
+    "total_images": 143240
+   },
+   "n_forwards_per_batch_seen": [
+    1
+   ],
+   "reconstruction_gate": {
+    "pass": true,
+    "max_batch_finish_deviation_ms": 0.0,
+    "replayed_sim_p99_ms": 717.755,
+    "banked_sim_p99_ms": 717.755
+   },
+   "membership_recovery": {
+    "requests_matched": 1241,
+    "requests_with_images": 1241,
+    "complete": true
+   },
+   "replayed_sim_percentiles": {
+    "p50": 0.0,
+    "p90": 401.158,
+    "p99": 717.755,
+    "max": 944.078
+   },
+   "sim_busy_worker_s": 713.894
+  }
+ },
+ "cells": {
+  "steady24h__fc": {
+   "cell": "steady24h__fc",
+   "window": "steady24h",
+   "arm": "fc_p90",
+   "cap": 64,
+   "encoder_workers": 2,
+   "schedule": "simulation/results/comparator_frontier/eval/steady24h_fc_L30.sched.json",
+   "stored_sim_p99": 681.117,
+   "direct_vllm_p99": 741.987,
+   "per_n_scaled_p99": 745.833,
+   "by_vllm_table": {
+    "tier5_rerun": {
+     "direct_vllm_p99": 741.987,
+     "per_n_scaled_p99": 745.833,
+     "direct_vllm_percentiles": {
+      "p50": 0.0,
+      "p90": 50.916,
+      "p99": 741.987,
+      "max": 2198.533
+     },
+     "per_n_scaled_percentiles": {
+      "p50": 0.0,
+      "p90": 51.049,
+      "p99": 745.833,
+      "max": 2206.543
+     },
+     "direct_vllm_busy_worker_s": 2567.696,
+     "per_n_scaled_busy_worker_s": 2575.349,
+     "dispatch_n_not_in_table": [],
+     "interpolation_used": false
+    },
+    "phaseE_canonical": {
+     "direct_vllm_p99": 738.751,
+     "per_n_scaled_p99": 742.587,
+     "direct_vllm_percentiles": {
+      "p50": 0.0,
+      "p90": 50.876,
+      "p99": 738.751,
+      "max": 2191.346
+     },
+     "per_n_scaled_percentiles": {
+      "p50": 0.0,
+      "p90": 51.009,
+      "p99": 742.587,
+      "max": 2199.335
+     },
+     "direct_vllm_busy_worker_s": 2563.271,
+     "per_n_scaled_busy_worker_s": 2570.91,
+     "dispatch_n_not_in_table": [],
+     "interpolation_used": false
+    }
+   },
+   "n_distribution": {
+    "n_batches": 39906,
+    "p50": 1,
+    "p90": 36,
+    "p99": 64,
+    "max": 64,
+    "min": 1,
+    "distinct_n": 48,
+    "total_images": 470293
+   },
+   "n_forwards_per_batch_seen": [
+    1
+   ],
+   "reconstruction_gate": {
+    "pass": true,
+    "max_batch_finish_deviation_ms": 0.0,
+    "replayed_sim_p99_ms": 681.117,
+    "banked_sim_p99_ms": 681.117
+   },
+   "membership_recovery": {
+    "requests_matched": 37672,
+    "requests_with_images": 37672,
+    "complete": true
+   },
+   "replayed_sim_percentiles": {
+    "p50": 0.0,
+    "p90": 52.392,
+    "p99": 681.117,
+    "max": 2088.647
+   },
+   "sim_busy_worker_s": 2452.938
+  },
+  "steady24h__re": {
+   "cell": "steady24h__re",
+   "window": "steady24h",
+   "arm": "reactive",
+   "cap": 64,
+   "encoder_workers": 2,
+   "schedule": "simulation/results/comparator_frontier/eval/steady24h_re_L30.sched.json",
+   "stored_sim_p99": 684.999,
+   "direct_vllm_p99": 741.987,
+   "per_n_scaled_p99": 745.833,
+   "by_vllm_table": {
+    "tier5_rerun": {
+     "direct_vllm_p99": 741.987,
+     "per_n_scaled_p99": 745.833,
+     "direct_vllm_percentiles": {
+      "p50": 0.0,
+      "p90": 50.916,
+      "p99": 741.987,
+      "max": 3893.123
+     },
+     "per_n_scaled_percentiles": {
+      "p50": 0.0,
+      "p90": 51.049,
+      "p99": 745.833,
+      "max": 3903.555
+     },
+     "direct_vllm_busy_worker_s": 2567.792,
+     "per_n_scaled_busy_worker_s": 2575.445,
+     "dispatch_n_not_in_table": [],
+     "interpolation_used": false
+    },
+    "phaseE_canonical": {
+     "direct_vllm_p99": 738.751,
+     "per_n_scaled_p99": 742.587,
+     "direct_vllm_percentiles": {
+      "p50": 0.0,
+      "p90": 50.876,
+      "p99": 738.751,
+      "max": 3883.704
+     },
+     "per_n_scaled_percentiles": {
+      "p50": 0.0,
+      "p90": 51.009,
+      "p99": 742.587,
+      "max": 3894.109
+     },
+     "direct_vllm_busy_worker_s": 2563.366,
+     "per_n_scaled_busy_worker_s": 2571.005,
+     "dispatch_n_not_in_table": [],
+     "interpolation_used": false
+    }
+   },
+   "n_distribution": {
+    "n_batches": 39899,
+    "p50": 1,
+    "p90": 36,
+    "p99": 64,
+    "max": 64,
+    "min": 1,
+    "distinct_n": 47,
+    "total_images": 470293
+   },
+   "n_forwards_per_batch_seen": [
+    1
+   ],
+   "reconstruction_gate": {
+    "pass": true,
+    "max_batch_finish_deviation_ms": 0.0,
+    "replayed_sim_p99_ms": 684.999,
+    "banked_sim_p99_ms": 684.999
+   },
+   "membership_recovery": {
+    "requests_matched": 37672,
+    "requests_with_images": 37672,
+    "complete": true
+   },
+   "replayed_sim_percentiles": {
+    "p50": 0.0,
+    "p90": 52.392,
+    "p99": 684.999,
+    "max": 3701.474
+   },
+   "sim_busy_worker_s": 2452.909
+  },
+  "steady24h__staticC8": {
+   "cell": "steady24h__staticC8",
+   "window": "steady24h",
+   "arm": "static_C8",
+   "cap": 64,
+   "encoder_workers": 2,
+   "schedule": "simulation/results/comparator_frontier/eval/steady24h_staticC8_L30.sched.json",
+   "stored_sim_p99": 418.205,
+   "direct_vllm_p99": 435.423,
+   "per_n_scaled_p99": 436.407,
+   "by_vllm_table": {
+    "tier5_rerun": {
+     "direct_vllm_p99": 435.423,
+     "per_n_scaled_p99": 436.407,
+     "direct_vllm_percentiles": {
+      "p50": 0.0,
+      "p90": 50.916,
+      "p99": 435.423,
+      "max": 1163.0
+     },
+     "per_n_scaled_percentiles": {
+      "p50": 0.0,
+      "p90": 51.049,
+      "p99": 436.407,
+      "max": 1164.967
+     },
+     "direct_vllm_busy_worker_s": 2568.271,
+     "per_n_scaled_busy_worker_s": 2575.925,
+     "dispatch_n_not_in_table": [],
+     "interpolation_used": false
+    },
+    "phaseE_canonical": {
+     "direct_vllm_p99": 434.516,
+     "per_n_scaled_p99": 435.497,
+     "direct_vllm_percentiles": {
+      "p50": 0.0,
+      "p90": 50.876,
+      "p99": 434.516,
+      "max": 1161.185
+     },
+     "per_n_scaled_percentiles": {
+      "p50": 0.0,
+      "p90": 51.009,
+      "p99": 435.497,
+      "max": 1163.147
+     },
+     "direct_vllm_busy_worker_s": 2563.861,
+     "per_n_scaled_busy_worker_s": 2571.502,
+     "dispatch_n_not_in_table": [],
+     "interpolation_used": false
+    }
+   },
+   "n_distribution": {
+    "n_batches": 40199,
+    "p50": 1,
+    "p90": 36,
+    "p99": 64,
+    "max": 64,
+    "min": 1,
+    "distinct_n": 36,
+    "total_images": 470293
+   },
+   "n_forwards_per_batch_seen": [
+    1
+   ],
+   "reconstruction_gate": {
+    "pass": true,
+    "max_batch_finish_deviation_ms": 0.0,
+    "replayed_sim_p99_ms": 418.205,
+    "banked_sim_p99_ms": 418.205
+   },
+   "membership_recovery": {
+    "requests_matched": 37672,
+    "requests_with_images": 37672,
+    "complete": true
+   },
+   "replayed_sim_percentiles": {
+    "p50": 0.0,
+    "p90": 52.392,
+    "p99": 418.205,
+    "max": 1128.563
+   },
+   "sim_busy_worker_s": 2453.939
+  }
+ },
+ "sla_bound_check": {
+  "bound_ms": 1000.0,
+  "all_steady24h_p99_below_bound": true,
+  "max_p99_over_all_steady24h_representations_ms": 745.833,
+  "note": "p99 encoder delay only; the bound is the encoder-delay SLA the campaign uses for the static-C8 feasibility verdict."
+ },
+ "notes": [
+  "steady24h dispatches are dominated by N=1 batches (p50 = 1 image/batch) with a heavy tail to the cap (p99 = 64). Both vLLM tables are dense over N=1..64 and every dispatched N is an exact table key in all three cells, so no interpolation and no extrapolation is exercised (dispatch_n_not_in_table is empty everywhere).",
+  "steady24h__fc and steady24h__re return the SAME retimed p99 to full float precision (direct 741.987, per-N 745.833) even though their stored simulator p99 differ (681.117 vs 684.999), their dispatches differ (39906 vs 39899 batches) and 1686 of the 88260 per-request delays differ. It is a genuine order-statistic coincidence at the p99 index, not an input mix-up: the immediate neighbours of the p99 order statistic, the p99.9 and the max all differ between the two arms.",
+  "The static-C8 arm is the only steady24h cell whose retimed p99 sits far below the others; the reactive and forecast arms are provisioned more thinly in this window, which is why their p99 encoder delay is higher under every service representation."
+ ]
+}

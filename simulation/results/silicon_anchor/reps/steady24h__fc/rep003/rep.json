@@ -1,0 +1,564 @@
+{
+ "cell": "steady24h__fc",
+ "rep": 3,
+ "window": "steady24h",
+ "arm": "fc_p90",
+ "n_batches": 39906,
+ "total_images": 470293,
+ "wall_s": 3778.83,
+ "resumed_from_batch": null,
+ "measured_busy_s": 3772.236,
+ "sim_busy_s": 2452.938,
+ "overhead_frac": 0.00174,
+ "peak_mem_gb": 3.643,
+ "per_batch_ratio_measured_over_sim": {
+  "p50": 1.389,
+  "p90": 1.58,
+  "p99": 1.61,
+  "mean": 1.4207,
+  "min": 1.2658,
+  "max": 1.6143
+ },
+ "measured_batch_service_ms": {
+  "p50": 11.453,
+  "p90": 285.903,
+  "p99": 510.697,
+  "max": 512.207
+ },
+ "sim_batch_service_ms": {
+  "p50": 8.186,
+  "p90": 180.95,
+  "p99": 317.299,
+  "max": 317.299
+ },
+ "measured_fn_table": {
+  "1": {
+   "count": 20519,
+   "median_ms": 11.2751,
+   "mean_ms": 11.2699,
+   "min_ms": 11.0103,
+   "max_ms": 12.1238,
+   "aic_ms": 8.162,
+   "ratio_median_over_aic": 1.3814
+  },
+  "2": {
+   "count": 391,
+   "median_ms": 17.4272,
+   "mean_ms": 17.4195,
+   "min_ms": 17.1715,
+   "max_ms": 18.0009,
+   "aic_ms": 13.271,
+   "ratio_median_over_aic": 1.3132
+  },
+  "3": {
+   "count": 10,
+   "median_ms": 23.8275,
+   "mean_ms": 23.8082,
+   "min_ms": 23.673,
+   "max_ms": 23.8884,
+   "aic_ms": 17.281,
+   "ratio_median_over_aic": 1.3788
+  },
+  "4": {
+   "count": 2704,
+   "median_ms": 30.5795,
+   "mean_ms": 30.5621,
+   "min_ms": 30.2362,
+   "max_ms": 31.0622,
+   "aic_ms": 23.127,
+   "ratio_median_over_aic": 1.3222
+  },
+  "5": {
+   "count": 47,
+   "median_ms": 39.4108,
+   "mean_ms": 39.4089,
+   "min_ms": 39.1586,
+   "max_ms": 39.6809,
+   "aic_ms": 30.841,
+   "ratio_median_over_aic": 1.2779
+  },
+  "6": {
+   "count": 2,
+   "median_ms": 43.1762,
+   "mean_ms": 43.1762,
+   "min_ms": 43.0728,
+   "max_ms": 43.2797,
+   "aic_ms": 31.792,
+   "ratio_median_over_aic": 1.3581
+  },
+  "8": {
+   "count": 3,
+   "median_ms": 58.5535,
+   "mean_ms": 58.4848,
+   "min_ms": 58.3365,
+   "max_ms": 58.5643,
+   "aic_ms": 43.126,
+   "ratio_median_over_aic": 1.3577
+  },
+  "9": {
+   "count": 6671,
+   "median_ms": 66.4037,
+   "mean_ms": 66.4006,
+   "min_ms": 65.9911,
+   "max_ms": 68.4278,
+   "aic_ms": 47.431,
+   "ratio_median_over_aic": 1.4
+  },
+  "10": {
+   "count": 213,
+   "median_ms": 75.4573,
+   "mean_ms": 75.4531,
+   "min_ms": 75.1403,
+   "max_ms": 75.9062,
+   "aic_ms": 53.331,
+   "ratio_median_over_aic": 1.4149
+  },
+  "11": {
+   "count": 12,
+   "median_ms": 83.8839,
+   "mean_ms": 83.8912,
+   "min_ms": 83.6304,
+   "max_ms": 84.3284,
+   "aic_ms": 59.006,
+   "ratio_median_over_aic": 1.4216
+  },
+  "12": {
+   "count": 1,
+   "median_ms": 90.4396,
+   "mean_ms": 90.4396,
+   "min_ms": 90.4396,
+   "max_ms": 90.4396,
+   "aic_ms": 61.746,
+   "ratio_median_over_aic": 1.4647
+  },
+  "13": {
+   "count": 24,
+   "median_ms": 99.6359,
+   "mean_ms": 99.638,
+   "min_ms": 99.2883,
+   "max_ms": 99.8908,
+   "aic_ms": 67.925,
+   "ratio_median_over_aic": 1.4669
+  },
+  "14": {
+   "count": 4,
+   "median_ms": 107.707,
+   "mean_ms": 107.7069,
+   "min_ms": 107.5733,
+   "max_ms": 107.8403,
+   "aic_ms": 73.234,
+   "ratio_median_over_aic": 1.4707
+  },
+  "15": {
+   "count": 3,
+   "median_ms": 115.3132,
+   "mean_ms": 115.2601,
+   "min_ms": 115.0023,
+   "max_ms": 115.4647,
+   "aic_ms": 77.468,
+   "ratio_median_over_aic": 1.4885
+  },
+  "16": {
+   "count": 343,
+   "median_ms": 122.9268,
+   "mean_ms": 122.9351,
+   "min_ms": 122.501,
+   "max_ms": 123.7438,
+   "aic_ms": 82.217,
+   "ratio_median_over_aic": 1.4952
+  },
+  "17": {
+   "count": 23,
+   "median_ms": 132.7217,
+   "mean_ms": 132.7285,
+   "min_ms": 132.4991,
+   "max_ms": 132.9575,
+   "aic_ms": 89.09,
+   "ratio_median_over_aic": 1.4897
+  },
+  "18": {
+   "count": 48,
+   "median_ms": 139.1382,
+   "mean_ms": 139.1106,
+   "min_ms": 138.8002,
+   "max_ms": 139.6412,
+   "aic_ms": 91.828,
+   "ratio_median_over_aic": 1.5152
+  },
+  "19": {
+   "count": 5,
+   "median_ms": 149.1101,
+   "mean_ms": 149.0153,
+   "min_ms": 148.6377,
+   "max_ms": 149.1598,
+   "aic_ms": 98.192,
+   "ratio_median_over_aic": 1.5186
+  },
+  "20": {
+   "count": 4,
+   "median_ms": 157.0734,
+   "mean_ms": 157.0865,
+   "min_ms": 156.9425,
+   "max_ms": 157.2566,
+   "aic_ms": 103.236,
+   "ratio_median_over_aic": 1.5215
+  },
+  "22": {
+   "count": 1,
+   "median_ms": 173.3052,
+   "mean_ms": 173.3052,
+   "min_ms": 173.3052,
+   "max_ms": 173.3052,
+   "aic_ms": 112.26,
+   "ratio_median_over_aic": 1.5438
+  },
+  "24": {
+   "count": 1,
+   "median_ms": 188.0079,
+   "mean_ms": 188.0079,
+   "min_ms": 188.0079,
+   "max_ms": 188.0079,
+   "aic_ms": 120.455,
+   "ratio_median_over_aic": 1.5608
+  },
+  "25": {
+   "count": 4538,
+   "median_ms": 198.8845,
+   "mean_ms": 198.8926,
+   "min_ms": 198.2787,
+   "max_ms": 200.338,
+   "aic_ms": 128.062,
+   "ratio_median_over_aic": 1.553
+  },
+  "26": {
+   "count": 137,
+   "median_ms": 204.394,
+   "mean_ms": 204.3856,
+   "min_ms": 203.8166,
+   "max_ms": 204.9125,
+   "aic_ms": 130.461,
+   "ratio_median_over_aic": 1.5667
+  },
+  "27": {
+   "count": 10,
+   "median_ms": 213.4717,
+   "mean_ms": 213.4918,
+   "min_ms": 213.0556,
+   "max_ms": 214.2211,
+   "aic_ms": 136.065,
+   "ratio_median_over_aic": 1.5689
+  },
+  "28": {
+   "count": 2,
+   "median_ms": 223.1705,
+   "mean_ms": 223.1705,
+   "min_ms": 223.0559,
+   "max_ms": 223.2852,
+   "aic_ms": 142.375,
+   "ratio_median_over_aic": 1.5675
+  },
+  "29": {
+   "count": 16,
+   "median_ms": 229.2369,
+   "mean_ms": 229.3098,
+   "min_ms": 228.993,
+   "max_ms": 229.9668,
+   "aic_ms": 146.137,
+   "ratio_median_over_aic": 1.5686
+  },
+  "30": {
+   "count": 1,
+   "median_ms": 237.6777,
+   "mean_ms": 237.6777,
+   "min_ms": 237.6777,
+   "max_ms": 237.6777,
+   "aic_ms": 150.366,
+   "ratio_median_over_aic": 1.5807
+  },
+  "33": {
+   "count": 36,
+   "median_ms": 262.8737,
+   "mean_ms": 262.9067,
+   "min_ms": 262.6442,
+   "max_ms": 263.1774,
+   "aic_ms": 166.23,
+   "ratio_median_over_aic": 1.5814
+  },
+  "34": {
+   "count": 48,
+   "median_ms": 270.8256,
+   "mean_ms": 270.8702,
+   "min_ms": 270.3419,
+   "max_ms": 271.6809,
+   "aic_ms": 171.009,
+   "ratio_median_over_aic": 1.5837
+  },
+  "35": {
+   "count": 2,
+   "median_ms": 278.4359,
+   "mean_ms": 278.4359,
+   "min_ms": 278.2093,
+   "max_ms": 278.6625,
+   "aic_ms": 175.878,
+   "ratio_median_over_aic": 1.5831
+  },
+  "36": {
+   "count": 396,
+   "median_ms": 286.0643,
+   "mean_ms": 286.0962,
+   "min_ms": 285.4977,
+   "max_ms": 287.2652,
+   "aic_ms": 180.414,
+   "ratio_median_over_aic": 1.5856
+  },
+  "37": {
+   "count": 4,
+   "median_ms": 294.9491,
+   "mean_ms": 294.9839,
+   "min_ms": 294.6957,
+   "max_ms": 295.3417,
+   "aic_ms": 186.279,
+   "ratio_median_over_aic": 1.5834
+  },
+  "40": {
+   "count": 1,
+   "median_ms": 316.349,
+   "mean_ms": 316.349,
+   "min_ms": 316.349,
+   "max_ms": 316.349,
+   "aic_ms": 198.92,
+   "ratio_median_over_aic": 1.5903
+  },
+  "41": {
+   "count": 23,
+   "median_ms": 326.4619,
+   "mean_ms": 326.5063,
+   "min_ms": 326.1403,
+   "max_ms": 327.4639,
+   "aic_ms": 205.764,
+   "ratio_median_over_aic": 1.5866
+  },
+  "43": {
+   "count": 1,
+   "median_ms": 340.0294,
+   "mean_ms": 340.0294,
+   "min_ms": 340.0294,
+   "max_ms": 340.0294,
+   "aic_ms": 213.0,
+   "ratio_median_over_aic": 1.5964
+  },
+  "45": {
+   "count": 9,
+   "median_ms": 357.2485,
+   "mean_ms": 357.3193,
+   "min_ms": 356.9781,
+   "max_ms": 357.7229,
+   "aic_ms": 223.27,
+   "ratio_median_over_aic": 1.6001
+  },
+  "48": {
+   "count": 1,
+   "median_ms": 381.7741,
+   "mean_ms": 381.7741,
+   "min_ms": 381.7741,
+   "max_ms": 381.7741,
+   "aic_ms": 238.658,
+   "ratio_median_over_aic": 1.5997
+  },
+  "49": {
+   "count": 74,
+   "median_ms": 389.3402,
+   "mean_ms": 389.3697,
+   "min_ms": 388.8852,
+   "max_ms": 390.377,
+   "aic_ms": 242.966,
+   "ratio_median_over_aic": 1.6024
+  },
+  "50": {
+   "count": 57,
+   "median_ms": 398.2826,
+   "mean_ms": 398.2866,
+   "min_ms": 397.6292,
+   "max_ms": 398.9981,
+   "aic_ms": 247.936,
+   "ratio_median_over_aic": 1.6064
+  },
+  "51": {
+   "count": 4,
+   "median_ms": 406.2834,
+   "mean_ms": 406.358,
+   "min_ms": 406.1068,
+   "max_ms": 406.7585,
+   "aic_ms": 253.245,
+   "ratio_median_over_aic": 1.6043
+  },
+  "53": {
+   "count": 1,
+   "median_ms": 421.3668,
+   "mean_ms": 421.3668,
+   "min_ms": 421.3668,
+   "max_ms": 421.3668,
+   "aic_ms": 262.019,
+   "ratio_median_over_aic": 1.6082
+  },
+  "57": {
+   "count": 22,
+   "median_ms": 453.8419,
+   "mean_ms": 453.86,
+   "min_ms": 453.195,
+   "max_ms": 454.6511,
+   "aic_ms": 281.916,
+   "ratio_median_over_aic": 1.6098
+  },
+  "59": {
+   "count": 2,
+   "median_ms": 471.1528,
+   "mean_ms": 471.1528,
+   "min_ms": 471.0187,
+   "max_ms": 471.2868,
+   "aic_ms": 291.988,
+   "ratio_median_over_aic": 1.6136
+  },
+  "60": {
+   "count": 1,
+   "median_ms": 477.7089,
+   "mean_ms": 477.7089,
+   "min_ms": 477.7089,
+   "max_ms": 477.7089,
+   "aic_ms": 296.086,
+   "ratio_median_over_aic": 1.6134
+  },
+  "61": {
+   "count": 2,
+   "median_ms": 485.7818,
+   "mean_ms": 485.7818,
+   "min_ms": 485.7151,
+   "max_ms": 485.8484,
+   "aic_ms": 300.875,
+   "ratio_median_over_aic": 1.6146
+  },
+  "62": {
+   "count": 1,
+   "median_ms": 495.4973,
+   "mean_ms": 495.4973,
+   "min_ms": 495.4973,
+   "max_ms": 495.4973,
+   "aic_ms": 306.399,
+   "ratio_median_over_aic": 1.6172
+  },
+  "63": {
+   "count": 1,
+   "median_ms": 501.0445,
+   "mean_ms": 501.0445,
+   "min_ms": 501.0445,
+   "max_ms": 501.0445,
+   "aic_ms": 310.007,
+   "ratio_median_over_aic": 1.6162
+  },
+  "64": {
+   "count": 3487,
+   "median_ms": 510.1446,
+   "mean_ms": 510.1808,
+   "min_ms": 509.0625,
+   "max_ms": 512.207,
+   "aic_ms": 316.369,
+   "ratio_median_over_aic": 1.6125
+  }
+ },
+ "retimed_encoder_delay_ms": {
+  "p50": 0.0,
+  "p90": 71.518,
+  "p99": 1120.953,
+  "max": 3626.557
+ },
+ "replayed_sim_encoder_delay_ms": {
+  "p50": 0.0,
+  "p90": 52.392,
+  "p99": 681.117,
+  "max": 2088.647
+ },
+ "banked_sim_encoder_delay_ms": {
+  "p50": 0.0,
+  "p90": 52.392,
+  "p99": 681.117,
+  "max": 2088.647
+ },
+ "reconstruction_gate": {
+  "pass": true,
+  "max_batch_finish_deviation_ms": 0.0,
+  "replayed_sim_p99_ms": 681.117,
+  "banked_sim_p99_ms": 681.117,
+  "meaning": "retiming under the sim's OWN service times reproduces the dumped dispatch timeline and the banked encoder-delay p99; membership and slot recovery are therefore faithful and the measured retiming is valid"
+ },
+ "membership_recovery_requests_matched": 37672,
+ "membership_recovery_requests_total": 37672,
+ "warmup": {
+  "sizes": [
+   64,
+   8,
+   1
+  ],
+  "reps": 6,
+  "wall_s": 3.48
+ },
+ "throttle_evidence": {
+  "snapshots": 82,
+  "sm_mhz_min": 2385,
+  "sm_mhz_max": 2392,
+  "mem_mhz_seen": [
+   13801
+  ],
+  "throttle_hex_histogram": {
+   "0x0": 77,
+   "0x4": 5
+  },
+  "sw_power_cap_snapshots": 5,
+  "fatal_slowdown_snapshots": 0,
+  "note": "sw_power_cap is benign and expected at ~380 W: the delivered SM clock stayed inside the locked band throughout, which is the physical criterion. fatal_slowdown_snapshots must be 0."
+ },
+ "clock_start": {
+  "sm_mhz": 2385,
+  "mem_mhz": 13801,
+  "max_sm_mhz": 3105,
+  "persistence": "Enabled",
+  "throttle_hex": "0x0000000000000000",
+  "temp_c": 58,
+  "power_w": 364.22,
+  "mem_used_mib": 4888,
+  "util_pct": 95,
+  "compute_apps": [
+   {
+    "pid": 3018097,
+    "mib": 4864
+   }
+  ],
+  "utc": "2026-07-28T01:22:35Z"
+ },
+ "clock_end": {
+  "sm_mhz": 2385,
+  "mem_mhz": 13801,
+  "max_sm_mhz": 3105,
+  "persistence": "Enabled",
+  "throttle_hex": "0x0000000000000000",
+  "temp_c": 58,
+  "power_w": 369.06,
+  "mem_used_mib": 4888,
+  "util_pct": 94,
+  "compute_apps": [
+   {
+    "pid": 3018097,
+    "mib": 4864
+   }
+  ],
+  "utc": "2026-07-28T02:25:37Z"
+ },
+ "encoder": {
+  "model_dir": "/home/gio/tese/models/Qwen3-VL-8B-ViT",
+  "attn": "sdpa",
+  "n_params": 576388336,
+  "load_s": 0.24,
+  "image_px": 448
+ },
+ "dispatch_meta": "simulation/results/silicon_anchor/dispatch/steady24h__fc.meta.json",
+ "queue_sha": null
+}
