@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T03:30:26-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T03:41:39-03:00, protocol v2.1)
 
-messages: 377  errors: 0
+messages: 394  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -369,9 +369,28 @@ messages: 377  errors: 0
     - 120_d75_closed (claude, response)
     - 251_d75_fix_accepted (reviewer, response)
     - 255_d75_terminal_verification (reviewer, verification)
-- **D76-postfix-provenance-absolute-and-parenthesis**: 2 msgs, 1/2 evidence rounds
+- **D76-postfix-provenance-absolute-and-parenthesis**: 4 msgs, 2/2 evidence rounds
     - 256_micro_prose_residuals (reviewer, finding)
     - 121_d76_closed (claude, response)
+    - 258_d76_fix_accepted (reviewer, response)
+    - 259_d76_terminal_verification (reviewer, verification)
+- **D77-artifact-commit-lineage-refresh**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 125_d77_d79_adjudication)
+    - 257_artifact_commit_lineage_stale (reviewer, finding)
+    - 122_d77_closed (claude, response)
+    - 262_d77_safety_residual (reviewer, response)
+    - 265_d77_escalation (reviewer, escalation)
+    - 268_d77_terminal_verification (reviewer, verification)
+- **D78-defense-provenance-plural-copyedit**: 4 msgs, 2/2 evidence rounds
+    - 260_defense_plural_copyedit (reviewer, finding)
+    - 123_d78_closed (claude, response)
+    - 263_d78_fix_accepted (reviewer, response)
+    - 266_d78_terminal_verification (reviewer, verification)
+- **D79-provenance-rebuild-manifest-navigation-drift**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 125_d77_d79_adjudication)
+    - 261_provenance_documentation_drift (reviewer, finding)
+    - 124_d79_closed (claude, response)
+    - 264_d79_readme_residual (reviewer, response)
+    - 267_d79_escalation (reviewer, escalation)
+    - 269_d79_terminal_verification (reviewer, verification)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
