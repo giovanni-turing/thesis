@@ -493,9 +493,9 @@ def bind(tese: Path) -> list:
        metn, errs, "replay: fc estimand 782.455+-0.270 bound to the 1 s PASS role")
     rx(r"\$22\{,\}565\.317 \\pm 0\.935\$\\,ms", metn, errs,
        "replay: reactive estimand 22,565.317+-0.935 present")
-    rx(r"static-\$C\{=\}8\$ feasible \(\\num\{746\.994\}\\,ms direct, \\num\{748\.409\}\\,ms"
-       r" per-\$N\$ simulator-scaled, against \\num\{717\.755\}\\,ms stored simulation p99\)",
-       metn, errs, "replay: vLLM exact-retime triple bound to static feasibility")
+    rx(r"static-\$C\{=\}8\$ feasible \(\\num\{745\.758\}\\,ms direct, \\num\{747\.169\}\\,ms"
+       r" per-\$N\$ simulator-scaled, against \\num\{717\.755\}\\,ms stored simulation p99; the canonical phase-E",
+       metn, errs, "replay: canonical vLLM exact-retime triple bound to static feasibility (D109)")
     rx(r"not a conservative bound", metn, errs,
        "replay: HF-eager carries the 199c sensitivity-not-bound role")
     rx(r"anchors \\emph\{encoder delays only\} \(resource-time economics remain"
@@ -511,9 +511,12 @@ def bind(tese: Path) -> list:
        metn, errs, "calm day: fc/re HF-eager estimand pair adjacent (near-tie form)")
     rx(r"\$610\.596 \\pm 0\.175\$\\,ms", metn, errs,
        "calm day: static HF-eager estimand present")
-    rx(r"passes for every arm \(forecast/reactive \\num\{741\.987\} direct and"
-       r" \\num\{745\.833\} per-\$N\$ scaled; static \\num\{435\.423\}/\\num\{436\.407\}\\,ms\)",
-       metn, errs, "calm day: vLLM quad bound to the every-arm PASS role")
+    rx(r"passes under the canonical vLLM representations for every arm"
+       r" \(forecast/reactive \\num\{738\.751\} direct and \\num\{742\.587\} per-\$N\$"
+       r" scaled; static \\num\{434\.516\}/\\num\{435\.497\}\\,ms\)",
+       metn, errs, "calm day: canonical vLLM quad bound to the every-arm PASS role (D109)")
+    rx(r"no resolved p99 separation from reactive in this experiment",
+       metn, errs, "calm day: near-tie stated as unresolved separation, not equivalence (D110)")
     rx(r"static \\num\{418\.205\}, forecast \\num\{681\.117\}, reactive \\num\{684\.999\}\\,ms",
        metn, errs, "calm day: banked sim triple in the inside-the-bound sentence")
     rx(r"engine-band-conditional", metn, errs,

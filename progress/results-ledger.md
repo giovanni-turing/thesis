@@ -3471,3 +3471,22 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   round 167 raises the disclosure for reviewer ruling.
 - **Feeds**: bridge tier-3 round (167); QA crib calm-day answer refresh
   after round closes.
+
+## d109-canonical-table-correction (2026-07-28)
+
+- **What**: reviewer ruling (bridge 369): the canonical phase-E vLLM sweep
+  governs every primary manuscript value; the tier-5 rerun is replication
+  sensitivity. PROVENANCE CORRECTION OF RECORD: the D63-verified burst3
+  static pair 746.994/748.409 was computed (by both parties) from the
+  RERUN table; the canonical pair is 745.758/747.169. Manuscript, gate
+  binds, TIER3 evidence file, and the retimes generator (two-table
+  validation gate, canonical headline) all repropagated: steady24h
+  fc/re 738.751/742.587, static 434.516/435.497. All verdicts unchanged.
+  D110 applied in the same pass: calm-day prose reduced to
+  representation-independent facts (static lowest; controller arms
+  near-tied — sim gap 3.9 ms, vLLM exact tie, HF-eager 0.037 ms
+  mean-difference with per-rep sign flips; canonical-vLLM PASS all arms);
+  "no calm-day penalty" replaced by "no resolved p99 separation ... in
+  this experiment"; no equivalence claim.
+- **Feeds**: bridge 168/169 responses; supersedes the vLLM numbers in the
+  tier3-steady24h-evidence-round entry above.
