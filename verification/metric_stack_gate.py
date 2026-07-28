@@ -457,6 +457,31 @@ def bind(tese: Path) -> list:
     rx(r"separately labeled forecast-free seven-day aggregate diagnostic", texn,
        errs, "seven-day diagnostic labeled separately")
 
+    # 6e. D72: abstract population roles, conclusion denominator label,
+    # and the deck post-hoc disclosures -- multiset-invariant role reversals.
+    absn = norm((tese / "tex/tese.tex").read_text())
+    rx(r"\(Azure, one" + W + r"million requests over seven days\)", absn, errs,
+       "EN abstract: full-trace population attached to the trace description")
+    rx(r"Over the 5\.60-day," + W
+       + r"749\{,\}601-request evaluation span the p90-forecast schedule holds",
+       absn, errs, "EN abstract: evaluation population attached to the 0.62x claim")
+    rx(r"um milh\\~ao de requisi", absn, errs,
+       "PT abstract: full-trace population present")
+    rx(r"5,60 dias \(749\\,601 requisi", absn, errs,
+       "PT abstract: evaluation population attached to the p90 claim")
+    rx(r"under request-matched normalization the" + W
+       + r"published language point \(p90 at conversion scale 8\) reads 1\.03\$\\times\$",
+       concn, errs, "conclusion: 1.03x bound to REQUEST-matched denominator + p90/s8")
+    for name, dk in (("reveal/index.html", deckA), ("deck_single.html", deckB)):
+        if "reactive-favorable post-hoc envelope" not in dk:
+            errs.append(f"deck {name}: post-hoc-envelope disclosure (validity tile) missing (msg 244)")
+        if "reactive-favorable post-hoc floor envelope" not in dk:
+            errs.append(f"deck {name}: post-hoc floor-envelope disclosure (conclusion tile) missing (msg 244)")
+        if "no symmetric forecast+floor sweep" not in dk:
+            errs.append(f"deck {name}: unswept-family disclosure (validity tile) missing (msg 244)")
+        if "a symmetric forecast+floor family was not swept" not in dk:
+            errs.append(f"deck {name}: unswept-family disclosure (conclusion tile) missing (msg 244)")
+
     # 7. figure byte-identity, restore in FINALLY (failure-safe)
     env_fig = tese / "figuras/sim/sim_metric_frontier.pdf"
     tracked = env_fig.read_bytes()
@@ -600,6 +625,20 @@ PROBES = [
                 if "scoring its\n1.4-day context split" in s
                 else s.replace("1.4-day context split as targets", "5.60-day context split as targets", 1),
      "context-split"),
+    ("abstract populations swapped (D72)",
+     "tex/tese.tex",
+     lambda s: s.replace("(Azure, one\nmillion requests over seven days)",
+                         "(Azure, 749,601 requests over 5.60 days)", 1),
+     "full-trace population attached"),
+    ("conclusion denominator relabeled time-matched (D72)",
+     "tex/conclusion.tex",
+     lambda s: s.replace("under request-matched normalization the",
+                         "under time-matched normalization the", 1),
+     "REQUEST-matched"),
+    ("deck post-hoc disclosure erased in one mirror (D72)",
+     "defense/reveal/index.html",
+     lambda s: s.replace("reactive-favorable post-hoc", "pre-frozen symmetric", 1),
+     "disclosure"),
     ("C2 outside-set role removed",
      "tex/closedloop.tex",
      lambda s: s.replace("encoder-only comparator outside the 29-arm composed set",

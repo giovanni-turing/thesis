@@ -428,8 +428,8 @@ calibrations clear the burst-masked week aggregate but fail the fast and
 high-volume onsets under per-window grading, and the one calibration that
 clears every evaluation window over-provisions at 1.09$\times$ static. Only the zero-shot
 foundation-model band clears every evaluation window \emph{and} beats static
-(0.62$\times$). Forecast \emph{accuracy} is therefore second-order (ARIMA is
-statistically indistinguishable from Chronos on matched origins,
+(0.62$\times$). Forecast \emph{accuracy} is therefore second-order (a paired-origin bootstrap cannot
+distinguish the ARIMA--Chronos gap from zero on matched origins,
 Chapter~\ref{cap:predictors}) while the calibrated band \emph{shape} is not:
 a state-adaptive band that lifts at onsets without inflating in calm, which the
 foundation models supply zero-shot and standard forward-EWMA calibrations do
@@ -723,8 +723,9 @@ oracle side on the threshold-free axis as well: no warm floor exists at or
 below its cost ($M{=}1$ is already the family's cheapest member), and the
 floor interpolated to the forecast's total-delay burden costs \num{754.4}
 worker-hours, 12.6\% more. The separation grows across the reported tail
-ladder. The arms are identical through p99 (the shared
-\num{589.301}-ms plateau), part
+ladder. The arms' selected all-request quantiles coincide through p99
+(p50/p90/p95/p99; the shared \num{589.301}-ms plateau) while the CDFs
+already differ below it in violation counts, part
 at p99.5 (\num{752.8} against \num{906.6}), and differ twofold by
 p99.99 (\num{6705.9} against \SI{14724.0}{\milli\second}), so the p99 tie of
 Section~\ref{sec:cl-ledger-enc} is a statement about the plateau, not
@@ -1558,10 +1559,11 @@ grade TTFT only.}
 \end{table}
 
 Unlike on the encoder pool, TTFT is retained per request, so infraction \emph{duration}
-is real here. \textbf{This pool separates on every window, and the separation
-is compliance, not thrift.} Forecast holds TTFT p99 at \SI{651}{\milli\second}
-and ITL p99 at 5.1--6.3\,\si{\milli\second} on all five windows of this arm
-set; reactive violates TTFT on \emph{all five of them} and ITL on four (the
+is real here. \textbf{This pool separates on every window of this arm set,
+and the separation is compliance, not thrift.} Forecast holds TTFT p99 at \SI{651}{\milli\second}
+and ITL p99 at 5.1--6.3\,\si{\milli\second} on the aggregate span and all
+four forecast-covered burst windows of this arm
+set; reactive violates TTFT on \emph{every one of those rows} and ITL on four (the
 aggregate-window ITL pass is the masking of Section~\ref{sec:cl-aggregate}
 again), leaving the fastest onset's bound breached for 87 seconds: 5.37\% of
 wall-clock, 9.96\% of requests. On the calm day's composed arm

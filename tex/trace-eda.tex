@@ -137,8 +137,8 @@ The arrival process is not Poisson at any tested scale
 (\SI{1}{\second}--\SI{1}{\hour}): inter-arrival coefficient of variation 1.55,
 per-second counts overdispersed against Poisson$(1.65)$, and a Fano factor that
 keeps growing across the measured range of counting windows, from 1.8 at
-\SI{1}{\second} to 938 at one hour. Every aggregation scale an autoscaler could
-use is therefore overdispersed. Spectrally, a diurnal harmonic family
+\SI{1}{\second} to 938 at one hour. Every tested aggregation scale an
+autoscaler would plausibly use is therefore overdispersed. Spectrally, a diurnal harmonic family
 (\SI{24}{\hour} fundamental, weaker 12/8/\SI{6}{\hour} overtones) sits on a
 strong $1/f^{\beta}$ long-range-dependent background; no sharp non-harmonic
 line dominates the sub-diurnal band above it.
@@ -289,7 +289,7 @@ lagged linear cross-correlation. (Nonlinear or multivariate predictors with
 calendar features are not ruled out by these tests;
 Chapter~\ref{cap:predictors}'s covariate experiments probe that direction and
 find nearly nothing to exploit at provisioning cadence.) Image count and
-generation length are independent at request level (Spearman $-0.06$, no
+generation length are weakly rank-correlated at request level (Spearman $-0.06$), with no
 monotonic trend in per-bucket median generation), and at window level their
 cross-correlation peaks sharply at lag zero with no lead. Below the one-minute
 scale it is the image signal that loses forecastability: at

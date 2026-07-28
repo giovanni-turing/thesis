@@ -139,8 +139,8 @@ nominal-80\% band more at finer bins. \emph{Upper-quantile headroom is
 trustworthy at provisioning cadence; band-width and lower-edge semantics
 are not}, so the closed loop consumes p50/p90 paths, not the full band.
 
-\paragraph{What under-provisioning looks like.} Calibration guarantees that
-about one bin in ten sits above the provisioned edge; the size and duration
+\paragraph{What under-provisioning looks like.} On the common span, the
+calibrated edge leaves about one bin in ten above it; the size and duration
 of those excursions decide whether that is acceptable. In the cell the
 closed loop consumes (Chronos-2 with covariates, image signal,
 \SI{15}{\second} bins), 10.9\% of common-span
@@ -248,8 +248,8 @@ zero always scores exactly 100\%, so at 1-second bins the image forecasts
 move from far-worse-than-zero (the baselines) to par-with-zero, the white
 shot-noise floor of Section~\ref{sec:eda-predictability}, while the
 smoother signals keep measurable 1-second skill (best WAPE 62.9\%
-requests, 81.6\% generated, 86.0\% context). Nothing forecasts single
-\emph{image} bins at sub-minute cadence, and no policy should assume
+requests, 81.6\% generated, 86.0\% context). Nothing forecasts
+single-second \emph{image} bins, and no policy should assume
 otherwise.
 
 \textbf{The inter-model ranking is noise-level}: Toto-2 (usually with
@@ -283,7 +283,9 @@ at 73.3\%, trails both); rescoring the archived foundation-model forecasts
 on ARIMA's exact 300 origins puts ARIMA at 66.8\% WAPE against
 66.0--66.1\% for Chronos and 66.5\% for TimesFM (sub-point gaps a paired
 origin bootstrap cannot distinguish from zero), while Toto with
-covariates, at 60.9\%, beats ARIMA by a statistically significant margin.
+covariates, at 60.9\%, beats ARIMA with a 95\% paired-origin-bootstrap
+interval that excludes zero (300 independently resampled time-ordered
+origins, not a day- or block-level population test).
 The shipped best thus ties the classical baselines and trails the best
 foundation model by about a WAPE point at \SI{1}{\minute}, a gap widening to
 ${\approx}6$ points at \SI{15}{\second} (matched-origin rescore in
@@ -352,8 +354,8 @@ per-series tuning would narrow the margins of Table~\ref{tab:pred-wape},
 which should be read as a lower bound on tuned-baseline competitiveness.
 ARIMA, the incumbent in production autoscalers including Dynamo's, is
 absent from the main resolution$\times$signal grid (though benchmarked
-on the image signal above, where at \SI{15}{\second} it is statistically
-indistinguishable from Chronos on matched origins) but present where it
+on the image signal above, where at \SI{15}{\second} a paired-origin
+bootstrap cannot distinguish its gap to Chronos from zero) but present where it
 matters more: the reactive baseline of Chapter~\ref{cap:closedloop} runs
 Dynamo's planner with its ARIMA predictor unmodified. Coverage is assessed
 only for the upper edge, and its horizon- and burst-conditional forms
@@ -371,7 +373,8 @@ controller consumes is empirically calibrated (coverage $0.88$--$0.90$),
 and that calibration holds across the full 12-step horizon and inside
 burst windows, covering the
 tested \SIrange{15}{300}{\second} startup leads; the under-provision
-events it concedes are short and bounded. Underneath, zero-shot foundation
+events it concedes are short and bounded (measured for the consumed
+Chronos-2, image-signal, \SI{15}{\second} cell). Underneath, zero-shot foundation
 models beat the fixed-parameter classical baselines in every cell of the
 $5{\times}4$ grid, with inter-model margins and covariate effects small
 enough that engineering considerations can drive the choice. None of this

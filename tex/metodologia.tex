@@ -548,8 +548,11 @@ landing 2{,}726 images at once. Behind a strict FIFO a frames flood
 monopolizes \emph{every} worker: the backlog exceeds 1{,}000 queued images
 for 805 seconds across the eight-hour window, peaking at 4{,}701, each
 excursion a multi-second p99 event, yet the pool drains fully between them.
-Request rate, mean utilization, and every minute-averaged signal read
-healthy while the tail SLA is violated episodically all day. Catching that
+Request rate, mean utilization, and conventional five-minute aggregate
+summaries read healthy while the tail SLA is violated episodically all day
+--- the invisibility is clean only near five-minute cadence, since on a
+1-minute clock the image-driven busy fraction reaches 0.90 here, with 0.6\%
+of one-minute windows above an 0.8 target. Catching that
 requires watching, or forecasting, the image signal itself, at the
 horizons Chapter~\ref{cap:predictors} shows to be forecastable.
 
