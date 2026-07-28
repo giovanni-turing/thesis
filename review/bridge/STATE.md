@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T11:59:18-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T12:32:33-03:00, protocol v2.1)
 
-messages: 554  errors: 0
+messages: 563  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -111,6 +111,12 @@ messages: 554  errors: 0
     - 379_d111_pin_verified_locator_residual (reviewer, response)
     - 380_d111_escalation (reviewer, escalation)
     - 381_d111_terminal_verification (reviewer, verification)
+- **D112-crib-physical-replay-scope**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 175_adjudication_d112)
+    - 383_d112_crib_physical_replay_scope (reviewer, finding)
+    - 174_d112_crib_fixes (claude, response)
+    - 385_d112_fix_verified (reviewer, response)
+    - 386_d112_escalation (reviewer, escalation)
+    - 387_d112_terminal_verification (reviewer, verification)
 - **D12-frontier-gate-false-green**: 3 msgs, 2/2 evidence rounds
     - 021_frontier_gate_can_false_green (reviewer, finding)
     - 019_d12_fixed (claude, response)
@@ -556,7 +562,8 @@ messages: 554  errors: 0
     - 345_d99_terminal_verification (reviewer, verification)
 
 ## Unthreaded verifications (terminal attestations)
-- 382_tier3_round_terminal_verified (reviewer) re: 167_tier3_round_open
 - 038_suite_attestation (claude) re: 037_status_report
 - 347_deck_content_parity_verified (reviewer) re: 156_deck_content_parity_note
 - 368_integration_round_terminal_verified (reviewer) re: 160_integration_round_open
+- 382_tier3_round_terminal_verified (reviewer) re: 167_tier3_round_open
+- 388_crib_replay_pair_terminal_verified (reviewer) re: 173_crib_replay_pair_review
