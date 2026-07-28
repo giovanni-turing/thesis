@@ -651,12 +651,16 @@ def bind(tese: Path) -> list:
 
     # 6h-D2. the printed convention-minimized role itself (397 residual):
     # the ruled terminology is "convention-MINIMIZED", never "-free".
-    rx(r"convention-minimized", enn, errs,
-       "EN abstract: RQ3 lead carries the printed convention-minimized role")
-    rx(r"minimiza convenções", ptn, errs,
-       "PT abstract: RQ3 lead carries the printed minimized-convention role")
+    rx(r"the leading result is full-span and convention-minimized: over the"
+       r" 5\.60-day, 749\{,\}601-request evaluation span", enn, errs,
+       "EN abstract: convention-minimized ATTACHED to the leading full-span "
+       "result and its evaluation population (D117.1)")
+    rx(r"o resultado principal cobre todo o intervalo e minimiza convenções:"
+       r" nos 5,60 dias e 749\\,601 requisições da avaliação", ptn, errs,
+       "PT abstract: minimiza-convenções ATTACHED to the principal full-span "
+       "result and its evaluation population (D117.1)")
     for lang, body in (("EN", enn), ("PT", ptn)):
-        if re.search(r"convention-free|livre de convenç", body):
+        if re.search(r"convention-free|livre de convenç", body, re.IGNORECASE):
             errs.append(f"{lang} abstract: overstrong convention-FREE label "
                         f"(the ruled term is convention-minimized)")
 
@@ -707,7 +711,7 @@ def bind(tese: Path) -> list:
             if abs(got - want) > 0.05:
                 errs.append(f"abstract RQ3 lead: {what} saving states {got}% "
                             f"but the operands recompute to {want}%")
-        # the lead must stay convention-free in BOTH languages
+        # the lead's no-burst/SLA/percentile-selection clause, BOTH languages
         rx(r"no burst definition, SLA cutoff, or percentile selection in either"
            r" operand", enn, errs,
            "EN abstract: RQ3 lead declares no burst/SLA/percentile convention")
@@ -996,6 +1000,25 @@ PROBES = [
      lambda s: s.replace("30\\,277,5 contra 34\\,015,6",
                          "34\\,015,6 contra 30\\,277,5", 1),
      "operands disagree"),
+    ("EN abstract: convention-minimized relocated off the RQ3 lead (D117.1)",
+     "tex/tese.tex",
+     lambda s: s.replace("full-span and convention-minimized:",
+                         "full-span and convention-neutral:", 1)
+                .replace("replay protocol the leading",
+                         "replay protocol (convention-minimized) the leading", 1),
+     "ATTACHED to the leading"),
+    ("PT abstract: minimiza-convencoes relocated off the principal result (D117.1)",
+     "tex/tese.tex",
+     lambda s: s.replace("cobre todo o intervalo e minimiza convenções:",
+                         "cobre todo o intervalo:", 1)
+                .replace("pré-congelado, o",
+                         "pré-congelado (minimiza convenções), o", 1),
+     "ATTACHED to the principal"),
+    ("EN abstract: sentence-initial Convention-free appended (D117.2)",
+     "tex/tese.tex",
+     lambda s: s.replace("Week-scale economics remain simulated.",
+                         "Week-scale economics remain simulated. Convention-free grading throughout.", 1),
+     "convention-FREE"),
     ("EN abstract: convention-minimized promoted to convention-free (397)",
      "tex/tese.tex",
      lambda s: s.replace("convention-minimized", "convention-free", 1),
