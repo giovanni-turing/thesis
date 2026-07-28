@@ -17,10 +17,16 @@ demand, and structure remains.} A constant-fraction model explains
 $R^2=\num{0.123}$ of the image-rate series against \num{0.654} of the decode
 series; the two signals' extreme minutes are essentially disjoint, and
 minute-resolution monitoring erases most of the image peak. The
-misrepresentation is mechanical as well as statistical: the two pools
-saturate an order of magnitude apart, and the encoder pool misses its tail
+misrepresentation is mechanical as well as statistical: on the
+2{,}000-request steady head the two pools saturate an order of magnitude
+apart --- the calibrated language knee sits at $s{=}2$ while vision stays
+uncrossed through $s{=}32$ --- and the encoder pool misses its tail
 bound at the trace's own recorded rate, invisibly to rate- and
-utilization-based monitors. Forecastable structure nevertheless survives,
+utilization-based monitors. The separation is a calm-traffic property, not a
+workload-invariant one: inside the burst window both calibrated pools are
+already over their bounds at $s{=}1$, through different mechanisms (a
+per-request prefill floor on the language side, episodic encoder queueing on
+the vision side). Forecastable structure nevertheless survives,
 concentrated in that same vision-borne signal --- an autocorrelation
 half-life of \SI{69}{\minute} against \SI{9}{\minute} for requests, over a
 burst population of 18 episodes whose median onset, \SI{6.5}{\minute},
@@ -30,7 +36,11 @@ competes directly with replica startup.
 meaning.} The quantity a provisioning controller consumes is an upper band
 edge, and it is empirically calibrated: p90 coverage $0.88$--$0.90$, holding
 across the full twelve-step horizon and inside burst windows, so it covers
-the tested \SIrange{15}{300}{\second} startup leads, while the
+the encoder controller's realizable \SIrange{15}{165}{\second}
+forecast-issued leads --- the \SI{15}{\second}, $H{=}12$ archive supplies no
+more --- and, at \SI{1}{\minute} bins, the language pool's leads out to
+\SI{300}{\second}, which is a forecast-evaluation horizon rather than an
+issued encoder lead, while the
 under-provision events it concedes are short and bounded (measured for the
 consumed Chronos-2, image-signal, \SI{15}{\second} cell). Underneath that,
 zero-shot foundation models beat the fixed-parameter classical baselines in
@@ -45,8 +55,10 @@ the 5.60-day, \num{749601}-request evaluation span,
 forecast-informed placement uses
 669.7 provisioned worker-hours; under the frozen every-window p99 compliance
 rule the cheapest passing common-warm reactive floor uses
-801.8 (1.20$\times$ the forecast), and the shipped reactive arm 725.4
-under different readiness mechanics. The resource-time advantage is
+801.8 (1.20$\times$ the forecast), and the cheapest floor that passes under
+the shipped strict re-warm mechanics ($M{=}6$) uses 1{,}120.3
+(1.67$\times$). The shipped direct-reactive arm's 725.4 is not an
+equal-compliance comparator: that arm fails burst3. The resource-time advantage is
 robust across readiness interpretations, while the latency ordering is
 readiness-dependent (Table~\ref{tab:cl-readiness}). The span leads
 magnitude and already rejects reactive; the frozen per-window grid remains
@@ -68,12 +80,19 @@ down to \SI{682}{\milli\second} under warm-pool readiness; under the strict
 re-warm sensitivity the forecast's worst window is \SI{733}{\milli\second}
 (Table~\ref{tab:cl-frontier}, Section~\ref{sec:cl-headline}). A reactive
 controller granted a minimum warm floor calibrated on the calibration split
-\emph{fails} the held-out fastest-onset window, and the cheapest all-passing
-member of that floor family, identifiable only after the fact, costs
-\textbf{1.042$\times$} static. Under the symmetric warm-pool model (the
-footing most favorable to reactive), forecast-informed
-placement remains \textbf{1.20$\times$} cheaper than the best warm-floor
-reactive at equal compliance, and 1.67$\times$ under the shipped mechanics;
+\emph{fails} the held-out fastest-onset window \emph{under the shipped
+strict re-warm mechanics}; that same calibration-frozen floor, unchanged,
+passes every evaluation window under the post-hoc common-warm diagnostic, so
+the failure is readiness-scoped rather than absolute. The cheapest
+all-passing member of that floor family, identifiable only after the fact, costs
+\textbf{1.042$\times$} static. The floor sweep is a reactive-favorable
+\emph{post-hoc} envelope --- reactive gets an ex-post minimum-capacity sweep,
+the forecast stays one fixed operating point, and the symmetric
+forecast-plus-floor family was not run --- so the compact claim is
+tested-point, not policy-class: under the symmetric warm-pool model (the
+footing most favorable to reactive), the cheapest evaluation-passing floor
+costs \textbf{1.20$\times$} the forecast at equal compliance (equivalently,
+the forecast uses 16.5\% less worker-time), and 1.67$\times$ under the shipped mechanics;
 the strict-readiness repair is not fully symmetric between arms, so the pair
 is a sensitivity range, not an equalized interval, and the single figure
 1.67$\times$ is reported only with its warm-pool counterpart.
@@ -192,9 +211,13 @@ Appendix~\ref{app:engine-sensitivity}), not yet as a live serving loop ---
 the live anchor covers the control plane with mocked engines. Cost direction
 is denominator- and fold-sensitive: under request-matched normalization the
 published language point (p90 at conversion scale 8) reads 1.03$\times$ and
-the fold-robust p90/scale-6 point 0.87$\times$, and one daily fold misses the
-encoder bound. No directional claim extends beyond the tested span, model
-and denominator.
+the fold-robust p90/scale-6 point 0.87$\times$, and the pure encoder forecast
+misses the bound on \emph{two} whole daily folds for different reasons: F6,
+fully covered by the issue-time archive, is a genuine missed onset
+(\SI{1264}{\milli\second}), while F2 fails at \SI{1319}{\milli\second} because
+the fixed-context forecast archive does not cover it fully --- a coverage
+failure rather than an onset miss. No directional claim extends beyond the
+tested span, model and denominator.
 
 \section{Future work}
 \label{sec:conc-future}

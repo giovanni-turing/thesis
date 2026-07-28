@@ -255,7 +255,9 @@ def bind(tese: Path) -> list:
     rx(r"cheapest passing common-warm reactive floor uses" + W
        + r"801\.8 \(1\.20\$\\times\$ the forecast\)", concn, errs,
        "conclusion: 801.8 / 1.20x attaches to the common-warm floor")
-    rx(r"shipped reactive arm 725\.4" + W + r"under different readiness mechanics", concn, errs, "conclusion: 725.4 attaches to shipped reactive")
+    rx(r"shipped direct-reactive arm's 725\.4 is not an" + W
+       + r"equal-compliance comparator: that arm fails burst3", concn, errs,
+       "conclusion: 725.4 attaches to the failing shipped direct-reactive arm")
 
     # 6. bound-robustness margins, role-scoped
     fcells = json.loads((base / "frontier_summary_cells.json").read_text())

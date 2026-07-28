@@ -78,10 +78,15 @@ twelve-step horizon and inside burst windows. A two-pool simulation
 platform --- encoder costs collected on RTX~5090 silicon (submitted upstream
 to NVIDIA's aiconfigurator as a draft PR) and validated against the serving
 engine's own vision tower to within 12.8\%, composed with Dynamo's
-discrete-event language-pool simulator under calibrated H100 timing ---
-reproduces the decoupling mechanically: the pools' saturation knees sit an
-order of magnitude apart, and the encoder pool misses its tail bound at the
-trace's own recorded rate, invisibly to rate- and utilization-based monitors.
+discrete-event language-pool simulator under AIC's shipped H100 timing
+database, not physically revalidated here ---
+reproduces the decoupling mechanically: on the steady head the pools'
+saturation knees sit an order of magnitude apart (vision uncrossed through
+$32\times$ the trace rate, the calibrated language knee at $2\times$),
+while inside the burst window both pools are already over their bounds at the
+trace's own rate through different mechanisms; and the encoder pool misses its
+tail bound at that same recorded rate, invisibly to rate- and
+utilization-based monitors.
 
 Closing the loop under a single pre-frozen replay protocol yields a
 trade-off with an identified failure mode, not universal superiority: over the aggregate evaluation span the forecast and reactive
@@ -94,19 +99,29 @@ encoder tail bound at
 0.62$\times$ the deployable static encoder fleet's provisioned worker-time
 (669.7 against 1{,}074.8 worker-hours; the latency ordering against
 reactive is readiness-dependent and reported per readiness model), while a reactive controller granted a warm floor
-calibrated on the calibration split fails a held-out window and its
-cheapest all-passing member costs 1.042$\times$ static --- forecast-informed
-placement is 1.20$\times$ cheaper at equal compliance even under the
-readiness model most favorable to reactive (1.67$\times$ under the shipped
-mechanics), with a perfect-information reference at 0.292$\times$ marking the
+calibrated on the calibration split fails a held-out window \emph{under the
+shipped strict re-warm mechanics} --- that same calibration-frozen floor
+passes the post-hoc common-warm diagnostic --- and its
+cheapest all-passing member under those shipped mechanics ($M{=}6$) costs
+1.042$\times$ static. The floor sweep is a
+reactive-favorable \emph{post-hoc} envelope in which the forecast stays one
+fixed operating point and no symmetric forecast-plus-floor family was run:
+within it, the cheapest evaluation-passing floor under the readiness
+model most favorable to reactive (post-hoc common-warm $M{=}2$, a
+different member) costs 1.20$\times$ the forecast (the forecast uses
+16.5\% less worker-time; shipped-mechanics $M{=}6$: 1.67$\times$), with a perfect-information reference at 0.292$\times$ marking the
 remaining signal-quality headroom.
 Resource-time is reported per hardware class and never summed. As a
 secondary result, the forecast-driven language policy holds its SLA only
 through a tail-aware
-capacity conversion of the same forecast, near break-even against static
-(0.61$\times$ at the calibration-selected point, which drops the hardest
-daily-fold onset, and 0.82$\times$ for a post-hoc robustness variant that
-recovers it). The language-pool p90-versus-reactive verdict reproduces on
+capacity conversion of the same forecast, and at its published operating
+point --- the calibrated band edge, p90 at conversion scale 8 --- it sits
+near break-even against static (0.965$\times$ time-matched, 1.03$\times$
+request-matched). A post-hoc re-selection of quantile and conversion scale
+brackets a cheaper range, both points time-matched: 0.61$\times$ at the
+calibration-selected p70/scale-6 point, which drops the hardest daily-fold
+onset, and 0.82$\times$ (0.87$\times$ request-matched) at the post-hoc
+p90/scale-6 robustness variant that recovers it. The language-pool p90-versus-reactive verdict reproduces on
 the fastest-onset burst through Dynamo's real control plane with mocked
 engines (one live run per policy); the encoder cost model is anchored
 separately on RTX~5090 silicon, and the week-scale economics are simulated.
@@ -157,11 +172,16 @@ de dois \emph{pools} --- custos do codificador medidos em sil\'icio
 RTX~5090 (submetidos ao aiconfigurator da NVIDIA como \emph{draft PR}) e
 validados contra a pr\'opria torre de vis\~ao do motor de servi\c{c}o com
 diferen\c{c}a de at\'e 12,8\%, compostos com o simulador de eventos
-discretos do Dynamo sob tempos H100 calibrados --- reproduz o desacoplamento
-mecanicamente: os \emph{pools} saturam a escalas separadas por uma ordem de
-magnitude, e o \emph{pool} codificador viola seu limite de cauda \emph{na
-pr\'opria taxa registrada pelo trace}, de forma invis\'ivel a monitores de
-taxa e utiliza\c{c}\~ao.
+discretos do Dynamo sob a base de tempos H100 distribu\'ida pelo AIC, n\~ao
+revalidada fisicamente neste trabalho --- reproduz o desacoplamento
+mecanicamente: no trecho est\'avel (\emph{steady head}) os \emph{pools}
+saturam a escalas separadas por uma ordem de magnitude (vis\~ao n\~ao
+cruzada at\'e $32\times$ a taxa do \emph{trace}, joelho da linguagem
+calibrada em $2\times$), ao passo que dentro da janela de rajada ambos
+os \emph{pools} j\'a est\~ao acima de seus limites na pr\'opria taxa do
+\emph{trace}, por mecanismos distintos; e o \emph{pool} codificador viola seu
+limite de cauda \emph{nessa mesma taxa registrada pelo trace}, de forma
+invis\'ivel a monitores de taxa e utiliza\c{c}\~ao.
 
 Fechando o la\c{c}o sob um protocolo \'unico de replay pr\'e-congelado, o resultado \'e um
 compromisso com um modo de falha identificado, e n\~ao superioridade
@@ -177,20 +197,35 @@ tempo de \emph{workers} provisionado da frota est\'atica de codificadores
 implant\'avel (669,7 contra 1\,074,8 \emph{worker}-horas; a ordena\c{c}\~ao de
 lat\^encia frente ao reativo depende do modelo de prontid\~ao e \'e
 reportada por modelo), enquanto um controlador reativo dotado de um piso quente
-calibrado no conjunto de calibra\c{c}\~ao falha em uma janela reservada e
-seu membro mais barato que passa custa 1,042$\times$ o est\'atico --- a
-coloca\c{c}\~ao informada por previs\~ao \'e 1,20$\times$ mais barata a
-igual conformidade mesmo sob o modelo de prontid\~ao mais favor\'avel ao
-reativo (1,67$\times$ sob a mec\^anica original), com uma refer\^encia de
+calibrado no conjunto de calibra\c{c}\~ao falha em uma janela reservada
+\emph{sob a mec\^anica original de reaquecimento estrito} --- esse mesmo piso
+congelado na calibra\c{c}\~ao passa no diagn\'ostico \emph{post hoc} de
+aquecimento comum --- e
+seu membro mais barato que passa sob essa mec\^anica original ($M{=}6$)
+custa 1,042$\times$ o est\'atico. A
+varredura de pisos \'e um envelope \emph{post hoc} favor\'avel ao reativo, no
+qual a previs\~ao permanece um \'unico ponto de opera\c{c}\~ao fixo e nenhuma
+fam\'ilia sim\'etrica de previs\~ao-mais-piso foi executada: dentro dele, o
+piso mais barato que passa a avalia\c{c}\~ao sob o modelo de
+prontid\~ao mais favor\'avel ao reativo (o $M{=}2$ \emph{post hoc} de
+aquecimento comum, um membro diferente) custa 1,20$\times$ a previs\~ao
+(a previs\~ao usa 16,5\% menos tempo de \emph{worker}; $M{=}6$ sob a
+mec\^anica original: 1,67$\times$), com uma refer\^encia de
 informa\c{c}\~ao perfeita a 0,292$\times$ marcando a margem restante de
 qualidade de sinal. O tempo de recurso \'e
 reportado por classe de \emph{hardware} e nunca somado. Como resultado
 secund\'ario, a pol\'itica de linguagem dirigida por previs\~ao sustenta sua
 SLA apenas por meio de
-uma convers\~ao de capacidade ciente de cauda da mesma previs\~ao, perto do
-equil\'ibrio face ao est\'atico (0,61$\times$ no ponto selecionado pela
-calibra\c{c}\~ao, que perde o in\'icio de dobra di\'aria mais dif\'icil, e
-0,82$\times$ para uma variante \emph{post hoc} de robustez que o recupera).
+uma convers\~ao de capacidade ciente de cauda da mesma previs\~ao, e em seu
+ponto de opera\c{c}\~ao publicado --- a borda calibrada da banda, p90 na
+escala de convers\~ao 8 --- fica perto do equil\'ibrio face ao est\'atico
+(0,965$\times$ pareado por tempo, 1,03$\times$ pareado por requisi\c{c}\~oes).
+Uma reescolha \emph{post hoc} de quantil e escala de convers\~ao delimita uma
+faixa mais barata, ambos os pontos pareados por tempo: 0,61$\times$ no ponto
+p70/escala~6 selecionado pela calibra\c{c}\~ao, que perde o in\'icio de dobra
+di\'aria mais dif\'icil, e 0,82$\times$ (0,87$\times$ pareado por
+requisi\c{c}\~oes) na variante \emph{post hoc} de robustez p90/escala~6 que o
+recupera.
 Na rajada de in\'icio mais r\'apido, o par de veredictos p90-versus-reativo
 do \emph{pool} de linguagem se reproduz atrav\'es do plano de controle real
 do Dynamo com \emph{engines} simulados (uma execu\c{c}\~ao ao vivo por

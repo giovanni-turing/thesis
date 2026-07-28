@@ -108,9 +108,14 @@ the signal most dangerous to reactive scaling is also the most \emph{persistent}
 the most forecastable. Pretrained time-series foundation models forecast it
 zero-shot, beating every classical baseline in all twenty (signal, resolution)
 cells. Driving the encoder schedule from that forecast holds the tail SLA
-through every burst onset at $0.62\times$ the provisioned worker-time of the
-deployable static fleet, where an identically-informed reactive controller loses
-the fastest onset at every lead time.
+on all five declared evaluation windows at $0.62\times$ the provisioned
+worker-time of the deployable static fleet, where an identically-informed
+reactive controller loses the fastest onset at every lead time. The finer
+daily-fold audit surfaces one further onset the pure forecast misses (fold
+F6, p99 \SI{1264}{\milli\second}), recovered post hoc by the hybrid combiner
+at $0.76\times$ --- so the honest headline is ``all five declared windows at
+$0.62\times$, one additional daily-fold miss recovered post hoc at
+$0.76\times$,'' not ``every onset.''
 
 \Q{What is the single most important number in the thesis?}
 \A $R^2 = \num{0.123}$. Everything else follows from it. If image demand were
@@ -141,8 +146,10 @@ rate, mean utilization, or any minute-averaged series sees a \emph{healthy}
 pool during an SLA violation --- p99 encoder delay hits \SI{5.0}{\second} at
 29\% mean utilization, at the trace's own recorded rate. Second, that watching
 the right metric is not enough: a reactive controller reading the true image
-signal still loses the fastest-onset burst at every tested cold-start lead
-from 15 to \SI{300}{\second} (p99 encoder delay 9.5--\SI{54}{\second},
+signal still loses the fastest-onset burst at every realizable issued
+cold-start lead from 15 to \SI{165}{\second} (the old \SI{300}{\second}
+cell was target-indexed, an evaluation bound rather than an issued lead;
+p99 encoder delay 9.5--\SI{54}{\second},
 degrading toward the \SI{54.2}{\second} never-scaled limit). Third, that the
 escape --- forecasting --- is
 actually open, which nothing guarantees a priori: burstiness and
@@ -162,8 +169,11 @@ that the request stream barely registers ($370$\,img/s at under 4.5\,req/s).
 (b)~The \emph{insufficiency of the obvious fix}: scale on images reactively
 and you still fail --- onsets ramp in a median of six minutes, the fastest in
 one, with a median steepest single-minute jump of 208\,img/s, against replica
-leads of tens of seconds to minutes. I ran exactly that controller; it loses
-the fast onset at every lead. (c)~The \emph{escape hatch}: the same signal has
+leads of tens of seconds to minutes. I ran exactly that controller --- the
+floorless trailing arm at matched rating --- and it loses
+the fast onset at every lead. (A standing reactive \emph{floor} deep enough
+does pass; every tested passing floor costs more than the fixed forecast
+point on this trace.) (c)~The \emph{escape hatch}: the same signal has
 a 69-minute autocorrelation half-life and Hurst ${\approx}0.93$, so the
 information a reactive loop lacks is recoverable by a forecaster. ``Obvious''
 predicts (a); it does not predict (b) or (c), and (b) is where deployed
@@ -171,9 +181,13 @@ systems actually die. ModServe --- the system that introduced this
 architecture --- scales its image pool \emph{reactively}; if the full answer
 were obvious, the system defining the field would not have shipped the failing
 half of it.
-\Point{The reactive-on-the-same-signal ablation --- it isolates
-\emph{anticipation}, not signal choice, as the operative advantage. Without it
-the thesis is a metric-selection paper; with it, the forecast is load-bearing.}
+\Point{The reactive-on-the-same-signal ablation --- it isolates the
+\emph{placement of standing probabilistic headroom}, not signal choice, as
+the operative advantage. Say ``placement,'' not ``anticipation'': on burst3
+there is no usable anticipation (that is measured on the gradual burst4
+onset), and the ablation matches rating and mechanics, not worker-time.
+Without it the thesis is a metric-selection paper; with it, the forward band
+is load-bearing.}
 
 \Q{Who is the audience --- systems or ML?}
 \A Systems, using ML as an instrument. The research questions are capacity
@@ -318,11 +332,19 @@ evaluation time --- Google, Amazon, and Datadog lineages; 120M to 2.5B
 parameters; different tokenizations --- against naive persistence, EWMA, and
 Holt--Winters as the classical frontier, plus Dynamo's four shipped
 predictors (ARIMA, Kalman, Prophet, constant) run through the identical
-protocol. And the answer to ``why not model X'' is that it demonstrably would
-not matter: all three foundation models pass the week at the \emph{identical}
+protocol. And the answer to ``why not a \emph{fourth} TSFM'' is that within
+the three tested the choice demonstrably does not matter: all three
+foundation models pass the week at the \emph{identical}
 \SI{651.1}{\milli\second} tail; only provisioning cost shifts (Chronos 518.6
-$<$ Toto 625.3 $<$ TimesFM \SI{641.1}{GPU\hour}). The forecaster sets how much
-headroom you buy, not whether you meet the SLA. Model choice is second-order
+$<$ Toto 625.3 $<$ TimesFM \SI{641.1}{GPU\hour}), because integer-replica
+conversion quantizes most of the accuracy difference away. I will not stretch
+that into an open-ended ``model X would not matter'' either: the forward
+band's \emph{family and shape} are load-bearing --- on burst3 the tested EWMA
+calibrations split on outcome (additive and width-scaled fail at p99
+$1{,}285$ and $2{,}084$\,ms; multiplicative passes only by carrying
+substantially more standing work) --- so a predictor that changes the upper
+edge can change the SLA verdict, not just the cost. Within the TSFM class,
+identity is second-order after capacity quantization
 --- that is a finding, not an evasion --- and the headline deliberately rests
 on the \emph{smallest and cheapest} of the three (Chronos, 120M parameters,
 versus Toto's 2.5B), so no part of the result depends on forecaster scale.
@@ -334,24 +356,30 @@ cheapest route to the frontier.}
 
 \Q{Are the foundation models actually good, or just better than weak baselines?}
 \A Both claims are in the manuscript with their sizes attached, and I will
-state the unflattering one first: on the image signal at one minute the best
-model's WAPE is 98.8\% --- against EWMA's 146.1\%, but read against WAPE's
-no-skill floor (always predicting zero scores 100\%), a 98.8\% point forecast
-is barely above no-skill \emph{as a point forecast}. That is precisely why the
-thesis does not deploy point forecasts: the operating instrument is the
+state the unflattering one first, at the resolution it actually belongs to.
+At \emph{one-second} bins the best model's image WAPE is 98.8\% (Toto)
+against EWMA's 146.1\%; read against WAPE's no-skill floor (always predicting
+zero scores 100\%), that point forecast is barely above no-skill. At the
+\emph{one-minute} provisioning-reporting cadence the picture is different:
+52.9\% WAPE (Chronos with covariates) against EWMA's 54.2\% --- material
+skill against the no-skill floor, on a thin 1.3-point margin over the cheap
+baseline. Neither resolution changes what the thesis deploys, because it does
+not deploy point forecasts at all: the operating instrument is the
 \emph{quantile band}, whose p90 edge is empirically calibrated at provisioning
 cadence --- measured coverage 0.88--0.90 against the nominal 0.90, across all
-models and signals at one minute. The honest summary: the models cannot tell
-you the next minute's image count on a bursty signal (nothing can; the
-signal's own CV$^2$ is 3.83), but they can tell you, calibratedly, how bad it
-might get --- and provisioning consumes exactly that. Wins over the classical
+models and signals at one minute. The honest summary: at second resolution
+nothing usefully predicts the next bin of a signal whose own CV$^2$ is 3.83;
+at minute resolution the point forecast has real but modest skill; and at
+either resolution what the models supply calibratedly is how bad it might get
+--- which is exactly what provisioning consumes. Wins over the classical
 baselines hold in all twenty (signal, resolution) cells regardless, and
 degradation across a 12-step horizon is ${\approx}2$ WAPE points, covering the
 median six-minute onset with margin.
 \Trap{Do not quote ``beats every baseline in all twenty cells'' without the
-no-skill caveat in the same breath. A time-series person on the committee will
-know what 98.8\% WAPE means, and hearing me say it first converts the
-weakness into credibility.}
+no-skill caveat in the same breath --- and keep that caveat attached to the
+\emph{one-second} cell. Calling 98.8\% a one-minute number is the error a
+time-series person on the committee will catch; saying it first, correctly
+scoped, converts the weakness into credibility.}
 
 \Q{The encoder cost model is silicon-validated, but the language pool's H100 timing is not. Is half the two-pool result resting on an unvalidated model?}
 \A Yes, the fidelity is asymmetric, and I put that in print rather than
@@ -718,17 +746,26 @@ asymptotic LRD. The operational claim needs only \emph{within-window}
 overdispersion, which is measured, not modeled.}
 
 \Q{Your p90 coverage of 0.88--0.90 is pooled over all twelve horizon steps and over a burst-heavy span. Is the band calibrated at the lead that actually matters?}
-\A Pooled, yes, and horizon- and burst-conditional coverage are named as
-open in the limitations. What is established: at one minute the \emph{upper}
-edge --- the only one provisioning consumes --- is calibrated pooled
-(0.88--0.90; Chronos+cov on images 0.888), the median edge is 0.43--0.48,
-and the lower edge is broken by zero-inflation, so I explicitly do not
-provision on the full band. The independent cross-check is the exceedance
-rate on the largest burst episode itself: 11\% of bins pierce the p90
-against a nominal 10\%.
-\Concede{Per-step calibration is unmeasured. Defend the pooled upper-edge
-coverage plus the burst exceedance check as sufficient for a p90
-provisioning rule, and name horizon-conditional coverage as future work.}
+\A It is resolved by horizon step, not only pooled. The pooled figure is
+0.88--0.90 (Chronos+cov on images 0.888), and beneath it, coverage of the
+\emph{upper} edge --- the only one provisioning consumes --- is reported for
+every one of the twelve horizon steps on the image signal: $0.876$--$0.903$
+at \SI{15}{\second} bins and
+$0.857$--$0.911$ at \SI{1}{\minute} bins, with no trend in $h$, so no decay
+with lead. Those twelve steps are forecast-evaluation \emph{target horizons}
+--- \SIrange{15}{180}{\second} ahead of the forecast origin --- not issued
+lead: an $H{=}12$ archive at \SI{15}{\second} bins supplies at most
+$(12{-}1)\times15 = \SI{165}{\second}$ of usable issue-time lead, and the
+closed loop tests issued leads of 15/30/45/165\,s. Pooled in-burst versus outside-burst coverage is also reported
+($0.890$--$0.901$ in burst against $0.890$--$0.896$ outside). The median edge
+is 0.43--0.48 and the lower edge is broken by zero-inflation, so I explicitly
+do not provision on the full band. The independent cross-check is the
+exceedance rate on the largest burst episode itself: 11\% of bins pierce the
+p90 against a nominal 10\%.
+\Concede{What is \emph{not} measured is onset-stratified, per-episode
+calibration --- coverage in the minutes around each of the 18 onsets. Concede
+that specific gap; do not concede horizon-step or pooled burst coverage,
+which are in the manuscript.}
 
 \Q{Your quantile band ``adds headroom,'' but the point forecast is the median for Chronos and Toto and the \emph{mean} for TimesFM. Is the quantile finding not just an artifact of inconsistent point heads?}
 \A It is exactly that, and the thesis diagnoses it rather than being caught
@@ -802,10 +839,15 @@ comfortably inside any 15--60-second control cadence, and the headline rests
 on the 120M model. The real asymmetry is deployment footprint --- a
 GPU-resident service versus arithmetic --- and I do not hide it; the closed
 loop is what prices whether the margin earns it. The honest finding cuts
-\emph{against} buying the biggest model: at provisioning cadence the edge
-over EWMA is only 2--9\%, and the SLA outcome is decided by the quantile and
-the conversion, not the model, so the value is the calibrated band a
-foundation model gives zero-shot without per-signal fitting --- exactly what
+\emph{against} buying the biggest model: at provisioning cadence the point
+accuracy edge over EWMA is only 2--9\%, and the SLA outcome is decided far
+more by the quantile and the conversion than by which of the three TSFMs
+supplies the band. What I will \emph{not} say is that the predictor is
+outcome-irrelevant: the tested EWMA calibrations split on burst3 --- additive
+and width-scaled fail, multiplicative passes only by carrying substantially
+more standing work --- so the band's \emph{shape} is load-bearing even where
+TSFM identity is not. That is precisely the value on offer: a calibrated band
+a foundation model gives zero-shot without per-signal fitting --- exactly what
 a multi-pool system, multiplying signals, needs. Even the cheapest of the
 three suffices.
 
@@ -900,18 +942,23 @@ provisioning cadence is ``not beaten by any baseline, by margins too small
 to certify per-cell.''}
 
 \Q{Your closed-loop mechanism is p90 headroom standing capacity up \emph{at onsets}. But your calibration --- coverage 0.88--0.90 --- is pooled over the horizon and the span; onset-conditional p90 coverage, the one number the mechanism depends on, is never computed.}
-\A Correct, and I flag horizon- and burst-conditional coverage as open. What
-I have is the pooled marginal (0.88--0.90 at one minute, upper edge only ---
-the lower edge is broken by zero ties, which is why I provision one-sided)
-plus an in-situ check on the largest burst itself: 11\% of bins pierce the
-p90 against a nominal 10\%, and zero calm-day false alarms. That is
-onset-region evidence, but a single-episode operational proxy, not a
-coverage statistic stratified by onset.
-\Concede{The mechanism assumes the upper edge stays calibrated at onsets; I
-have shown that once, not distributionally. A per-episode coverage table is
-the honest addition, and Chronos's occasional crossed quantiles mean I
-should say ``a calibrated upper quantile,'' not ``a calibrated predictive
-distribution.''}
+\A Correct about \emph{onsets}, and only about onsets. Horizon-conditional
+coverage is measured --- $0.876$--$0.903$ across all twelve steps at
+\SI{15}{\second} bins, no trend in $h$ --- and so is burst-conditional
+coverage pooled over the models ($0.890$--$0.901$ in burst against
+$0.890$--$0.896$ outside), so the band does not decay with lead and does not
+collapse inside bursts. Both are upper-edge only; the lower edge is broken by
+zero ties, which is why I provision one-sided. Beyond that I have an in-situ
+check on the largest burst itself: 11\% of bins pierce the p90 against a
+nominal 10\%, and zero calm-day false alarms. That is onset-region evidence,
+but a single-episode operational proxy, not a coverage statistic stratified
+by onset.
+\Concede{The remaining gap is precisely onset-stratified, per-episode
+calibration: the mechanism assumes the upper edge stays calibrated
+\emph{at} onsets, and I have shown that once, not distributionally. A
+per-episode coverage table is the honest addition, and Chronos's occasional
+crossed quantiles mean I should say ``a calibrated upper quantile,'' not ``a
+calibrated predictive distribution.''}
 
 % ============================================================================
 \section{Results and their limits}
@@ -1164,15 +1211,26 @@ the premise outright. Short of that: if the image signal's persistence turned ou
 to be an artifact of this trace, and the signal proved unforecastable elsewhere,
 the escape route closes and reactive scaling is all there is. And on the mechanism
 specifically: if a reactive controller watching the \emph{correct} signal could be
-tuned to hold the tail through the fast onsets, then anticipation would be
-unnecessary and the contribution collapses to ``watch the right metric.'' I tested
-that last one directly --- the reactive-on-the-same-signal ablation --- and it
+tuned to hold the tail through the fast onsets \emph{as cheaply}, then the
+forecast machinery would be unnecessary and the contribution collapses to
+``watch the right metric.'' I tested that directly --- the
+reactive-on-the-same-signal ablation at matched rating --- and it
 fails at every lead. And the stronger variant too: a reactive controller
 granted the \emph{same} tail-aware p90 headroom it was supposedly denied
 still fails the one-minute onset at every lead and window (p99
 $1{,}973$--$11{,}568$\,ms), even though that headroom cuts its tail by up to
-$8\times$. Headroom without anticipation is not enough; that is why I believe
-the anticipation claim rather than merely asserting it.
+$8\times$. What I will \emph{not} claim is that reactive can never pass: the
+whole $M{=}1\ldots32$ warm-floor family was run, and under the post-hoc
+common-warm readiness diagnostic $M{=}2$ passes every evaluation window at
+$0.746\times$ static while the calibration-frozen $M{=}4$ passes at
+$0.887\times$. Both cost more than the fixed forecast point. So the
+established mechanism is cheaper \emph{placement} of standing headroom at
+matched rating, not the necessity of forecasting for feasibility --- and the
+falsifier is correspondingly ``a reactive point that holds every evaluation
+window at no more than the fixed forecast point's worker-time.'' That is a
+distinct experiment from the untested symmetric forecast-plus-floor family,
+which I also owe: the first would falsify the observed tested-point gap, the
+second only repairs design-space symmetry.
 \Trap{This question rewards a specific falsifiable answer and punishes a vague
 one. Do not say ``more traces would help.'' Name the observation that kills the
 claim.}
@@ -1215,14 +1273,24 @@ separate the remaining dials by ablation. It gets the same worker-mapping
 law, the same $\rho{=}15$, the same 3-minute hysteresis, the same cold-start
 lead, and the correct per-pool signal --- the observed image rate, not the
 request rate --- read reactively rather than forecast. The only differences
-left are anticipation and the p90 headroom band, and I isolate them: a
+left are the p90 headroom band and where that headroom is placed ---
+forward-projected versus trailing --- and I isolate them: a
 reactive controller \emph{given} the tail-aware p90 headroom of the observed
 rate still fails the one-minute onset at every lead (p99
 $1{,}973$--$11{,}568$\,ms against the forecast's \SI{588}{\milli\second}),
-even though that headroom cuts its tail up to $8\times$. So the strawman is
-not thrift-limited (spend cannot buy the tail), not headroom-limited
-(reactive-with-headroom fails), and not signal-limited (it reads the right
-signal); the residual is anticipation. The language-side reactive baseline
+even though that headroom cuts its tail up to $8\times$. So at matched
+\emph{rating and mechanics} the baseline is not headroom-limited
+(reactive-with-headroom fails) and not
+signal-limited (it reads the right signal); the residual is forward
+\emph{placement}. And I will state the limit of that matching before anyone
+asks: matched $\rho$ is not matched cost. On burst3 at $L{=}\SI{30}{\second}$
+the forecast arm provisions 31{,}838.0 worker-seconds against the trailing-p90
+$W{=}480$ reactive arm's 22{,}988.1 --- the reactive arm is the
+\emph{cheaper} one there and still loses the onset, which is why I say
+matched rating rather than equal cost. Spend does buy the tail, and I say so: with a deep enough
+standing floor the reactive family passes --- post-hoc common-warm $M{=}2$ at
+$0.746\times$ static, calibration-frozen $M{=}4$ at $0.887\times$ --- just
+never as cheaply as the fixed forecast point. The language-side reactive baseline
 is stronger still --- Dynamo's production SLA planner in both shipped
 variants, unmodified.
 \Point{The reactive-with-headroom ablation is the whole answer to
@@ -1463,7 +1531,8 @@ me more than five seconds in rehearsal, drill it again.
 \item \textbf{Onsets:} 18 episodes; median ramp 6\,min, fastest 1\,min;
   median steepest single-minute jump 208\,img/s.
 \item \textbf{Forecasting:} FMs win all 20 (signal, resolution) cells;
-  images@1min 98.8\% WAPE (EWMA 146.1\%, no-skill 100\%); ${\approx}2$ WAPE
+  images@1min 52.9\% WAPE (EWMA 54.2\%); images@1s 98.8\% (EWMA 146.1\%,
+  no-skill 100\%); ${\approx}2$ WAPE
   points lost over 12 steps; p90 coverage 0.88--0.90; p10--p90 band covers
   69\% vs.\ nominal 80\%.
 \item \textbf{Cost model:} attention operator within ${\approx}3\%$ of
@@ -1476,9 +1545,12 @@ me more than five seconds in rehearsal, drill it again.
   octave below 8B (ITL-bound, 87.7\,ms at trace rate).
 \item \textbf{Closed loop:} 588\,ms zero-queueing floor on burst windows;
   calm day $\le$ 734\,ms; p90 passes 60/60 issue-time cells (both readiness
-  models); p50 passes 23--24/60; reactive loses burst3 at every lead (9.5--54\,s,
+  models); p50 passes 23--24/60; the floorless matched-rating reactive arm
+  loses burst3 at every lead (9.5--54\,s,
   never-scaled limit 54{,}170\,ms); reactive-with-headroom still fails it
-  (1{,}973--11{,}568\,ms, despite up to $8\times$ tail cut); triad on
+  (1{,}973--11{,}568\,ms, despite up to $8\times$ tail cut); standing floors
+  do pass but cost more (post-hoc common-warm $M{=}2$ $0.746\times$ static
+  $=1.20\times$ forecast; shipped-mechanics $M{=}6$ $1.042\times$); triad on
   burst1@L60: 1{,}616 / 1{,}717 / 736\,ms.
 \item \textbf{Economics:} $0.62\times$ = 2{,}410{,}755 / 3{,}869{,}278
   worker-seconds vs.\ static $C{=}8$ over 5.60 days; frontier $\rho10$--$20$
@@ -1546,17 +1618,26 @@ hardware, which the silicon-portable calibration was designed to make cheap
 thesis.
 
 \Q{What did you learn that you did not expect?}
-\A That the forecaster barely matters. I went in expecting model choice to be
-a headline --- it is the axis with all the recent literature --- and it turned
-out to be second-order everywhere I could measure it: all three foundation
+\A That the choice \emph{among the tested foundation models} barely matters.
+I went in expecting model choice to be
+a headline --- it is the axis with all the recent literature --- and within
+the three tested TSFMs it turned
+out to be second-order after capacity quantization: all three foundation
 models pass the week at the identical \SI{651.1}{\milli\second} tail with only
 cost shifting; swapping Dynamo's shipped predictors leaves verdicts unchanged;
-integer-replica conversion quantizes away most forecast differences. What
+integer-replica conversion quantizes away most differences \emph{between
+them}. What
 actually decides outcomes is the \emph{quantile} (p90 passes all 48 week-scale
 cells on the encoder pool, p50 passes zero) and the \emph{conversion}
-(tail-aware passes, mean-based fails --- with the same forecast). The
-information was never the scarce resource; the willingness to provision
-against the tail of the belief, rather than its center, was. I looked for a
+(tail-aware passes, mean-based fails --- with the same forecast). I will not
+stretch that into ``information was never the scarce resource,'' because the
+forward band's \emph{shape} is load-bearing: on burst3 the tested EWMA
+alternatives split on outcome --- additive and width-scaled bands fail at p99
+$1{,}285$ and $2{,}084$\,ms, and multiplicative EWMA passes only by carrying
+substantially more standing work than the forecast arm. The correct statement
+is narrower and still surprising: within the TSFM class the identity of the
+model is second-order, while the state-adaptive upper edge, and what you do
+with it, decide the verdict. I looked for a
 forecasting result and found a control-theory result, and it is a better
 finding than the one I wanted.
 
@@ -1622,10 +1703,16 @@ whose inference is noise against a single H100-hour.
 \A They can, and the static $C{=}8$ baseline \emph{is} that policy priced
 honestly --- it passes the week. The thesis's claim is not that static
 provisioning fails; it is that it costs $1.6\times$ the forecast policy for
-the same SLA, and that the reactive alternative --- the one that promises
-static's savings without forecasting --- is the option that does not exist:
-it fails the fast onset at every lead. So the real menu is: pay $1.6\times$
-for simplicity, or run the loop. At encoder-pool scale that gap is real money
+the same SLA. The reactive alternative that promises static's savings without
+forecasting does exist, but only with standing capacity bought back: at
+matched rating and no floor it fails the fast onset at every lead, and the
+floors that do pass cost more than the forecast point --- post-hoc
+common-warm $M{=}2$ at $0.746\times$ static ($1.20\times$ the forecast),
+calibration-frozen $M{=}4$ at $0.887\times$, and under the shipped strict
+re-warm mechanics the cheapest passing floor is $M{=}6$ at $1.042\times$
+static. So the real menu is: pay $1.6\times$
+for simplicity, roughly $1.2\times$ for a floor whose depth you can only pick
+after the fact, or run the loop. At encoder-pool scale that gap is real money
 (the static fleet holds 8 workers around the clock against the policy's
 demand-following 2.41M worker-seconds), and the machinery is one 120M-model
 forecast pass per control tick. The economics get more compelling, not less,
@@ -1739,8 +1826,8 @@ claim is ``standard forward-EWMA calibrations do not match the TSFM,'' not
 \A On burst3, nothing about the onset --- I concede that cleanly, and it is
 the correction I am most careful to make. The win is not foresight; it is
 that the forecast's p90 band sits higher \emph{earlier}, during the ambient
-activity before the spike, than a trailing-observed p90 does at equal cost,
-so capacity is standing when the one-minute spike lands. Genuine
+activity before the spike, than a trailing-observed p90 does at matched
+rating, so capacity is standing when the one-minute spike lands. Genuine
 anticipatory lead is measured only on the gradual onset (burst4,
 ${+}\SI{345}{\second}$). The load-bearing comparison is therefore not
 lead-over-ground-truth (the forecast has none on burst3) but
@@ -1754,17 +1841,27 @@ and \emph{is} reactively caught (its peak drains within a batch), so
 burst3's difficulty is volume, not speed alone.}
 
 \Q{Your only direct isolation of ``anticipation'' --- the reactive-with-headroom ablation --- uses a trailing window at matched $\rho{=}15$. On a one-minute onset no trailing window can place capacity in time \emph{by construction}, so the ablation is rigged to fail reactive. And if the burst3 win is ``the same over-provisioning the $\rho$-frontier prices,'' a sufficiently over-provisioned reactive floor should also pass. Where is that run?}
-\A The ablation is a fair \emph{cost-matched} comparison --- at equal $\rho$
-the forecast's projected p90 band beats a trailing p90 band, and headroom
-alone (which cuts the reactive tail up to $8\times$) still fails, so headroom
-is necessary-not-sufficient \emph{at equal cost}. That is the honest claim:
-at equal $\rho$, forward placement beats trailing placement on fast onsets.
-\Concede{``At equal $\rho$'' is not ``anticipation is necessary.'' A brute
-reactive floor of ${\approx}21$ workers on burst3 was never run and
-plausibly passes --- at higher cost. Concede that this would demote the
-claim from ``anticipation enables the SLA'' to ``anticipation makes the same
-SLA cheaper,'' still true but weaker, and offer the fixed-floor run as a
-one-line addition.}
+\A The ablation is a fair \emph{matched-rating} comparison, and I should name
+what it matches: $\rho$, the signal, the conversion law, the hysteresis and
+the lead --- not provisioned worker-time. On burst3 at $L{=}\SI{30}{\second}$
+the forecast arm provisions 31{,}838.0 worker-seconds against the
+trailing-p90 $W{=}480$ arm's 22{,}988.1, so equal $\rho$ is emphatically not
+equal cost, and the reactive arm loses the onset while spending \emph{less}.
+At that matched rating the forecast's projected p90 band beats a trailing p90
+band, and headroom alone (which cuts the reactive tail up to $8\times$) still
+fails, so headroom is necessary-not-sufficient \emph{at matched rating}. That
+is the honest claim: at equal $\rho$ and mechanics, forward placement beats
+trailing placement on fast onsets.
+\Concede{``At equal $\rho$'' is not ``anticipation is necessary,'' and the
+brute-floor run exists: the $M{=}1\ldots32$ family was swept. Under the
+post-hoc common-warm diagnostic $M{=}2$ passes every evaluation window at
+$0.746\times$ static ($1.20\times$ the forecast) and the calibration-frozen
+$M{=}4$ passes at $0.887\times$; under the shipped strict re-warm mechanics
+the cheapest passing floor is $M{=}6$ at $1.042\times$ static. So concede the
+demotion outright rather than offering the run: the claim is ``anticipation
+makes the same SLA cheaper,'' not ``anticipation enables the SLA'' --- still
+true, and weaker, and the floor sweep is reactive-favorable post hoc while
+the forecast stayed one frozen point.}
 
 \Q{You report 0.62$\times$ on the encoder pool and 0.965$\times$ on the language pool and never add them. The encoder runs cheap consumer 5090s; the language pool runs H100s that dominate real spend. Priced end-to-end in one currency, is your headline not a small cut on the cheap line while the expensive line is break-even --- or 1.16--1.19$\times$ with Toto or TimesFM?}
 \A The two pools carry two different claims, and the language one was never
@@ -1787,7 +1884,12 @@ minute-resolution monitoring recovers under 4\% of the true instantaneous
 image peak, which is ${\approx}16\times$ the mean and rate-invisible. The
 static $C{=}8$ baseline is an \emph{oracle}, sized from the whole week's
 observed maximum, knowledge a live operator lacks a priori; the forecast
-reaches 0.62$\times$ of that oracle using only causal information. And
+reaches 0.62$\times$ of that oracle under \emph{causal actuation} --- every
+schedule is issued from a rolling-origin forecast that never reads its own
+future. What is not causal is the choice of operating point: the headline
+rating $\rho{=}15$ was selected \emph{ex post}, with the whole frontier
+disclosed, so ``only causal information'' is a statement about runtime
+actuation, not about how the arm was picked. And
 over-provisioning fails \emph{invisibly}: the pool violates its bound at
 29\% mean utilization via episodic blocking a dashboard cannot see, so ``set
 it and forget it'' is unsafe, not just wasteful --- you cannot pick the right
@@ -1995,12 +2097,15 @@ separately from the language model. The question is what signal sizes that
 pool. On the first public production multimodal trace, the image demand that
 drives the encoder is almost decoupled from the request rate every
 autoscaler watches --- $R^2{=}0.12$ --- an order of magnitude burstier, and
-its peaks do not even coincide. So the encoder needs its own signal. But it
-cannot be watched reactively: bursts peak in minutes against cold starts of
-minutes. The escape is that the same signal is the most \emph{persistent} of
+its peaks do not even coincide. So the encoder needs its own signal. Watching it with a floorless,
+matched-rating trailing controller is not enough: bursts peak in minutes
+against cold starts of minutes, and that arm loses the fastest onset at
+every issued lead (standing reactive floors do pass, at higher cost). The escape is that the same signal is the most \emph{persistent} of
 the four, so a pretrained forecaster reads it zero-shot --- and provisioning
-on that forecast holds the tail SLA through the burst onsets a reactive
-controller loses, at 0.62 times the static fleet.'' Then stop.
+on that forecast holds the tail SLA on every declared evaluation window,
+including the fast onset the matched-rating reactive controller loses, at
+0.62 times the static fleet, and more cheaply than every reactive
+configuration that also passes.'' Then stop.
 \Trap{Do not front-load the $0.62\times$. Open on the decoupling; the
 economics are the payoff, not the hook.}
 

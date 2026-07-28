@@ -151,8 +151,13 @@ apart. Under that condition the vision pool must be provisioned on its own
 demand signal, which, being the least visible to conventional autoscaling and
 also the most persistent, is forecastable zero-shot at the horizons
 provisioning requires. Placing standing capacity from those forecasts buys,
-at equal tail-SLA compliance, a better resource-time frontier than reactive
-control given the same signal and the standing capacity it was denied.
+at equal tail-SLA compliance, a better resource-time operating point than
+every \emph{evaluation-passing} reactive comparator tested on the same signal
+--- the cheapest passing floor on each readiness footing --- including one granted
+the standing capacity it was denied and selected \emph{post hoc} in
+reactive's favor --- a comparison between tested operating points, the
+forecast held at one fixed setting, not a symmetrically swept policy-class
+frontier.
 \end{quote}
 
 Three research questions structure the work; their answers belong to the
@@ -200,7 +205,9 @@ tower. No encoder-timing data existed for any consumer GPU and AIC has no
 usable fallback, so the dominant operator families were collected at locked
 clocks and upstreamed. The \emph{language pool} is simulated by Dynamo's
 discrete-event engine (\texttt{dynamo.replay} with a KV-aware
-router)~\cite{Dynamo2025} under AIC-calibrated H100 timing. The pools
+router)~\cite{Dynamo2025} under AIC's shipped \texttt{h100\_sxm} timing
+database, trusted rather than physically revalidated in this work
+(Section~\ref{sec:sim-limitations}). The pools
 compose through the trace itself: each request's encoder delay is folded
 into its language-pool arrival timestamp, a seam that keeps per-pool
 saturation attributable (Chapter~\ref{cap:metodologia}).

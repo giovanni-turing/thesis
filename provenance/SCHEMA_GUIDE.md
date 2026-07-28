@@ -1023,7 +1023,7 @@ Live results of (2) and (3), 2026-07-20:
 --------------------+-------------------+-----------    -------------+--------------------+--------------+----------+---------
  mv_llm_p99_check   |               178 |       178              178 |                178 |          610 |      178 | t
  mv_llm_percentiles |               178 |       178
- mv_worker_seconds  |               234 |       234     all four matviews fresh; v_mv_stale is empty
+ mv_worker_seconds  |               234 |       234     all five matviews fresh (incl. mv_check_results since D92); v_mv_stale is empty
  mv_infraction      |              2337 |      2337
 ```
 
@@ -1179,12 +1179,15 @@ deviation is a fixed property of the archived summary. Worst `p99` drift across 
 
 ### 6.4 RESOLVED — the matviews are fresh
 
-The old text reported `mv_llm_p99_check` at 101 materialized vs 125 live. All four matviews are now
-fresh and `v_mv_stale` is empty. Do not rely on point-in-time counts here:
-the invariant is `SELECT count(*) FROM provenance.v_mv_stale` = 0, and since
-D92 (2026-07-28) the surface includes `mv_check_results` (one row per enabled
-check definition), so a stale check cache also trips it. The delivery gate
-(`verify_all.sh` A3) enforces the zero-stale invariant on every run. The
+The old text reported `mv_llm_p99_check` at 101 materialized vs 125 live. All FIVE matviews
+(incl. `mv_check_results` since D92) are now fresh and `v_mv_stale` is empty.
+Do not rely on point-in-time counts here: the row-count invariant is
+`SELECT count(*) FROM provenance.v_mv_stale` = 0, which catches cardinality
+drift only; same-cardinality verdict/evidence drift in the check cache is
+caught by the SEPARATE full-content gate in `verify_all.sh` A3, which
+compares every `mv_check_results` field except `evaluated_at` against a
+live `check_all()` evaluation in both directions. The delivery gate
+enforces both invariants on every run. The
 refresh discipline in §5 still applies
 after any future K1/K2 ingest.
 

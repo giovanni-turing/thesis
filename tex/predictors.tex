@@ -21,8 +21,10 @@ This chapter asks \textbf{RQ2: can encoder demand be forecast with usable
 uncertainty at replica-startup horizons?} \emph{Usable} here is not a WAPE
 ranking: a capacity controller consumes an \emph{upper quantile}, holds it
 across a startup lead, and pays for whatever demand does above it. That
-edge's behavior at the leads the pools need (\SIrange{15}{300}{\second},
-Chapter~\ref{cap:closedloop}) decides RQ2; point accuracy enters second.
+edge's behavior at the leads the pools need (encoder:
+\SIrange{15}{165}{\second} of forecast-\emph{issued} lead; language: to
+\SI{300}{\second}; Chapter~\ref{cap:closedloop}) decides RQ2; point accuracy
+enters second.
 
 \begin{description}
 \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
@@ -127,9 +129,16 @@ gen      & 0.893--0.900 & 0.887--0.897 & 0.897 & 0.896 \\
 horizon step stays within $0.876$--$0.903$ across $h{=}1\ldots12$ at
 \SI{15}{\second} bins (\SIrange{15}{180}{\second} of lead) and
 $0.857$--$0.911$ at \SI{1}{\minute} bins (1--12 minutes), with no trend in
-$h$, so every tested encoder startup lead $L \in
-\{15,30,45,300\}$\,\si{\second} (Chapter~\ref{cap:closedloop}) sits inside a
-horizon where the edge holds. \textbf{It does not collapse in bursts}:
+$h$, so every \emph{realizable issued} encoder startup lead $L \in
+\{15,30,45,165\}$\,\si{\second} (Chapter~\ref{cap:closedloop}) sits inside a
+horizon where the edge holds. That grid is what the \SI{15}{\second} archive
+can actuate on: at $H{=}12$ it supplies at most
+$(12{-}1)\times15 = \SI{165}{\second}$ of issued lead. The superseded
+\SI{300}{\second} cell is not an issued lead --- it was reached by target-time
+indexing --- and sits inside the \SI{1}{\minute} forecast-\emph{evaluation}
+horizon (1--12 minutes), where the edge also holds; the distinction between
+that horizon and realizable actuation lead is kept throughout.
+\textbf{It does not collapse in bursts}:
 pooled over the five model series at \SI{15}{\second} bins, in-burst
 coverage is $0.890$--$0.901$ against
 $0.890$--$0.896$ outside. The rest of the band is weaker and is not used:
@@ -371,8 +380,10 @@ apart from the nonnegativity floor.
 RQ2 answers yes, with a bounded meaning. The p90 edge a provisioning
 controller consumes is empirically calibrated (coverage $0.88$--$0.90$),
 and that calibration holds across the full 12-step horizon and inside
-burst windows, covering the
-tested \SIrange{15}{300}{\second} startup leads; the under-provision
+burst windows, covering the encoder controller's realizable
+\SIrange{15}{165}{\second} forecast-issued leads and, at \SI{1}{\minute}
+bins, the language pool's leads out to \SI{300}{\second} --- a
+forecast-evaluation horizon, not an issued encoder lead; the under-provision
 events it concedes are short and bounded (measured for the consumed
 Chronos-2, image-signal, \SI{15}{\second} cell). Underneath, zero-shot foundation
 models beat the fixed-parameter classical baselines in every cell of the

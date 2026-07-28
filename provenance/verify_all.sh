@@ -85,6 +85,15 @@ if [ -z "$PGPASSWORD" ]; then bad "cannot reach postgres (no password from docke
   [ "${STALEMV:-x}" = "0" ] && ok "all evidence caches fresh (v_mv_stale: 0 rows, incl. mv_check_results)" \
                             || { bad "stale evidence caches: $STALEMV (see provenance.v_mv_stale)"; \
                                  Q "select '        - '||matview||': '||materialized_rows||' vs '||live_rows from provenance.v_mv_stale"; }
+  # D92 closure (bridge 289): CONTENT freshness for the check cache, not count
+  # alone -- the cached (check_id, passed, severity) set must equal a live
+  # check_all() evaluation in both directions.
+  CKDIFF=$(Q "with live as materialized (select check_id, title, severity, passed, detail from provenance.check_all()),
+                   mv as (select check_id, title, severity, passed, detail from provenance.mv_check_results)
+              select (select count(*) from (select * from mv except select * from live) a)
+                   + (select count(*) from (select * from live except select * from mv) b)")
+  [ "${CKDIFF:-x}" = "0" ] && ok "mv_check_results full-row content-identical to live check_all() (all fields except evaluated_at)" \
+                           || bad "mv_check_results CONTENT-STALE: $CKDIFF row diffs vs live -- REFRESH MATERIALIZED VIEW provenance.mv_check_results"
   DRIFT=$(Q "select coalesce(max(ttft_pct_diff),0)::numeric(10,4) from provenance.v_llm_drift")
   awk -v d="${DRIFT:-99}" 'BEGIN{exit !(d<2.0)}' && ok "worst raw-vs-summary drift ${DRIFT}% (<2%)" \
                                                  || bad "worst drift ${DRIFT}% exceeds 2%"

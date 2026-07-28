@@ -107,7 +107,11 @@ padded span sets the window's GPU-time denominator. Cold-start lead is modeled
 explicitly: a scale-up issued at $t$ delivers capacity at $t+L$, and scale-downs
 take effect immediately under a 3-minute hysteresis. The encoder pool is
 swept over $L \in \{15,30,45,300\}$\,\si{\second}, above the measured
-3--5\,\si{\second} model-side minimum. On the language pool, leads $L \in
+3--5\,\si{\second} model-side minimum; that grid grades the reactive and
+static comparators, whose lead is a harness parameter. The forecast arm's
+lead is additionally bounded by what its archive can \emph{issue}, so its
+declared grid is $\{15,30,45,165\}$\,\si{\second}
+(Section~\ref{sec:cl-matrix}). On the language pool, leads $L \in
 \{60,\ldots,300\}$\,\si{\second} (the weight-loading regime) apply to the
 predictive runs and to the slowest-onset reactive sensitivity below; the fourteen
 headline language reactive runs model \emph{no} startup lead
@@ -590,7 +594,8 @@ the calibration windows alone, by the cheapest setting holding the gate on
 both of them at \emph{every} declared cold-start lead. That rule yields
 $M{=}4$, decided entirely by the $L{=}\SI{300}{\second}$ column (every $M$
 passes at 15/30/45\,s) with a thin \SI{4.0}{\milli\second} margin at its
-binding cell. Evaluated once on held-out data, that calibrated floor
+binding cell. Evaluated once on held-out data \emph{under the shipped strict
+re-warm mechanics}, that calibrated floor
 \textbf{fails the fastest onset at \SI{2084}{\milli\second}}, which is the
 language pool's calibration story exactly (Section~\ref{sec:cl-llm}): a point
 selected honestly on the calibration split does not survive per-window grading
@@ -619,12 +624,19 @@ materially: its unfloored fastest-onset p99 is \SI{2000}{\milli\second} rather
 than 16{,}084 (that figure is inflated ${\approx}8\times$ by the asymmetry and is
 quoted here only with its warm-pool counterpart), and the floor $M{=}2$ now
 \emph{passes} every evaluation window at 2.89 Mworker-s (0.746$\times$ static), cheaper
-than static. Even on that most-favorable-to-reactive footing the forecast arm
-is cheaper: \textbf{forecasting is 1.20$\times$ cheaper than the best
-warm-floor reactive at equal compliance on the symmetric warm-pool footing},
+than static. So does the calibration-frozen $M{=}4$, unchanged, at 3.43
+Mworker-s (0.887$\times$ static): the held-out failure of the calibrated floor
+is a fact about the \emph{shipped strict re-warm} mechanics, not an absolute
+one, and is scoped that way wherever it is repeated. Even on that
+most-favorable-to-reactive footing the forecast arm
+is cheaper: \textbf{the cheapest evaluation-passing warm-floor reactive costs
+1.20$\times$ the forecast at equal compliance on the symmetric warm-pool
+footing} --- equivalently, the forecast uses 16.5\% less worker-time ---
 and 1.67$\times$ under the shipped mechanics; the strict-direction figure is
 a sensitivity (see the caveat above), and the single number 1.67$\times$ must
-never be quoted alone. The
+never be quoted alone. Both are comparisons between \emph{tested operating
+points}: reactive is granted an ex-post floor sweep while the forecast stays
+one frozen setting, so neither licenses a policy-class ordering. The
 comparison is conservative in reactive's favor: the forecast is one
 pre-frozen arm ($\rho{=}15$ chosen \emph{ex post} earlier, disclosed), the floor family an ex-post best-of-family read on the evaluation span.
 And the perfect-information oracle reference prices the signal-quality axis
@@ -654,10 +666,15 @@ depend on as few of them as possible. The convention-minimized leading
 quantities are two absolute totals over the full 5.60-day evaluation span:
 provisioned worker-seconds and total encoder-delay mass, computed over
 all \num{749601} requests with no burst definition, SLA cut, or percentile
-selection in either operand. Total delay mass is not another convention.
-It is exactly the area under the complete empirical exceedance-count
+selection in either operand. Total delay mass introduces no SLA-threshold
+and no percentile cut of its own --- it is exactly the area under the
+complete empirical exceedance-count
 curve, $\sum_i d_i = \int_0^\infty N(d_i > t)\,dt$, so it integrates every
-possible threshold instead of privileging one; it is a post-hoc,
+possible threshold instead of privileging one --- but it is not
+convention-free: it remains conditional on the declared evaluation
+population and span, on the encoder-delay definition, and on a linear loss
+functional (a quadratic or capped loss \emph{could} rank arms differently; no
+such ranking is computed in this suite). It is a post-hoc,
 threshold-integrated synthesis that may lead the prose but does not
 replace the predeclared every-window compliance endpoint. Under the
 shipped mechanics the forecast schedule provisions \num{2410754.7}
@@ -671,8 +688,10 @@ repaired and measured in ``The result survives equalizing the readiness
 models'' above), so Table~\ref{tab:cl-readiness} states the full-span
 comparison under each readiness interpretation.
 \textbf{The readiness-invariant result is efficiency: the forecast
-schedule provisions less worker-time than every reactive comparator under
-both readiness interpretations, at equal declared compliance.} The latency
+schedule provisions less worker-time than every evaluation-passing
+reactive comparator under both readiness interpretations, at equal
+declared compliance} (failing diagnostics such as warm $M{=}1$ sit
+outside that comparison). The latency
 ordering is readiness-conditional and reported as such: under common
 warm-pool readiness the warm reactive floor $M{=}1$ carries 8.1\% less
 total delay than the forecast at 12.1\% more cost, and \emph{fails}
@@ -731,9 +750,14 @@ p99.99 (\num{6705.9} against \SI{14724.0}{\milli\second}), so the p99 tie of
 Section~\ref{sec:cl-ledger-enc} is a statement about the plateau, not
 about the distributions. Static $C{=}8$ and the deeper floors carry lighter
 tails across the examined grid and at p99.9, though not uniformly deeper
-($M{=}2$'s p99.99, \num{6933.1}, sits above the forecast's), which is
-what their 1.6--1.7$\times$ bill buys; every one of them meets the
-graded bound, and the forecast arm is the only deployable (non-oracle)
+($M{=}2$'s p99.99, \num{6933.1}, sits above the forecast's). For static
+$C{=}8$ and for $M{=}6$, the cheapest shipped floor that passes, that
+thinner tail is what a 1.6--1.7$\times$ bill buys (1.605$\times$ and
+1.673$\times$ the forecast arm's worker-time), and both meet the
+graded bound. The subject is those two arms only: the shallower floors
+neither cost that much nor pass --- shipped $M{=}2$, the cited exception,
+costs 1.149$\times$ the forecast and \emph{fails} burst3 at
+\SI{9352.2}{\milli\second}. The forecast arm is the only deployable (non-oracle)
 SLA-passing schedule \emph{below} the standing-capacity curve.
 
 \begin{table}[htbp]
@@ -1130,9 +1154,15 @@ the bound runs $1.9$--$19.2\times$ across the burst windows against
 $0$--$0.3\times$ for the forecast. The exception is the aggregate window,
 where all four arms share the same \SI{35807}{\milli\second} worst request, a
 trace-wide outlier no policy avoids. Only one canonical encoder arm violates
-(reactive on the fastest onset), and \emph{how long} it was in violation is
-structurally uncomputable: the encoder time series stores per-second occupancy,
-not per-request latency, so time-in-violation and fraction-over-bound are
+(reactive on the fastest onset), and the \emph{fraction of requests} over the
+bound is available at both grains: on that window reactive puts
+\num{189} of the window's \num{3093} requests above \SI{1}{\second} against
+\emph{zero} for the forecast, and over the full span the counts are
+\num{2650} forecast (0.354\% of all requests), \num{3299} reactive (0.440\%)
+and \num{599} static (0.080\%) (Table~\ref{tab:cl-metric-stack}). What is
+structurally uncomputable is \emph{how long} an arm was in violation: the
+encoder time series stores per-second occupancy,
+not per-request latency, so wall-clock time-in-violation is
 unavailable for every encoder arm on every window, an absence of
 instrumentation rather than a missing ingest. No encoder p99 here is
 backlog-divergent, so none is a lower bound on an unbounded quantity.
@@ -1690,9 +1720,16 @@ compliance gate. Under the pre-frozen replay protocol the
 five-arm frontier settles the standing-capacity objection: at equal compliance
 the forecast arm provisions 669.7 against the deployable static fleet's
 1{,}074.8 worker-hours (0.623$\times$; Table~\ref{tab:cl-metric-stack}), while the
-calibrated warm floor fails the held-out fastest onset and the cheapest all-passing floor
-costs 1.042$\times$, or 1.20$\times$ the forecast even on the
-reactive-favorable warm-pool footing (1.67$\times$ as shipped), with a
+calibrated warm floor fails the held-out fastest onset under the shipped
+strict re-warm mechanics (unchanged, that same floor passes under the
+post-hoc common-warm diagnostic). The cheapest all-passing floor is a
+different arm on each footing: under the shipped mechanics it is $M{=}6$, at
+1.042$\times$ static and 1.67$\times$ the forecast; on the reactive-favorable
+post-hoc common-warm footing it is the shallower $M{=}2$, at 0.746$\times$
+static and still 1.20$\times$ the forecast --- a
+tested-point comparison in which reactive is swept \emph{post hoc} and the
+forecast is one frozen setting, the symmetric forecast-plus-floor family
+being unrun --- with a
 perfect-information reference at 0.292$\times$ marking the remaining
 signal-quality headroom. The mechanism behind the encoder pass is the
 better \emph{placement of standing probabilistic headroom}, not
