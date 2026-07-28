@@ -384,13 +384,13 @@ The same protocol was applied to the opposite regime: a calm 24-hour slice
 dispatches mostly single-image batches (p50 $N{=}1$) --- the small-$N$ end
 of $f(N)$, the corner the burst window does not exercise. In the banked
 simulation all three arms sit inside the bound (static \num{418.205},
-forecast \num{681.117}, reactive \num{684.999}\,ms). Three facts hold
-in every service representation: static remains the lowest-p99 arm; the
-two controller arms remain near-tied at p99 (a 3.9\,ms simulator gap
-that becomes an exact order-statistic tie under the measured vLLM
-service, and a $0.037$\,ms difference of five-repetition means under
-HuggingFace-eager whose sign flips between repetitions); and the calm
-day passes under the canonical vLLM representations for every arm
+forecast \num{681.117}, reactive \num{684.999}\,ms). Across the three
+service representations, static remains the lowest-p99 arm and the two
+controller arms remain near-tied at p99 (a 3.9\,ms simulator gap that
+becomes an exact order-statistic tie under the measured vLLM service,
+and a $0.037$\,ms difference of five-repetition means under
+HuggingFace-eager whose sign flips between repetitions). Under the
+canonical vLLM representations, every arm passes the calm day
 (forecast/reactive \num{738.751} direct and \num{742.587} per-$N$
 scaled; static \num{434.516}/\num{435.497}\,ms). Under
 HuggingFace-eager the two controller arms cross the bound

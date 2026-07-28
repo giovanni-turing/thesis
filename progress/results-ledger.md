@@ -3450,7 +3450,8 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
 ## tier3-steady24h-evidence-round (2026-07-28)
 
 - **What**: author directive — the calm day goes in the thesis. Settled
-  tier-3 evidence commit ceb91b6 (15 steady24h reps + deterministic
+  tier-3 evidence commit ceb91b6 (pin later advanced to 1511606 — D109
+  canonical correction + D111 inventory; see entries below) (15 steady24h reps + deterministic
   summary + frozen excerpt w/ daemon timeline + vLLM exact retimes,
   validation-gated on the reviewer-verified burst3 pair; 32/32 sweep
   clean; burst4 stays excluded, broken trio disclosed). Manuscript:

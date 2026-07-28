@@ -504,14 +504,14 @@ def bind(tese: Path) -> list:
     rx(r"forecast-versus-reactive delay verdict for this window survives physical retiming",
        metn, errs, "replay: verdict claim scoped to THIS WINDOW")
 
-    # 6g. Tier-3 calm-day replay (evidence commit ceb91b6): HF-eager
+    # 6g. Tier-3 calm-day replay (evidence commit 1511606): HF-eager
     # estimands, the vLLM like-for-like PASS quad, the banked triple, and
     # the engine-band-conditional role.
     rx(r"\$1\{,\}120\.967 \\pm 0\.456\$ and \$1\{,\}121\.004 \\pm 0\.143\$\\,ms",
        metn, errs, "calm day: fc/re HF-eager estimand pair adjacent (near-tie form)")
     rx(r"\$610\.596 \\pm 0\.175\$\\,ms", metn, errs,
        "calm day: static HF-eager estimand present")
-    rx(r"passes under the canonical vLLM representations for every arm"
+    rx(r"Under the canonical vLLM representations, every arm passes the calm day"
        r" \(forecast/reactive \\num\{738\.751\} direct and \\num\{742\.587\} per-\$N\$"
        r" scaled; static \\num\{434\.516\}/\\num\{435\.497\}\\,ms\)",
        metn, errs, "calm day: canonical vLLM quad bound to the every-arm PASS role (D109)")
