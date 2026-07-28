@@ -1,0 +1,118 @@
+{
+ "bound_ms": 1000.0,
+ "cells": {
+  "burst3__fc": {
+   "mean_ms": 782.455,
+   "mean_ms_3dp": "782.455",
+   "membership_matched_total": [
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ]
+   ],
+   "n_reps": 5,
+   "per_rep_retimed_p99_ms": [
+    782.932,
+    782.299,
+    782.295,
+    782.368,
+    782.38
+   ],
+   "reconstruction_gate_all_pass": true,
+   "sample_sd_ms": 0.27,
+   "sample_sd_ms_3dp": "0.270"
+  },
+  "burst3__re": {
+   "mean_ms": 22565.317,
+   "mean_ms_3dp": "22565.317",
+   "membership_matched_total": [
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ]
+   ],
+   "n_reps": 5,
+   "per_rep_retimed_p99_ms": [
+    22565.687,
+    22566.252,
+    22565.763,
+    22563.828,
+    22565.055
+   ],
+   "reconstruction_gate_all_pass": true,
+   "sample_sd_ms": 0.935,
+   "sample_sd_ms_3dp": "0.935"
+  },
+  "burst3__staticC8": {
+   "mean_ms": 1397.413,
+   "mean_ms_3dp": "1397.413",
+   "membership_matched_total": [
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ],
+    [
+     1241,
+     1241
+    ]
+   ],
+   "n_reps": 5,
+   "per_rep_retimed_p99_ms": [
+    1397.813,
+    1398.834,
+    1395.692,
+    1397.517,
+    1397.207
+   ],
+   "reconstruction_gate_all_pass": true,
+   "sample_sd_ms": 1.14,
+   "sample_sd_ms_3dp": "1.140"
+  }
+ },
+ "dispersion": "sample standard deviation over 5 predeclared reps",
+ "estimand": "per-repetition retimed p99 of per-request encoder delay (ms); frozen-composition retiming"
+}

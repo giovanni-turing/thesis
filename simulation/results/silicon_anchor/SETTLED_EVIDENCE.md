@@ -109,6 +109,36 @@ round.
 (`eda/.venv`, verified via /proc cmdline) with clock policy and daemon
 interpreter evidence.
 
+## Model, engine, and input provenance (D108)
+
+- **Model** (`models/Qwen3-VL-8B-ViT`, local extracted tower, untracked):
+  sha256(`model.safetensors`) =
+  `b76056ebf9067cdb36e77554b2c1855aa1b662a9265c8ed26468b490e40b4adb`;
+  sha256(`config.json`) =
+  `1e0b2f32d13806e58a938442bd8b7523e4c78f2a5d36aaeb09a3e77622e9df53`.
+  Source model `Qwen/Qwen3-VL-8B-Instruct`; the extraction is
+  field-by-field identical to the AIC graph configuration
+  (tex/metodologia.tex, sec:aic-validation).
+- **Local engine (this campaign's replay cells)**: HuggingFace transformers
+  5.13.0 eager/SDPA in `eda/.venv` — **no container** (explicit
+  no-container statement per D108); interpreter and versions in the env
+  snapshot.
+- **vLLM anchor** (cited like-for-like retimes; tier-5/phase-E artifacts,
+  not in this commit): image `vllm/vllm-openai:v0.22.0`, immutable digest
+  `sha256:0fec7ec5f3e6bc168e54899935fb0557da908a4832a1dbc88e2debcf2f889416`
+  (from the local docker image store that executed it).
+- **Dispatch vs schedule paths** (distinct, per D108): regenerated dispatch
+  outputs live under `dispatch/` here; the FROZEN schedules and banked
+  statistics they were regenerated from live under
+  `simulation/results/comparator_frontier/eval/`
+  (`burst3_{fc,re,static}_*.sched.json` + `*.stats.json`), and each
+  `dispatch/*.meta.json` records their sha256 hashes.
+- **Aggregate summary artifact**: `burst3_summary.json` (tracked), generated
+  deterministically by exactly
+  `python3 simulation/results/silicon_anchor/make_burst3_summary.py`
+  from the 15 committed rep.json files; the manuscript estimands equal its
+  3-decimal fields digit-for-digit.
+
 ## Negative gates (item 9, bridge 101)
 
 `verification/silicon_negative_gates.py` — 18 corruption probes through the
