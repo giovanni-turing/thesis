@@ -1016,14 +1016,17 @@ SELECT * FROM provenance.v_id_collision;
 > preflight with `check_failures('expensive')`. `'expensive'` is a *ceiling*, not a selector: it runs
 > everything enabled, ~43 s.
 
-Live results of (2) and (3), 2026-07-20:
+Historical snapshot of (2) and (3), captured 2026-07-20, BEFORE the D92
+surface extension -- four caches, old counts, preserved as history only
+(the current surface has five caches; see the invariant note in the
+freshness section below):
 
 ```
       matview       | materialized_rows | live_rows      matview_runs | live_joinable_runs | summary_runs | raw_runs | is_fresh
 --------------------+-------------------+-----------    -------------+--------------------+--------------+----------+---------
  mv_llm_p99_check   |               178 |       178              178 |                178 |          610 |      178 | t
  mv_llm_percentiles |               178 |       178
- mv_worker_seconds  |               234 |       234     all five matviews fresh (incl. mv_check_results since D92); v_mv_stale is empty
+ mv_worker_seconds  |               234 |       234
  mv_infraction      |              2337 |      2337
 ```
 

@@ -100,22 +100,25 @@ production trace, the image demand that drives the encoder is nearly decoupled
 from the request rate a conventional autoscaler watches
 ($R^2 = \num{0.123}$), an order of magnitude burstier, and its extremes do not
 even co-occur with the request signal's. So the encoder pool must be
-provisioned on its own signal. But that signal cannot be watched
-\emph{reactively} either, because bursts ramp to peak in a median of six minutes
-against replica cold starts of tens of seconds to minutes. The escape is that
+provisioned on its own signal. But a floorless, matched-rating trailing
+controller watching that signal still fails, because bursts ramp to peak in
+a median of six minutes against replica cold starts of tens of seconds to
+minutes (standing reactive floors do pass, at higher cost). The escape is that
 the signal most dangerous to reactive scaling is also the most \emph{persistent}
 (autocorrelation half-life 69 minutes, Hurst ${\approx}0.93$) --- and therefore
 the most forecastable. Pretrained time-series foundation models forecast it
 zero-shot, beating every classical baseline in all twenty (signal, resolution)
 cells. Driving the encoder schedule from that forecast holds the tail SLA
 on all five declared evaluation windows at $0.62\times$ the provisioned
-worker-time of the deployable static fleet, where an identically-informed
-reactive controller loses the fastest onset at every lead time. The finer
-daily-fold audit surfaces one further onset the pure forecast misses (fold
-F6, p99 \SI{1264}{\milli\second}), recovered post hoc by the hybrid combiner
-at $0.76\times$ --- so the honest headline is ``all five declared windows at
-$0.62\times$, one additional daily-fold miss recovered post hoc at
-$0.76\times$,'' not ``every onset.''
+worker-time of the deployable static fleet, where the identically informed
+floorless trailing controller loses the fastest onset at every lead time. The finer
+daily-fold audit surfaces one further \emph{onset} the pure forecast
+misses (fold F6, p99 \SI{1264}{\milli\second}), recovered post hoc by the
+hybrid combiner at $0.76\times$; a second fold, F2, fails through
+incomplete fixed-context archive coverage, not a missed onset. So the
+honest headline is ``all five declared windows at $0.62\times$, one
+additional daily-fold onset miss recovered post hoc at $0.76\times$ (plus
+one coverage-failure fold),'' not ``every onset.''
 
 \Q{What is the single most important number in the thesis?}
 \A $R^2 = \num{0.123}$. Everything else follows from it. If image demand were
@@ -373,8 +376,8 @@ at minute resolution the point forecast has real but modest skill; and at
 either resolution what the models supply calibratedly is how bad it might get
 --- which is exactly what provisioning consumes. Wins over the classical
 baselines hold in all twenty (signal, resolution) cells regardless, and
-degradation across a 12-step horizon is ${\approx}2$ WAPE points, covering the
-median six-minute onset with margin.
+degradation across the 12-step horizon at \emph{one-minute} bins is
+${\approx}2$ WAPE points, covering the median six-minute onset with margin.
 \Trap{Do not quote ``beats every baseline in all twenty cells'' without the
 no-skill caveat in the same breath --- and keep that caveat attached to the
 \emph{one-second} cell. Calling 98.8\% a one-minute number is the error a
@@ -873,8 +876,9 @@ superposition mechanically produces both (the Taqqu--Willinger duality). So
 this is one identifiable mechanism, not two properties that surprisingly
 coincide. What the operational claim needs is not that they are independent
 --- it is that the envelope is \emph{forecastable} at provisioning leads,
-and that is measured directly (WAPE flat within ${\approx}2$ points over
-twelve steps, p90 coverage 0.88--0.90), not inferred from the coupling.
+and that is measured directly (one-minute-bin WAPE flat within
+${\approx}2$ points over twelve steps, p90 coverage 0.88--0.90), not
+inferred from the coupling.
 \Concede{Downgrade ``surprising coupling'' to ``the operational readout of
 one identifiable mechanism.'' Forecastability is validated independently;
 do not defend it as a general law of bursty signals.}
@@ -1533,7 +1537,7 @@ me more than five seconds in rehearsal, drill it again.
 \item \textbf{Forecasting:} FMs win all 20 (signal, resolution) cells;
   images@1min 52.9\% WAPE (EWMA 54.2\%); images@1s 98.8\% (EWMA 146.1\%,
   no-skill 100\%); ${\approx}2$ WAPE
-  points lost over 12 steps; p90 coverage 0.88--0.90; p10--p90 band covers
+  points lost over 12 steps at 1-min bins; p90 coverage 0.88--0.90; p10--p90 band covers
   69\% vs.\ nominal 80\%.
 \item \textbf{Cost model:} attention operator within ${\approx}3\%$ of
   physical; composed vs.\ vLLM tower within 12.8\% ($N{\le}64$, 69-point
@@ -1654,8 +1658,9 @@ serving engine's own kernels would close the gap --- and the dense 69-point
 vLLM sweep then checked it, landing at 12.8\%. A progressive problemshift, not
 an ad hoc rescue; the anomaly produced the thesis's strongest validation
 artifact. Falsifiability I answer in Popper's currency because the committee
-expects it (a trace with $R^2 \to 1$ kills the premise; a reactive controller
-that holds the fast onsets kills the mechanism), while noting the honest
+expects it (a trace with $R^2 \to 1$ kills the premise; a floorless
+matched-rating reactive controller that holds the fast onsets at no more
+than the forecast's cost kills the mechanism), while noting the honest
 Lakatosian caveat that single results are rarely decisive --- which is why the
 manuscript reports whole frontiers and both readiness models instead of point
 verdicts. What I will \emph{not} do is use demarcation language against rival
@@ -1672,8 +1677,10 @@ planner, show it works once. What makes this a thesis is that each link in
 that chain is replaced by a \emph{measured general claim with its boundary
 conditions}: a characterization result (the decoupling and its LRD structure,
 continuous with the teletraffic literature), an impossibility-shaped result
-(no averaging window rescues reactive control --- Fano growth through 938
---- and reactive-on-the-right-signal fails at every realizable lead), a
+(no averaging window rescues threshold-rule reactive control --- Fano
+growth through 938 --- and the floorless matched-rating arm on the right
+signal fails at every realizable lead; standing floors pass at higher
+cost), a
 feasibility result (the signal is forecastable where it must be, with
 calibrated uncertainty), a mechanism result (the 1{,}616/1{,}717/736\,ms
 triad separating anticipation from conversion --- the finding that mean-based
@@ -1805,9 +1812,11 @@ the thesis's aggregate-and-per-episode grading the forward EWMA hits a
 coverage-versus-cost bind: the two cheap calibrations fail the fast onset
 (burst3 p99 1{,}285 and 2{,}084\,ms) and the high-volume onset (burst5,
 backlog-divergent), passing only the \emph{burst-masked} aggregate
-(0.70/0.56$\times$); the one calibration that clears every episode
+(0.70/0.56$\times$); the one calibration that clears every declared
+evaluation episode
 (multiplicative, burst3 \SI{747}{\milli\second}) costs \textbf{1.09$\times$
-the static fleet} --- no economic win at all. Chronos clears every episode
+the static fleet} --- no economic win at all. Chronos clears every declared
+evaluation episode (the finer daily-fold audit has the F2/F6 failures)
 \emph{and} costs 0.62$\times$. So the forecaster is load-bearing: the TSFM's
 zero-shot, state-adaptive p90 band is the one thing that covers fast onsets
 \emph{without} calm-time over-provisioning, and a cheap forward forecaster's
@@ -2104,8 +2113,8 @@ every issued lead (standing reactive floors do pass, at higher cost). The escape
 the four, so a pretrained forecaster reads it zero-shot --- and provisioning
 on that forecast holds the tail SLA on every declared evaluation window,
 including the fast onset the matched-rating reactive controller loses, at
-0.62 times the static fleet, and more cheaply than every reactive
-configuration that also passes.'' Then stop.
+0.62 times the static fleet, and more cheaply than every tested
+evaluation-passing floor in the reported sweep.'' Then stop.
 \Trap{Do not front-load the $0.62\times$. Open on the decoupling; the
 economics are the payoff, not the hook.}
 
@@ -2122,7 +2131,8 @@ late to boot machines.'' Then offer to go as deep as they want.
 
 \Q{If time is short, which single result do I show?}
 \A The burst3 reactive-versus-forecast split: same signal, same lead, same
-platform --- reactive fails the fast onset (p99 up to \SI{54}{\second}), the
+platform --- the floorless matched-rating reactive arm fails the fast onset
+(p99 up to \SI{54}{\second}), the
 p90 forecast holds the \SI{588}{\milli\second} floor. It carries the whole
 argument in one comparison. If they want the \emph{why}, the
 1{,}616/1{,}717/\SI{736}{\milli\second} triad; if they want the premise, the

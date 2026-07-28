@@ -107,8 +107,10 @@ padded span sets the window's GPU-time denominator. Cold-start lead is modeled
 explicitly: a scale-up issued at $t$ delivers capacity at $t+L$, and scale-downs
 take effect immediately under a 3-minute hysteresis. The encoder pool is
 swept over $L \in \{15,30,45,300\}$\,\si{\second}, above the measured
-3--5\,\si{\second} model-side minimum; that grid grades the reactive and
-static comparators, whose lead is a harness parameter. The forecast arm's
+3--5\,\si{\second} model-side minimum; that grid grades the reactive
+comparators, whose lead is a harness parameter (static arms are
+lead-invariant: their schedules are constant and $L$ enters only the run
+tag). The forecast arm's
 lead is additionally bounded by what its archive can \emph{issue}, so its
 declared grid is $\{15,30,45,165\}$\,\si{\second}
 (Section~\ref{sec:cl-matrix}). On the language pool, leads $L \in
@@ -1160,11 +1162,12 @@ bound is available at both grains: on that window reactive puts
 \emph{zero} for the forecast, and over the full span the counts are
 \num{2650} forecast (0.354\% of all requests), \num{3299} reactive (0.440\%)
 and \num{599} static (0.080\%) (Table~\ref{tab:cl-metric-stack}). What is
-structurally uncomputable is \emph{how long} an arm was in violation: the
-encoder time series stores per-second occupancy,
-not per-request latency, so wall-clock time-in-violation is
-unavailable for every encoder arm on every window, an absence of
-instrumentation rather than a missing ingest. No encoder p99 here is
+not reported is \emph{how long} an arm was in violation as wall-clock
+time: per-request encoder delay \emph{is} reconstructable from the raw
+emissions (completion timestamp minus arrival, the same reconstruction the
+metric stack uses), but no temporal-aggregation convention for wall-clock
+time-in-violation was declared or reported, so that statistic is an
+undeclared convention rather than missing request-level evidence. No encoder p99 here is
 backlog-divergent, so none is a lower bound on an unbounded quantity.
 
 \paragraph{Cold start, and the denominator it hides.} The warm-up columns

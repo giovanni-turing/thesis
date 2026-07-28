@@ -82,12 +82,13 @@ if [ -z "$PGPASSWORD" ]; then bad "cannot reach postgres (no password from docke
                                 || bad "lineage matview STALE ($MV materialized vs $LIVE live) -- REFRESH MATERIALIZED VIEW provenance.mv_llm_p99_check"
   # D92 (bridge 283): EVERY evidence cache must be fresh, incl. mv_check_results.
   STALEMV=$(Q "select count(*) from provenance.v_mv_stale")
-  [ "${STALEMV:-x}" = "0" ] && ok "all evidence caches fresh (v_mv_stale: 0 rows, incl. mv_check_results)" \
+  [ "${STALEMV:-x}" = "0" ] && ok "evidence-cache CARDINALITY fresh (v_mv_stale: 0 rows over five caches)" \
                             || { bad "stale evidence caches: $STALEMV (see provenance.v_mv_stale)"; \
                                  Q "select '        - '||matview||': '||materialized_rows||' vs '||live_rows from provenance.v_mv_stale"; }
-  # D92 closure (bridge 289): CONTENT freshness for the check cache, not count
-  # alone -- the cached (check_id, passed, severity) set must equal a live
-  # check_all() evaluation in both directions.
+  # D92 closure (bridge 289/291): CONTENT freshness for the check cache, not
+  # count alone -- the cached (check_id, title, severity, passed, detail)
+  # rows (every field except evaluated_at) must equal a live check_all()
+  # evaluation in both directions.
   CKDIFF=$(Q "with live as materialized (select check_id, title, severity, passed, detail from provenance.check_all()),
                    mv as (select check_id, title, severity, passed, detail from provenance.mv_check_results)
               select (select count(*) from (select * from mv except select * from live) a)
@@ -177,6 +178,20 @@ if (cd "$LOADER" && timeout 3600 "$TESE/eda/.venv/bin/python" main.py >"$TMP/ing
   else bad "ingest NOT idempotent -- content digest changed on a settled re-run ($D_BEFORE -> $D_AFTER)"
     grep -E 'files=[1-9]' "$TMP/ingest.log" | sed 's/^/        /' | head -8; fi
 else bad "main.py exited non-zero"; tail -5 "$TMP/ingest.log" | sed 's/^/        /'; fi
+
+# D92 closure (bridge 291 item 5): the settle passes above WRITE to the DB, so
+# cache freshness must be re-asserted AFTER the final database-writing pass --
+# checking only before it lets a fresh ingest stale the caches yet end green.
+STALEMV2=$(Q "select count(*) from provenance.v_mv_stale")
+[ "${STALEMV2:-x}" = "0" ] && ok "post-settle evidence-cache CARDINALITY fresh (v_mv_stale: 0 rows)" \
+                          || { bad "post-settle stale evidence caches: $STALEMV2"; \
+                               Q "select '        - '||matview||': '||materialized_rows||' vs '||live_rows from provenance.v_mv_stale"; }
+CKDIFF2=$(Q "with live as materialized (select check_id, title, severity, passed, detail from provenance.check_all()),
+                  mv as (select check_id, title, severity, passed, detail from provenance.mv_check_results)
+             select (select count(*) from (select * from mv except select * from live) a)
+                  + (select count(*) from (select * from live except select * from mv) b)")
+[ "${CKDIFF2:-x}" = "0" ] && ok "post-settle mv_check_results full-row content-identical to live check_all()" \
+                          || bad "post-settle mv_check_results CONTENT-STALE: $CKDIFF2 row diffs -- REFRESH MATERIALIZED VIEW provenance.mv_check_results"
 fi
 
 # ─────────────────────────────────────────────────────────── GATE B: thesis

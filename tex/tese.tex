@@ -117,11 +117,11 @@ through a tail-aware
 capacity conversion of the same forecast, and at its published operating
 point --- the calibrated band edge, p90 at conversion scale 8 --- it sits
 near break-even against static (0.965$\times$ time-matched, 1.03$\times$
-request-matched). A post-hoc re-selection of quantile and conversion scale
-brackets a cheaper range, both points time-matched: 0.61$\times$ at the
-calibration-selected p70/scale-6 point, which drops the hardest daily-fold
-onset, and 0.82$\times$ (0.87$\times$ request-matched) at the post-hoc
-p90/scale-6 robustness variant that recovers it. The language-pool p90-versus-reactive verdict reproduces on
+request-matched). A cheaper bracket exists with two distinct statuses,
+both points time-matched: 0.61$\times$ at the calibration-selected
+p70/scale-6 point, which drops the hardest daily-fold onset, and
+0.82$\times$ (0.87$\times$ request-matched) at p90/scale-6, a post-hoc
+re-selection of the quantile alone (the scale stays 6) that recovers it. The language-pool p90-versus-reactive verdict reproduces on
 the fastest-onset burst through Dynamo's real control plane with mocked
 engines (one live run per policy); the encoder cost model is anchored
 separately on RTX~5090 silicon, and the week-scale economics are simulated.
@@ -220,12 +220,12 @@ uma convers\~ao de capacidade ciente de cauda da mesma previs\~ao, e em seu
 ponto de opera\c{c}\~ao publicado --- a borda calibrada da banda, p90 na
 escala de convers\~ao 8 --- fica perto do equil\'ibrio face ao est\'atico
 (0,965$\times$ pareado por tempo, 1,03$\times$ pareado por requisi\c{c}\~oes).
-Uma reescolha \emph{post hoc} de quantil e escala de convers\~ao delimita uma
-faixa mais barata, ambos os pontos pareados por tempo: 0,61$\times$ no ponto
-p70/escala~6 selecionado pela calibra\c{c}\~ao, que perde o in\'icio de dobra
-di\'aria mais dif\'icil, e 0,82$\times$ (0,87$\times$ pareado por
-requisi\c{c}\~oes) na variante \emph{post hoc} de robustez p90/escala~6 que o
-recupera.
+Uma faixa mais barata existe com dois estatutos distintos, ambos os
+pontos pareados por tempo: 0,61$\times$ no ponto p70/escala~6 selecionado
+pela calibra\c{c}\~ao, que perde o in\'icio de dobra di\'aria mais
+dif\'icil, e 0,82$\times$ (0,87$\times$ pareado por requisi\c{c}\~oes) em
+p90/escala~6, uma reescolha \emph{post hoc} apenas do quantil (a escala
+permanece 6) que o recupera.
 Na rajada de in\'icio mais r\'apido, o par de veredictos p90-versus-reativo
 do \emph{pool} de linguagem se reproduz atrav\'es do plano de controle real
 do Dynamo com \emph{engines} simulados (uma execu\c{c}\~ao ao vivo por
