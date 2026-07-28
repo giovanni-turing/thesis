@@ -17,7 +17,7 @@ LIVE_DIR_OWNER = {"to_reviewer":"claude","from_reviewer":"reviewer"}
 HDR_KEYS = ["from","ts","re","type","thread","authority","rulings"]  # last three optional
 REQ_KEYS = ["from","ts","re","type"]
 FNAME_RE = re.compile(r"^\d{3}_[A-Za-z0-9][A-Za-z0-9_-]*$")
-THREAD_RE = re.compile(r"^D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*$")
+THREAD_RE = re.compile(r"^[DV]\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*$")
 # v2.0 GRANDFATHER: historical body-form adjudications recognized by exact sha,
 # carrying their (already reviewer-verified) rulings as data.
 GRANDFATHER_RULINGS = {}  # fresh visual corpus: no historical adjudications
@@ -32,9 +32,9 @@ AUTHORITY_SENDER = {"author": {"claude", "reviewer"},
 # v2.1 (D43): strict whole-value rulings grammar -- PAIR (';' PAIR)*, at least one
 # pair, nothing else. Empty/dangling components are a grammar violation, not noise.
 # v2.1.1 (D45): separator whitespace is ASCII space/tab only, matching the doc.
-_PAIR = r"D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*=(?:CLOSED-FIXED|CLOSED-REJECTED|REOPENED)"
+_PAIR = r"[DV]\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*=(?:CLOSED-FIXED|CLOSED-REJECTED|REOPENED)"
 RULINGS_VALUE_RE = re.compile(rf"^{_PAIR}(?:[ \t]*;[ \t]*{_PAIR})*$")
-RULINGS_PAIR_RE = re.compile(r"(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)=(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)")
+RULINGS_PAIR_RE = re.compile(r"([DV]\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)=(CLOSED-FIXED|CLOSED-REJECTED|REOPENED)")
 # v2.1 (D43): bodies are semantically inert EVERYWHERE. The retired Markdown
 # heading/authority parser is gone; ONE narrow, unconditional lexical lint marks
 # legacy line-forms deprecated outside the sha-pinned grandfather corpus.
@@ -44,7 +44,7 @@ RULINGS_PAIR_RE = re.compile(r"(D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*)=(CLOSED-FIXED
 # whitespace, unspaced trailing hashes, NBSP separators, ruling prefixes inside
 # sentences) are inert prose, exactly as the retired grammar classified them.
 DEPRECATED_BODY = [
-    re.compile(r"^RULING D\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*: "
+    re.compile(r"^RULING [DV]\d{2,}-[A-Za-z0-9][A-Za-z0-9_-]*: "
                r"(?:CLOSED-FIXED|CLOSED-REJECTED|REOPENED)[ \t]*$"),
     re.compile(r"^#{1,6} AUTHOR ADJUDICATION(?: #+)?[ \t]*$", re.I),
 ]
@@ -103,7 +103,7 @@ def main():
                 if hdr.get("type") and hdr["type"] not in TYPES:
                     errors.append(f"{p}: bad type '{hdr['type']}'")
                 if hdr.get("thread") is not None and not THREAD_RE.match(hdr.get("thread","")):
-                    errors.append(f"{p}: thread id '{hdr.get('thread')}' not DNN-<slug>")
+                    errors.append(f"{p}: thread id '{hdr.get('thread')}' not VNN-<slug> or DNN-<slug>")
                 if hdr.get("type") in ("finding","escalation") and "thread" not in hdr:
                     errors.append(f"{p}: type {hdr['type']} requires 'thread'")
             msgs.append({"file":name,"dir":d,"hdr":hdr,"body":body})
