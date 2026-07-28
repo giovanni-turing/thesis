@@ -3461,7 +3461,7 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   HF-eager sensitivity case fc 1,120.967±0.456 / re 1,121.004±0.143
   breach vs static 610.596±0.175 pass; ordering + 0.037ms near-tie
   invariant; engine-band-conditional absolutes per 199c. Appendix row
-  extended (tier-3 pin ceb91b6). Gate: 5 binds + 2 probes, selftest
+  extended (originally pinned at ceb91b6; current pin 1511606). Gate: 5 binds + 2 probes, selftest
   green. Build 135pp 0/0.
 - **MATERIAL DISCLOSURE (to bridge)**: the D63-verified burst3 vLLM pair
   746.994/748.409 reproduces digit-exact ONLY from the tier-5 rerun
