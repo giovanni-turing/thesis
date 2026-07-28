@@ -1679,38 +1679,6 @@ inputs with a ledger entry naming artifact, command, and the paragraph it
 feeds, and the headline recomputes from tracked raw artifacts in a detached
 clean worktree at $0.623$ against $0.623$ expected.
 
-\Q{You validated the cost model. But did the \emph{controllers} ever touch real hardware?}
-\A Yes --- by trace-driven physical replay, in both traffic regimes. Each
-arm's exact batch dispatch sequence from the frozen simulation was executed
-batch-for-batch on the physical encoder (RTX~5090, locked clocks, five
-predeclared repetitions per arm), and per-request delay was recomputed from
-the \emph{measured} service times with membership and worker schedule held
-fixed. On the fastest-onset burst window the simulated verdict survives with
-room to spare: forecast $782.455 \pm 0.270$\,ms against floorless reactive
-at $22{,}565 \pm 0.9$\,ms --- a ${\approx}29\times$ separation dwarfing
-within-arm variation. On the calm 24-hour slice, three facts hold across
-every service representation: static is the lowest-p99 arm, the two
-controller arms are near-tied (no resolved p99 separation --- I do not claim
-equivalence; no margin was predeclared), and under the canonical vLLM
-service every arm passes the bound. The HuggingFace-eager stack is reported
-as a measured sensitivity case where the controller arms cross the bound ---
-engine-band-conditional absolutes, not a conservative bound. Scope
-discipline: the replay anchors \emph{encoder delays only}; resource-time
-economics remain simulated by construction; a single physical unit retimes a
-simulated multi-worker schedule; and an 18-probe negative-gate suite proves
-corrupted membership, reordered dispatch, or changed fingerprints fail
-loudly rather than silently retime. Every raw artifact is pinned at
-immutable evidence commits.
-
-\Q{Follow-up: what does the replay \emph{not} prove?}
-\A Three things, and I concede them before they are asked. It is a
-frozen-composition retiming, not a closed-loop re-simulation --- a slower
-encoder would re-form batches, and no representation tested here bounds that
-re-batching error. It is one GPU retiming a fleet's schedule, so cross-unit
-variance and multi-worker interference are untouched. And the windows
-without settled five-repetition cells carry no physical claim at all --- one
-burst window's trio is incomplete and is disclosed as evidence with no
-claim attached.
 The positive case is not ``simulation is acceptable'' but that the object of
 study is a \emph{counterfactual} --- same trace, same arrivals, different
 scaler --- which a live cluster cannot supply because the arrivals are gone.
@@ -1721,6 +1689,41 @@ own positioning table: the systems I compare against are evaluated on real
 GPU clusters and I am not. That is the single column where this thesis scores
 worst, a closed loop on a real GPU serving cluster is named as the next step,
 and I should say both before anyone reads the table aloud.}
+
+\Q{You validated the cost model. But did the \emph{controllers} ever touch real hardware?}
+\A Their frozen dispatches did; the controllers themselves did not run
+closed-loop against hardware. The test is a trace-driven physical replay,
+in both traffic regimes: each arm's exact batch dispatch sequence from the
+frozen simulation was executed batch-for-batch on the physical encoder
+(RTX~5090, locked clocks, five predeclared repetitions per arm), and
+per-request delay was recomputed from the \emph{measured} service times
+with membership and worker schedule held fixed. On the fastest-onset burst
+window the simulated verdict survives with room to spare: forecast
+$782.455 \pm 0.270$\,ms against floorless reactive at
+$22{,}565.3 \pm 0.9$\,ms --- a ${\approx}29\times$ separation dwarfing
+within-arm variation. On the calm 24-hour slice: across the service
+representations, static is the lowest-p99 arm and the two controller arms
+are near-tied (no resolved p99 separation --- I do not claim equivalence;
+no margin was predeclared). Under the canonical vLLM service, every arm
+passes the bound. The HuggingFace-eager stack is reported as a measured
+sensitivity case where the controller arms cross the bound ---
+engine-band-conditional absolutes, not a conservative bound. Scope
+discipline: the replay anchors \emph{encoder delays only}; resource-time
+economics remain simulated by construction; a single physical unit retimes
+a simulated multi-worker schedule; and a negative-gate suite rejects all
+18 of its injected corruptions loudly --- corrupted membership, reordered
+dispatch, changed fingerprints --- rather than silently retiming. Every
+raw artifact is pinned at immutable evidence commits.
+
+\Q{Follow-up: what does the replay \emph{not} prove?}
+\A Three things, and I concede them before they are asked. It is a
+frozen-composition retiming, not a closed-loop re-simulation --- a slower
+encoder would re-form batches, and no representation tested here bounds
+that re-batching error. It is one GPU retiming a fleet's schedule, so
+cross-unit variance and multi-worker interference are untouched. And the
+windows without settled five-repetition cells carry no physical claim at
+all --- one burst window's trio is incomplete and is disclosed as evidence
+with no claim attached.
 
 \Q{The live validation --- how strong is it really?}
 \A Weaker than the word ``validation'' suggests, and I have narrowed the claims
