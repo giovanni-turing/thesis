@@ -83,6 +83,8 @@ settled provenance schema are being archived under the **reserved DOI
 (record registration pending publication --- this section flips tense
 when the DOI resolves publicly)
 (author ORCID [0000-0003-3682-1188](https://orcid.org/0000-0003-3682-1188)).
-Corrections after examination will appear as new versions under the same
-concept DOI. The GitHub repository (`gio-turing/thesis`) remains the live
+Corrections after examination will appear as new versions grouped under
+the Zenodo concept DOI assigned at publication (Zenodo mints the
+version DOI and the concept DOI as distinct identifiers when the record
+first publishes; both will be reported here). The GitHub repository (`gio-turing/thesis`) remains the live
 mirror.
