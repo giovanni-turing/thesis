@@ -5,18 +5,16 @@ Completeness (verified 2026-07-28, D115.5) -- the earlier one-word claim
 
   * Every file of the pinned upstream tree is present under
     template/modelo-latex/ with upstream content.
-  * ONE file is present on disk but NOT tracked by git:
-        pre-compilados/colinha.pdf   (md5 ab683823cb8f83cf710133ca93a72900)
-    It is byte-identical to
-    https://raw.githubusercontent.com/ccsl-usp/modelo-latex/cb57593/pre-compilados/colinha.pdf
-    (re-fetched and compared on 2026-07-28).  It is invisible to git only
-    because the VENDORED upstream .gitignore itself ignores it
-    (template/modelo-latex/.gitignore:36 -- upstream generates colinha.pdf
-    from colinha.tex and does not track the artifact either).  Tracking it
-    here therefore requires `git add -f`; that is a deliberate deviation
-    from upstream's own ignore rules, taken so the vendored snapshot is
-    complete without the reader having to rebuild anything.
-
+  * pre-compilados/colinha.pdf (md5 ab683823cb8f83cf710133ca93a72900,
+    sha256 faf0bc90ea5a0bd08967dfd43c2eef71f17204655bc5096c2ed3f54066fe4e8a)
+    IS tracked both here and by the pinned upstream commit: upstream
+    cb57593 tracks it as blob ad9351e8b18151a95075b007a958482ba04dba81
+    (the .gitignore pattern at .gitignore:36 does not untrack an
+    already-tracked file), and the local vendor tracks the byte-identical
+    blob. It was omitted in the initial vendoring (hidden by the ignore
+    pattern during `git add`) and restored via `git add -f` on
+    2026-07-28. The vendored tree is now COMPLETE relative to upstream
+    cb57593; there is no deliberate extra-file deviation.
   * Nothing else was added, removed, or edited under template/.
 
 The vendored tree is a reference copy only: the thesis build never reads it

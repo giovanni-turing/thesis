@@ -3616,8 +3616,10 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   the METADATA path only --- the printed wording is unchanged.
 - **Gate**: `verification/metric_stack_gate.py` section 6h binds the four
   repaired roles plus the new RQ3 lead operands in BOTH languages, and
-  asserts the ABSENCE of a scope-free floor range in either abstract; ten
-  new adversarial probes (one or more per role family) are in `PROBES`.
+  asserts the ABSENCE of the floor endpoint literals in either abstract
+  (unconditional forbid per 397); 17 new adversarial probes (one or more
+  per role family) are in `PROBES` (corrected from the earlier "ten" ---
+  D115/398 residual).
 - **Artifacts**: `tex/tese.pdf` (see the run log in the report). Feeds:
   bridge round 180; supersedes the abstract/front-matter portions of the
   entry above.

@@ -594,30 +594,18 @@ def bind(tese: Path) -> list:
        ptn, errs,
        "PT abstract: burst-window qualifier on the encoder-breach claim (D114.1)")
 
-    # 6h-B. floor endpoints + boundaries (D114.2).  The adjudicated choice
-    # here is REMOVAL-WHOLE: under the one-page/500-word limits the floor
-    # claim and its numbers left the abstracts together, which D114.2
-    # authorizes, rather than surviving as a scope-free range.  So the bind
-    # is conditional: if either endpoint literal EVER comes back, all three
-    # ruled boundaries must come back with it (forecast fixed at one
-    # operating point; no symmetric forecast-plus-floor family; the two
-    # named floor members).  A bare "1.20x to 1.67x" therefore fails.
-    floor_rules = (
-        ("EN", enn, (r"reactive-favorable", r"post-hoc",
-                     r"no symmetric forecast-plus-floor",
-                     r"M\{=\}2", r"M\{=\}6")),
-        ("PT", ptn, (r"favorável ao reativo", r"post hoc",
-                     r"nenhuma varredura simétrica de previsão-mais-piso",
-                     r"M\{=\}2", r"M\{=\}6")),
-    )
-    for lang, body, required in floor_rules:
-        if re.search(r"1[.,]20|1[.,]67", body):
-            for pat in required:
-                if not re.search(pat, body):
-                    errs.append(
-                        f"{lang} abstract: floor endpoints present without the "
-                        f"adjudicated boundary /{pat}/ -- a scope-free floor "
-                        f"range is exactly the D114.2 regression")
+    # 6h-B. floor endpoints (D114.2, 397 residual).  The adjudicated choice
+    # is REMOVAL-WHOLE: the floor claim and its numbers left the abstracts
+    # together.  Per 397 the robust enforcement for that path is an
+    # UNCONDITIONAL forbid of the endpoint literals in the abstract bodies:
+    # any reappearance (scoped or not) must route through a fresh review
+    # round, not through a bind that tries to enumerate sufficient scope.
+    for lang, body in (("EN", enn), ("PT", ptn)):
+        if re.search(r"\b1[.,]20\b|\b1[.,]67\b", body):
+            errs.append(
+                f"{lang} abstract: floor endpoint literal present -- the "
+                f"D114.2 ruling is removal-whole; reintroduction requires a "
+                f"review round, not a scope patch")
 
     # 6h-C. language operating point (D114.3): the causal operator is that
     # the SLA holds ONLY through tail-aware conversion, and the near-break-
@@ -660,6 +648,17 @@ def bind(tese: Path) -> list:
        r" simulada\.", ptn, errs,
        "PT abstract: live (LANGUAGE pool) and physical (ENCODER-only) evidence "
        "separated, both pools named, week-scale still simulated (D114.4)")
+
+    # 6h-D2. the printed convention-minimized role itself (397 residual):
+    # the ruled terminology is "convention-MINIMIZED", never "-free".
+    rx(r"convention-minimized", enn, errs,
+       "EN abstract: RQ3 lead carries the printed convention-minimized role")
+    rx(r"minimiza convenções", ptn, errs,
+       "PT abstract: RQ3 lead carries the printed minimized-convention role")
+    for lang, body in (("EN", enn), ("PT", ptn)):
+        if re.search(r"convention-free|livre de convenç", body):
+            errs.append(f"{lang} abstract: overstrong convention-FREE label "
+                        f"(the ruled term is convention-minimized)")
 
     # 6h-E. the convention-minimized full-span RQ3 lead (D114.5).  Operands
     # are role-scoped (which number provisions, which arm is the comparator,
@@ -921,7 +920,7 @@ PROBES = [
          "worker-hours), while the cheapest evaluation-passing reactive warm"
          " floor costs 1.20\\vez{} to 1.67\\vez{} the forecast's worker-time"
          " depending on readiness model. The gain is a trade-off", 1),
-     "scope-free floor"),
+     "floor endpoint literal"),
     ("PT abstract: scope-free floor range reintroduced (D114.2)",
      "tex/tese.tex",
      lambda s: s.replace(
@@ -929,7 +928,7 @@ PROBES = [
          "\\emph{worker}-horas), enquanto o piso quente reativo mais barato"
          " custa de 1,20\\vez{} a 1,67\\vez{} a previsão conforme o modelo de"
          " prontidão. O\nganho", 1),
-     "scope-free floor"),
+     "floor endpoint literal"),
 
     # C. language operating point and what "only" governs
     ("EN abstract: language 'only' moved off the conversion (D114.3)",
@@ -982,7 +981,7 @@ PROBES = [
      lambda s: s.replace("worker-seconds (7.7\\% less)",
                          "worker-seconds (17.7\\% less)", 1),
      "recompute"),
-    ("EN abstract: RQ3 lead convention-free clause removed (D114.5)",
+    ("EN abstract: RQ3 lead no-convention-selection clause removed (D114.5)",
      "tex/tese.tex",
      lambda s: s.replace("no burst definition, SLA cutoff, or\npercentile"
                          " selection in either operand ---", "", 1),
@@ -997,6 +996,15 @@ PROBES = [
      lambda s: s.replace("30\\,277,5 contra 34\\,015,6",
                          "34\\,015,6 contra 30\\,277,5", 1),
      "operands disagree"),
+    ("EN abstract: convention-minimized promoted to convention-free (397)",
+     "tex/tese.tex",
+     lambda s: s.replace("convention-minimized", "convention-free", 1),
+     "convention-minimized"),
+    ("EN abstract: floor endpoint literal reintroduced bare (397)",
+     "tex/tese.tex",
+     lambda s: s.replace("holds the encoder tail bound at",
+                         "holds the encoder tail bound (floors cost 1.20$\\times$--1.67$\\times$) at", 1),
+     "floor endpoint literal"),
     ("PT abstract: evaluation population detached from the RQ3 lead (D72)",
      "tex/tese.tex",
      lambda s: s.replace("nos 5,60\ndias e 749\\,601 requisições da avaliação",

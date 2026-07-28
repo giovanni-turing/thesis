@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SLO-convention-free metric stack over the frontier arms (author directive,
+"""Convention-minimized metric stack over the frontier arms (author directive,
 2026-07-27: "bursts and SLOs are conventions -- prefer aggregated metrics
 (violations, intensity, worker-hours) and full distributions"). COMPUTE-ONLY:
 writes metric_stack.json next to this script and prints a table; touches no

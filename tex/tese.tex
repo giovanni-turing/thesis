@@ -21,7 +21,8 @@
 % A opção twoside (frente-e-verso) significa que a aparência das páginas pares
 % e ímpares pode ser diferente.  A última língua da lista é a principal: aqui
 % o texto é em inglês, com o português como língua secundária obrigatória
-% (resumo, título traduzido, capa).
+% (resumo e título traduzido; a capa e a folha de rosto usam o título na
+% língua principal).
 \documentclass[a4paper,12pt,twoside,brazilian,english]{book}
 
 % Quase todo o preâmbulo vive nas packages do modelo.
@@ -78,9 +79,10 @@
 % É possível definir como determinadas palavras podem (ou não) ser hifenizadas.
 \babelhyphenation{latexmk aiconfigurator}
 
-% O título é dado na língua principal do documento (inglês); \translatedtitle
-% é o título em português.  Ambos vão para a capa, a folha de rosto, o resumo
-% e os metadados do PDF.
+% O título é dado na língua principal do documento (inglês) e é o que o
+% modelo imprime na capa e na folha de rosto; \translatedtitle fornece o
+% título em português usado na referência bibliográfica do Resumo e como
+% alternativa de título nos metadados XMP do PDF.
 %
 % CAIXA: a norma IME embutida no modelo (template/modelo-latex/conteudo/
 % 01-exemplo-normas-ime.tex, "O título ... deverá começar com letra maiúscula
