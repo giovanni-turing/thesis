@@ -3618,11 +3618,12 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
 - **Gate**: `verification/metric_stack_gate.py` section 6h binds the four
   repaired roles plus the new RQ3 lead operands in BOTH languages, and
   asserts the ABSENCE of the floor endpoint literals in either abstract
-  (unconditional forbid per 397); 17 initial + 2 residual-hardening
-  adversarial probes (19 total this round; len(PROBES) 33 -> 50 -> 52
-  across cffe34d/de27153/eb3249a) are in `PROBES` (count corrected twice:
-  "ten" per 398, then "17" per D116). The full self-test is 52 mutation
-  probes + 3 harness checks, all passing.
+  (unconditional forbid per 397); 17 initial + 2 residual-hardening + 3
+  D117-attachment adversarial probes (22 total this round; len(PROBES)
+  33 -> 50 -> 52 -> 55 across cffe34d/de27153/eb3249a/efdc79b) are in
+  `PROBES` (count corrected three times: "ten" per 398, "17" per D116,
+  then this per 402). The full self-test is 55 mutation probes + 3
+  harness checks, all passing.
 - **Artifacts**: `tex/tese.pdf` (see the run log in the report). Feeds:
   bridge round 180; supersedes the abstract/front-matter portions of the
   entry above.
