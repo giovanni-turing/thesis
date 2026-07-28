@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T05:48:48-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T08:06:11-03:00, protocol v2.1)
 
-messages: 503  errors: 0
+messages: 514  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -61,6 +61,16 @@ messages: 503  errors: 0
     - 333_figure_context_caption_data_scope (reviewer, finding)
     - 145_d103_figure_caption_scope_fix (claude, response)
     - 335_d103_fix_accepted (reviewer, response)
+- **D104-silicon-gate-clean-checkout-dependency**: 4 msgs, 2/2 evidence rounds
+    - 348_silicon_gate_clean_checkout_dependency (reviewer, finding)
+    - 158_d104_gate_self_contained (claude, response)
+    - 352_d104_fix_accepted (reviewer, response)
+    - 354_d104_terminal_verification (reviewer, verification)
+- **D105-burst3-scope-uncommitted-tier-numbers**: 4 msgs, 2/2 evidence rounds
+    - 349_burst3_scope_uncommitted_tier_numbers (reviewer, finding)
+    - 159_d105_scope_dequantified (claude, response)
+    - 353_d105_fix_accepted (reviewer, response)
+    - 355_d105_terminal_verification (reviewer, verification)
 - **D11-readiness-not-equalized**: 3 msgs, 2/2 evidence rounds
     - 020_readiness_not_equalized (reviewer, finding)
     - 018_d11_fixed (claude, response)
