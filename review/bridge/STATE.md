@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T03:41:39-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T04:28:52-03:00, protocol v2.1)
 
-messages: 394  errors: 0
+messages: 432  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -391,6 +391,57 @@ messages: 394  errors: 0
     - 264_d79_readme_residual (reviewer, response)
     - 267_d79_escalation (reviewer, escalation)
     - 269_d79_terminal_verification (reviewer, verification)
+- **D80-issued-lead-horizon-scope**: 2 msgs, 1/2 evidence rounds
+    - 270_issued_lead_horizon_scope (reviewer, finding)
+    - 126_D80_closed (claude, response)
+- **D81-common-warm-posthoc-headline-scope**: 2 msgs, 1/2 evidence rounds
+    - 271_common_warm_posthoc_headline_scope (reviewer, finding)
+    - 127_D81_closed (claude, response)
+- **D82-h100-timing-fidelity-scope**: 2 msgs, 1/2 evidence rounds
+    - 272_h100_timing_fidelity_scope (reviewer, finding)
+    - 128_D82_closed (claude, response)
+- **D83-defense-comparator-staleness**: 2 msgs, 1/2 evidence rounds
+    - 273_defense_comparator_staleness (reviewer, finding)
+    - 129_D83_closed (claude, response)
+- **D84-defense-forecast-crib-facts**: 2 msgs, 1/2 evidence rounds
+    - 274_defense_forecast_crib_facts (reviewer, finding)
+    - 130_D84_closed (claude, response)
+- **D85-encoder-violation-fraction-available**: 2 msgs, 1/2 evidence rounds
+    - 275_encoder_violation_fraction_available (reviewer, finding)
+    - 131_D85_closed (claude, response)
+- **D86-metric-stack-scope-and-floor-subject**: 2 msgs, 1/2 evidence rounds
+    - 276_metric_stack_scope_and_floor_subject (reviewer, finding)
+    - 132_D86_closed (claude, response)
+- **D87-defense-model-choice-scope**: 2 msgs, 1/2 evidence rounds
+    - 277_defense_model_choice_scope (reviewer, finding)
+    - 133_D87_closed (claude, response)
+- **D88-equal-compliance-conclusion-pair**: 2 msgs, 1/2 evidence rounds
+    - 278_equal_compliance_conclusion_pair (reviewer, finding)
+    - 134_D88_closed (claude, response)
+- **D89-daily-fold-population-scope**: 2 msgs, 1/2 evidence rounds
+    - 280_daily_fold_population_scope (reviewer, finding)
+    - 135_D89_closed (claude, response)
+- **D90-language-abstract-operating-points**: 2 msgs, 1/2 evidence rounds
+    - 281_language_abstract_operating_points (reviewer, finding)
+    - 136_D90_closed (claude, response)
+- **D91-saturation-knee-workload-scope**: 2 msgs, 1/2 evidence rounds
+    - 282_saturation_knee_workload_scope (reviewer, finding)
+    - 137_D91_closed (claude, response)
+- **D92-provenance-cache-freshness-gap**: 2 msgs, 1/2 evidence rounds
+    - 283_provenance_cache_freshness_gap (reviewer, finding)
+    - 138_D92_closed (claude, response)
+- **D93-defense-wape-and-horizon-duplicates**: 2 msgs, 1/2 evidence rounds
+    - 284_defense_wape_and_horizon_duplicates (reviewer, finding)
+    - 139_D93_closed (claude, response)
+- **D94-defense-matched-rating-mechanism**: 2 msgs, 1/2 evidence rounds
+    - 285_defense_matched_rating_mechanism (reviewer, finding)
+    - 140_D94_closed (claude, response)
+- **D95-defense-tsfm-scope-duplicates**: 2 msgs, 1/2 evidence rounds
+    - 286_defense_tsfm_scope_duplicates (reviewer, finding)
+    - 141_D95_closed (claude, response)
+- **D96-draft-main-precision-residuals**: 2 msgs, 1/2 evidence rounds
+    - 288_draft_main_precision_residuals (reviewer, finding)
+    - 142_D96_closed (claude, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
