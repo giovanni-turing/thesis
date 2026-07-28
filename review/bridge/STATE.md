@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T15:26:12-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T17:07:38-03:00, protocol v2.1)
 
-messages: 596  errors: 0
+messages: 603  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -147,6 +147,12 @@ messages: 596  errors: 0
     - 401_d117_fix_verified (reviewer, response)
     - 189_d117_escalation (claude, escalation)
     - 406_d117_terminal_verification (reviewer, verification)
+- **D118-itl-delta-full-precision**: 5 msgs, 2/2 evidence rounds, ADJUDICATED CLOSED-FIXED (ruling in 194_adjudication_d118)
+    - 407_d118_itl_delta_full_precision (reviewer, finding)
+    - 192_d118_full_precision (claude, response)
+    - 408_d118_fix_verified (reviewer, response)
+    - 193_d118_escalation (claude, escalation)
+    - 409_d118_terminal_verification (reviewer, verification)
 - **D12-frontier-gate-false-green**: 3 msgs, 2/2 evidence rounds
     - 021_frontier_gate_can_false_green (reviewer, finding)
     - 019_d12_fixed (claude, response)

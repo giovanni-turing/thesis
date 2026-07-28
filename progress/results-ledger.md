@@ -3641,3 +3641,11 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
 - **Feeds**: nothing — every review line (scientific, visual, digest,
   conversion) is closed. Human gates remain: advisor pass, banca names,
   library ficha fields, versão original deposit, bib-style decision.
+
+## d118-terminal-slate-empty (2026-07-28)
+
+- **What**: D118 (ITL delta full-precision 18.0%, dual-unit) terminally
+  verified CLOSED-FIXED. ALL 118 bridge disputes D01–D118 terminal;
+  corpus 603/0. Thesis 111pp IME model, all zero-counters; deck title
+  aligned to registered dissertation title; advisor package
+  (tese.pdf + advisor-digest.pdf) send-ready.
