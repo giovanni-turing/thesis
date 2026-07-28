@@ -84,7 +84,7 @@ import tempfile
 import time
 from pathlib import Path
 
-ROOT = Path("/home/gio/tese")
+ROOT = Path(__file__).resolve().parents[1]
 CAMPAIGN = ROOT / "simulation" / "results" / "silicon_anchor"
 ANCHOR = ROOT / "collector_artifacts" / "phaseE_physical_anchor" / "anchor_sdpa_locked2400.json"
 DEFAULT_CELL = "burst3__fc"      # tier-1 headline cell
