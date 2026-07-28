@@ -3434,3 +3434,15 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   scope, this-window verdict scope) + 2 must-fail probes (bound promotion,
   estimand perturbation); selftest ALL PASS.
 - **Feeds**: the separately-scoped integration review round (bridge 160).
+
+## silicon-integration-round-terminal (2026-07-28)
+
+- **What**: bridge 368 — the physical-replay integration round is
+  terminally verified clean. D106 (pin → 6a8b2d7), D107 (sensitivity
+  wording, tolerance wording), D108 (model/engine/container/dispatch/
+  schedule/summary provenance) all adjudicated and terminally verified
+  CLOSED-FIXED. "No text, data, provenance, or conclusion complaint
+  remains standing." ALL 108 bridge disputes D01–D108 now terminal;
+  corpus 534/0. Thesis 135pp 0/0 at f03e17c; suite 65/0 DELIVERY-READY.
+- **Feeds**: nothing — the scientific review line is fully closed. Open:
+  visual per-image re-verdicts (17 figures @ 97ce588, deck slide 7).
