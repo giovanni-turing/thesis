@@ -132,3 +132,11 @@ review/tools/.pw
 simulation/results/lang_qsweep/**/*.zst
 simulation/results/encoder_hybrid/**/*.zst
 figuras_new/_data/*.parquet
+
+# silicon campaign operational files (live/growing; evidence enters via
+# frozen excerpts + SETTLED_EVIDENCE.md)
+simulation/results/silicon_anchor/daemon.out
+simulation/results/silicon_anchor/daemon.pid
+simulation/results/silicon_anchor/daemon.log
+simulation/results/silicon_anchor/manifest.jsonl
+simulation/results/silicon_anchor/STOP

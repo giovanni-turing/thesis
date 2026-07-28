@@ -1,0 +1,29 @@
+{
+ "captured_utc": "2026-07-28T08:19:43Z",
+ "purpose": "environment snapshot for the silicon-anchor settled evidence commit (audit forgotten-detail items 2-4); captured while the campaign daemon is live in this same environment",
+ "python": "3.14.0rc2 (main, Sep  2 2025, 14:20:56) [Clang 20.1.4 ]",
+ "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.39",
+ "nvidia_driver": "595.84",
+ "gpu": "NVIDIA GeForce RTX 5090, 32607 MiB",
+ "cuda_runtime": "CUDA Version: 13.2",
+ "clock_policy": {
+  "author_lock_commands": [
+   "nvidia-smi -lgc 2400,2400",
+   "nvidia-smi -lmc 14001"
+  ],
+  "fatal_throttle_mask": "0xf8",
+  "observed_mem_clocks_mhz": [
+   13801,
+   14001
+  ],
+  "note": "policy lived in the mutable queue file; recorded here per audit item 6"
+ },
+ "daemon": {
+  "pid": "3018097",
+  "runner_git_sha_at_capture": "5efb6a33a8c58742f72b381b8175b9a3f1f40d4d",
+  "cmdline_interpreter": "/home/gio/tese/eda/.venv/bin/python (verified via /proc cmdline; base cpython-3.14.0rc2 via uv)",
+  "note": "torch/transformers versions above ARE the campaign environment (daemon runs in eda/.venv)"
+ },
+ "torch": "2.12.1+cu130",
+ "transformers": "5.13.0"
+}

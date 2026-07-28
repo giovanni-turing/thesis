@@ -3358,3 +3358,26 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   hyphen (scal\-ing-up). Pagination proven byte-identical vs HEAD baseline
   (toc/lof/lot + all newlabel anchors). Build 129pp 0/0; gate OK.
 - **Feeds**: visual reviewer's next tex sweep (note 018).
+
+## silicon-settled-burst3-evidence-commit (2026-07-28)
+
+- **What**: campaign ENDED 10:51:56Z (auto-STOP at 15/15 steady24h; daemon
+  banked partial burst4__staticC8 and exited). Settled evidence commit on
+  the 210/211 boundary: burst3 cells only, 5 reps × 3 arms complete
+  (fc 782.455±0.270 PASS / re 22,565.317±0.935 / staticC8 1,397.413±1.140 ms
+  retimed p99; banked reconstruction exact in all reps). Full task-24
+  checklist executed: partial rep003 csv replaced by csv.gz+rep.json;
+  rep004/005 tracked ×3; daemon.out/pid/manifest UNtracked (+.gitignore);
+  final queue pinned sha 0d7b186b… with the mid-campaign edit documented
+  (tier-5+steady24h extension, REORDER 2, max_attempts 3→6, vllm skip/fail
+  flip, design-field mangling disclosed) and queue_sha:null defect noted;
+  frozen burst3 manifest excerpt (307 events, fc/rep001 double-resume
+  510+1044 preserved); hf_fa2 = second-SDPA annotation; 1000 ms bound
+  declared; env snapshot committed; negative gates suite committed AND
+  wired into provenance/verify_all.sh (18/18 probes; --all-reps 32/32
+  clean same day); integration framing notes (calm-day inversion
+  engine-band-conditional, burst4 no-power + static orphan, tier-5
+  throttle scope, wall_s semantics, MEM 13801/14001) in
+  simulation/results/silicon_anchor/SETTLED_EVIDENCE.md.
+- **Feeds**: metodologia physical-anchor integration delta (bridge 199
+  conditions, next round); supersedes the partial-rep003 state at HEAD.

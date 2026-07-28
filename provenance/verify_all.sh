@@ -144,6 +144,15 @@ if "$TESE/eda/.venv/bin/python" "$TESE/verification/artifact_lineage_gate.py" >"
   ok "artifact lineage: every repo-local pin matches live git log -1 (D77)"
 else bad "artifact lineage STALE"; sed 's/^/        /' "$TMP/lineage.log" | tail -6; fi
 
+# Silicon negative gates (bridge 101, settled-evidence commit): 18 corruption
+# probes over a temp-dir COPY of a completed rep, driven through the runner's
+# own functions -- membership drop/dup, dispatch reorder/mismatch, fingerprint
+# and clock-band edits must all fail loudly. Read-only vs the campaign tree.
+# (--all-reps full-campaign sweep is manual: ~minutes, verifies every rep.)
+if "$TESE/eda/.venv/bin/python" "$TESE/verification/silicon_negative_gates.py" >"$TMP/silicon_neg.log" 2>&1; then
+  ok "silicon negative gates (18/18 corruptions fail loudly; bridge 101)"
+else bad "silicon negative gates FAILED"; sed 's/^/        /' "$TMP/silicon_neg.log" | tail -8; fi
+
 # A6 idempotency -- a re-run must CHANGE NOTHING.
 #
 # Judge by content hashes, not by main.py's stdout counters. SCHEMA_GUIDE §6.14: three

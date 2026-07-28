@@ -1,56 +1,0 @@
-2026-07-27T03:11:33Z [daemon] pid=1522019 python=/home/gio/tese/eda/.venv/bin/python root=/home/gio/tese/simulation/results/silicon_anchor STOP=/home/gio/tese/simulation/results/silicon_anchor/STOP
-2026-07-27T03:11:33Z [daemon] next: burst3__fc rep1 (tier1) est [1110, 1202] GPU-s
-Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 14505.01it/s]
-2026-07-27T03:11:36Z [encoder] loaded /home/gio/tese/models/Qwen3-VL-8B-ViT attn=sdpa params=576.4M in 0.31s; buffer 50176x1536 bf16 (0.14 GiB), n_max=64
-2026-07-27T03:11:39Z [encoder] warmup 6x[64, 8, 1] in 3.87s
-2026-07-27T03:13:40Z [gate] burst3__fc rep1: clocks left the band mid-rep at batch 350 -- throttle reasons 0x0000000000000004 != 0x0000000000000000; pausing
-2026-07-27T03:13:40Z [gate] burst3__fc/rep1/batch350: WAITING (not measuring) -- throttle reasons 0x0000000000000004 != 0x0000000000000000 | SM 2385 MEM 13801 thr 0x0000000000000004 used 4888 MiB
-2026-07-27T03:14:40Z [gate] burst3__fc/rep1/batch350: clocks OK after 1 polls (60 s waited)
-/home/gio/snap/code/current/.local/share/uv/python/cpython-3.14.0rc2-linux-x86_64-gnu/lib/python3.14/multiprocessing/resource_tracker.py:297: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/loky-1522019-f8kjxlxl'}
-  warnings.warn(
-2026-07-27T03:16:53Z [daemon] pid=1538660 python=/home/gio/tese/eda/.venv/bin/python root=/home/gio/tese/simulation/results/silicon_anchor STOP=/home/gio/tese/simulation/results/silicon_anchor/STOP
-2026-07-27T03:16:53Z [daemon] next: burst3__fc rep1 (tier1) est [1110, 1202] GPU-s
-Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 21194.33it/s]
-2026-07-27T03:16:55Z [encoder] loaded /home/gio/tese/models/Qwen3-VL-8B-ViT attn=sdpa params=576.4M in 0.22s; buffer 50176x1536 bf16 (0.14 GiB), n_max=64
-2026-07-27T03:16:55Z [rep] burst3__fc rep1: RESUMING at batch 510/3179
-2026-07-27T03:16:59Z [encoder] warmup 6x[64, 8, 1] in 3.81s
-2026-07-27T03:20:00Z [gate] burst3__fc rep1: clocks left the band mid-rep at batch 1044 -- throttle reasons 0x0000000000000004 != 0x0000000000000000; pausing
-2026-07-27T03:20:00Z [daemon] stopping: STOP while waiting on clock gate (burst3__fc/rep1/batch1044)
-2026-07-27T03:20:31Z [daemon] pid=1549240 python=/home/gio/tese/eda/.venv/bin/python root=/home/gio/tese/simulation/results/silicon_anchor STOP=/home/gio/tese/simulation/results/silicon_anchor/STOP
-2026-07-27T03:20:31Z [daemon] next: burst3__fc rep1 (tier1) est [1110, 1202] GPU-s
-Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 20164.92it/s]
-2026-07-27T03:20:33Z [encoder] loaded /home/gio/tese/models/Qwen3-VL-8B-ViT attn=sdpa params=576.4M in 0.22s; buffer 50176x1536 bf16 (0.14 GiB), n_max=64
-2026-07-27T03:20:33Z [rep] burst3__fc rep1: RESUMING at batch 1044/3179
-2026-07-27T03:20:37Z [encoder] warmup 6x[64, 8, 1] in 3.83s
-2026-07-27T03:33:39Z [daemon] burst3__fc rep1 DONE in 781.81s (1 reps this process)
-2026-07-27T03:33:39Z [daemon] next: burst3__re rep1 (tier1) est [1110, 1202] GPU-s
-2026-07-27T03:33:42Z [encoder] warmup 6x[64, 8, 1] in 3.49s
-/home/gio/snap/code/current/.local/share/uv/python/cpython-3.14.0rc2-linux-x86_64-gnu/lib/python3.14/multiprocessing/resource_tracker.py:297: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/loky-1549240-7fgvivna'}
-  warnings.warn(
-2026-07-27T03:37:55Z [daemon] pid=1595986 python=/home/gio/tese/eda/.venv/bin/python root=/home/gio/tese/simulation/results/silicon_anchor STOP=/home/gio/tese/simulation/results/silicon_anchor/STOP
-2026-07-27T03:37:55Z [daemon] next: burst3__re rep1 (tier1) est [1110, 1202] GPU-s
-Loading weights:   0%|          | 0/351 [00:00<?, ?it/s]Loading weights: 100%|██████████| 351/351 [00:00<00:00, 20393.98it/s]
-2026-07-27T03:37:57Z [encoder] loaded /home/gio/tese/models/Qwen3-VL-8B-ViT attn=sdpa params=576.4M in 0.23s; buffer 50176x1536 bf16 (0.14 GiB), n_max=64
-2026-07-27T03:37:57Z [rep] burst3__re rep1: RESUMING at batch 675/3098
-2026-07-27T03:38:01Z [encoder] warmup 6x[64, 8, 1] in 3.83s
-2026-07-27T03:53:04Z [daemon] burst3__re rep1 DONE in 902.71s (1 reps this process)
-2026-07-27T03:53:04Z [daemon] next: burst3__staticC8 rep1 (tier1) est [1110, 1202] GPU-s
-2026-07-27T03:53:07Z [encoder] warmup 6x[64, 8, 1] in 3.5s
-2026-07-27T04:12:11Z [daemon] burst3__staticC8 rep1 DONE in 1143.27s (2 reps this process)
-2026-07-27T04:12:11Z [daemon] next: burst3__fc rep2 (tier1) est [1110, 1202] GPU-s
-2026-07-27T04:12:14Z [encoder] warmup 6x[64, 8, 1] in 3.49s
-2026-07-27T04:31:17Z [daemon] burst3__fc rep2 DONE in 1142.67s (3 reps this process)
-2026-07-27T04:31:17Z [daemon] next: burst3__re rep2 (tier1) est [1110, 1202] GPU-s
-2026-07-27T04:31:20Z [encoder] warmup 6x[64, 8, 1] in 3.49s
-2026-07-27T04:50:23Z [daemon] burst3__re rep2 DONE in 1142.35s (4 reps this process)
-2026-07-27T04:50:23Z [daemon] next: burst3__staticC8 rep2 (tier1) est [1110, 1202] GPU-s
-2026-07-27T04:50:26Z [encoder] warmup 6x[64, 8, 1] in 3.49s
-2026-07-27T05:09:29Z [daemon] burst3__staticC8 rep2 DONE in 1142.27s (5 reps this process)
-2026-07-27T05:09:29Z [daemon] next: burst3__fc rep3 (tier1) est [1110, 1202] GPU-s
-2026-07-27T05:09:32Z [encoder] warmup 6x[64, 8, 1] in 3.49s
-2026-07-27T05:28:34Z [daemon] burst3__fc rep3 DONE in 1142.06s (6 reps this process)
-2026-07-27T05:28:34Z [daemon] next: burst3__re rep3 (tier1) est [1110, 1202] GPU-s
-2026-07-27T05:28:38Z [encoder] warmup 6x[64, 8, 1] in 3.49s
-2026-07-27T05:47:40Z [daemon] burst3__re rep3 DONE in 1142.21s (7 reps this process)
-2026-07-27T05:47:40Z [daemon] next: burst3__staticC8 rep3 (tier1) est [1110, 1202] GPU-s
-2026-07-27T05:47:44Z [encoder] warmup 6x[64, 8, 1] in 3.49s
