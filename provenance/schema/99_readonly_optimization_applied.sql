@@ -308,7 +308,7 @@ COMMENT ON MATERIALIZED VIEW provenance.mv_infraction IS
 COMMENT ON VIEW provenance.v_mv_freshness_all IS
   'One row per materialized view: materialized row count vs the live population it summarizes. Expensive by design (recomputes the live side); run when auditing, not on the read path.';
 COMMENT ON VIEW provenance.v_mv_stale IS
-  'Freshness guard. Returns ZERO ROWS when every materialized view matches its live population. Any row is a stale matview that must be refreshed before its numbers are cited.';
+  'CARDINALITY-freshness guard: compares ROW COUNTS only. Zero rows means every materialized view matches its live population in cardinality; it does NOT detect same-cardinality content drift. For mv_check_results, same-cardinality verdict/evidence drift is caught by the full-row content gate in provenance/verify_all.sh (every field except evaluated_at, both directions). Any row here is a stale matview that must be refreshed before its numbers are cited.';
 
 -- REFRESH ORDER after any future load:
 --   REFRESH MATERIALIZED VIEW CONCURRENTLY provenance.mv_llm_percentiles;
