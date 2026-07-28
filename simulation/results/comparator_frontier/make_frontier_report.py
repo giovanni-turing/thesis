@@ -16,6 +16,7 @@ Run:  /home/gio/tese/eda/.venv/bin/python make_frontier_report.py
 from __future__ import annotations
 
 import json
+import textwrap
 from pathlib import Path
 
 import matplotlib
@@ -39,16 +40,27 @@ INK, MUTED, GRID = "#1f2430", "#6b7280", "#e5e7eb"
 plt.rcParams.update({
     "figure.dpi": 120,
     "savefig.dpi": 200,
-    "font.size": 9,
+    # Visual-review pass V01/V03. Type 42 (TrueType) embedding replaces
+    # matplotlib's default Type 3, and the whole type scale drops to print
+    # sizes because the canvas below is now the figure's real
+    # \includegraphics width (\linewidth = 427 pt) instead of 971 pt.
+    "pdf.fonttype": 42,
+    "ps.fonttype": 42,
+    "font.size": 6.5,
     "axes.edgecolor": MUTED,
     "axes.labelcolor": INK,
-    "axes.titlesize": 10,
+    "axes.titlesize": 7.5,
+    "axes.linewidth": 0.6,
     "axes.grid": True,
     "grid.color": GRID,
-    "grid.linewidth": 0.6,
+    "grid.linewidth": 0.4,
     "xtick.color": MUTED,
     "ytick.color": MUTED,
-    "lines.linewidth": 1.6,
+    "xtick.labelsize": 6.2,
+    "ytick.labelsize": 6.2,
+    "xtick.major.width": 0.6,
+    "ytick.major.width": 0.6,
+    "lines.linewidth": 1.0,
     "axes.spines.top": False,
     "axes.spines.right": False,
 })
@@ -445,19 +457,21 @@ print("wrote frontier_summary.json")
 # directly comparable. Filled marker = passes all 5 evaluation windows;
 # hollow = fails at least one (count + window name in the label).
 MS = 1e6
-LEADER = dict(arrowstyle="-", color="#b9bec7", lw=0.7, shrinkA=2, shrinkB=5)
-BBOX = dict(facecolor="white", edgecolor="none", alpha=0.78, pad=1.2)
+FS_LAB = 6.2          # in-panel point tags (>= the 6 pt print floor at 1.0x)
+LEADER = dict(arrowstyle="-", color="#b9bec7", lw=0.45, shrinkA=1, shrinkB=3)
+BBOX = dict(facecolor="white", edgecolor="none", alpha=0.78, pad=0.8)
 
 
 def label(ax, xy, xytext, text, color, weight="normal", ha="left"):
-    ax.annotate(text, xy=xy, xytext=xytext, textcoords="data", fontsize=7.5,
+    ax.annotate(text, xy=xy, xytext=xytext, textcoords="data", fontsize=FS_LAB,
                 color=color, fontweight=weight, ha=ha, va="center",
-                arrowprops=LEADER, bbox=BBOX, zorder=6)
+                arrowprops=LEADER, bbox=BBOX, zorder=6, linespacing=1.15)
 
 
 def point(ax, x, y, failed, color, marker="o", ms=9):
-    ax.plot([x], [y], marker=marker, ms=ms, mfc=color if failed == 0 else "white",
-            mec=color, mew=1.8, ls="none", zorder=8, clip_on=False)
+    ax.plot([x], [y], marker=marker, ms=ms * 0.55,
+            mfc=color if failed == 0 else "white",
+            mec=color, mew=0.9, ls="none", zorder=8, clip_on=False)
 
 
 def tag(a, name, short=False):
@@ -470,8 +484,8 @@ def tag(a, name, short=False):
 
 
 def frame(ax, title):
-    ax.axhline(SLA_MS, color=C_RED, lw=1.2, ls="--", zorder=2)
-    ax.axvline(STATIC_REF / MS, color=MUTED, lw=1.0, ls=":", zorder=1)
+    ax.axhline(SLA_MS, color=C_RED, lw=0.8, ls="--", zorder=2)
+    ax.axvline(STATIC_REF / MS, color=MUTED, lw=0.6, ls=":", zorder=1)
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlim(0.95, 18)
@@ -480,17 +494,25 @@ def frame(ax, title):
     ax.set_xticklabels(["1", "1.5", "2", "3", "4", "6", "8", "12", "16"])
     ax.set_yticks([500, 1000, 2000, 5000, 10000, 20000])
     ax.set_yticklabels(["500", "1000", "2000", "5000", "10000", "20000"])
-    ax.set_xlabel("provisioned worker-time, 5.60-day evaluation span (Mworker-s)")
-    ax.set_title(title, color=INK, loc="left", pad=8)
+    ax.set_xlabel("provisioned worker-time, 5.60-day evaluation span (Mworker-s)",
+                  fontsize=7, labelpad=1.5)
+    ax.set_title(title, color=INK, loc="left", pad=3)
 
 
-fig, (axA, axB) = plt.subplots(1, 2, figsize=(13.2, 5.9))
+# Panels are STACKED, not side by side (packet 022). The per-point tags are
+# two-line blocks 90+ characters wide; at \linewidth = 427 pt a side-by-side
+# pair gives each panel ~190 pt, which cannot hold them at any legible size.
+# Stacking gives every panel the full 427 pt, which is what makes the 6.2 pt
+# tags fit without a single character of content being dropped.
+FIG_W, FIG_H = 427 / 72, 474 / 72
+fig, (axA, axB) = plt.subplots(2, 1, figsize=(FIG_W, FIG_H),
+                               gridspec_kw=dict(height_ratios=[1.0, 1.18]))
 
 # ---------------------------------------------------------------- panel A
 fam_pts = sorted((family[k]["cost_worker_s_eval_span"] / MS,
                   family[k]["worst_episode_p99_ms"],
                   family[k]["episodes_failed"], int(k.split("M")[1])) for k in fam_keys)
-axA.plot([p[0] for p in fam_pts], [p[1] for p in fam_pts], color=C_YELLOW, lw=1.4,
+axA.plot([p[0] for p in fam_pts], [p[1] for p in fam_pts], color=C_YELLOW, lw=0.9,
          alpha=0.8, zorder=7)
 for x, y, f, _m in fam_pts:
     point(axA, x, y, f, C_YELLOW, "o", 5.5)
@@ -508,11 +530,11 @@ for _lab, key, c, m, ms in core_pts:
           a["episodes_failed"], c, m, ms)
 
 LAB_A = {
-    "2_reactive_react_point": (4.6, 26000),
-    "5_perfect_future_oracle_H0": (1.00, 6000),
-    "3_reactive_plus_warm_floor_M4": (5.6, 4600),
-    "1_forecast_p90_issue_time": (1.00, 1150),
-    "4_static_C8_deployable": (1.00, 520),
+    "2_reactive_react_point": (4.8, 26000),
+    "5_perfect_future_oracle_H0": (0.99, 26000),
+    "3_reactive_plus_warm_floor_M4": (4.8, 9000),
+    "1_forecast_p90_issue_time": (0.99, 1500),
+    "4_static_C8_deployable": (0.99, 520),
 }
 for lab, key, c, _m, _ms in core_pts:
     a = arms[key]
@@ -527,13 +549,14 @@ axA.annotate(f"warm-floor family M = 1…32 (envelope, not a selection); cheapes
              f"dearer than the static fleet, and {m6['cost_worker_s_eval_span']/FC:.2f}× the "
              f"forecast arm",
              xy=(m6["cost_worker_s_eval_span"] / MS, m6["worst_episode_p99_ms"]),
-             xytext=(4.9, 1750), textcoords="data", fontsize=7.5, color=C_YELLOW,
-             va="center", arrowprops=LEADER, bbox=BBOX, zorder=6)
+             xytext=(0.99, 4300), textcoords="data", fontsize=FS_LAB, color=C_YELLOW,
+             va="center", arrowprops=LEADER, bbox=BBOX, zorder=6, linespacing=1.15)
 axA.annotate("M = 9…32: saturated at the no-queue plateau", xy=(11.0, 589.301),
-             xytext=(4.9, 730), textcoords="data", fontsize=7.2, color=C_YELLOW,
+             xytext=(5.2, 800), textcoords="data", fontsize=FS_LAB, color=C_YELLOW,
              ha="left", va="center", arrowprops=LEADER, bbox=BBOX, zorder=6)
 frame(axA, "A · shipped mechanics (the §8.2 frontier)")
-axA.set_ylabel("worst-window encoder-delay p99 (ms)", color=INK)
+axA.set_ylabel("worst-window encoder-\ndelay p99 (ms)", color=INK, fontsize=7,
+               labelpad=1.5)
 
 # ---------------------------------------------------------------- panel B
 rep_pts = [
@@ -551,8 +574,8 @@ for _l, a, c, m, ms in rep_pts:
           a["episodes_failed"], c, m, ms)
 
 LAB_B = [
-    (5.5, 26000), (1.00, 1450), (5.5, 10000), (5.5, 4400),
-    (5.5, 1850), (1.00, 3200), (1.00, 520), (1.00, 21000),
+    (5.0, 26000), (0.99, 1450), (5.0, 11000), (5.0, 5200),
+    (5.0, 2300), (0.99, 3400), (0.99, 520), (0.99, 21000),
 ]
 ORDER_B = ["reactive · warm-pool, no floor (M=1)", "forecast p90 · strict re-warm",
            "reactive · warm-pool floor M=2", "reactive · warm-pool floor M=3",
@@ -565,36 +588,43 @@ for nm, pos in zip(ORDER_B, LAB_B):
           tag(a, nm), c if c != MUTED else INK,
           weight="bold" if nm.startswith("forecast p90 · warm-pool") else "normal")
 frame(axB, "B · readiness repairs (warm-pool symmetric; strict near-symmetric)")
+axB.set_ylabel("worst-window encoder-\ndelay p99 (ms)", color=INK, fontsize=7,
+               labelpad=1.5)
 
 handles = [
-    Line2D([], [], marker="o", color=C_BLUE, ls="none", ms=8, label="forecast p90"),
-    Line2D([], [], marker="s", color=C_ORANGE, ls="none", ms=7, label="reactive"),
-    Line2D([], [], marker="D", color=C_YELLOW, ls="none", ms=7, label="reactive + warm floor"),
-    Line2D([], [], marker="^", color=MUTED, ls="none", ms=8, label="static C=8"),
-    Line2D([], [], marker="*", color=C_VIOLET, ls="none", ms=12, label="perfect-future oracle"),
-    Line2D([], [], marker="o", color=INK, ls="none", ms=8, mfc=INK, label="passes all 5 evaluation windows"),
-    Line2D([], [], marker="o", color=INK, ls="none", ms=8, mfc="white", mew=1.6,
+    Line2D([], [], marker="o", color=C_BLUE, ls="none", ms=4.5, label="forecast p90"),
+    Line2D([], [], marker="s", color=C_ORANGE, ls="none", ms=4, label="reactive"),
+    Line2D([], [], marker="D", color=C_YELLOW, ls="none", ms=4, label="reactive + warm floor"),
+    Line2D([], [], marker="^", color=MUTED, ls="none", ms=4.5, label="static C=8"),
+    Line2D([], [], marker="*", color=C_VIOLET, ls="none", ms=6.5, label="perfect-future oracle"),
+    Line2D([], [], marker="o", color=INK, ls="none", ms=4.5, mfc=INK,
+           label="passes all 5 evaluation windows"),
+    Line2D([], [], marker="o", color=INK, ls="none", ms=4.5, mfc="white", mew=0.9,
            label="fails ≥ 1 window"),
 ]
-fig.legend(handles=handles, loc="lower center", ncol=7, frameon=False, fontsize=8.2,
-           bbox_to_anchor=(0.5, -0.055))
-fig.text(0.5, -0.105,
-         "Filled marker = passes all 5 evaluation windows; hollow = fails (count and window named "
-         "in the label).  Dashed red = the declared gate, encoder-delay p99 < 1 s;  dotted grey = "
-         "the static-C=8 cost reference.  Both panels share log–log axes.\n"
-         "Panel A is the frontier as run.  Panel B removes the one undisclosed asymmetry — the "
-         "forecast/oracle arms actuate through a warm pool, the reactive family through strict "
-         "re-warm — by giving every arm the warm-pool readiness model (the strict forecast\nvariant shown is a near-symmetric sensitivity, not an equalized arm),\nand lets the oracle order "
-         "before its window opens.  Even on that most-favourable-to-reactive footing the cheapest "
-         f"passing floor (M=2, {WP/MS:.2f} Mworker-s) costs {WP/FC:.2f}× the forecast arm.",
-         ha="center", va="top", fontsize=7.4, color=MUTED)
-fig.suptitle("§8.2 encoder-pool frontier — provisioned worker-time vs worst-window tail over the "
-             "5.60-day evaluation span\n(gate: encoder-delay p99 < 1 s in every evaluation window; "
-             "evaluation windows burst1 / burst3 / burst4 / burst5 / calm day)",
-             fontsize=10.5, color=INK, y=1.03)
-fig.tight_layout()
+fig.legend(handles=handles, loc="lower center", ncol=4, frameon=False, fontsize=6.5,
+           bbox_to_anchor=(0.5, 0.152), handletextpad=0.4, columnspacing=1.2)
+NOTE = (
+    "Filled marker = passes all 5 evaluation windows; hollow = fails (count and window named "
+    "in the label).  Dashed red = the declared gate, encoder-delay p99 < 1 s;  dotted grey = "
+    "the static-C=8 cost reference.  Both panels share log–log axes.  Panel A is the frontier "
+    "as run.  Panel B removes the one undisclosed asymmetry — the forecast/oracle arms actuate "
+    "through a warm pool, the reactive family through strict re-warm — by giving every arm the "
+    "warm-pool readiness model (the strict forecast variant shown is a near-symmetric "
+    "sensitivity, not an equalized arm), and lets the oracle order before its window opens.  "
+    "Even on that most-favourable-to-reactive footing the cheapest passing floor "
+    f"(M=2, {WP/MS:.2f} Mworker-s) costs {WP/FC:.2f}× the forecast arm.")
+fig.text(0.012, 0.140, "\n".join(textwrap.wrap(NOTE, 104)),
+         ha="left", va="top", fontsize=6.2, color=MUTED, linespacing=1.30)
+fig.suptitle("§8.2 encoder-pool frontier — provisioned worker-time vs worst-window tail\n"
+             "over the 5.60-day evaluation span (gate: encoder-delay p99 < 1 s in every\n"
+             "evaluation window; windows burst1 / burst3 / burst4 / burst5 / calm day)",
+             fontsize=7.0, color=INK, y=0.997, va="top")
+# fixed canvas: the legend and the note block live INSIDE the figure box, so
+# the export is exactly FIG_W x FIG_H and does not drift with bbox_inches.
+fig.subplots_adjust(left=0.108, right=0.995, top=0.905, bottom=0.252, hspace=0.44)
 out = HERE / "frontier_worktime_vs_worstp99.pdf"
-fig.savefig(out, bbox_inches="tight")
-fig.savefig(out.with_suffix(".png"), bbox_inches="tight")
+fig.savefig(out)
+fig.savefig(out.with_suffix(".png"))
 plt.close(fig)
 print(f"figure: {out}")

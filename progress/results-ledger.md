@@ -3381,3 +3381,35 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   simulation/results/silicon_anchor/SETTLED_EVIDENCE.md.
 - **Feeds**: metodologia physical-anchor integration delta (bridge 199
   conditions, next round); supersedes the partial-rep003 state at HEAD.
+
+## figure-regeneration-pass (2026-07-28)
+
+- **What**: all 17 included figures re-exported per figure-regen-spec.md +
+  packets 011–027, plus 3 unincluded theme-sharing siblings. ROOT CAUSE
+  CORRECTED vs the spec: 15/17 are plotly→kaleido→Chromium-88/Skia exports
+  (not matplotlib); PUA glyphs + reversed rotated streams are Skia PDF
+  text-layer defects. Fix: figuras_new/_theme.py now renders
+  plotly→SVG→cairosvg (proper ToUnicode CMap, forward rotated runs; also
+  fixed Chromium kerning corruption GFMM→GEMM). The 2 matplotlib producers
+  got fonttype 42 (Type3→CID TrueType). Canvas = exact placement width
+  (scale 0.999–1.001), min effective text 6.20pt, packet-011 band
+  separation 1.14:1→1.475:1 + boundary strokes + x0/x1 callout; heatmap
+  cells 2.65→7.0pt; log minor-tick 5.25pt labels suppressed.
+- **Data immutability**: figuras_new/_datadump.py harness (trace-level
+  x/y/z/text serialization pre/post): 12/15 byte-identical, 3 label-only
+  deltas (eda_a required callout, framework_diff line-breaks, burst_queue
+  padding flip), 0 numeric changes; matplotlib pair verified by
+  numeric-token multiset (sim_metric_frontier identical). Both byte gates
+  green: sim_metric_frontier script+PDF regenerated together (gate OK);
+  verify_all D25.b sim_frontier promoted copies + frontier_summary.json
+  byte-identical, regeneration deterministic.
+- **Layout decisions**: sim_frontier restacked 2-row 427×474 (13 two-line
+  point tags can't fit side-by-side at legible size; no content dropped);
+  make_frontier_report.py layout-only edit sanctioned same-class as its
+  byte-gated sibling; aic_fn legend 6.2pt (plotly 30px legend floor, 9
+  entries) = smallest type in the set.
+- **Build**: 129→133pp (+2 figures, +2 silicon integration delta); 0
+  errors, 0 undefined; gate OK. Pre-existing absences unchanged and
+  flagged (sim_knees SLA hline labels dropped by plotly at HEAD too;
+  scatter constant-fraction legend).
+- **Feeds**: visual mailbox per-image re-verdicts (all 17 packets).
