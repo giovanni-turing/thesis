@@ -2926,6 +2926,15 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   (3,179/3,098/3,156) on all 15 reps [audited independently, bridge 211].
   (Partial burst4/steady cells are preliminary campaign data and carry NO
   claim here; see the campaign manifest.)
+- **Provenance locator [213]:** the five-repetition means and the 15-rep
+  audit above were computed and independently audited from LIVE,
+  UNCOMMITTED campaign state; at the metric-stack freeze (7fd894c) the
+  tracked tree holds only the earlier 3/3/2 completed triplets (plus an
+  incomplete staticC8 rep003). The 15-rep evidence becomes immutable only
+  at the separate post-campaign settled evidence commit (boundary per
+  bridge 210/211: reps/burst3__{fc,re,staticC8}/ only, from a stable
+  manifest snapshot); until that commit exists, this entry's five-rep
+  numbers are live-state observations, not repository-pinned artifacts.
 - **Feeds:** pending manuscript decision -- candidates: metodologia
   (physical anchor section), intro/conclusion "remains future work"
   softening, closedloop static-C8 engine-sensitivity caveat. HOLD until
