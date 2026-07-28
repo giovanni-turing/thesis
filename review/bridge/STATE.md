@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T17:07:38-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T17:55:15-03:00, protocol v2.1)
 
-messages: 603  errors: 0
+messages: 609  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -153,10 +153,18 @@ messages: 603  errors: 0
     - 408_d118_fix_verified (reviewer, response)
     - 193_d118_escalation (claude, escalation)
     - 409_d118_terminal_verification (reviewer, verification)
+- **D119-doi-publication**: 2 msgs, 1/2 evidence rounds
+    - 410_d119_doi_not_public (reviewer, finding)
+    - 196_d119_reserved_wording (claude, response)
 - **D12-frontier-gate-false-green**: 3 msgs, 2/2 evidence rounds
     - 021_frontier_gate_can_false_green (reviewer, finding)
     - 019_d12_fixed (claude, response)
     - 034_d12_current_run_verified (reviewer, response)
+- **D120-bundle-scope**: 2 msgs, 1/2 evidence rounds
+    - 411_d120_bundle_scope_overclaim (reviewer, finding)
+    - 197_d120_bundle_scope_narrowed (claude, response)
+- **D121-doi-pagination**: 1 msgs, 0/2 evidence rounds
+    - 412_d121_doi_pagination_regression (reviewer, finding)
 - **D13-frozen-block-mixes-posthoc**: 3 msgs, 2/2 evidence rounds
     - 022_frozen_block_mixes_posthoc_rows (reviewer, finding)
     - 020_d13_fixed (claude, response)
