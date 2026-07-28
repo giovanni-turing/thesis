@@ -83,8 +83,10 @@ H100 GPU-hours for the language pool, never summed. Three denominators are
 defensible and not interchangeable: \emph{deployable static},
 \emph{grid-SLA-minimal static}, and the \emph{per-window optimum} (an oracle).
 Every ratio is quoted with the one it uses
-(Section~\ref{sec:cl-ledger-cost}). All evidence is one production trace over
-one 5.60-day span.
+(Section~\ref{sec:cl-ledger-cost}). All primary forecast evaluation
+evidence uses the held-out 5.60-day span of one production trace; a
+separately labeled forecast-free seven-day aggregate diagnostic is also
+reported.
 \end{description}
 
 \section{Comparators: the static optimum and reactive control}
@@ -1024,12 +1026,14 @@ the repository (\texttt{defense/anim/data/g1\_runs/}, tracked
 \texttt{.zst} with manifest provenance), and both
 windows enter results grading through the forecast-free comparators of
 Section~\ref{sec:cl-comparators}; their static joins sit outside the
-frozen fill-campaign arm set. \textbf{The full trace carries no forecast
-arm}: the archive's first 1.4 days are that forecast's own context, so a
-full-trace forecast cannot be constructed without leaking context into the
-graded span, the same reason the full-trace family is graded in aggregate
-only. The forecast cells are protocol-forbidden; those static cells are
-out of frozen scope, not impossible.
+frozen fill-campaign arm set. \textbf{The frozen fixed-context archive starts after the 1.4-day
+context split, so the preregistered protocol defines no forecast arm over
+the full seven-day trace}: scoring those context days as targets would
+violate the split. An expanding-context forecast construction exists as a
+tracked diagnostic and is not part of the frozen protocol. The available
+seven-day diagnostic therefore contains aggregate static/reactive rows
+only; grading that family in aggregate is a separate diagnostic-scope
+choice, and its static cells are out of frozen scope, not impossible.
 Four experiment families (a16, g2, g3\_32b, g6: exploratory
 endogenous-demand/client-response, token-accounting-convention,
 served-model/TP and image-size/fabric-robustness sweeps; IDs per the
@@ -1044,13 +1048,15 @@ run populations were still growing when the tables were frozen.
 \begin{table}[htbp]
 \centering
 \caption[Encoder-pool ledger, request-linked composed arm set]{Encoder-pool
-ledger on the request-linked composed arm set --- aggregate +
-the four forecast-covered
-burst windows + the full-trace family. The full-trace rows are
-forecast-free by protocol: the trace's first 1.4 days are the
-forecaster's own context, so full-trace forecast cells would leak that
-context into the graded span (see text); forecast arms are graded on the
-forecast-covered evaluation span. The calm-day and burst-static composed
+ledger on the request-linked composed arm set: the 5.60-day /
+\num{749601}-request evaluation aggregate + the four forecast-covered
+burst windows + the seven-day / 1\,M-request diagnostic block. The
+seven-day rows are forecast-free: the preregistered fixed-context
+protocol defines no forecast arm over the full trace (scoring its
+1.4-day context split as targets would violate the split); forecast arms
+are graded on the held-out evaluation aggregate. Static $C{=}2$ is an
+encoder-only comparator outside the 29-arm composed set. The calm-day
+and burst-static composed
 rows are in Table~\ref{tab:cl-ledger-joint} (forecast = Chronos p90, $\rho{=}15$,
 $L{=}30$\,\si{\second}, issue-time, warm-pool; reactive = the identically
 informed strawman at the same lead); bold marks a p99 over the

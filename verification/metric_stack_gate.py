@@ -435,6 +435,28 @@ def bind(tese: Path) -> list:
        + r"request-seconds against reactive's \\num\{69671\.3\} \(37\.4\\% less\)", texn, errs, "llm-week total-mass pair in role order with polarity")
     rx(r"p95" + W + r"\\num\{178\.9\} against \\num\{501\.9\}~ms", texn, errs, "llm-week p95 pair in role order")
 
+    # 6d. D71: fixed-vs-expanding context, held-out vs seven-day populations,
+    # and the C2 outside-set role -- semantic binds the multiset baseline
+    # cannot protect.
+    rx(r"preregistered fixed-context" + W
+       + r"protocol defines no forecast arm over the full trace", texn, errs,
+       "seven-day forecast-free RULE (fixed-context protocol, not impossibility)")
+    rx(r"seven-day rows are forecast-free", texn, errs,
+       "seven-day rows labeled forecast-free")
+    rx(r"scoring its" + W + r"1\.4-day context split as targets would violate the split",
+       texn, errs, "1.4-day context-split role (targets violation)")
+    rx(r"expanding-context forecast construction exists as a" + W
+       + r"tracked diagnostic and is not part of the frozen protocol", texn, errs,
+       "expanding-context acknowledged and excluded from frozen protocol")
+    rx(r"Static \$C\{=\}2\$ is an" + W
+       + r"encoder-only comparator outside the 29-arm composed set", texn, errs,
+       "C2 marked outside the composed set")
+    rx(r"All primary forecast evaluation" + W
+       + r"evidence uses the held-out 5\.60-day span", texn, errs,
+       "population hierarchy: primary evidence = held-out 5.60-day span")
+    rx(r"separately labeled forecast-free seven-day aggregate diagnostic", texn,
+       errs, "seven-day diagnostic labeled separately")
+
     # 7. figure byte-identity, restore in FINALLY (failure-safe)
     env_fig = tese / "figuras/sim/sim_metric_frontier.pdf"
     tracked = env_fig.read_bytes()
@@ -567,6 +589,22 @@ PROBES = [
      "defense/reveal/index.html",
      lambda s: s.replace("(integer-ms crossings)", "(continuous crossings)", 1),
      "reveal/index.html"),
+    ("fulltrace forecast-free flipped to forecast-driven",
+     "tex/closedloop.tex",
+     lambda s: s.replace("seven-day rows are forecast-free",
+                         "seven-day rows are forecast-driven", 1),
+     "forecast-free"),
+    ("context-split roles swapped 1.4 <-> 5.60",
+     "tex/closedloop.tex",
+     lambda s: s.replace("scoring its\n1.4-day context split", "scoring its\n5.60-day context split", 1)
+                if "scoring its\n1.4-day context split" in s
+                else s.replace("1.4-day context split as targets", "5.60-day context split as targets", 1),
+     "context-split"),
+    ("C2 outside-set role removed",
+     "tex/closedloop.tex",
+     lambda s: s.replace("encoder-only comparator outside the 29-arm composed set",
+                         "encoder-only comparator of the 29-arm composed set", 1),
+     "C2 marked outside"),
 ]
 
 
