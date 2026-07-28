@@ -73,10 +73,13 @@ cardinality- and content-freshness guards (`v_mv_stale`,
   collection protocol in the methodology chapter and
   `collector_artifacts/`).
 
-## Suggested archive flow for examination/deposit
+## Archived record
 
-1. Push this repository (private) and grant the advisor/committee read
-   access — everything above works from a fresh clone.
-2. At deposit, snapshot to a DOI archive (e.g. Zenodo) including a
-   `pg_dump` of the settled provenance schema for readers who prefer the
-   database to rebuilding it.
+This repository, its full git history (as a git bundle in which every
+evidence pin above resolves), and a `pg_dump` of the settled provenance
+schema are archived at **DOI
+[10.5281/zenodo.21654632](https://doi.org/10.5281/zenodo.21654632)**
+(author ORCID [0000-0003-3682-1188](https://orcid.org/0000-0003-3682-1188)).
+Corrections after examination will appear as new versions under the same
+concept DOI. The GitHub repository (`gio-turing/thesis`) remains the live
+mirror.
