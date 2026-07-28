@@ -9,7 +9,7 @@
 \title{\vspace{-1.2em}Final results digest --- forecast-informed vision-pool provisioning\\
 \large Simulation results (as requested) + physical validation (new)}
 \author{Giovanni Oliveira --- IME-USP}
-\date{2026-07-28 --- thesis build: 135 pp, 0 errors; all results recompute from pinned artifacts}
+\date{2026-07-28 --- thesis build: 135 pp, 0 errors; results traceable to pinned artifacts}
 \begin{document}
 \maketitle
 \vspace{-2.2em}
@@ -43,11 +43,11 @@ across the 12-step horizon and inside burst windows.
 encoder tail bound at \textbf{0.62$\times$} the deployable static fleet's
 provisioned worker-time (\textbf{669.7 vs.\ 1{,}074.8} worker-hours).
 Forecast and reactive delay quantiles coincide through p99 over the span;
-the latency advantage lives in the one-minute onsets. Against reactive
-with warm floors (a reactive-favorable post-hoc sweep): the cheapest
-evaluation-passing floor costs \textbf{1.20$\times$} the forecast's
-worker-time under the readiness model most favorable to reactive, and
-\textbf{1.67$\times$} under shipped re-warm mechanics. A
+the latency advantage lives in the one-minute onsets. In a
+reactive-favorable post-hoc floor sweep (forecast fixed; no symmetric
+forecast-plus-floor sweep), common-warm $M{=}2$ costs
+\textbf{1.20$\times$} the forecast's worker-time; shipped strict
+$M{=}6$ gives a non-symmetric \textbf{1.67$\times$} sensitivity. A
 perfect-information reference at 0.292$\times$ marks remaining
 signal-quality headroom.
 
@@ -57,11 +57,12 @@ published operating point it is near break-even vs.\ static
 (0.965$\times$ time-matched, 1.03$\times$ request-matched). Week-scale
 language grading: the reactive span TTFT p99 breaches
 (\SI{1196.6}{\milli\second} vs.\ forecast \SI{651.1}{\milli\second},
-consistent across three forecast models) with 37.4\% less total delay
+consistent across three forecast models) with 37.4\% less total TTFT
 mass for forecast.
 
 \paragraph{Live-stack check.} Both burst-window verdicts reproduce in both
-directions through Dynamo's \emph{real} control plane (mocked engines):
+directions through Dynamo's \emph{real} control plane (mocked engines, single run
+per policy):
 forecast passes (695 vs.\ 651 ms offline), reactive fails (3{,}531 vs.\
 3{,}495 ms).
 
@@ -79,24 +80,24 @@ forecast passes (695 vs.\ 651 ms offline), reactive fails (3{,}531 vs.\
   burst the simulated verdict survives with a ${\approx}29\times$ margin
   --- forecast $782.455\pm0.270$ ms (inside the \SI{1}{\second} bound)
   vs.\ floorless reactive $22{,}565.3\pm0.9$ ms. Every repetition
-  reconstructs the banked simulation percentiles exactly before retiming.
+  reconstructs the banked simulation percentiles within the declared
+  numerical tolerances before retiming.
 \item \textbf{Opposite regime too:} on a calm 24-hour slice the
   simulation's structure is preserved on silicon --- static lowest,
   forecast/reactive near-tied, and every arm passes under the serving
   engine's measured service times. (A slower HuggingFace-eager stack
   inflates absolutes 1.5--1.6$\times$; reported as an engine sensitivity
   case, not a bound.)
-\item \textbf{Integrity:} an 18-probe negative-gate suite (corrupted
-  membership, reordered dispatch, changed fingerprints must fail loudly)
-  passes from a clean checkout; all raw evidence is pinned at immutable
-  commits with model/container hashes.
+\item \textbf{Integrity:} the negative-gate suite rejects all 18 of its
+  injected corruptions loudly, from a clean checkout; raw evidence is
+  pinned at immutable commits with model hashes, the applicable container
+  digest, and the explicit no-container case.
 \end{itemize}
 
 \section*{Verification state}
-112 adversarial review disputes opened and terminally closed (semantics,
-denominators, provenance, statistics); semantic gate binds every headline
-sentence with adversarial self-tests; the delivery suite (65 checks) is
-green; every number above recomputes from tracked raw artifacts in a
-detached clean worktree.
+Results are traceable to pinned artifacts; the 0.623 headline and
+comparator cells recompute from a detached clean checkout; role-scoped
+semantic gates bind the load-bearing claims with adversarial self-tests,
+and the 65-check delivery suite is green.
 
 \end{document}
