@@ -76,9 +76,12 @@ cardinality- and content-freshness guards (`v_mv_stale`,
 ## Archived record
 
 This repository, its full git history (as a git bundle in which every
-evidence pin above resolves), and a `pg_dump` of the settled provenance
-schema are archived at **DOI
+thesis-repository evidence pin above resolves; external-repository
+commits are cited against their own upstreams), and a `pg_dump` of the
+settled provenance schema are being archived under the **reserved DOI
 [10.5281/zenodo.21654632](https://doi.org/10.5281/zenodo.21654632)**
+(record registration pending publication --- this section flips tense
+when the DOI resolves publicly)
 (author ORCID [0000-0003-3682-1188](https://orcid.org/0000-0003-3682-1188)).
 Corrections after examination will appear as new versions under the same
 concept DOI. The GitHub repository (`gio-turing/thesis`) remains the live

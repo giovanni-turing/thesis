@@ -38,7 +38,7 @@ the provenance database dump in the archived record) are licensed under
 the Creative Commons Attribution 4.0 International License (CC-BY 4.0):
 https://creativecommons.org/licenses/by/4.0/. Attribution: Giovanni
 Oliveira, "Forecast-informed vision-pool provisioning for
-modality-disaggregated multimodal serving", IME-USP, 2026 — DOI
+modality-disaggregated model serving", IME-USP, 2026 — DOI
 10.5281/zenodo.21654632.
 
 ## Third-party material (respective upstream licenses)
