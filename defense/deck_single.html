@@ -742,7 +742,7 @@ section.has-dark-background, section.has-dark-background h1, section.has-dark-ba
         (224 img/s), extended to the surrounding median crossings → <b>18 episodes</b> ·
         <b>onset</b> = baseline → peak ramp time</div>
       <canvas id="onsetStrip" style="width:100%; height:215px; margin-top:10px;"></canvas>
-      <p class="lead handoff"><span class="fragment fade-up">Median onset <b>6 min</b>, fastest <b>1 min</b> —
+      <p class="lead handoff"><span class="fragment fade-up">Median onset <b>6.5 min</b>, fastest <b>1 min</b> —
         inside a single observation lag. Cold starts run <b>15 s – 5 min</b>: for the fast half,
         the budget <i>onset − cold-start</i> ≤ 0. At an issued forecast lead of L=30 s reactive control fails
         <b style="color:var(--critical)">9 of 18</b> episodes.</span>
@@ -5031,10 +5031,10 @@ function drawWeekCharts() {
       ctx.fillText(t, x(t), H - PAD.b + 14);
     }
     ctx.setLineDash([5, 4]); ctx.strokeStyle = C("--ink-2"); ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(x(6), PAD.t); ctx.lineTo(x(6), H - PAD.b); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x(6.5), PAD.t); ctx.lineTo(x(6.5), H - PAD.b); ctx.stroke();
     ctx.setLineDash([]);
     ctx.fillStyle = C("--ink-2"); ctx.font = "650 11.5px system-ui";
-    ctx.fillText("median onset 6 min", x(6), PAD.t - 7);
+    ctx.fillText("median onset 6.5 min", x(6.5), PAD.t - 7);
     ctx.fillStyle = "rgba(176,48,48,0.9)"; ctx.textAlign = "left";
     ctx.fillText("cold-start range 15 s – 5 min: the reactive-dead zone", PAD.l + 6, H - PAD.b - 10);
     ctx.fillStyle = C("--muted"); ctx.textAlign = "right"; ctx.font = "600 10.5px system-ui";
