@@ -1,0 +1,102 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,booktabs,enumitem}
+\usepackage{siunitx}
+\setlist{nosep}
+\usepackage[hidelinks]{hyperref}
+\title{\vspace{-1.2em}Final results digest --- forecast-informed vision-pool provisioning\\
+\large Simulation results (as requested) + physical validation (new)}
+\author{Giovanni Oliveira --- IME-USP}
+\date{2026-07-28 --- thesis build: 135 pp, 0 errors; all results recompute from pinned artifacts}
+\begin{document}
+\maketitle
+\vspace{-2.2em}
+
+\section*{The chain being graded}
+Encoder-specific demand signal $\to$ provisioning-horizon probabilistic
+forecast $\to$ replica schedule under startup delay $\to$ window-level
+SLA/resource grading against matched controls (static optimum, reactive),
+on the public Azure multimodal trace (one million requests, seven days),
+under a single pre-frozen replay protocol.
+
+\section*{1. Final simulation results}
+
+\paragraph{Premise (the signal gap is real).} Request rate misrepresents
+vision demand: constant-fraction explains $R^2{=}0.12$ of the image rate
+vs.\ $0.65$ of decode demand; image arrivals are an order of magnitude
+burstier; the two signals' extreme minutes are essentially disjoint. In
+simulation the pools' saturation knees sit an order of magnitude apart,
+and inside the burst window the encoder pool misses its tail bound
+\emph{at the trace's own recorded rate} --- invisible to rate/utilization
+monitors.
+
+\paragraph{Forecastability.} Zero-shot time-series foundation models beat
+naive/EWMA/Holt-Winters in \textbf{20/20} cells; the vision signal is the
+most persistent (autocorrelation half-life 69 min vs.\ 9 for requests);
+the p90 band edge is empirically calibrated (coverage 0.88--0.90), holding
+across the 12-step horizon and inside burst windows.
+
+\paragraph{Closed loop --- the headline.} Over the 5.60-day,
+749{,}601-request evaluation span, the p90-forecast schedule holds the
+encoder tail bound at \textbf{0.62$\times$} the deployable static fleet's
+provisioned worker-time (\textbf{669.7 vs.\ 1{,}074.8} worker-hours).
+Forecast and reactive delay quantiles coincide through p99 over the span;
+the latency advantage lives in the one-minute onsets. Against reactive
+with warm floors (a reactive-favorable post-hoc sweep): the cheapest
+evaluation-passing floor costs \textbf{1.20$\times$} the forecast's
+worker-time under the readiness model most favorable to reactive, and
+\textbf{1.67$\times$} under shipped re-warm mechanics. A
+perfect-information reference at 0.292$\times$ marks remaining
+signal-quality headroom.
+
+\paragraph{Language pool (secondary).} The forecast-driven language policy
+holds its SLA only through tail-aware capacity conversion; at its
+published operating point it is near break-even vs.\ static
+(0.965$\times$ time-matched, 1.03$\times$ request-matched). Week-scale
+language grading: the reactive span TTFT p99 breaches
+(\SI{1196.6}{\milli\second} vs.\ forecast \SI{651.1}{\milli\second},
+consistent across three forecast models) with 37.4\% less total delay
+mass for forecast.
+
+\paragraph{Live-stack check.} Both burst-window verdicts reproduce in both
+directions through Dynamo's \emph{real} control plane (mocked engines):
+forecast passes (695 vs.\ 651 ms offline), reactive fails (3{,}531 vs.\
+3{,}495 ms).
+
+\section*{2. Physical validation (the plus --- new since we spoke)}
+
+\begin{itemize}
+\item \textbf{Cost model on silicon:} encoder costs collected on RTX~5090
+  (locked clocks; dataset submitted upstream to NVIDIA aiconfigurator as a
+  draft PR) and validated against the serving engine's \emph{own} vision
+  tower: within \textbf{12.8\%} across the entire $N\le64$ batching
+  regime (attention operator within ${\approx}3\%$). Re-running the loop
+  with measured costs moves the headline p99 only 589$\to$606 ms.
+\item \textbf{Controller dispatches replayed on silicon} (five predeclared
+  reps/arm, exact frozen dispatch, membership-exact): on the fastest-onset
+  burst the simulated verdict survives with a ${\approx}29\times$ margin
+  --- forecast $782.455\pm0.270$ ms (inside the \SI{1}{\second} bound)
+  vs.\ floorless reactive $22{,}565.3\pm0.9$ ms. Every repetition
+  reconstructs the banked simulation percentiles exactly before retiming.
+\item \textbf{Opposite regime too:} on a calm 24-hour slice the
+  simulation's structure is preserved on silicon --- static lowest,
+  forecast/reactive near-tied, and every arm passes under the serving
+  engine's measured service times. (A slower HuggingFace-eager stack
+  inflates absolutes 1.5--1.6$\times$; reported as an engine sensitivity
+  case, not a bound.)
+\item \textbf{Integrity:} an 18-probe negative-gate suite (corrupted
+  membership, reordered dispatch, changed fingerprints must fail loudly)
+  passes from a clean checkout; all raw evidence is pinned at immutable
+  commits with model/container hashes.
+\end{itemize}
+
+\section*{Verification state}
+112 adversarial review disputes opened and terminally closed (semantics,
+denominators, provenance, statistics); semantic gate binds every headline
+sentence with adversarial self-tests; the delivery suite (65 checks) is
+green; every number above recomputes from tracked raw artifacts in a
+detached clean worktree.
+
+\end{document}
