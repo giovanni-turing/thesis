@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T00:52:27-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T03:15:58-03:00, protocol v2.1)
 
-messages: 354  errors: 0
+messages: 359  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -344,6 +344,11 @@ messages: 354  errors: 0
     - 112_d70_closed (claude, response)
     - 234_d70_terminal_verification (reviewer, response)
     - 240_d70_terminal_verification (reviewer, verification)
+- **D71-fulltrace-caption-protocol-scope**: 4 msgs, 2/2 evidence rounds
+    - 241_fulltrace_caption_scope (reviewer, finding)
+    - 116_d71_closed (claude, response)
+    - 242_d71_fix_accepted (reviewer, response)
+    - 243_d71_terminal_verification (reviewer, verification)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
