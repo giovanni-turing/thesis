@@ -20,11 +20,14 @@ gates; the full-campaign `--all-reps` sweep on 2026-07-28 was 32/32 clean.
 
 ## The 1000 ms bound (checklist item 7)
 
-The campaign spec (queue JSON) never declares the pass/fail bound. Declared
-here: **1000 ms p99 per-request encoder delay** — the same evaluation bound
-used by the simulation comparator (metric-stack SLA); every PASS/BREACH
-wording in campaign notes and the audit uses it. It is an evaluation
-convention, not a runner gate; the runner measures and banks regardless.
+The campaign spec (queue JSON) omits the pass/fail bound. It is not invented
+here: the strict **1000 ms p99 per-request encoder delay** bound pre-exists
+in `simulation/results/comparator_frontier/FROZEN.json` (lines 6–12) and
+`tex/metodologia.tex` (lines 64–70) — the same evaluation bound the
+simulation comparator grades against. Applying it to the retimed
+measurements is post-hoc measurement grading against a pre-declared
+threshold, not a new one. It is an evaluation convention, not a runner
+gate; the runner measures and banks regardless.
 
 ## Queue provenance (item 4)
 
@@ -54,10 +57,14 @@ convention, not a runner gate; the runner measures and banks regardless.
 
 ## Manifest excerpt (item 5)
 
-`burst3_manifest_excerpt.jsonl` (307 events, sha256
-`883271ba2be4c6291b7b07a2e8b8f4314ff484490f204a2e9de860578d6b3850`) is the
-FROZEN burst3-only slice of the live manifest, which itself stays
-untracked (it kept growing until campaign end). The excerpt preserves the
+`burst3_manifest_excerpt.jsonl` (315 events = all 8 `daemon_start`
+events + the 307 burst3 cell events, sha256
+`bdb4c728ece722233e9a3fa5bf245e562f75fde4693d25235ca39db0b48676be`) is the
+FROZEN slice of the live manifest, which itself stays untracked (it kept
+growing until campaign end). The `daemon_start` events carry the daemon PID
+timeline the negative-gate suite needs to adjudicate per-snapshot tenancy
+from a clean checkout (D104); the suite prefers the live manifest when one
+exists and falls back to this excerpt otherwise. The excerpt preserves the
 full resume history — in particular **burst3__fc rep001 resumed twice**
 (from_batch 510 at 03:16:55Z, then 1044 at 03:20:33Z) while its rep.json
 records only the last resume; the excerpt is the authoritative record.
@@ -82,14 +89,18 @@ round.
 - Any "zero fatal slowdowns" claim is scoped to **trace-replay cells**;
   tier-5 engine cells have no clock.jsonl (throttle evidence comes from
   their run wrappers, a weaker record).
-- Calm-day framing for integration: under HF-eager retiming the steady24h
-  ordering INVERTS vs burst3 — fc 1,120.875 ± 0.470 and re 1,121.014 ±
-  0.163 ms BREACH while staticC8 610.580 ± 0.197 PASSES. The absolutes are
-  engine-band-conditional (HF-eager runs ≈1.3–1.6× the AIC/vLLM band); the
-  robust relative facts are the fc-vs-re near-tie (0.14 ms) and the
-  burst3 ordering. burst4 has no discriminating power at p99 (fc 782.389
-  vs re 782.576) with an extreme beyond-p99 tail (max ≈13.6 s), and its
-  static cell finished 0/5 — a broken trio: disclose, claim nothing.
+- Calm-day / burst4 framing for the LATER tier round (D105 scope note:
+  the steady24h and burst4 artifacts are NOT in this commit, and no
+  quantitative value or pass/fail verdict for them is asserted here —
+  numbers enter only with the commit that carries their artifacts).
+  Qualitative planning observations from the live workspace, with no
+  evidentiary standing: the calm-day ORDERING under HF-eager retiming
+  differs from burst3's (static best, fc/re an order-of-magnitude-smaller
+  near-tie above it), so calm-day absolutes must be presented as
+  engine-band-conditional when they enter; burst4's fc and re retime to
+  near-indistinguishable p99s with an extreme beyond-p99 tail, and its
+  static cell completed 0/5 reps — a broken trio to disclose, carrying no
+  claim.
 
 ## Environment (item 8)
 

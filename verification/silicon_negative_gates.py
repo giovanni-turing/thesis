@@ -66,8 +66,10 @@ Usage:
     silicon_negative_gates.py [--selftest] [--cell burst3__fc] [--rep 2]
                               [--all-reps] [--keep]
 
-NOT WIRED INTO verify_all.sh YET -- that happens with the settled evidence
-commit, once the campaign stops and the corrective pin exists.
+Wired into provenance/verify_all.sh at the settled evidence commit. From a
+clean checkout the daemon PID timeline comes from the tracked frozen excerpt
+burst3_manifest_excerpt.jsonl (daemon_start + burst3 events); the live
+manifest, when present in a working campaign tree, takes precedence.
 """
 from __future__ import annotations
 
@@ -148,6 +150,19 @@ def cell_spec(queue: dict, cid: str) -> dict:
     raise KeyError(cid)
 
 
+def manifest_source(campaign: Path) -> Path:
+    """Live manifest if this is a working campaign tree, else the tracked
+    frozen burst3 excerpt (daemon_start + burst3 events), so the gate is
+    reproducible from a clean checkout of the settled evidence commit."""
+    live = campaign / "manifest.jsonl"
+    if live.exists():
+        return live
+    frozen = campaign / "burst3_manifest_excerpt.jsonl"
+    if frozen.exists():
+        return frozen
+    raise FileNotFoundError(f"no manifest source under {campaign}")
+
+
 def runner_pids(manifest: Path, cid: str, rep: int) -> list[tuple[float, int]]:
     """(start_ts, pid) of every runner process, from the append-only manifest.
 
@@ -210,7 +225,7 @@ def build_fixture(dst: Path, cid: str, rep: int) -> dict:
     shutil.copy(ROOT / spec["schedule"], dst / "inputs" / "schedule.json")
     shutil.copy(ROOT / spec["banked_stats"], dst / "inputs" / "banked_stats.json")
     shutil.copy(ANCHOR, dst / "anchor.json")
-    daemons = runner_pids(CAMPAIGN / "manifest.jsonl", cid, rep)
+    daemons = runner_pids(manifest_source(CAMPAIGN), cid, rep)
 
     return {
         "root": dst, "cell": cid, "rep": rep, "daemons": daemons,
