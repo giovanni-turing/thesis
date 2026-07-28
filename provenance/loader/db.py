@@ -7,7 +7,11 @@ and never persisted.
 """
 import os, subprocess, csv, functools
 
-PGHOST, PGPORT, PGUSER, PGDATABASE = "localhost", "5433", "goku", "postgres"
+import os as _os
+PGHOST = _os.environ.get("TESE_PGHOST", "localhost")
+PGPORT = _os.environ.get("TESE_PGPORT", "5433")
+PGUSER = _os.environ.get("TESE_PGUSER", "goku")
+PGDATABASE = _os.environ.get("TESE_PGDATABASE", "postgres")
 
 
 @functools.lru_cache(maxsize=1)
