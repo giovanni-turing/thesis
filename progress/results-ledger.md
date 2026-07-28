@@ -3425,8 +3425,9 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   (746.994 direct / 748.409 per-N vs 717.755 stored); HF-eager = measured
   sensitivity case, NOT a conservative bound (199c); encoder delays only,
   economics simulated by construction; membership 1,241/1,241 + banked
-  reconstruction exact + negative-gate suite cited. Appendix artifact-ledger
-  row pins everything at settled commit 2daa383. Estimands recomputed from
+  reconstruction within declared tolerances + negative-gate suite cited.
+  Appendix artifact-ledger row pins everything at settled-evidence
+  descendant 6a8b2d7 (D106 correction; originally 2daa383). Estimands recomputed from
   committed rep.jsons before writing (match reviewer 350 digit-exact).
 - **Gate**: 6 new binds (estimand+role adjacency, vLLM triple bound to
   static feasibility, sensitivity-not-bound role, encoder-delays-only

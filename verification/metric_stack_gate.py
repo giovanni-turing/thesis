@@ -485,7 +485,7 @@ def bind(tese: Path) -> list:
             errs.append(f"deck {name}: unswept-family disclosure (conclusion tile) missing (msg 244)")
 
     # 6f. Silicon physical-replay integration (bridge 199, settled commit
-    # 2daa383): replicate estimands with dispersion, the like-for-like vLLM
+    # 6a8b2d7): replicate estimands with dispersion, the like-for-like vLLM
     # anchor triple, the 199c sensitivity-not-bound role, and the narrow
     # scope. Estimands recomputed 2026-07-28 from committed rep.json files.
     metn = norm((tese / "tex/metodologia.tex").read_text())

@@ -305,7 +305,8 @@ Tab.~\ref{tab:app-engine}, Fig.~\ref{fig:app-engines} &
   \texttt{*.stats.json}, \texttt{replay\_provenance.md} & --- \\
 Physical replay of controller-arm dispatch
   (\S\ref{sec:aic-physical-replay}); settled evidence commit
-  \texttt{2daa383} &
+  \texttt{6a8b2d7} (descendant carrying the D104/D105 gate and scope
+  corrections and the D108 provenance bank) &
   \texttt{simulation/ silicon\_\allowbreak anchor\_\allowbreak
   \{runner,extract\}.py};
   \texttt{verification/ silicon\_\allowbreak negative\_\allowbreak
@@ -316,8 +317,15 @@ Physical replay of controller-arm dispatch
   frozen dispatch/schedule inputs (\texttt{dispatch/});
   \texttt{burst3\_\allowbreak manifest\_\allowbreak excerpt.jsonl}
   (sha-pinned, full resume history);
-  \texttt{SETTLED\_\allowbreak EVIDENCE.md} (queue pin, declared
-  \SI{1}{\second} bound, engine/model/driver/clock policy);
+  \texttt{SETTLED\_\allowbreak EVIDENCE.md} (queue pin; pre-declared
+  \SI{1}{\second} bound; model weight/config sha256; explicit
+  no-container statement for the HF replay cells and the immutable
+  \texttt{vllm/vllm-openai:v0.22.0} digest for the cited vLLM anchor;
+  driver/clock policy); frozen schedules + banked stats under
+  \texttt{comparator\_\allowbreak frontier/eval/} (sha256 recorded in each
+  \texttt{dispatch/*.meta.json});
+  \texttt{burst3\_\allowbreak summary.json} (tracked aggregate, generated
+  by exactly \texttt{make\_\allowbreak burst3\_\allowbreak summary.py});
   \texttt{env\_\allowbreak snapshot\_\allowbreak 2026-07-28.json} &
   --- \\
 \end{longtable}}

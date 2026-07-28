@@ -353,7 +353,9 @@ batch membership and worker schedule fixed while recomputing start and
 finish times from the \emph{measured} per-batch service, yielding a
 physically-timed per-request encoder delay. Composition is deliberately not
 allowed to re-form, so this is a retiming, not a closed-loop
-re-simulation; the measured per-$N$ table bounds that approximation.
+re-simulation; the measured per-$N$ table supplies a second
+frozen-dispatch service representation for sensitivity, and does not test
+composition re-formation.
 
 The replicate estimand is the per-repetition retimed delay p99; five
 predeclared repetitions per arm, reported as mean~$\pm$ sample standard
@@ -378,8 +380,8 @@ supply. Scope is equally narrow in the other directions: the replay anchors
 construction), a single physical unit retimes a simulated multi-worker
 schedule, and windows without settled physical cells carry no physical
 claim. Every included repetition passes exact membership recovery
-(1{,}241/1{,}241 requests) and byte-exact reconstruction of the banked
-simulation percentiles, and a negative-gate suite asserts that corrupted
+(1{,}241/1{,}241 requests) and reconstruction of the banked simulation
+percentiles within the declared numerical tolerances, and a negative-gate suite asserts that corrupted
 membership, reordered dispatch, or changed engine, model, or clock
 fingerprints fail loudly rather than silently retime
 (Appendix~\ref{ap:artifacts} pins every raw artifact at the settled
