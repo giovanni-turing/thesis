@@ -1,159 +1,234 @@
 % Thesis root (lives in tex/). Self-contained under /home/gio/tese;
-% figures under ../figuras/. Build: latexmk -pdf tese.tex
-% NOTE (submission): the generic book class is a working substitute until
-% the institutional template (abnTeX2 / departmental class) is adopted;
-% committee page, catalog sheet, and the Portuguese title page come with it.
-\documentclass[12pt,a4paper]{book}
+% figures under ../figuras/. Build: latexmk (see ./latexmkrc)
+%
+% 2026-07-28: converted from the plain `book` class to the official IME-USP
+% model (gitlab.com/ccsl-usp/modelo-latex), vendored into this directory as
+% imegoodies.sty / imelooks.sty / evenragged.sty.  The pristine upstream
+% checkout lives at ../template/modelo-latex and is never read by the build.
+%
+% Deviation from the stock model, deliberate and documented:
+%   * option `nobiblatex` --- this manuscript's bibliography is a manually
+%     curated and verified `thebibliography` (tex/bibliografia-manual.tex).
+%     Converting it to biblatex/ABNT is a separate, later decision; until
+%     then imelooks must not force-load biblatex.
 
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage[main=english,brazil]{babel}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{siunitx}
-% Uniform digit grouping (phase 3.5): one separator style everywhere ---
-% commas, from four digits --- matching the manuscript's manual {,} usage.
+% A opção twoside (frente-e-verso) significa que a aparência das páginas pares
+% e ímpares pode ser diferente.  A última língua da lista é a principal: aqui
+% o texto é em inglês, com o português como língua secundária obrigatória
+% (resumo, título traduzido, capa).
+\documentclass[a4paper,12pt,twoside,brazilian,english]{book}
+
+% Quase todo o preâmbulo vive nas packages do modelo.
+\usepackage{imegoodies}
+
+% imegoodies define round-mode=places, o que faria \num{55.7} imprimir
+% "55.70".  Restauramos aqui exatamente a configuração de siunitx que o
+% manuscrito usava antes da conversão, para que nenhum número mude.
 \sisetup{round-mode=none, group-separator={,}, group-minimum-digits=4}
 \DeclareSIUnit{\flop}{FLOP}  % used by the aiconfigurator chapter (TFLOP/s)
-\usepackage{array}
-\usepackage{booktabs}
-\usepackage{longtable}
-\usepackage{graphicx}
-\graphicspath{{../}}  % figures live at repo root: ../figuras/
-\usepackage{microtype}
-\usepackage{url}
-\usepackage{tikz}
+
+\usepackage[thesis,nobiblatex]{imelooks}
+
+%\nocolorlinks % para impressão em P&B
+
+% As figuras da tese vivem na raiz do repositório (../figuras/...), e os
+% capítulos as referenciam como "figuras/eda/foo"; o primeiro caminho abaixo
+% preserva exatamente esse comportamento.
+\graphicspath{{../}{../figuras/}{figuras/}}
+
+% Bibliotecas tikz usadas pelos diagramas do capítulo 1 e da metodologia
+% (tikz e pgfplots já são carregados por imegoodies).
 \usetikzlibrary{positioning,arrows.meta,calc}
-\usepackage[hidelinks]{hyperref}
-\hypersetup{
-  pdftitle={Forecast-Informed Vision-Pool Provisioning for
-            Modality-Disaggregated Multimodal Serving},
-  pdfauthor={Giovanni Oliveira},
-  pdfsubject={Provisioning of modality-disaggregated multimodal model
-              serving from encoder-specific demand forecasts},
-  pdfkeywords={multimodal model serving; modality disaggregation;
-               autoscaling; time-series forecasting; GPU provisioning;
-               tail latency},
-  pdflang={en-US},
+
+% Comandos rápidos para mudar de língua (\en, \br, \texten{}, \textbr{}).
+\babeltags{br = brazilian, en = english}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% METADADOS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Nenhum \addbibresource: a bibliografia é manual (ver o final deste arquivo).
+
+% É possível definir como determinadas palavras podem (ou não) ser hifenizadas.
+\babelhyphenation{latexmk aiconfigurator}
+
+% O título é dado na língua principal do documento (inglês); \translatedtitle
+% é o título em português.  Ambos vão para a capa, a folha de rosto, o resumo
+% e os metadados do PDF.
+\title{Forecast-Informed Vision-Pool Provisioning for
+       Modality-Disaggregated Multimodal Serving}
+% Tradução: é exatamente o título em português que o manuscrito já trazia,
+% impresso acima do resumo antes da conversão.
+\translatedtitle{Provisionamento do \emph{Pool} de Visão Informado por
+                 Previsão para Serviço Multimodal Desagregado por Modalidade}
+
+\author{Giovanni Oliveira}
+
+\orientador{Prof. Dr. Fabio Kon}
+
+\coorientador{Prof. Dr. Emilio Francesquini}
+
+\banca{
+  Prof. Dr. Fabio Kon (orientador) -- IME-USP,
+  % TODO: confirmar demais membros da banca
+  Prof. Dr. Fulano de Tal -- IME-USP,
+  Prof. Dr. Beltrano de Tal -- IME-USP,
 }
 
-\title{Forecast-Informed Vision-Pool Provisioning for\\
-Modality-Disaggregated Multimodal Serving}
-\author{Giovanni Oliveira\\[2ex]
-{\normalsize Advisor: Prof.\ Dr.\ Fabio Kon}\\
-{\normalsize Co-advisor: Prof.\ Dr.\ Em\'ilio Francesquini}\\[2ex]
-{\normalsize Programa de P\'os-Gradua\c{c}\~ao em Ci\^encia da Computa\c{c}\~ao}\\
-{\normalsize Instituto de Matem\'atica e Estat\'istica}\\
-{\normalsize Universidade de S\~ao Paulo}\\
-{\normalsize S\~ao Paulo, Brasil}}
-\date{\today}
+% A página de rosto da versão para depósito (ou seja, a versão final antes da
+% defesa) é diferente da página de rosto da versão definitiva.  Sem a opção
+% "definitiva", o modelo imprime o texto da VERSÃO ORIGINAL, que é o correto
+% para o depósito.
+\tipotese{
+  mestrado,
+  %doutorado,
+  %tcc,
+  %definitiva, % descomentar após a defesa, na versão corrigida
+  %quali,
+  programa={Ciência da Computação},
+}
+
+\defesa{
+  local={São Paulo},
+  data=2026-07-28, % YYYY-MM-DD -- TODO: confirmar data exata da defesa
+}
+
+% TODO: se houve bolsa (CAPES/FAPESP/CNPq), descomente e preencha \apoio{...}.
+%\apoio{Durante o desenvolvimento deste trabalho o autor
+%       recebeu auxílio financeiro da XXXX}
+
+\direitos{CC-BY}
+
+% Ficha catalográfica.  Os campos que o autor conhece já estão preenchidos; os
+% campos atribuídos pela biblioteca (CDD/CDU, número de páginas final, cabeçalhos
+% de assunto normalizados) continuam como TODO.  Para gerar a versão oficial,
+% acesse https://fc.ime.usp.br, preencha o formulário e escolha "Gerar Código
+% LaTeX", colando o resultado aqui no lugar de todo o bloco abaixo.
+% TODO (biblioteca): substituir TODO o bloco abaixo pelo código gerado em
+% https://fc.ime.usp.br --- os itens marcados [TODO] são atribuídos pela
+% Biblioteca do IME no ato do depósito.
+\fichacatalografica{
+\begingroup
+\singlespacing
+\footnotesize
+\setlength{\parindent}{0pt}%
+\begin{center}
+\fbox{\begin{minipage}{12.5cm}
+\vspace{.4\baselineskip}
+
+Oliveira, Giovanni
+
+\hangindent=2em\hangafter=0
+Forecast-informed vision-pool provisioning for modality-disaggregated
+multimodal serving / Giovanni Oliveira; orientador Fabio Kon; coorientador
+Emilio Francesquini. -- São Paulo, 2026.\\{}[TODO: número de folhas].
+
+\hangindent=2em\hangafter=0
+Dissertação (Mestrado) -- Programa de Pós-Graduação em Ciência da Computação
+/ Instituto de Matemática e Estatística / Universidade de São Paulo.\\
+Bibliografia.\\
+Versão original.
+
+\hangindent=2em\hangafter=0
+1. Serviço de modelos multimodais. 2. Desagregação por modalidade.
+3. Autoescalonamento. 4. Previsão de séries temporais. 5. Provisionamento de
+GPU. 6. Latência de cauda. I. Kon, Fabio, orient. II. Francesquini, Emilio,
+coorient. III. Título.
+
+\hangindent=2em\hangafter=0
+[TODO: CDD/CDU atribuída pela biblioteca]
+
+\vspace{.4\baselineskip}
+\end{minipage}}
+\end{center}
+\endgroup
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%% AQUI COMEÇA O CONTEÚDO DE FATO %%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% CAPA E PÁGINAS INICIAIS %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \frontmatter
-\maketitle
 
-\chapter*{Abstract}
-\addcontentsline{toc}{chapter}{Abstract}
-Multimodal model serving increasingly disaggregates by modality: a
-vision-encoder pool turns images into embedding tokens, a language pool
-runs prefill and decode, and each is provisioned separately. The prevailing
-reactive practice --- scaling on request rate or utilization --- assumes
-those signals carry every pool's demand. This thesis builds and grades one
-complete operational chain for the pool where that assumption fails:
-an encoder-specific demand signal, a provisioning-horizon probabilistic
-forecast of it, a replica schedule derived from that forecast under startup
-delay, and window-level SLA/resource grading against matched controls.
-No ingredient is new; the chain, measured end to end, is the contribution.
+\pagestyle{plain}
 
-On a public production trace of a multimodal inference cluster (Azure, one
-million requests over seven days), request rate misrepresents vision demand:
-a constant-fraction model explains $R^2{=}0.12$ of the image-rate series
-against $0.65$ of decode demand, image arrivals are an order of magnitude
-burstier, and the two signals' extreme minutes are essentially disjoint.
-That same vision-borne signal is the most \emph{persistent} --- an
-autocorrelation half-life of 69 minutes against 9 for requests --- and
-zero-shot time-series foundation models forecast it with an empirically
-calibrated upper band edge (p90 coverage 0.88--0.90) that holds across the
-twelve-step horizon and inside burst windows. A two-pool simulation
-platform --- encoder costs collected on RTX~5090 silicon (submitted upstream
-to NVIDIA's aiconfigurator as a draft PR) and validated against the serving
-engine's own vision tower to within 12.8\%, composed with Dynamo's
-discrete-event language-pool simulator under AIC's shipped H100 timing
-database, not physically revalidated here ---
-reproduces the decoupling mechanically: on the steady head the pools'
-saturation knees sit an order of magnitude apart (vision uncrossed through
-$32\times$ the trace rate, the calibrated language knee at $2\times$),
-while inside the burst window both pools are already over their bounds at the
-trace's own rate through different mechanisms; and the encoder pool misses its
-tail bound at that same recorded rate, invisibly to rate- and
-utilization-based monitors.
+\onehalfspacing % Espaçamento 1,5 na capa e páginas iniciais
 
-Closing the loop under a single pre-frozen replay protocol yields a
-trade-off with an identified failure mode, not universal superiority: over the aggregate evaluation span the forecast and reactive
-encoder-delay quantiles coincide through p99 (p50/p90/p95/p99) while the
-upper tails differ,
-and the latency advantage lives in the one-minute onset. What forecasting
-buys at week scale is resource-time at equal compliance. Over the 5.60-day,
-749{,}601-request evaluation span the p90-forecast schedule holds the
-encoder tail bound at
-0.62$\times$ the deployable static encoder fleet's provisioned worker-time
-(669.7 against 1{,}074.8 worker-hours; the latency ordering against
-reactive is readiness-dependent and reported per readiness model), while a reactive controller granted a warm floor
-calibrated on the calibration split fails a held-out window \emph{under the
-shipped strict re-warm mechanics} --- that same calibration-frozen floor
-passes the post-hoc common-warm diagnostic --- and its
-cheapest all-passing member under those shipped mechanics ($M{=}6$) costs
-1.042$\times$ static. The floor sweep is a
-reactive-favorable \emph{post-hoc} envelope in which the forecast stays one
-fixed operating point and no symmetric forecast-plus-floor family was run:
-within it, the cheapest evaluation-passing floor under the readiness
-model most favorable to reactive (post-hoc common-warm $M{=}2$, a
-different member) costs 1.20$\times$ the forecast (the forecast uses
-16.5\% less worker-time; shipped-mechanics $M{=}6$: 1.67$\times$), with a perfect-information reference at 0.292$\times$ marking the
-remaining signal-quality headroom.
-Resource-time is reported per hardware class and never summed. As a
-secondary result, the forecast-driven language policy holds its SLA only
-through a tail-aware
-capacity conversion of the same forecast, and at its published operating
-point --- the calibrated band edge, p90 at conversion scale 8 --- it sits
-near break-even against static (0.965$\times$ time-matched, 1.03$\times$
-request-matched). A cheaper bracket exists with two distinct statuses,
-both points time-matched: 0.61$\times$ at the calibration-selected
-p70/scale-6 point, which drops the hardest daily-fold onset, and
-0.82$\times$ (0.87$\times$ request-matched) at p90/scale-6, a post-hoc
-re-selection of the quantile alone (the scale stays 6) that recovers it. The language-pool p90-versus-reactive verdict reproduces on
-the fastest-onset burst through Dynamo's real control plane with mocked
-engines (one live run per policy); the encoder cost model is anchored
-separately on RTX~5090 silicon, and the week-scale economics are simulated.
+\maketitle % capa, folha de rosto e ficha catalográfica
 
-\medskip
-\noindent\textbf{Keywords:} multimodal model serving; modality
-disaggregation; autoscaling; time-series forecasting; GPU provisioning;
-tail latency.
+%%%%%%%%%%%%%%%% AGRADECIMENTOS, RESUMO/ABSTRACT %%%%%%%%%%%%%%%%%%
 
-\begin{otherlanguage}{brazil}
-\chapter*{Resumo}
-\addcontentsline{toc}{chapter}{Resumo}
-\begin{center}
-{\large\bfseries Provisionamento do \emph{Pool} de Vis\~ao\\
-Informado por Previs\~ao para Servi\c{c}o\\
-Multimodal Desagregado por Modalidade}
-\end{center}
-\medskip
-\noindent
+% Dedicatória: omitida deliberadamente (opcional pelas normas).
+
+\chapter*{Agradecimentos}
+
+Agradeço ao meu orientador, Prof.\ Dr.\ Fabio Kon, e ao meu coorientador, Prof.\ Dr.\ Emilio Francesquini, pela orientação, pela
+liberdade de pesquisa e pelo rigor que moldaram este trabalho. Agradeço aos
+colegas do Instituto de Matemática e Estatística da Universidade de São Paulo
+(IME-USP) pelas discussões que enriqueceram esta dissertação, e aos membros da
+banca examinadora pelo tempo e pelas contribuições. Sou grato à minha família e
+aos meus amigos pelo apoio constante ao longo do mestrado.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% RESUMO / ABSTRACT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% ATENCAO: este bloco DEVE permanecer fisicamente dentro de tex/tese.tex.
+% verification/metric_stack_gate.py (bind D72) le o resumo e o abstract deste
+% arquivo e o selftest injeta suas sondas de corrupcao aqui; move-los para um
+% \input separado quebra o gate.  Por isso NAO usamos o conteudo/resumoabstract.tex
+% do modelo.
+
+% As palavras-chave sao obrigatorias, em portugues e em ingles, e devem ser
+% definidas antes do resumo/abstract.
+%
+% PROVENANCE: these two lists are NOT proposed --- they are the thesis's own
+% keyword lines, moved verbatim (term for term, same order) out of the
+% pre-conversion abstract/resumo bodies, where they were typed by hand as
+% "\textbf{Keywords:} ..." / "\textbf{Palavras-chave:} ...".  The IME model
+% typesets them itself from the two commands below, so the manual lines were
+% dropped from the bodies (that is the ONLY thing removed from either body).
+\palavraschave{servi\c{c}o de modelos multimodais,
+desagrega\c{c}\~ao por modalidade,
+autoescalonamento,
+previs\~ao de s\'eries temporais,
+provisionamento de GPU,
+lat\^encia de cauda}
+
+\keywords{multimodal model serving,
+modality disaggregation,
+autoscaling,
+time-series forecasting,
+GPU provisioning,
+tail latency}
+
+% O resumo e obrigatorio, em portugues e ingles. Estes comandos tambem
+% geram automaticamente a referencia para o proprio documento, conforme
+% as normas sugeridas da USP.
+%
+% CORPO VERBATIM: o texto abaixo e byte-identico ao resumo que estava em
+% tex/tese.tex antes da conversao (linhas 144-233), sem uma unica alteracao
+% de palavra.  Removidos apenas: o \begin{center}...\end{center} com o
+% titulo em portugues (o modelo o imprime a partir de \translatedtitle),
+% o \noindent inicial e a linha manual de palavras-chave (ver acima).
+\resumo{
 O servi\c{c}o de modelos multimodais tem se desagregado por modalidade: um
 \emph{pool} codificador de vis\~ao converte imagens em \emph{tokens} de
-\emph{embedding}, e um \emph{pool} de linguagem executa \emph{prefill} e
-\emph{decode}, cada um provisionado separadamente. A pr\'atica reativa
-vigente --- escalar pela taxa de requisi\c{c}\~oes ou pela utiliza\c{c}\~ao
---- assume que esses sinais carregam a demanda de todos os \emph{pools}.
-Esta tese constr\'oi e avalia uma cadeia operacional completa para o
-\emph{pool} em que essa hip\'otese falha: um sinal de demanda espec\'ifico
-do codificador, uma previs\~ao probabil\'istica desse sinal no horizonte de
-provisionamento, um cronograma de r\'eplicas derivado dessa previs\~ao sob
-atraso de inicializa\c{c}\~ao, e avalia\c{c}\~ao de SLA e de recursos por
-janela de avalia\c{c}\~ao contra controles pareados. Nenhum ingrediente \'e novo; a
-cadeia, medida de ponta a ponta, \'e a contribui\c{c}\~ao.
+\emph{embedding}, um \emph{pool} de linguagem executa \emph{prefill} e
+\emph{decode}, e cada um \'e provisionado separadamente. A pr\'atica
+reativa vigente --- escalar pela taxa de requisi\c{c}\~oes ou pela
+utiliza\c{c}\~ao --- assume que esses sinais carregam a demanda de todos os
+\emph{pools}. Esta tese constr\'oi e avalia uma cadeia operacional completa
+para o \emph{pool} em que essa hip\'otese falha: um sinal de demanda
+espec\'ifico do codificador, uma previs\~ao probabil\'istica desse sinal no
+horizonte de provisionamento, um cronograma de r\'eplicas derivado dessa
+previs\~ao sob atraso de inicializa\c{c}\~ao, e avalia\c{c}\~ao de SLA e de
+recursos por janela contra controles pareados. Nenhum ingrediente \'e novo;
+a cadeia, medida de ponta a ponta, \'e a contribui\c{c}\~ao.
 
 Em um \emph{trace} p\'ublico de produ\c{c}\~ao de um \emph{cluster} de
 infer\^encia multimodal (Azure, um milh\~ao de requisi\c{c}\~oes em sete
@@ -161,95 +236,113 @@ dias), a taxa de requisi\c{c}\~oes representa mal a demanda de vis\~ao: um
 modelo de fra\c{c}\~ao constante explica $R^2{=}0{,}12$ da s\'erie de taxa
 de imagens contra $0{,}65$ da demanda de \emph{decode}, as chegadas de
 imagens s\~ao uma ordem de magnitude mais intermitentes, e os minutos
-extremos dos dois sinais s\~ao essencialmente disjuntos. Esse mesmo sinal
-de vis\~ao \'e o mais \emph{persistente} --- meia-vida de
+extremos dos dois sinais s\~ao essencialmente disjuntos. O sinal de vis\~ao
+\'e tamb\'em o mais \emph{persistente} --- meia-vida de
 autocorrela\c{c}\~ao de 69 minutos contra 9 para requisi\c{c}\~oes --- e
 modelos de funda\c{c}\~ao de s\'eries temporais, em \emph{zero-shot}, o
-preveem com uma borda superior de banda empiricamente calibrada
-(cobertura p90 de 0,88--0,90) que se sustenta ao longo do horizonte de doze
-passos e dentro das janelas de rajada. Uma plataforma de simula\c{c}\~ao
-de dois \emph{pools} --- custos do codificador medidos em sil\'icio
-RTX~5090 (submetidos ao aiconfigurator da NVIDIA como \emph{draft PR}) e
+preveem com uma borda de banda empiricamente calibrada (cobertura p90 de
+0,88--0,90), sustentada ao longo do horizonte e dentro das rajadas. Uma plataforma de simula\c{c}\~ao de dois
+\emph{pools} --- custos do codificador medidos em sil\'icio RTX~5090 e
 validados contra a pr\'opria torre de vis\~ao do motor de servi\c{c}o com
-diferen\c{c}a de at\'e 12,8\%, compostos com o simulador de eventos
-discretos do Dynamo sob a base de tempos H100 distribu\'ida pelo AIC, n\~ao
-revalidada fisicamente neste trabalho --- reproduz o desacoplamento
-mecanicamente: no trecho est\'avel (\emph{steady head}) os \emph{pools}
-saturam a escalas separadas por uma ordem de magnitude (vis\~ao n\~ao
-cruzada at\'e $32\times$ a taxa do \emph{trace}, joelho da linguagem
-calibrada em $2\times$), ao passo que dentro da janela de rajada ambos
-os \emph{pools} j\'a est\~ao acima de seus limites na pr\'opria taxa do
-\emph{trace}, por mecanismos distintos; e o \emph{pool} codificador viola seu
-limite de cauda \emph{nessa mesma taxa registrada pelo trace}, de forma
-invis\'ivel a monitores de taxa e utiliza\c{c}\~ao.
+diferen\c{c}a de at\'e 12,8\%, compostos com o simulador de linguagem do
+Dynamo sob a base de tempos H100 distribu\'ida (n\~ao revalidada) ---
+reproduz o desacoplamento mecanicamente, e o \emph{pool}
+codificador viola seu limite de cauda na pr\'opria taxa registrada pelo
+\emph{trace}, de forma invis\'ivel a monitores de taxa e utiliza\c{c}\~ao.
 
-Fechando o la\c{c}o sob um protocolo \'unico de replay pr\'e-congelado, o resultado \'e um
-compromisso com um modo de falha identificado, e n\~ao superioridade
-universal: ao longo do intervalo agregado de avalia\c{c}\~ao os quantis de
-atraso do codificador da previs\~ao e do reativo coincidem at\'e o p99
-(p50/p90/p95/p99), com as caudas superiores diferindo, e a
-vantagem de lat\^encia reside no in\'icio de um minuto. O que a previs\~ao compra em
+Fechar o la\c{c}o sob um protocolo \'unico de \emph{replay} pr\'e-congelado
+resulta em um compromisso com um modo de falha identificado, n\~ao em
+superioridade universal: no intervalo agregado os quantis de atraso do
+codificador da previs\~ao e do reativo coincidem at\'e o p99
+(p50/p90/p95/p99), com as caudas superiores diferindo, e a vantagem de
+lat\^encia reside no in\'icio de um minuto. O que a previs\~ao compra em
 escala semanal \'e tempo de recurso a igual conformidade. No intervalo de
 avalia\c{c}\~ao de 5,60 dias (749\,601 requisi\c{c}\~oes) o cronograma de
-previs\~ao p90 sustenta o
-limite de cauda do codificador a 0,62$\times$ o
-tempo de \emph{workers} provisionado da frota est\'atica de codificadores
-implant\'avel (669,7 contra 1\,074,8 \emph{worker}-horas; a ordena\c{c}\~ao de
-lat\^encia frente ao reativo depende do modelo de prontid\~ao e \'e
-reportada por modelo), enquanto um controlador reativo dotado de um piso quente
-calibrado no conjunto de calibra\c{c}\~ao falha em uma janela reservada
-\emph{sob a mec\^anica original de reaquecimento estrito} --- esse mesmo piso
-congelado na calibra\c{c}\~ao passa no diagn\'ostico \emph{post hoc} de
-aquecimento comum --- e
-seu membro mais barato que passa sob essa mec\^anica original ($M{=}6$)
-custa 1,042$\times$ o est\'atico. A
-varredura de pisos \'e um envelope \emph{post hoc} favor\'avel ao reativo, no
-qual a previs\~ao permanece um \'unico ponto de opera\c{c}\~ao fixo e nenhuma
-fam\'ilia sim\'etrica de previs\~ao-mais-piso foi executada: dentro dele, o
-piso mais barato que passa a avalia\c{c}\~ao sob o modelo de
-prontid\~ao mais favor\'avel ao reativo (o $M{=}2$ \emph{post hoc} de
-aquecimento comum, um membro diferente) custa 1,20$\times$ a previs\~ao
-(a previs\~ao usa 16,5\% menos tempo de \emph{worker}; $M{=}6$ sob a
-mec\^anica original: 1,67$\times$), com uma refer\^encia de
-informa\c{c}\~ao perfeita a 0,292$\times$ marcando a margem restante de
-qualidade de sinal. O tempo de recurso \'e
-reportado por classe de \emph{hardware} e nunca somado. Como resultado
-secund\'ario, a pol\'itica de linguagem dirigida por previs\~ao sustenta sua
-SLA apenas por meio de
-uma convers\~ao de capacidade ciente de cauda da mesma previs\~ao, e em seu
-ponto de opera\c{c}\~ao publicado --- a borda calibrada da banda, p90 na
-escala de convers\~ao 8 --- fica perto do equil\'ibrio face ao est\'atico
-(0,965$\times$ pareado por tempo, 1,03$\times$ pareado por requisi\c{c}\~oes).
-Uma faixa mais barata existe com dois estatutos distintos, ambos os
-pontos pareados por tempo: 0,61$\times$ no ponto p70/escala~6 selecionado
-pela calibra\c{c}\~ao, que perde o in\'icio de dobra di\'aria mais
-dif\'icil, e 0,82$\times$ (0,87$\times$ pareado por requisi\c{c}\~oes) em
-p90/escala~6, uma reescolha \emph{post hoc} apenas do quantil (a escala
-permanece 6) que o recupera.
-Na rajada de in\'icio mais r\'apido, o par de veredictos p90-versus-reativo
-do \emph{pool} de linguagem se reproduz atrav\'es do plano de controle real
-do Dynamo com \emph{engines} simulados (uma execu\c{c}\~ao ao vivo por
-pol\'itica); o modelo de custo do codificador \'e ancorado separadamente em
-sil\'icio RTX~5090, e a economia em escala semanal \'e simulada.
+previs\~ao p90 sustenta o limite de cauda do codificador a 0,62$\times$ o
+tempo de \emph{workers} provisionado da frota est\'atica implant\'avel
+(669,7 contra 1\,074,8 \emph{worker}-horas), enquanto o piso quente reativo
+mais barato que passa a avalia\c{c}\~ao custa de 1,20$\times$ a
+1,67$\times$ o tempo de \emph{worker} da previs\~ao conforme o modelo de
+prontid\~ao (membros distintos, dentro de uma varredura de pisos
+\emph{post hoc} favor\'avel ao reativo), e uma refer\^encia de
+informa\c{c}\~ao perfeita a 0,292$\times$ marca a margem restante de
+qualidade de sinal. A pol\'itica secund\'aria de linguagem, sob convers\~ao de capacidade
+ciente de cauda, fica em quase-equil\'ibrio face ao est\'atico
+(0,965$\times$ por tempo, 1,03$\times$ por requisi\c{c}\~oes). O
+veredicto de rajada se reproduz no plano de controle real do Dynamo
+(\emph{engines} simulados) e sobrevive \`a re-execu\c{c}\~ao dos
+despachos congelados em sil\'icio RTX~5090 f\'isico; a economia em
+escala semanal permanece simulada.
+}
 
-\medskip
-\noindent\textbf{Palavras-chave:} servi\c{c}o de modelos multimodais;
-desagrega\c{c}\~ao por modalidade; autoescalonamento; previs\~ao de
-s\'eries temporais; provisionamento de GPU; lat\^encia de cauda.
-\end{otherlanguage}
+% CORPO VERBATIM: byte-identico ao abstract que estava em tex/tese.tex antes
+% da conversao (linhas 57-127).  Removida apenas a linha manual de keywords.
+\abstract{
+Multimodal model serving increasingly disaggregates by modality: a
+vision-encoder pool turns images into embedding tokens, a language pool
+runs prefill and decode, and each is provisioned separately. The prevailing
+reactive practice --- scaling on request rate or utilization --- assumes
+those signals carry every pool's demand. This thesis builds and grades one
+complete operational chain for the pool where that assumption fails: an
+encoder-specific demand signal, a provisioning-horizon probabilistic
+forecast of it, a replica schedule derived from that forecast under startup
+delay, and window-level SLA/resource grading against matched controls. No
+ingredient is new; the chain, measured end to end, is the contribution.
 
-\tableofcontents
+On a public production trace of a multimodal inference cluster (Azure, one
+million requests over seven days), request rate misrepresents vision
+demand: a constant-fraction model explains $R^2{=}0.12$ of the image-rate
+series against $0.65$ of decode demand, image arrivals are an order of
+magnitude burstier, and the two signals' extreme minutes are essentially
+disjoint. The vision signal is also the most \emph{persistent} --- an
+autocorrelation half-life of 69 minutes against 9 for requests --- and
+zero-shot time-series foundation models forecast it with an empirically
+calibrated band edge (p90 coverage 0.88--0.90) that holds across the
+twelve-step horizon and inside burst windows. A two-pool simulation
+platform --- encoder costs collected on RTX~5090 silicon and validated
+against the serving engine's own vision tower within 12.8\%, composed with
+Dynamo's language-pool simulator under AIC's shipped (not physically
+revalidated) H100 timing database --- reproduces the decoupling
+mechanically, and the encoder pool misses its tail bound at the trace's own
+recorded rate, invisibly to rate- and utilization-based monitors.
+
+Closing the loop under a single pre-frozen replay protocol yields a
+trade-off with an identified failure mode, not universal superiority: over
+the aggregate span the forecast and reactive encoder-delay quantiles
+coincide through p99 (p50/p90/p95/p99) while the upper tails differ, and
+the latency advantage lives in the one-minute onset. What forecasting buys
+at week scale is resource-time at equal compliance. Over the 5.60-day,
+749{,}601-request evaluation span the p90-forecast schedule holds the
+encoder tail bound at 0.62$\times$ the deployable static encoder fleet's
+provisioned worker-time (669.7 against 1{,}074.8 worker-hours), while the
+cheapest evaluation-passing reactive warm floor costs 1.20$\times$ to
+1.67$\times$ the forecast's worker-time depending on readiness model
+(different floor members, inside a reactive-favorable post-hoc floor
+sweep), and a perfect-information reference at 0.292$\times$ marks the
+remaining signal-quality headroom. A secondary forecast-driven language
+policy reaches only near break-even against static (0.965$\times$
+time-matched, 1.03$\times$ request-matched) through a tail-aware capacity
+conversion of the same forecast. The burst-window forecast-versus-reactive
+verdict reproduces through Dynamo's real control plane with mocked engines,
+and the arms' frozen dispatches replayed on physical RTX~5090 silicon
+preserve it; week-scale economics remain simulated.
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% LISTAS DE FIGURAS ETC. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \cleardoublepage
-\phantomsection
-\addcontentsline{toc}{chapter}{\listfigurename}
-\listoffigures
-\cleardoublepage
-\phantomsection
-\addcontentsline{toc}{chapter}{\listtablename}
-\listoftables
+
+\newcommand\disablenewpage[1]{{\let\clearpage\par\let\cleardoublepage\par #1}}
+
+\bgroup
+\raggedbottom
+
+%%%%% Lista criada manualmente
+% Conteúdo idêntico ao "List of Abbreviations" da versão pré-conversão.
 
 \chapter*{List of Abbreviations}
-\addcontentsline{toc}{chapter}{List of Abbreviations}
+
 \begin{tabular}{@{}ll@{}}
 ACF & autocorrelation function \\
 AIC & \textit{aiconfigurator}, NVIDIA's offline deployment planner \\
@@ -272,7 +365,31 @@ ViT & Vision Transformer \\
 WAPE & weighted absolute percentage error \\
 \end{tabular}
 
+\clearpage
+
+%%%%% Listas criadas automaticamente
+
+\disablenewpage{\listoffigures}
+
+\disablenewpage{\listoftables}
+
+% \listof{program} desativado: a dissertação não contém floats do tipo
+% "program"; a lista vazia deixaria um título órfão antes do sumário.
+
+% Sumário (obrigatório)
+\tableofcontents
+
+\egroup % Final de "raggedbottom"
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CAPÍTULOS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \mainmatter
+
+\pagestyle{mainmatter}
+
+% Espaçamento simples
+\singlespacing
 
 % Chapter order after the 2026-07-26 restructure (thesis_shortening_plan_v3):
 % 1 intro, 2 related, 3 methodology & platform (merged aiconfigurator +
@@ -288,9 +405,36 @@ WAPE & weighted absolute percentage error \\
 \include{closedloop}
 \include{conclusion}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% APÊNDICES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\cleardoublepage
+
+\pagestyle{appendix}
+
 \appendix
+
+\addappheadtotoc
+
 \include{apendice}
 
+
+%%%%%%%%%%%%%%% SEÇÕES FINAIS (BIBLIOGRAFIA) %%%%%%%%%%%%%%%%
+
+\backmatter
+
+\pagestyle{backmatter}
+
+% Espaço adicional no sumário antes das referências
+\addtocontents{toc}{\vspace{2\baselineskip plus .5\baselineskip minus .5\baselineskip}}
+
+% A bibliografia é obrigatória.  Ela é MANUALMENTE CURADA E VERIFICADA e por
+% isso permanece aqui, byte-a-byte como na versão pré-conversão, ao invés de
+% ser convertida para biblatex/ABNT (decisão adiada) --- daí a opção
+% `nobiblatex` passada a imelooks.  Mantê-la DENTRO de tese.tex também é o que
+% preserva a cobertura de verification/style_immutability.py, cujo baseline
+% conta os literais numéricos deste arquivo.
+% tocbibind (carregada por imelooks) já insere a bibliografia no sumário.
 % Minimal bibliography so the build resolves \cite without biber.
 \begin{thebibliography}{99}
 \bibitem{Qiu2025ModServe}
@@ -647,5 +791,7 @@ J.~Cho, H.~Choi, G.~Heo, J.~Park.
 Disaggregated LLM Serving Infrastructure}.
 2026. arXiv:2602.23036.
 \end{thebibliography}
+
+% \printindex omitido: o texto não usa \index.
 
 \end{document}

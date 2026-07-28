@@ -3524,3 +3524,30 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   layout sweep). ZERO standing findings anywhere: manuscript 135pp 0/0,
   crib 62pp/134Q 0/0, deck both mirrors gate-bound, evidence pins
   6a8b2d7 (burst3) / 1511606 (tier-3), suite DELIVERY-READY.
+
+## ime-template-conversion + one-page-abstracts (2026-07-28)
+
+- **What**: tese.tex converted from plain book to the official IME-USP
+  model (fresh upstream clone ccsl-usp/modelo-latex @ cb57593, pristine
+  under template/; imegoodies/imelooks/evenragged/lstpseudocode vendored
+  into tex/). Full mestrado front matter: capa, folha de rosto (versão
+  original), ficha catalográfica (library TODOs), agradecimentos, resumo
+  PT + abstract EN INLINE in tese.tex (gate D72 binds read that path —
+  agent restructured rather than touch bound text), abbreviations, model
+  lists. nobiblatex option preserves the verified manual bibliography.
+  Exactly ONE chapter touch (metodologia allowbreak). 109pp (18 roman +
+  91 arabic; was 135 under book). Textwidth 390→432.48pt: figures were
+  being downscaled 0.91× under book, now render at design size
+  (1.008–1.011×). Overfulls 0. Gate OK + selftest ALL PASS; build 0/0.
+- **Abstracts compressed to one page each** (user directive): EN 688→439
+  words, PT 917→~530; all four D72 population binds verbatim; five-beat
+  arc + headline set retained with ruled scopes (post-hoc floor sweep
+  form, near-tie form, sensitivity-not-bound); chapter-grade mechanics
+  (floor-member taxonomy, two-status language bracket, strict-rewarm
+  narrative) moved out of abstract scope entirely. Verified one page each
+  in the rendered PDF.
+- **Deferred for user/advisor decision**: bibliography ABNT conformity
+  (numeric first-citation order + hand-formatted thebibliography vs
+  plainnat-ime author-year; "Bibliography" vs "Referências"); banca
+  members TODO; ficha CDD/folhas TODOs (library).
+- **Feeds**: bridge conversion round (180).

@@ -1,0 +1,1 @@
+upstream: https://github.com/ccsl-usp/modelo-latex @ cb57593 (2026-06-18), .git stripped for vendoring

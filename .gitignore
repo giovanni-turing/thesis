@@ -32,6 +32,10 @@ tex/*.fls
 tex/*.fdb_latexmk
 tex/*.synctex.gz
 tex/tese.pdf
+tex/*.idx
+tex/*.ind
+tex/*.ilg
+tex/mkidxhead.ist
 # Beamer defense slides: keep slides.tex + .latexmkrc + fig/ (scripts+figures), drop aux + compiled deck
 slides/slides.pdf
 slides/slides.aux

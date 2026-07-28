@@ -769,7 +769,7 @@ realigned to wall time; the offline virtual clock can never stall. Decision
 \emph{count} is therefore not exactly reproducible live; decision
 \emph{values} at matching times are.
 \item[Budget units differ between paths.] The offline replay caps replicas
-at \texttt{max\_gpu\_budget}; the live planner divides the same field by
+at \texttt{max\_\allowbreak gpu\_\allowbreak budget}; the live planner divides the same field by
 GPUs-per-replica, and the anchor equalizes the caps. The cap \emph{does}
 bind here: the tail-aware forecast requests up to 11 language replicas
 against the equalized four-replica (8-GPU) cap, so it reshapes the

@@ -1,0 +1,330 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%% INSERINDO COMENTÁRIOS EM ARQUIVOS .bib %%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% 1. Como em outros arquivos LaTeX, comentários são iniciados por "%" e,
+%    portanto, é preciso usar "\%" para imprimir o caractere "%". Esquecer
+%    disso pode gerar erros difíceis de encontrar!
+%
+% 2. Não é possível inserir comentários dentro de uma entrada, apenas fora.
+%
+% 3. Não é possível incluir o caractere arroba em um comentário.
+%
+% 4. Se quiser desabilitar temporariamente um campo ("comentar" o campo),
+%    troque seu nome para algum nome inválido, como "author-disable".
+%    Se quiser fazer alguma observação permanente dentro de uma entrada,
+%    você também pode usar algum nome de campo inválido, como "lembrete",
+%    ou usar o campo "annotation", que normalmente é ignorado.
+%
+% 5. Se quiser desabilitar temporariamente uma entrada inteira ("comentar" a
+%    entrada), não basta colocar "%" nas linhas correspondentes por causa do
+%    caractere arroba; também é preciso remover a arroba.
+%
+% 6. Na verdade, as regras não são bem essas, mas segui-las é uma boa ideia:
+%    https://tex.stackexchange.com/a/262282
+%
+% Por exemplo, esta entrada está comentada, ou seja, não tem efeito: se
+% houvesse uma referência a ela no texto, a referência ficaria inválida.
+% Observe que, para isso, o caractere arroba antes de "book" foi apagado!
+%
+%book{JW07,
+% author    = {Richard A. Johnson and Dean W. Wichern},
+% title     = {Applied Multivariate Statistical Analysis},
+% publisher = {Pearson Prentice Hall},
+% edition   = 6,
+% year      = {2007},
+% isbn      = {978-0131877153},
+% location  = {Upper Saddle River NJ},
+%}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% O CAMPO "MONTH" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% biblatex prefere o uso do campo "date" para definir ano, mês etc. No
+% entanto, se você quiser garantir compatibilidade tanto com biblatex
+% quanto com bibtex, use os campos "year" e "month". Ambos reconhecem
+% diversos formatos para o campo "month", mas apenas um funciona
+% corretamente com os dois: o nome do mês em inglês, abreviado com três
+% letras minúsculas e sem chaves, ou seja:
+%
+% ...
+% title  = {Some title},
+% author = {Somebody},
+% year   = {2011},
+% month  = oct,
+% ...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Algumas entradas não são usadas em poster.tex ou apresentacao.tex, mas
+% isso não é um problema: você pode ter um banco de dados com todos os
+% papers de seu interesse e, em um dado texto, citar apenas alguns deles.
+
+
+@book{eco:09,
+ author     = {Umberto Eco},
+ title      = {Como se Faz uma Tese},
+ edition    = 22,
+ publisher  = {Perspectiva},
+ translator = {Gilson César Cardoso de Souza},
+ year       = {2009},
+ location   = {São Paulo},
+ isbn       = {978-85-273-0079-7},
+}
+
+@book{zobel:14,
+ author    = {Justin Zobel},
+ title     = {Writing for Computer Science},
+ publisher = {Springer London},
+ edition   = 3,
+ year      = {2014},
+ isbn      = {978-1-4471-6638-2},
+ doi       = {10.1007/978-1-4471-6639-9},
+}
+
+@book{waz:20,
+ author    = {Raul S. Wazlawick},
+ title     = {Metodologia de Pesquisa para Ciência da Computação},
+ publisher = {GEN LTC},
+ edition   = 3,
+ year      = {2020},
+ isbn      = {978-8595151093},
+}
+
+@book{higham:19,
+ author    = {Nicholas J. Higham},
+ title     = {Handbook of Writing for the Mathematical Sciences},
+ edition   = 3,
+ publisher = {{SIAM: Society for Industrial and Applied Mathematics}},
+ month     = dec,
+ year      = {2019},
+ isbn      = {978-1611976090},
+}
+
+@book{knuth:96,
+ author    = {Donald E. Knuth and Tracy Larrabee and Paul M. Roberts},
+ title     = {Mathematical Writing},
+ publisher = {The Mathematical Association of America},
+ month     = sep,
+ year      = {1996},
+ isbn      = {978-0883850633},
+}
+
+@article{floats2014,
+ author          = {Frank Mittelbach},
+ title           = {How to influence the position of float environments
+                   like figure and table in \LaTeX?},
+ journal         = {TUGboat},
+ journalsubtitle = {Communications of the \TeX\ Users Group},
+ volume          = {35},
+ number          = {3},
+ year            = 2014,
+ url             = {tug.org/TUGboat/tb35-3/tb111mitt-float.pdf},
+ urldate         = {2020-01-09},
+ publisher       = {\TeX\ {Users} {Group}},
+ address         = {Portland (OR), USA},
+}
+
+% O campo "year" é usado por bibtex; biblatex pode usar "year" ou "date"
+@manual{natbib,
+ title   = {Reference sheet for \texttt{natbib} usage},
+ author  = {Patrick W. Daly},
+ year    = {2010},
+ date    = {2010-09-13},
+ urldate = {2018-12-20},
+ url     = {mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf},
+}
+
+@manual{biblatex,
+ title   = {The \texttt{biblatex} Package},
+ author  = {Philip Kime and Moritz Wemheuer and Philipp Lehman},
+ year    = 2024,
+ date    = {2024-03-21},
+ urldate = {2025-01-29},
+ url     = {mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdf},
+}
+
+@article{alon09:how,
+ author    = {Uri Alon},
+ title     = {How To Choose a Good Scientific Problem},
+ journal   = {Molecular Cell},
+ year      = {2009},
+ volume    = {35},
+ number    = {6},
+ pages     = {726--728},
+ publisher = {Cell Press},
+ month     = sep,
+ doi       = {10.1016/j.molcel.2009.09.013},
+ pages     = {726--728},
+ issn      = {1097-2765},
+}
+
+@book{tufte01:visualDisplay,
+ author    = {Edward Tufte},
+ title     = {The Visual Display of Quantitative Information},
+ year      = {2001},
+ edition   = 2,
+ publisher = {Graphics Press},
+ month     = may,
+ isbn      = {978-1930824133},
+ location  = {Cheshire CT},
+}
+
+@manual{usp:guidelines,
+ author      = {{Universidade de São Paulo -- Sistema Integrado
+                de Bibliotecas}},
+ shortauthor = {SIBiUSP},
+ title       = {Diretrizes para Apresentação de
+                Dissertações e Teses da {USP}:
+                Documento Eletrônico e Impresso},
+ year        = 2016,
+ url         = {www.teses.usp.br/index.php?option=com_content&view=article&id=52&Itemid=67},
+ urldate     = {2025-01-29},
+}
+
+@unpublished{carlis:09,
+ author  = {John V. Carlis},
+ title   = {Design: The Key to Writing (and Advising)
+            a One-Draft {Ph.D} Dissertation},
+ year    = 2009,
+ month   = oct,
+ url     = {www-users.cs.umn.edu/~carlis/one-draft.pdf},
+ urldate = {2017-11-10},
+}
+
+@book{craftresearch,
+ author    = {Wayne C. Booth and Gregory G. Colomb and Joseph M. Williams
+              and Joseph Bizup and William T. FitzGerald},
+ title     = {The Craft of Research},
+ publisher = {The University of Chicago Press},
+ year      = 2024,
+ edition   = 5,
+ isbn      = {978-0226826677},
+}
+
+@book{dissertjourney,
+ author    = {Laura Hyatt and Carol M. Roberts},
+ title     = {The Dissertation Journey},
+ publisher = {Corwin Press},
+ year      = 2023,
+ edition   = 4,
+ location  = {Thousand Oaks, CA},
+ isbn      = {978-1071891285},
+}
+
+@online{gnu83,
+ title   = {new {Unix} implementation},
+ author  = {Richard Stallman},
+ year    = 1983,
+ month   = sep,
+ url     = {www.gnu.org/gnu/initial-announcement.en.html},
+ urldate = {2025-01-29},
+}
+
+@online{FSF,
+ shortauthor = {FSF},
+ title       = {{Free Software Foundation} website},
+ year        = 2007,
+ urldate     = {2010-01-30},
+ url         = {www.gnu.org},
+}
+
+@manual{sbctemplate,
+ author  = {Luciana P. Nedel and Rafael H. Bordini
+            and Flávio Rech Wagner and Jomi F. Hübner},
+ title   = {Instructions for Authors of {SBC} Conferences
+            Papers and Abstracts},
+ year    = 2017,
+ url     = {www.sbc.org.br/documentos-da-sbc/category/169-templates-para-artigos-e-capitulos-de-livros},
+ urldate = {2018-12-13},
+}
+
+@techReport{yoon23,
+ author      = {Ana Y. F. de Lima and Fabio Kon},
+ title       = {Impacts of the {COVID-19} pandemic on
+                the bicycle sharing system in {São Paulo}},
+ institution = {Department of Computer Science, Institute of Mathematics
+                and Statistics, University of São Paulo},
+ year        = {2023},
+ month       = dec,
+ number      = {RT-MAC-2023-01},
+ url         = {interscity.org/assets/Technical_Report_Tembici_COVID.pdf},
+}
+
+@mastersThesis{shannon,
+ author  = {Claude Elwood Shannon},
+ title   = {A symbolic analysis of relay and switching circuits},
+ school  = {Massachusetts Institute of Technology
+            -- Dept. of Electrical Engineering},
+ address = {Cambridge MA},
+ year    = 1940,
+ url     = {hdl.handle.net/1721.1/11173},
+}
+
+@phdThesis{curie,
+ author  = {Marie Curie},
+ title   = {Recherches sur les substances radioactives},
+ school  = {Faculté des Sciences de Paris},
+ year    = 1903,
+ month   = jun,
+ url     = {catalogue.bnf.fr/ark:/12148/cb302919009},
+ urldate = {2025-01-29},
+}
+
+@inCollection{gridpat,
+ author    = {Raphael Yokoingawa de Camargo and Andrei Goldchleger
+              and Márcio Rodrigo de Freitas Carneiro and Fabio Kon},
+ title     = {The {Grid} architectural pattern},
+ subtitle  = {Leveraging Distributed Processing Capabilities},
+ booktitle = {Pattern Languages of Program Design},
+ series    = {Software patterns},
+ number    = 5,
+ editor    = {Dragos Manolescu and Markus Voelter and James Noble},
+ year      = 2006,
+ month     = apr,
+ isbn      = {978-0321321947},
+ publisher = {Addison-Wesley Professional},
+}
+
+@inProceedings{dbevolution,
+ author    = {Nepomuceno, Pedro Ivo Siqueira and Braghetto, Kelly Rosa},
+ title     = {Managing Semantic Evolutions in Semi-Structured Data},
+ booktitle = {Database and Expert Systems Applications:
+              {DEXA} 2023 proceedings, part {I}},
+ year      = {2023},
+ month     = aug,
+ series    = {Lecture Notes in Computer Science},
+ volume    = {14146},
+ isbn      = {978-3-031-39847-6},
+ publisher = {Springer, Cham},
+ location  = {Berlin, Heidelberg},
+ doi       = {10.1007/978-3-031-39847-6_12},
+ pages     = {179--185},
+ venue     = {Penang, Malaysia},
+ eventdate = {2023-08-28/2023-08-30},
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% URLS DO SOFTWARE HERITAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+@online{soft-with-style,
+    author={{Sofware Heritage}},
+    title={Citing software with style},
+    url={www.softwareheritage.org/2020/05/26/citing-software-with-style/},
+    date={2020-05-26},
+}
+
+@softwareversion{mlh-archiver,
+  author = {Passos, Rafael and Pilone, Arthur and Mendes, Eduardo
+            and Tadokoro, David and Meirelles, Paulo},
+  organization = {University of São Paulo},
+  license = {GPL-3.0},
+  date = {2025-10-11},
+  repository = {https://github.com/linux-duks/Mailing-Lists-Archiver.git},
+  title = {Mailing Lists Archiver},
+  version = {1},
+  swhid = {swh:1:dir:9ba7404353ec9088d9e669dcc2455ecd902a0a75;origin=https://github.com/linux-duks/Mailing-Lists-Archiver;visit=swh:1:snp:5ebd4b2f7e9914ca6fece58bead6bcfd7b94e495;anchor=swh:1:rev:f98b97e004e5e4cf24cd8198d37c6233548c3ed3},
+}
