@@ -1,0 +1,120 @@
+{
+ "note": "span-level language-pool stack over the 5.60-day evaluation span (749,601 requests, the encoder stack's population); derived from the tracked week planner-replay reports; language replica lead L=60 s by construction (evidence: llm_week/launch.sh and the results ledger, NOT report filenames -- the upstream 'L30' in encoder-schedule names is the encoder's issued forecast lead, a different protocol); total masses are mean x N (a post-hoc threshold-integrated magnitude synthesis; TTFT p99 remains the declared contract statistic). The frozen endpoint remains the declared TTFT/ITL p99 SLAs with per-window grading as the compliance gate.",
+ "population": {
+  "num_requests": 749601,
+  "input_tokens_total": 2205332831,
+  "output_tokens_total": 140631564,
+  "processed_tokens_total": 2345964395,
+  "identical_across_all_five_reports": true
+ },
+ "lead_config": {
+  "launch.sh": {
+   "lead_s": 60,
+   "occurrences": 2
+  },
+  "run_llm_week_p50.sh": {
+   "lead_s": 60,
+   "occurrences": 1
+  },
+  "run_llm_week_models.sh": {
+   "lead_s": 60,
+   "occurrences": 1
+  },
+  "lead_s": 60
+ },
+ "arms": {
+  "forecast_p90_chronos": {
+   "report": "week_fc_p90.report.json",
+   "num_requests": 749601,
+   "gpu_hours": 518.6,
+   "ttft_ms": {
+    "p50": 22.7,
+    "p75": 42.2,
+    "p90": 96.7,
+    "p95": 178.9,
+    "p99": 651.1
+   },
+   "ttft_mean_ms": 58.16,
+   "ttft_max_ms": 4365.9,
+   "itl_p99_ms": 6.41,
+   "total_ttft_mass_request_s": 43598.8,
+   "total_e2e_mass_request_s": 692901.7
+  },
+  "forecast_p90_toto": {
+   "report": "week_fc_p90_toto.report.json",
+   "num_requests": 749601,
+   "gpu_hours": 625.3,
+   "ttft_ms": {
+    "p50": 22.5,
+    "p75": 42.1,
+    "p90": 96.8,
+    "p95": 178.6,
+    "p99": 651.1
+   },
+   "ttft_mean_ms": 57.82,
+   "ttft_max_ms": 4365.9,
+   "itl_p99_ms": 6.31,
+   "total_ttft_mass_request_s": 43342.2,
+   "total_e2e_mass_request_s": 688656.5
+  },
+  "forecast_p90_timesfm": {
+   "report": "week_fc_p90_timesfm.report.json",
+   "num_requests": 749601,
+   "gpu_hours": 641.1,
+   "ttft_ms": {
+    "p50": 22.5,
+    "p75": 42.1,
+    "p90": 97.2,
+    "p95": 179.6,
+    "p99": 651.1
+   },
+   "ttft_mean_ms": 58.25,
+   "ttft_max_ms": 4365.9,
+   "itl_p99_ms": 6.29,
+   "total_ttft_mass_request_s": 43662.2,
+   "total_e2e_mass_request_s": 688480.9
+  },
+  "forecast_p50": {
+   "report": "week_fc_p50.report.json",
+   "num_requests": 749601,
+   "gpu_hours": 319.9,
+   "ttft_ms": {
+    "p50": 24.4,
+    "p75": 52.7,
+    "p90": 129.4,
+    "p95": 343.4,
+    "p99": 827.8
+   },
+   "ttft_mean_ms": 74.91,
+   "ttft_max_ms": 8398.5,
+   "itl_p99_ms": 13.34,
+   "total_ttft_mass_request_s": 56152.0,
+   "total_e2e_mass_request_s": 768763.9
+  },
+  "reactive_stock_planner": {
+   "report": "week_re.report.json",
+   "num_requests": 749601,
+   "gpu_hours": 281.8,
+   "ttft_ms": {
+    "p50": 25.1,
+    "p75": 58.8,
+    "p90": 157.5,
+    "p95": 501.9,
+    "p99": 1196.6
+   },
+   "ttft_mean_ms": 92.94,
+   "ttft_max_ms": 6387.8,
+   "itl_p99_ms": 21.28,
+   "total_ttft_mass_request_s": 69671.3,
+   "total_e2e_mass_request_s": 829655.2
+  }
+ },
+ "derived": {
+  "reactive_over_fc_spend": 0.5434,
+  "fc_ttft_mass_reduction_pct": 37.4,
+  "fc_e2e_mass_reduction_pct": 16.5,
+  "p99_ttft_model_invariant_ms": [
+   651.1
+  ]
+ }
+}

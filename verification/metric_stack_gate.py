@@ -49,9 +49,16 @@ def fmt_1dp(v):
 
 
 def rx(pattern, text, errs, why):
-    """Role-scoped regex bind: whitespace-tolerant, order-enforcing."""
+    """Role-scoped regex bind: order-enforcing. `text` must be
+    whitespace-normalized (see norm()); patterns use plain single spaces, so
+    line wrapping can never false-negative a correct sentence (msg 221)."""
     if not re.search(pattern, text):
         errs.append(f"role-bind missing: {why}")
+
+
+def norm(s):
+    """Collapse all whitespace runs to single spaces for role binding."""
+    return re.sub(r"\s+", " ", s)
 
 
 def row_cells(line):
@@ -67,7 +74,8 @@ def bind(tese: Path) -> list:
     arms = {r["arm"]: r for r in ms["arms"]}
     tex = (tese / "tex/closedloop.tex").read_text()
     conc = (tese / "tex/conclusion.tex").read_text()
-    W = r"[\s\n]+"   # line-wrap tolerant separator
+    texn, concn = norm(tex), norm(conc)   # for role binds (msg 221)
+    W = " "   # patterns use plain spaces; rx() input is normalized
 
     # 1. generated ladder completeness
     for arm in ("forecast_p90", "reactive"):
@@ -113,16 +121,13 @@ def bind(tese: Path) -> list:
         errs.append(f"p99.99 artifact drift: {q_fc['99.99']} / {q_re['99.99']}")
     rx(r"p99\.99 \(\\num\{" + re.escape(f"{round(q_fc['99.99'], 1)}")
        + r"\} against" + W + r"\\SI\{" + re.escape(f"{round(q_re['99.99'], 1)}")
-       + r"\}\{\\milli\\second\}\)",
-       tex, errs, "p99.99 pair in artifact order (forecast first)")
+       + r"\}\{\\milli\\second\}\)", texn, errs, "p99.99 pair in artifact order (forecast first)")
     rx(r"at p99\.5 \(\\num\{" + re.escape(f"{round(q_fc['99.5'], 1)}") + r"\} against" + W
-       + r"\\num\{" + re.escape(f"{round(q_re['99.5'], 1)}") + r"\}\)",
-       tex, errs, "p99.5 pair in artifact order")
+       + r"\\num\{" + re.escape(f"{round(q_re['99.5'], 1)}") + r"\}\)", texn, errs, "p99.5 pair in artifact order")
     m2 = arms["warm_floor_M2"]
     if round(m2["delay_quantiles_all_ms"]["99.99"], 1) != 6933.1:
         errs.append("M2 p99.99 artifact drift")
-    rx(r"\$M\{=\}2\$'s p99\.99, \\num\{6933\.1\}, sits above the forecast's",
-       tex, errs, "M2 p99.99 exception clause")
+    rx(r"\$M\{=\}2\$'s p99\.99, \\num\{6933\.1\}, sits above the forecast's", texn, errs, "M2 p99.99 exception clause")
 
     saving = (1 - fc["worker_s"] / rea["worker_s"]) * 100
     if round(saving, 1) != 7.7:
@@ -131,12 +136,10 @@ def bind(tese: Path) -> list:
     if (ws_fc, ws_re) != ("2410754.7", "2611319.7"):
         errs.append("worker-second operands drifted from printed values")
     rx(r"provisions \\num\{" + re.escape(ws_fc) + r"\}" + W
-       + r"worker-seconds against reactive's \\num\{" + re.escape(ws_re) + r"\}",
-       tex, errs, "absolute worker-seconds in role order (forecast provisions, reactive against)")
+       + r"worker-seconds against reactive's \\num\{" + re.escape(ws_re) + r"\}", texn, errs, "absolute worker-seconds in role order (forecast provisions, reactive against)")
     if round((rea["worker_s"] - fc["worker_s"]) / 3600.0, 1) != 55.7:
         errs.append("55.7 worker-hour saving does not recompute")
-    rx(r"\\num\{55\.7\} fewer" + W + r"worker-hours \(7\.7\\%\)",
-       tex, errs, "55.7 FEWER worker-hours (7.7%) with polarity")
+    rx(r"\\num\{55\.7\} fewer" + W + r"worker-hours \(7\.7\\%\)", texn, errs, "55.7 FEWER worker-hours (7.7%) with polarity")
 
     td_fc, td_re = fc["total_delay_request_s"], rea["total_delay_request_s"]
     if round(td_fc, 1) != 30277.5 or round(td_re, 1) != 34015.6:
@@ -149,8 +152,7 @@ def bind(tese: Path) -> list:
     rx(r"accumulating 11\.0\\% less total delay" + W
        + r"\(\\num\{" + re.escape(f"{round(td_fc, 1)}") + r"\} against \\num\{"
        + re.escape(f"{round(td_re, 1)}") + r"\} request-seconds, a reduction of" + W
-       + r"\\num\{3738\.1\}\)",
-       tex, errs, "total-delay pair in role order with 11.0% polarity (fc less)")
+       + r"\\num\{3738\.1\}\)", texn, errs, "total-delay pair in role order with 11.0% polarity (fc less)")
 
     fvr = ms["fc_vs_re"]
     ivs = fvr["exception_intervals"]
@@ -159,12 +161,12 @@ def bind(tese: Path) -> list:
             round(ivs[0]["interval_s"][1], 2) != 26.23:
         errs.append(f"survival exception drift: {ivs}")
     rx(r"\$\[\\num\{25\.08\}, \\num\{26\.23\}\)\$~s, where it counts" + W
-       + r"3 against 2", tex, errs, "exception interval with 3-vs-2 in role order")
+       + r"3 against 2", texn, errs, "exception interval with 3-vs-2 in role order")
     p = fvr["paired"]
     if (p["forecast_better"], p["ties"], p["forecast_worse"]) != (6742, 738027, 4832):
         errs.append(f"paired outcomes drift: {p}")
     rx(r"\\num\{6742\} forecast-better, \\num\{738027\} ties, \\num\{4832\}" + W
-       + r"forecast-worse", tex, errs, "paired outcomes with roles attached")
+       + r"forecast-worse", texn, errs, "paired outcomes with roles attached")
 
     t = (td_re - td_fc) / (td_re - m2["total_delay_request_s"])
     interp = rea["worker_s"] + t * (m2["worker_s"] - rea["worker_s"])
@@ -172,8 +174,7 @@ def bind(tese: Path) -> list:
         errs.append(f"total-delay floor interpolation recomputes to {interp/3600:.3f} h")
     if round((interp / fc["worker_s"] - 1) * 100, 1) != 12.6:
         errs.append("12.6% floor premium does not recompute")
-    rx(r"costs \\num\{754\.4\}" + W + r"worker-hours, 12\.6\\% more",
-       tex, errs, "754.4 h / 12.6% floor premium with polarity (more)")
+    rx(r"costs \\num\{754\.4\}" + W + r"worker-hours, 12\.6\\% more", texn, errs, "754.4 h / 12.6% floor premium with polarity (more)")
 
     m1 = arms["warm_floor_M1"]
     if m1["worker_s"] != rea["worker_s"] or \
@@ -184,7 +185,7 @@ def bind(tese: Path) -> list:
     if round((1 - e_fc / e_re) * 100, 1) != 45.0:
         errs.append("45.0% excess reduction does not recompute")
     rx(r"\(45\.0\\% less: \\num\{" + re.escape(f"{e_fc:.1f}") + r"\} against \\num\{"
-       + re.escape(f"{e_re:.1f}") + r"\}", tex, errs,
+       + re.escape(f"{e_re:.1f}") + r"\}", texn, errs,
        "45.0% excess with operands in role order (fc first)")
 
     # 4. readiness block: declaration cross-check, ordered table, polarity
@@ -231,20 +232,18 @@ def bind(tese: Path) -> list:
     if round((1 - fc["worker_s"] / m1w["worker_s"]) * 100, 1) != 12.1 or \
             round((fc["total_delay_request_s"] / m1w["total_delay_request_s"] - 1) * 100, 1) != 8.1:
         errs.append("common-warm 12.1%/8.1% do not recompute")
-    rx(r"12\.1\\% cheaper, 8\.1\\% more delay", tex, errs,
+    rx(r"12\.1\\% cheaper, 8\.1\\% more delay", texn, errs,
        "common-warm polarity phrase (forecast cheaper, more delay)")
-    rx(r"carries 8\.1\\% less" + W + r"total delay than the forecast at 12\.1\\% more cost",
-       tex, errs, "warm-M1 polarity phrase (M1 less delay, more cost)")
+    rx(r"carries 8\.1\\% less" + W + r"total delay than the forecast at 12\.1\\% more cost", texn, errs, "warm-M1 polarity phrase (M1 less delay, more cost)")
     if round((1 - fs_["worker_s"] / rea["worker_s"]) * 100, 1) != 8.6 or \
             round((1 - fs_["total_delay_request_s"] / rea["total_delay_request_s"]) * 100, 1) != 10.0:
         errs.append("near-strict 8.6%/10.0% do not recompute")
-    rx(r"8\.6\\% cheaper, 10\.0\\% less delay", tex, errs,
+    rx(r"8\.6\\% cheaper, 10\.0\\% less delay", texn, errs,
        "near-strict polarity phrase")
     if round((m2w["worker_s"] / fc["worker_s"] - 1) * 100, 1) != 19.7 or \
             round(m2w["worker_s"] / 3600.0, 1) != 801.8:
         errs.append("warm-M2 801.8 h / 19.7% do not recompute")
-    rx(r"\$M\{=\}2\$ at \\num\{801\.8\}" + W + r"worker-hours, 19\.7\\% above the forecast",
-       tex, errs, "801.8 h attaches to warm M2, 19.7% above forecast")
+    rx(r"\$M\{=\}2\$ at \\num\{801\.8\}" + W + r"worker-hours, 19\.7\\% above the forecast", texn, errs, "801.8 h attaches to warm M2, 19.7% above forecast")
     if not all(m1w["violations"][str(t_)]["count"] < fc["violations"][str(t_)]["count"]
                for t_ in (250, 500, 750, 1000, 1500, 2000)):
         errs.append("common-warm sweep reversal does not recompute at all six thresholds")
@@ -252,13 +251,11 @@ def bind(tese: Path) -> list:
     # 5. conclusion compact claim, role-scoped
     if round(m2w["worker_s"] / fc["worker_s"], 2) != 1.20:
         errs.append("1.20x does not recompute")
-    rx(r"forecast-informed placement uses" + W + r"669\.7 provisioned worker-hours",
-       conc, errs, "conclusion: 669.7 attaches to forecast")
+    rx(r"forecast-informed placement uses" + W + r"669\.7 provisioned worker-hours", concn, errs, "conclusion: 669.7 attaches to forecast")
     rx(r"cheapest passing common-warm reactive floor uses" + W
-       + r"801\.8 \(1\.20\$\\times\$ the forecast\)", conc, errs,
+       + r"801\.8 \(1\.20\$\\times\$ the forecast\)", concn, errs,
        "conclusion: 801.8 / 1.20x attaches to the common-warm floor")
-    rx(r"shipped reactive arm 725\.4" + W + r"under different readiness mechanics",
-       conc, errs, "conclusion: 725.4 attaches to shipped reactive")
+    rx(r"shipped reactive arm 725\.4" + W + r"under different readiness mechanics", concn, errs, "conclusion: 725.4 attaches to shipped reactive")
 
     # 6. bound-robustness margins, role-scoped
     fcells = json.loads((base / "frontier_summary_cells.json").read_text())
@@ -271,18 +268,172 @@ def bind(tese: Path) -> list:
                  ("warm_floor_M6", 906.6), ("warm_floor_M7", 749.9)):
         if round(worst[a], 1) != v:
             errs.append(f"worst-window p99 for {a}: artifact {worst[a]:.1f} vs printed {v}")
-    rx(r"forecast schedule's worst evaluation-window p99 is \\num\{681\.1\}~ms",
-       tex, errs, "681.1 attaches to forecast worst window")
-    rx(r"static fleet's worst window" + W + r"is \\num\{807\.6\}",
-       tex, errs, "807.6 attaches to static worst window")
-    rx(r"\$M\{=\}6\$ floor's \\num\{906\.6\}", tex, errs,
+    rx(r"forecast schedule's worst evaluation-window p99 is \\num\{681\.1\}~ms", texn, errs, "681.1 attaches to forecast worst window")
+    rx(r"static fleet's worst window" + W + r"is \\num\{807\.6\}", texn, errs, "807.6 attaches to static worst window")
+    rx(r"\$M\{=\}6\$ floor's \\num\{906\.6\}", texn, errs,
        "906.6 attaches to M6 floor")
     if round(arms["warm_floor_M7"]["worker_s"] / arms["static_C8"]["worker_s"], 3) != 1.139 or \
             round(arms["warm_floor_M8"]["worker_s"] / arms["static_C8"]["worker_s"], 3) != 1.239:
         errs.append("M7/M8 vs static ratios do not recompute")
+
+    # 6c. D68: adversarial strict cells + derived integer-ms passing bounds.
+    # The declared gate is strict p99 < B, so the lowest passing integer
+    # bound is floor(worst)+1 per population; populations must not merge.
+    import math
+    worst_strict = max(c["p99"] for c in fcells
+                       if c.get("group") == "adversarial"
+                       and c.get("arm") == "forecast_p90_strict_rewarm"
+                       and c.get("window") in EVAL)
+    if round(worst_strict, 3) != 732.999:
+        errs.append(f"frontier strict worst window drifts: {worst_strict}")
+    fact = json.loads((tese / "simulation/results/factorial_issuetime/"
+                       "factorial_issuetime_p90_rho15_results.json").read_text())
+    fact_max = max(r["p99_ms"] for r in fact["results"]
+                   if r.get("readiness") == "strict")
+    if round(fact_max, 3) != 733.643:
+        errs.append(f"strict factorial maximum drifts: {fact_max}")
+    derived_bounds = [
+        ("shipped warm-pool forecast", worst["forecast_p90"], 682),
+        ("frontier strict sensitivity", worst_strict, 733),
+        ("strict factorial", fact_max, 734),
+        ("static", worst["static_C8"], 808),
+        ("M6 floor", worst["warm_floor_M6"], 907),
+        ("M7 floor", worst["warm_floor_M7"], 750),
+    ]
+    for name, w, b in derived_bounds:
+        if math.floor(w) + 1 != b:
+            errs.append(f"integer passing bound for {name}: floor({w})+1 != {b}")
+    rx(r"survives any bound down to" + W + r"\\SI\{682\}\{\\milli\\second\} under warm-pool readiness",
+       texn, errs, "682 bound scoped to warm-pool readiness")
+    rx(r"frontier strict" + W + r"re-warm sensitivity's worst window is \\SI\{732\.999\}\{\\milli\\second\}",
+       texn, errs, "frontier strict role + exact 732.999 (msg 227 precision)")
+    rx(r"pass survives down to" + W + r"\\SI\{733\}\{\\milli\\second\}", texn, errs,
+       "frontier strict integer bound printed 733")
+    rx(r"factorial's maximum,?" + W + r"?\\SI\{733\.6\}\{\\milli\\second\}, passes down to \\SI\{734\}\{\\milli\\second\}",
+       texn, errs, "strict factorial 733.6 -> 734 separately scoped")
+    rx(r"at integer-millisecond" + W + r"bounds over the tested 682--\\SI\{1000\}\{\\milli\\second\} interval, under the" + W
+       + r"shipped warm-pool forecast readiness", texn, errs,
+       "682-1000 sweep scoped to integer bounds + shipped warm-pool readiness")
+    # D69: chapter crossing roles bound with their arm ratios
+    rx(r"below \\SI\{907\}\{\\milli\\second\} the 1\.042\$\\times\$ floor is no" + W
+       + r"longer all-passing \(\$M\{=\}7\$, at 1\.139", texn, errs,
+       "907 crossing bound to M6->M7 role")
+    rx(r"below" + W + r"\\SI\{750\}\{\\milli\\second\}, \$M\{=\}8\$ at 1\.239", texn, errs,
+       "750 crossing bound to M8 role")
+    rx(r"below" + W + r"\\SI\{808\}\{\\milli\\second\} the static reference itself fails",
+       texn, errs, "808 crossing bound to static role")
+    # D69: conclusion crossing claims bound independently
+    rx(r"down to \\SI\{682\}\{\\milli\\second\} under warm-pool readiness; under the strict" + W
+       + r"re-warm sensitivity the forecast's worst window is \\SI\{733\}\{\\milli\\second\}",
+       concn, errs, "conclusion 682+warm-pool qualifier+733 bound")
+    # D69: BOTH deck mirrors bound to the same claims and to each other
+    deckA = norm((tese / "defense/reveal/index.html").read_text())
+    deckB = norm((tese / "defense/deck_single.html").read_text())
+    DFRAG = ("Tighten the 1 s bound (integer-ms crossings): the shipped "
+             "warm-pool forecast still passes down to <b>682 ms</b>; "
+             "static (readiness-independent) holds to 808 ms, the cheapest "
+             "passing strict-rewarm floor to 907 ms. The verdict is not a "
+             "gift of the convention.")
+    for name, dk in (("reveal/index.html", deckA), ("deck_single.html", deckB)):
+        if DFRAG not in dk:
+            errs.append(f"deck {name}: complete integer-scope margins tile missing or diverged (msg 228)")
     for lit in ("1.139", "1.239"):
         if lit not in tex:
             errs.append(f"margin ratio literal {lit} missing")
+
+    # 6b. span-level language-pool stack (tab:cl-llm-week-stack): column-
+    # ordered cells against llm_week_stack.json, derived claims recomputed.
+    lw = json.loads((tese / "simulation/results/llm_week/llm_week_stack.json").read_text())
+    la = lw["arms"]
+    pop = lw.get("population", {})
+    if (pop.get("num_requests") != 749601
+            or pop.get("input_tokens_total") != 2205332831
+            or pop.get("output_tokens_total") != 140631564
+            or pop.get("identical_across_all_five_reports") is not True):
+        errs.append("llm-week population/token totals drift in artifact (msg 221)")
+    for arm_name, r in la.items():
+        if r["num_requests"] != 749601:
+            errs.append(f"llm-week arm {arm_name}: num_requests != 749601")
+    if pop.get("processed_tokens_total") != 2345964395:
+        errs.append("llm-week processed_tokens_total drift (msg 223)")
+    lc = lw.get("lead_config", {})
+    if lc.get("lead_s") != 60:
+        errs.append("llm-week lead_config lead_s != 60 (msg 223)")
+    want_occ = {"launch.sh": 2, "run_llm_week_p50.sh": 1,
+                "run_llm_week_models.sh": 1}
+    for drv, n in want_occ.items():
+        d = lc.get(drv, {})
+        if d.get("lead_s") != 60 or d.get("occurrences") != n:
+            errs.append(f"llm-week lead_config for {drv} != 60 x{n} (msg 224)")
+    rx(r"language lead \$L\{=\}\\SI\{60\}\{\\second\}\$ is the held-cursor",
+       texn, errs, "body L=60 claim bound to held-cursor role (msg 224)")
+    rx(r"continuous planner replays, \$L\{=\}\\SI\{60\}\{\\second\}\$ by" + W
+       + r"construction", texn, errs, "llm-week caption L=60 matches artifact lead_config")
+    # msg 223 prose role binds: GPU-hour roles, reactive TTFT p99 role,
+    # e2e polarity, ITL roles -- all against artifact-derived operands.
+    rx(r"\\textbf\{passes the week\} at TTFT" + W
+       + r"p99 \\SI\{651\}\{\\milli\\second\} \(ITL p99 \\SI\{6\.4\}\{\\milli\\second\}\) for 518\.6" + W
+       + r"H100 GPU-hours", texn, errs,
+       "forecast role: 651 ms + 518.6 GPU-h attach to the forecast arm")
+    rx(r"\\textbf\{fails the week outright\} \(TTFT p99 1\{,\}197\\,\\si\{\\milli\\second\}\) on" + W
+       + r"281\.8 GPU-hours", texn, errs,
+       "reactive role: 1,197 ms + 281.8 GPU-h attach to reactive")
+    if round(la["reactive_stock_planner"]["ttft_ms"]["p99"], 0) != 1197.0:
+        errs.append("reactive span TTFT p99 drifts from printed 1,197 ms")
+    if round(la["forecast_p90_chronos"]["gpu_hours"], 1) != 518.6 or \
+            round(la["reactive_stock_planner"]["gpu_hours"], 1) != 281.8:
+        errs.append("llm-week GPU-hour operands drift from printed values")
+    rx(r"total end-to-end mass 16\.5\\% less", texn, errs,
+       "16.5% e2e polarity (LESS, not more)")
+    rx(r"\(6\.41 against 21\.28~ms", texn, errs,
+       "ITL roles in artifact order (forecast 6.41 first)")
+    if round(la["forecast_p90_chronos"]["itl_p99_ms"], 2) != 6.41 or \
+            round(la["reactive_stock_planner"]["itl_p99_ms"], 2) != 21.28:
+        errs.append("ITL operands drift from printed values")
+    m = re.search(r"\\label\{tab:cl-llm-week-stack\}.*?\\end\{tabular\}", tex, re.S)
+    if not m:
+        errs.append("tab:cl-llm-week-stack not found")
+    else:
+        lt = m.group(0)
+    rx(r"language-pool grading over the same \\num\{749601\}-request"
+       + W + r"evaluation span", texn, errs,
+       "llm-week caption population (749,601)")
+    if m:
+        lrow = [
+            ("forecast p90 (Chronos)", "forecast_p90_chronos"),
+            ("forecast p90 (Toto)", "forecast_p90_toto"),
+            ("forecast p90 (TimesFM)", "forecast_p90_timesfm"),
+            ("forecast p50 (thrift)", "forecast_p50"),
+            ("reactive (stock planner)", "reactive_stock_planner"),
+        ]
+        for label, arm in lrow:
+            r = la[arm]
+            lines = [ln for ln in lt.splitlines() if ln.strip().startswith(label)]
+            if len(lines) != 1:
+                errs.append(f"llm-week row {label!r}: found {len(lines)} lines")
+                continue
+            cells = row_cells(lines[0])
+            want = [fmt_1dp(r["gpu_hours"]), fmt_1dp(r["ttft_ms"]["p99"]),
+                    fmt_1dp(r["ttft_ms"]["p95"]),
+                    fmt_1dp(r["total_ttft_mass_request_s"]),
+                    fmt_1dp(r["total_e2e_mass_request_s"]),
+                    f"{r['itl_p99_ms']:.2f}"]
+            if len(cells) != 7:
+                errs.append(f"llm-week {label}: expected 7 columns, found {len(cells)}")
+                continue
+            for i, (got, exp) in enumerate(zip(cells[1:], want)):
+                if got != exp:
+                    errs.append(f"llm-week {label} column {i + 1}: printed {got!r} != artifact {exp!r}")
+    lfc, lre = la["forecast_p90_chronos"], la["reactive_stock_planner"]
+    if round((1 - lfc["total_ttft_mass_request_s"] / lre["total_ttft_mass_request_s"]) * 100, 1) != 37.4:
+        errs.append("llm-week 37.4% TTFT-mass reduction does not recompute")
+    if round((1 - lfc["total_e2e_mass_request_s"] / lre["total_e2e_mass_request_s"]) * 100, 1) != 16.5:
+        errs.append("llm-week 16.5% e2e-mass reduction does not recompute")
+    if lw["derived"]["p99_ttft_model_invariant_ms"] != [651.1]:
+        errs.append("llm-week 651.1 model-invariance broken in artifact")
+    rx(r"total TTFT mass \\num\{43598\.8\}" + W
+       + r"request-seconds against reactive's \\num\{69671\.3\} \(37\.4\\% less\)", texn, errs, "llm-week total-mass pair in role order with polarity")
+    rx(r"p95" + W + r"\\num\{178\.9\} against \\num\{501\.9\}~ms", texn, errs, "llm-week p95 pair in role order")
 
     # 7. figure byte-identity, restore in FINALLY (failure-safe)
     env_fig = tese / "figuras/sim/sim_metric_frontier.pdf"
@@ -349,6 +500,73 @@ PROBES = [
                 .replace("801.8", "669.7", 1)
                 .replace("XSWAPX", "801.8", 1),
      "conclusion"),
+    ("llm-week forecast/reactive TTFT-mass operands swapped",
+     "tex/closedloop.tex",
+     lambda s: s.replace("total TTFT mass \\num{43598.8}",
+                         "total TTFT mass \\num{69671.3}", 1)
+                .replace("against reactive's \\num{69671.3}",
+                         "against reactive's \\num{43598.8}", 1),
+     "llm-week total-mass"),
+    ("llm-week table GPU-hours column swapped with p99",
+     "tex/closedloop.tex",
+     lambda s: s.replace(
+         "reactive (stock planner) & 281.8 & 1{,}196.6",
+         "reactive (stock planner) & 1{,}196.6 & 281.8", 1),
+     "llm-week reactive"),
+    ("llm-week prose GPU-hour roles swapped",
+     "tex/closedloop.tex",
+     lambda s: s.replace("for 518.6", "for 281.8", 1)
+                .replace("on\n281.8 GPU-hours", "on\n518.6 GPU-hours", 1),
+     "forecast role"),
+    ("llm-week reactive p99 fabricated 1,197 -> 1,999",
+     "tex/closedloop.tex",
+     lambda s: s.replace("TTFT p99 1{,}197\\,", "TTFT p99 1{,}999\\,", 1),
+     "reactive role"),
+    ("llm-week 16.5% polarity flipped",
+     "tex/closedloop.tex",
+     lambda s: s.replace("total end-to-end mass 16.5\\% less",
+                         "total end-to-end mass 16.5\\% more", 1),
+     "polarity"),
+    ("llm-week ITL roles swapped",
+     "tex/closedloop.tex",
+     lambda s: s.replace("(6.41 against 21.28~ms", "(21.28 against 6.41~ms", 1),
+     "ITL roles"),
+    ("chapter crossing 808 -> 809",
+     "tex/closedloop.tex",
+     lambda s: s.replace("\\SI{808}{\\milli\\second} the static reference",
+                         "\\SI{809}{\\milli\\second} the static reference", 1),
+     "808 crossing"),
+    ("chapter crossing 907 -> 908",
+     "tex/closedloop.tex",
+     lambda s: s.replace("below \\SI{907}{\\milli\\second} the 1.042$\\times$",
+                         "below \\SI{908}{\\milli\\second} the 1.042$\\times$", 1),
+     "907 crossing"),
+    ("chapter role frontier strict -> factorial strict",
+     "tex/closedloop.tex",
+     lambda s: s.replace("frontier strict", "factorial strict", 1),
+     "frontier strict role"),
+    ("conclusion 682 changed independently",
+     "tex/conclusion.tex",
+     lambda s: s.replace("down to \\SI{682}{\\milli\\second} under warm-pool readiness; under the strict",
+                         "down to \\SI{683}{\\milli\\second} under warm-pool readiness; under the strict", 1),
+     "conclusion 682"),
+    ("conclusion warm-pool qualifier removed",
+     "tex/conclusion.tex",
+     lambda s: s.replace("down to \\SI{682}{\\milli\\second} under warm-pool readiness; under the strict",
+                         "down to \\SI{682}{\\milli\\second}; under the strict", 1),
+     "conclusion 682"),
+    ("deck reveal 682 changed",
+     "defense/reveal/index.html",
+     lambda s: s.replace("passes down to <b>682 ms</b>", "passes down to <b>683 ms</b>", 1),
+     "reveal/index.html"),
+    ("deck single-mirror 907 changed",
+     "defense/deck_single.html",
+     lambda s: s.replace("floor to 907 ms", "floor to 908 ms", 1),
+     "deck_single.html"),
+    ("deck one-mirror integer-scope phrase diverged",
+     "defense/reveal/index.html",
+     lambda s: s.replace("(integer-ms crossings)", "(continuous crossings)", 1),
+     "reveal/index.html"),
 ]
 
 
@@ -370,6 +588,16 @@ def selftest(tese: Path) -> int:
             shutil.copy(tese / "simulation/results/comparator_frontier" / f, cf / f)
         (root / "figuras/sim").mkdir(parents=True)
         shutil.copy(tese / "figuras/sim/sim_metric_frontier.pdf", root / "figuras/sim/")
+        (root / "simulation/results/llm_week").mkdir(parents=True)
+        shutil.copy(tese / "simulation/results/llm_week/llm_week_stack.json",
+                    root / "simulation/results/llm_week/")
+        (root / "defense/reveal").mkdir(parents=True)
+        shutil.copy(tese / "defense/reveal/index.html", root / "defense/reveal/")
+        shutil.copy(tese / "defense/deck_single.html", root / "defense/")
+        (root / "simulation/results/factorial_issuetime").mkdir(parents=True)
+        shutil.copy(tese / "simulation/results/factorial_issuetime/"
+                           "factorial_issuetime_p90_rho15_results.json",
+                    root / "simulation/results/factorial_issuetime/")
         (root / "eda").mkdir()
         # symlink the WHOLE venv directory: interpreter resolves pyvenv.cfg
         # and site-packages through it, so matplotlib imports (msg 208)

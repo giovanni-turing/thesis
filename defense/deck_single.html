@@ -742,7 +742,7 @@ section.has-dark-background, section.has-dark-background h1, section.has-dark-ba
       <canvas id="onsetStrip" style="width:100%; height:215px; margin-top:10px;"></canvas>
       <p class="lead handoff"><span class="fragment fade-up">Median onset <b>6 min</b>, fastest <b>1 min</b> —
         inside a single observation lag. Cold starts run <b>15 s – 5 min</b>: for the fast half,
-        the budget <i>onset − cold-start</i> ≤ 0. At L=30 s reactive control fails
+        the budget <i>onset − cold-start</i> ≤ 0. At an issued forecast lead of L=30 s reactive control fails
         <b style="color:var(--critical)">9 of 18</b> episodes.</span>
         <span class="fragment fade-up" style="color:var(--muted)"> The only way out: capacity that exists
         <b>before</b> the burst — which requires predicting the image rate. →</span></p>
@@ -790,7 +790,7 @@ section.has-dark-background, section.has-dark-background h1, section.has-dark-ba
       <div class="kicker">The economics</div>
       <h2>A full week: the tail held at <span style="color:var(--blue)">0.62×</span> the always-on cost</h2>
       <p class="lead" style="margin-bottom:0.4em">Five policies over the 5.60-day evaluation span —
-        749,601 requests, Toto-2 as forecaster, L = 30 s. Cost = provisioned worker-time
+        749,601 requests, Toto-2 as forecaster, issued forecast lead L = 30 s. Cost = provisioned worker-time
         vs. always-on static C8. <b>Every endpoint reproduces the ledgered week numbers.</b></p>
 
       <div class="polrow fragment fade-up">
@@ -901,9 +901,10 @@ section.has-dark-background, section.has-dark-background h1, section.has-dark-ba
         </div>
         <div class="numtile info fragment fade-up">
           <div class="k">no privileged bound either</div>
-          <div class="d">Tighten the 1 s bound: forecast's worst window still passes down to
-            <b>682 ms</b>; static holds to 808 ms, the cheapest passing floor to 907 ms.
-            The verdict is not a gift of the convention.</div>
+          <div class="d">Tighten the 1 s bound (integer-ms crossings): the shipped warm-pool forecast
+            still passes down to <b>682 ms</b>; static (readiness-independent) holds to 808 ms,
+            the cheapest passing strict-rewarm floor to 907 ms. The verdict is not a gift of
+            the convention.</div>
         </div>
         <div class="numtile grn fragment fade-up">
           <div class="k">windows = the validity gate</div>
@@ -918,43 +919,45 @@ section.has-dark-background, section.has-dark-background h1, section.has-dark-ba
     <!-- 12 · the language pool -->
     <section>
       <div class="kicker">The other pool</div>
-      <h2>Language pool, real planner — same mechanism, same verdict</h2>
-      <p class="lead" style="margin-bottom:0.5em">Both policies replayed through <b>Dynamo's actual
-        planner</b> on the composed trace: forecast = p90 path + tail-aware conversion; reactive =
-        the stock SLA planner (ARIMA, mean targets). TP2 replicas · <b>52 planner replays</b>,
-        every L=60 anchor reproducing its ledgered twin. SLA: TTFT p99 &lt; 1 s, ITL p99 &lt; 100 ms.</p>
+      <h2>Language pool, real planner — graded on the whole span first</h2>
+      <p class="lead" style="margin-bottom:0.5em">Same forecast, <b>Dynamo's actual planner</b>.
+        Graded on the whole 5.60-day span first: forecast holds the tail SLA; the stock reactive
+        planner (mean-based sizing) misses it — on half the budget, so cheaper buys the breach.
+        Held-cursor conversion test, not anticipation: the same forecast fails under the native
+        mean conversion. Forecast compliance is sealed by the every-window gate (all cells ✓).
+        SLA: TTFT p99 &lt; 1 s, ITL p99 &lt; 100 ms.</p>
 
       <div class="lmat">
         <div class="lhead"></div>
-        <div class="lhead" style="color:var(--fc)">forecast — worst cell across 3 models × 3 leads (week: L=60)</div>
-        <div class="lhead" style="color:var(--re)">reactive — best cell across leads</div>
+        <div class="lhead" style="color:var(--fc)">forecast — span: 3 models at held-cursor replica L=60 · onset rows: range over 3 models × 3 replica leads</div>
+        <div class="lhead" style="color:var(--re)">reactive — span: L=60 · onset rows: best cell across 3 leads</div>
 
-        <div class="lwin">burst3 <span>1-min onset</span></div>
+        <div class="lwin">whole span <span>5.60 days</span></div>
+        <div class="lcell ok">651 ms ✓ · ITL ≤ 7 ms ✓ <i>TTFT mass −37% (post-hoc threshold-integrated synthesis; p99 is the contract)</i></div>
+        <div class="lcell bad">1.19 s ✗ <i>at 0.44–0.54× the spend</i></div>
+
+        <div class="lwin">fastest onset <span>1 min (burst3) — where the tail is lost</span></div>
         <div class="lcell ok">TTFT 651–692 ms ✓ · ITL ≤ 6 ms ✓ <i>9/9 cells</i></div>
         <div class="lcell bad">TTFT 3.49 s ✗ · ITL 160 ms ✗ <i>every lead</i></div>
 
-        <div class="lwin">burst5 <span>35-min</span></div>
+        <div class="lwin">35-min onset <span>(burst5)</span></div>
         <div class="lcell ok">651 ms ✓ · ITL ≤ 6 ms ✓ <i>9/9</i></div>
         <div class="lcell bad">2.15 s ✗ · ITL 146 ms ✗</div>
 
-        <div class="lwin">burst4 <span>60-min</span></div>
+        <div class="lwin">60-min onset <span>(burst4)</span></div>
         <div class="lcell ok">651–669 ms ✓ · ITL ≤ 6 ms ✓ <i>9/9</i></div>
         <div class="lcell bad">2.56 s ✗ · ITL 149 ms ✗</div>
 
-        <div class="lwin">burst1 <span>220-min</span></div>
+        <div class="lwin">slowest onset <span>6.7 h (burst1)</span></div>
         <div class="lcell ok">651–680 ms ✓ · ITL ≤ 6 ms ✓ <i>9/9</i></div>
         <div class="lcell bad">1.59 s ✗ · ITL 123 ms ✗</div>
-
-        <div class="lwin">full week <span>5.60 days</span></div>
-        <div class="lcell ok">651 ms ✓ · ITL ≤ 7 ms ✓ <i>3/3 models · L=60 only</i></div>
-        <div class="lcell bad">1.19 s ✗ <i>L=60 · at 0.44× the spend</i></div>
       </div>
 
       <div class="numrow">
         <div class="numtile viol fragment fade-up">
-          <div class="k">lead- and model-invariant</div>
-          <div class="d"><b>651 ms</b> at L = 60, 120 <i>and</i> 300 s — Chronos, Toto, TimesFM alike.
-            The mechanism wins, not one lucky forecast.</div>
+          <div class="k">verdict robust across leads and models</div>
+          <div class="d"><b>651 ms</b> span p99 across Chronos, Toto <i>and</i> TimesFM (L=60);
+            every onset cell passes across leads 60–300 s. The mechanism wins, not one lucky forecast.</div>
         </div>
         <div class="numtile warn fragment fade-up">
           <div class="k">the mean-law alibi</div>

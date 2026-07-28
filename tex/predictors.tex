@@ -16,13 +16,13 @@
 
 Chapter~\ref{cap:trace-eda} left the vision pool's demand signal decoupled
 from request rate, an order of magnitude burstier, and the most persistent
-of the four --- a necessary condition, not an operational one. This chapter
-asks \textbf{RQ2: can encoder demand be forecast with usable uncertainty at
-replica-startup horizons?} \emph{Usable} is not a WAPE ranking: a capacity
-controller consumes an \emph{upper quantile}, holds it across a startup
-lead, and pays for whatever demand does above it. What decides RQ2 is that
+of the four, which is a necessary condition rather than an operational one.
+This chapter asks \textbf{RQ2: can encoder demand be forecast with usable
+uncertainty at replica-startup horizons?} \emph{Usable} here is not a WAPE
+ranking: a capacity controller consumes an \emph{upper quantile}, holds it
+across a startup lead, and pays for whatever demand does above it. That
 edge's behavior at the leads the pools need (\SIrange{15}{300}{\second},
-Chapter~\ref{cap:closedloop}); point accuracy enters second.
+Chapter~\ref{cap:closedloop}) decides RQ2; point accuracy enters second.
 
 \begin{description}
 \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
@@ -31,7 +31,7 @@ five bin resolutions; statements are made per \emph{day or burst episode}.
 The $5\times4\times8$ (resolution, signal, model-mode) cells are a
 parameter-robustness surface, never a sample size.
 \item[Primary endpoint.] Empirical coverage of the \emph{p90 forecast
-edge} --- what a provisioning controller consumes --- resolved by horizon
+edge}, the quantity a provisioning controller consumes, resolved by horizon
 step and conditioned on burst windows; secondarily the size and duration
 of the exceedances.
 \item[Comparator.] Nominal $0.90$ for coverage; for accuracy, three
@@ -55,8 +55,8 @@ The demand series of Section~\ref{sec:eda-temporal} are used as-is, at
 \SI{1}{\second}, \SI{15}{\second}, \SI{30}{\second}, \SI{45}{\second}, and
 \SI{1}{\minute} bins. An \emph{origin} $o$ predicts bins $[o, o{+}H)$ from
 context $[o{-}C, o)$ with $H{=}12$ \emph{bins} at the series' native
-cadence --- 12 seconds of wall-clock at 1-second bins up to 12 minutes at
-1-minute bins --- and origins advance in strides of $H$, so forecasts tile
+cadence (12 seconds of wall-clock at 1-second bins, up to 12 minutes at
+1-minute bins). Origins advance in strides of $H$, so forecasts tile
 the timeline into the continuous, non-overlapping path a scaler would
 consume. Each model gets its maximum context minus its forecast tokens; the
 baselines take TimesFM's. Everything is scored on the \emph{common span},
@@ -67,13 +67,13 @@ the final \SI{33.4}{\hour} at 1-minute bins: within-column comparisons are
 unaffected, but WAPE levels are not comparable across columns and the
 1-minute columns over-represent burst conditions.
 
-Three foundation models run \emph{zero-shot} ---
+Three foundation models run \emph{zero-shot}:
 TimesFM-2.0-500M~\cite{Das2024TimesFM}, Chronos-2
-(120M)~\cite{Ansari2025Chronos2}, Toto-2.0-2.5B~\cite{Khwaja2026Toto2} ---
-against naive persistence, exponential smoothing, and additive
-Holt--Winters~\cite{Hyndman2021fpp3}, each forecasting every signal from
-its own history. Chronos-2 and Toto-2, the two with a genuine covariate
-mechanism, also run in \emph{covariate} mode (past-only covariates and
+(120M)~\cite{Ansari2025Chronos2}, and Toto-2.0-2.5B~\cite{Khwaja2026Toto2}.
+They are scored against naive persistence, exponential smoothing, and
+additive Holt--Winters~\cite{Hyndman2021fpp3}, each model forecasting every
+signal from its own history. Chronos-2 and Toto-2, the two with a genuine
+covariate mechanism, also run in \emph{covariate} mode (past-only covariates and
 joint variate-axis attention respectively); TimesFM, having none, is the
 strict univariate control. The baselines are \emph{fixed-parameter},
 configured conventionally in versioned code
@@ -86,8 +86,8 @@ models' common heads. Accuracy is WAPE, $\sum_t |\hat y_t - y_t| \,/
 fraction of realized values at or below a predicted quantile; both are
 computed at $h{=}1$, per horizon step, and pooled. Per-decision GPU time on
 the single RTX~5090 is negligible, so the honest cost comparison is
-deployment footprint --- a GPU-resident 120M--2.5B-parameter service
-against EWMA's few lines of arithmetic --- which the closed loop prices.
+deployment footprint: a GPU-resident 120M--2.5B-parameter service against
+EWMA's few lines of arithmetic, a difference the closed loop prices.
 
 \section[The provisioning operating point]{The provisioning operating
 point: upper-quantile coverage}
@@ -98,7 +98,7 @@ empirical coverage was computed over the archived quantiles. The p90 edge
 is essentially calibrated for every model and signal at both provisioning
 cadences (Table~\ref{tab:pred-coverage}): $0.88$--$0.90$ against a nominal
 $0.90$, the widest deviation over the twenty combinations being $0.880$.
-Two conditional breakdowns then decide whether that calibration is usable.
+Two conditional breakdowns decide whether that calibration is usable.
 
 \begin{table}[htbp]
 \centering
@@ -129,22 +129,23 @@ horizon step stays within $0.876$--$0.903$ across $h{=}1\ldots12$ at
 $0.857$--$0.911$ at \SI{1}{\minute} bins (1--12 minutes), with no trend in
 $h$, so every tested encoder startup lead $L \in
 \{15,30,45,300\}$\,\si{\second} (Chapter~\ref{cap:closedloop}) sits inside a
-horizon where the edge holds. \textbf{It does not collapse in bursts}, the
-regime that motivates the exercise: pooled over the five model series at
-\SI{15}{\second} bins, in-burst coverage is $0.890$--$0.901$ against
+horizon where the edge holds. \textbf{It does not collapse in bursts}:
+pooled over the five model series at \SI{15}{\second} bins, in-burst
+coverage is $0.890$--$0.901$ against
 $0.890$--$0.896$ outside. The rest of the band is weaker and is not used:
 median coverage sits near $0.45$--$0.52$, and zero ties distort the lower
 edge (the p10 frequently touches zero on bursty signals), deflating the
 nominal-80\% band more at finer bins. \emph{Upper-quantile headroom is
 trustworthy at provisioning cadence; band-width and lower-edge semantics
-are not} --- so the closed loop consumes p50/p90 paths, not the full band.
+are not}, so the closed loop consumes p50/p90 paths, not the full band.
 
 \paragraph{What under-provisioning looks like.} Calibration guarantees that
-about one bin in ten sits above the provisioned edge; what matters is what
-those bins do. In the cell the closed loop consumes (Chronos-2 with
-covariates, image signal, \SI{15}{\second} bins), 10.9\% of common-span
-bins and 11.2\% of in-burst bins exceed p90 --- the calibrated rate --- and
-their shape is benign: 70.3\% of exceedance runs last a single bin,
+about one bin in ten sits above the provisioned edge; the size and duration
+of those excursions decide whether that is acceptable. In the cell the
+closed loop consumes (Chronos-2 with covariates, image signal,
+\SI{15}{\second} bins), 10.9\% of common-span
+bins and 11.2\% of in-burst bins exceed p90, matching the calibrated rate.
+Their shape is benign: 70.3\% of exceedance runs last a single bin,
 more than nine in ten at most three (\SI{45}{\second}), the longest in the
 week nine (\SI{135}{\second}); inside bursts the median excursion is 23.5\%
 above the provisioned level, 74.2\% at the excursions' own 90th percentile.
@@ -156,8 +157,8 @@ sweep, which also scores what the shortfalls cost in tail latency.
 \paragraph{Is another percentile a better point forecast?} Every quantile
 was also scored as a candidate point forecast across the 160 (model, mode,
 resolution, signal) cells. Wins concentrate entirely where the point is
-\emph{not} the median --- TimesFM's mean head and the Gaussian-band
-baselines --- as right-skewed rates predict. For Chronos-2 and Toto-2,
+\emph{not} the median (TimesFM's mean head and the Gaussian-band
+baselines), as right-skewed rates predict. For Chronos-2 and Toto-2,
 whose point \emph{is} the median, no fixed quantile materially improves on
 it; the largest gain anywhere is 0.06 WAPE points, at 1-second image bins.
 The band is headroom, not correction.
@@ -167,7 +168,7 @@ The band is headroom, not correction.
 
 Figure~\ref{fig:pred-band} renders that output as an autoscaler would
 consume it, over the week's largest image burst. The path tracks the burst
-\emph{plateau} --- the provisioning envelope --- rather than chasing single
+\emph{plateau} (the provisioning envelope) rather than chasing single
 1-minute spikes, the desired behavior given the shot-noise floor of
 Section~\ref{sec:eda-predictability}. At the collapse it lags by up to one
 horizon (12 minutes), the price of tiling in $H$-step blocks; but holding
@@ -176,8 +177,7 @@ minutes late to a median-onset burst (Section~\ref{sec:eda-vision}).
 Minute-level paths are \emph{provisioning} inputs, not scheduler signals:
 dispatch and capacity handle the second-scale head-of-line blocking of
 Chapter~\ref{cap:metodologia}, while the forecast decides only how much
-capacity stands when the flood arrives --- forecast-informed capacity
-placement under startup delay.
+capacity stands when the flood arrives.
 
 \begin{figure}[htbp]
 \centering
@@ -241,7 +241,7 @@ degrading fastest.}
 
 \textbf{The foundation models beat every baseline in all twenty cells},
 zero-shot and untuned. The margin over the best baseline (EWMA) is modest
-at \SI{1}{\minute} --- 2--9\% relative --- and widens as bins shrink, the
+at \SI{1}{\minute} (2--9\% relative) and widens as bins shrink, the
 best model cutting image WAPE by about a third at \SI{1}{\second}. That
 sub-minute margin must be read against WAPE's no-skill floor: predicting
 zero always scores exactly 100\%, so at 1-second bins the image forecasts
@@ -253,13 +253,13 @@ requests, 81.6\% generated, 86.0\% context). Nothing forecasts single
 otherwise.
 
 \textbf{The inter-model ranking is noise-level}: Toto-2 (usually with
-covariates) takes nearly all the 1\,s--30\,s cells --- all four signals at
-\SI{1}{\second} --- while at \SI{1}{\minute} Chronos-2 takes two of the four
-against one each for Toto-2 and TimesFM, but spreads are typically under 2
-WAPE points and
-several bolded wins are decided by $\leq$0.1 points, below plausible
-sampling variability with no significance test attached --- a three-way tie
-in which model choice matters far less than using a foundation model at
+covariates) takes nearly all the 1\,s--30\,s cells, including all four
+signals at \SI{1}{\second}, while at \SI{1}{\minute} Chronos-2 takes two of
+the four against one each for Toto-2 and TimesFM. Spreads are typically
+under 2 WAPE points and several bolded wins are decided by $\leq$0.1
+points, below plausible sampling variability with no significance test
+attached. The three models are effectively tied, and model choice matters
+far less than using a foundation model at
 all. \textbf{Horizon degradation is mild}: for images at \SI{1}{\minute}
 the models grow only from ${\approx}52\%$ WAPE at $h{=}1$ to
 ${\approx}53\text{--}54\%$ at $h{=}12$, so the persistence of
@@ -272,7 +272,7 @@ on 1-second bins.
 \paragraph{Against the shipped incumbents.} Dynamo's SLA planner selects a
 load predictor from a fixed registry (ARIMA, Kalman, Prophet, constant).
 All four ran the same protocol on the image signal with shipped defaults
---- the constant predictor reproduces the naive baseline's WAPE exactly ---
+(the constant predictor reproduces the naive baseline's WAPE exactly),
 with one asymmetry: at \SI{15}{\second} the costly ARIMA and Prophet fits
 are scored on an evenly subsampled 300 of the 2{,}687 common-span origins. At
 \SI{1}{\minute} all four sit at or below the naive baseline, none
@@ -281,8 +281,8 @@ foundation-model level. At \SI{15}{\second} ARIMA edges ahead of the
 classical baselines (naive scores 69.0\% on the same 300 origins; Prophet,
 at 73.3\%, trails both); rescoring the archived foundation-model forecasts
 on ARIMA's exact 300 origins puts ARIMA at 66.8\% WAPE against
-66.0--66.1\% for Chronos and 66.5\% for TimesFM --- sub-point gaps a paired
-origin bootstrap cannot distinguish from zero --- while Toto with
+66.0--66.1\% for Chronos and 66.5\% for TimesFM (sub-point gaps a paired
+origin bootstrap cannot distinguish from zero), while Toto with
 covariates, at 60.9\%, beats ARIMA by a statistically significant margin.
 The shipped best thus ties the classical baselines and trails the best
 foundation model by about a WAPE point at \SI{1}{\minute}, a gap widening to
@@ -299,14 +299,14 @@ Barely, and only where it does not matter (Table~\ref{tab:pred-cov}): the
 effect is within $\pm0.4\%$ everywhere but consistent, helping at
 \SI{15}{\second} and \SI{1}{\second} and neutral-to-harmful at coarser
 bins. This is the forecasting-side counterpart of the decoupling of
-Section~\ref{sec:eda-vision} --- the request-rate covariate explains only
-$R^2{=}0.12$ of the image signal --- so per-pool forecasts can run
+Section~\ref{sec:eda-vision}: the request-rate covariate explains only
+$R^2{=}0.12$ of the image signal, so per-pool forecasts can run
 univariate unless the system decides on sub-15-second windows. A stronger
-structural variant fails for the same reason: forecasting context
+structural variant fails for the same reason. Forecasting context
 \emph{additively}, as text-borne demand plus the image forecast scaled by a
 per-image token factor, bets that the higher-persistence vision component
 sharpens burst-onset forecasts, but pooled it ties or slightly trails the
-direct forecast, and the mechanism is diagnostic --- \emph{at} the onsets
+direct forecast. The mechanism is diagnostic: \emph{at} the onsets
 the image forecast is the \emph{worst} component, least forecastable
 exactly where the structural bet needed it (per-component ranges in
 Appendix~\ref{ap:artifacts}).
@@ -331,7 +331,7 @@ Toto-2    & $-0.04\%$ & $+0.08\%$ & $-0.02\%$ & $-0.25\%$ & $-0.24\%$ \\
 \section{Limitations}
 \label{sec:pred-limitations}
 
-The trace-level caveats of Chapter~\ref{cap:trace-eda} carry over --- one
+The trace-level caveats of Chapter~\ref{cap:trace-eda} carry over: one
 seven-day trace of one cluster, its by-construction 50/50 modality split,
 and signals stamped at arrival, so decode-side forecasts predict offered
 load rather than instantaneous decode occupancy. All models run zero-shot;
@@ -351,12 +351,13 @@ baselines are \emph{fixed-parameter} (context-capped at TimesFM's budget);
 per-series tuning would narrow the margins of Table~\ref{tab:pred-wape},
 which should be read as a lower bound on tuned-baseline competitiveness.
 ARIMA, the incumbent in production autoscalers including Dynamo's, is
-absent from the main resolution$\times$signal grid --- though benchmarked
+absent from the main resolution$\times$signal grid (though benchmarked
 on the image signal above, where at \SI{15}{\second} it is statistically
-indistinguishable from Chronos on matched origins --- but present where it
+indistinguishable from Chronos on matched origins) but present where it
 matters more: the reactive baseline of Chapter~\ref{cap:closedloop} runs
-Dynamo's planner with its ARIMA predictor unmodified. Coverage is assessed only for the upper edge, and its horizon-
-and burst-conditional forms only on the image signal at \SI{15}{\second}
+Dynamo's planner with its ARIMA predictor unmodified. Coverage is assessed
+only for the upper edge, and its horizon- and burst-conditional forms
+only on the image signal at \SI{15}{\second}
 and \SI{1}{\minute} bins; lower-edge and band-width semantics remain
 distorted by zero ties, and four in-span burst windows are a small
 sample. Finally, Chronos-2 occasionally emits locally crossed quantiles
@@ -366,13 +367,13 @@ apart from the nonnegativity floor.
 \section{Summary}
 
 RQ2 answers yes, with a bounded meaning. The p90 edge a provisioning
-controller consumes is empirically calibrated (coverage $0.88$--$0.90$)
-and --- the part that makes it operational --- that calibration holds
-across the full 12-step horizon and inside burst windows, covering the
-tested \SIrange{15}{300}{\second} startup leads, while the under-provision
+controller consumes is empirically calibrated (coverage $0.88$--$0.90$),
+and that calibration holds across the full 12-step horizon and inside
+burst windows, covering the
+tested \SIrange{15}{300}{\second} startup leads; the under-provision
 events it concedes are short and bounded. Underneath, zero-shot foundation
 models beat the fixed-parameter classical baselines in every cell of the
 $5{\times}4$ grid, with inter-model margins and covariate effects small
-enough that engineering considerations can drive the choice. What none of
-this establishes is control value: whether standing capacity placed on this
+enough that engineering considerations can drive the choice. None of this
+establishes control value: whether standing capacity placed on this
 signal protects the tail is the question of Chapter~\ref{cap:closedloop}.

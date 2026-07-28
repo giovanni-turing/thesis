@@ -3193,3 +3193,61 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   "convention-free" claims of the two 2026-07-27 metric-stack entries
   above (marked inline); feeds sec:cl-frontier, sec:cl-headline,
   sec:cl-limits, conclusion RQ3, abstract, deck slide 11b.
+
+### llm-week-span-stack (2026-07-27)
+
+- **What (author directive: one grading standard for both pools):**
+  span-level language-pool metric stack over the same 749,601-request
+  5.60-day population as the encoder stack -- GPU-hours, TTFT quantile
+  ladder, threshold-integrated total TTFT/e2e delay masses (mean x N),
+  ITL p99 -- derived from the five tracked week planner-replay reports
+  (L=60 by construction).
+- **Artifact:** simulation/results/llm_week/llm_week_stack.{py,json}
+  (compute-only generator + tracked artifact, --check mode); bound
+  column-ordered + role-scoped by verification/metric_stack_gate.py
+  (section 6b; two new negative probes) and wired into verify_all A5c.
+- **Result:** reactive breaches the span-level contract statistic
+  OUTRIGHT (TTFT p99 1,196.6 ms vs bound 1,000; forecast 651.1, identical
+  across Chronos/Toto/TimesFM); total TTFT mass 43,598.8 vs 69,671.3
+  req-s (37.4% less), total e2e mass 16.5% less, p95 178.9 vs 501.9 ms;
+  ITL p99 passes the span for BOTH arms (6.41 vs 21.28 vs 100 ms) -- the
+  ITL violations are burst-local; reactive spend 281.8 GPU-h = 0.543x
+  forecast, a non-compliant point. Unlike the encoder, no window check is
+  needed to separate this pair; the grid stays as the anti-masking gate
+  (p50 clears the aggregate and fails burst3/5 -- already in prose).
+- **Command:** `python3 simulation/results/llm_week/llm_week_stack.py`
+  (regenerate) / `--check` (verify).
+- **Feeds:** tex/closedloop.tex tab:cl-llm-week-stack + week-scale
+  paragraph extension (sec:cl-llm); build 0/0 at 127 pp; immutability
+  rebaselined. Reopens review for this delta only (196 boundary).
+
+### readability-hierarchy-freeze (2026-07-28)
+
+- **What:** overnight author-directed pass, reviewer-supervised live
+  (bridge 220-225 + internal adversarial critic): aggregate-first
+  exposition at every results locus with the frozen per-window grid as
+  the compliance gate (220/224 safe form); episode codenames out of
+  flowing prose (descriptors + keys at definitional/table loci; F6/e13
+  unified with both keys); em-dash density cut ~85% manuscript-wide
+  (in-prose ~0); numbers demoted to tables unless argumentative;
+  triadic/imperative/meta AI-tone constructions removed; abstract
+  operand misattachment fixed (669.7 against 1,074.8) and abstract
+  latency framing made span-level (identical through p99) EN+PT; 682 ms
+  margin claim readiness-qualified (strict re-warm worst window 733 ms);
+  cross-build variance footnotes (681.1/677, 35,902.5/35,807,
+  16,084/16,079 -- frontier vs request-linked composed emissions);
+  15x -> 16 times; first-use glosses (Mworker-s, conversion scale, rho,
+  TP2x2, campaign IDs).
+- **Gate v5 (msgs 221/223/224):** whitespace-normalized role binding;
+  llm-week population/native-token/processed==in+out asserts; per-driver
+  STARTUP_TIME=60 occurrence counts (launch.sh x2); body+caption L=60
+  binds; four new llm prose-role probes (GPU-h roles, reactive p99
+  fabrication, 16.5% polarity, ITL roles) -- all fail semantically.
+- **Verification:** every chapter agent verified number/ref/cite/env
+  multisets identical by extraction diff before return; immutability
+  rebaselined (documented; content changes author-ordered); gate +
+  selftest ALL PASS; build 0 errors / 0 undefined refs / 127 pp.
+- **Command:** suite `./provenance/verify_all.sh`; language stack
+  `python3 simulation/results/llm_week/llm_week_stack.py [--check]`.
+- **Feeds:** whole-manuscript prose, deck slides 11b/12/14; freeze
+  commit pins this state (hash in the bridge packet).

@@ -12,7 +12,7 @@ on its own demand signal, with standing capacity placed ahead of the load by
 a probabilistic forecast. The three research questions of
 Chapter~\ref{cap:intro} can now be answered from evidence.
 
-\paragraph{RQ1 --- Demand adequacy: request rate misrepresents vision
+\paragraph{RQ1 (demand adequacy): request rate misrepresents vision
 demand, and structure remains.} A constant-fraction model explains
 $R^2=\num{0.123}$ of the image-rate series against \num{0.654} of the decode
 series; the two signals' extreme minutes are essentially disjoint, and
@@ -26,7 +26,7 @@ half-life of \SI{69}{\minute} against \SI{9}{\minute} for requests, over a
 burst population of 18 episodes whose median onset, \SI{6.5}{\minute},
 competes directly with replica startup.
 
-\paragraph{RQ2 --- Operational forecastability: yes, with a bounded
+\paragraph{RQ2 (operational forecastability): yes, with a bounded
 meaning.} The quantity a provisioning controller consumes is an upper band
 edge, and it is empirically calibrated: p90 coverage $0.88$--$0.90$, holding
 across the full twelve-step horizon and inside burst windows, so it covers
@@ -34,53 +34,60 @@ the tested \SIrange{15}{300}{\second} startup leads, while the
 under-provision events it concedes are short and bounded. Underneath that,
 zero-shot foundation models beat the fixed-parameter classical baselines in
 every cell of the $5{\times}4$ grid, with inter-model margins and covariate
-effects small enough that engineering considerations can decide the choice
---- accuracy underwrites the operating point without deciding it.
+effects small enough that engineering considerations can decide the choice.
+Accuracy underwrites the operating point without deciding it.
 
-\paragraph{RQ3 --- Control payoff: a trade-off with an identified failure
-mode, not universal superiority.} On three of the five evaluation windows
-(burst1/4/5) and on the aggregate span the forecast and reactive window
-p99 values \emph{tie exactly} (the distributions separate above p99), the
-calm day within \SI{5}{\milli\second}; the latency advantage lives in the
-one-minute onset, which the identically informed reactive controller loses
-at every lead. What forecasting buys at week scale is resource-time at
-equal compliance, on convention-minimized absolutes: over the 5.60-day,
-\num{749601}-request evaluation span, forecast-informed placement uses
-669.7 provisioned worker-hours; under the frozen every-window p99
-compliance rule the cheapest passing common-warm reactive floor uses
+\paragraph{RQ3 (control payoff): a trade-off with an identified failure mode
+rather than universal superiority.} What forecasting buys at week scale is
+resource-time at equal compliance, on convention-minimized absolutes: over
+the 5.60-day, \num{749601}-request evaluation span,
+forecast-informed placement uses
+669.7 provisioned worker-hours; under the frozen every-window p99 compliance
+rule the cheapest passing common-warm reactive floor uses
 801.8 (1.20$\times$ the forecast), and the shipped reactive arm 725.4
 under different readiness mechanics. The resource-time advantage is
 robust across readiness interpretations, while the latency ordering is
-readiness-dependent (Table~\ref{tab:cl-readiness}). Under a pre-frozen five-arm replay
+readiness-dependent (Table~\ref{tab:cl-readiness}). The span leads
+magnitude and already rejects reactive; the frozen per-window grid remains
+the compliance gate that establishes every-window forecast compliance, and
+its record locates the trade: on three of the
+five evaluation windows and on the aggregate span the forecast and
+reactive window p99 values \emph{tie exactly} (the distributions separate
+above p99), the calm day within \SI{5}{\milli\second}, and the latency
+advantage concentrates in the fastest, one-minute onset, which the
+identically informed reactive controller loses at every lead. Under a pre-frozen five-arm replay
 protocol (arm mechanics frozen before the frontier replay; the forecast arm's
 $\rho{=}15$ had been chosen \emph{ex post} earlier and is disclosed as such,
 Section~\ref{sec:cl-frontier}), the p90 forecast arm holds the
 encoder bound over the evaluation span at \textbf{0.623$\times$} the deployable
 static fleet's provisioned worker-time (\num{2650} of \num{749601}
-requests over the bound; the per-window grid, an analysis instrument kept as
-the masking check, shows zero failed windows) --- a pass that survives any
-bound down to \SI{682}{\milli\second}
-(Section~\ref{sec:cl-headline}); a reactive
+requests over the bound; the frozen per-window grid, the compliance gate
+and masking check, shows zero failed windows). The pass survives any bound
+down to \SI{682}{\milli\second} under warm-pool readiness; under the strict
+re-warm sensitivity the forecast's worst window is \SI{733}{\milli\second}
+(Table~\ref{tab:cl-frontier}, Section~\ref{sec:cl-headline}). A reactive
 controller granted a minimum warm floor calibrated on the calibration split
-\emph{fails} held-out burst3, and the cheapest all-passing member of that
-floor family --- identifiable only after the fact --- costs
-\textbf{1.042$\times$} static. Under the symmetric warm-pool
-model --- the footing most favorable to reactive --- forecast-informed
+\emph{fails} the held-out fastest-onset window, and the cheapest all-passing
+member of that floor family, identifiable only after the fact, costs
+\textbf{1.042$\times$} static. Under the symmetric warm-pool model (the
+footing most favorable to reactive), forecast-informed
 placement remains \textbf{1.20$\times$} cheaper than the best warm-floor
 reactive at equal compliance, and 1.67$\times$ under the shipped mechanics;
 the strict-readiness repair is not fully symmetric between arms, so the pair
 is a sensitivity range, not an equalized interval, and the single figure
-1.67$\times$ must never be quoted alone.
+1.67$\times$ is reported only with its warm-pool counterpart.
 A perfect-information reference under the same fixed conversion prices the
 signal-quality axis at \textbf{0.292$\times$}; the forecast arm captures
-53\% of the measured gap to that reference --- a bound on forecast quality
-under these mechanics, not on all admissible SLA-passing schedules. The headline schedule prices the covered span at \textbf{0.62 times
+53\% of the measured gap to that reference. That figure bounds forecast
+quality under these mechanics, not all admissible SLA-passing schedules.
+The headline schedule prices the covered span at \textbf{0.62 times
 the deployable static encoder fleet's worker-time}, with the finer
-daily-fold grain surfacing the one missed covered onset (e13), recovered at
+daily-fold grain surfacing the one missed covered onset (fold F6; ledger key
+e13), recovered at
 0.76$\times$ by a hybrid forecast--reactive schedule designed post hoc on
-the failing fold. On the language pool --- a secondary result, and a
-same-input \emph{conversion} test rather than a second anticipation
-experiment --- the forecast passes bursts under realistic replica leads only
+the failing fold. On the language pool (a secondary result, and a same-input
+\emph{conversion} test rather than a second anticipation experiment), the
+forecast passes bursts under realistic replica leads only
 when combined with a tail-aware capacity conversion; fed through the
 planner's native mean-based conversion it fails like the reactive baseline,
 so the defect is the conversion, not loop tuning. That pool sits near
@@ -91,8 +98,8 @@ the denominator (Section~\ref{sec:cl-ledger-cost}).
 \label{sec:conc-regimes}
 
 The measurements above are one trace, one pool pair and one week. What can
-be carried elsewhere is not the ratios but the regime conditions that
-produced them: four quantities decide whether a forecast-informed schedule,
+be carried elsewhere is the regime conditions that produced them rather than
+the ratios: four quantities decide whether a forecast-informed schedule,
 a standing warm floor, or nothing at all is the right instrument.
 Table~\ref{tab:conc-regimes} states them, each grounded in the measured
 instance from which it was read, and offers them as design conditions to
@@ -120,7 +127,7 @@ Regime & Condition & Measured instance & Provisioning rule \\
 \textbf{Forecast anticipation} &
 $U > 0$ at every threshold; $U \geq L$ at a named threshold, signal coupled
 to the pool's own work &
-burst4: usable issue lead \SI{345}{\second} at the 60\,s/224-images-per-second
+the gradual 60-minute onset (burst4): usable issue lead \SI{345}{\second} at the 60\,s/224-images-per-second
 detection threshold against $L{=}\SI{30}{\second}$ (at the strictest
 crossing $U{=}\SI{15}{\second} < L$: anticipation at every threshold, a
 full startup lead only at the coarse one); capacity in place before the ramp &
@@ -129,7 +136,7 @@ Schedule from the forecast; the lead is real and is the mechanism \\
 \textbf{Headroom placement} &
 $U \approx 0$ (no usable issued lead), but the predictive band has already
 widened before the spike &
-burst3: one-minute onset; the p90 band already holds ${\approx}21$ workers
+the fastest one-minute onset (burst3); the p90 band already holds ${\approx}21$ workers
 pre-spike and passes where reactive fails at every lead &
 Schedule from the band's \emph{upper edge}, not from onset detection \\
 \addlinespace
@@ -156,7 +163,7 @@ path exists or none is deployed) &
 locked $2{\times}2$ topology: the encoder misses its 5\,s tail at 29\%
 mean utilization while aggregate rate and utilization read healthy (no
 forecast path ran, so $U$ is unmeasured here, and no aggregate-signal scaler
-was instantiated --- a mechanism inference) &
+was instantiated, a mechanism inference) &
 Fix the signal or the shape first; a scaler watching the aggregate signal
 has no basis to act (inference, not a graded controller result) \\
 \bottomrule
@@ -166,12 +173,11 @@ has no basis to act (inference, not a graded controller result) \\
 The rule that generalizes is therefore narrower than ``forecasting helps'':
 a forecast is worth its complexity when the pool's own demand signal is
 decoupled from the aggregate one, when onsets are fast relative to replica
-startup, and when the span is mostly calm --- so that standing capacity
+startup, and when the span is mostly calm, so that standing capacity
 sized for the worst episode is paid for continuously while a predictive band
-is paid for episodically. Where any of those fails, a fixed floor or a static fleet becomes
-competitive --- on this trace no floor beat the forecast, and the closest
-measured analogue of that regime is the language pool's near-break-even
-conversion result.
+is paid for episodically. Where any of those fails, a fixed floor or a
+static fleet becomes competitive --- on this trace no floor beat the
+forecast.
 
 \paragraph{What bounds these claims.} The evidence is one seven-day
 production trace with an offered-work upper bound on decode demand
@@ -185,14 +191,14 @@ Appendix~\ref{app:engine-sensitivity}), not yet as a live serving loop ---
 the live anchor covers the control plane with mocked engines. Cost direction
 is denominator- and fold-sensitive: under request-matched normalization the
 published language point (p90 at conversion scale 8) reads 1.03$\times$ and
-the e13-robust p90/scale-6 point 0.87$\times$, and one daily fold misses the
+the fold-robust p90/scale-6 point 0.87$\times$, and one daily fold misses the
 encoder bound. No directional claim extends beyond the tested span, model
 and denominator.
 
 \section{Future work}
 \label{sec:conc-future}
 
-Three extensions remain. \emph{Completing the physical encoder anchor}:
+\emph{Completing the physical encoder anchor}:
 Chapter~\ref{cap:metodologia} reports a dense whole-tower sweep on the 5090
 whose measured $f(N)$ matches the AIC composition across the serving regime.
 What remains is one real encoder worker serving a burst replay end to end

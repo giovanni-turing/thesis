@@ -28,9 +28,9 @@ over time, and defends a specific answer: on \emph{its own} demand signal,
 placed ahead of the load by a probabilistic forecast, because that signal is
 invisible to the aggregate monitors reactive autoscalers watch and moves
 faster than a replica can start. The
-contribution is not any single ingredient but the complete operational
-chain --- encoder-specific signal, provisioning-horizon forecast, replica
-schedule under startup delay, window-level SLA and resource grading ---
+contribution is the complete operational chain rather than any single
+ingredient: encoder-specific signal, provisioning-horizon forecast, replica
+schedule under startup delay, and window-level SLA and resource grading,
 built once and measured end to end against the controls a practitioner would
 actually deploy.
 
@@ -45,7 +45,7 @@ token (TTFT, dominated by
 queueing and prefill) and time per output token (TPOT, decode; reported here
 as the equivalent per-gap inter-token latency, ITL). Such bounds are
 service-level \emph{objectives} (SLOs), conventionally stated on upper-tail
-percentiles --- the field's standard contract
+percentiles, the field's standard contract
 statistic~\cite{Dean2013TailAtScale,DeCandia2007Dynamo}; following
 serving-systems usage,
 this document writes ``the evaluation SLA'' for the specific tail bounds it
@@ -57,12 +57,12 @@ bottlenecks~\cite{Qin2025Mooncake}.
 A multimodal request adds a third phase preceding both: a vision encoder,
 in current practice a Vision Transformer~\cite{Dosovitskiy2021ViT}, ingests
 the request's images as grids of patches and emits embedding tokens. This
-stage resembles neither prefill nor decode --- its attention is non-causal
+stage resembles neither prefill nor decode: its attention is non-causal
 and carries no KV cache, its cost scales with image count and resolution
 rather than conversation length, and its work arrives in bulk, as $k\times
 k$ tile and frame grids of up to $97^2=\num{9409}$ images in a single
 request. These properties invite \emph{modality disaggregation}: run the
-encoder as its own pool, on its own hardware class, scaled independently ---
+encoder as its own pool, on its own hardware class, scaled independently, as
 demonstrated by ModServe~\cite{Qiu2025ModServe} and pursued by fully
 disaggregated~\cite{vLLMOmni2026} and elastic~\cite{Liu2025ElasticMM}
 multimodal runtimes. This thesis adopts that system model and extends it on
@@ -71,13 +71,13 @@ the control side.
 Independent pools require independent provisioning. The prevailing practice,
 inherited from stateless web serving, is \emph{reactive}: watch an aggregate
 load signal and add or remove replicas at a threshold. Two assumptions hide
-in that loop --- that the watched signal carries each pool's demand, and
+in that loop: that the watched signal carries each pool's demand, and
 that new replicas arrive faster than the load changes. The second is
 optimistic for GPU serving,
 where bringing up a replica (scheduling, weight loading, warmup) takes tens
 of seconds to minutes~\cite{Fu2024ServerlessLLM}.\footnote{The lead is
-pool-specific --- the encoder's is orchestration-bound at a few seconds,
-the language pool's tens of seconds and up --- so the evaluation sweeps
+pool-specific (the encoder's is orchestration-bound at a few seconds, the
+language pool's tens of seconds and up), so the evaluation sweeps
 per-pool leads.} Prediction-driven capacity management has appeared for
 text-only LLM fleets~\cite{Jaiswal2025SageServe,WarmServe2025}, but watches
 aggregate, request-level signals; which signal a predictor should watch in a
@@ -98,8 +98,8 @@ volume. Its four \emph{offered-work} signals (requests, images, context
 tokens and generated tokens per second) map onto the pools directly: images
 drive the vision pool, context tokens prefill, generated tokens decode.
 
-They are not interchangeable. A constant-fraction model --- vision work as a
-fixed multiple of request rate --- explains only $R^2=\num{0.123}$ of the
+They are not interchangeable. A constant-fraction model (vision work as a
+fixed multiple of request rate) explains only $R^2=\num{0.123}$ of the
 image-rate series but $R^2=\num{0.654}$ of decode demand. The image signal
 is also an order of magnitude burstier, and its extremes almost never
 co-occur with the request signal's: the week's largest burst drives image
@@ -118,44 +118,43 @@ for a policy that waits to observe them. Aggregation does not rescue the
 reactive loop: the arrival process is overdispersed at every tested
 operational scale (the Fano factor grows nearly three orders of magnitude
 with the counting window), so no tested averaging window makes the signal
-safe for a threshold rule --- the scale-free burstiness long documented for
-network and Web traffic~\cite{Leland1994,Crovella1997} reappearing in a
+safe for a threshold rule. This is the scale-free burstiness long documented
+for network and Web traffic~\cite{Leland1994,Crovella1997}, reappearing in a
 serving system's demand signals. The failure is also invisible to the
 dashboards reactive systems watch: in simulation the encoder pool violates
-its tail-latency target \emph{at the trace's own recorded rate} --- p99
-encoder delay reaching \SI{5.0}{\second} at 29\% mean utilization, chunked
-frames-class requests inducing episodic head-of-line blocking behind the
-pool's FIFO --- while a rate- or utilization-based monitor sees a healthy
+its tail-latency target \emph{at the trace's own recorded rate}, with p99
+encoder delay reaching \SI{5.0}{\second} at 29\% mean utilization and
+chunked frames-class requests inducing episodic head-of-line blocking behind
+the pool's FIFO, while a rate- or utilization-based monitor sees a healthy
 pool all day.
 
-The signal that carries the vision pool's load is not only the burstiest but
-the most persistent: its autocorrelation half-life is 69 minutes against 9
+The signal that carries the vision pool's load is the burstiest and also the
+most persistent: its autocorrelation half-life is 69 minutes against 9
 for requests, and its spectral-slope long-range-dependence proxy is the
 strongest of the four (Hurst ${\approx}0.93$ versus $0.83$ for requests).
 The signal most dangerous to reactive scaling thus retains the most
-predictive structure at exactly the horizons provisioning needs. The gap is
-a lead-time problem, and the lead time is available: to a forecaster.
+predictive structure at the horizons provisioning needs: the gap is a
+lead-time problem, and a forecaster can supply the lead.
 
 \section{Thesis statement and research questions}
 \label{sec:intro-thesis}
 
-The position this document defends, stated compactly:
+The position this document defends:
 
 \begin{quote}
 \itshape In a modality-disaggregated multimodal serving system, no single
 load signal can size every pool: the pools' demands originate in different
 request properties, decouple in time, and saturate at offered loads far
 apart. The vision pool must therefore be provisioned on its own demand
-signal --- which, being the least visible to conventional autoscaling and
+signal, which, being the least visible to conventional autoscaling and
 also the most persistent, is forecastable zero-shot at the horizons
 provisioning requires. Placing standing capacity from those forecasts buys,
 at equal tail-SLA compliance, a better resource-time frontier than reactive
 control given the same signal and the standing capacity it was denied.
 \end{quote}
 
-Three research questions structure the work. They are stated here as
-questions; their answers belong to the body chapters and are collected in
-Chapter~\ref{cap:conclusion}.
+Three research questions structure the work; their answers belong to the
+body chapters and are collected in Chapter~\ref{cap:conclusion}.
 
 \begin{description}\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
 \item[RQ1 --- Demand adequacy.] How strongly does request rate misrepresent
@@ -172,8 +171,8 @@ and static controls? (Chapter~\ref{cap:closedloop}.)
 \end{description}
 
 Whether the two-pool system can be simulated defensibly enough to carry
-these answers is not a research question but a methodological obligation, and
-is discharged as such: the encoder cost model, the composed simulator and
+these answers is treated as a methodological obligation rather than a
+research question: the encoder cost model, the composed simulator and
 the live-runtime anchor are presented together in
 Chapter~\ref{cap:metodologia}, as methodology supporting all three RQs.
 
@@ -187,7 +186,7 @@ These questions cannot be answered responsibly on a production cluster: the
 experiments sweep offered load past saturation and require counterfactuals
 (same trace, same arrivals, different scaler). The methodology is therefore
 trace-driven discrete-event simulation~\cite{Agrawal2024Vidur}, with
-fidelity a measured obligation --- every timing model is either collected on
+fidelity a measured obligation: every timing model is either collected on
 silicon and validated physically, or compared against its alternative.
 
 The platform prices each pool on the hardware class it targets
@@ -256,7 +255,7 @@ materialized demand signals the controller consumes.}
 The model under study is the Qwen3-VL family~\cite{Qwen3VL2025}: the 8B, 32B
 and 235B variants share one vision tower, so the calibrated encoder model
 transfers across the family, and a 235B-TP8 spot-check finds its saturation
-knee below the 8B's --- decoder scale shrinks only the language pool's
+knee below the 8B's; decoder scale shrinks only the language pool's
 envelope. Forecasting uses three pretrained time-series foundation models
 (TimesFM-2.0~\cite{Das2024TimesFM}, Chronos-2~\cite{Ansari2025Chronos2},
 Toto-2.0~\cite{Khwaja2026Toto2}) against classical baselines, under one
@@ -276,14 +275,16 @@ zero-shot, with an empirically calibrated upper band edge; a replica
 schedule derived from that band under an explicit startup delay; and a
 window-level grading (per burst window and calm day) of the resulting
 tail-SLA and resource-time against
-the controls a practitioner would deploy --- the best static fleet, an
+the controls a practitioner would deploy: the best static fleet, an
 identically informed reactive controller, that controller with a warm floor
 calibrated outside the evaluation span, and a perfect-future oracle. The
-chain is graded under a pre-frozen replay protocol, and the result is reported as
-what it is: a trade-off with an identified failure mode, in which forecast
-and reactive window p99 values tie on most evaluation windows, the latency
-advantage concentrates in the fastest onset, and the payoff is
-resource-time at equal compliance (Chapter~\ref{cap:closedloop}).
+chain is graded under a pre-frozen replay protocol, leading with
+span-level totals while the per-window grid remains the compliance
+gate. The result is a
+trade-off with an identified failure mode, whose payoff is
+resource-time at equal compliance: window p99 values tie on most
+evaluation windows, and the latency advantage concentrates in the fastest
+onset (Chapter~\ref{cap:closedloop}).
 
 No ingredient of that chain is claimed as novel; modality disaggregation,
 image volume as the encoder's load signal, predictive and cold-start-aware
@@ -294,7 +295,7 @@ made the chain measurable and are of independent use:
 \begin{enumerate}\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
 \item \textbf{A silicon-calibrated encoder cost model}
 (Chapter~\ref{cap:metodologia}): encoder performance data for a GPU class
-the planner's per-operator database did not cover --- RTX~5090 onboarded as
+the planner's per-operator database did not cover: RTX~5090 onboarded as
 an AIC system, encoder-attention and bf16-GEMM data collected at locked
 clocks and upstreamed (draft PR ai-dynamo/aiconfigurator~\#1312), the
 kernel-time ledger closed against physical measurement of the same network
@@ -336,15 +337,16 @@ assume an embedding-only handoff or a ${\geq}100$\,Gbps fabric
 deterministic, and the evaluation SLA's bounds are a design
 choice whose sensitivity Chapter~\ref{cap:metodologia} quantifies. The
 language-pool results characterize the 8B at TP1 but deploy it at
-TP2$\times$2, intermediate family members unpriced --- and the burst-window
+TP2$\times$2 (two tensor-parallel-2 replica groups), intermediate family
+members unpriced. The burst-window
 language \emph{pass} at TP2 is token-accounting-convention-dependent, while
 the TP1 prefill plateau and the vision-pool verdict are not. Finally, both
 policies,
 replayed against the live Dynamo runtime (real control plane, mocked
 engines) on the fastest-onset burst, reproduce the simulated verdicts in
-both directions --- TTFT p99 within 1.1--6.8\%, provisioned replica-time
-within 8\% (Chapter~\ref{cap:metodologia}); the physical encoder-worker
-anchor remains future work.
+both directions, with TTFT p99 within 1.1--6.8\% and provisioned
+replica-time within 8\% (Chapter~\ref{cap:metodologia}); the physical
+encoder-worker anchor remains future work.
 
 \section{Organization}
 \label{sec:intro-org}
@@ -352,8 +354,8 @@ anchor remains future work.
 Chapter~\ref{cap:related} situates the thesis in the literatures it borders;
 Chapter~\ref{cap:metodologia} builds the evaluation platform and states its
 measured fidelity (encoder cost model, composed simulator, live-runtime
-anchor). The three RQ chapters follow --- Chapters~\ref{cap:trace-eda},
-\ref{cap:predictors} and~\ref{cap:closedloop} --- and
+anchor). The three RQ chapters follow (Chapters~\ref{cap:trace-eda},
+\ref{cap:predictors} and~\ref{cap:closedloop}), and
 Chapter~\ref{cap:conclusion} answers the three questions and states the
 regime conditions for transfer. Appendix~\ref{ap:artifacts} maps every
 figure and table to its script, artifact and run identifier.
