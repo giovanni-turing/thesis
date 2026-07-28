@@ -303,6 +303,23 @@ Tab.~\ref{tab:app-engine}, Fig.~\ref{fig:app-engines} &
   tier2\_\allowbreak vllm\_\allowbreak replay\}.py} &
   same dir: \texttt{vllm\_*.json}, \texttt{merged\_*.csv},
   \texttt{*.stats.json}, \texttt{replay\_provenance.md} & --- \\
+Physical replay of controller-arm dispatch
+  (\S\ref{sec:aic-physical-replay}); settled evidence commit
+  \texttt{2daa383} &
+  \texttt{simulation/ silicon\_\allowbreak anchor\_\allowbreak
+  \{runner,extract\}.py};
+  \texttt{verification/ silicon\_\allowbreak negative\_\allowbreak
+  gates.py} (18 must-fail probes, wired into \texttt{verify\_all.sh}) &
+  \texttt{results/silicon\_ anchor/}: per-rep \texttt{rep.json} +
+  \texttt{batches.csv.gz} + \texttt{clock.jsonl}
+  (\texttt{burst3\_\allowbreak\{fc,re,staticC8\}/rep001--005});
+  frozen dispatch/schedule inputs (\texttt{dispatch/});
+  \texttt{burst3\_\allowbreak manifest\_\allowbreak excerpt.jsonl}
+  (sha-pinned, full resume history);
+  \texttt{SETTLED\_\allowbreak EVIDENCE.md} (queue pin, declared
+  \SI{1}{\second} bound, engine/model/driver/clock policy);
+  \texttt{env\_\allowbreak snapshot\_\allowbreak 2026-07-28.json} &
+  --- \\
 \end{longtable}}
 
 \section{Supplementary archive}

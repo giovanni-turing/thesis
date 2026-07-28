@@ -335,6 +335,56 @@ $1.14$--$1.16\times$ at larger images as fixed per-layer dispatch overhead
 amortizes over longer kernels. Per-term kernel figures are in the provenance
 manifest (Appendix~\ref{ap:artifacts}).
 
+\subsection{Physical replay of controller-arm dispatch}
+\label{sec:aic-physical-replay}
+
+The batch-one and $f(N)$ checks above validate the encoder \emph{cost
+model}; a final check validates the \emph{controller-arm delay verdicts}
+that model produces. One GPU cannot host a time-shared fleet without
+distorting physics, so the test is a trace-driven physical replay: each
+arm's exact batch dispatch sequence for the fastest-onset burst window
+(ledger key \texttt{burst3}) is regenerated from the frozen simulation
+artifacts, gated against the banked statistics (batch, forward, image,
+busy-time, and delay-percentile counts must match exactly), and executed
+batch-for-batch on the physical encoder (the extracted tower of
+Section~\ref{sec:aic-validation}, RTX~5090, bf16, clock-gated at
+${\geq}2377$\,\si{\mega\hertz}). A frozen-composition retiming then holds
+batch membership and worker schedule fixed while recomputing start and
+finish times from the \emph{measured} per-batch service, yielding a
+physically-timed per-request encoder delay. Composition is deliberately not
+allowed to re-form, so this is a retiming, not a closed-loop
+re-simulation; the measured per-$N$ table bounds that approximation.
+
+The replicate estimand is the per-repetition retimed delay p99; five
+predeclared repetitions per arm, reported as mean~$\pm$ sample standard
+deviation. Under the HuggingFace-eager execution stack the forecast arm
+retimes to $782.455 \pm 0.270$\,ms --- inside the \SI{1}{\second} bound
+--- while the floorless reactive arm retimes to $22{,}565.317 \pm
+0.935$\,ms, a ${\approx}29\times$ separation that dwarfs within-arm
+variation: \textbf{the simulated forecast-versus-reactive delay verdict for
+this window survives physical retiming} on the named engine and hardware.
+The static arm breaches under HuggingFace-eager ($1{,}397.413 \pm
+1.140$\,ms), but the like-for-like anchor for feasibility is the vLLM
+serving stack AIC's kernels target: exact queue retimes through the
+measured vLLM per-batch service keep static-$C{=}8$ feasible
+(\num{746.994}\,ms direct, \num{748.409}\,ms per-$N$ simulator-scaled,
+against \num{717.755}\,ms stored simulation p99). The HuggingFace-eager
+numbers are therefore the higher-latency measured sensitivity case on the
+tested shapes --- an execution-stack effect, consistent with the
+$1.4$--$1.6\times$ stack ratio above --- not a conservative bound, which
+would require an ordering argument over engines these measurements do not
+supply. Scope is equally narrow in the other directions: the replay anchors
+\emph{encoder delays only} (resource-time economics remain simulated by
+construction), a single physical unit retimes a simulated multi-worker
+schedule, and windows without settled physical cells carry no physical
+claim. Every included repetition passes exact membership recovery
+(1{,}241/1{,}241 requests) and byte-exact reconstruction of the banked
+simulation percentiles, and a negative-gate suite asserts that corrupted
+membership, reordered dispatch, or changed engine, model, or clock
+fingerprints fail loudly rather than silently retime
+(Appendix~\ref{ap:artifacts} pins every raw artifact at the settled
+evidence commit).
+
 \section{Two-pool composition and fidelity}
 \label{sec:aic-twopool}
 

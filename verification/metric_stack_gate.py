@@ -484,6 +484,26 @@ def bind(tese: Path) -> list:
         if "a symmetric forecast+floor family was not swept" not in dk:
             errs.append(f"deck {name}: unswept-family disclosure (conclusion tile) missing (msg 244)")
 
+    # 6f. Silicon physical-replay integration (bridge 199, settled commit
+    # 2daa383): replicate estimands with dispersion, the like-for-like vLLM
+    # anchor triple, the 199c sensitivity-not-bound role, and the narrow
+    # scope. Estimands recomputed 2026-07-28 from committed rep.json files.
+    metn = norm((tese / "tex/metodologia.tex").read_text())
+    rx(r"\$782\.455 \\pm 0\.270\$\\,ms --- inside the \\SI\{1\}\{\\second\} bound",
+       metn, errs, "replay: fc estimand 782.455+-0.270 bound to the 1 s PASS role")
+    rx(r"\$22\{,\}565\.317 \\pm 0\.935\$\\,ms", metn, errs,
+       "replay: reactive estimand 22,565.317+-0.935 present")
+    rx(r"static-\$C\{=\}8\$ feasible \(\\num\{746\.994\}\\,ms direct, \\num\{748\.409\}\\,ms"
+       r" per-\$N\$ simulator-scaled, against \\num\{717\.755\}\\,ms stored simulation p99\)",
+       metn, errs, "replay: vLLM exact-retime triple bound to static feasibility")
+    rx(r"not a conservative bound", metn, errs,
+       "replay: HF-eager carries the 199c sensitivity-not-bound role")
+    rx(r"anchors \\emph\{encoder delays only\} \(resource-time economics remain"
+       r" simulated by construction\)", metn, errs,
+       "replay: encoder-delays-only scope with simulated-economics clause")
+    rx(r"forecast-versus-reactive delay verdict for this window survives physical retiming",
+       metn, errs, "replay: verdict claim scoped to THIS WINDOW")
+
     # 7. figure byte-identity, restore in FINALLY (failure-safe)
     env_fig = tese / "figuras/sim/sim_metric_frontier.pdf"
     tracked = env_fig.read_bytes()
@@ -646,6 +666,14 @@ PROBES = [
      lambda s: s.replace("encoder-only comparator outside the 29-arm composed set",
                          "encoder-only comparator of the 29-arm composed set", 1),
      "C2 marked outside"),
+    ("silicon replay promoted to conservative bound (199c)",
+     "tex/metodologia.tex",
+     lambda s: s.replace("not a conservative bound", "a conservative lower bound", 1),
+     "sensitivity-not-bound"),
+    ("silicon fc estimand perturbed",
+     "tex/metodologia.tex",
+     lambda s: s.replace("782.455 \\pm 0.270", "782.5 \\pm 0.270", 1),
+     "fc estimand"),
 ]
 
 

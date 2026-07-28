@@ -3413,3 +3413,23 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   flagged (sim_knees SLA hline labels dropped by plotly at HEAD too;
   scatter constant-fraction legend).
 - **Feeds**: visual mailbox per-image re-verdicts (all 17 packets).
+
+## silicon-integration-delta-metodologia (2026-07-28)
+
+- **What**: new subsection "Physical replay of controller-arm dispatch"
+  (sec:aic-physical-replay) in metodologia, per the bridge-199 conditions:
+  replicate estimand (per-rep retimed p99, mean±sample sd over 5
+  predeclared reps) — fc 782.455±0.270 ms inside the 1 s bound vs reactive
+  22,565.317±0.935 (≈29×; verdict survives physical retiming, THIS window,
+  named engine+hardware); vLLM exact retimes keep static-C8 feasible
+  (746.994 direct / 748.409 per-N vs 717.755 stored); HF-eager = measured
+  sensitivity case, NOT a conservative bound (199c); encoder delays only,
+  economics simulated by construction; membership 1,241/1,241 + banked
+  reconstruction exact + negative-gate suite cited. Appendix artifact-ledger
+  row pins everything at settled commit 2daa383. Estimands recomputed from
+  committed rep.jsons before writing (match reviewer 350 digit-exact).
+- **Gate**: 6 new binds (estimand+role adjacency, vLLM triple bound to
+  static feasibility, sensitivity-not-bound role, encoder-delays-only
+  scope, this-window verdict scope) + 2 must-fail probes (bound promotion,
+  estimand perturbation); selftest ALL PASS.
+- **Feeds**: the separately-scoped integration review round (bridge 160).
