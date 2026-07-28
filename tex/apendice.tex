@@ -313,7 +313,15 @@ Physical replay of controller-arm dispatch
   gates.py} (18 must-fail probes, wired into \texttt{verify\_all.sh}) &
   \texttt{results/silicon\_ anchor/}: per-rep \texttt{rep.json} +
   \texttt{batches.csv.gz} + \texttt{clock.jsonl}
-  (\texttt{burst3\_\allowbreak\{fc,re,staticC8\}/rep001--005});
+  (\texttt{burst3\_\allowbreak\{fc,re,staticC8\}/rep001--005};
+  \texttt{steady24h\_\allowbreak\{fc,re,staticC8\}/rep001--005},
+  tier-3 evidence commit \texttt{ceb91b6} with
+  \texttt{TIER3\_\allowbreak STEADY24H\_\allowbreak EVIDENCE.md},
+  \texttt{steady24h\_\allowbreak summary.json},
+  \texttt{steady24h\_\allowbreak vllm\_\allowbreak retimes.json}
+  (validation-gated on the verified burst3 pair; both vLLM tables banked
+  with the table-provenance disclosure) and the sha-pinned steady24h
+  manifest excerpt);
   frozen dispatch outputs (\texttt{dispatch/});
   \texttt{burst3\_\allowbreak manifest\_\allowbreak excerpt.jsonl}
   (sha-pinned, full resume history);

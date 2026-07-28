@@ -375,13 +375,36 @@ numbers are therefore the higher-latency measured sensitivity case on the
 tested shapes --- an execution-stack effect, consistent with the
 $1.4$--$1.6\times$ stack ratio above --- not a conservative bound, which
 would require an ordering argument over engines these measurements do not
-supply. Scope is equally narrow in the other directions: the replay anchors
+supply.
+
+The same protocol was applied to the opposite regime: a calm 24-hour slice
+(ledger key \texttt{steady24h}; five repetitions per arm), which
+dispatches mostly single-image batches (p50 $N{=}1$) --- the small-$N$ end
+of $f(N)$, the corner the burst window does not exercise. In the banked
+simulation all three arms sit inside the bound (static \num{418.205},
+forecast \num{681.117}, reactive \num{684.999}\,ms), and the physical
+retiming preserves both that ordering and the forecast-versus-reactive
+near-tie under every service representation. Under the measured vLLM
+per-batch service the calm day passes for every arm
+(forecast/reactive \num{741.987} direct and \num{745.833} per-$N$
+scaled; static \num{435.423}/\num{436.407}\,ms); under HuggingFace-eager
+the two controller arms cross the bound ($1{,}120.967 \pm 0.456$ and
+$1{,}121.004 \pm 0.143$\,ms) while static does not ($610.596 \pm
+0.175$\,ms). The absolutes are therefore engine-band-conditional; the
+invariant facts are the ordering, the 0.037\,ms near-tie, and the
+like-for-like PASS. On physical silicon the forecast policy shows no
+calm-day delay penalty relative to reactive; against the overprovisioned
+static arm both controller arms trade delay headroom for the worker-hour
+savings quantified in Chapter~\ref{cap:closedloop}.
+
+Scope is equally narrow in the other directions: the replay anchors
 \emph{encoder delays only} (resource-time economics remain simulated by
 construction), a single physical unit retimes a simulated multi-worker
 schedule, and windows without settled physical cells carry no physical
 claim. Every included repetition passes exact membership recovery
-(1{,}241/1{,}241 requests) and reconstruction of the banked simulation
-percentiles within the declared numerical tolerances, and a negative-gate suite asserts that corrupted
+(1{,}241/1{,}241 requests on the burst window; 37{,}672/37{,}672 on the
+calm day) and reconstruction of the banked simulation percentiles within
+the declared numerical tolerances, and a negative-gate suite asserts that corrupted
 membership, reordered dispatch, or changed engine, model, or clock
 fingerprints fail loudly rather than silently retime
 (Appendix~\ref{ap:artifacts} pins every raw artifact at the settled

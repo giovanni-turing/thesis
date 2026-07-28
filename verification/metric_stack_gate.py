@@ -504,6 +504,21 @@ def bind(tese: Path) -> list:
     rx(r"forecast-versus-reactive delay verdict for this window survives physical retiming",
        metn, errs, "replay: verdict claim scoped to THIS WINDOW")
 
+    # 6g. Tier-3 calm-day replay (evidence commit ceb91b6): HF-eager
+    # estimands, the vLLM like-for-like PASS quad, the banked triple, and
+    # the engine-band-conditional role.
+    rx(r"\$1\{,\}120\.967 \\pm 0\.456\$ and \$1\{,\}121\.004 \\pm 0\.143\$\\,ms",
+       metn, errs, "calm day: fc/re HF-eager estimand pair adjacent (near-tie form)")
+    rx(r"\$610\.596 \\pm 0\.175\$\\,ms", metn, errs,
+       "calm day: static HF-eager estimand present")
+    rx(r"passes for every arm \(forecast/reactive \\num\{741\.987\} direct and"
+       r" \\num\{745\.833\} per-\$N\$ scaled; static \\num\{435\.423\}/\\num\{436\.407\}\\,ms\)",
+       metn, errs, "calm day: vLLM quad bound to the every-arm PASS role")
+    rx(r"static \\num\{418\.205\}, forecast \\num\{681\.117\}, reactive \\num\{684\.999\}\\,ms",
+       metn, errs, "calm day: banked sim triple in the inside-the-bound sentence")
+    rx(r"engine-band-conditional", metn, errs,
+       "calm day: absolutes carry the engine-band-conditional role")
+
     # 7. figure byte-identity, restore in FINALLY (failure-safe)
     env_fig = tese / "figuras/sim/sim_metric_frontier.pdf"
     tracked = env_fig.read_bytes()
@@ -674,6 +689,14 @@ PROBES = [
      "tex/metodologia.tex",
      lambda s: s.replace("782.455 \\pm 0.270", "782.5 \\pm 0.270", 1),
      "fc estimand"),
+    ("calm-day absolutes promoted to engine-independent",
+     "tex/metodologia.tex",
+     lambda s: s.replace("engine-band-conditional", "engine-independent", 1),
+     "engine-band-conditional"),
+    ("calm-day near-tie perturbed",
+     "tex/metodologia.tex",
+     lambda s: s.replace("1{,}121.004 \\pm 0.143", "1{,}121.0 \\pm 0.143", 1),
+     "fc/re HF-eager estimand pair"),
 ]
 
 

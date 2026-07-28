@@ -3446,3 +3446,28 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   corpus 534/0. Thesis 135pp 0/0 at f03e17c; suite 65/0 DELIVERY-READY.
 - **Feeds**: nothing — the scientific review line is fully closed. Open:
   visual per-image re-verdicts (17 figures @ 97ce588, deck slide 7).
+
+## tier3-steady24h-evidence-round (2026-07-28)
+
+- **What**: author directive — the calm day goes in the thesis. Settled
+  tier-3 evidence commit ceb91b6 (15 steady24h reps + deterministic
+  summary + frozen excerpt w/ daemon timeline + vLLM exact retimes,
+  validation-gated on the reviewer-verified burst3 pair; 32/32 sweep
+  clean; burst4 stays excluded, broken trio disclosed). Manuscript:
+  calm-day paragraph in sec:aic-physical-replay — banked sim all-PASS
+  triple 418.205/681.117/684.999; vLLM like-for-like ALL ARMS PASS
+  (fc/re 741.987 direct / 745.833 per-N; static 435.423/436.407);
+  HF-eager sensitivity case fc 1,120.967±0.456 / re 1,121.004±0.143
+  breach vs static 610.596±0.175 pass; ordering + 0.037ms near-tie
+  invariant; engine-band-conditional absolutes per 199c. Appendix row
+  extended (tier-3 pin ceb91b6). Gate: 5 binds + 2 probes, selftest
+  green. Build 135pp 0/0.
+- **MATERIAL DISCLOSURE (to bridge)**: the D63-verified burst3 vLLM pair
+  746.994/748.409 reproduces digit-exact ONLY from the tier-5 rerun
+  table, not the canonical phase-E artifact (which gives 745.758/747.169,
+  Δ1.24ms, same PASS) — both author and reviewer verified rerun-table
+  numbers unknowingly. Both tables banked side by side in
+  steady24h_vllm_retimes.json; manuscript keeps the verified pair;
+  round 167 raises the disclosure for reviewer ruling.
+- **Feeds**: bridge tier-3 round (167); QA crib calm-day answer refresh
+  after round closes.
