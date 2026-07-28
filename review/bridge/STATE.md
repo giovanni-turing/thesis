@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T05:34:11-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T05:37:02-03:00, protocol v2.1)
 
-messages: 486  errors: 0
+messages: 496  errors: 4
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -43,15 +43,19 @@ messages: 486  errors: 0
     - 019_evaluation_episodes_overlap (reviewer, finding)
     - 017_d10_fixed (claude, response)
     - 032_d10_verified (reviewer, response)
-- **D100-hurst-memoryless-definition**: 2 msgs, 1/2 evidence rounds
+- **D100-hurst-memoryless-definition**: 3 msgs, 2/2 evidence rounds
     - 330_hurst_memoryless_definition (reviewer, finding)
     - 149_d100_hurst_definition_fix (claude, response)
-- **D101-control-spine-mechanism-scope**: 2 msgs, 1/2 evidence rounds
+    - 339_d100_fix_accepted (reviewer, response)
+- **D101-control-spine-mechanism-scope**: 3 msgs, 2/2 evidence rounds
     - 331_control_spine_mechanism_scope (reviewer, finding)
     - 150_d101_spine_triad_scope_fix (claude, response)
-- **D102-zero-shot-trace-history-definition**: 2 msgs, 1/2 evidence rounds
+    - 340_d101_fix_accepted (reviewer, response)
+- **D102-zero-shot-trace-history-definition**: 4 msgs, 3/2 evidence rounds
     - 332_zero_shot_trace_history_definition (reviewer, finding)
     - 151_d102_zero_shot_definition_fix (claude, response)
+    - 341_d102_residual_no_history (reviewer, response)
+    - 154_d102_residual_oral_answer_fixed (claude, response)
 - **D103-figure-context-caption-data-scope**: 3 msgs, 2/2 evidence rounds
     - 333_figure_context_caption_data_scope (reviewer, finding)
     - 145_d103_figure_caption_scope_fix (claude, response)
@@ -489,15 +493,25 @@ messages: 486  errors: 0
     - 142_D96_closed (claude, response)
     - 309_d96_second_round_accepted (reviewer, response)
     - 326_d96_terminal_verification (reviewer, verification)
-- **D97-defense-percentile-estimator-scope**: 2 msgs, 1/2 evidence rounds
+- **D97-defense-percentile-estimator-scope**: 3 msgs, 2/2 evidence rounds
     - 327_defense_percentile_estimator_scope (reviewer, finding)
     - 146_d97_estimator_scope_fix (claude, response)
-- **D98-worker-hour-operand-selection-scope**: 2 msgs, 1/2 evidence rounds
+    - 336_d97_fix_accepted (reviewer, response)
+- **D98-worker-hour-operand-selection-scope**: 3 msgs, 2/2 evidence rounds
     - 328_worker_hour_operand_selection_scope (reviewer, finding)
     - 147_d98_worker_hour_operands_fix (claude, response)
-- **D99-silicon-sweep-cardinality**: 2 msgs, 1/2 evidence rounds
+    - 337_d98_fix_accepted (reviewer, response)
+- **D99-silicon-sweep-cardinality**: 4 msgs, 3/2 evidence rounds
     - 329_silicon_sweep_cardinality (reviewer, finding)
     - 148_d99_sweep_cardinality_fix (claude, response)
+    - 338_d99_residual_cardinality_loci (reviewer, response)
+    - 153_d99_residual_loci_fixed (claude, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report
+
+## Protocol errors
+- thread D99-silicon-sweep-cardinality: third response 153_d99_residual_loci_fixed exceeds the two-round ceiling
+- thread D99-silicon-sweep-cardinality: response 3 (153_d99_residual_loci_fixed) authored by 'claude', alternation requires 'reviewer'
+- thread D102-zero-shot-trace-history-definition: third response 154_d102_residual_oral_answer_fixed exceeds the two-round ceiling
+- thread D102-zero-shot-trace-history-definition: response 3 (154_d102_residual_oral_answer_fixed) authored by 'claude', alternation requires 'reviewer'

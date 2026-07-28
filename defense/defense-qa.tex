@@ -774,10 +774,13 @@ locally crossed quantiles, recorded unrepaired apart from a nonnegativity
 floor.}
 
 \Q{Why zero-shot forecasting? Would fine-tuning not do better?}
-\A Almost certainly, which is exactly why I did not do it. Zero-shot is the
-\emph{conservative} reading of the foundation models' capability: it is the lower
-bound on what an operator gets on day one, with no trace history and no training
-pipeline. If the claim holds zero-shot, fine-tuning can only help. Reporting
+\A Almost certainly, which is exactly why I did not do it. Zero-shot here
+means no gradient step, no fitted target-trace parameter, and no per-signal
+hyperparameter search --- each forecast still conditions on its inference-time
+history window. It is the \emph{conservative} reading of the foundation
+models' capability: the lower bound on what an operator gets on day one of
+deployment, with a context buffer that fills as traffic arrives and no
+training pipeline. If the claim holds zero-shot, fine-tuning can only help. Reporting
 fine-tuned numbers would have made the result stronger on paper and weaker as
 evidence.
 
@@ -1626,8 +1629,9 @@ pinned production container, and upstreamed. Second, the dominant operator agree
 with physical measurement within ${\approx}3\%$ and the end-to-end kernel ledger
 closes with no unexplained residual. Third, and most important, the composed cost
 model was validated against \emph{the serving engine's own vision tower} (vLLM)
-over a dense sweep of 69 batch sizes, holding within $12.8\%$ across the entire
-$N \le 64$ regime the pool actually batches into. And the closed-loop result was
+over a 69-point sweep --- the dense $N{=}1,\ldots,64$ serving grid plus five
+off-cap probes $\{96,128,192,256,512\}$ --- holding within $12.8\%$ across
+the entire $N \le 64$ regime the pool actually batches into. And the closed-loop result was
 re-run with the measured vLLM cost substituted for the model's: the p99 moved
 from \SI{589}{\milli\second} to \SI{606}{\milli\second} and the provisioned
 worker-seconds did not move at all.
@@ -1798,8 +1802,9 @@ measured one. Say it before it is said to me.}
 
 \Q{Is a 12.8\% cost-model error acceptable? That sounds large.}
 \A The disciplined answer has three steps, in order. First, the error is
-\emph{bounded and measured}, not estimated: a dense sweep of 69 batch sizes,
-$N{=}1$ through 512, against the serving engine's own vision tower, with the
+\emph{bounded and measured}, not estimated: a 69-point sweep (the dense
+$N{=}1,\ldots,64$ serving grid plus five off-cap probes
+$\{96,128,192,256,512\}$) against the serving engine's own vision tower, with the
 maximum deviation $+12.7\%$ at $N{=}52$ inside the $N \le 64$ regime the pool
 actually batches into, and the sign disclosed in both directions (the model
 also \emph{over}prices some shapes, minimum ratio 0.914). The $+21.8\%$ drift
@@ -2875,8 +2880,9 @@ and the test of integrity is what happens when the belt takes a hit. When the
 $1.4$--$1.6\times$ silicon anomaly appeared, the repair was
 \emph{content-increasing} in exactly Lakatos's sense: the execution-engine
 hypothesis predicted something new and checkable --- that measuring the
-serving engine's own kernels would close the gap --- and the dense 69-point
-vLLM sweep then checked it, landing at 12.8\%. A progressive problemshift, not
+serving engine's own kernels would close the gap --- and the 69-point vLLM
+sweep (dense $N{\le}64$ grid plus five off-cap probes) then checked it,
+landing at 12.8\% in-cap. A progressive problemshift, not
 an ad hoc rescue; the anomaly produced the thesis's strongest validation
 artifact. Falsifiability I answer in Popper's currency because the committee
 expects it (a trace with $R^2 \to 1$ kills the premise; a floorless

@@ -3325,3 +3325,25 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   corpus 486 msgs / 0 errors.
 - **Feeds**: figure-regen-spec.md governs the post-campaign regen pass; D103
   terminal verification fires on this commit.
+
+## silicon-negative-gates-suite (2026-07-28)
+
+- **What**: `verification/silicon_negative_gates.py` — the bridge-101 negative
+  gate tests, now real. 18 corruption probes over a copied rep
+  (burst3__fc/rep002 + dispatch inputs, temp-dir guarded, campaign untouched):
+  membership drop/dup, request drop/dup, dispatch reorder/mismatch, schedule
+  sha + content, model/engine/attn fingerprints, clock-band/tenancy, banked
+  headline edit, gate-verdict flip. All 18 fail loudly. Uses the runner's own
+  functions via importlib shim (recover_membership, retime, request_delays,
+  pct, gate_verdict, throttle_evidence) — no reimplemented math.
+- **Bonus**: `--all-reps` read-only sweep verifies 29/29 completed reps against
+  all 9 gates, including the three preempted-and-resumed reps — the
+  resume-misalignment exposure never materialized in campaign data.
+- **Gap analysis (extractor-side guards, post-campaign)**: dispatch log
+  `batches.jsonl` is unhashed in meta.provenance (add batches_jsonl_sha256 —
+  clearest guard); reconstruction gate is advisory (consumers must filter
+  `reconstruction_gate.pass`); no measured-rows-vs-dispatch-log
+  reconciliation by batch_idx (resume slices by len(rows)); G2/G7
+  fingerprints recorded but never compared; G1b verdict trusted not
+  recomputed. Runner NOT patched (campaign freeze).
+- **Feeds**: settled evidence commit (task 24, item 9); suite commits with it.

@@ -36,9 +36,27 @@ Every regenerated figure re-enters the visual mailbox for per-image re-verdict.
 - Keep: linear axes, solid-circle median vs dotted reference distinction.
 - Caption itself already realigned (main-bridge D103, accepted 2/2).
 
-### eda_c_seven_day_signals (packet 012) — criteria TBD from packet
-### eda_eval_windows (packet 013) — criteria TBD from packet
+### Per-image target canvases (deep-dive packets 012–020, all MAJOR)
 
-(Continue appending one block per deep-dive packet as the series streams in;
-final pass must cover every packet's Required Action list plus the family
-requirements above.)
+Every packet so far instantiates the same triple defect — canvas overscale
+(0.375–0.471×, effective text 3.0–3.8 pt), reversed rotated y-axis text
+streams, PUA glyph corruption — with a per-figure target canvas:
+
+| packet | figure | target canvas (pt) | placement |
+|---|---|---|---|
+| 012 | eda_c_seven_day_signals | ≈367×220 | — |
+| 013 | eda_eval_windows | ≈405×150 | — |
+| 014 | eda_d_img_vs_req_scatter | ≈265×160 | 0.62\linewidth |
+| 015 | eda_i_burst_onsets | ≈350×155 | — |
+| 016 | eda_q_multires | ≈376×165 | — |
+| 017 | aic_fn | ≈427×166 | \linewidth |
+| 018 | sim_knees | ≈427×175 | \linewidth |
+| 019 | sim_burst_queue | ≈427×213 | \linewidth |
+| 020 | pred_forecast_band | ≈376×148 | 0.88\linewidth |
+
+Figure-specific extras: 014 colorbar + axis-title glyphs; 017 the 12 PUA
+multiplier glyphs in numerical annotations; 020 PUA timestamp colons.
+
+(Stream still in progress — append rows for the remaining packets, then the
+regen agent must satisfy every packet's Required Action list plus the family
+requirements above, and each figure re-enters the mailbox for re-verdict.)

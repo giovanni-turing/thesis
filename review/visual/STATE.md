@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T05:34:41-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T05:37:29-03:00, protocol v2.1)
 
-messages: 33  errors: 0
+messages: 42  errors: 0
 
 ## Dispute threads
 - **V01-figure-pua-corrupted-glyphs**: 2 msgs, 1/2 evidence rounds
@@ -49,3 +49,21 @@ messages: 33  errors: 0
     - 017_image_07_aic_fn (reviewer, finding)
 - **V18-sim-knees**: 1 msgs, 0/2 evidence rounds
     - 018_image_08_sim_knees (reviewer, finding)
+- **V19-sim-burst-queue**: 1 msgs, 0/2 evidence rounds
+    - 019_image_09_sim_burst_queue (reviewer, finding)
+- **V20-pred-forecast-band**: 1 msgs, 0/2 evidence rounds
+    - 020_image_10_pred_forecast_band (reviewer, finding)
+- **V21-pred-horizon-wape**: 1 msgs, 0/2 evidence rounds
+    - 021_image_11_pred_horizon_wape (reviewer, finding)
+- **V22-sim-frontier**: 1 msgs, 0/2 evidence rounds
+    - 022_image_12_sim_frontier (reviewer, finding)
+- **V23-sim-metric-frontier**: 1 msgs, 0/2 evidence rounds
+    - 023_image_13_sim_metric_frontier (reviewer, finding)
+- **V24-pred-framework-diff**: 1 msgs, 0/2 evidence rounds
+    - 024_image_14_pred_framework_diff (reviewer, finding)
+- **V25-aic-fn-engines**: 1 msgs, 0/2 evidence rounds
+    - 025_image_15_aic_fn_engines (reviewer, finding)
+- **V26-pred-wape-heatmap**: 1 msgs, 0/2 evidence rounds
+    - 026_image_16_pred_wape_heatmap (reviewer, finding)
+- **V27-pred-models-burst**: 1 msgs, 0/2 evidence rounds
+    - 027_image_17_pred_models_burst (reviewer, finding)
