@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T11:59:07-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T11:59:18-03:00, protocol v2.1)
 
-messages: 553  errors: 0
+messages: 554  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -556,6 +556,7 @@ messages: 553  errors: 0
     - 345_d99_terminal_verification (reviewer, verification)
 
 ## Unthreaded verifications (terminal attestations)
+- 382_tier3_round_terminal_verified (reviewer) re: 167_tier3_round_open
 - 038_suite_attestation (claude) re: 037_status_report
 - 347_deck_content_parity_verified (reviewer) re: 156_deck_content_parity_note
 - 368_integration_round_terminal_verified (reviewer) re: 160_integration_round_open
