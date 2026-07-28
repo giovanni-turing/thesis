@@ -203,8 +203,9 @@ Tab.~\ref{tab:cl-ewma} & EWMA p90 calibration, identical encoder loop &
   \texttt{predictors:\allowbreak ewma\_*} \\
 Tab.~\ref{tab:cl-triad}; LLM lead sweep (\S\ref{sec:cl-llm}); onset
   detection (\S\ref{sec:cl-matrix}) &
-  \texttt{simulation/ run\_44\_riders.sh; replay\_with\_forecast.py;
-  detect\_onsets\_44.py} &
+  \texttt{simulation/ run\_\allowbreak 44\_\allowbreak riders.sh;
+  replay\_\allowbreak with\_\allowbreak forecast.py;
+  detect\_\allowbreak onsets\_\allowbreak 44.py} &
   \texttt{results/riders44/} (reports; \texttt{detection\_delay.json}).
   \emph{Caveat:} these legacy objects embed pre-correction onset labels
   (burst1 220, burst6 1\,min); authoritative onset statistics are
@@ -234,13 +235,14 @@ Tab.~\ref{tab:cl-frontier} (${\equiv}$~\ref{tab:cl-aggregate}),
   \texttt{adversarial/}, \texttt{eval\{,\_family\}/};
   \texttt{results/aggregate44 \{,\_rho,\_strict\}/} &
   \texttt{comparator\_\allowbreak frontier:*};
-  \texttt{aggregate44\{,\_rho, \_strict\}:*}; static
+  \texttt{aggregate44\allowbreak\{,\allowbreak\_rho, \_strict\}:*}; static
   \texttt{a6:static\_C8} \\
 Hybrid $\max(fc,re)$ schedule, folds, combiner sweep
   (\S\ref{sec:cl-aggregate}) &
-  \texttt{simulation/ run\_encoder\_hybrid*.sh; combine\_schedules.py} &
+  \texttt{simulation/ run\_\allowbreak encoder\_\allowbreak hybrid*.sh;
+  combine\_\allowbreak schedules.py} &
   \texttt{results/ encoder\_hybrid/} (with \texttt{folds/}, \texttt{combos/})
-  & \texttt{encoder\_hybrid:*} \\
+  & \texttt{encoder\_\allowbreak hybrid:*} \\
 Daily folds (\S\ref{sec:cl-limits}) & fold split + per-fold replay &
   \texttt{defense/anim/data/ g4\_folds/} & \texttt{g4:*} \\
 Tabs.~\ref{tab:cl-ledger-enc}--\ref{tab:cl-ledger-joint},
@@ -275,7 +277,9 @@ Tab.~\ref{tab:cl-llm-week-stack} &
   occurrence counts asserted) & (DB: cross-check only) \\
 Language operating point: $q\times s$ grid, held-out frontier, folds
   (\S\ref{sec:cl-llm}) &
-  \texttt{simulation/ run\_lang\_calib\{,\_eval\}.sh; run\_lang\_folds.sh} &
+  \texttt{simulation/ run\_\allowbreak lang\_\allowbreak
+  calib\allowbreak\{,\_eval\}.sh; run\_\allowbreak lang\_\allowbreak
+  folds.sh} &
   \texttt{results/lang\_qsweep/} (grid, \texttt{eval\_*/}, \texttt{folds\_*/})
   & \texttt{langcalib:*}; \texttt{lang\_qsweep:*} \\
 Controller inference cost (\S\ref{sec:cl-ledger-cost}) &
@@ -287,13 +291,16 @@ Tab.~\ref{tab:val-anchor}; live divergences (\S\ref{sec:val-findings}) &
   \texttt{results/live51/}: offline twins; \texttt{live\_runs/} &
   \texttt{live:arm:*} \\
 Physical encoder anchor (\S\ref{sec:aic-validation}) &
-  \texttt{phaseE\_physical\_ anchor/\{bench\_encoder\_ anchor,
-  silicon\_in\_loop, silicon\_multiworker\}.py} &
+  \texttt{phaseE\_physical\_ anchor/\allowbreak\{bench\_encoder\_ anchor,
+  silicon\_\allowbreak in\_\allowbreak loop,
+  silicon\_\allowbreak multiworker\}.py} &
   \texttt{anchor\_sdpa\_*.json}; \texttt{oneworker\_artifact/};
   \texttt{silicon\_multiworker.json} & --- \\
 Tab.~\ref{tab:app-engine}, Fig.~\ref{fig:app-engines} &
-  \texttt{phaseE\_physical\_ anchor/\{vllm\_eager\_dense, vllm\_multires,
-  vit\_compile\_dense, tier2\_vllm\_replay\}.py} &
+  \texttt{phaseE\_physical\_ anchor/\allowbreak\{vllm\_\allowbreak
+  eager\_\allowbreak dense, vllm\_\allowbreak multires,
+  vit\_\allowbreak compile\_\allowbreak dense,
+  tier2\_\allowbreak vllm\_\allowbreak replay\}.py} &
   same dir: \texttt{vllm\_*.json}, \texttt{merged\_*.csv},
   \texttt{*.stats.json}, \texttt{replay\_provenance.md} & --- \\
 \end{longtable}}
@@ -392,7 +399,8 @@ unfused elementwise, DeepStack and patch-embed overhead intact, and
 either engine's default. vLLM's \emph{own} vision tower through its
 FlashAttention backend is the like-for-like anchor --- AIC's collected
 operators \emph{are} vLLM's kernels (attention
-\texttt{kernel\_source=vllm\_vit\_flash\_attn}, GEMMs vLLM
+\texttt{kernel\_\allowbreak source=\allowbreak vllm\_\allowbreak
+vit\_\allowbreak flash\_\allowbreak attn}, GEMMs vLLM
 \texttt{RowParallelLinear}) --- and it matches the composition at the table's
 anchor shapes. The earlier $1.4$--$1.6\times$ ``gap'' is thus the
 HuggingFace$\to$vLLM execution-stack difference: against the engine it

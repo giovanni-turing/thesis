@@ -356,6 +356,7 @@ frontier reported rather than a value selected to flatter.
 \section{Encoder pool: window compliance and the dials}
 \label{sec:cl-matrix}
 
+{\emergencystretch=1em
 The p90-forecast policy at $\rho{=}15$ is graded on a per-window factorial
 (the 5 in-span evaluation windows $\times$ 3 TSFMs $\times$ 4 realizable issued
 leads $\{15,30,45,165\}$\,s, each a two-pool replay under \emph{issue-time}
@@ -373,7 +374,7 @@ reached the plateau only by target-time indexing, an upper bound rather than
 an issued lead. The identically informed reactive controller, by contrast,
 loses the fastest onset at every lead and the 35-minute onset beyond 45
 seconds, though the 60-minute onset still passes at $L{=}\SI{165}{\second}$
-(\SI{904.7}{\milli\second}).
+(\SI{904.7}{\milli\second}).\par}
 
 On the burst windows the p90 schedule's p99 encoder delay is pinned at
 \SI{588}{\milli\second}, the \emph{observed no-queue plateau} this harness
@@ -1330,7 +1331,16 @@ One caveat keeps that volume from being over-read: scale is not independence
 --- the runs replay a \emph{single} production trace over five evaluation
 windows, and the limits of Section~\ref{sec:cl-limits} apply undiminished.
 
+% Same running-head fix as Section~\ref{sec:cl-comparators}: suppress the mark
+% \section emits itself so the short \sectionmark below is the first mark on
+% the opening page and the head rule does not overflow.
+\makeatletter
+\let\cl@svsectionmark\sectionmark
+\let\sectionmark\@gobble
 \section{Language pool: the conversion result (secondary)}
+\let\sectionmark\cl@svsectionmark
+\makeatother
+\sectionmark{Language pool: conversion (secondary)}
 \label{sec:cl-llm}
 
 The language pool is a \emph{secondary} result, and its evidential status

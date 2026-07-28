@@ -476,7 +476,7 @@ tabulated knee is insensitive to this --- $s{=}2$ meets every bound and the
 $s{=}3$ inter-token p99 breaches \SI{100}{\milli\second} outright.}
 \label{tab:sim-knees}
 \footnotesize
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{2pt}
 \begin{tabular}{llrrr}
 \toprule
 Pool / timing & Window & Knee & Offered & TTFT / enc.\ delay p99 (ms) \\
@@ -668,7 +668,7 @@ policy-level; all are worth knowing before a deployment:
 
 \begin{description}
 \item[Live \texttt{startup\_time} inverts the offline semantics.] Offline it
-keeps a scaling-up mocker invisible to the router until ready; live it
+keeps a scal\-ing-up mocker invisible to the router until ready; live it
 registers the worker \emph{immediately} and stalls its requests, opening a
 routable-but-dead window that a load-aware router, seeing an idle-looking
 worker, preferentially fills. Hence the delayed-spawn modeling above.

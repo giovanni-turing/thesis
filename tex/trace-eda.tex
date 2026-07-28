@@ -138,6 +138,7 @@ Vision: video/frame analysis    & 3.4\%  & \textbf{85.7\%} & 32.9\% & 400 / 31{,
 \section{Temporal structure}
 \label{sec:eda-temporal}
 
+{\emergencystretch=1em
 The arrival process is not Poisson at any tested scale
 (\SI{1}{\second}--\SI{1}{\hour}): inter-arrival coefficient of variation 1.55,
 per-second counts overdispersed against Poisson$(1.65)$, and a Fano factor that
@@ -146,7 +147,7 @@ keeps growing across the measured range of counting windows, from 1.8 at
 autoscaler would plausibly use is therefore overdispersed. Spectrally, a diurnal harmonic family
 (\SI{24}{\hour} fundamental, weaker 12/8/\SI{6}{\hour} overtones) sits on a
 strong $1/f^{\beta}$ long-range-dependent background; no sharp non-harmonic
-line dominates the sub-diurnal band above it.
+line dominates the sub-diurnal band above it.\par}
 
 Table~\ref{tab:eda-persistence} summarizes the four demand signals at one-minute
 resolution. The load-bearing contrast is between the two pools' arrival signals:

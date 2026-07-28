@@ -3347,3 +3347,14 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   fingerprints recorded but never compared; G1b verdict trusted not
   recomputed. Runner NOT patched (campaign freeze).
 - **Feeds**: settled evidence commit (task 24, item 9); suite commits with it.
+
+## overfull-second-pass (2026-07-28)
+
+- **What**: V04 follow-up sweep, 19 → 2 overfull hboxes (residual pair
+  <1pt: §2.1 heading 0.99pt, Population item 0.13pt). §6.7 running head
+  short-marked ("Language pool: conversion (secondary)"); 8 texttt paths
+  allowbreak'd; 4 prose paragraphs given paragraph-local emergencystretch
+  (no rewording); sim-knees tabular tabcolsep 3→2pt; one discretionary
+  hyphen (scal\-ing-up). Pagination proven byte-identical vs HEAD baseline
+  (toc/lof/lot + all newlabel anchors). Build 129pp 0/0; gate OK.
+- **Feeds**: visual reviewer's next tex sweep (note 018).

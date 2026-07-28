@@ -182,6 +182,7 @@ persistence gradient.
 \section{Time-series forecasting for provisioning}
 \label{sec:rel-forecast}
 
+{\emergencystretch=1em
 Classical operational forecasting (exponential smoothing,
 Holt--Winters, ARIMA), codified in Hyndman and
 Athanasopoulos~\cite{Hyndman2021fpp3}, remains the default in production
@@ -204,7 +205,7 @@ Zero-shot use is what makes TSFMs interesting here (the second gap of
 Section~\ref{sec:rel-autoscale}); Chapter~\ref{cap:predictors} reports
 a rolling-origin, provisioning-framed, zero-shot benchmark of
 three TSFMs against classical baselines on all four demand signals of a
-production multimodal trace, with the forecast consumed as a scaler would.
+production multimodal trace, with the forecast consumed as a scaler would.\par}
 
 Two classical literatures ground the \emph{use} of a forecast rather
 than its accuracy: sizing quantile headroom under a provisioning lead
@@ -219,6 +220,7 @@ the SLA rather than on mean throughput (Chapter~\ref{cap:closedloop}).
 \section{Simulators and performance models}
 \label{sec:rel-sim}
 
+{\emergencystretch=1em
 Simulation is the standard answer to systems questions of this kind:
 Vidur, from profiled and learned kernel timings validated against real
 deployments~\cite{Agrawal2024Vidur}; LLMServingSim, co-simulating
@@ -235,7 +237,7 @@ aiconfigurator had no
 encoder data for consumer- or workstation-class GPUs before this work
 (Section~\ref{sec:aic-collection}). This thesis therefore composes its
 platform from parts and quantifies the fidelity of each seam
-(Chapter~\ref{cap:metodologia}).
+(Chapter~\ref{cap:metodologia}).\par}
 
 \section{Positioning}
 \label{sec:rel-positioning}
