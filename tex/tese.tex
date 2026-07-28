@@ -5,10 +5,11 @@
 % model (github.com/ccsl-usp/modelo-latex @ cb57593), vendored into this
 % directory as imegoodies.sty / imelooks.sty / evenragged.sty.  The upstream
 % checkout lives at ../template/modelo-latex and is never read by the build.
-% It reproduces the pinned upstream tree file for file, with one caveat
-% recorded in ../template/UPSTREAM.txt: pre-compilados/colinha.pdf is present
-% on disk and byte-identical to upstream, but the vendored .gitignore hides it
-% from git, so it must be force-added to be tracked (D115.5).
+% It reproduces the pinned upstream tree file for file; see
+% ../template/UPSTREAM.txt. Historical note (D115.5/D116): the vendored
+% .gitignore pattern caused pre-compilados/colinha.pdf to be skipped during
+% the initial vendoring add; it was subsequently restored with git add -f
+% and is now tracked (byte-identical to the upstream blob).
 %
 % Deviation from the stock model, deliberate and documented:
 %   * option `nobiblatex` --- this manuscript's bibliography is a manually

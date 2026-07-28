@@ -3588,9 +3588,10 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   nonexistent `tex/bibliografia-manual.tex` (the manual bibliography is
   inline in `tex/tese.tex`). The word "pristine" for the vendored template
   is replaced by an explicit completeness statement in
-  `template/UPSTREAM.txt`: `pre-compilados/colinha.pdf` is present and
-  byte-identical to upstream but hidden from git by the vendored upstream
-  `.gitignore`, so it is now force-added.
+  `template/UPSTREAM.txt`: `pre-compilados/colinha.pdf` was initially
+  skipped because the vendoring add honored the upstream ignore pattern;
+  it was subsequently force-added and is now tracked, byte-identical to
+  the upstream blob (historical/current distinction per D116).
 - **Abstracts (D114)**: both bodies rewritten as SINGLE paragraphs --- EN
   362 and PT 475 detex words (were 439 / 553). All four reopened roles
   repaired in both languages, and the convention-minimized full-span
@@ -3617,9 +3618,11 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
 - **Gate**: `verification/metric_stack_gate.py` section 6h binds the four
   repaired roles plus the new RQ3 lead operands in BOTH languages, and
   asserts the ABSENCE of the floor endpoint literals in either abstract
-  (unconditional forbid per 397); 17 new adversarial probes (one or more
-  per role family) are in `PROBES` (corrected from the earlier "ten" ---
-  D115/398 residual).
+  (unconditional forbid per 397); 17 initial + 2 residual-hardening
+  adversarial probes (19 total this round; len(PROBES) 33 -> 50 -> 52
+  across cffe34d/de27153/eb3249a) are in `PROBES` (count corrected twice:
+  "ten" per 398, then "17" per D116). The full self-test is 52 mutation
+  probes + 3 harness checks, all passing.
 - **Artifacts**: `tex/tese.pdf` (see the run log in the report). Feeds:
   bridge round 180; supersedes the abstract/front-matter portions of the
   entry above.
