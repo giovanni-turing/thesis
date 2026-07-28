@@ -89,7 +89,16 @@ separately labeled forecast-free seven-day aggregate diagnostic is also
 reported.
 \end{description}
 
+% The running head takes \rightmark from the *first* mark on the page, which is
+% the one \section emits itself; a \sectionmark placed afterwards is therefore
+% ignored on the page the section opens, and the full title overflows the head
+% rule. Suppress \section's own mark so the short form below is the first one.
+\makeatletter
+\let\cl@svsectionmark\sectionmark
+\let\sectionmark\@gobble
 \section{Comparators: the static optimum and reactive control}
+\let\sectionmark\cl@svsectionmark
+\makeatother
 \sectionmark{Comparators: static and reactive}
 \label{sec:cl-comparators}
 
@@ -811,7 +820,7 @@ space (Section~\ref{sec:cl-limits}). Artifact:
 \texttt{metric\_stack.json:comparisons\_by\_readiness}.}
 \label{tab:cl-readiness}
 \footnotesize
-\setlength{\tabcolsep}{2.5pt}
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lccp{3.3cm}@{}}
 \toprule
 Readiness footing & forecast (h / req$\cdot$s) & reactive (h / req$\cdot$s)
@@ -1378,7 +1387,7 @@ masking diagnostic. Artifact:
 replay reports, regeneration-gated by the delivery suite.}
 \label{tab:cl-llm-week-stack}
 \footnotesize
-\setlength{\tabcolsep}{3.5pt}
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lrrrrrr@{}}
 \toprule
 & & \multicolumn{2}{c}{TTFT (ms)} & total TTFT & total e2e & ITL p99 \\

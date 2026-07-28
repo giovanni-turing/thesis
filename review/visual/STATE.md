@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T05:16:54-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T05:34:41-03:00, protocol v2.1)
 
-messages: 17  errors: 0
+messages: 33  errors: 0
 
 ## Dispute threads
 - **V01-figure-pua-corrupted-glyphs**: 2 msgs, 1/2 evidence rounds
@@ -12,17 +12,40 @@ messages: 17  errors: 0
 - **V03-figure-canvas-scale-discrepancy**: 2 msgs, 1/2 evidence rounds
     - 003_figure_canvas_scale_discrepancy (reviewer, finding)
     - 006_triage_status (claude, response)
-- **V04-tex-overfull-hbox-bleed**: 1 msgs, 0/2 evidence rounds
+- **V04-tex-overfull-hbox-bleed**: 2 msgs, 1/2 evidence rounds
     - 004_tex_overfull_hbox_bleed (reviewer, finding)
-- **V05-deck-subscale-lecture-hall-typography**: 1 msgs, 0/2 evidence rounds
+    - 008_v04_applied (claude, response)
+- **V05-deck-subscale-lecture-hall-typography**: 2 msgs, 1/2 evidence rounds
     - 005_deck_subscale_lecture_hall_typography (reviewer, finding)
-- **V06-deck-slide11-vertical-crowding**: 1 msgs, 0/2 evidence rounds
+    - 009_v05_applied (claude, response)
+- **V06-deck-slide11-vertical-crowding**: 2 msgs, 1/2 evidence rounds
     - 006_deck_slide11_vertical_crowding (reviewer, finding)
-- **V07-deck-slide14-five-tier-density**: 1 msgs, 0/2 evidence rounds
+    - 010_v06_applied_partial (claude, response)
+- **V07-deck-slide14-five-tier-density**: 2 msgs, 1/2 evidence rounds
     - 007_deck_slide14_five_tier_density (reviewer, finding)
-- **V08-tex-table-padding-crowding**: 1 msgs, 0/2 evidence rounds
+    - 011_v07_applied (claude, response)
+- **V08-tex-table-padding-crowding**: 2 msgs, 1/2 evidence rounds
     - 008_tex_table_padding_crowding (reviewer, finding)
-- **V09-qa-toc-straggler-page8**: 1 msgs, 0/2 evidence rounds
+    - 012_v08_applied (claude, response)
+- **V09-qa-toc-straggler-page8**: 2 msgs, 1/2 evidence rounds
     - 009_qa_toc_straggler_page8 (reviewer, finding)
-- **V10-qa-unwanted-space-before-punctuation**: 1 msgs, 0/2 evidence rounds
+    - 013_v09_applied_structural (claude, response)
+- **V10-qa-unwanted-space-before-punctuation**: 2 msgs, 1/2 evidence rounds
     - 010_qa_unwanted_space_before_punctuation (reviewer, finding)
+    - 014_v10_applied (claude, response)
+- **V11-eda-a-context-vs-numimages**: 1 msgs, 0/2 evidence rounds
+    - 011_image_01_eda_a_context_vs_numimages (reviewer, finding)
+- **V12-eda-c-seven-day-signals**: 1 msgs, 0/2 evidence rounds
+    - 012_image_02_eda_c_seven_day_signals (reviewer, finding)
+- **V13-eda-eval-windows**: 1 msgs, 0/2 evidence rounds
+    - 013_image_03_eda_eval_windows (reviewer, finding)
+- **V14-eda-d-img-vs-req-scatter**: 1 msgs, 0/2 evidence rounds
+    - 014_image_04_eda_d_img_vs_req_scatter (reviewer, finding)
+- **V15-eda-i-burst-onsets**: 1 msgs, 0/2 evidence rounds
+    - 015_image_05_eda_i_burst_onsets (reviewer, finding)
+- **V16-eda-q-multires**: 1 msgs, 0/2 evidence rounds
+    - 016_image_06_eda_q_multires (reviewer, finding)
+- **V17-aic-fn**: 1 msgs, 0/2 evidence rounds
+    - 017_image_07_aic_fn (reviewer, finding)
+- **V18-sim-knees**: 1 msgs, 0/2 evidence rounds
+    - 018_image_08_sim_knees (reviewer, finding)

@@ -3251,3 +3251,77 @@ commit:     runner scaffolding swept into a942fb2/5efb6a3 (flagged: committed wi
   `python3 simulation/results/llm_week/llm_week_stack.py [--check]`.
 - **Feeds:** whole-manuscript prose, deck slides 11b/12/14; freeze
   commit pins this state (hash in the bridge packet).
+
+### silicon-campaign-full-audit (2026-07-28)
+
+- **What:** exhaustive read-only audit of the live campaign (agent,
+  05:19 local) ahead of the settled evidence commit. VERDICT: physics and
+  arithmetic clean; provenance/commit-boundary defective.
+- **Clean:** all 29 completed replay reps pass every integrity gate
+  (reconstruction 0.0 ms exact, membership exact incl. 37,672/37,672
+  steady, gzip-clean, monotone clocks, SM 2377-2392 in-band, temps
+  34-63 C, zero foreign compute, zero fatal slowdowns [replay cells
+  only]); all 29 headlines re-derived from raw operands with delta
+  0.0000 ms; bridge-211 values reproduced exactly.
+- **Preliminary steady24h (4/4 reps each, PRELIM):** fc 1,120.875 +/-
+  0.470 BREACH, re 1,121.014 +/- 0.163 BREACH, staticC8 610.580 +/-
+  0.197 PASS -- the calm-day ordering INVERTS vs burst3 under HF-eager
+  retiming (engine-band-conditional absolutes; the fc-vs-re near-tie,
+  0.14 ms apart, is preserved). burst4 fc/re indistinguishable (782.389
+  vs 782.576; no discriminating power at p99; re max 13,627 ms
+  beyond-p99 tail). Integration MUST frame these; see task checklist.
+- **Commit-blocking defects:** HEAD carries half-finished
+  burst3__staticC8/rep003 (partial uncompressed csv, no rep.json); only
+  8/15 tier-1 reps tracked; daemon.out/daemon.pid committed; queue_sha
+  hardcoded null + queue edited mid-campaign (vllm skip->fail flip
+  17:37->18:20Z) while the reconstruction reference reads from it;
+  rep.json under-records resumes (fc/rep001 resumed twice, only 1044
+  recorded -- manifest is sole evidence, so a frozen burst3 manifest
+  excerpt joins the evidence commit).
+- **Forgotten commitments found in time:** bridge-101 negative gate
+  tests DO NOT EXIST as code (being written now); container digest and
+  software versions never recorded (env_snapshot_2026-07-28.json
+  captured live: driver 595.84, CUDA 13.2, torch 2.12.1+cu130,
+  transformers 5.13.0, daemon in eda/.venv); clock policy lived only in
+  the mutable queue (snapshotted); 1000 ms bound absent from campaign
+  spec (to be declared in the evidence commit); hf_fa2 label misleading
+  (FA2 never engaged; annotation artifact planned); tier-5 has no
+  clock.jsonl (throttle claims scoped to replay cells); ledger MEM
+  correction: both 13801 and 14001 observed (both in allowed set,
+  superseding the "MEM 13801" wording above).
+- **Litter:** burst4__staticC8 orphan partial (never resumed; burst4
+  trio will end 1/1/0); engine__vllm_serving 5 empty dirs + 15 fail
+  events (real vLLM evidence is the tracked rerun artifact, no clock/
+  digest); disk at 12 GB free (watched).
+- **Feeds:** the settled evidence commit checklist (task 24) and the
+  metodologia integration framing.
+
+## review-round-d97-d103-v04-v10-qa-reinforcement (2026-07-28)
+
+- **What**: overnight consolidation round. (a) QA crib reinforced 121→132 Q/As
+  (ethics/governance, MPC/PID, Qwen3-VL choice, 10× scale via measured
+  0.47–1.10× fold ratios, regime change, buy-vs-engineer, multi-tenant,
+  simulation epistemology, rolling-origin CV, p90-as-highest-common-head) +
+  5 follow-up chains + 8 crib-vs-manuscript consistency fixes (81.1%, 92–96%,
+  1.36–1.62×, torch.compile 1.13–1.23×, ≈3% attention close, r=0.458
+  provenance-annotated, ≈8× readiness-asymmetry referent, p10–p90 69%
+  artifact-only marker); D97–D102 applied (estimator scope, worker-hour
+  operand split, 69=64+5 sweep, H=0.5 short-memory, spine placement-vs-
+  conversion split, zero-shot operational definition); "doctoral-level" Q
+  relabeled scientific-contribution (mestrado). Crib 61pp, 0 errors.
+- **Manuscript**: D103 caption realignment of fig:eda-ctx-vs-img (n≥1,000 bins,
+  N=0 text-only reference, overall-not-strict monotonicity, 25→36 dip 3.4%)
+  — accepted 2/2 by reviewer (335); V04 overfull fixes (24→19, all four cited
+  gone, §6.2 running-head mark fix); V08 tabcolsep 4pt both tables. Build
+  129pp 0/0; metric-stack gate OK.
+- **Deck**: V05 14px type floor (CSS-only, zero text changes), V06 slide-11
+  height 880→823, V07 slide-14 tier separation; anims untouched; both mirrors
+  gate-bound texts verbatim; 15/15 slides screenshot-verified 1920×1080.
+- **Visual mailbox**: responses 008–015 (V04–V10 applied + V11 note); per-image
+  deep-dive series streaming in (packets 011–016 so far, all instantiating
+  V01/V02/V03 family defects) → acceptance criteria accumulating in
+  progress/figure-regen-spec.md; regeneration pass QUEUED post-campaign.
+- **Bridge**: claude 145 (D103 fix, accepted), 146–151 (D97–D102 responses);
+  corpus 486 msgs / 0 errors.
+- **Feeds**: figure-regen-spec.md governs the post-campaign regen pass; D103
+  terminal verification fires on this commit.

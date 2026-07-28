@@ -1,6 +1,6 @@
-# Bridge state (generated 2026-07-28T04:42:18-03:00, protocol v2.1)
+# Bridge state (generated 2026-07-28T05:34:11-03:00, protocol v2.1)
 
-messages: 470  errors: 0
+messages: 486  errors: 0
 
 ## Dispute threads
 - **D01-v12-thread-machine**: 3 msgs, 2/2 evidence rounds
@@ -43,6 +43,19 @@ messages: 470  errors: 0
     - 019_evaluation_episodes_overlap (reviewer, finding)
     - 017_d10_fixed (claude, response)
     - 032_d10_verified (reviewer, response)
+- **D100-hurst-memoryless-definition**: 2 msgs, 1/2 evidence rounds
+    - 330_hurst_memoryless_definition (reviewer, finding)
+    - 149_d100_hurst_definition_fix (claude, response)
+- **D101-control-spine-mechanism-scope**: 2 msgs, 1/2 evidence rounds
+    - 331_control_spine_mechanism_scope (reviewer, finding)
+    - 150_d101_spine_triad_scope_fix (claude, response)
+- **D102-zero-shot-trace-history-definition**: 2 msgs, 1/2 evidence rounds
+    - 332_zero_shot_trace_history_definition (reviewer, finding)
+    - 151_d102_zero_shot_definition_fix (claude, response)
+- **D103-figure-context-caption-data-scope**: 3 msgs, 2/2 evidence rounds
+    - 333_figure_context_caption_data_scope (reviewer, finding)
+    - 145_d103_figure_caption_scope_fix (claude, response)
+    - 335_d103_fix_accepted (reviewer, response)
 - **D11-readiness-not-equalized**: 3 msgs, 2/2 evidence rounds
     - 020_readiness_not_equalized (reviewer, finding)
     - 018_d11_fixed (claude, response)
@@ -476,6 +489,15 @@ messages: 470  errors: 0
     - 142_D96_closed (claude, response)
     - 309_d96_second_round_accepted (reviewer, response)
     - 326_d96_terminal_verification (reviewer, verification)
+- **D97-defense-percentile-estimator-scope**: 2 msgs, 1/2 evidence rounds
+    - 327_defense_percentile_estimator_scope (reviewer, finding)
+    - 146_d97_estimator_scope_fix (claude, response)
+- **D98-worker-hour-operand-selection-scope**: 2 msgs, 1/2 evidence rounds
+    - 328_worker_hour_operand_selection_scope (reviewer, finding)
+    - 147_d98_worker_hour_operands_fix (claude, response)
+- **D99-silicon-sweep-cardinality**: 2 msgs, 1/2 evidence rounds
+    - 329_silicon_sweep_cardinality (reviewer, finding)
+    - 148_d99_sweep_cardinality_fix (claude, response)
 
 ## Unthreaded verifications (terminal attestations)
 - 038_suite_attestation (claude) re: 037_status_report

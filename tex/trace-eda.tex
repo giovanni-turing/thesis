@@ -82,11 +82,16 @@ confirms (Figure~\ref{fig:eda-ctx-vs-img}).
 \centering
 \includegraphics[width=0.62\linewidth]{figuras/eda/eda_a_context_vs_numimages}
 \caption[Context tokens versus image count]{Median context tokens conditioned on
-image count (image-bearing requests). Context rises monotonically with images,
-but the \emph{per-image} increment decays --- ${\approx}277$ tokens at one image,
-${\approx}66$ at 529 --- so the embedded vision contribution cannot be
-subtracted out. The converter therefore takes \texttt{ContextTokens} verbatim as
-the language-pool input length and drives encoder work from \texttt{NumImages}.}
+image count, over well-populated image-count bins ($n{\geq}1{,}000$
+requests; 16 bins through 529 images, below the trace maximum of
+$97^2{=}9{,}409$), with the zero-image bin included as the text-only
+reference. Context rises with image count overall, though not strictly
+monotonically at every retained bin (the median dips 3.4\% between 25 and
+36 images), and the \emph{per-image} increment decays: ${\approx}277$
+tokens at one image, ${\approx}66$ at 529. The embedded vision
+contribution therefore cannot be subtracted out, so the converter takes
+\texttt{ContextTokens} verbatim as the language-pool input length and
+drives encoder work from \texttt{NumImages}.}
 \label{fig:eda-ctx-vs-img}
 \end{figure}
 

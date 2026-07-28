@@ -28,6 +28,8 @@
 \newcommand{\Point}[1]{\par\smallskip\noindent\textit{Point to:}\enspace #1}
 % A concession I have decided in advance to make, quickly and without defending.
 \newcommand{\Concede}[1]{\par\smallskip\noindent\textit{Concede:}\enspace #1}
+% The second-level answer: what to say when the first one does not end the exchange.
+\newcommand{\Push}[1]{\par\smallskip\noindent\textit{If they push further:}\enspace #1}
 
 \title{Defense Q\,\&\,A\\[0.5ex]
 {\large Preparation notes}}
@@ -105,11 +107,18 @@ every question is an attack on exactly one beat.
   half-life \SI{69}{\minute} against \SI{9}{\minute} for requests.
 
   \item \textbf{CONTROL --- watching it is not enough; placement and
-  conversion are.} Better information through the wrong conversion buys
-  nothing, and trailing placement loses the fast onset.
-  \emph{Killer number:} the burst1@L60 triad,
+  conversion are.} Two distinct results, and I must not let one stand in for
+  the other. \emph{Placement} (fastest onset, burst3): the \emph{floorless,
+  matched-rating} trailing arm loses that onset at every realizable issued
+  lead --- p99 encoder delay 9.5--\SI{54}{\second} against the forecast's
+  \SI{588}{\milli\second}. Standing reactive floors do pass, at higher cost.
+  \emph{Conversion} (slowest onset, burst1 at a 60-second replica lead):
+  better information through the wrong conversion buys nothing.
+  \emph{Killer number:} the burst1@$L{=}\SI{60}{\second}$ triad,
   1{,}616 / 1{,}717 / \SI{736}{\milli\second} (reactive / forecast through
-  mean conversion / forecast through tail-aware conversion).
+  mean conversion / forecast through tail-aware conversion) --- a
+  \emph{conversion} result on the 404-minute onset, not evidence about fast
+  onsets.
 
   \item \textbf{ECONOMICS --- the same compliance costs less.}
   Equal declared compliance at less standing capacity, never a latency win.
@@ -120,7 +129,10 @@ every question is an attack on exactly one beat.
   Silicon for the encoder cost, a live control plane for the planner, a
   sensitivity bracket for the H100 timing; no single all-real experiment.
   \emph{Killer number:} $12.8\%$ --- the composed cost model against the
-  serving engine's own vision tower over 69 batch sizes, $N \leq 64$.
+  serving engine's own vision tower over the 64 in-cap batch sizes of a
+  69-point sweep (dense $N{=}1$--$64$, plus five off-cap probes at
+  $N\in\{96,128,192,256,512\}$). The $12.8\%$ is the $N \leq 64$
+  serving-regime bound, not a bound over all 69 points.
 \end{enumerate}
 
 Then three closing layers, which are not beats but preparation:
@@ -143,6 +155,7 @@ re-scope, I do; a defended overclaim there loses the room. Three of them (the
 actuation-timing wording, the $4\%$-noise sentence, the two per-stage bounds)
 are also manuscript fixes I should make before the defense, not only answers.
 \tableofcontents
+\clearpage
 
 % ==========================================================================
 \section{Opening: the thesis in one breath}
@@ -160,7 +173,7 @@ from the request rate a conventional autoscaler watches
 even co-occur with the request signal's. So the encoder pool must be
 provisioned on its own signal. But a floorless, matched-rating trailing
 controller watching that signal still fails, because bursts ramp to peak in
-a median of six minutes against replica cold starts of tens of seconds to
+a median of \SI{6.5}{\minute} against replica cold starts of tens of seconds to
 minutes (standing reactive floors do pass, at higher cost). The escape is that
 the signal most dangerous to reactive scaling is also the most \emph{persistent}
 (autocorrelation half-life 69 minutes, Hurst ${\approx}0.93$) --- and therefore
@@ -228,10 +241,10 @@ web serving.
 problem are not, and prior work got none of them. (a)~The \emph{magnitude}:
 $R^2 = 0.123$ is not ``weakly coupled,'' it is near-total decoupling ---
 the week's top-percentile minutes of the two signals share 5 of ${\sim}101$
-members, Jaccard 0.02, because bursts are 93--96\% pure frames-class floods
+members, Jaccard 0.02, because bursts are 92--96\% pure frames-class floods
 that the request stream barely registers ($370$\,img/s at under 4.5\,req/s).
 (b)~The \emph{insufficiency of the obvious fix}: scale on images reactively
-and you still fail --- onsets ramp in a median of six minutes, the fastest in
+and you still fail --- onsets ramp in a median of \SI{6.5}{\minute}, the fastest in
 one, with a median steepest single-minute jump of 208\,img/s, against replica
 leads of tens of seconds to minutes. I ran exactly that controller --- the
 floorless trailing arm at matched rating --- and it loses
@@ -370,7 +383,7 @@ fair.}
 
 \Q{Your ``burstiest signal is the most forecastable'' is sold as a discovered coupling. Is it not just the heavy-tail-to-long-range-dependence identity of one batch-arrival process?}
 \A Partly, and I will name the mechanism rather than defend a coincidence.
-The frames class (2.7\% of requests, 81.2\% of image volume) drives
+The frames class (2.7\% of requests, 81.1\% of image volume) drives
 \emph{both} the high CV$^2$ (3.83) and the low-frequency spectral power
 (Hurst ${\approx}0.93$) --- they are the second moment and the spectral
 slope of one heavy-tailed component, and a heavy-tailed batch/ON--OFF
@@ -388,7 +401,7 @@ do not defend it as a general law of bursty signals.}
 \Q{The 18 episodes, the six evaluation windows, and ``which one is burst3'' all come from a single unswept recipe --- image rate above its p99, contiguous runs merged to median crossings. At p98 or p99.5, do you still get 18 episodes, and is burst3 still the worst?}
 \A The threshold is principled --- it is the SLA percentile the pools are
 graded on --- and the episode \emph{set} is not knife-edge: the frames class
-supplies 93--96\% of every top episode's volume and clustering isolates a
+supplies 92--96\% of every top episode's volume and clustering isolates a
 single mixed outlier, so the trace contains ``one burst type'' and moving
 the cut rescales magnitude and duration, not kind. The load-bearing windows
 are the largest episodes, far above any p98/p99 boundary, and the burstiness
@@ -413,6 +426,20 @@ ships; it does not refute the thesis, it deletes its regime.
 trace's, and I say so; a frames-light workload weakens the case toward the
 language pool's break-even. This is the narrowest empirical flank, and a
 second trace is the honest test, not a wider title.}
+\Push{If they push to ``so this is a thesis about one tenant's batch video
+jobs'': accept the mechanism, refuse the diminutive, and say the mechanism is
+\emph{in print} rather than improvised --- my trace chapter names it as a few
+tenants submitting batch video/frame pipelines into a cluster that also
+serves interactive traffic, and derives the transfer condition from it
+(the decoupling should recur wherever batch visual work shares a serving
+system with interactive chat, while its magnitude stays workload-specific).
+That is not an anomaly to be excluded; it is the reference workload that
+makes modality disaggregation worth building, which is why ModServe, EPD,
+ElasticMM and vLLM-Omni all ship a separately scaled encoder. Then put the
+falsifier back on the table before they do: a trace where image volume tracks
+request rate collapses the decoupling, and I say so in the chapter. What I
+must \emph{not} do is retreat to ``it generalizes anyway'' --- the magnitudes
+are this trace's, the mechanism is stated, and a second trace is the test.}
 
 \Q{Why one trace? Does this generalize beyond Azure's workload?}
 \A One trace --- I will say that before anyone asks, and the scope section
@@ -434,13 +461,42 @@ re-runnable on the next trace.
 \Concede{One trace, a by-construction 50/50 modality split, image counts but
 not sizes. All three, immediately, unprompted.}
 
+\Q{What are the ethics and data governance of building a thesis on a production trace of real users' requests?}
+\A The exposure is unusually small, and I can bound it precisely rather than
+reassure. The trace is Microsoft's own public release ---
+\textit{AzureLMM\-Inference\-Dataset2025}, published with ModServe in the
+AzurePublicDataset repository and used under the schema and terms of use
+stated there. I did not collect it, negotiate access to it, or hold anything
+beyond the public file. What a row contains is four numbers: an arrival
+timestamp, an image count, a context-token count, and a generated-token
+count. There are no request bodies --- no prompts, no images, no completions
+--- which my methods chapter states as a \emph{limitation}, not as a
+safeguard, because every unit of simulated work has to be reconstructed from
+those four fields. The trace also carries no session or user identifiers, no
+image resolutions, and no completion-time ground truth; it is arrival-side
+only. So there is no personal datum in the pipeline to protect, nothing to
+re-identify, and I perform no linkage, enrichment, or join against any other
+source. What honestly remains is the ordinary trace-driven caveat: the
+workload belongs to Microsoft's customers rather than to me, so the
+conclusions are about \emph{that} deployment's demand; and the mechanism I
+attribute the bursts to --- a few tenants running batch visual pipelines into
+a cluster that also serves interactive chat --- is an inference from arrival
+structure, not from any tenant metadata I hold or could hold.
+\Concede{The manuscript carries no formal ethics or data-governance
+paragraph, because the dataset arrived pre-published with its own terms. If
+the committee wants one it belongs in the methods chapter and it is one
+paragraph long. Do not claim an approval process that did not happen, and do
+not call the trace ``anonymized'' --- the defensible statement is that it
+contains no bodies and no identifiers, which is a schema fact, not a
+de-identification claim.}
+
 \Q{Your split is a by-construction 50/50 text/image mix. How much of the result is an artifact of that ratio?}
 \A The exact numbers are ratio-sensitive; the mechanism is not, and I keep
 them apart. $R^2{=}0.123$ and the $4\times$/$2\times$ static missizing are
 this trace's constants --- a heavier image fraction would inflate vision
 load and \emph{sharpen} the decoupling, a lighter one shrink the pool. What
-does not move is the driver: each burst is a 93--96\% frames-class flood,
-and frames are 2.7\% of requests but 81.2\% of image volume, so the
+does not move is the driver: each burst is a 92--96\% frames-class flood,
+and frames are 2.7\% of requests but 81.1\% of image volume, so the
 encoder's episodic head-of-line blocking is a within-image-traffic
 phenomenon a different text fraction rescales but does not remove.
 \Concede{The 50/50 is a dataset property, not a measured field ratio, and
@@ -733,6 +789,69 @@ forecasts are stitched to tile the timeline as a scaler would consume them. A
 static train/test split would have measured something a provisioning system never
 experiences.
 
+\Q{Rolling origin with stride $H$ is one protocol among several. Why not $k$-fold or blocked cross-validation, and why non-overlapping origins rather than scoring every origin?}
+\A Because one of those is unsound here, one of them is what I am already
+doing under another name, and the third would buy statistical power I could
+not honestly spend. Ordinary $k$-fold is disqualified outright: holding out
+interior folds lets the model see --- or here, \emph{condition on} --- the
+future of the bin being scored, and the entire result is about what a scaler
+can know at issue time. Blocked or forward-chaining cross-validation is the
+sound family, and my protocol \emph{is} its forward-chaining member: origin
+$o$ predicts $[o, o{+}H)$ from context $[o{-}C, o)$, with the block equal to
+the horizon, $H{=}12$ bins, and no information flowing backward across the
+split or within it. Stride $H$ is then a deliberate choice rather than an
+oversight: it makes the forecasts \emph{tile} the timeline into the
+continuous, non-overlapping path a scaler actually consumes --- stand at a
+point in time, ask for the next twelve steps, act, let the clock advance.
+Stride~1 would multiply the origin count without multiplying the information,
+because adjacent origins on a signal with a 69-minute autocorrelation
+half-life are very nearly the same draw; the extra origins would inflate $n$
+against a dependence structure the interval arithmetic then has to undo.
+Where I do need a sampling statement I take it from the paired-origin
+bootstrap, and I state its scope in the same sentence: 300 independently
+resampled time-ordered origins, origin-level, \emph{not} a day- or
+block-level population test.
+\Concede{Stride $H$ is exactly why the one-minute column has only 167
+origins, and I never swept the stride or the horizon. Concede that the
+protocol trades statistical power for consumption realism, and that I chose
+realism on purpose --- then note the cheap addition is a stride sensitivity,
+not a different family of protocol.}
+
+\Q{Your week contains no regime change. What happens when the workload shifts --- a new tenant, a product launch, a COVID-scale break in traffic? A model tuned to one regime is worthless in the next.}
+\A Untested, and the honest answer starts with the one structural protection
+I actually have: nothing here is tuned. The forecasters run zero-shot --- no
+gradient step and no fitted parameter on this trace, no per-signal
+hyperparameter search --- so a regime shift changes the \emph{context window}
+a pretrained model conditions on, not a parameter vector that was fitted to
+the old regime and now describes the wrong world. That is the opposite
+failure mode from ARIMA or a bespoke per-service statistical predictor, and
+it is one of the reasons zero-shot was the conservative choice rather than
+the convenient one. What I cannot claim is that this \emph{works}, because a
+seven-day record contains no regime change to test against --- my own trace
+chapter says the window supports diurnal but not weekly periodicity claims.
+Two measured things stand in for the untested case, and I would offer both.
+First, the closest analogue inside my own results is a fold the forecast does
+\emph{not} cover: on fold F2 the fixed-context archive covers the fold only
+partially and the schedule reads \SI{1319}{\milli\second} while the reactive
+arm passes at \SI{369}{\milli\second} --- a coverage failure rather than a
+missed onset, and structurally the same shape a regime discontinuity would
+take, an interval where the forecast is not informative about the world in
+front of it. Second, the repair for that shape is already in the thesis and
+it is not a better forecast: the hybrid $\max(C_{\text{fc}}, C_{\text{re}})$
+degenerates to the reactive arm by construction wherever no forecast covers
+the span, which is exactly the degradation path a deployed system should
+want --- forecast where covered, trailing control where not, never worse than
+reactive. I must say in the same breath that the hybrid is a \emph{post-hoc}
+repair, designed after the F6 failure was inspected, and costs $0.76\times$
+rather than $0.62\times$.
+\Concede{No drift, changepoint, or regime-shift experiment exists anywhere in
+this work, and my conclusion states the transfer conditions as design
+hypotheses to test rather than validated law. The right test is a second
+trace, or an injected regime break replayed through the identical pipeline.
+Do not claim robustness I have not measured; claim only that the
+\emph{failure mode} is different from a fitted model's, and that the
+fallback is a floor at reactive rather than a cliff.}
+
 \Q{The analysis is at one-minute resolution but the controller runs on 15-second bins. Why two cadences?}
 \A They serve different jobs. One minute is the provisioning-\emph{reporting}
 cadence --- the horizon over which the persistence result and the WAPE
@@ -810,6 +929,20 @@ not --- and that shape is exactly what the TSFM supplies for free. Measured
 conceivable one --- a bespoke volatility-band EWMA might do better, so the
 claim is ``standard forward-EWMA calibrations do not match the TSFM,'' not
 ``no cheap forecaster could.''}
+\Push{If they push to ``then a better cheap band would close it, so the
+foundation model is still decorative'': concede the possibility explicitly
+--- I tested three standard calibrations, not the space --- and then move the
+burden somewhere it can actually be settled. What I defend is a
+\emph{measured bind}, not an impossibility: on this trace the cheap
+calibrations either miss the fast onset (burst3 p99 1{,}285 and
+2{,}084\,ms) or buy their coverage with calm-time standing capacity, and the
+one calibration that clears every declared evaluation episode costs
+$1.09\times$ the static fleet --- no economic win at all. Whoever believes a
+bespoke band closes that gap can run it: the issue-time pipeline, the three
+calibration schemes, and the control cell are archived, and the Chronos
+control reproduces the $0.62\times$/\SI{589}{\milli\second} headline exactly.
+Offering the experiment is the right way to lose this argument if I am going
+to lose it, and it is far stronger than defending the negative.}
 
 \Q{Why not ensemble the three foundation models rather than pick one?}
 \A Because ensembling optimizes the axis I showed does not matter. The three
@@ -883,6 +1016,21 @@ wording I should fix. Say ``anticipation is demonstrated on burst4; burst3
 is better-placed standing headroom.'' Note burst6 is also a one-minute onset
 and \emph{is} reactively caught (its peak drains within a batch), so
 burst3's difficulty is volume, not speed alone.}
+\Push{If they push to ``then drop the word \emph{anticipatory} altogether'':
+do not surrender the word, surrender its \emph{scope}, and be able to draw
+the line in one breath. Anticipation is demonstrated once and measured ---
+burst4, the gradual onset, ${+}\SI{345}{\second}$ of genuine lead. On burst3
+the mechanism is forward \emph{placement} of a calibrated band, and the
+evidence for it is not a lead measurement at all but the matched-rating
+comparison: at equal $\rho$, equal signal, equal conversion law, equal
+hysteresis and equal lead, the trailing arm spends \emph{less}
+(22{,}988.1 against 31{,}838.0 worker-seconds at $L{=}\SI{30}{\second}$) and
+still loses the onset. So the thesis-level term that survives both cases is
+\emph{forecast-anticipated provisioning}; the beat-level term on burst3 is
+placement. If they will not grant that, take the fallback I have already made
+in print rather than inventing a new one --- ``anticipation makes the same
+SLA cheaper,'' not ``anticipation enables it.'' That is the weaker claim, it
+is the true one, and conceding to it costs nothing the headline depends on.}
 
 \Q{Your only direct isolation of ``anticipation'' --- the reactive-with-headroom ablation --- uses a trailing window at matched $\rho{=}15$. On a one-minute onset no trailing window can place capacity in time \emph{by construction}, so the ablation is rigged to fail reactive. And if the burst3 win is ``the same over-provisioning the $\rho$-frontier prices,'' a sufficiently over-provisioned reactive floor should also pass. Where is that run?}
 \A The ablation is a fair \emph{matched-rating} comparison, and I should name
@@ -994,6 +1142,33 @@ calibrated exceedances, not an arbitrary cushion.
 \Point{Newsvendor is the principled answer to ``why p90.'' Pair it with the
 calibration: p90 is a \emph{measured} edge, not a guess.}
 
+\Q{Why p90 and not p95 or p99? You grade a p99 latency SLA --- provisioning at the p90 of demand to hold a p99 of latency looks like a mismatch of tails.}
+\A Three answers, and the first is a hard constraint rather than a taste. The
+nine quantiles $0.1,\ldots,0.9$ are the three foundation models' \emph{common}
+heads, so p90 is the highest edge all three emit; a p95 or p99 demand band was
+not a knob I could turn without dropping to a single model and forfeiting the
+model-invariance result that makes ``model choice is second-order'' sayable.
+Second, the two tails are not the same object and are not required to match:
+p90 is a quantile of \emph{demand} over a control interval, p99 is a quantile
+of \emph{latency} over requests, and the bridge between them is not a matching
+of percentile labels --- it is the conversion, the per-worker rating $\rho$
+and the tail-aware knee. That bridge is the dial that is actually swept: p90
+clears every cell at $\rho \in \{10,15,20\}$, spanning 0.48--0.89$\times$, and
+only $\rho{=}25$ starts dropping cells, all on the 35-minute onset. Third, the
+evidence I have runs \emph{downward} from p90, not upward. The p50-versus-p90
+sweep is what settles the quantile, and p50 fails --- 23--24 of its 60 cells,
+failing even the calm day --- because a median forecast sizes to the mean and
+reproduces the reactive planner's mean-sizing defect. And on the language pool,
+re-selecting quantile and conversion scale on the first 1.4 days alone picks
+\emph{p70}, and shows the p90 edge over-provisioned by 36.3\% of its spend. So
+everything I measured says the useful edge sits at or below p90.
+\Concede{p95 and p99 demand bands were never emitted or swept, so ``p90 is
+optimal'' is not a claim I can make. What I can claim: p90 is empirically
+calibrated (coverage 0.88--0.90), p50 fails outright, p70 is cheaper where it
+was tested, and the cost dial that \emph{does} exist across the whole
+frontier is $\rho$, not the quantile. If a higher edge is wanted, name it as
+the untested direction it is.}
+
 \Q{Your p90-headroom rule looks like square-root staffing. Why not just use Erlang machinery?}
 \A It is the same instinct --- provision against demand uncertainty, not
 demand mean --- and I cite that lineage deliberately (Halfin--Whitt 1981;
@@ -1010,6 +1185,42 @@ rather than from a Poisson assumption, and it is empirically calibrated
 use it --- the service side is a plain FIFO with a measured batch service
 curve --- the departure is confined to the arrival side, where the data
 forces it.
+
+\Q{You close by saying you found a control-theory result. Where is the control theory? This is a threshold rule with hysteresis --- why not a PID controller, or model-predictive control, which is literally ``use a forecast to choose an action over a horizon''?}
+\A I use ``control'' in its systems sense and I should not be allowed to
+smuggle in the mathematical one: there is no plant model, no stability
+analysis, no gain, and no guarantee anywhere in this thesis, and the same
+discipline I keep about Little's law applies here. What the loop actually is:
+a \emph{feedforward} map from a calibrated demand quantile to an integer
+worker count, $\lceil \text{demand}/\rho \rceil$, with a three-minute
+hysteresis as the only damping term and an explicit cold-start lead $L$. It
+is deliberately minimal, and that is the design, not a shortcut --- a tuned
+controller would make every advantage arguable as tuning, whereas a minimal
+one lets the matched-rating ablation attribute the advantage to information
+placement and conversion.
+On the two named alternatives. PID is a \emph{feedback} law, and feedback is
+precisely what I show arrives too late: the derivative term on a signal whose
+Fano factor reaches 938 at the hour differentiates shot noise, and the
+integral term accumulates memory of an error the pool has already paid for by
+the time a one-minute onset is over. The honest member of that family is
+already in the evaluation --- the trailing arm, at matched rating, matched
+mechanics, and the correct signal --- and it loses the fastest onset at every
+realizable lead. MPC is the closer relative, and I would frame my loop as its
+degenerate case: a receding horizon, a forecast over that horizon, an action
+chosen each tick, the first action taken and the plan redone next tick. What
+is missing to call it MPC is everything that makes MPC MPC --- an explicit
+cost functional over the horizon, a constrained optimization, and a model of
+how the action feeds back into the state. I chose the quantile by the
+critical-fractile argument instead of by solving a program, which is
+receding-horizon \emph{form} without receding-horizon \emph{optimization}.
+\Concede{No control-theoretic analysis exists --- no stability, no
+convergence, no formal robustness margin --- and a genuine MPC formulation
+with an explicit cost over the cold-start lead is a real and attractive next
+step, arguably the most natural one after a second trace. Say ``a
+forecast-fed feedforward provisioner,'' never ``a controller'' in the
+mathematical sense, and if I say ``a control result'' say immediately that I
+mean \emph{where the leverage sits} --- placement and conversion rather than
+accuracy --- not a theorem.}
 
 \Q{The burst breaks the encoder pool and you say ``only capacity fixes it.'' Would a smarter queue discipline --- shortest-job-first, priority for small requests --- not remove the blocking without buying GPUs?}
 \A Scheduling and provisioning are orthogonal levers, and this thesis is
@@ -1242,6 +1453,19 @@ coming.}
 \Concede{For one small cluster the absolute dollars are modest; the
 efficiency case scales with fleet size and encoder growth, which I do not
 quantify beyond one trace.}
+\Push{If they push to ``fine, then buy sixteen and stop thinking'': that arm
+was run, and it is the one that reads worst for the objection. Doubling a
+fleet does not double safety, because the failure at 29\% mean utilization is
+not a capacity-\emph{average} failure --- and every reactive standing floor
+deep enough to pass costs more than the fixed forecast point on this trace:
+$0.746\times$ static post hoc under common-warm readiness, $0.887\times$
+calibration-frozen at $M{=}4$, $1.042\times$ under the shipped strict re-warm
+mechanics. Present it as a menu rather than a verdict --- pay $1.6\times$ for
+simplicity, roughly $1.2\times$ for a floor whose depth is only pickable
+after the fact, or run the loop --- and then say the scope out loud: on
+\emph{this} trace no floor beat the forecast. That is a measured statement
+about one week, not a law, and the floor sweep was reactive-favorable post
+hoc while the forecast stayed one frozen point.}
 
 \Q{Could the operator not just buy 2x capacity and skip the machinery?}
 \A They can, and the static $C{=}8$ baseline \emph{is} that policy priced
@@ -1261,6 +1485,65 @@ after the fact, or run the loop. At encoder-pool scale that gap is real money
 demand-following 2.41M worker-seconds), and the machinery is one 120M-model
 forecast pass per control tick. The economics get more compelling, not less,
 as the pool grows.
+
+\Q{GPU capacity gets cheaper every year and engineers do not. Is a 38\% saving on a small encoder pool not simply cheaper to \emph{buy} than to engineer?}
+\A It may well be at one small cluster, and I have already conceded that the
+absolute dollars there are modest. But the question assumes the trade is
+``saving versus salary,'' and on this trace it is not, for two reasons that
+do not move with the price of a card. First, the thing being compared against
+is not a fleet you can go and buy: the $C{=}8$ static denominator is an
+\emph{oracle}, sized from the whole week's observed maximum, and a
+minute-resolution monitor recovers under 4\% of the true instantaneous image
+peak. Cheap hardware does not tell you how much of it to buy --- that is the
+forecasting problem --- and buying the wrong constant fails \emph{invisibly},
+at 29\% mean utilization, through episodic blocking no dashboard shows. A
+falling price makes the wrong answer cheaper; it does not make it visible.
+Second, the engineering cost is small \emph{by construction}, and that is a
+design property rather than luck: the models are consumed zero-shot, so there
+is no per-signal fitting, no training pipeline, and no retuning burden that
+multiplies as a system grows more pools --- which is precisely the case for
+zero-shot in a multi-pool world. The run-time cost of the headline arm is one
+120M-parameter forward per control tick, a duty cycle under 0.8\% at a
+15-second tick, moving the forecast arm's own cost by less than
+$0.001\times$.
+\Concede{The thesis quotes no dollar figure by policy --- everything is
+resource-time, per hardware class, never summed --- so I cannot answer this
+in currency and I will not improvise a price. What I defend is the ratio and
+the reason the machinery is cheap to run; the dollar arithmetic is the
+operator's, with their own prices.}
+
+\Q{Everything here is an eight-worker pool. What breaks at ten times the scale, and does the 0.62$\times$ survive?}
+\A Some of it improves, one thing degrades, and I can say which part is
+measured and which is speculation. What improves is quantization: the
+conversion rounds up to whole workers, so the $\lceil\cdot\rceil$ tax is a
+much larger relative penalty on a pool swinging between 2 and 8 workers than
+on one ten times larger --- and part of why the three foundation models are
+indistinguishable at this scale is exactly that integer conversion quantizes
+their differences away. What is scale-free is the instrument itself: the p90
+band is a quantile of a \emph{rate}, and the conversion is a rate divided by
+a per-worker rating $\rho$, so neither carries a fleet size anywhere in it.
+What degrades is the source of the saving, and here I have a measurement
+\emph{inside} the trace rather than a guess. The daily-fold audit prices the
+same policy against the same fixed $C{=}8$ denominator across folds spanning
+a $12\times$ range of offered image load, and the cost ratio runs
+0.47--1.10$\times$, monotone in each fold's load. The saving is largest where
+the span is calm and shrinks toward --- and past --- parity as sustained load
+rises, for the obvious reason that a fixed fleet is only wasteful while it is
+idle. That is the same condition my conclusion states as the transfer rule: a
+forecast is worth its complexity when the pool's own signal is decoupled,
+when onsets are fast relative to replica startup, and \emph{when the span is
+mostly calm}; where any of those fails, a fixed floor or a static fleet
+becomes competitive. So ``ten times the scale'' has two readings and they
+diverge. Ten times the fleet at the same duty cycle should preserve the ratio
+and lose the quantization tax. Ten times the sustained \emph{load} into a
+fixed reference moves the ratio toward one, at which point a static fleet or
+a warm floor is the right instrument --- which the thesis says in print
+rather than hiding.
+\Concede{No large-fleet experiment exists, and nothing here is measured above
+eight encoder workers; the fold spread is a within-trace proxy for load, not
+for fleet size. The dependence of the efficiency case on fleet size is
+unquantified and already in the scope section. Give the fold range and the
+transfer rule; do not extrapolate the ratio.}
 
 \Q{You price the encoder pool on RTX~5090 and the language pool on H100 in one system. Is a cross-pool cost comparison not apples-to-oranges?}
 \A The mixing is the architecture, not an accident: modality disaggregation
@@ -1364,6 +1647,44 @@ serving. What I did \emph{not} do is treat fidelity as an assumption: every
 timing model is either collected on silicon and physically validated, or
 compared against its alternative so its effect on the conclusions is known.
 
+\Q{Systems committees are trained to distrust simulation. What makes a simulated result admissible as science here, rather than an elaborate assertion?}
+\A Let me name the three ways a simulation result is inadmissible and say
+what I did about each, because that is more useful than defending the
+instrument in the abstract.
+The first is an \emph{unvalidated cost model} --- the simulator prices work
+with numbers nobody checked. That is where most of the effort went: the
+encoder cost is not a fit, it is performance data collected on the silicon at
+locked clocks and validated against the serving engine's own vision tower
+across the whole $N \le 64$ regime the pool batches into, holding within
+$12.8\%$; and the closed loop was then re-run with the measured cost
+substituted per dispatched batch --- p99 \SI{589}{} to
+\SI{606}{\milli\second}, provisioned worker-seconds identical to the digit.
+Where I could not do that I say so instead of papering over it: the H100
+language timing is a vendor database, and what I claim for it is
+\emph{sensitivity}, not accuracy.
+The second is \emph{assumptions that select the conclusion}. The answer is to
+price the conclusion under the alternative rather than argue for the
+assumption, and each load-bearing one is replayed both ways: the dispatch
+cap, sequential versus chunk-parallel dispatch, polynomial versus calibrated
+language timing, both readiness models, and the $4\times$ DeepStack payload
+--- including where it hurts, since at that payload \emph{every} policy
+violates the bound, the deployable static fleet included.
+The third is \emph{irreproducibility}, which simulation makes easy to fix and
+easy to skip. Every number is generated by a versioned script over archived
+inputs with a ledger entry naming artifact, command, and the paragraph it
+feeds, and the headline recomputes from tracked raw artifacts in a detached
+clean worktree at $0.623$ against $0.623$ expected.
+The positive case is not ``simulation is acceptable'' but that the object of
+study is a \emph{counterfactual} --- same trace, same arrivals, different
+scaler --- which a live cluster cannot supply because the arrivals are gone.
+The instrument is not a substitute for the experiment; it is the only form
+the experiment has.
+\Concede{The comparison class is where this hurts, and it is already in my
+own positioning table: the systems I compare against are evaluated on real
+GPU clusters and I am not. That is the single column where this thesis scores
+worst, a closed loop on a real GPU serving cluster is named as the next step,
+and I should say both before anyone reads the table aloud.}
+
 \Q{The live validation --- how strong is it really?}
 \A Weaker than the word ``validation'' suggests, and I have narrowed the claims
 accordingly. What was carried live: the p90-forecast policy and the reactive
@@ -1417,13 +1738,29 @@ live control loop for the planner (both verdicts reproduce, TTFT within
 1.1--6.8\%), a sensitivity bracket for the H100 timing. The ``shape-determined,
 so random weights suffice'' assumption is sound for the two dense operators I
 collect (non-causal FlashAttention, bf16 GEMM: no data-dependent sparsity),
-and the kernel ledger closes to 3.2\% on attention --- but I do not claim it
+and the kernel ledger closes on attention to within ${\approx}3\%$ (the
+manuscript's own wording; there is no ``3.2\%'' figure to quote) --- but I do
+not claim it
 for the full forward under real weights and sustained-serving thermals.
 \Concede{No single all-real experiment exists, and the specific missing rung
 is a weight-loaded vLLM encoder worker in the queue --- named as future work.
 Also concede $n{=}1$ die: I cannot error-bar another 5090, a contended run
 swung the ratio $2\times$, and the clock-invariant \emph{ratio} protects
 against boost differences, not bin or thermal ones.}
+\Push{If they push to ``then the composition is unvalidated by
+construction'': separate what a composition error would have to \emph{do} to
+matter, and show it was priced rather than argued. A cost-model error only
+counts if it moves a verdict, so I substituted the measured vLLM cost per
+dispatched batch into the closed loop --- p99 \SI{589}{} to
+\SI{606}{\milli\second}, provisioned worker-seconds identical to the digit
+--- and re-checked the static \emph{denominator} under measured cost as well
+(\SI{692}{\milli\second}, still feasible), so neither side of the ratio
+carries a silicon penalty. Say plainly what that is: a \emph{bound} on the
+composition's effect, not a proof of the composition. Then name the
+experiment rather than defend the corners --- a weight-loaded vLLM encoder
+worker on the live request path, the Phase-E gap --- and offer it before it
+is demanded. Offering the missing experiment is stronger than any further
+defence of the three I have.}
 
 \Q{The abstract sells a ``calibrated H100 language simulator'' and RQ3 answers ``platform validity: yes, with measured fidelity.'' But Chapter~5 says the language timing ``cannot be re-validated against physical H100 within this work,'' and the live mockers load the \emph{same} AIC model. So no physical measurement backs any language latency that decides a verdict --- and even ``validated physically'' on the vision side spans 3\% (one operator), 12.8\% (the composed forward), and 0 for language.}
 \A The asymmetry is the right one and disclosed in RQ3: the encoder cost model
@@ -1615,6 +1952,36 @@ matrix on such systems only because the harness supplies no image
 dimensions --- it silently skips the encoder phase and certifies text-only
 costing. That masking is the real gap the collection closes.
 
+\Q{Why Qwen3-VL? The encoder result is a cost model for one vendor's vision tower --- pick LLaVA or InternVL and the numbers change.}
+\A Two reasons, and neither is that it was fashionable. The first is
+\emph{transfer within the family}: the 8B, 32B, and 235B variants share one
+vision tower, and the 235B shares the 4096-dimensional projector target
+unchanged, so a single collected cost model prices the encoder pool for the
+whole family. That is why the 235B spot-check moves only the language
+envelope and leaves the encoder cost model, the batching law, the
+burst-saturation result, and the handoff bound intact --- one collection,
+three model scales. The second is that the validation had to be
+\emph{like-for-like with the serving engine}: the operators aiconfigurator
+collects are vLLM's \emph{own} kernels, so the honest anchor is vLLM's
+serving forward of that tower, and Qwen3-VL is the tower that stack actually
+ships. Anchoring on a model whose encoder the planner does not price would
+have made the $12.8\%$ agreement meaningless --- it would have been measuring
+two different networks.
+And I would push back gently on the premise. What the encoder result rests on
+is not Qwen's constants but the \emph{batching law}: no cross-image
+attention, so cost depends only on the total images in a forward, probed
+directly in the graph and identical to the microsecond across the tested
+factorings. That is a property of ViT-style encoders in general, not of this
+one. A different tower changes $f(N)$ and therefore the rating $\rho$; it does
+not change that the pool's demand is decoupled, bursty, and forecastable, and
+re-anchoring is one $f(N)$ benchmark, memoized in minutes.
+\Concede{No other vision-language family was collected or compared, and the
+manuscript makes no comparative claim about one --- not even the 32B, which
+is explicitly unpriced. The constants are
+\texttt{Qwen/Qwen3-VL-8B-Instruct}'s, measured on a single RTX~5090 node, so
+cross-unit silicon variance is unquantified too. Say ``the constants are this
+tower's; the law and the method are not.''}
+
 \Q{Why an RTX~5090 for the encoder pool? That is not a datacenter part.}
 \A Deliberately. The vision tower is 576M parameters and fits comfortably in
 consumer memory, which makes consumer-class parts a plausible and cost-effective
@@ -1689,6 +2056,33 @@ very tails I measure). The burst failures are prefill-compute floors and
 encoder FIFO blocking --- arithmetic and queueing phenomena robust to
 KV-modeling detail.
 
+\Q{Both pools are modelled as if they owned their machines. Real fleets are multi-tenant --- what do colocation, contention, and noisy neighbours do to any of this?}
+\A Nothing, in the model --- and I want to separate the two places the word
+lands, because only one of them is a gap. On the \emph{workload} side the
+trace is already multi-tenant, and that is load-bearing \emph{for} me rather
+than against: the near-pure frames-class composition of every major burst
+points to a specific mechanism, a few tenants pushing batch video and frame
+pipelines into a cluster that also serves interactive chat, and that
+mechanism is precisely why the vision signal is decoupled from the request
+rate. It is also the basis of my transfer claim --- the decoupling should
+recur wherever those two workloads share a serving system.
+On the \emph{execution} side I model none of it. The encoder pool is a
+dedicated FIFO of whole workers; the replay is open-loop and deterministic;
+there is no contention for SMs, memory bandwidth, NIC, PCIe, or host CPU
+between pools, between replicas, or with anything else on the node. I have
+exactly one measurement of what that assumption is worth, and it is not
+comforting: a contended run on the physical 5090 swung the validation ratio
+by $2\times$, which is why the silicon anchor was collected single-tenant, in
+persistence mode, at locked clocks. So contention is a first-order threat to
+\emph{absolute} encoder latencies, and I bought it off by isolating the
+measurement rather than by modelling it.
+\Concede{No interference model, no colocation experiment, no noisy-neighbour
+sensitivity --- and the same holds one layer up, where the language pool has
+no KV eviction, preemption, or admission control. The defensible line is
+comparative: every policy replays under the identical contention-free
+assumption, so the ranking is fair; the absolute tails would move under
+contention, and they would move the wrong way, not the convenient one.}
+
 \Q{Is the reported p99 even statistically meaningful over these windows?}
 \A Yes, by volume and by construction. The burst windows contain tens of
 thousands to hundreds of thousands of requests (burst1 alone spans 64{,}804
@@ -1725,6 +2119,39 @@ verdict --- did not move at all.
 \Trap{Tone decides this one. It reads as either defensive or confident depending
 entirely on delivery. Name the errors \emph{first}; earn the ``but the core
 survived'' clause rather than rushing to it.}
+
+\Q{Who actually reviewed this before today? Ten rounds of ``adversarial review'' is not peer review.}
+\A It is not, and I do not present it as one --- the peer review of this work
+is the one happening in this room. What the audit rounds are is an
+\emph{internal verification protocol} I built and ran against my own
+manuscript, and I would rather describe its mechanics than claim its
+authority. Every claim in a chapter was checked, claim by claim, against
+ground truth outside the prose: the provenance database, the results ledger,
+and the source that generated each artifact. Reviewers were strictly
+read-only on the manuscript and on the code and wrote only their own findings
+files; every finding was then adjudicated, and each adjudicated finding was
+either fixed with a recomputed number or rebutted in writing. A claim with no
+traceable backing was flagged unverifiable rather than assumed true. The
+whole trail --- reviews, resolution report, adjudications --- is archived and
+declared as a supplementary item in the appendix, so it is inspectable rather
+than asserted.
+What that process is good at is exactly what it caught: transcription drift,
+stale numbers, overclaimed verbs, internal inconsistency, and three real
+substantive errors. What it structurally \emph{cannot} do is supply
+independent judgement about whether the question is worth asking or the
+framing is right --- it audits fidelity to my own evidence, not significance.
+That is the committee's job, and it is also why every correction it produced
+moved the headline against me rather than for me.
+\Trap{If asked directly \emph{who} the reviewers were, say it plainly and
+without hedging: an automated, model-based review fleet run under a fixed
+protocol, plus my own adjudication --- not human peers. The strength of the
+claim is the ground-truth checking and the archived trail, not the identity
+of the reviewers, and hedging on this question is the only thing here that
+would look bad.}
+\Concede{A self-administered audit is not independent review, however many
+rounds it runs. Claim only what it establishes --- the numbers are traceable
+to artifacts and internally consistent --- and never offer the round count as
+a credential.}
 
 \Q{Walk me through re-running the 0.62$\times$ from a clean checkout. The AIC data is an unmerged draft PR; the aiconfigurator and dynamo venvs are external with no dependency lock; a live-planner fix is a local-only commit; some scripts hard-code paths; and you ran the replay on two runtimes that disagree in the tails.}
 \A Two claims, and I keep them apart. \textbf{(1)~The headline is
@@ -1847,19 +2274,32 @@ bound, read per gap rather than per request.
 
 \paragraph{Percentile, quantile, and which estimator.} A quantile is the
 value below which a given fraction of the sample lies; a percentile is the
-same thing named on a 0--100 scale. Every reported p99 in this thesis is an
-\emph{order-statistic selection with no interpolation}: sort the sample and
-take index $\min(n-1, \lfloor n p/100 \rfloor)$. That is the converter's own
-rule (the \texttt{percentiles} helper in
-\texttt{workload/trace\_to\_two\_pool.py}) and it is reused verbatim by the
-independent recompute (\texttt{pctl} in the comparator frontier's
-\texttt{build\_frontier\_summary.py}) and by the metric stack. Two consequences worth knowing cold.
-Every quoted p99 is an \emph{observed} request delay, never a weighted blend
-of two neighbours, so it is reproducible to the decimal under determinism.
-And it is a rank-selection estimator in the nearest-rank family, not the
+same thing named on a 0--100 scale. The estimator I can defend by name is the
+\emph{encoder comparator and metric-stack} one: an \emph{order-statistic
+selection with no interpolation}, sort the sample and take index
+$\min(n-1, \lfloor n p/100 \rfloor)$. That is the converter's own rule (the
+\texttt{percentiles} helper in \texttt{workload/trace\_to\_two\_pool.py}) and
+it is reused verbatim by the independent recompute (\texttt{pctl} in the
+comparator frontier's \texttt{build\_frontier\_summary.py}). Two consequences
+worth knowing cold, \emph{within that family}. Every encoder-delay p99 quoted
+from it is an \emph{observed} request delay, never a weighted blend of two
+neighbours, so it is reproducible to the decimal under determinism. And it is
+a rank-selection estimator in the nearest-rank family, not the
 linear-interpolation default of \texttt{numpy.percentile}, which is why arms
 sitting on the same service plateau report the \emph{identical} value
 (\SI{589.301}{\milli\second}) rather than nearly-identical ones.
+
+The scope matters and I should volunteer it rather than universalize: this is
+\emph{not} the estimator behind every percentile in the thesis. The trace
+chapter's 99th-percentile image \emph{rate} threshold
+(\num{224}\,\si{img/s}) comes from the EDA analysis code's default
+\texttt{numpy} quantile, which interpolates --- and is a rate, not a request
+delay. The modelled ingress-to-first-token p99 likewise comes from a default
+\texttt{numpy.percentile}. Even inside the replay stack the report and the
+converter can land on adjacent order statistics, a boundary documented in the
+composed-join code. So the correct sentence is ``the encoder comparator's p99
+is a non-interpolating order statistic, which is why the plateau ties are
+exact,'' never ``every p99 in the thesis is.''
 
 \paragraph{The p90 band edge, and what ``calibrated'' means for it.}
 Coverage is the fraction of realized values at or below a predicted
@@ -1916,11 +2356,19 @@ used twice: the sub-point ARIMA-versus-Chronos gap at \SI{15}{\second} is
 beats ARIMA's 66.8\% with an interval that excludes zero.
 
 \paragraph{Zero-shot forecasting.} A pretrained model applied to a series it
-was never fitted on: no per-signal training, no fine-tuning, no trace
-history, no hyperparameter search. It is the \emph{conservative} reading of a
-foundation model's capability, being what an operator gets on day one. All
-three foundation models here run zero-shot, and the headline rests on the
-smallest of them (Chronos-2, 120M).
+was never fitted on: no per-signal training, no fine-tuning on the target
+trace, no per-signal hyperparameter search. It is \emph{not} the absence of
+history --- and I must get this right, because an examiner who has read the
+protocol will catch it. Every origin forecasts from a historical context
+window $[o{-}C,o)$ supplied at inference, and the trace's first 1.4 days are
+consumed as exactly that rolling history before the first usable forecast
+exists. What is zero-shot is the absence of any gradient step or fitted
+parameter on this trace, not the absence of inference context. So ``what an
+operator gets on day one'' means day one of \emph{deployment} with a context
+buffer filling, not a cold start with no data. It is the \emph{conservative}
+reading of a foundation model's capability. All three foundation models here
+run zero-shot, and the headline rests on the smallest of them (Chronos-2,
+120M).
 
 \paragraph{Issued lead versus forecast target horizon.} These are not the
 same axis, and confusing them cost this thesis a factor of two. The
@@ -2010,9 +2458,14 @@ at the same one-minute resolution, on a $1/f^{0.86}$ spectral background. The
 operational consequence, and the only one the thesis needs, is that no tested
 averaging window makes the signal safe for a reactive threshold.
 
-\paragraph{Hurst exponent.} The self-similarity parameter: $H = 0.5$ is a
-memoryless process, $H > 0.5$ long memory, and $H \to 1$ is strong
-persistence. Measured instance: $H \approx 0.93$ for images against
+\paragraph{Hurst exponent.} The self-similarity parameter: $H = 0.5$ is the
+\emph{no-long-range-dependence} benchmark --- the short-memory scaling case,
+which is \emph{not} the same as memoryless, since ordinary stationary ARMA
+processes sit at $H = 0.5$ while carrying finite-lag dependence --- while
+$H > 0.5$ is long memory and $H \to 1$ is strong persistence. Nothing about
+$H$ establishes or excludes a Markov property, and this thesis's $H$ is in
+any case a spectral-slope-derived persistence proxy, so it could not settle
+that question even if the question were asked. Measured instance: $H \approx 0.93$ for images against
 ${\approx}0.83$ for requests. The honest scope, printed in the manuscript, is
 that $H$ is derived algebraically from the spectral slope,
 $H = (1{+}\beta)/2$, over the sub-diurnal band (10 minutes to 12 hours). It
@@ -2045,7 +2498,7 @@ many ON/OFF sources whose ON periods are heavy-tailed produces long-range
 dependence in the aggregate: heavy tails and long memory are two readings of
 one mechanism, not two properties that coincidentally co-occur. That is the
 correct framing for this trace, and I should volunteer it rather than sell a
-surprising coupling. The frames class (2.7\% of requests, 81.2\% of image
+surprising coupling. The frames class (2.7\% of requests, 81.1\% of image
 volume) drives \emph{both} the second moment (CV$^2$ 3.83) and the
 low-frequency spectral power ($H \approx 0.93$). What the operational claim
 needs is not that the two are independent, but that the envelope is
@@ -2334,7 +2787,7 @@ by-products (the upstreamed dataset, the shipped-predictor comparison, the
 actuation-semantics discipline) are independently usable. Gluing is easy;
 gluing so the numbers survive ten adversarial rounds is the work.
 
-\Q{Why is this doctoral-level work rather than excellent engineering?}
+\Q{Why is this a scientific contribution rather than excellent engineering?}
 \A Engineering would be: pick the image metric, wire a forecaster into a
 planner, show it works once. What makes this a thesis is that each link in
 that chain is replaced by a \emph{measured general claim with its boundary
@@ -2450,9 +2903,9 @@ me more than five seconds in rehearsal, drill it again.
 \item \textbf{Trace:} 1M requests, exactly 7 days, Azure production
   multimodal cluster; 50\% text-only by construction; per-request image
   counts, no sizes.
-\item \textbf{Frames class:} $k{>}10$ grids; 2.7\% of requests, 81.2\% of
-  image volume; up to $97^2 = 9{,}409$ images in one request; 93--96\% of
-  each burst's volume.
+\item \textbf{Frames class:} $k{>}10$ grids; 2.7\% of requests, 81.1\% of
+  image volume; up to $97^2 = 9{,}409$ images in one request; 92--96\% of
+  each top episode's volume.
 \item \textbf{Decoupling:} $R^2 = 0.123$ images-vs-requests ($0.654$ for
   decode offered-work); Jaccard 0.02 between top-percentile minutes;
   best-fit constant fraction 15.1 img/req.
@@ -2467,21 +2920,35 @@ me more than five seconds in rehearsal, drill it again.
   images@1min 52.9\% WAPE (EWMA 54.2\%); images@1s 98.8\% (EWMA 146.1\%,
   no-skill 100\%); ${\approx}2$ WAPE
   points lost over 12 steps at 1-min bins; p90 coverage 0.88--0.90; p10--p90 band covers
-  69\% vs.\ nominal 80\%.
+  69\% vs.\ nominal 80\% (from the coverage artifact and the ledger entry that
+  fed the paragraph; the manuscript itself prints only median coverage
+  $0.45$--$0.52$ and ``deflating the nominal-80\% band'' --- so cite it as the
+  artifact figure).
 \item \textbf{Cost model:} attention operator within ${\approx}3\%$ of
-  physical; composed vs.\ vLLM tower within 12.8\% ($N{\le}64$, 69-point
-  dense sweep); HF-eager gap 1.4--1.6$\times$ (engine, not model); unlocked
+  physical; composed vs.\ vLLM tower within 12.8\% across $N{\le}64$
+  (the sweep is 69 points $=$ dense $N{=}1$--$64$ \emph{plus} five off-cap
+  probes; the 12.8\% is the in-cap bound, not an all-69 bound); max deviation
+  $+12.7\%$ at $N{=}52$, min ratio $0.914$ at $N{=}5$ (both from the
+  artifact, not printed in the manuscript);
+  HF-eager gap 1.4--1.6$\times$ (engine, not model); unlocked
   clocks inflate ${\approx}17\%$; AIC SOL fallback ${\approx}5.9\times$
   optimistic; upstream PR \#1312.
 \item \textbf{Knees:} order of magnitude apart on steady traffic (vision
-  censored $\ge 32\times$, LLM first-over at $3\times$); 235B@TP8 knee one
+  censored $\ge 32\times$, LLM first-over at $3\times$ \emph{under polynomial
+  timing} --- $s{=}2$ under the calibrated AIC timing that decides the
+  verdicts); 235B@TP8 knee one
   octave below 8B (ITL-bound, 87.7\,ms at trace rate).
 \item \textbf{Closed loop:} 588\,ms zero-queueing floor on burst windows;
   calm day $\le$ 734\,ms; p90 passes 60/60 issue-time cells (both readiness
   models); p50 passes 23--24/60; the floorless matched-rating reactive arm
   loses burst3 at every lead (9.5--54\,s,
   never-scaled limit 54{,}170\,ms); reactive-with-headroom still fails it
-  (1{,}973--11{,}568\,ms, despite up to $8\times$ tail cut); standing floors
+  (1{,}973--11{,}568\,ms, despite a large tail cut off the floorless
+  9.5--\SI{54}{\second} range --- if I say ``$8\times$,'' say what it is
+  measured against, because the manuscript's own ${\approx}8\times$ is a
+  \emph{different} quantity: the readiness-asymmetry inflation of the
+  unfloored reactive p99, 16{,}084 against \SI{2000}{\milli\second}
+  warm-pool); standing floors
   do pass but cost more (post-hoc common-warm $M{=}2$ $0.746\times$ static
   $=1.20\times$ forecast; shipped-mechanics $M{=}6$ $1.042\times$); triad on
   burst1@L60: 1{,}616 / 1{,}717 / 736\,ms.
@@ -2496,7 +2963,7 @@ me more than five seconds in rehearsal, drill it again.
   3{,}495\,ms; TTFT within 1.1--6.8\%; replica-time within 8\%; one run per
   policy, mocked engines, fastest-onset window.
 \item \textbf{Upstream status:} encoder dataset + system file are a
-  \emph{draft} PR (ai-dynamo/aiconfigurator \#1312), \emph{not merged};
+  \emph{draft} PR (ai-dynamo/aiconfigurator \#1312), \emph{not merged\nocorr};
   data is commit-pinned (\texttt{1e8b9cac} locked-clock recollection,
   extensions through \texttt{b55dd0b7}) and snapshot-archived, so
   reproducibility does not depend on the merge.
@@ -2516,10 +2983,17 @@ me more than five seconds in rehearsal, drill it again.
 \item \textbf{SLA provenance:} TTFT/enc-delay p99 $<1$\,s, ITL p99
   $<100$\,ms $= 2\times$ Dynamo's 500/50\,ms window-mean defaults, applied
   as tails; joint ingress-to-first-token ${\approx}1.24$--$1.30$\,s at
-  ${\approx}$p98 (encoder/prefill tails correlated $r{=}0.52$).
-\item \textbf{Engine sweep} (vs.\ AIC): HF-SDPA 1.36--1.61$\times$ (rising
-  with $N$); HF-FA2 1.25--1.47$\times$; \texttt{torch.compile}
-  1.2--1.4$\times$; vLLM within 12.8\% for $N{\le}64$ ($+21.8\%$ only past
+  ${\approx}$p98 (encoder/prefill tails correlated $r{=}0.52$ in the
+  reconstruction artifact that produces the \SI{1.30}{\second} figure; the
+  \emph{manuscript} prints $0.458$ for the calm day, \texttt{closedloop.tex}.
+  Quote $0.52$ as ``from the end-to-end reconstruction,'' never as the
+  thesis's printed correlation).
+\item \textbf{Engine sweep} (vs.\ AIC): HF-SDPA 1.36--1.62$\times$ (rising
+  with $N$; the manuscript's printed range is 1.36--1.62, measured
+  $1.617\times$ at $f(64)$ --- do not say 1.61); HF-FA2 1.25--1.47$\times$
+  (per-point table, no range printed in prose); \texttt{torch.compile}
+  1.13--1.23$\times$ ($1.172\times$ at $f(64)$ --- \emph{not} 1.2--1.4);
+  vLLM within 12.8\% for $N{\le}64$ ($+21.8\%$ only past
   the cap at $N{=}512$) --- vLLM being the engine AIC's kernels come from.
 \item \textbf{235B flagship:} vision tower $+$ 4096 projector shared with 8B
   (encoder result transfers unchanged); TP8 language knee $s{=}1$
@@ -2542,14 +3016,26 @@ a tracked artifact.
   the introduction, followed thesis-wide.
 \item \textbf{ITL:} the per-gap equivalent of TPOT, the per-token decode gap
   TPOT summarizes; ITL $=$ TPOT in the live client.
-\item \textbf{Percentile estimator:} order-statistic pick, no interpolation
-  --- $\text{sorted}[\min(n{-}1,\lfloor np/100 \rfloor)]$, the converter's own
-  rule, reused by the independent recompute. Every p99 is an observed delay,
-  which is why plateau ties are exact (\SI{589.301}{\milli\second}).
+\item \textbf{Percentile estimator (scoped):} in the \emph{encoder comparator
+  and metric stack}, order-statistic pick, no interpolation ---
+  $\text{sorted}[\min(n{-}1,\lfloor np/100 \rfloor)]$, the converter's own
+  rule, reused by the independent recompute. There every p99 is an observed
+  delay, which is why plateau ties are exact (\SI{589.301}{\milli\second}).
+  \emph{Not} thesis-universal: the EDA's p99 image-\emph{rate} threshold
+  (\num{224}\,\si{img/s}) and the modelled ingress-to-first-token p99 use
+  default interpolating \texttt{numpy} percentiles, and report-vs-converter
+  can differ by one order statistic. Never say ``every p99 in the thesis.''
 \item \textbf{Headline in worker-hours:} 669.7 (forecast p90) against
   1{,}074.8 (deployable static $C{=}8$) $= 0.623\times$, over the 5.60-day,
-  749{,}601-request span; \emph{no burst definition, SLA cut, or percentile
-  selection enters either operand}.
+  749{,}601-request span. The threshold-free property is about the
+  \emph{arithmetic once the arms are fixed}: \emph{given the declared
+  population and these two arms, integrating provisioned worker-time uses no
+  burst definition, latency threshold, or percentile aggregation}. The arms'
+  \emph{identities} are not convention-free --- 669.7 is specifically the
+  Chronos p90 schedule (the quantile is named and selected), and deployable
+  static $C{=}8$ is the minimum fleet surviving every window \emph{under the
+  evaluation SLA}, so its selection depends on the SLA feasibility rule.
+  State operand identities first, then the threshold-free arithmetic.
 \item \textbf{Threshold-integrated identity:}
   $\sum_i d_i = \int_0^\infty N(d_i>t)\,\mathrm{d}t$ --- total delay mass is
   the area under the full exceedance-count curve, so it integrates every
