@@ -708,7 +708,7 @@ the verdicts grade latency on completed requests, not availability.}
 Policy & Metric & Live & Offline twin & $\Delta$ \\
 \midrule
 Forecast p90 & TTFT p99 (ms) & 695 & 651 & $+6.8\%$ \\
- & ITL p99 (ms) & 11.5 & 9.7 & $+18.6\%$ ($+1.8$\,ms) \\
+ & ITL p99 (ms) & 11.5 & 9.7 & $+18.0\%$ ($+1.8$\,ms) \\
  & replica-seconds & 6{,}063 & 6{,}400 & $-5.3\%$ \\
  & verdict & \textbf{PASS} & \textbf{PASS} & agree \\
 \midrule
@@ -789,7 +789,7 @@ encoder side. Within that scope, closed-loop
 behavior transfers to the real stack in both verdict directions: SLA
 verdicts agree on both graded metrics, TTFT and provisioned replica-time
 agree within single-digit percent, and the forecast policy's ITL differs by
-\SI{1.8}{\milli\second} (18.6\%, on a \SI{9.7}{\milli\second} base, far under
+\SI{1.8}{\milli\second} (18.0\%, on a \SI{9.7}{\milli\second} base, far under
 the \SI{100}{\milli\second} bound). The divergences that do exist
 (identified, explained, one fixed on a local branch to be proposed upstream)
 are properties of the harnesses, not of the policies compared here.
