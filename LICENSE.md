@@ -38,17 +38,15 @@ the provenance database dump in the archived record) are licensed under
 the Creative Commons Attribution 4.0 International License (CC-BY 4.0):
 https://creativecommons.org/licenses/by/4.0/. Attribution: Giovanni
 Oliveira, "Forecast-informed vision-pool provisioning for
-modality-disaggregated model serving", IME-USP, 2026 — DOI
-10.5281/zenodo.21654632.
+modality-disaggregated model serving", IME-USP, 2026 —
+https://github.com/giovanni-turing/thesis/releases/tag/v1.0.
 
 ## Third-party material (respective upstream licenses)
 
-- `template/modelo-latex/` and the vendored `tex/*.sty` files: the
+- The vendored `tex/*.sty` files: the
   IME-USP LaTeX model, MIT License (upstream:
   https://github.com/ccsl-usp/modelo-latex; see its LICENSE).
 - The Azure multimodal inference trace is NOT redistributed here; obtain
   it from its upstream under its own terms.
 - Model weights (`Qwen/Qwen3-VL-8B-Instruct`) are NOT redistributed;
   only content hashes are recorded.
-- Vendored skill/data snapshots from `ai-dynamo/*` and `rapidsai/*`
-  projects retain their upstream licenses (Apache-2.0 unless noted).

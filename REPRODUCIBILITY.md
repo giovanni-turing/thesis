@@ -77,14 +77,9 @@ cardinality- and content-freshness guards (`v_mv_stale`,
 
 This repository, its full git history (as a git bundle in which every
 thesis-repository evidence pin above resolves; external-repository
-commits are cited against their own upstreams), and a `pg_dump` of the
-settled provenance schema are being archived under the **reserved DOI
-[10.5281/zenodo.21654632](https://doi.org/10.5281/zenodo.21654632)**
-(record registration pending publication --- this section flips tense
-when the DOI resolves publicly)
+commits are cited against their own upstreams), a `pg_dump` of the
+settled provenance schema, the dissertation PDF and the git history of
+its text are published as the GitHub release
+[v1.0](https://github.com/giovanni-turing/thesis/releases/tag/v1.0) (tag `v1.0` = the research cutoff commit `de5eb35`)
 (author ORCID [0000-0003-3682-1188](https://orcid.org/0000-0003-3682-1188)).
-Corrections after examination will appear as new versions grouped under
-the Zenodo concept DOI assigned at publication (Zenodo mints the
-version DOI and the concept DOI as distinct identifiers when the record
-first publishes; both will be reported here). The GitHub repository (`gio-turing/thesis`) remains the live
-mirror.
+Corrections after examination will appear as new releases.
